@@ -102,7 +102,7 @@ import org.matsim.vehicles.VehicleType;
           > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
         Carrier auxiliaryCarrier =
-            CarrierSchedulerUtils.solveVrpWithJspritWithToll(
+            CarrierSchedulerUtils.solveVrpWithJsprit(
                 createAuxiliaryCarrier(
                     shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
                 resource.getNetwork(), rpscheme);
@@ -119,7 +119,7 @@ import org.matsim.vehicles.VehicleType;
 
     if (!shipmentsInCurrentTour.isEmpty()) {
       Carrier auxiliaryCarrier =
-          CarrierSchedulerUtils.solveVrpWithJspritWithToll(
+          CarrierSchedulerUtils.solveVrpWithJsprit(
               createAuxiliaryCarrier(
                   shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
               resource.getNetwork(), rpscheme);

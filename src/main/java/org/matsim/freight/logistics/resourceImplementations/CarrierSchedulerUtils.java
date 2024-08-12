@@ -19,6 +19,8 @@ import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
 
+import javax.annotation.Nullable;
+
 /**
  * This class contains some code fragments, that are used in the different *CarrierScheduler
  * classes. To avoid code duplication these methods are extracted and located here more centralized.
@@ -33,21 +35,42 @@ public class CarrierSchedulerUtils {
    * <p>
    * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
    * So, maybe this can be more simplify.
-   * <p>
+   *
+   * @deprecated please inline; use #solveVrpWithJsprit(Carrier, Network, RoadPricingScheme) instead.
    *
    * @param carrier               Carrier for which the problem should be solved
    * @param network               the underlying network to create the network based transport costs
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
-   * @Todo: include toll in the NetbasedCosts (if set), so it is also pat of the VRP
-   * <li> Pro: saves computation times,
-   * <li> Con: There is now update of the costs if the network (load) changes.
-   * <li> --> do it at least per Carrier or generally or stay as it is? --> Discuss with KN
    */
+  @Deprecated
   public static Carrier solveVrpWithJsprit(Carrier carrier, Network network) {
-    NetworkBasedTransportCosts netbasedTransportCosts =
-            NetworkBasedTransportCosts.Builder.newInstance(
-                            network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
-                    .build();
+    return solveVrpWithJsprit(carrier, network, null);
+  }
+
+  /**
+   * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
+   * If a roadPricingScheme is given, the tolls are considered in the routing costs.
+   * <p>
+   * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
+   * So, maybe this can be more simplify.
+   *
+   * @param carrier           Carrier for which the problem should be solved
+   * @param network           the underlying network to create the network based transport costs
+   * @param roadPricingScheme (MATSim's) road pricing scheme from the roadpricing contrib. If null, no tolls are considered.
+   * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
+   */
+  public static Carrier solveVrpWithJsprit(
+          Carrier carrier, Network network, RoadPricingScheme roadPricingScheme) {
+    NetworkBasedTransportCosts netbasedTransportCosts;
+    if (roadPricingScheme != null) {
+      netbasedTransportCosts = NetworkBasedTransportCosts.Builder.newInstance(network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
+              .setRoadPricingScheme(roadPricingScheme)
+              .build();
+    } else {
+      log.debug("RoadPricingScheme is null. Tolls cannot be considered.");
+      netbasedTransportCosts = NetworkBasedTransportCosts.Builder.newInstance(network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
+              .build();
+    }
 
     VehicleRoutingProblem vrp =
             MatsimJspritFactory.createRoutingProblemBuilder(carrier, network)
@@ -63,61 +86,14 @@ public class CarrierSchedulerUtils {
       jspritIterations = 1;
     }
 
-    VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-    algorithm.setMaxIterations(jspritIterations);
-
-    VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
+    VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
+    vra.setMaxIterations(jspritIterations);
+    VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
 
     CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
     NetworkRouter.routePlan(plan, netbasedTransportCosts);
     carrier.setSelectedPlan(plan);
     return carrier;
-  }
-
-  /**
-   * First try with tolls.
-   * Rest is the same as {@link #solveVrpWithJsprit(Carrier, Network)}.
-   * //TODO: Combine this method with the untolled version {@link #solveVrpWithJsprit(Carrier, Network)}.
-   * @param carrier           Carrier for which the problem should be solved
-   * @param network           the underlying network to create the network based transport costs
-   * @param roadPricingScheme (MATSim's) road pricing scheme from the roadpricing contrib
-   * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
-   */
-  public static Carrier solveVrpWithJspritWithToll(Carrier carrier, Network network, RoadPricingScheme roadPricingScheme) {
-    if (roadPricingScheme != null) {
-      NetworkBasedTransportCosts netbasedTransportCosts =
-          NetworkBasedTransportCosts.Builder.newInstance(
-                  network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
-              .setRoadPricingScheme(roadPricingScheme)
-              .build();
-
-      VehicleRoutingProblem vrp =
-          MatsimJspritFactory.createRoutingProblemBuilder(carrier, network)
-                  .setRoutingCost(netbasedTransportCosts)
-                  .build();
-
-      //If jspritIterations are not set (get.... returns a negativ value), set it to 1
-      int jspritIterations;
-      if (CarriersUtils.getJspritIterations(carrier) >= 1) {
-        jspritIterations = CarriersUtils.getJspritIterations(carrier);
-      } else  {
-        log.info("Jsprit iterations are not set (properly) for carrier {}. Set to 1.", carrier.getId());
-        jspritIterations = 1;
-      }
-
-      VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
-      vra.setMaxIterations(jspritIterations);
-      VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
-
-      CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
-      NetworkRouter.routePlan(plan, netbasedTransportCosts);
-      carrier.setSelectedPlan(plan);
-      return carrier;
-
-    } else { //no Toll -> goto previous implementation without toll
-        return solveVrpWithJsprit(carrier, network);
-    }
-
   }
 
   public static Double sumUpScore(List<CarrierPlan> scheduledPlans) {
