@@ -128,8 +128,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			Schedule schedule = insertion.insertion.vehicleEntry.vehicle.getSchedule();
 
 			for (Task task : schedule.getTasks()) {
-				if (task instanceof DrtStopTask) {
-					DrtStopTask stopTask = (DrtStopTask) task;
+				if (task instanceof DrtStopTask stopTask) {
 
 					for (AcceptedDrtRequest request : stopTask.getPickupRequests().values()) {
 						Verify.verify(stopTask.getEndTime() <= request.getLatestStartTime());
@@ -211,12 +210,16 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					beforePickupTask = insertWait(vehicleEntry.vehicle, currentTask, dropoffIdx);
 				}
 			}
+			if(!stops.isEmpty() && stops.size() + 1 > pickupIdx) {
+				//there is an existing stop which was scheduled earlier and was not the destination of the already diverted drive task
+				removeBetween(schedule, beforePickupTask, stops.get(pickupIdx).task);
+			}
 		} else { // insert pickup after an existing stop/stay task
 			StayTask stayTask = null;
 			DrtStopTask stopTask = null;
 			if (pickupIdx == 0) {
 				if (scheduleStatus == ScheduleStatus.PLANNED) {// PLANNED schedule
-					stayTask = (StayTask)schedule.getTasks().get(0);
+					stayTask = (StayTask)schedule.getTasks().getFirst();
 					stayTask.setEndTime(stayTask.getBeginTime());// could get later removed with ScheduleTimingUpdater
 				} else if (STAY.isBaseTypeOf(currentTask)) {
 					stayTask = (StayTask)currentTask; // ongoing stay task
