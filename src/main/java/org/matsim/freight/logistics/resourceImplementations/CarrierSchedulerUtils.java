@@ -19,8 +19,6 @@ import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
 
-import javax.annotation.Nullable;
-
 /**
  * This class contains some code fragments, that are used in the different *CarrierScheduler
  * classes. To avoid code duplication these methods are extracted and located here more centralized.
@@ -109,7 +107,7 @@ public class CarrierSchedulerUtils {
   /**
    * Sum up the jsprit score of the given list of CarrierPlans.
    * As a consequence this is not from the one and only jsprit run, but from all jsprit runs af the different auxiliary carriers.
-   * @param scheduledPlans
+   * @param scheduledPlans the scheduled plans with the jsprit results
    * @return the summ of the scores coming from jsprit
    */
   public static Double sumUpJspritScore(List<CarrierPlan> scheduledPlans) {
