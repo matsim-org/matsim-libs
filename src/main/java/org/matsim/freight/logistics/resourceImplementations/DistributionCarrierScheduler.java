@@ -181,9 +181,9 @@ import org.matsim.vehicles.VehicleType;
         CarrierService.Builder.newInstance(serviceId, tuple.getLspShipment().getTo());
     builder.setCapacityDemand(tuple.getLspShipment().getSize());
     builder.setServiceDuration(tuple.getLspShipment().getDeliveryServiceTime());
-    CarrierService service = builder.build();
-    pairs.add(new LSPCarrierPair(tuple, service));
-    return service;
+    CarrierService carrierService = builder.build();
+    pairs.add(new LSPCarrierPair(tuple, carrierService));
+    return carrierService;
   }
 
   @Override
@@ -196,12 +196,12 @@ import org.matsim.vehicles.VehicleType;
             LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
             for (LSPCarrierPair pair : pairs) {
               if (pair.tuple == carrierPair.tuple
-                  && pair.service.getId() == carrierPair.service.getId()) {
+                  && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
                 addShipmentLoadElement(tuple, tour, serviceActivity);
                 addShipmentTransportElement(tuple, tour, serviceActivity);
                 addShipmentUnloadElement(tuple, tour, serviceActivity);
-                addDistributionTourStartEventHandler(pair.service, tuple, resource, tour);
-                addDistributionServiceEventHandler(pair.service, tuple, resource);
+                addDistributionTourStartEventHandler(pair.carrierService, tuple, resource, tour);
+                addDistributionServiceEventHandler(pair.carrierService, tuple, resource);
               }
             }
           }
@@ -294,10 +294,10 @@ import org.matsim.vehicles.VehicleType;
       }
     }
     int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-    ServiceActivity service = (ServiceActivity) tour.getTourElements().get(serviceIndex);
+    ServiceActivity serviceAct = (ServiceActivity) tour.getTourElements().get(serviceIndex);
 
-    final double startTime = service.getExpectedArrival();
-    final double endTime = startTime + service.getDuration();
+    final double startTime = serviceAct.getExpectedArrival();
+    final double endTime = startTime + serviceAct.getDuration();
     Assert.isTrue(
         endTime >= startTime,
         "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
@@ -369,13 +369,5 @@ import org.matsim.vehicles.VehicleType;
     }
   }
 
-  static class LSPCarrierPair {
-    private final LspShipmentWithTime tuple;
-    private final CarrierService service;
-
-    public LSPCarrierPair(LspShipmentWithTime tuple, CarrierService service) {
-      this.tuple = tuple;
-      this.service = service;
-    }
-  }
+  private record LSPCarrierPair(LspShipmentWithTime tuple, CarrierService carrierService) {}
 }

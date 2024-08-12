@@ -603,7 +603,7 @@ import org.matsim.vehicles.VehicleType;
     public void handleEvent(CarrierTourEndEvent event) {
       score++;
       // use event handlers to compute score.  In this case, score is incremented by one every time
-      // a service and a tour ends.
+      // a CarrierService and a tour ends.
     }
 
     @Override
@@ -615,7 +615,7 @@ import org.matsim.vehicles.VehicleType;
     public void handleEvent(CarrierServiceEndEvent event) {
       score++;
       // use event handlers to compute score.  In this case, score is incremented by one every time
-      // a service and a tour ends.
+      // a CarrierService and a tour ends.
     }
   }
 }

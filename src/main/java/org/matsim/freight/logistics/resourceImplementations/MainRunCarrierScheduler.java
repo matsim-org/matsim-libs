@@ -241,12 +241,12 @@ import org.matsim.vehicles.VehicleType;
                     lspShipmentWithTime, serviceActivity.getService());
             for (LSPShipmentCarrierServicePair pair : pairs) {
               if (pair.tuple == carrierPair.tuple
-                  && pair.service.getId() == carrierPair.service.getId()) {
+                  && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
                 addShipmentLoadElement(lspShipmentWithTime, tour);
                 addShipmentTransportElement(lspShipmentWithTime, tour, serviceActivity);
                 addShipmentUnloadElement(lspShipmentWithTime, tour, serviceActivity);
-                addMainTourRunStartEventHandler(pair.service, lspShipmentWithTime, resource, tour);
-                addMainRunTourEndEventHandler(pair.service, lspShipmentWithTime, resource, tour);
+                addMainTourRunStartEventHandler(pair.carrierService, lspShipmentWithTime, resource, tour);
+                addMainRunTourEndEventHandler(pair.carrierService, lspShipmentWithTime, resource, tour);
               }
             }
           }
@@ -386,5 +386,5 @@ import org.matsim.vehicles.VehicleType;
     }
   }
 
-  private record LSPShipmentCarrierServicePair(LspShipmentWithTime tuple, CarrierService service) {}
+  private record LSPShipmentCarrierServicePair(LspShipmentWithTime tuple, CarrierService carrierService) {}
 }

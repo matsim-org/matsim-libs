@@ -94,9 +94,9 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
     builder.setServiceStartTimeWindow(tuple.getLspShipment().getPickupTimeWindow());
     builder.setCapacityDemand(tuple.getLspShipment().getSize());
     builder.setServiceDuration(tuple.getLspShipment().getDeliveryServiceTime());
-    CarrierService service = builder.build();
-    pairs.add(new LSPCarrierPair(tuple, service));
-    return service;
+    CarrierService carrierService = builder.build();
+    pairs.add(new LSPCarrierPair(tuple, carrierService));
+    return carrierService;
   }
 
   @Override
@@ -109,12 +109,12 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
             LSPCarrierPair carrierPair = new LSPCarrierPair(tuple, serviceActivity.getService());
             for (LSPCarrierPair pair : pairs) {
               if (pair.tuple == carrierPair.tuple
-                  && pair.service.getId() == carrierPair.service.getId()) {
+                  && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
                 addShipmentLoadElement(tuple, tour, serviceActivity);
                 addShipmentTransportElement(tuple, tour, serviceActivity);
                 addShipmentUnloadElement(tuple, tour, serviceActivity);
-                addCollectionTourEndEventHandler(pair.service, tuple, resource, tour);
-                addCollectionServiceEventHandler(pair.service, tuple, resource);
+                addCollectionTourEndEventHandler(pair.carrierService, tuple, resource, tour);
+                addCollectionServiceEventHandler(pair.carrierService, tuple, resource);
               }
             }
           }
@@ -246,5 +246,5 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
     return unloadEndTime;
   }
 
-  private record LSPCarrierPair(LspShipmentWithTime tuple, CarrierService service) {}
+  private record LSPCarrierPair(LspShipmentWithTime tuple, CarrierService carrierService) {}
 }
