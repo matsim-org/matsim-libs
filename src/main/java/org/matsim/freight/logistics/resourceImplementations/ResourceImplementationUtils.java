@@ -214,7 +214,7 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Utils method to create a  DistributionCarrierScheduler
+   * Utils method to create a DistributionCarrierScheduler
    *  TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
@@ -224,7 +224,7 @@ public class ResourceImplementationUtils {
   }
 
   /**
-   * Utils method to create a  Collection CarrierScheduler
+   * Utils method to create a CollectionCarrierScheduler
    * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
@@ -233,8 +233,14 @@ public class ResourceImplementationUtils {
     return new CollectionCarrierScheduler(scenario);
   }
 
-  public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
-    return new MainRunCarrierScheduler();
+  /**
+   * Utils method to create a MainRunCarrierScheduler
+   * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
+   */
+  public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler(Scenario scenario) {
+    return new MainRunCarrierScheduler(scenario);
   }
 
   public enum VehicleReturn {

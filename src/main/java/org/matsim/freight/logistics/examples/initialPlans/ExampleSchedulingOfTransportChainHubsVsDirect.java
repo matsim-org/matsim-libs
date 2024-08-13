@@ -267,7 +267,7 @@ import org.matsim.vehicles.VehicleType;
               .setFromLinkId(depotLinkId)
               .setToLinkId(hubLinkId)
               .setMainRunCarrierScheduler(
-                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
               .build();
 
       mainRunElement =

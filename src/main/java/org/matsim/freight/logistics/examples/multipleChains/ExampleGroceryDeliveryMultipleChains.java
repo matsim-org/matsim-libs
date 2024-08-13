@@ -231,7 +231,7 @@ final class ExampleGroceryDeliveryMultipleChains {
                     mainCarrier, scenario.getNetwork())
                 .setFromLinkId(depotLinkFromVehicles)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();

@@ -145,7 +145,7 @@ public class CompleteLSPSchedulingTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(toLinkId)
 				.build();

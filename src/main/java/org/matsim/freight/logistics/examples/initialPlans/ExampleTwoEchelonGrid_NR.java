@@ -299,7 +299,7 @@ final class ExampleTwoEchelonGrid_NR {
           ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
               .setFromLinkId(DEPOT_LINK_ID)
               .setMainRunCarrierScheduler(
-                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
               .setToLinkId(HUB_LINK_ID)
               .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
               .build();

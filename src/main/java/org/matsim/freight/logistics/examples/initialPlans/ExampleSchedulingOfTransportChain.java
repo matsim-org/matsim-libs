@@ -152,7 +152,7 @@ import org.matsim.vehicles.VehicleType;
         ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
             .setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
             .setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-            .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+            .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
             .build();
 
     // The LogisticsSolutionElement for the main run Resource is created

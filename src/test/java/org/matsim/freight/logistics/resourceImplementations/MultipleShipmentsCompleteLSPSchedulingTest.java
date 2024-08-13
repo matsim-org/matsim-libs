@@ -147,7 +147,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 
 		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(toLinkId)
 				.build();

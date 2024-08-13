@@ -145,7 +145,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 
 
 		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(Id.createLinkId(toLinkId))
 				.build();

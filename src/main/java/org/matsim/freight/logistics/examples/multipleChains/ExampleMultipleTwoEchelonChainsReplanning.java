@@ -206,7 +206,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft, network)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LEFT_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -284,7 +284,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_RIGHT_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();

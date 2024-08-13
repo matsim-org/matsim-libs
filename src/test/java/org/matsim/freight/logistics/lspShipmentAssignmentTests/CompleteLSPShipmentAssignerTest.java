@@ -133,7 +133,7 @@ public class CompleteLSPShipmentAssignerTest {
 
 
 		LSPResource mainRunResource  = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();

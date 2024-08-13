@@ -202,7 +202,7 @@ final class ExampleMultipleMixedEchelonChains {
                     mainCarrier1, network)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -319,7 +319,7 @@ final class ExampleMultipleMixedEchelonChains {
                     mainCarrier, network)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();

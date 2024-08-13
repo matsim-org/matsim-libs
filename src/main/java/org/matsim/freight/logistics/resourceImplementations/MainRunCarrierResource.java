@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.MainRunCarrierResourceBuilder;
@@ -43,7 +42,6 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
   private final MainRunCarrierScheduler mainRunScheduler;
 
   private final ResourceImplementationUtils.VehicleReturn vehicleReturn;
-  private final Network network;
 
   MainRunCarrierResource(MainRunCarrierResourceBuilder builder) {
     super(builder.getId());
@@ -58,7 +56,6 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
       log.warn("Return behaviour was not specified. Using the following setting as default: {}", ResourceImplementationUtils.VehicleReturn.endAtToLink);
       this.vehicleReturn = ResourceImplementationUtils.VehicleReturn.endAtToLink;
     }
-    this.network = builder.getNetwork();
   }
 
   @Override
@@ -83,10 +80,6 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 
   public Carrier getCarrier() {
     return carrier;
-  }
-
-  public Network getNetwork() {
-    return network;
   }
 
   public ResourceImplementationUtils.VehicleReturn getVehicleReturn() {
