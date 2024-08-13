@@ -213,33 +213,23 @@ public class ResourceImplementationUtils {
     carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType);
   }
 
+  /**
+   * Utils method to create a  DistributionCarrierScheduler
+   *  TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
+   */
   public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler(Scenario scenario) {
     return new DistributionCarrierScheduler(scenario);
   }
 
-  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler(Scenario scenario) {
-    return new CollectionCarrierScheduler(scenario);
-  }
-
   /**
-   * Utils method to create a  DistributionCarrierScheduler with Roadpricing.
-   *  TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
-   *
-   * @param scenario the scenario
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
-   */
-  public static DistributionCarrierScheduler createDefaultDistributionCarrierSchedulerWithRoadPricing(Scenario scenario) {
-    return new DistributionCarrierScheduler(scenario);
-  }
-
-  /**
-   * Utils method to create a  Collection CarrierScheduler with Roadpricing.
+   * Utils method to create a  Collection CarrierScheduler
    * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
    */
-  public static CollectionCarrierScheduler createDefaultCollectionCarrierSchedulerWithRoadPricing(Scenario scenario) {
+  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler(Scenario scenario) {
     return new CollectionCarrierScheduler(scenario);
   }
 

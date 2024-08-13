@@ -364,9 +364,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             distributionCarrier, scenario.getNetwork())
-                    .setDistributionScheduler(
-//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
-                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+                    .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement distributionCarrierElement =
@@ -438,7 +436,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             directCarrier, scenario.getNetwork())
                     .setDistributionScheduler(
-//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
                               ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
