@@ -95,8 +95,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	private double receiverPointGap = 250.;
 
-	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-	private String[] consideredActivitiesForDamageCalculation = {"home", "work"};
+	private String[] consideredActivitiesForReceiverPointGrid = {"home*", "work*"};
+	private String[] consideredActivitiesForDamageCalculation = {"home*", "work*"};
 
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;

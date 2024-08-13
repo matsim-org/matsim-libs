@@ -13,7 +13,7 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String APPLY_UPPER_BOUND = "applyUpperBound";
     public static final String UPPER_BOUND_FACTOR = "upperBoundFactor";
 
-    public enum PtFareCalculationModels {distanceBased} // More to come (e.g. zone based, hybrid...)
+    public enum PtFareCalculationModels {distanceBased, fareZoneBased} // More to come (e.g. zone based, hybrid...)
 
     private static final String PT_FARE_CALCULATION_CMT = "PT fare calculation scheme. Current implementation: distanceBased (more to come...)";
     public static final String UPPER_BOUND_FACTOR_CMT = "When upper bound is applied, upperBound  = upperBoundFactor * max Fare of the day. " +
