@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -109,6 +110,7 @@ public class TestForEmergenceTime {
 		sc.getVehicles().addVehicleType(car);
 
 		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 

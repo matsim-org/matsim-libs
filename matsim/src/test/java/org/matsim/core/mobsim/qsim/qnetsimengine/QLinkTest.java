@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -313,6 +314,7 @@ public final class QLinkTest {
 	@ValueSource(booleans = {true, false})
 	void testBuffer(boolean isUsingFastCapacityUpdate) {
 		Config conf = utils.loadConfig((String)null);
+		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		conf.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
@@ -543,6 +545,7 @@ public final class QLinkTest {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
+		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MatsimRandom.reset(4711); // yyyyyy !!!!!!
 		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -622,6 +625,7 @@ public final class QLinkTest {
 			this.scenario.getConfig().qsim().setStuckTime(100);
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			this.scenario.getConfig().qsim().setUsingFastCapacityUpdate(usingFastCapacityUpdate);
+			this.scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			Network network = (Network) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);

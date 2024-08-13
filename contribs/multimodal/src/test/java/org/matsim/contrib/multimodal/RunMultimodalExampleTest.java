@@ -20,8 +20,9 @@ public class RunMultimodalExampleTest{
 		URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "berlin" ), "config_multimodal.xml" );;
 
 		String [] args = { url.toString(),
-				"--config:controler.outputDirectory" , utils.getOutputDirectory()
-		} ;
+				"--config:controler.outputDirectory" , utils.getOutputDirectory(),
+				"--config:routing.networkRouteConsistencyCheck", "disable"
+		} ;;
 
 		try{
 			RunMultimodalExample.main( args );

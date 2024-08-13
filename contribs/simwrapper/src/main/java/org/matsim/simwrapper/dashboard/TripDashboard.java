@@ -506,4 +506,5 @@ public class TripDashboard implements Dashboard {
 
 		}
 	}
+
 }

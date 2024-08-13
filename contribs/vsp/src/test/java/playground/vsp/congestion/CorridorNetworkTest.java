@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -68,7 +69,7 @@ public class CorridorNetworkTest {
 	void v3Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
-		
+
 		List<CongestionEvent> v3_events = getCongestionEvents("v3", sc);
 
 		Assertions.assertEquals(6, v3_events.size(), MatsimTestUtils.EPSILON, "wrong number of congestion events");
@@ -83,27 +84,27 @@ public class CorridorNetworkTest {
 			} else if ( event.getAffectedAgentId().equals(Id.createPersonId(3)) ) { // agent 3 is delayed on link 2 due to agent 2, 1
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(2))) {
-					
+
 					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				} else {
-				
+
 					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				}
 
-			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec) 
+			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec)
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(3))){
-				
+
 					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				} else if (event.getCausingAgentId().equals(Id.createPersonId(2))){
-					
+
 					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				} else {
-					
+
 					Assertions.assertEquals("1", event.getCausingAgentId().toString(), "wrong causing agent");
 					Assertions.assertEquals(1, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 				}
@@ -130,35 +131,35 @@ public class CorridorNetworkTest {
 			} else if ( event.getAffectedAgentId().equals(Id.createPersonId(3)) ) { // agent 3 is delayed on link 2 due to agent 2, 1
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(2))) {
-					
+
 					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				} else {
-				
+
 					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
+
 				}
 
-			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec) 
+			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec)
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(3)) ){
 					if ( event.getTime() == 10.0 ) {
-						
+
 						Assertions.assertEquals(3, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-					
+
 					} else {
-					
+
 						Assertions.assertEquals(18.0, event.getTime(), MatsimTestUtils.EPSILON, "wrong congestion event time");
 						Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-					
+
 					}
-					
+
 				} else {
-					
+
 					Assertions.assertEquals("2", event.getCausingAgentId().toString(), "wrong causing agent");
 					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
-				
-				} 
+
+				}
 			}
 		}
 	}
@@ -173,7 +174,7 @@ public class CorridorNetworkTest {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -188,7 +189,7 @@ public class CorridorNetworkTest {
 				LogManager.getLogger( CorridorNetworkTest.class ).warn( event );
 			}
 		});
-		
+
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
 			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
 		}
@@ -204,10 +205,10 @@ public class CorridorNetworkTest {
 	private class CorridorNetworkAndPlans {
 
 		/**
-		 * generates network with 3 links. 
-		 *<p>			
+		 * generates network with 3 links.
+		 *<p>
 		 *<p>  o--0---o---1---o---2---o---3---o
-		 *<p>				  
+		 *<p>
 		 */
 		Scenario scenario;
 		Config config;
@@ -221,6 +222,7 @@ public class CorridorNetworkTest {
 
 		CorridorNetworkAndPlans(){
 			config=ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();

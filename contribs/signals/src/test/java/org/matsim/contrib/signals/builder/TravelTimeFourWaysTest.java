@@ -30,6 +30,7 @@ import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
@@ -77,6 +78,8 @@ public class TravelTimeFourWaysTest {
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
+		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
 		signalsConfig.setUseSignalSystems(true);
