@@ -87,7 +87,7 @@ public class CompleteLogisticChainTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		CollectionCarrierResourceBuilder collectionResourceBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder
-				.newInstance(collectionCarrier, network);
+				.newInstance(collectionCarrier);
 		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 

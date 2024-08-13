@@ -85,7 +85,7 @@ import org.matsim.vehicles.VehicleType;
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
     LSPResource lspResource =
         ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
-                carrier, scenario.getNetwork())
+                carrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)

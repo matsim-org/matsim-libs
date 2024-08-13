@@ -290,21 +290,19 @@ public class ResourceImplementationUtils {
 
     final Id<LSPResource> id;
     final ArrayList<LogisticChainElement> clientElements;
-    final Network network;
     final Carrier carrier;
     Id<Link> locationLinkId;
     CollectionCarrierScheduler collectionScheduler;
 
-    private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
+    private CollectionCarrierResourceBuilder(Carrier carrier) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
       setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
-      this.network = network;
     }
 
-    public static CollectionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-      return new CollectionCarrierResourceBuilder(carrier, network);
+    public static CollectionCarrierResourceBuilder newInstance(Carrier carrier) {
+      return new CollectionCarrierResourceBuilder(carrier);
     }
 
     public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {

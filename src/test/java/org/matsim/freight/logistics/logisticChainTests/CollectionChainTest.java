@@ -75,7 +75,7 @@ public class CollectionChainTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 		LSPCarrierResource carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder
-				.newInstance(carrier, network)
+				.newInstance(carrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();

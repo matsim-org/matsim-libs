@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
@@ -37,14 +36,12 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
   private final Carrier carrier;
   private final List<LogisticChainElement> clientElements;
   private final CollectionCarrierScheduler collectionScheduler;
-  private final Network network;
 
   CollectionCarrierResource(CollectionCarrierResourceBuilder builder) {
     super(builder.id);
     this.collectionScheduler = builder.collectionScheduler;
     this.clientElements = builder.clientElements;
     this.carrier = builder.carrier;
-    this.network = builder.network;
   }
 
   @Override
@@ -85,7 +82,4 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
     return carrier;
   }
 
-  public Network getNetwork() {
-    return network;
-  }
 }

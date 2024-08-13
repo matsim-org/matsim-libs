@@ -101,7 +101,7 @@ public class AssignerRequirementsTest {
 		Carrier redCarrier = CarriersUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		LSPResource redCollectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+		LSPResource redCollectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
@@ -133,7 +133,7 @@ public class AssignerRequirementsTest {
 		Carrier blueCarrier = CarriersUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		LSPResource blueCollectionResource  = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+		LSPResource blueCollectionResource  = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();

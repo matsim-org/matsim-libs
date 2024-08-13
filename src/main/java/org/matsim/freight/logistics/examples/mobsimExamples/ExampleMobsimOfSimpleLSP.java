@@ -181,7 +181,7 @@ import org.matsim.vehicles.VehicleType;
 
     // The Resource i.e. the Resource is created
     LSPResource collectionResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)

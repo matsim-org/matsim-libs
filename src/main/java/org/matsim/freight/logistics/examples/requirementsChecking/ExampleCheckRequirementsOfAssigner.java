@@ -96,7 +96,7 @@ class ExampleCheckRequirementsOfAssigner {
     redCarrier.setCarrierCapabilities(redCapabilities);
 
     LSPResource redResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
@@ -132,7 +132,7 @@ class ExampleCheckRequirementsOfAssigner {
     blueCarrier.setCarrierCapabilities(blueCapabilities);
 
     LSPResource blueResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)

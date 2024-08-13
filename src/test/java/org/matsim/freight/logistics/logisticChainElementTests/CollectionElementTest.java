@@ -74,7 +74,7 @@ public class CollectionElementTest {
 		Carrier carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+		carrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();

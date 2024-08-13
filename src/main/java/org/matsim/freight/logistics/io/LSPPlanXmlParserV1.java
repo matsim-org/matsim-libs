@@ -315,7 +315,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         switch (ResourceImplementationUtils.getCarrierType(currentCarrier)) {
           case collectionCarrier -> lspResource =
               ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
-                      currentCarrier, null)
+                      currentCarrier)
                   .setCollectionScheduler(
                       ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(null))
                   .build();
