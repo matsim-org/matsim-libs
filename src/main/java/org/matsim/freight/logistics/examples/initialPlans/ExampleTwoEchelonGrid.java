@@ -47,8 +47,8 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -391,7 +391,7 @@ final class ExampleTwoEchelonGrid {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : createInitialLSPShipments(network)) {
+    for (LspShipment lspShipment : createInitialLSPShipments(network)) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -401,15 +401,15 @@ final class ExampleTwoEchelonGrid {
     return lsp;
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    List<LSPShipment> shipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    List<LspShipment> shipmentList = new ArrayList<>();
 
     switch (demandSetting) {
       case oneCustomer -> {
-        Id<LSPShipment> id = Id.create("Shipment_" + 1, LSPShipment.class);
+        Id<LspShipment> id = Id.create("Shipment_" + 1, LspShipment.class);
         int capacityDemand = 1;
 
-        ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         builder.setCapacityDemand(capacityDemand);
         builder.setFromLinkId(DEPOT_LINK_ID);
@@ -439,9 +439,9 @@ final class ExampleTwoEchelonGrid {
         }
 
         for (int i = 1; i <= 10; i++) {
-          Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
-          ShipmentUtils.LSPShipmentBuilder builder =
-              ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+          Id<LspShipment> id = Id.create("Shipment_" + i, LspShipment.class);
+          LspShipmentUtils.LspShipmentBuilder builder =
+              LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
           int capacityDemand =
               rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to bound (excl) -> adding 1.

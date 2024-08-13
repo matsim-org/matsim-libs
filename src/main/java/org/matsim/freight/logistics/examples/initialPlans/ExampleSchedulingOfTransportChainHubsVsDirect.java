@@ -49,8 +49,8 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandle
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.lspReplanning.AssignmentStrategyFactory;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -121,7 +121,7 @@ import org.matsim.vehicles.VehicleType;
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : createInitialLSPShipments(scenario.getNetwork())) {
+    for (LspShipment lspShipment : createInitialLSPShipments(scenario.getNetwork())) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -542,13 +542,13 @@ import org.matsim.vehicles.VehicleType;
         .build();
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
     Random rand = new Random(1);
     for (int i = 1; i < 6; i++) {
-      Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-      ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+      Id<LspShipment> id = Id.create(i, LspShipment.class);
+      LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
       int capacityDemand = rand.nextInt(10);
       builder.setCapacityDemand(capacityDemand);
 
@@ -575,7 +575,7 @@ import org.matsim.vehicles.VehicleType;
       TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
       builder.setStartTimeWindow(startTimeWindow);
       builder.setDeliveryServiceTime(capacityDemand * 60);
-      LSPShipment lspShipment = builder.build();
+      LspShipment lspShipment = builder.build();
       shipmentList.add(lspShipment);
     }
     return shipmentList;

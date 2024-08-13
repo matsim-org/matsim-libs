@@ -28,8 +28,8 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 @Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
@@ -59,8 +59,8 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
             plan.setInitialShipmentAssigner(assigner);
             //				LSP lsp = assigner.getLSP();
             LSP lsp = plan.getLSP();
-            Collection<LSPShipment> lspShipments = lsp.getLspShipments();
-            for (LSPShipment lspShipment : lspShipments) {
+            Collection<LspShipment> lspShipments = lsp.getLspShipments();
+            for (LspShipment lspShipment : lspShipments) {
               assigner.assignToPlan(plan, lspShipment);
             }
 
@@ -72,8 +72,8 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
               }
             }
 
-            for (LSPShipment lspShipment : plan.getLSP().getLspShipments()) {
-              ShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).clear();
+            for (LspShipment lspShipment : plan.getLSP().getLspShipments()) {
+              LspShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).clear();
               lspShipment.getShipmentLog().clear();
               plan.getInitialShipmentAssigner().assignToPlan(plan, lspShipment);
             }

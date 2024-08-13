@@ -23,19 +23,19 @@ package org.matsim.freight.logistics.resourceImplementations;
 import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * In the class SimpleForwardSolutionScheduler two tasks are performed:
  *
- * <p>1.) the {@link LSPShipment}s that were assigned to the suitable {@link LogisticChain} by the
+ * <p>1.) the {@link LspShipment}s that were assigned to the suitable {@link LogisticChain} by the
  * {@link InitialShipmentAssigner} in a previous step are handed over to the first {@link
  * LogisticChainElement}.
  *
  * <p>2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
  * exogenously, are now scheduled sequentially in an order that was also specified exogenously. This
  * order ensures that each {@link LogisticChain} is traversed from the first to the last {@link
- * LogisticChainElement}. During this procedure, the concerned {@link LSPShipment}s are taken from
+ * LogisticChainElement}. During this procedure, the concerned {@link LspShipment}s are taken from
  * the collection of incoming shipments, handled by the {@link LSPResource} in charge and then added
  * to the collection of outgoing shipments of the client {@link LogisticChainElement}.
  *
@@ -76,7 +76,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
       LogisticChainElement firstElement = getFirstElement(solution);
       assert firstElement != null;
-      for (Id<LSPShipment> lspShipmentId : solution.getLspShipmentIds()) {
+      for (Id<LspShipment> lspShipmentId : solution.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         assert shipment != null;
         firstElement

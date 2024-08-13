@@ -20,9 +20,22 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LogisticChain;
+import org.matsim.api.core.v01.Id;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
-public interface LSPShipmentRequirement {
+public interface LspShipmentPlanElement {
 
-  boolean checkRequirement(LogisticChain solution);
+  LogisticChainElement getLogisticChainElement();
+
+  Id<LSPResource> getResourceId();
+
+  // yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
+  // 2018, Item 23).  It is, however, probably not
+  // used as a type, but rather as a description.  Rename?
+  String getElementType();
+
+  double getStartTime();
+
+  double getEndTime();
 }

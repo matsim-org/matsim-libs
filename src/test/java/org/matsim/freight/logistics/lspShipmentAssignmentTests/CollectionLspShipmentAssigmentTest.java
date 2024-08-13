@@ -39,11 +39,11 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.CollectionCarrierResourceBuilder;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
-public class CollectionLSPShipmentAssigmentTest {
+public class CollectionLspShipmentAssigmentTest {
 
 	private LSPPlan collectionPlan;
 	private LSP collectionLSP;
@@ -113,8 +113,8 @@ public class CollectionLSPShipmentAssigmentTest {
 
 
 		for (int i = 1; i < 11; i++) {
-			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create(i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
@@ -136,7 +136,7 @@ public class CollectionLSPShipmentAssigmentTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
-			LSPShipment shipment = builder.build();
+			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 	}

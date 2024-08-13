@@ -37,9 +37,9 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubResource;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
  * Writes out resources, shipments and plans for each LSP in an XML-file including header for
@@ -130,7 +130,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
   private void writeShipments(LSP lsp) throws IOException {
     if (lsp.getLspShipments().isEmpty()) return;
     this.writeStartTag(SHIPMENTS, null);
-    for (LSPShipment lspShipment : lsp.getLspShipments()) {
+    for (LspShipment lspShipment : lsp.getLspShipments()) {
       this.writeStartTag(
           SHIPMENT,
           List.of(
@@ -185,7 +185,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
 
       writeStartTag(SHIPMENT_PLANS, null);
       for (LogisticChain chain : plan.getLogisticChains()) {
-        for (Id<LSPShipment> shipmentId : chain.getLspShipmentIds()) {
+        for (Id<LspShipment> shipmentId : chain.getLspShipmentIds()) {
           if (chain.getLspShipmentIds().contains(shipmentId)) {
             this.writeStartTag(
                 SHIPMENT_PLAN,
@@ -193,12 +193,12 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
                     createTuple(SHIPMENT_ID, shipmentId.toString()),
                     createTuple(CHAIN_ID, chain.getId().toString())));
           }
-          LSPShipment lspShipment = LSPUtils.findLspShipment(lsp, shipmentId);
+          LspShipment lspShipment = LSPUtils.findLspShipment(lsp, shipmentId);
           assert lspShipment != null;
-          final Map<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements =
-              ShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).getPlanElements();
-          for (Id<ShipmentPlanElement> elementId : planElements.keySet()) {
-            ShipmentPlanElement element = planElements.get(elementId);
+          final Map<Id<LspShipmentPlanElement>, LspShipmentPlanElement> planElements =
+              LspShipmentUtils.getOrCreateShipmentPlan(plan, lspShipment.getId()).getPlanElements();
+          for (Id<LspShipmentPlanElement> elementId : planElements.keySet()) {
+            LspShipmentPlanElement element = planElements.get(elementId);
             this.writeStartTag(
                 ELEMENT,
                 List.of(

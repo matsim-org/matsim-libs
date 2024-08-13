@@ -33,7 +33,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  *  This strategy removes **all** shipments from the logistic chains and reassigns them.
@@ -73,7 +73,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
             LSP lsp = lspPlan.getLSP();
             Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
-            for (LSPShipment lspShipment : lsp.getLspShipments()) {
+            for (LspShipment lspShipment : lsp.getLspShipments()) {
               if (shipmentCountByChain.isEmpty()) {
                 for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
                   shipmentCountByChain.put(chain, 0);

@@ -41,8 +41,8 @@ import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
@@ -125,14 +125,14 @@ import org.matsim.vehicles.VehicleType;
         .build();
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    List<LSPShipment> shipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    List<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
     // Create five LSPShipments that are located in the left half of the network.
     for (int i = 1; i < 6; i++) {
-      Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-      ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+      Id<LspShipment> id = Id.create(i, LspShipment.class);
+      LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
       Random random = new Random(1);
       int capacityDemand = random.nextInt(4);
       builder.setCapacityDemand(capacityDemand);
@@ -200,10 +200,10 @@ import org.matsim.vehicles.VehicleType;
 
     // Create LSP and lspShipments
     LSP lsp = createLSPWithScorer(scenario);
-    Collection<LSPShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
+    Collection<LspShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
 
     // assign the lspShipments to the LSP
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 

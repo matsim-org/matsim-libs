@@ -50,7 +50,7 @@ import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
 
 final class ExampleGroceryDeliveryMultipleChains {
@@ -320,7 +320,7 @@ final class ExampleGroceryDeliveryMultipleChains {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : createLSPShipmentsFromCarrierShipments(carrier)) {
+    for (LspShipment lspShipment : createLSPShipmentsFromCarrierShipments(carrier)) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 

@@ -20,46 +20,19 @@
 
 package org.matsim.freight.logistics.shipment;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.HasBackpointer;
 
-/*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
+public interface LspShipmentPlan extends HasBackpointer<Id<LspShipment>> {
 
-  private final double startTime;
-  private final double endTime;
-  private final LogisticChainElement element;
-  private final Id<LSPResource> resourceId;
+  Id<LspShipment> getLspShipmentId();
 
-  LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder) {
-    this.startTime = builder.startTime;
-    this.endTime = builder.endTime;
-    this.element = builder.element;
-    this.resourceId = builder.resourceId;
-  }
+  Map<Id<LspShipmentPlanElement>, LspShipmentPlanElement> getPlanElements();
 
-  @Override
-  public LogisticChainElement getLogisticChainElement() {
-    return element;
-  }
+  void addPlanElement(Id<LspShipmentPlanElement> id, LspShipmentPlanElement element);
 
-  @Override
-  public Id<LSPResource> getResourceId() {
-    return resourceId;
-  }
+  LspShipmentPlanElement getMostRecentEntry();
 
-  @Override
-  public String getElementType() {
-    return "HANDLE";
-  }
-
-  @Override
-  public double getStartTime() {
-    return startTime;
-  }
-
-  @Override
-  public double getEndTime() {
-    return endTime;
-  }
+  void clear();
 }

@@ -32,22 +32,22 @@ import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentLeg;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentLeg;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /*package-private*/ class LSPTourEndEventHandler
-    implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
+    implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final CarrierService carrierService;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private final Tour tour;
-  private LSPShipment lspShipment;
+  private LspShipment lspShipment;
 
   public LSPTourEndEventHandler(
-      LSPShipment lspShipment,
+      LspShipment lspShipment,
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
@@ -91,30 +91,30 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
   }
 
   private void logUnload(Id<Carrier> carrierId, double startTime, double endTime) {
-    ShipmentUtils.LoggedShipmentUnloadBuilder builder =
-        ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
+        LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
     builder.setLogisticChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setCarrierId(carrierId);
-    ShipmentPlanElement unload = builder.build();
+    LspShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId().toString()
             + unload.getLogisticChainElement().getId()
             + unload.getElementType();
-    Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
+    Id<LspShipmentPlanElement> unloadId = Id.create(idString, LspShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
   }
 
   private void logTransport(double endTime, Id<Link> endLinkId) {
     String idString = resource.getId().toString() + logisticChainElement.getId() + "TRANSPORT";
-    ShipmentPlanElement abstractPlanElement =
+    LspShipmentPlanElement abstractPlanElement =
         lspShipment
             .getShipmentLog()
             .getPlanElements()
-            .get(Id.create(idString, ShipmentPlanElement.class));
-    if (abstractPlanElement instanceof ShipmentLeg transport) {
+            .get(Id.create(idString, LspShipmentPlanElement.class));
+    if (abstractPlanElement instanceof LspShipmentLeg transport) {
       transport.setEndTime(endTime);
       transport.setToLinkId(endLinkId);
     }
@@ -134,7 +134,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
     return carrierService;
   }
 
-  public LSPShipment getLspShipment() {
+  public LspShipment getLspShipment() {
     return lspShipment;
   }
 
@@ -147,7 +147,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
   }
 
   @Override
-  public void setEmbeddingContainer(LSPShipment pointer) {
+  public void setEmbeddingContainer(LspShipment pointer) {
     this.lspShipment = pointer;
   }
 

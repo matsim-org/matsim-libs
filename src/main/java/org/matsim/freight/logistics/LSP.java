@@ -22,11 +22,11 @@ package org.matsim.freight.logistics;
 
 import java.util.Collection;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * In the class library, the interface LSP has the following tasks: 1. Maintain one or several
- * transport chains through which {@link LSPShipment}s are routed. 2. Assign {@link LSPShipment}s to
+ * transport chains through which {@link LspShipment}s are routed. 2. Assign {@link LspShipment}s to
  * the suitable transport chain. --> {@link InitialShipmentAssigner}. 3. Interact with the agents that
  * embody the demand side of the freight transport market, if they are specified in the setting. 4.
  * Coordinate carriers that are in charge of the physical transport.
@@ -34,7 +34,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<LSP> {
 
   /** yyyy does this have to be exposed? */
-  Collection<LSPShipment> getLspShipments();
+  Collection<LspShipment> getLspShipments();
 
   /** ok (behavioral method) */
   void scheduleLogisticChains();
@@ -48,6 +48,6 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
   /**
    * @param lspShipment ok (LSP needs to be told that it is responsible for lspShipment)
    */
-  void assignShipmentToLSP(LSPShipment lspShipment);
+  void assignShipmentToLSP(LspShipment lspShipment);
 
 }

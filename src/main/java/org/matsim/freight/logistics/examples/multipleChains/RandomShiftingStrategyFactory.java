@@ -36,7 +36,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  *  This strategy removes **one** randomly selected shipment from the logistic chain it was assigned to and reassign it to another chain.
@@ -73,9 +73,9 @@ class RandomShiftingStrategyFactory {
                 LSP lsp = lspPlan.getLSP();
 
                 // Make a new list of lspShipments and pick a random lspShipment from it
-                List<LSPShipment> lspShipments = new ArrayList<>(lsp.getLspShipments());
+                List<LspShipment> lspShipments = new ArrayList<>(lsp.getLspShipments());
                 int shipmentIndex = random.nextInt(lsp.getLspShipments().size());
-                LSPShipment lspShipment = lspShipments.get(shipmentIndex);
+                LspShipment lspShipment = lspShipments.get(shipmentIndex);
 
                 // Find and remove the random lspShipment from its current logistic chain
                 LogisticChain sourceLogisticChain = null;

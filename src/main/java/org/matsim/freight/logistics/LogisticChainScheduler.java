@@ -20,8 +20,10 @@
 
 package org.matsim.freight.logistics;
 
+import org.matsim.freight.logistics.shipment.LspShipment;
+
 /**
- * Serve the purpose of routing a set of {@link org.matsim.freight.logistics.shipment.LSPShipment}s
+ * Serve the purpose of routing a set of {@link LspShipment}s
  * through a set of {@link LogisticChain}s, which, in turn, consist of several {@link
  * LogisticChainElement}s and the corresponding {@link LSPResource}s.
  */

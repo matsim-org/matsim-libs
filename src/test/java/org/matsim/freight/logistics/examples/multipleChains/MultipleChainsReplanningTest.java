@@ -51,9 +51,9 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlan;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -151,7 +151,7 @@ public class MultipleChainsReplanningTest {
 				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
 				.build();
 
-		for (LSPShipment shipment : createInitialLSPShipments()) {
+		for (LspShipment shipment : createInitialLSPShipments()) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
@@ -160,14 +160,14 @@ public class MultipleChainsReplanningTest {
 		return lsp;
 	}
 
-	private static Collection<LSPShipment> createInitialLSPShipments() {
-		List<LSPShipment> shipmentList = new ArrayList<>();
+	private static Collection<LspShipment> createInitialLSPShipments() {
+		List<LspShipment> shipmentList = new ArrayList<>();
 		int capacityDemand = 1;
 
 		for (int i = 1; i <= 10; i++) {
 			if (i % 2 != 0) {
-				Id<LSPShipment> id = Id.create("ShipmentLeft_" + i, LSPShipment.class);
-				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+				Id<LspShipment> id = Id.create("ShipmentLeft_" + i, LspShipment.class);
+				LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
 				builder.setCapacityDemand(capacityDemand);
 				builder.setFromLinkId(DEPOT_LINK_ID);
@@ -180,8 +180,8 @@ public class MultipleChainsReplanningTest {
 
 				shipmentList.add(builder.build());
 			} else {
-				Id<LSPShipment> id = Id.create("ShipmentRight_" + i, LSPShipment.class);
-				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+				Id<LspShipment> id = Id.create("ShipmentRight_" + i, LspShipment.class);
+				LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
 				builder.setCapacityDemand(capacityDemand);
 				builder.setFromLinkId(DEPOT_LINK_ID);
@@ -257,8 +257,8 @@ public class MultipleChainsReplanningTest {
 		innovatedPlanShipmentPlanCount = lsp.getPlans().get(1).getShipmentPlans().size();
 
 		innovatedPlanFirstLogisticChainShipmentCount = lsp.getPlans().get(1).getLogisticChains().iterator().next().getLspShipmentIds().size();
-		for (ShipmentPlan shipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
-			if (shipmentPlan.getPlanElements().isEmpty()) {
+		for (LspShipmentPlan lspShipmentPlan : lsp.getPlans().get(1).getShipmentPlans()) {
+			if (lspShipmentPlan.getPlanElements().isEmpty()) {
 				innovatedPlanHasEmptyShipmentPlanElements = true;
 			}
 		}

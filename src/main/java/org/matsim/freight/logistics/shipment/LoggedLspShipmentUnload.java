@@ -24,18 +24,42 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-public interface ShipmentPlanElement {
+class LoggedLspShipmentUnload implements LspShipmentPlanElement {
 
-  LogisticChainElement getLogisticChainElement();
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
 
-  Id<LSPResource> getResourceId();
+  LoggedLspShipmentUnload(LspShipmentUtils.LoggedShipmentUnloadBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+  }
 
-  // yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
-  // 2018, Item 23).  It is, however, probably not
-  // used as a type, but rather as a description.  Rename?
-  String getElementType();
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-  double getStartTime();
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-  double getEndTime();
+  @Override
+  public String getElementType() {
+    return "UNLOAD";
+  }
+
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
+
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 }

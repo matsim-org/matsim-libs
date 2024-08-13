@@ -21,37 +21,26 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-final class ScheduledShipmentTransport implements ShipmentLeg {
+class ScheduledLspShipmentLoad implements LspShipmentPlanElement {
 
   private final double startTime;
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
-  private final Id<Carrier> carrierId;
-  private final Id<Link> fromLinkId;
-  private final Id<Link> toLinkId;
-  private final CarrierService carrierService;
 
-  ScheduledShipmentTransport(ShipmentUtils.ScheduledShipmentTransportBuilder builder) {
+    ScheduledLspShipmentLoad(LspShipmentUtils.ScheduledShipmentLoadBuilder builder) {
     this.startTime = builder.startTime;
     this.endTime = builder.endTime;
     this.element = builder.element;
     this.resourceId = builder.resourceId;
-    this.carrierId = builder.carrierId;
-    this.fromLinkId = builder.fromLinkId;
-    this.toLinkId = builder.toLinkId;
-    this.carrierService = builder.carrierService;
-  }
+    }
 
   @Override
   public String getElementType() {
-    return "TRANSPORT";
+    return "LOAD";
   }
 
   @Override
@@ -65,11 +54,6 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
   }
 
   @Override
-  public void setEndTime(double time) {
-    throw new RuntimeException("not implemented");
-  }
-
-  @Override
   public LogisticChainElement getLogisticChainElement() {
     return element;
   }
@@ -79,28 +63,4 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
     return resourceId;
   }
 
-  @Override
-  public Id<Link> getToLinkId() {
-    return toLinkId;
-  }
-
-  @Override
-  public void setToLinkId(Id<Link> endLinkId) {
-    throw new RuntimeException("not implemented");
-  }
-
-  @Override
-  public Id<Carrier> getCarrierId() {
-    return carrierId;
-  }
-
-  @Override
-  public Id<Link> getFromLinkId() {
-    return fromLinkId;
-  }
-
-  @Override
-  public CarrierService getCarrierService() {
-    return carrierService;
-  }
 }

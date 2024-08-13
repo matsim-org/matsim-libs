@@ -22,7 +22,7 @@ package org.matsim.freight.logistics;
 
 import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * .... Macht 3 Schritte: 1.) the LSPShipments are handed over to the first {@link
@@ -131,7 +131,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
       LogisticChainElement firstElement = getFirstElement(solution);
       assert firstElement != null;
-      for (Id<LSPShipment> lspShipmentId : solution.getLspShipmentIds()) {
+      for (Id<LspShipment> lspShipmentId : solution.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         assert shipment != null;
         firstElement

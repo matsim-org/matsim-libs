@@ -34,8 +34,8 @@ import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -207,8 +207,8 @@ import org.matsim.vehicles.VehicleType;
 
   private void addShipmentLoadElement(
       LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
-    ShipmentUtils.ScheduledShipmentLoadBuilder builder =
-        ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+    LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
+        LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
@@ -228,18 +228,18 @@ import org.matsim.vehicles.VehicleType;
     builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
     builder.setEndTime(startTimeOfTransport);
 
-    ShipmentPlanElement load = builder.build();
+    LspShipmentPlanElement load = builder.build();
     String idString =
         load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
-    Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
+    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, load);
   }
 
   private void addShipmentTransportElement(
       LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
-    ShipmentUtils.ScheduledShipmentTransportBuilder builder =
-        ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+    LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
+        LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
@@ -267,21 +267,21 @@ import org.matsim.vehicles.VehicleType;
     builder.setFromLinkId(tour.getStartLinkId());
     builder.setToLinkId(serviceActivity.getLocation());
     builder.setCarrierService(serviceActivity.getService());
-    ShipmentPlanElement transport = builder.build();
+    LspShipmentPlanElement transport = builder.build();
     String idString =
         transport.getResourceId()
             + ""
             + transport.getLogisticChainElement().getId()
             + transport.getElementType();
-    Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
+    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, transport);
   }
 
   private void addShipmentUnloadElement(
       LspShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
-    ShipmentUtils.ScheduledShipmentUnloadBuilder builder =
-        ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
+    LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
+        LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
     builder.setResourceId(resource.getId());
     for (LogisticChainElement element : resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
@@ -300,13 +300,13 @@ import org.matsim.vehicles.VehicleType;
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
 
-    ShipmentPlanElement unload = builder.build();
+    LspShipmentPlanElement unload = builder.build();
     String idString =
         unload.getResourceId()
             + String.valueOf(unload.getLogisticChainElement().getId())
             + unload.getElementType();
-    Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-    ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
+    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
         .addPlanElement(id, unload);
   }
 

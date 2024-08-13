@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
- * An event, that informs that the handling of a {@link LSPShipment} in a hub has started.
+ * An event, that informs that the handling of a {@link LspShipment} in a hub has started.
  *
  * @author Kai Martins-Turner (kturner)
  */
@@ -45,7 +45,7 @@ public final class HandlingInHubStartsEvent extends AbstractLogisticEvent {
   public HandlingInHubStartsEvent(
       double time,
       Id<Link> linkId,
-      Id<LSPShipment> lspShipmentId,
+      Id<LspShipment> lspShipmentId,
       Id<LSPResource> hubId,
       double expHandlingDuration) {
     super(time, linkId, lspShipmentId);
@@ -57,8 +57,8 @@ public final class HandlingInHubStartsEvent extends AbstractLogisticEvent {
     Map<String, String> attributes = event.getAttributes();
     double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
     Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
-    Id<LSPShipment> lspSipmentId =
-        Id.create(attributes.get(ATTRIBUTE_LSP_SHIPMENT_ID), LSPShipment.class);
+    Id<LspShipment> lspSipmentId =
+        Id.create(attributes.get(ATTRIBUTE_LSP_SHIPMENT_ID), LspShipment.class);
     var hubId = Id.create(attributes.get(ATTRIBUTE_HUB_ID), LSPResource.class);
     double expHandlingDuration =
         Double.parseDouble(attributes.get(ATTRIBUTE_EXP_HANDLING_DURATION));

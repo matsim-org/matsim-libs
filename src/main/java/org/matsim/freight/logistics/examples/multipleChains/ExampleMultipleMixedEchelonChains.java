@@ -47,8 +47,8 @@ import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 final class ExampleMultipleMixedEchelonChains {
@@ -405,7 +405,7 @@ final class ExampleMultipleMixedEchelonChains {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : createInitialLSPShipments(network)) {
+    for (LspShipment lspShipment : createInitialLSPShipments(network)) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -415,8 +415,8 @@ final class ExampleMultipleMixedEchelonChains {
     return lsp;
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    List<LSPShipment> shipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    List<LspShipment> shipmentList = new ArrayList<>();
 
     Random rand = MatsimRandom.getLocalInstance();
 
@@ -435,8 +435,8 @@ final class ExampleMultipleMixedEchelonChains {
 
     for (int i = 1; i <= 10; i++) {
       if (i % 2 != 0) {
-        Id<LSPShipment> id = Id.create("ShipmentInside_" + i, LSPShipment.class);
-        ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        Id<LspShipment> id = Id.create("ShipmentInside_" + i, LspShipment.class);
+        LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         builder.setCapacityDemand(capacityDemand);
         builder.setFromLinkId(DEPOT_LINK_ID);
@@ -450,8 +450,8 @@ final class ExampleMultipleMixedEchelonChains {
 
         shipmentList.add(builder.build());
       } else {
-        Id<LSPShipment> id = Id.create("ShipmentOutside_" + i, LSPShipment.class);
-        ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        Id<LspShipment> id = Id.create("ShipmentOutside_" + i, LspShipment.class);
+        LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         builder.setCapacityDemand(capacityDemand);
         builder.setFromLinkId(DEPOT_LINK_ID);

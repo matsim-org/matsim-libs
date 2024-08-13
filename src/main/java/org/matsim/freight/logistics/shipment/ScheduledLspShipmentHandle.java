@@ -24,23 +24,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-/*package-private*/ class LoggedShipmentLoad implements ShipmentPlanElement {
+class ScheduledLspShipmentHandle implements LspShipmentPlanElement {
 
   private final double startTime;
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
 
-  LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder) {
-    this.startTime = builder.getStartTime();
-    this.endTime = builder.getEndTime();
-    this.element = builder.getElement();
-    this.resourceId = builder.getResourceId();
+  ScheduledLspShipmentHandle(LspShipmentUtils.ScheduledShipmentHandleBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
   }
 
   @Override
   public String getElementType() {
-    return "LOAD";
+    return "HANDLE";
   }
 
   @Override

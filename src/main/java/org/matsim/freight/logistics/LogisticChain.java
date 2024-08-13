@@ -23,7 +23,7 @@ package org.matsim.freight.logistics;
 import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -42,7 +42,7 @@ public interface LogisticChain
 
   Collection<LogisticChainElement> getLogisticChainElements();
 
-  Collection<Id<LSPShipment>> getLspShipmentIds();
+  Collection<Id<LspShipment>> getLspShipmentIds();
 
-  void addShipmentToChain(LSPShipment lspShipment);
+  void addShipmentToChain(LspShipment lspShipment);
 }

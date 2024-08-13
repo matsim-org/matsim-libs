@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
@@ -35,7 +35,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public void addShipment(double time, LSPShipment lspShipment) {
+  public void addShipment(double time, LspShipment lspShipment) {
     LspShipmentWithTime tuple = new LspShipmentWithTime(time, lspShipment);
     this.shipments.add(tuple);
     shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));

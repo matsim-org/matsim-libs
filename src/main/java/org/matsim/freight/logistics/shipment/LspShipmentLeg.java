@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 
-public interface ShipmentLeg extends ShipmentPlanElement {
+public interface LspShipmentLeg extends LspShipmentPlanElement {
   Id<Link> getToLinkId();
 
   void setToLinkId(Id<Link> endLinkId);

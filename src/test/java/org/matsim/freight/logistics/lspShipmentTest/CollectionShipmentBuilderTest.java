@@ -35,13 +35,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.TimeWindow;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 public class CollectionShipmentBuilderTest {
 
 	private Network network;
-	private ArrayList<LSPShipment> shipments;
+	private ArrayList<LspShipment> shipments;
 
 
 	@BeforeEach
@@ -57,8 +57,8 @@ public class CollectionShipmentBuilderTest {
 		this.shipments = new ArrayList<>();
 
 		for (int i = 1; i < 11; i++) {
-			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create(i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
@@ -88,7 +88,7 @@ public class CollectionShipmentBuilderTest {
 	@Test
 	public void testShipments() {
 		assertEquals(10, shipments.size());
-		for (LSPShipment shipment : shipments) {
+		for (LspShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
 			assertNotNull(shipment.getSize());
 			assertNotNull(shipment.getDeliveryTimeWindow());
