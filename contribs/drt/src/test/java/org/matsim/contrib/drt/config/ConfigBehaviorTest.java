@@ -100,7 +100,7 @@ public class ConfigBehaviorTest{
 
             DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
             DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet =
-                    drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
+                    (DefaultDrtOptimizationConstraintsSet) drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
             optimizationConstraintsSet.maxTravelTimeAlpha = 2.;
             optimizationConstraintsSet.maxTravelTimeBeta = 5. * 60;
 
@@ -115,8 +115,11 @@ public class ConfigBehaviorTest{
             DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
 
             // check if you are getting back the values from the config file:
-            Assertions.assertEquals( 2., drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxTravelTimeAlpha, Double.MIN_VALUE );
-            Assertions.assertEquals( 300., drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxTravelTimeBeta, Double.MIN_VALUE );
+            DefaultDrtOptimizationConstraintsSet constraintsSet =
+                    (DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
+                            addOrGetDefaultDrtOptimizationConstraintsSet();
+            Assertions.assertEquals( 2., constraintsSet.maxTravelTimeAlpha, Double.MIN_VALUE );
+            Assertions.assertEquals( 300., constraintsSet.maxTravelTimeBeta, Double.MIN_VALUE );
         }
     }
 

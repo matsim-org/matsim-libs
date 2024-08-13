@@ -391,11 +391,8 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	private ModeData getDataForMode(final String legMode) {
-		ModeData modeData = this.data.get(legMode);
-		if (modeData == null) {
-			modeData = new ModeData(this.nofBins + 1); // +1 for all times out of our range
-			this.data.put(legMode, modeData);
-		}
+		// +1 for all times out of our range
+		ModeData modeData = this.data.computeIfAbsent(legMode, k -> new ModeData(this.nofBins + 1));
 		return modeData;
 	}
 

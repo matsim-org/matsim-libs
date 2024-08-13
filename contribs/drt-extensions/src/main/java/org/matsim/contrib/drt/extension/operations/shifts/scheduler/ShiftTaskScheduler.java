@@ -23,4 +23,8 @@ public interface ShiftTaskScheduler {
 
 	boolean updateShiftChange(ShiftDvrpVehicle vehicle, Link link, DrtShift shift,
 							  LinkTimePair start, OperationFacility facility, Task lastTask);
+
+	void planAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift);
+
+	void cancelAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift);
 }

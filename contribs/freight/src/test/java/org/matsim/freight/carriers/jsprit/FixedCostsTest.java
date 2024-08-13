@@ -65,7 +65,7 @@ public class FixedCostsTest  {
 	private final Carriers carriersPlannedAndRouted = new Carriers();
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 		// Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
 		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);
 		CarrierService service2 = createMatsimService("Service2", "i(9,9)R", 1);
@@ -161,7 +161,7 @@ public class FixedCostsTest  {
 		netBuilder.setTimeSliceWidth(86400) ; // !!!!, otherwise it will not do anything.
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			log.info("creating and solving VRP for carrier: " + carrier.getId().toString());
+			log.info("creating and solving VRP for carrier: {}", carrier.getId().toString());
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;

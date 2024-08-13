@@ -92,7 +92,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
 
-	// emission factors for tables - no dublicates!
+	// emission factors for tables - no duplicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
 	private static final Double averageAverageFactor = .1;
@@ -107,18 +107,18 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		// first case: complete data
 		// corresponding entry in average table
 		Collections.addAll(testCase1, "PASSENGER_CAR", petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor);
-		logger.info("Running testcase:" + testCase1.toString());
+		logger.info("Running testcase:{}", testCase1);
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);
 		Id<VehicleType> vehicleTypeId = Id.create(testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3), VehicleType.class);
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, VehicleUtils.getFactory().createVehicleType(vehicleTypeId));
-		logger.info("VehicleId: " + vehicle.getId().toString());
-		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		logger.info("VehicleId: {}", vehicle.getId().toString());
+		logger.info("VehicleTypeId: {}", vehicle.getType().getId());
 
 		final Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
-		String message = "The expected emissions for " + testCase1.toString() + " are " + pollutants.size() * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
+		String message = "The expected emissions for " + testCase1 + " are " + pollutants.size() * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
 		Assertions.assertEquals(pollutants.size() * (Double) testCase1.get(4), sumOfEmissions, MatsimTestUtils.EPSILON, message);
 	}
 
@@ -135,7 +135,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
-		// This test seems to refer to an direct lookup in average table
+		// This test seems to refer to a direct lookup in average table
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		return new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
 	}
@@ -227,5 +227,5 @@ public class TestColdEmissionAnalysisModuleCase1 {
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
-	
+
 }

@@ -20,7 +20,7 @@ public class EmissionsDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = "Emissions";
-		header.description = "Shows the emissions footprint and spatial distribution.";
+		header.description = "Shows the emissions footprint and spatial distribution. Shown values are already upscaled from simulated sample size.";
 
 
 		layout.row("links")
@@ -55,6 +55,7 @@ public class EmissionsDashboard implements Dashboard {
 		layout.row("second")
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "CO₂ Emissions";
+				viz.unit = "CO₂ [g]";
 				viz.description = "per day";
 				viz.height = 12.;
 				viz.cellSize = 100;
@@ -70,6 +71,7 @@ public class EmissionsDashboard implements Dashboard {
 		layout.row("third")
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "CO₂ Emissions";
+				viz.unit = "CO₂ [g]";
 				viz.description = "per hour";
 				viz.height = 12.;
 				viz.cellSize = 100;

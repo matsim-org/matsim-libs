@@ -60,9 +60,9 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 			reader.setValidating(true) ;
 			reader.readFile( filename );
 		} catch (Exception e) {
-			log.warn("### Exception: Message=" + e.getMessage() + " ; cause=" + e.getCause() + " ; class=" + e.getClass());
+			log.warn("### Exception: Message={} ; cause={} ; class={}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
-				log.warn("read with validation = true failed. Try it again without validation. filename: " + filename);
+				log.warn("read with validation = true failed. Try it again without validation. filename: {}", filename);
 				reader.setValidating(false);
 				reader.readFile(filename);
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
@@ -78,11 +78,11 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 			reader.setValidating(true) ;
 			reader.readURL(url);
 		}  catch (Exception e) {
-			log.warn("### Exception: Message=" + e.getMessage() );
-			log.warn("### Exception: Cause=" + e.getCause() );
-			log.warn("### Exception: Class=" + e.getClass() );
+			log.warn("### Exception: Message={}", e.getMessage());
+			log.warn("### Exception: Cause={}", e.getCause());
+			log.warn("### Exception: Class={}", e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
-				log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
+				log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());
 				reader.setValidating(false);
 				reader.readURL(url);
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
@@ -97,7 +97,8 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 			reader.setValidating(true) ;
 			reader.parse( inputStream ) ;
 		} catch (Exception e)
-		{log.warn("### Exception found while trying to read Carrier Vehicle Type: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+		{
+			log.warn("### Exception found while trying to read Carrier Vehicle Type: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... ");
 				reader.setValidating(false);
@@ -121,10 +122,10 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 
 		@Override
 		public void startTag(final String name, final Attributes attributes, final Stack<String> context) {
-			log.debug("Reading start tag. name: " + name + " , attributes: " + attributes.toString() + " , context: " + context);
+			log.debug("Reading start tag. name: {} , attributes: {} , context: {}", name, attributes.toString(), context);
 			if ( "vehicleTypes".equalsIgnoreCase( name ) ) {
 				String str = attributes.getValue( "xsi:schemaLocation" );
-				log.info("Found following schemeLocation in carriers definition file: " + str);
+				log.info("Found following schemeLocation in carriers definition file: {}", str);
 				if (str == null){
 					log.warn( "No validation information found. Using ReaderV1." );
 					delegate = new CarrierVehicleTypeReaderV1( vehicleTypes );

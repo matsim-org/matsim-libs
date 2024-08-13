@@ -139,7 +139,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
 
         Config config = ConfigUtils.createConfig();
         String[] modes = new String[]{TransportMode.car, TransportMode.bike};
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.controller().setOutputDirectory(this.utils.getOutputDirectory());
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controller().setLastIteration(20);

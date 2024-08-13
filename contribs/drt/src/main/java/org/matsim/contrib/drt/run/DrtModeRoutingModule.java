@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
@@ -98,7 +98,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 
 		bindModal(DrtRouteConstraintsCalculator.class).toProvider(modalProvider(getter -> new DefaultDrtRouteConstraintsCalculator())).in(Singleton.class);
-		DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(ConstraintSetChooser.class).toProvider(
 				() -> (departureTime, accessActLink, egressActLink, person, tripAttributes)
 						-> Optional.of(optimizationConstraintsSet)

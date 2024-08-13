@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -119,6 +120,7 @@ public class NetworkReprojectionIOTest {
 		new NetworkWriter( initialNetwork ).write( networkFile );
 
 		final Config config = ConfigUtils.createConfig();
+		 config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.network().setInputFile( networkFile );
 
 		// web mercator. This would be a pretty silly choice for simulation,
@@ -171,6 +173,7 @@ public class NetworkReprojectionIOTest {
 		new NetworkWriter( initialNetwork ).write( networkFile );
 
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.network().setInputFile( networkFile );
 
 		config.network().setInputCRS( INITIAL_CRS );

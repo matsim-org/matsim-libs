@@ -65,7 +65,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	private static final Double parkingDuration = 1.;
 	private static final int distance = 1;
 
-	//This are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.csv" and
+	//These are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.csv" and
 	// "./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.csv"
 	//Both for AmbientConditionPattern 0-1h, 0-1km
 	private final double emissionsFactorInGrammPerKilometer_Detailed = 3.337293625; 		//detailed table
@@ -76,9 +76,9 @@ public class TestColdEmissionsFallbackBehaviour {
 // ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------
 	/**
 	 * vehicles information is complete
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should calculate value
 	 */
 	@Test
@@ -86,7 +86,7 @@ public class TestColdEmissionsFallbackBehaviour {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
-				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(), 
+				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(),
 						startTime, parkingDuration, distance);
 
 		Assertions.assertEquals(emissionsFactorInGrammPerKilometer_Detailed, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
@@ -97,7 +97,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	 *
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -114,9 +114,9 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -135,7 +135,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average
 	 * ---> should calculate value from detailed value
 	 */
@@ -144,7 +144,7 @@ public class TestColdEmissionsFallbackBehaviour {
 		EmissionModule emissionModule = setUpScenario( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort );
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
-				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(), 
+				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(),
 						startTime, parkingDuration, distance);
 
 		Assertions.assertEquals(emissionsFactorInGrammPerKilometer_Detailed, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
@@ -154,7 +154,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average
 	 * ---> should calculate value from technology average
 	 */
@@ -173,9 +173,9 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
 	@Test
@@ -193,7 +193,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average or average table
 	 * ---> should calculate value from detailed value
 	 */
@@ -212,7 +212,7 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average; do NOT fall back to average table
 	 * ---> should calculate value from technology average
 	 */
@@ -230,9 +230,9 @@ public class TestColdEmissionsFallbackBehaviour {
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: tryDetailedThenTechnologyAverageThenAverageTable
-	 *
+	 * <p>
 	 * -> do fall back to average table
 	 * ---> should calculate value from average table
 	 */

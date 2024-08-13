@@ -21,6 +21,7 @@
 package org.matsim.core.network;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.algorithms.NetworkModeRestriction;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -1018,8 +1020,30 @@ public final class NetworkUtils {
 		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
 		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
 	}
-	
+
 	public static void removeDisallowedNextLinks(Link link) {
 		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static void addAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.add(mode);
+		link.setAllowedModes(modes);
+	}
+
+	public static void removeAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.remove(mode);
+		link.setAllowedModes(modes);
+	}
+
+	/**
+	 * Removes the given modes from the links and runs the network cleaner afterwards. Thus, some more links may be restricted to keep the network consistent.
+	 * That means, each link can be reached from each other link.
+	 * @param network the network
+	 * @param modesToRemoveByLinkId map of modes that should be removed from the links
+	 */
+	public static void restrictModesAndCleanNetwork(Network network, Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
+		new NetworkModeRestriction(modesToRemoveByLinkId).run(network);
 	}
 }

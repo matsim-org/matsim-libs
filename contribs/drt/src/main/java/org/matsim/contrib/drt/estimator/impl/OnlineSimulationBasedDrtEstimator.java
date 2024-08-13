@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.estimator.impl;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.regression.RegressionResults;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,12 +22,14 @@ import java.util.Map;
 import java.util.SplittableRandom;
 
 /**
+ * When this estimator is used, explicit simulations of DRT will be carried out intermittently. During the iterations where no
+ * DRT is simulated, estimated DRT will be used. This estimator will replace the original DRT speed-up module
  * Estimates drt trips based only daily averages. No spatial or temporal differentiation is taken into account for the estimate.
  * This estimator is suited for small scenarios with few vehicles and trips and consequently few data points.
  */
-public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListener {
+public class OnlineSimulationBasedDrtEstimator implements DrtOnlineEstimator, IterationEndsListener {
 
-	private static final Logger log = LogManager.getLogger(BasicDrtEstimator.class);
+	private static final Logger log = LogManager.getLogger(OnlineSimulationBasedDrtEstimator.class);
 
 	private final DrtEventSequenceCollector collector;
 	private final DrtEstimatorParams config;
@@ -41,8 +42,8 @@ public class BasicDrtEstimator implements DrtOnlineEstimator, IterationEndsListe
 	 */
 	private GlobalEstimate currentEst;
 
-	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimator initial,
-							 DrtEstimatorParams config, DrtConfigGroup drtConfig) {
+	public OnlineSimulationBasedDrtEstimator(DrtEventSequenceCollector collector, DrtEstimator initial,
+											 DrtEstimatorParams config, DrtConfigGroup drtConfig) {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		this.collector = collector;
 		this.initial = initial;
