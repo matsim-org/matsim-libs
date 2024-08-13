@@ -56,7 +56,7 @@ public final class DemandReaderFromCSV {
 	private static double roundingError;
 
 	// NEW
-	protected static HashMap<Id<Person>, HashMap<Integer, Integer>> demandForEachPerson;
+	protected static HashMap<Id<Person>, HashMap<Integer, Integer>> demandForEachPerson = new HashMap<>();
 
 	protected static final HashMap demandDistributionPerAgeGroup = new HashMap<>(Map.of(
 		(int) 0,new HashMap<>(Map.of("lower",0,"upper",13,"share", 0.0)),
