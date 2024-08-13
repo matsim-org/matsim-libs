@@ -53,16 +53,15 @@ import org.matsim.vehicles.VehicleType;
   private DistributionCarrierResource resource;
   private ArrayList<LSPCarrierPair> pairs;
   private int carrierCnt = 1;
-  private Scenario scenario;
+  private final Scenario scenario;
 
 
   /**
    * Constructor for the DistributionCarrierScheduler.
-   * TODO: In the future, the scenario shpuld come via injection(?) This here is only a dirty workaround. KMT'Aug'24
+   * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the scenario
    */
-  @Deprecated
   DistributionCarrierScheduler(Scenario scenario) {
     this.pairs = new ArrayList<>();
     this.scenario = scenario;

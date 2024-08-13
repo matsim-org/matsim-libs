@@ -47,15 +47,14 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
   private Carrier carrier;
   private CollectionCarrierResource resource;
   private ArrayList<LSPCarrierPair> pairs;
-  private Scenario scenario;
+  private final Scenario scenario;
 
   /**
    * Constructor for the CollectionCarrierScheduler.
-   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
+   * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
    *
    * @param scenario the road pricing scheme
    */
-  @Deprecated
   CollectionCarrierScheduler(Scenario scenario) {
     this.pairs = new ArrayList<>();
     this.scenario = scenario;
