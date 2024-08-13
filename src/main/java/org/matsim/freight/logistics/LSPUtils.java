@@ -144,7 +144,9 @@ public final class LSPUtils {
     return null;
   }
 
-  public static final class LSPBuilder {
+    public enum LogicOfVrp {serviceBased, shipmentBased}
+
+    public static final class LSPBuilder {
     final Collection<LSPResource> resources;
     final Id<LSP> id;
     LogisticChainScheduler logisticChainScheduler;

@@ -19,6 +19,7 @@ import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
+import org.matsim.freight.logistics.LSPUtils;
 
 /**
  * This class contains some code fragments, that are used in the different *CarrierScheduler
@@ -28,6 +29,7 @@ import org.matsim.freight.carriers.jsprit.NetworkRouter;
  */
 public class CarrierSchedulerUtils {
   private static final Logger log = LogManager.getLogger(CarrierSchedulerUtils.class);
+  private static final String LOGIC_OF_VRP = "logicOfVrp";
 
   /**
    * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
@@ -107,4 +109,27 @@ public class CarrierSchedulerUtils {
     }
     return jspritScore;
   }
+
+  /**
+   * Setter for the internal solving logic of a VRP.
+   * This decides later, whether the VRP is build base on {@link org.matsim.freight.carriers.CarrierService}s or {@link org.matsim.freight.carriers.CarrierShipment}s.
+   *
+   * @param carrier The carrier for which the setting should be set.
+   * @param logicOfVrp the logic of the VRP
+   */
+  public static void setVrpLogic(Carrier carrier, LSPUtils.LogicOfVrp logicOfVrp){
+    carrier.getAttributes().putAttribute(LOGIC_OF_VRP, logicOfVrp);
+  }
+
+    /**
+     * Getter for the internal solving logic of a VRP.
+     * This decides later, whether the VRP is build base on {@link org.matsim.freight.carriers.CarrierService}s or {@link org.matsim.freight.carriers.CarrierShipment}s.
+     *
+     * @param carrier The carrier for which the setting should be got.
+     * @return the logic of the VRP
+     */
+  public static LSPUtils.LogicOfVrp getVrpLogic(Carrier carrier){
+    return (LSPUtils.LogicOfVrp) carrier.getAttributes().getAttribute(LOGIC_OF_VRP);
+  }
+
 }
