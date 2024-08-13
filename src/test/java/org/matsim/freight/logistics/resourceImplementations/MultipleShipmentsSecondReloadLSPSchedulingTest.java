@@ -92,8 +92,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		collectionResource  = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+		collectionResource  = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier)
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -144,8 +144,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(fromLinkId)
 				.setToLinkId(Id.createLinkId(toLinkId))
 				.build();

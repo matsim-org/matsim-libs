@@ -263,11 +263,11 @@ import org.matsim.vehicles.VehicleType;
 
       // The scheduler for the main run Resource is created and added to the Resource
       LSPResource mainRunResource =
-          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
               .setFromLinkId(depotLinkId)
               .setToLinkId(hubLinkId)
               .setMainRunCarrierScheduler(
-                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
               .build();
 
       mainRunElement =
@@ -328,10 +328,10 @@ import org.matsim.vehicles.VehicleType;
       // The distribution adapter i.e. the Resource is created
       LSPResource distributionResource =
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  distributionCarrier, network)
+                  distributionCarrier)
               .setLocationLinkId(hubLinkId)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
       // (The scheduler is where jsprit comes into play.)
 
@@ -371,10 +371,10 @@ import org.matsim.vehicles.VehicleType;
       // The distribution adapter i.e. the Resource is created
       LSPResource directDistributionResource =
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  directDistributionCarrier, network)
+                  directDistributionCarrier)
               .setLocationLinkId(depotLinkId)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
       // (The scheduler is where jsprit comes into play.)
 

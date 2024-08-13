@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -30,36 +31,24 @@ public class CarrierSchedulerUtils {
 
   /**
    * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
-   * <p>
-   * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
-   * So, maybe this can be more simplify.
-   *
-   * @deprecated please inline; use #solveVrpWithJsprit(Carrier, Network, RoadPricingScheme) instead.
-   *
-   * @param carrier               Carrier for which the problem should be solved
-   * @param network               the underlying network to create the network based transport costs
-   * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
-   */
-  @Deprecated
-  public static Carrier solveVrpWithJsprit(Carrier carrier, Network network) {
-    return solveVrpWithJsprit(carrier, network, null);
-  }
-
-  /**
-   * Creates a VehicleRoutingProblem from a carrier and a network and solves it with Jsprit.
    * If a roadPricingScheme is given, the tolls are considered in the routing costs.
    * <p>
    * This looks for me (KMT) similar to what is done in {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)}.
    * So, maybe this can be more simplify.
    *
-   * @param carrier           Carrier for which the problem should be solved
-   * @param network           the underlying network to create the network based transport costs
-   * @param roadPricingScheme (MATSim's) road pricing scheme from the roadpricing contrib. If null, no tolls are considered.
+   * @param carrier  Carrier for which the problem should be solved
+   * @param scenario the scenario
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
    */
-  public static Carrier solveVrpWithJsprit(
-          Carrier carrier, Network network, RoadPricingScheme roadPricingScheme) {
+  public static Carrier solveVrpWithJsprit(Carrier carrier, Scenario scenario) {
     NetworkBasedTransportCosts netbasedTransportCosts;
+    Network network = scenario.getNetwork();
+    RoadPricingScheme roadPricingScheme = null;
+    try {
+      roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
+    } catch (Exception e) {
+      log.info("Was not able getting RoadPricingScheme. Tolls cannot be considered.", e);
+    }
     if (roadPricingScheme != null) {
       netbasedTransportCosts = NetworkBasedTransportCosts.Builder.newInstance(network, ResourceImplementationUtils.getVehicleTypeCollection(carrier))
               .setRoadPricingScheme(roadPricingScheme)

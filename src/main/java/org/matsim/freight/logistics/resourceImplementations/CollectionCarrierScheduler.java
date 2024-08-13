@@ -23,7 +23,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.ScheduledTour;
@@ -47,22 +47,17 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
   private Carrier carrier;
   private CollectionCarrierResource resource;
   private ArrayList<LSPCarrierPair> pairs;
-  private RoadPricingScheme rpscheme = null;
-
-  CollectionCarrierScheduler() {
-    this.pairs = new ArrayList<>();
-  }
+  private final Scenario scenario;
 
   /**
    * Constructor for the CollectionCarrierScheduler.
-   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
-   * @param rpscheme the road pricing scheme
+   * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the road pricing scheme
    */
-  @Deprecated
-  CollectionCarrierScheduler(RoadPricingScheme rpscheme) {
+  CollectionCarrierScheduler(Scenario scenario) {
     this.pairs = new ArrayList<>();
-    this.rpscheme = rpscheme;
+    this.scenario = scenario;
   }
 
   @Override
@@ -83,7 +78,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
       CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
       carrier.getServices().put(carrierService.getId(), carrierService);
     }
-    carrier = CarrierSchedulerUtils.solveVrpWithJsprit(carrier, resource.getNetwork(), rpscheme);
+    CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
   }
 
   private CarrierService convertToCarrierService(LspShipmentWithTime tuple) {

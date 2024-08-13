@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
@@ -53,22 +53,18 @@ import org.matsim.vehicles.VehicleType;
   private DistributionCarrierResource resource;
   private ArrayList<LSPCarrierPair> pairs;
   private int carrierCnt = 1;
-  private RoadPricingScheme rpscheme = null;
+  private final Scenario scenario;
 
-  DistributionCarrierScheduler() {
-    this.pairs = new ArrayList<>();
-  }
 
   /**
    * Constructor for the DistributionCarrierScheduler.
-   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
-   * @param rpscheme the road pricing scheme
+   * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
    */
-  @Deprecated
-  DistributionCarrierScheduler(RoadPricingScheme rpscheme) {
+  DistributionCarrierScheduler(Scenario scenario) {
     this.pairs = new ArrayList<>();
-    this.rpscheme = rpscheme;
+    this.scenario = scenario;
   }
 
   @Override
@@ -103,9 +99,8 @@ import org.matsim.vehicles.VehicleType;
         load = 0;
         Carrier auxiliaryCarrier =
             CarrierSchedulerUtils.solveVrpWithJsprit(
-                createAuxiliaryCarrier(
-                    shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-                resource.getNetwork(), rpscheme);
+                    createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+                    scenario);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         carrier.getServices().putAll(auxiliaryCarrier.getServices());
         cumulatedLoadingTime = 0;
@@ -122,7 +117,7 @@ import org.matsim.vehicles.VehicleType;
           CarrierSchedulerUtils.solveVrpWithJsprit(
               createAuxiliaryCarrier(
                   shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-              resource.getNetwork(), rpscheme);
+                  scenario);
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
       carrier.getServices().putAll(auxiliaryCarrier.getServices());
       shipmentsInCurrentTour.clear();
@@ -315,8 +310,7 @@ import org.matsim.vehicles.VehicleType;
         .addPlanElement(id, unload);
   }
 
-  private Carrier createAuxiliaryCarrier(
-      ArrayList<LspShipmentWithTime> shipmentsInCurrentTour, double startTime) {
+  private Carrier createAuxiliaryCarrier(ArrayList<LspShipmentWithTime> shipmentsInCurrentTour, double startTime) {
     final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
     carrierCnt++;
     Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);

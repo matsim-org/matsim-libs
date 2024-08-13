@@ -312,10 +312,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                     vehicleTypesMainRun.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource mainCarrierResource =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                            mainCarrier, scenario.getNetwork())
+                            mainCarrier)
                     .setFromLinkId(depotLinkFromVehicles)
                     .setMainRunCarrierScheduler(
-                            ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                            ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                     .setToLinkId(hubLinkId)
                     .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                     .build();
@@ -363,10 +363,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                             .get(Id.create("heavy40t_electro", VehicleType.class))));
     LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            distributionCarrier, scenario.getNetwork())
-                    .setDistributionScheduler(
-//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
-                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                            distributionCarrier)
+                    .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement distributionCarrierElement =
@@ -436,10 +434,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                     vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource singleCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            directCarrier, scenario.getNetwork())
+                            directCarrier)
                     .setDistributionScheduler(
-//                            ResourceImplementationUtils.createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingUtils.getRoadPricingScheme(scenario)))
-                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement singleCarrierElement =

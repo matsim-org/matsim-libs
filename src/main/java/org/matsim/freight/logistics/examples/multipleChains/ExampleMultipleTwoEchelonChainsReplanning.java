@@ -203,10 +203,10 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResourceLeft =
-            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft, network)
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LEFT_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -248,9 +248,9 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 Id.createVehicleId("distributionTruck"), HUB_LEFT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResourceLeft =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrierLeft, network)
+                    distributionCarrierLeft)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElementLeft =
@@ -281,10 +281,10 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource =
-            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_RIGHT_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -326,9 +326,9 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 Id.createVehicleId("distributionTruck"), HUB_RIGHT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrier, network)
+                    distributionCarrier)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

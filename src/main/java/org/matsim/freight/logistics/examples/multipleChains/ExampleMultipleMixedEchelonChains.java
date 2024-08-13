@@ -199,10 +199,10 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource1 =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                    mainCarrier1, network)
+                    mainCarrier1)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -244,9 +244,9 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResource1 =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrier1, network)
+                    distributionCarrier1)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement1 =
@@ -288,9 +288,9 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("singleCarrier"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource singleCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    singleCarrier, network)
+                    singleCarrier)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement singleCarrierElement =
@@ -316,10 +316,10 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                    mainCarrier, network)
+                    mainCarrier)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -361,9 +361,9 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrier, network)
+                    distributionCarrier)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

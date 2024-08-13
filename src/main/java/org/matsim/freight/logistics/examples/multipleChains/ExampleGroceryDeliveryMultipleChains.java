@@ -198,9 +198,9 @@ final class ExampleGroceryDeliveryMultipleChains {
                 vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
         LSPResource singleCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    singleCarrier, scenario.getNetwork())
+                    singleCarrier)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement singleCarrierElement =
@@ -228,10 +228,10 @@ final class ExampleGroceryDeliveryMultipleChains {
                 vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
         LSPResource mainCarrierResource =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                    mainCarrier, scenario.getNetwork())
+                    mainCarrier)
                 .setFromLinkId(depotLinkFromVehicles)
                 .setMainRunCarrierScheduler(
-                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
                 .setToLinkId(HUB_LINK_ID)
                 .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
                 .build();
@@ -278,9 +278,9 @@ final class ExampleGroceryDeliveryMultipleChains {
                     .get(Id.create("heavy40t_electro", VehicleType.class))));
         LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrier, scenario.getNetwork())
+                    distributionCarrier)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

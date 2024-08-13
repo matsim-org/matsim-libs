@@ -66,7 +66,9 @@ class ExampleCheckRequirementsOfAssigner {
 
   static final String ATTRIBUTE_COLOR = "color";
 
-  public static LSP createLSPWithProperties(Network network) {
+  private static LSP createLSPWithProperties(Scenario scenario) {
+
+    final Network network = scenario.getNetwork();
 
     // Create red LogisticsSolution which has the corresponding info
     final Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
@@ -94,9 +96,9 @@ class ExampleCheckRequirementsOfAssigner {
     redCarrier.setCarrierCapabilities(redCapabilities);
 
     LSPResource redResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -130,9 +132,9 @@ class ExampleCheckRequirementsOfAssigner {
     blueCarrier.setCarrierCapabilities(blueCapabilities);
 
     LSPResource blueResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier)
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -227,7 +229,7 @@ class ExampleCheckRequirementsOfAssigner {
     Network network = scenario.getNetwork();
 
     // Create LSP and lspShipments
-    LSP lsp = createLSPWithProperties(network);
+    LSP lsp = createLSPWithProperties(scenario);
     Collection<LSPShipment> lspShipments = createShipmentsWithRequirements(network);
 
     // assign the lspShipments to the LSP

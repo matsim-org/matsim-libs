@@ -80,8 +80,8 @@ public class CollectionLSPShipmentAssigmentTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
+				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
+		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
 

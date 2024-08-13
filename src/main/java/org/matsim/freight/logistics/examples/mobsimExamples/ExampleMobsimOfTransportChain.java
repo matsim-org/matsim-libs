@@ -82,9 +82,9 @@ import org.matsim.vehicles.VehicleType;
     // The collection adapter i.e. the Resource is created
     LSPResource collectionResource =
         ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
-                collectionCarrier, network)
+                collectionCarrier)
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -150,10 +150,10 @@ import org.matsim.vehicles.VehicleType;
 
     // The adapter i.e. the main run resource is created
     LSPResource mainRunResource =
-        ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+        ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
             .setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
             .setToLinkId(Id.createLinkId("(14 2) (14 3)"))
-            .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+            .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
             .build();
 
     // The LogisticsSolutionElement for the main run Resource is created
@@ -219,12 +219,12 @@ import org.matsim.vehicles.VehicleType;
     // The distribution adapter i.e. the Resource is created
     LSPResource distributionResource =
         ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                distributionCarrier, network)
+                distributionCarrier)
             .setLocationLinkId(distributionLinkId)
             // The scheduler for the Resource is created and added. This is where jsprit comes into
             // play.
             .setDistributionScheduler(
-                ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
             .build();
 
     // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only

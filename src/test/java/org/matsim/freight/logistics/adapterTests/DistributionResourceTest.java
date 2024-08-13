@@ -83,8 +83,8 @@ public class DistributionResourceTest {
 		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		DistributionCarrierResourceBuilder builder = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network);
-		builder.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler());
+		DistributionCarrierResourceBuilder builder = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier);
+		builder.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario));
 		builder.setLocationLinkId(distributionLinkId);
 		distributionResource = builder.build();
 	}

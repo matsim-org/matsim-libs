@@ -23,6 +23,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.freight.carriers.*;
@@ -48,14 +49,16 @@ import org.matsim.vehicles.VehicleType;
  * shipments into the vehicle * has passed.
  */
 /*package-private*/ class MainRunCarrierScheduler extends LSPResourceScheduler {
-
+  
   private Carrier carrier;
   private MainRunCarrierResource resource;
   private ArrayList<LSPShipmentCarrierServicePair> pairs;
+  private final Scenario scenario;
   private int tourIdIndex = 1; // Have unique TourIds for the MainRun.
 
-  /*package-private*/ MainRunCarrierScheduler() {
+  /*package-private*/ MainRunCarrierScheduler(Scenario scenario) {
     this.pairs = new ArrayList<>();
+    this.scenario = scenario;
   }
 
   @Override
@@ -117,7 +120,7 @@ import org.matsim.vehicles.VehicleType;
     // statt!
     NetworkBasedTransportCosts.Builder tpcostsBuilder =
         NetworkBasedTransportCosts.Builder.newInstance(
-            resource.getNetwork(),
+            scenario.getNetwork(),
             ResourceImplementationUtils.getVehicleTypeCollection(resource.getCarrier()));
     NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
     Collection<ScheduledTour> tours = new ArrayList<>();
@@ -193,14 +196,14 @@ import org.matsim.vehicles.VehicleType;
           // distance
           NetworkRoute route = (NetworkRoute) leg.getRoute();
           for (Id<Link> linkId : route.getLinkIds()) {
-            distance = distance + resource.getNetwork().getLinks().get(linkId).getLength();
+            distance = distance + scenario.getNetwork().getLinks().get(linkId).getLength();
           }
           if (route.getEndLinkId()
               != route
                   .getStartLinkId()) { // Do not calculate any distance, if start and endpoint are
                                        // identical
             distance =
-                distance + resource.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
+                distance + scenario.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
           }
 
           // travel time (exp.)

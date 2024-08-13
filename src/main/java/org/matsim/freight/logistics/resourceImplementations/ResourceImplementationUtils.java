@@ -28,8 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
@@ -214,36 +212,34 @@ public class ResourceImplementationUtils {
     carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType);
   }
 
-  public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler() {
-    return new DistributionCarrierScheduler();
-  }
-
-  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
-    return new CollectionCarrierScheduler();
+  /**
+   * Utils method to create a DistributionCarrierScheduler
+   *  TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
+   */
+  public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler(Scenario scenario) {
+    return new DistributionCarrierScheduler(scenario);
   }
 
   /**
-   * Utils method to create a  DistributionCarrierScheduler with Roadpricing.
-   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
-   * @param roadPricingScheme the road pricing scheme
+   * Utils method to create a CollectionCarrierScheduler
+   * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
    */
-  public static DistributionCarrierScheduler createDefaultDistributionCarrierSchedulerWithRoadPricing(RoadPricingScheme roadPricingScheme) {
-    return new DistributionCarrierScheduler(roadPricingScheme);
+  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler(Scenario scenario) {
+    return new CollectionCarrierScheduler(scenario);
   }
 
   /**
-   * Utils method to create a  Collection CarrierScheduler with Roadpricing.
-   * TODO: In the future, the road pricing scheme should come from some the scenario: RoadPricingUtils.getRoadPricingScheme(scenario). This here is only a dirty workaround. KMT'Aug'24
-   * @deprecated This is only a dirty workaround. KMT'Aug'24
-   * @param roadPricingScheme the road pricing scheme
+   * Utils method to create a MainRunCarrierScheduler
+   * TODO: In the future, the scheduler should get the scenario via injection. This here is only a dirty workaround. KMT'Aug'24
+   *
+   * @param scenario the scenario
    */
-  public static CollectionCarrierScheduler createDefaultCollectionCarrierSchedulerWithRoadPricing(RoadPricingScheme roadPricingScheme) {
-    return new CollectionCarrierScheduler(roadPricingScheme);
-  }
-
-  public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
-    return new MainRunCarrierScheduler();
+  public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler(Scenario scenario) {
+    return new MainRunCarrierScheduler(scenario);
   }
 
   public enum VehicleReturn {
@@ -263,21 +259,19 @@ public class ResourceImplementationUtils {
 
     final Id<LSPResource> id;
     final ArrayList<LogisticChainElement> clientElements;
-    final Network network;
     final Carrier carrier;
     Id<Link> locationLinkId;
     DistributionCarrierScheduler distributionHandler;
 
-    private DistributionCarrierResourceBuilder(Carrier carrier, Network network) {
+    private DistributionCarrierResourceBuilder(Carrier carrier) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
       setCarrierType(carrier, CARRIER_TYPE.distributionCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
-      this.network = network;
     }
 
-    public static DistributionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-      return new DistributionCarrierResourceBuilder(carrier, network);
+    public static DistributionCarrierResourceBuilder newInstance(Carrier carrier) {
+      return new DistributionCarrierResourceBuilder(carrier);
     }
 
     public DistributionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
@@ -301,21 +295,19 @@ public class ResourceImplementationUtils {
 
     final Id<LSPResource> id;
     final ArrayList<LogisticChainElement> clientElements;
-    final Network network;
     final Carrier carrier;
     Id<Link> locationLinkId;
     CollectionCarrierScheduler collectionScheduler;
 
-    private CollectionCarrierResourceBuilder(Carrier carrier, Network network) {
+    private CollectionCarrierResourceBuilder(Carrier carrier) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
       setCarrierType(carrier, CARRIER_TYPE.collectionCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
-      this.network = network;
     }
 
-    public static CollectionCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-      return new CollectionCarrierResourceBuilder(carrier, network);
+    public static CollectionCarrierResourceBuilder newInstance(Carrier carrier) {
+      return new CollectionCarrierResourceBuilder(carrier);
     }
 
     public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
@@ -339,23 +331,21 @@ public class ResourceImplementationUtils {
 
     private final Id<LSPResource> id;
     private final ArrayList<LogisticChainElement> clientElements;
-    private final Network network;
     private Carrier carrier;
     private Id<Link> fromLinkId;
     private Id<Link> toLinkId;
     private MainRunCarrierScheduler mainRunScheduler;
     private VehicleReturn vehicleReturn;
 
-    private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
+    private MainRunCarrierResourceBuilder(Carrier carrier) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
       setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
-      this.network = network;
     }
 
-    public static MainRunCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-      return new MainRunCarrierResourceBuilder(carrier, network);
+    public static MainRunCarrierResourceBuilder newInstance(Carrier carrier) {
+      return new MainRunCarrierResourceBuilder(carrier);
     }
 
     public MainRunCarrierResourceBuilder setMainRunCarrierScheduler(
@@ -408,10 +398,6 @@ public class ResourceImplementationUtils {
 
     MainRunCarrierScheduler getMainRunScheduler() {
       return mainRunScheduler;
-    }
-
-    Network getNetwork() {
-      return network;
     }
 
     VehicleReturn getVehicleReturn() {

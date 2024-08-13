@@ -87,8 +87,8 @@ public class CompleteLogisticChainTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		CollectionCarrierResourceBuilder collectionResourceBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder
-				.newInstance(collectionCarrier, network);
-		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
+				.newInstance(collectionCarrier);
+		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",
@@ -134,8 +134,8 @@ public class CompleteLogisticChainTest {
 		Carrier mainRunCarrier = CarriersUtils.createCarrier(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		LSPResource mainRunResource  = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
-				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler())
+		LSPResource mainRunResource  = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
+				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
 				.setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();
@@ -188,8 +188,8 @@ public class CompleteLogisticChainTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder
-				.newInstance(carrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.newInstance(carrier)
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 
