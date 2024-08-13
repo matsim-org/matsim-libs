@@ -78,7 +78,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
       CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
       carrier.getServices().put(carrierService.getId(), carrierService);
     }
-    carrier = CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
+    CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
   }
 
   private CarrierService convertToCarrierService(LspShipmentWithTime tuple) {
