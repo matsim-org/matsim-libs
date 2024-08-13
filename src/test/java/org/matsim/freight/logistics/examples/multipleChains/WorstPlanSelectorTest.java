@@ -102,7 +102,7 @@ public class WorstPlanSelectorTest {
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarriersUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
-			LSPResource singleCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
+			LSPResource singleCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier)
 					.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 					.build();
 
@@ -131,7 +131,7 @@ public class WorstPlanSelectorTest {
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
-				LSPResource carrierSouthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
+				LSPResource carrierSouthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth)
 						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
@@ -146,7 +146,7 @@ public class WorstPlanSelectorTest {
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
-				LSPResource carrierNorthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
+				LSPResource carrierNorthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth)
 						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 

@@ -198,7 +198,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		Carrier carrier = CarriersUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		LSPResource distributionResource  = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+		LSPResource distributionResource  = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();

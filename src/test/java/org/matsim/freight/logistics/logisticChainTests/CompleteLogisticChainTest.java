@@ -188,7 +188,7 @@ public class CompleteLogisticChainTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder
-				.newInstance(carrier, network)
+				.newInstance(carrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();

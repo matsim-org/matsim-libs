@@ -24,7 +24,6 @@ package org.matsim.freight.logistics.resourceImplementations;
 import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
@@ -36,14 +35,12 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
   private final Carrier carrier;
   private final Collection<LogisticChainElement> clientElements;
   private final DistributionCarrierScheduler distributionHandler;
-  private final Network network;
 
   DistributionCarrierResource(DistributionCarrierResourceBuilder builder) {
     super(builder.id);
     this.distributionHandler = builder.distributionHandler;
     this.clientElements = builder.clientElements;
     this.carrier = builder.carrier;
-    this.network = builder.network;
   }
 
   @Override
@@ -78,10 +75,6 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
   @Override
   public void schedule(int bufferTime, LSPPlan lspPlan) {
     distributionHandler.scheduleShipments(lspPlan, this, bufferTime);
-  }
-
-  public Network getNetwork() {
-    return network;
   }
 
   public Carrier getCarrier() {

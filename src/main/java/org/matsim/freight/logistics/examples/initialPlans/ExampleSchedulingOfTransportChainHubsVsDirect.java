@@ -328,7 +328,7 @@ import org.matsim.vehicles.VehicleType;
       // The distribution adapter i.e. the Resource is created
       LSPResource distributionResource =
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  distributionCarrier, network)
+                  distributionCarrier)
               .setLocationLinkId(hubLinkId)
               .setDistributionScheduler(
                   ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
@@ -371,7 +371,7 @@ import org.matsim.vehicles.VehicleType;
       // The distribution adapter i.e. the Resource is created
       LSPResource directDistributionResource =
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  directDistributionCarrier, network)
+                  directDistributionCarrier)
               .setLocationLinkId(depotLinkId)
               .setDistributionScheduler(
                   ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))

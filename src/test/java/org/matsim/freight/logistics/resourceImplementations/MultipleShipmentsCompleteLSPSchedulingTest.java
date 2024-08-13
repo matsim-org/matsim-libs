@@ -196,7 +196,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		distributionResource  = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
+		distributionResource  = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();

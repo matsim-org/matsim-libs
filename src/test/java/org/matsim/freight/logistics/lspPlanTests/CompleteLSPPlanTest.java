@@ -178,7 +178,7 @@ public class CompleteLSPPlanTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
+		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();

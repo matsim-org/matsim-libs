@@ -102,7 +102,7 @@ public class MultipleChainsReplanningTest {
 				carrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierLeftResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
+				LSPResource carrierLeftResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft)
 						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
@@ -117,7 +117,7 @@ public class MultipleChainsReplanningTest {
 				carrierRight.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 				CarriersUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-				LSPResource carrierRightResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
+				LSPResource carrierRightResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight)
 						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 

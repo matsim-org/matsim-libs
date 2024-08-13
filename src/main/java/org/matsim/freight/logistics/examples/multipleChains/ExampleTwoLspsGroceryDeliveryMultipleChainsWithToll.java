@@ -363,7 +363,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                             .get(Id.create("heavy40t_electro", VehicleType.class))));
     LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            distributionCarrier, scenario.getNetwork())
+                            distributionCarrier)
                     .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
@@ -434,7 +434,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                     vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource singleCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            directCarrier, scenario.getNetwork())
+                            directCarrier)
                     .setDistributionScheduler(
                               ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();

@@ -248,7 +248,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 Id.createVehicleId("distributionTruck"), HUB_LEFT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResourceLeft =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrierLeft, network)
+                    distributionCarrierLeft)
                 .setDistributionScheduler(
                     ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
@@ -326,7 +326,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
                 Id.createVehicleId("distributionTruck"), HUB_RIGHT_LINK_ID, VEH_TYPE_SMALL_05));
         LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                    distributionCarrier, network)
+                    distributionCarrier)
                 .setDistributionScheduler(
                     ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();

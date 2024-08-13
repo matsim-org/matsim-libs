@@ -217,7 +217,7 @@ import org.matsim.vehicles.VehicleType;
     // The distribution adapter i.e. the Resource is created
     DistributionCarrierResourceBuilder distributionResourceBuilder =
         ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-            distributionCarrier, network);
+            distributionCarrier);
     distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
