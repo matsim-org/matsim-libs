@@ -82,7 +82,7 @@ public class MainRunResourceTest {
 		carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(carrier, network)
+		mainRunResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(carrier)
 				.setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
 				.setFromLinkId(Id.createLinkId("(4 2) (4 3)")).setToLinkId(Id.createLinkId("(14 2) (14 3)"))
 				.build();

@@ -296,7 +296,7 @@ final class ExampleTwoEchelonGrid_NR {
           CarrierVehicle.newInstance(
               Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
       LSPResource mainCarrierRessource =
-          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
               .setFromLinkId(DEPOT_LINK_ID)
               .setMainRunCarrierScheduler(
                   ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))

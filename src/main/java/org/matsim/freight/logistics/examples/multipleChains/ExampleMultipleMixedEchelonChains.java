@@ -199,7 +199,7 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource1 =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                    mainCarrier1, network)
+                    mainCarrier1)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
                     ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
@@ -316,7 +316,7 @@ final class ExampleMultipleMixedEchelonChains {
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                    mainCarrier, network)
+                    mainCarrier)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
                     ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))

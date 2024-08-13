@@ -150,7 +150,7 @@ import org.matsim.vehicles.VehicleType;
 
     // The adapter i.e. the main run resource is created
     LSPResource mainRunResource =
-        ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+        ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
             .setFromLinkId(Id.createLinkId("(4 2) (4 3)"))
             .setToLinkId(Id.createLinkId("(14 2) (14 3)"))
             .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))

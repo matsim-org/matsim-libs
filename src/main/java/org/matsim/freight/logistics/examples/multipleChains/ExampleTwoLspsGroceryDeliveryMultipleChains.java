@@ -286,7 +286,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                     vehicleTypesMainRun.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource mainCarrierResource =
             ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(
-                            mainCarrier, scenario.getNetwork())
+                            mainCarrier)
                     .setFromLinkId(depotLinkFromVehicles)
                     .setMainRunCarrierScheduler(
                             ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))

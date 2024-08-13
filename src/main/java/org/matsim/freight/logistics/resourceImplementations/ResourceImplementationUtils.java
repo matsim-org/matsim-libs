@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
@@ -332,23 +331,21 @@ public class ResourceImplementationUtils {
 
     private final Id<LSPResource> id;
     private final ArrayList<LogisticChainElement> clientElements;
-    private final Network network;
     private Carrier carrier;
     private Id<Link> fromLinkId;
     private Id<Link> toLinkId;
     private MainRunCarrierScheduler mainRunScheduler;
     private VehicleReturn vehicleReturn;
 
-    private MainRunCarrierResourceBuilder(Carrier carrier, Network network) {
+    private MainRunCarrierResourceBuilder(Carrier carrier) {
       this.id = Id.create(carrier.getId().toString(), LSPResource.class);
       setCarrierType(carrier, CARRIER_TYPE.mainRunCarrier);
       this.carrier = carrier;
       this.clientElements = new ArrayList<>();
-      this.network = network;
     }
 
-    public static MainRunCarrierResourceBuilder newInstance(Carrier carrier, Network network) {
-      return new MainRunCarrierResourceBuilder(carrier, network);
+    public static MainRunCarrierResourceBuilder newInstance(Carrier carrier) {
+      return new MainRunCarrierResourceBuilder(carrier);
     }
 
     public MainRunCarrierResourceBuilder setMainRunCarrierScheduler(
@@ -401,10 +398,6 @@ public class ResourceImplementationUtils {
 
     MainRunCarrierScheduler getMainRunScheduler() {
       return mainRunScheduler;
-    }
-
-    Network getNetwork() {
-      return network;
     }
 
     VehicleReturn getVehicleReturn() {

@@ -263,7 +263,7 @@ import org.matsim.vehicles.VehicleType;
 
       // The scheduler for the main run Resource is created and added to the Resource
       LSPResource mainRunResource =
-          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
+          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier)
               .setFromLinkId(depotLinkId)
               .setToLinkId(hubLinkId)
               .setMainRunCarrierScheduler(

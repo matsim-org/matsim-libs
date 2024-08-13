@@ -203,7 +203,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResourceLeft =
-            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft, network)
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
                     ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
@@ -281,7 +281,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             CarrierVehicle.newInstance(
                 Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
         LSPResource mainCarrierResource =
-            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
+            ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
                 .setFromLinkId(DEPOT_LINK_ID)
                 .setMainRunCarrierScheduler(
                     ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
