@@ -110,7 +110,7 @@ public class CollectionLSPMobsimTest {
 
 
 		collectionResource  = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, scenario.getNetwork())
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler()).setLocationLinkId(collectionLinkId)
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario)).setLocationLinkId(collectionLinkId)
 				.build();
 
 		final LogisticChainElement collectionElement;

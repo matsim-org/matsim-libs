@@ -251,7 +251,7 @@ final class ExampleTwoEchelonGrid {
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                   directCarrier, network)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
 
       LogisticChainElement directCarrierElement =
@@ -344,7 +344,7 @@ final class ExampleTwoEchelonGrid {
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                   distributionCarrier, network)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
 
       LogisticChainElement distributionCarrierElement =

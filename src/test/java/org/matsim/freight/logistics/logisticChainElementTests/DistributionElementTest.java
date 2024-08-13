@@ -79,7 +79,7 @@ public class DistributionElementTest {
 
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
 		adapter = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

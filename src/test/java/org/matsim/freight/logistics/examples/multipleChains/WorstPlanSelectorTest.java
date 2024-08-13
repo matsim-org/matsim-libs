@@ -103,7 +103,7 @@ public class WorstPlanSelectorTest {
 
 			CarriersUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
 			LSPResource singleCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
-					.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+					.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 					.build();
 
 			LogisticChainElement singleCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("singleCarrierElement", LogisticChainElement.class))
@@ -132,7 +132,7 @@ public class WorstPlanSelectorTest {
 
 				CarriersUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierSouthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
 				southCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("southCarrierElement", LogisticChainElement.class))
@@ -147,7 +147,7 @@ public class WorstPlanSelectorTest {
 
 				CarriersUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierNorthResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
 				northCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("northCarrierElement", LogisticChainElement.class))

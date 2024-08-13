@@ -103,7 +103,7 @@ public class MultipleChainsReplanningTest {
 
 				CarriersUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierLeftResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
 				leftCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("leftCarrierElement", LogisticChainElement.class))
@@ -118,7 +118,7 @@ public class MultipleChainsReplanningTest {
 
 				CarriersUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierRightResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 						.build();
 
 				rightCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("rightCarrierElement", LogisticChainElement.class))

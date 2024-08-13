@@ -101,7 +101,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 		LSPResource collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 

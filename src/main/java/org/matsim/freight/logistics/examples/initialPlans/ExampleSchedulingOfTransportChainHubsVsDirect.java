@@ -331,7 +331,7 @@ import org.matsim.vehicles.VehicleType;
                   distributionCarrier, network)
               .setLocationLinkId(hubLinkId)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
       // (The scheduler is where jsprit comes into play.)
 
@@ -374,7 +374,7 @@ import org.matsim.vehicles.VehicleType;
                   directDistributionCarrier, network)
               .setLocationLinkId(depotLinkId)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
       // (The scheduler is where jsprit comes into play.)
 

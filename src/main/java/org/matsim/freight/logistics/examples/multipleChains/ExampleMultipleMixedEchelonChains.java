@@ -246,7 +246,7 @@ final class ExampleMultipleMixedEchelonChains {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrier1, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement1 =
@@ -290,7 +290,7 @@ final class ExampleMultipleMixedEchelonChains {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     singleCarrier, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement singleCarrierElement =
@@ -363,7 +363,7 @@ final class ExampleMultipleMixedEchelonChains {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrier, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

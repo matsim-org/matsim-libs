@@ -44,7 +44,7 @@ import org.matsim.vehicles.VehicleType;
 
 /*package-private*/ class ExampleSchedulingOfInitialPlan {
 
-  private static LSP createInitialLSP(Network network) {
+  private static LSP createInitialLSP(Scenario scenario) {
 
     // The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
     Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -73,9 +73,10 @@ import org.matsim.vehicles.VehicleType;
 
     // The Resource i.e. the Resource is created
     LSPResource collectionResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
+                carrier, scenario.getNetwork())
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -161,7 +162,7 @@ import org.matsim.vehicles.VehicleType;
     Network network = scenario.getNetwork();
 
     // Create LSP and lspShipments
-    LSP lsp = createInitialLSP(network);
+    LSP lsp = createInitialLSP(scenario);
     Collection<LSPShipment> lspShipments = createInitialLSPShipments(network);
 
     // assign the lspShipments to the LSP

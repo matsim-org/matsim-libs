@@ -99,7 +99,7 @@ public class MainRunLSPMobsimTest {
 
 
 		LSPResource collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 

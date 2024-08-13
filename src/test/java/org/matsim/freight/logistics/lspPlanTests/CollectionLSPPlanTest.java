@@ -76,7 +76,7 @@ public class CollectionLSPPlanTest {
 
 
 		CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
+		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 
 

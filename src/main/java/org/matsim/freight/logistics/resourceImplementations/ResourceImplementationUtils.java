@@ -213,12 +213,12 @@ public class ResourceImplementationUtils {
     carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType);
   }
 
-  public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler() {
-    return new DistributionCarrierScheduler();
+  public static DistributionCarrierScheduler createDefaultDistributionCarrierScheduler(Scenario scenario) {
+    return new DistributionCarrierScheduler(scenario);
   }
 
-  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
-    return new CollectionCarrierScheduler();
+  public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler(Scenario scenario) {
+    return new CollectionCarrierScheduler(scenario);
   }
 
   /**

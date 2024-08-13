@@ -250,7 +250,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrierLeft, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElementLeft =
@@ -328,7 +328,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrier, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

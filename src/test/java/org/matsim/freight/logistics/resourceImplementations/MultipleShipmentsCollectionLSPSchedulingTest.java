@@ -85,7 +85,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
 				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network);
-		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
+		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionResource = adapterBuilder.build();
 

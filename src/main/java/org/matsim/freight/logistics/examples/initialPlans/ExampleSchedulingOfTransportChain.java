@@ -84,7 +84,7 @@ import org.matsim.vehicles.VehicleType;
         ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
                 collectionCarrier, network)
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -222,7 +222,7 @@ import org.matsim.vehicles.VehicleType;
 
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
     distributionResourceBuilder.setDistributionScheduler(
-        ResourceImplementationUtils.createDefaultDistributionCarrierScheduler());
+        ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario));
     LSPResource distributionResource = distributionResourceBuilder.build();
 
     // The adapter is now inserted into the corresponding LogisticsSolutionElement of the only

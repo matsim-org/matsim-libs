@@ -80,7 +80,7 @@ import org.matsim.vehicles.VehicleType;
         ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
                 carrier, scenario.getNetwork())
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 

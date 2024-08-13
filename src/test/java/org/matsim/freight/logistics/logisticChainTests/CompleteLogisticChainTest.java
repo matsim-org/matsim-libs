@@ -88,7 +88,7 @@ public class CompleteLogisticChainTest {
 
 		CollectionCarrierResourceBuilder collectionResourceBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder
 				.newInstance(collectionCarrier, network);
-		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 		Id<LogisticChainElement> collectionElementId = Id.create("CollectionElement",
@@ -189,7 +189,7 @@ public class CompleteLogisticChainTest {
 
 		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder
 				.newInstance(carrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

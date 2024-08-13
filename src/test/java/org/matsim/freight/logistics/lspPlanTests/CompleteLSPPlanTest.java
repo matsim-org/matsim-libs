@@ -80,7 +80,7 @@ public class CompleteLSPPlanTest {
 
 		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
 		final LSPResource collectionCarrierResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -179,7 +179,7 @@ public class CompleteLSPPlanTest {
 
 
 		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

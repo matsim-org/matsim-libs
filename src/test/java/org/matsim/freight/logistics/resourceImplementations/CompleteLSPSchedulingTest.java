@@ -94,7 +94,7 @@ public class CompleteLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -194,7 +194,7 @@ public class CompleteLSPSchedulingTest {
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		distributionResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

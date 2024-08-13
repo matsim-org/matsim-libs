@@ -216,7 +216,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
           ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                   singleCarrier, network)
               .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
 
       LogisticChainElement singleCarrierElement =
@@ -258,7 +258,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     carrierLeft, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         leftCarrierElement =
@@ -282,7 +282,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     carrierRight, network)
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         rightCarrierElement =

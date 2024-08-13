@@ -95,7 +95,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 
 		collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -197,7 +197,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 
 		distributionResource  = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 

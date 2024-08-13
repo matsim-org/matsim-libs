@@ -54,7 +54,7 @@ import org.matsim.vehicles.VehicleType;
 
   private ExampleLSPScoring() {}
 
-  private static LSP createLSPWithScorer(Network network) {
+  private static LSP createLSPWithScorer(Scenario scenario) {
 
     // The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
     var carrierVehicleType =
@@ -84,9 +84,10 @@ import org.matsim.vehicles.VehicleType;
     // The Resource i.e. the Resource is created
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
     LSPResource lspResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier, network)
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
+                carrier, scenario.getNetwork())
             .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
@@ -198,7 +199,7 @@ import org.matsim.vehicles.VehicleType;
     Scenario scenario = ScenarioUtils.loadScenario(config);
 
     // Create LSP and lspShipments
-    LSP lsp = createLSPWithScorer(scenario.getNetwork());
+    LSP lsp = createLSPWithScorer(scenario);
     Collection<LSPShipment> lspShipments = createInitialLSPShipments(scenario.getNetwork());
 
     // assign the lspShipments to the LSP

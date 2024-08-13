@@ -200,7 +200,7 @@ final class ExampleGroceryDeliveryMultipleChains {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     singleCarrier, scenario.getNetwork())
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement singleCarrierElement =
@@ -280,7 +280,7 @@ final class ExampleGroceryDeliveryMultipleChains {
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                     distributionCarrier, scenario.getNetwork())
                 .setDistributionScheduler(
-                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+                    ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                 .build();
 
         LogisticChainElement distributionCarrierElement =

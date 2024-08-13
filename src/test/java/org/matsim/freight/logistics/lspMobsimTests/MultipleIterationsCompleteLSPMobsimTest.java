@@ -104,7 +104,7 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 
 
 		LSPResource collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
-				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler())
+				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
 				.setLocationLinkId(collectionLinkId)
 				.build();
 
@@ -204,7 +204,7 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 		LSPResource distributionResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier, network)
-				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler())
+				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();
 
