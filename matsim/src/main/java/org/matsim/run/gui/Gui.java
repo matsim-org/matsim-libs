@@ -91,6 +91,11 @@ public class Gui extends JFrame {
 
 	private File configFile;
 	private File lastUsedDirectory;
+
+	/**
+	 * This is the working directory for the simulation. If it is null, the working directory is the directory of the config file.
+	 */
+	private File workingDirectory = null;
 	private ConfigEditor editor = null;
 	private ScheduleValidatorWindow transitValidator = null;
 
@@ -439,6 +444,8 @@ public class Gui extends JFrame {
 		textStdOut.setText("");
 		textErrOut.setText("");
 
+		String cwd = workingDirectory == null ? new File(txtConfigfilename.getText()).getParent() : workingDirectory.getAbsolutePath();
+
 		new Thread(() -> {
 			String classpath = System.getProperty("java.class.path");
 			String[] cpParts = classpath.split(File.pathSeparator);
@@ -457,8 +464,7 @@ public class Gui extends JFrame {
 					"--add-exports", "java.desktop/sun.java2d=ALL-UNNAMED",
 					mainClass, txtConfigfilename.getText() };
 			// see https://jogamp.org/bugzilla/show_bug.cgi?id=1317#c21 and/or https://github.com/matsim-org/matsim-libs/pull/2940
-			exeRunner = ExeRunner.run(cmdArgs, textStdOut, textErrOut,
-					new File(txtConfigfilename.getText()).getParent());
+			exeRunner = ExeRunner.run(cmdArgs, textStdOut, textErrOut, cwd);
 			int exitcode = exeRunner.waitForFinish();
 			exeRunner = null;
 
@@ -573,6 +579,10 @@ public class Gui extends JFrame {
 	public static void main(String[] args) {
 		Preconditions.checkArgument(args.length < 2);
 		Gui.show("MATSim", RunMatsim.class, args.length == 1 ? new File(args[0]) : null);
+	}
+
+	public void setWorkingDirectory(File cwd) {
+		this.workingDirectory = cwd;
 	}
 
 	// Is it a problem to make the following available to the outside?  If so, why?  Would it

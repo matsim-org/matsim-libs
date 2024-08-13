@@ -46,6 +46,11 @@ public class NoiseDashboardTests {
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**emission_per_day.csv")
 			.isDirectoryContaining("glob:**immission_per_day.avro")
-			.isDirectoryContaining("glob:**immission_per_hour.avro");
+			.isDirectoryContaining("glob:**immission_per_hour.avro")
+			.isDirectoryContaining("glob:**damages_receiverPoint_per_hour.avro")
+			.isDirectoryContaining("glob:**damages_receiverPoint_per_day.avro")
+			.isDirectoryContaining("glob:**noise_stats.csv");
+
+		//TODO check content / values of the files
 	}
 }
