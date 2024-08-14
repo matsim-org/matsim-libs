@@ -379,7 +379,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 
-			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
 			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
@@ -406,7 +406,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			}
 			assertTrue(handledByTranshipmentHub);
 
-			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+			assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
 			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 

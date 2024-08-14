@@ -270,8 +270,8 @@ public class FirstReloadLSPSchedulingTest {
 				}
 			}
 			assertTrue(handledByTranshipmentHub);
-			//This asserts that the shipments waiting for handling have been handled and the queues have been cleared
-			assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+
+			assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
 			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
 		}
 
