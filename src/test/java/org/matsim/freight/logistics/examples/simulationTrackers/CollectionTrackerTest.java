@@ -280,7 +280,7 @@ public class CollectionTrackerTest {
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}
 					}
-					log.warn("scheduledDistanceCosts=" + scheduledDistanceCosts);
+					log.warn("scheduledDistanceCosts={}", scheduledDistanceCosts);
 				}
 				totalScheduledCosts += scheduledDistanceCosts;
 				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts, trackedDistanceCosts) * 0.01);
