@@ -41,20 +41,20 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 public abstract class LSPResourceScheduler {
 
   protected LSPResource resource;
-  protected ArrayList<LspShipment> lspShipmentsToScedule;
+  protected ArrayList<LspShipment> lspShipmentsToSchedule;
 
   protected LSPPlan lspPlan;
 
   public final void scheduleShipments(LSPPlan lspPlan, LSPResource resource, int bufferTime) {
     this.lspPlan = lspPlan;
     this.resource = resource;
-    this.lspShipmentsToScedule = new ArrayList<>();
+    this.lspShipmentsToSchedule = new ArrayList<>();
     initializeValues(resource);
     presortIncomingShipments();
     scheduleResource();
     updateShipments();
     switchHandledShipments(bufferTime);
-    lspShipmentsToScedule.clear();
+    lspShipmentsToSchedule.clear();
   }
 
   /**
@@ -79,15 +79,15 @@ public abstract class LSPResourceScheduler {
   protected abstract void updateShipments();
 
   private void presortIncomingShipments() {
-    this.lspShipmentsToScedule = new ArrayList<>();
+    this.lspShipmentsToSchedule = new ArrayList<>();
     for (LogisticChainElement element : resource.getClientElements()) {
-      lspShipmentsToScedule.addAll(element.getIncomingShipments().getLspShipmentsWTime());
+      lspShipmentsToSchedule.addAll(element.getIncomingShipments().getLspShipmentsWTime());
     }
-    lspShipmentsToScedule.sort(Comparator.comparingDouble(LspShipment::getTime));
+    lspShipmentsToSchedule.sort(Comparator.comparingDouble(LspShipment::getTime));
   }
 
   private void switchHandledShipments(int bufferTime) {
-    for (LspShipment lspShipmentWithTime : lspShipmentsToScedule) {
+    for (LspShipment lspShipmentWithTime : lspShipmentsToSchedule) {
       var shipmentPlan = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
       lspShipmentWithTime.setTime(endOfTransportTime);
