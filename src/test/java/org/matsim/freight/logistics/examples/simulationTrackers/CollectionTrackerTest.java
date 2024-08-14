@@ -21,9 +21,6 @@
 
 package org.matsim.freight.logistics.examples.simulationTrackers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +54,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionTrackerTest {
 	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
@@ -209,7 +208,7 @@ public class CollectionTrackerTest {
 
 		assertEquals(1, logisticChain.getSimulationTrackers().size());
 		LSPSimulationTracker<LogisticChain> tracker = logisticChain.getSimulationTrackers().iterator().next();
-		assertTrue(tracker instanceof LinearCostTracker);
+		assertInstanceOf(LinearCostTracker.class, tracker);
 		LinearCostTracker linearTracker = (LinearCostTracker) tracker;
 		double totalScheduledCosts = 0;
 		double totalTrackedCosts = 0;

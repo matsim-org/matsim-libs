@@ -42,6 +42,7 @@
 
 package org.matsim.freight.logistics.examples.requirementsChecking;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -203,11 +204,11 @@ public class AssignerRequirementsTest {
 	public void testAssignerRequirements() {
 		for (Id<LspShipment> shipmentId : blueChain.getLspShipmentIds()) {
 			LspShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
-			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
+			assertInstanceOf(BlueRequirement.class, shipment.getRequirements().iterator().next());
 		}
 		for (Id<LspShipment> shipmentId : redChain.getLspShipmentIds()) {
 			LspShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
-			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
+			assertInstanceOf(RedRequirement.class, shipment.getRequirements().iterator().next());
 		}
 	}
 

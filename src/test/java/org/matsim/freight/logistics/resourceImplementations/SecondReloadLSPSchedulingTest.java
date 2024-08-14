@@ -358,7 +358,7 @@ public class SecondReloadLSPSchedulingTest {
 
 		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertTrue(eventHandlers.getFirst() instanceof TransshipmentHubTourEndEventHandler);
+		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
 		Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>> iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
@@ -385,7 +385,7 @@ public class SecondReloadLSPSchedulingTest {
 
 		assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
 		eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
-		assertTrue(eventHandlers.getFirst() instanceof TransshipmentHubTourEndEventHandler);
+		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 		reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
 		iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
@@ -419,7 +419,7 @@ public class SecondReloadLSPSchedulingTest {
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 
 			//CollectionTourEnd
-			assertTrue(eventHandlers.getFirst() instanceof LSPTourEndEventHandler);
+			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 			LSPTourEndEventHandler collectionEndHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(collectionEndHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(collectionEndHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
@@ -436,7 +436,7 @@ public class SecondReloadLSPSchedulingTest {
 			assertSame(collectionEndHandler.getResourceId(), resources.getFirst().getId());
 
 			//CollectionServiceEnd
-			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
+			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
 			CollectionServiceEndEventHandler collectionServiceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(collectionServiceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(collectionServiceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
@@ -453,7 +453,7 @@ public class SecondReloadLSPSchedulingTest {
 			assertSame(collectionServiceHandler.getResourceId(), resources.getFirst().getId());
 
 			//MainRunStart
-			assertTrue(eventHandlers.get(2) instanceof LSPTourStartEventHandler);
+			assertInstanceOf(LSPTourStartEventHandler.class, eventHandlers.get(2));
 			LSPTourStartEventHandler mainRunStartHandler = (LSPTourStartEventHandler) eventHandlers.get(2);
 			assertSame(mainRunStartHandler.getCarrierService().getLocationLinkId(), toLinkId);
 			assertEquals(mainRunStartHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -471,7 +471,7 @@ public class SecondReloadLSPSchedulingTest {
 			assertSame(mainRunStartHandler.getResourceId(), resources.get(2).getId());
 
 			//MainRunEnd
-			assertTrue(eventHandlers.get(3) instanceof LSPTourEndEventHandler);
+			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.get(3));
 			LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);
 			assertSame(mainRunEndHandler.getCarrierService().getLocationLinkId(), toLinkId);
 			assertEquals(mainRunEndHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
