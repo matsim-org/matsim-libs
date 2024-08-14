@@ -100,7 +100,6 @@ public class CollectionLSPMobsimTest {
 		// define carrier:
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();

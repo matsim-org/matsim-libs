@@ -95,7 +95,6 @@ public class AssignerRequirementsTest {
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities redCapabilities  = CarrierCapabilities.Builder.newInstance()
-				.addType(collectionType)
 				.addVehicle(redVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
@@ -127,7 +126,6 @@ public class AssignerRequirementsTest {
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities blueCapabilities = CarrierCapabilities.Builder.newInstance()
-				.addType(collectionType)
 				.addVehicle(blueVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();

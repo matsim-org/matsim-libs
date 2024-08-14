@@ -95,7 +95,6 @@ public class MultipleShipmentsFirstAndSecondReloadLSPMobsimTest {
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		collectionCapabilitiesBuilder.addType(collectionType);
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
@@ -146,7 +145,6 @@ public class MultipleShipmentsFirstAndSecondReloadLSPMobsimTest {
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
@@ -271,7 +269,7 @@ public class MultipleShipmentsFirstAndSecondReloadLSPMobsimTest {
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
+                    strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
 					return strategyManager;
 				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
