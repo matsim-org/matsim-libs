@@ -152,7 +152,7 @@ public class CollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( () -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance(ExampleLSPScoring.TipScorer::new);
 			}
 		});
 

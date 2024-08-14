@@ -182,12 +182,7 @@ public class CollectionLSPMobsimTest {
 			lsps = new LSPs(lspList);
 		}
 		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler(new BasicEventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				log.warn(event);
-			}
-		});
+		controler.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

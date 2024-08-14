@@ -174,7 +174,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( () -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance(ExampleLSPScoring.TipScorer::new);
 				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
