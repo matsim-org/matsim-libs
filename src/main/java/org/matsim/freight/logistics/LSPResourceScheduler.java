@@ -22,8 +22,8 @@ package org.matsim.freight.logistics;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /**
  * Resources are scheduled separately by calling their individual scheduling algorithm.
@@ -71,9 +71,9 @@ public abstract class LSPResourceScheduler {
   protected abstract void scheduleResource();
 
   /**
-   * Endows the involved {@link LSPShipment}s with information that resulted from the scheduling in
+   * Endows the involved {@link LspShipment}s with information that resulted from the scheduling in
    * a narrow sense in scheduleResource(). The information can be divided into two main components.
-   * 1.) the schedule of the {@link LSPShipment}s is updated if necessary 2.) the information for a
+   * 1.) the schedule of the {@link LspShipment}s is updated if necessary 2.) the information for a
    * later logging of the is added.
    */
   protected abstract void updateShipments();
@@ -89,7 +89,7 @@ public abstract class LSPResourceScheduler {
   private void switchHandledShipments(int bufferTime) {
     for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
       var shipmentPlan =
-          ShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getLspShipment().getId());
+          LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getLspShipment().getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
       LspShipmentWithTime outgoingTuple =
           new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getLspShipment());

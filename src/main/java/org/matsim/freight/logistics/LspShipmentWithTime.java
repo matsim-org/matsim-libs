@@ -20,7 +20,7 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 public class LspShipmentWithTime {
   // yyyyyy find better solution for this.  It is not so good to define an interface, and then
@@ -29,15 +29,15 @@ public class LspShipmentWithTime {
   // means (delivery time?  current time?).  kai,
   // jun'22
 
-  private final LSPShipment lspShipment;
+  private final LspShipment lspShipment;
   private final double time;
 
-  public LspShipmentWithTime(double time, LSPShipment lspShipment) {
+  public LspShipmentWithTime(double time, LspShipment lspShipment) {
     this.lspShipment = lspShipment;
     this.time = time;
   }
 
-  public LSPShipment getLspShipment() {
+  public LspShipment getLspShipment() {
     return lspShipment;
   }
 

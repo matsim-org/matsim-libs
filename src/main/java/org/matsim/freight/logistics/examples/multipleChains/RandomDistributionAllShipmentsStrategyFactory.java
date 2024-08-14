@@ -33,7 +33,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  *  This strategy removes **all** shipments from the logistic chains and reassigns them randomly.
@@ -74,7 +74,7 @@ final class RandomDistributionAllShipmentsStrategyFactory {
                         List<LogisticChain> logisticChains =
                                 new ArrayList<>(lsp.getSelectedPlan().getLogisticChains());
 
-                        for (LSPShipment lspShipment : lsp.getLspShipments()) {
+                        for (LspShipment lspShipment : lsp.getLspShipments()) {
                             int index = MatsimRandom.getRandom().nextInt(logisticChains.size());
                             logisticChains.get(index).addShipmentToChain(lspShipment);
                         }

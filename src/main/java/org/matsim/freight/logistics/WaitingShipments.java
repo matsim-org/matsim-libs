@@ -21,7 +21,7 @@
 package org.matsim.freight.logistics;
 
 import java.util.Collection;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * Each LogisticsSolutionElement maintains two collections of WaitingShipments. Instances of the
@@ -41,7 +41,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
  */
 public interface WaitingShipments {
 
-  void addShipment(double time, LSPShipment lspShipment);
+  void addShipment(double time, LspShipment lspShipment);
 
   Collection<LspShipmentWithTime> getSortedLspShipments();
 

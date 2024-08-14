@@ -36,9 +36,9 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -116,14 +116,14 @@ import org.matsim.vehicles.VehicleType;
         .build();
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
     // Create five LSPShipments that are located in the left half of the network.
     for (int i = 1; i < 6; i++) {
-      Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-      ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+      Id<LspShipment> id = Id.create(i, LspShipment.class);
+      LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
       Random random = new Random(1);
       int capacityDemand = random.nextInt(4);
       builder.setCapacityDemand(capacityDemand);
@@ -163,10 +163,10 @@ import org.matsim.vehicles.VehicleType;
 
     // Create LSP and lspShipments
     LSP lsp = createInitialLSP(scenario);
-    Collection<LSPShipment> lspShipments = createInitialLSPShipments(network);
+    Collection<LspShipment> lspShipments = createInitialLSPShipments(network);
 
     // assign the lspShipments to the LSP
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -174,20 +174,20 @@ import org.matsim.vehicles.VehicleType;
     lsp.scheduleLogisticChains();
 
     // print the schedules for the assigned LSPShipments
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       System.out.println("Shipment: " + lspShipment.getId());
-      ArrayList<ShipmentPlanElement> scheduleElements =
+      ArrayList<LspShipmentPlanElement> scheduleElements =
           new ArrayList<>(
-              ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
+              LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
                   .getPlanElements()
                   .values());
-      scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-      ArrayList<ShipmentPlanElement> logElements =
+      scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
+      ArrayList<LspShipmentPlanElement> logElements =
           new ArrayList<>(lspShipment.getShipmentLog().getPlanElements().values());
-      logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
+      logElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-      for (ShipmentPlanElement element :
-          ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
+      for (LspShipmentPlanElement element :
+          LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
               .getPlanElements()
               .values()) {
         System.out.println(

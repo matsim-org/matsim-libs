@@ -23,39 +23,39 @@ package org.matsim.freight.logistics.shipment;
 import java.util.*;
 import org.matsim.api.core.v01.Id;
 
-/*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
+/*package-private*/ class LspShipmentPlanImpl implements LspShipmentPlan {
 
-  private final Id<LSPShipment> lspShipmentId;
-  private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> planElements;
+  private final Id<LspShipment> lspShipmentId;
+  private final LinkedHashMap<Id<LspShipmentPlanElement>, LspShipmentPlanElement> planElements;
 
-  ShipmentPlanImpl(Id<LSPShipment> lspShipmentId) {
+  LspShipmentPlanImpl(Id<LspShipment> lspShipmentId) {
     this.lspShipmentId = lspShipmentId;
     this.planElements = new LinkedHashMap<>();
   }
 
   // TODO: Ist kein embedding container!
   @Override
-  public void setEmbeddingContainer(Id<LSPShipment> pointer) {
+  public void setEmbeddingContainer(Id<LspShipment> pointer) {
     throw new RuntimeException("not implemented");
   }
 
   @Override
-  public Id<LSPShipment> getLspShipmentId() {
+  public Id<LspShipment> getLspShipmentId() {
     return lspShipmentId;
   }
 
   @Override
-  public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
+  public void addPlanElement(Id<LspShipmentPlanElement> id, LspShipmentPlanElement element) {
     planElements.put(id, element);
   }
 
   @Override
-  public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
+  public Map<Id<LspShipmentPlanElement>, LspShipmentPlanElement> getPlanElements() {
     return Collections.unmodifiableMap(planElements);
   }
 
   @Override
-  public ShipmentPlanElement getMostRecentEntry() {
+  public LspShipmentPlanElement getMostRecentEntry() {
 
     // there is no method to remove entries.  in consequence, the only way to change the result of
     // this method is to "add" additional material into the plan.  Possibly,
@@ -63,7 +63,7 @@ import org.matsim.api.core.v01.Id;
     // figure out how the next one can be added.  However, this then
     // should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
-    ArrayList<ShipmentPlanElement> logList = new ArrayList<>(planElements.values());
+    ArrayList<LspShipmentPlanElement> logList = new ArrayList<>(planElements.values());
     logList.sort(new LogElementComparator());
     Collections.reverse(logList);
     return logList.getFirst();
@@ -74,10 +74,10 @@ import org.matsim.api.core.v01.Id;
     planElements.clear();
   }
 
-  static class LogElementComparator implements Comparator<ShipmentPlanElement> {
+  static class LogElementComparator implements Comparator<LspShipmentPlanElement> {
 
     @Override
-    public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
+    public int compare(LspShipmentPlanElement o1, LspShipmentPlanElement o2) {
       if (o1.getStartTime() > o2.getStartTime()) {
         return 1;
       }

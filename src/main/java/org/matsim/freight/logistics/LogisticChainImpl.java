@@ -25,14 +25,14 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /* package-private */ class LogisticChainImpl extends LSPDataObject<LogisticChain>
     implements LogisticChain {
   private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
 
   private final Collection<LogisticChainElement> logisticChainElements;
-  private final Collection<Id<LSPShipment>> lspShipmentIds;
+  private final Collection<Id<LspShipment>> lspShipmentIds;
   private LSP lsp;
 
   LogisticChainImpl(LSPUtils.LogisticChainBuilder builder) {
@@ -60,12 +60,12 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public Collection<Id<LSPShipment>> getLspShipmentIds() {
+  public Collection<Id<LspShipment>> getLspShipmentIds() {
     return lspShipmentIds;
   }
 
   @Override
-  public void addShipmentToChain(LSPShipment lspShipment) {
+  public void addShipmentToChain(LspShipment lspShipment) {
     lspShipmentIds.add(lspShipment.getId());
   }
 
@@ -86,7 +86,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
     strb.append("[No of Shipments=").append(lspShipmentIds.size()).append("] \n");
     if (!lspShipmentIds.isEmpty()) {
       strb.append("{ShipmentIds=");
-      for (Id<LSPShipment> lspShipmentId : lspShipmentIds) {
+      for (Id<LspShipment> lspShipmentId : lspShipmentIds) {
         strb.append("[").append(lspShipmentId.toString()).append("]");
       }
       strb.append("}");

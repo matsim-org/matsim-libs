@@ -24,13 +24,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * Ganz einfacher {@link InitialShipmentAssigner}: Voraussetzung: Der {@link LSPPlan} hat genau 1 {@link
  * LogisticChain}.
  *
- * <p>Dann wird das {@link LSPShipment} diesem zugeordnet.
+ * <p>Dann wird das {@link LspShipment} diesem zugeordnet.
  *
  * <p>(Falls die Voraussetzung "exakt 1 LogisticChain pro Plan" nicht erfüllt ist, kommt eine
  * RuntimeException)
@@ -40,7 +40,7 @@ class SingleLogisticChainShipmentAssigner implements InitialShipmentAssigner {
   SingleLogisticChainShipmentAssigner() {}
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
+  public void assignToPlan(LSPPlan lspPlan, LspShipment lspShipment) {
     Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
     LogisticChain singleSolution = lspPlan.getLogisticChains().iterator().next();
     singleSolution.addShipmentToChain(lspShipment);

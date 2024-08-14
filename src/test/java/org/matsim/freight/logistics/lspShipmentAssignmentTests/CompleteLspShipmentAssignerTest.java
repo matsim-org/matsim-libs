@@ -40,12 +40,12 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-public class CompleteLSPShipmentAssignerTest {
+public class CompleteLspShipmentAssignerTest {
 
 	private LSPPlan completePlan;
 	private LSP completeLSP;
@@ -226,8 +226,8 @@ public class CompleteLSPShipmentAssignerTest {
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		for (int i = 1; i < 11; i++) {
-			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create(i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 

@@ -22,11 +22,11 @@ package org.matsim.freight.logistics.shipment;
 
 import java.util.Comparator;
 
-final class ShipmentPlanElementComparator implements Comparator<ShipmentPlanElement> {
+final class ShipmentPlanElementComparator implements Comparator<LspShipmentPlanElement> {
 
   ShipmentPlanElementComparator() {}
 
-  public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
+  public int compare(LspShipmentPlanElement o1, LspShipmentPlanElement o2) {
     if (o1.getStartTime() > o2.getStartTime()) {
       return 1;
     }

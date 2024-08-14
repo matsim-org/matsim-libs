@@ -34,22 +34,22 @@ import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentLeg;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentLeg;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /*package-private*/ class LSPTourStartEventHandler
-    implements CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
+    implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final Tour tour;
   private final CarrierService carrierService;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
-  private LSPShipment lspShipment;
+  private LspShipment lspShipment;
 
   public LSPTourStartEventHandler(
-      LSPShipment lspShipment,
+      LspShipment lspShipment,
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
@@ -101,41 +101,41 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
   private void logLoad(Id<Carrier> carrierId, Id<Link> linkId,
       double startTime, double endTime) {
-    ShipmentUtils.LoggedShipmentLoadBuilder builder =
-        ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentLoadBuilder builder =
+        LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
-    ShipmentPlanElement loggedShipmentLoad = builder.build();
+    LspShipmentPlanElement loggedShipmentLoad = builder.build();
     String idString =
         loggedShipmentLoad.getResourceId()
             + ""
             + loggedShipmentLoad.getLogisticChainElement().getId()
             + loggedShipmentLoad.getElementType();
-    Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
+    Id<LspShipmentPlanElement> loadId = Id.create(idString, LspShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
   }
 
   private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId,
       Id<Link> toLinkId, double startTime) {
-    ShipmentUtils.LoggedShipmentTransportBuilder builder =
-        ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentTransportBuilder builder =
+        LspShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setFromLinkId(fromLinkId);
     builder.setToLinkId(toLinkId);
     builder.setLogisticChainElement(logisticChainElement);
     builder.setResourceId(resource.getId());
     builder.setStartTime(startTime);
-    ShipmentLeg transport = builder.build();
+    LspShipmentLeg transport = builder.build();
     String idString =
         transport.getResourceId()
             + ""
             + transport.getLogisticChainElement().getId()
             + transport.getElementType();
-    Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
+    Id<LspShipmentPlanElement> transportId = Id.create(idString, LspShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(transportId, transport);
   }
 
@@ -153,7 +153,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
     return carrierService;
   }
 
-  public LSPShipment getLspShipment() {
+  public LspShipment getLspShipment() {
     return lspShipment;
   }
 
@@ -166,7 +166,7 @@ import org.matsim.freight.logistics.shipment.ShipmentUtils;
   }
 
   @Override
-  public void setEmbeddingContainer(LSPShipment pointer) {
+  public void setEmbeddingContainer(LspShipment pointer) {
     this.lspShipment = pointer;
   }
 }

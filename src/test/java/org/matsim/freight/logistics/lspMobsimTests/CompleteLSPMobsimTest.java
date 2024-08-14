@@ -44,9 +44,9 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -239,8 +239,8 @@ public class CompleteLSPMobsimTest {
 		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 		Random rand = new Random(1);
 		for (int i = 1; i < 2; i++) {
-			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create(i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 			int capacityDemand = 1 + rand.nextInt(4);
 			builder.setCapacityDemand(capacityDemand);
 
@@ -277,7 +277,7 @@ public class CompleteLSPMobsimTest {
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
-			LSPShipment shipment = builder.build();
+			LspShipment shipment = builder.build();
 			completeLSP.assignShipmentToLSP(shipment);
 		}
 		completeLSP.scheduleLogisticChains();
@@ -310,15 +310,15 @@ public class CompleteLSPMobsimTest {
 
 	@Test
 	public void testFirstReloadLSPMobsim() {
-		for (LSPShipment shipment : completeLSP.getLspShipments()) {
+		for (LspShipment shipment : completeLSP.getLspShipments()) {
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(ShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
-			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
-			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
+			ArrayList<LspShipmentPlanElement> scheduleElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
+			scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
+			ArrayList<LspShipmentPlanElement> logElements = new ArrayList<>(shipment.getShipmentLog().getPlanElements().values());
+			logElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-			for (ShipmentPlanElement scheduleElement : scheduleElements) {
-				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+			for (LspShipmentPlanElement scheduleElement : scheduleElements) {
+				LspShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
 				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
 				assertSame(scheduleElement.getLogisticChainElement(), logElement.getLogisticChainElement());

@@ -34,7 +34,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  *  This strategy removes **one** randomly selected shipment from logistic chain with the most shipments and reassign it to one of the chains with the lowest number of shipments.
@@ -87,7 +87,7 @@ class RebalancingStrategyFactory {
             if (minChain.equals(maxChain)) return;
 
             // get the first shipment ID from the chain with the maximum shipment count
-            Id<LSPShipment> shipmentIdForReplanning = maxChain.getLspShipmentIds().iterator().next();
+            Id<LspShipment> shipmentIdForReplanning = maxChain.getLspShipmentIds().iterator().next();
 
             // iterate through the chains and move the shipment from the max chain to the min chain
             for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {

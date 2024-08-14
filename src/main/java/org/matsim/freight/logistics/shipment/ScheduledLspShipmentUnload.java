@@ -21,42 +21,26 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-final class LoggedShipmentTransport implements ShipmentLeg {
+class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
 
   private final double startTime;
+  private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
-  private final Id<Link> fromLinkId;
-  private double endTime;
-  private Id<Link> toLinkId;
 
-  LoggedShipmentTransport(ShipmentUtils.LoggedShipmentTransportBuilder builder) {
-    this.startTime = builder.getStartTime();
-    this.element = builder.getElement();
-    this.resourceId = builder.getResourceId();
-    this.fromLinkId = builder.getFromLinkId();
-    this.toLinkId = builder.getToLinkId();
-  }
-
-  @Override
-  public LogisticChainElement getLogisticChainElement() {
-    return element;
-  }
-
-  @Override
-  public Id<LSPResource> getResourceId() {
-    return resourceId;
-  }
+    ScheduledLspShipmentUnload(LspShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+    }
 
   @Override
   public String getElementType() {
-    return "TRANSPORT";
+    return "UNLOAD";
   }
 
   @Override
@@ -69,29 +53,14 @@ final class LoggedShipmentTransport implements ShipmentLeg {
     return endTime;
   }
 
-  public void setEndTime(double endTime) {
-    this.endTime = endTime;
-  }
-
-  public Id<Link> getFromLinkId() {
-    return fromLinkId;
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
   }
 
   @Override
-  public CarrierService getCarrierService() {
-    throw new RuntimeException("not implemented");
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
   }
 
-  public Id<Link> getToLinkId() {
-    return toLinkId;
-  }
-
-  public void setToLinkId(Id<Link> toLinkId) {
-    this.toLinkId = toLinkId;
-  }
-
-  @Override
-  public Id<Carrier> getCarrierId() {
-    throw new RuntimeException("not implemented");
-  }
 }

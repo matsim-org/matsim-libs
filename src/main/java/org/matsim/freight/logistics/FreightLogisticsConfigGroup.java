@@ -35,22 +35,6 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     static final String LSPS_FILE = "lspsFile";
     private static final String LSPS_FILE_DESC = "Freight LogisticsServiceProviders (LSP)s File, according to MATSim logistics extension as part of MATSim's freight contrib.";
 
-
-    public enum LogicOfVrp {serviceBased, shipmentBased}
-
-    static final String VRP_LOGIC_OF_DISTRIBUTION_CARRIER = "vrpLogicOfDistributionCarrier";
-    private LogicOfVrp vrpLogicOfDistributionCarrier = LogicOfVrp.serviceBased;
-    private static final String VRP_LOGIC_OF_DISTRIBUTION_CARRIER_DESC = "Define, on which type of jobs the VRP of the **distribution** carrier will base on:" + Arrays.toString(LogicOfVrp.values());
-
-    static final String VRP_LOGIC_OF_MAINRUN_CARRIER = "vrpLogicOfMainRunCarrier";
-    private LogicOfVrp vrpLogicOfMainRunCarrier = LogicOfVrp.serviceBased;
-    private static final String VRP_LOGIC_OF_MAINRUN_CARRIER_DESC = "Define, on which type of jobs the VRP of the **MainRun** carrier will base on:" + Arrays.toString(LogicOfVrp.values());
-
-    static final String VRP_LOGIC_OF_COLLECTION_CARRIER = "vrpLogicOfCollectionCarrier";
-    private LogicOfVrp vrpLogicOfCollectionCarrier = LogicOfVrp.serviceBased;
-    private static final String VRP_LOGIC_OF_COLLECTION_CARRIER_DESC = "Define, on which type of jobs the VRP of the **Collection** carrier will base on:" + Arrays.toString(LogicOfVrp.values());
-
-
     public FreightLogisticsConfigGroup() {
         super(GROUPNAME);
     }
@@ -79,56 +63,70 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
 
 
     //---
+    // Commenting this out, because in a frist step I think it is better/ more streight forward to have the VRP logic in the carriers as an attribute.
+    // please see {@link CarrierSchedulerUtils#setVrpLogic(carrier, VRPLogic)} and {@link CarrierSchedulerUtils#getVrpLogic(carrier)}
     //---
 
-    /**
-     *
-     * @return The internal type of jobs, on which the VRPs of the distribution carrier bases on.
-     */
-    @StringGetter(VRP_LOGIC_OF_DISTRIBUTION_CARRIER)
-    public LogicOfVrp getVrpLogicOfDistributionCarrier() {
-        return vrpLogicOfDistributionCarrier;
-    }
-
-    /**
-     * @param vrpLogicOfDistributionCarrier {@value #VRP_LOGIC_OF_DISTRIBUTION_CARRIER}
-     */
-    @StringSetter(VRP_LOGIC_OF_DISTRIBUTION_CARRIER)
-    public void setVrpLogicOfDistributionCarrier(LogicOfVrp vrpLogicOfDistributionCarrier) {
-        this.vrpLogicOfDistributionCarrier = vrpLogicOfDistributionCarrier;
-    }
-
-    /**
-     * @return The internal type of jobs, on which the VRPs of the main run carrier bases on.
-     */
-    @StringGetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_MAINRUN_CARRIER)
-    public LogicOfVrp getVrpLogicOfMainRunCarrier() {
-        return vrpLogicOfMainRunCarrier;
-    }
-
-    /**
-     * @param vrpLogicOfMainRunCarrier {@value #VRP_LOGIC_OF_MAINRUN_CARRIER}
-     */
-    @StringSetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_MAINRUN_CARRIER)
-    public void setVrpLogicOfMainRunCarrier(LogicOfVrp vrpLogicOfMainRunCarrier) {
-        this.vrpLogicOfMainRunCarrier = vrpLogicOfMainRunCarrier;
-    }
-
-    /**
-     * @return The internal type of jobs, on which the VRPs of the collection carrier bases on.
-     */
-    @StringGetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_COLLECTION_CARRIER)
-    public LogicOfVrp getVrpLogicOfCollectionCarrier() {
-        return vrpLogicOfCollectionCarrier;
-    }
-
-    /**
-     * @param vrpLogicOfCollectionCarrier {@value #VRP_LOGIC_OF_COLLECTION_CARRIER}
-     */
-    @StringSetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_COLLECTION_CARRIER)
-    public void setVrpLogicOfCollectionCarrier(LogicOfVrp vrpLogicOfCollectionCarrier) {
-        this.vrpLogicOfCollectionCarrier = vrpLogicOfCollectionCarrier;
-    }
+//    static final String VRP_LOGIC_OF_DISTRIBUTION_CARRIER = "vrpLogicOfDistributionCarrier";
+//    private LSPUtils.LogicOfVrp vrpLogicOfDistributionCarrier = LSPUtils.LogicOfVrp.serviceBased;
+//    private static final String VRP_LOGIC_OF_DISTRIBUTION_CARRIER_DESC = "Define, on which type of jobs the VRP of the **distribution** carrier will base on:" + Arrays.toString(LSPUtils.LogicOfVrp.values());
+//
+//    static final String VRP_LOGIC_OF_MAINRUN_CARRIER = "vrpLogicOfMainRunCarrier";
+//    private LSPUtils.LogicOfVrp vrpLogicOfMainRunCarrier = LSPUtils.LogicOfVrp.serviceBased;
+//    private static final String VRP_LOGIC_OF_MAINRUN_CARRIER_DESC = "Define, on which type of jobs the VRP of the **MainRun** carrier will base on:" + Arrays.toString(LSPUtils.LogicOfVrp.values());
+//
+//    static final String VRP_LOGIC_OF_COLLECTION_CARRIER = "vrpLogicOfCollectionCarrier";
+//    private LSPUtils.LogicOfVrp vrpLogicOfCollectionCarrier = LSPUtils.LogicOfVrp.serviceBased;
+//    private static final String VRP_LOGIC_OF_COLLECTION_CARRIER_DESC = "Define, on which type of jobs the VRP of the **Collection** carrier will base on:" + Arrays.toString(LSPUtils.LogicOfVrp.values());
+//
+//    /**
+//     *
+//     * @return The internal type of jobs, on which the VRPs of the distribution carrier bases on.
+//     */
+//    @StringGetter(VRP_LOGIC_OF_DISTRIBUTION_CARRIER)
+//    public LSPUtils.LogicOfVrp getVrpLogicOfDistributionCarrier() {
+//        return vrpLogicOfDistributionCarrier;
+//    }
+//
+//    /**
+//     * @param vrpLogicOfDistributionCarrier {@value #VRP_LOGIC_OF_DISTRIBUTION_CARRIER}
+//     */
+//    @StringSetter(VRP_LOGIC_OF_DISTRIBUTION_CARRIER)
+//    public void setVrpLogicOfDistributionCarrier(LSPUtils.LogicOfVrp vrpLogicOfDistributionCarrier) {
+//        this.vrpLogicOfDistributionCarrier = vrpLogicOfDistributionCarrier;
+//    }
+//
+//    /**
+//     * @return The internal type of jobs, on which the VRPs of the main run carrier bases on.
+//     */
+//    @StringGetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_MAINRUN_CARRIER)
+//    public LSPUtils.LogicOfVrp getVrpLogicOfMainRunCarrier() {
+//        return vrpLogicOfMainRunCarrier;
+//    }
+//
+//    /**
+//     * @param vrpLogicOfMainRunCarrier {@value #VRP_LOGIC_OF_MAINRUN_CARRIER}
+//     */
+//    @StringSetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_MAINRUN_CARRIER)
+//    public void setVrpLogicOfMainRunCarrier(LSPUtils.LogicOfVrp vrpLogicOfMainRunCarrier) {
+//        this.vrpLogicOfMainRunCarrier = vrpLogicOfMainRunCarrier;
+//    }
+//
+//    /**
+//     * @return The internal type of jobs, on which the VRPs of the collection carrier bases on.
+//     */
+//    @StringGetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_COLLECTION_CARRIER)
+//    public LSPUtils.LogicOfVrp getVrpLogicOfCollectionCarrier() {
+//        return vrpLogicOfCollectionCarrier;
+//    }
+//
+//    /**
+//     * @param vrpLogicOfCollectionCarrier {@value #VRP_LOGIC_OF_COLLECTION_CARRIER}
+//     */
+//    @StringSetter(FreightLogisticsConfigGroup.VRP_LOGIC_OF_COLLECTION_CARRIER)
+//    public void setVrpLogicOfCollectionCarrier(LSPUtils.LogicOfVrp vrpLogicOfCollectionCarrier) {
+//        this.vrpLogicOfCollectionCarrier = vrpLogicOfCollectionCarrier;
+//    }
 
     //---
     //---
@@ -136,9 +134,9 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(LSPS_FILE, LSPS_FILE_DESC);
-        map.put(VRP_LOGIC_OF_DISTRIBUTION_CARRIER, VRP_LOGIC_OF_DISTRIBUTION_CARRIER_DESC);
-        map.put(VRP_LOGIC_OF_MAINRUN_CARRIER, VRP_LOGIC_OF_MAINRUN_CARRIER_DESC);
-        map.put(VRP_LOGIC_OF_COLLECTION_CARRIER, VRP_LOGIC_OF_COLLECTION_CARRIER_DESC);
+//        map.put(VRP_LOGIC_OF_DISTRIBUTION_CARRIER, VRP_LOGIC_OF_DISTRIBUTION_CARRIER_DESC);
+//        map.put(VRP_LOGIC_OF_MAINRUN_CARRIER, VRP_LOGIC_OF_MAINRUN_CARRIER_DESC);
+//        map.put(VRP_LOGIC_OF_COLLECTION_CARRIER, VRP_LOGIC_OF_COLLECTION_CARRIER_DESC);
         return map;
     }
 

@@ -22,12 +22,12 @@ package org.matsim.freight.logistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
+import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 
 public class LSPPlanImpl implements LSPPlan {
 
   private final Collection<LogisticChain> logisticChains;
-  private final Collection<ShipmentPlan> shipmentPlans;
+  private final Collection<LspShipmentPlan> lspShipmentPlans;
   private LSP lsp;
   private Double score = null;
   private InitialShipmentAssigner assigner;
@@ -35,7 +35,7 @@ public class LSPPlanImpl implements LSPPlan {
 
   public LSPPlanImpl() {
     this.logisticChains = new ArrayList<>();
-    this.shipmentPlans = new ArrayList<>();
+    this.lspShipmentPlans = new ArrayList<>();
   }
 
   @Override
@@ -62,13 +62,13 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public Collection<ShipmentPlan> getShipmentPlans() {
-    return this.shipmentPlans;
+  public Collection<LspShipmentPlan> getShipmentPlans() {
+    return this.lspShipmentPlans;
   }
 
   @Override
-  public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
-    this.shipmentPlans.add(shipmentPlan);
+  public LSPPlan addShipmentPlan(LspShipmentPlan lspShipmentPlan) {
+    this.lspShipmentPlans.add(lspShipmentPlan);
     return null;
   }
 

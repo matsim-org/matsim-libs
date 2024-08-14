@@ -31,8 +31,8 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 class MultipleChainsUtils {
   private MultipleChainsUtils() {}
@@ -50,15 +50,15 @@ class MultipleChainsUtils {
     return new PrimaryLogisticChainShipmentAssigner();
   }
 
-  public static Collection<LSPShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
-    List<LSPShipment> shipmentList = new ArrayList<>();
+  public static Collection<LspShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
+    List<LspShipment> shipmentList = new ArrayList<>();
 
     List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream().toList();
 
     for (CarrierShipment shipment : carrierShipments) {
-      ShipmentUtils.LSPShipmentBuilder builder =
-          ShipmentUtils.LSPShipmentBuilder.newInstance(
-              Id.create(shipment.getId().toString(), LSPShipment.class));
+      LspShipmentUtils.LspShipmentBuilder builder =
+          LspShipmentUtils.LspShipmentBuilder.newInstance(
+              Id.create(shipment.getId().toString(), LspShipment.class));
       builder.setCapacityDemand(shipment.getSize());
       builder.setFromLinkId(shipment.getFrom());
       builder.setToLinkId(shipment.getTo());

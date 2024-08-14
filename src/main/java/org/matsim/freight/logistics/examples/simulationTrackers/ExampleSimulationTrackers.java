@@ -39,8 +39,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -129,14 +129,14 @@ import org.matsim.vehicles.VehicleType;
     return collectionLSPBuilder.build();
   }
 
-  public static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-    ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+  public static Collection<LspShipment> createInitialLSPShipments(Network network) {
+    ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
     // Create five LSPShipments that are located in the left half of the network.
     for (int i = 1; i < 6; i++) {
-      Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-      ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+      Id<LspShipment> id = Id.create(i, LspShipment.class);
+      LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
       Random random = new Random(1);
       int capacityDemand = random.nextInt(4);
       builder.setCapacityDemand(capacityDemand);
@@ -176,10 +176,10 @@ import org.matsim.vehicles.VehicleType;
 
     // Create LSP and lspShipments
     LSP lsp = createLSPWithTracker(scenario);
-    Collection<LSPShipment> lspShipments = createInitialLSPShipments(network);
+    Collection<LspShipment> lspShipments = createInitialLSPShipments(network);
 
     // assign the lspShipments to the LSP
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 

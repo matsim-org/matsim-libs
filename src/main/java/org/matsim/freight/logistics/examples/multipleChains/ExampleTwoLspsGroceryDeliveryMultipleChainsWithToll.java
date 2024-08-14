@@ -49,7 +49,7 @@ import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -252,7 +252,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
    * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
    * @return the LSP
    */
-  private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LSPShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
+  private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
     //Chains
     LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect);
@@ -274,7 +274,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             .build();
 
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -395,7 +395,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
    * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
    * @return the LSP
    */
-  private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LSPShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
+  private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
 
     LSPPlan lspPlan = LSPUtils.createLSPPlan()
@@ -411,7 +411,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                     .build();
 
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 

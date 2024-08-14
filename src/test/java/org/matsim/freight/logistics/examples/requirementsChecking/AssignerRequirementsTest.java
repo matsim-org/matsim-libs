@@ -60,8 +60,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -164,8 +164,8 @@ public class AssignerRequirementsTest {
 		Random rand = new Random(1);
 
 		for (int i = 1; i < 11; i++) {
-			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create(i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 			int capacityDemand = rand.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
@@ -194,19 +194,19 @@ public class AssignerRequirementsTest {
 				builder.addRequirement(new RedRequirement());
 			}
 
-			LSPShipment shipment = builder.build();
+			LspShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 	}
 
 	@Test
 	public void testAssignerRequirements() {
-		for (Id<LSPShipment> shipmentId : blueChain.getLspShipmentIds()) {
-			LSPShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
+		for (Id<LspShipment> shipmentId : blueChain.getLspShipmentIds()) {
+			LspShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
 		}
-		for (Id<LSPShipment> shipmentId : redChain.getLspShipmentIds()) {
-			LSPShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
+		for (Id<LspShipment> shipmentId : redChain.getLspShipmentIds()) {
+			LspShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
 			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
 		}
 	}

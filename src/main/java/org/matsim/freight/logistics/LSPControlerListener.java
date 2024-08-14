@@ -43,7 +43,7 @@ import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controler.CarrierAgentTracker;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 class LSPControlerListener
     implements StartupListener,
@@ -134,7 +134,7 @@ class LSPControlerListener
       }
 
       // simulation trackers of shipments:
-      for (LSPShipment lspShipment : lsp.getLspShipments()) {
+      for (LspShipment lspShipment : lsp.getLspShipments()) {
         registerSimulationTrackers(lspShipment);
       }
 

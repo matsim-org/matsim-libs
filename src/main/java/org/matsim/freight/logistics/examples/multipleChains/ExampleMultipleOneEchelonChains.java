@@ -48,8 +48,8 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 final class ExampleMultipleOneEchelonChains {
@@ -305,7 +305,7 @@ final class ExampleMultipleOneEchelonChains {
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
-    for (LSPShipment lspShipment : createInitialLSPShipments()) {
+    for (LspShipment lspShipment : createInitialLSPShipments()) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
@@ -315,8 +315,8 @@ final class ExampleMultipleOneEchelonChains {
     return lsp;
   }
 
-  private static Collection<LSPShipment> createInitialLSPShipments() {
-    List<LSPShipment> lspShipmentList = new ArrayList<>();
+  private static Collection<LspShipment> createInitialLSPShipments() {
+    List<LspShipment> lspShipmentList = new ArrayList<>();
     int capacityDemand;
 
     switch (demandSetting) {
@@ -327,8 +327,8 @@ final class ExampleMultipleOneEchelonChains {
 
     for (int i = 1; i <= 10; i++) {
       if (i % 2 != 0) {
-        Id<LSPShipment> id = Id.create("ShipmentLeft_" + i, LSPShipment.class);
-        ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        Id<LspShipment> id = Id.create("ShipmentLeft_" + i, LspShipment.class);
+        LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         builder.setCapacityDemand(capacityDemand);
         builder.setFromLinkId(DEPOT_LINK_ID);
@@ -341,8 +341,8 @@ final class ExampleMultipleOneEchelonChains {
 
         lspShipmentList.add(builder.build());
       } else {
-        Id<LSPShipment> id = Id.create("ShipmentRight_" + i, LSPShipment.class);
-        ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        Id<LspShipment> id = Id.create("ShipmentRight_" + i, LspShipment.class);
+        LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         builder.setCapacityDemand(capacityDemand);
         builder.setFromLinkId(DEPOT_LINK_ID);

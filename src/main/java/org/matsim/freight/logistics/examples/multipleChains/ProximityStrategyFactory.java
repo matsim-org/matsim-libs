@@ -36,7 +36,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  *  This strategy removes **one** randomly selected shipment from logistic chain with the most shipments and reassign it to the chain with the closest chain.
@@ -76,17 +76,17 @@ final class ProximityStrategyFactory {
             LSPResource minDistanceResource = null;
 
             // get all shipments assigned to the LSP
-            Map<Id<LSPShipment>, LSPShipment> lspShipmentById = new HashMap<>();
-            for (LSPShipment lspShipment : lsp.getLspShipments()) {
+            Map<Id<LspShipment>, LspShipment> lspShipmentById = new HashMap<>();
+            for (LspShipment lspShipment : lsp.getLspShipments()) {
               lspShipmentById.put(lspShipment.getId(), lspShipment);
             }
 
             // Retrieve all shipments in the logistic chains of the plan
             // These should be all shipments of the lsp, but not necessarily if shipments got lost
-            ArrayList<LSPShipment> shipments = new ArrayList<>();
+            ArrayList<LspShipment> shipments = new ArrayList<>();
             for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-              for (Id<LSPShipment> id : logisticChain.getLspShipmentIds()) {
-                LSPShipment lspShipment = lspShipmentById.get(id);
+              for (Id<LspShipment> id : logisticChain.getLspShipmentIds()) {
+                LspShipment lspShipment = lspShipmentById.get(id);
                 if (lspShipment != null) {
                   shipments.add(lspShipment);
                 }
@@ -95,7 +95,7 @@ final class ProximityStrategyFactory {
 
             // pick a random lspShipment from the shipments contained in the plan
             int shipmentIndex = MatsimRandom.getRandom().nextInt(shipments.size());
-            LSPShipment lspShipment = shipments.get(shipmentIndex);
+            LspShipment lspShipment = shipments.get(shipmentIndex);
 
             // Collect all resources of the logistic chains of the LSP plan
             ArrayList<LSPResource> resources = new ArrayList<>();

@@ -32,37 +32,37 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-public final class ShipmentUtils {
-  private ShipmentUtils() {} // do not instantiate
+public final class LspShipmentUtils {
+  private LspShipmentUtils() {} // do not instantiate
 
-  public static Comparator<ShipmentPlanElement> createShipmentPlanElementComparator() {
+  public static Comparator<LspShipmentPlanElement> createShipmentPlanElementComparator() {
     return new ShipmentPlanElementComparator();
   }
 
   /**
-   * Gives back the {@link ShipmentPlan} object of the {@link LSPPlan}, which matches to the id of
-   * the {@link LSPShipment}
+   * Gives back the {@link LspShipmentPlan} object of the {@link LSPPlan}, which matches to the id of
+   * the {@link LspShipment}
    *
    * @param lspPlan The lspPlan in which this method tries to find the shipmentPlan.
    * @param shipmentId Id of the shipment for which the Plan should be found.
    * @return the ShipmentPlan object or null, if it is not found.
    */
-  public static ShipmentPlan getOrCreateShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId) {
+  public static LspShipmentPlan getOrCreateShipmentPlan(LSPPlan lspPlan, Id<LspShipment> shipmentId) {
     // Return shipmentPlan if already existing in LspPlan
-    for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-      if (shipmentPlan.getLspShipmentId().equals(shipmentId)) {
-        return shipmentPlan;
+    for (LspShipmentPlan lspShipmentPlan : lspPlan.getShipmentPlans()) {
+      if (lspShipmentPlan.getLspShipmentId().equals(shipmentId)) {
+        return lspShipmentPlan;
       }
     }
     // ShipmentPlan does not exist in LspPlan. Will create one, add it to the LspPlan.
-    ShipmentPlan newShipmentPlan = new ShipmentPlanImpl(shipmentId);
-    lspPlan.addShipmentPlan(newShipmentPlan);
-    return newShipmentPlan;
+    LspShipmentPlan newLspShipmentPlan = new LspShipmentPlanImpl(shipmentId);
+    lspPlan.addShipmentPlan(newLspShipmentPlan);
+    return newLspShipmentPlan;
   }
 
-  public static final class LSPShipmentBuilder {
-    final Id<LSPShipment> id;
-    final List<LSPShipmentRequirement> lspShipmentRequirements;
+  public static final class LspShipmentBuilder {
+    final Id<LspShipment> id;
+    final List<LspShipmentRequirement> lspShipmentRequirements;
     Id<Link> fromLinkId;
     Id<Link> toLinkId;
     TimeWindow startTimeWindow;
@@ -71,13 +71,13 @@ public final class ShipmentUtils {
     double deliveryServiceTime;
     double pickupServiceTime;
 
-    private LSPShipmentBuilder(Id<LSPShipment> id) {
+    private LspShipmentBuilder(Id<LspShipment> id) {
       this.lspShipmentRequirements = new ArrayList<>();
       this.id = id;
     }
 
-    public static LSPShipmentBuilder newInstance(Id<LSPShipment> id) {
-      return new LSPShipmentBuilder(id);
+    public static LspShipmentBuilder newInstance(Id<LspShipment> id) {
+      return new LspShipmentBuilder(id);
     }
 
     public void setFromLinkId(Id<Link> fromLinkId) {
@@ -104,17 +104,17 @@ public final class ShipmentUtils {
       this.deliveryServiceTime = serviceTime;
     }
 
-    public LSPShipmentBuilder setPickupServiceTime(double serviceTime) {
+    public LspShipmentBuilder setPickupServiceTime(double serviceTime) {
       this.pickupServiceTime = serviceTime;
       return this;
     }
 
-    public void addRequirement(LSPShipmentRequirement requirement) {
+    public void addRequirement(LspShipmentRequirement requirement) {
       lspShipmentRequirements.add(requirement);
     }
 
-    public LSPShipment build() {
-      return new LSPShipmentImpl(this);
+    public LspShipment build() {
+      return new LspShipmentImpl(this);
     }
   }
 
@@ -141,8 +141,8 @@ public final class ShipmentUtils {
       this.element = element;
     }
 
-    public LoggedShipmentLoad build() {
-      return new LoggedShipmentLoad(this);
+    public LoggedLspShipmentLoad build() {
+      return new LoggedLspShipmentLoad(this);
     }
 
     public double getStartTime() {
@@ -211,8 +211,8 @@ public final class ShipmentUtils {
       this.element = element;
     }
 
-    public LoggedShipmentTransport build() {
-      return new LoggedShipmentTransport(this);
+    public LoggedLspShipmentTransport build() {
+      return new LoggedLspShipmentTransport(this);
     }
 
     // --- Getters --- //
@@ -300,8 +300,8 @@ public final class ShipmentUtils {
       this.carrierId = carrierId;
     }
 
-    public LoggedShipmentUnload build() {
-      return new LoggedShipmentUnload(this);
+    public LoggedLspShipmentUnload build() {
+      return new LoggedLspShipmentUnload(this);
     }
   }
 
@@ -343,8 +343,8 @@ public final class ShipmentUtils {
       return this;
     }
 
-    public ShipmentPlanElement build() {
-      return new LoggedShipmentHandle(this);
+    public LspShipmentPlanElement build() {
+      return new LoggedLspShipmentHandle(this);
     }
   }
 
@@ -381,8 +381,8 @@ public final class ShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledShipmentLoad build() {
-      return new ScheduledShipmentLoad(this);
+    public ScheduledLspShipmentLoad build() {
+      return new ScheduledLspShipmentLoad(this);
     }
   }
 
@@ -435,8 +435,8 @@ public final class ShipmentUtils {
       this.carrierService = carrierService;
     }
 
-    public ScheduledShipmentTransport build() {
-      return new ScheduledShipmentTransport(this);
+    public ScheduledLspShipmentTransport build() {
+      return new ScheduledLspShipmentTransport(this);
     }
   }
 
@@ -469,8 +469,8 @@ public final class ShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledShipmentUnload build() {
-      return new ScheduledShipmentUnload(this);
+    public ScheduledLspShipmentUnload build() {
+      return new ScheduledLspShipmentUnload(this);
     }
   }
 
@@ -503,8 +503,8 @@ public final class ShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledShipmentHandle build() {
-      return new ScheduledShipmentHandle(this);
+    public ScheduledLspShipmentHandle build() {
+      return new ScheduledLspShipmentHandle(this);
     }
   }
 

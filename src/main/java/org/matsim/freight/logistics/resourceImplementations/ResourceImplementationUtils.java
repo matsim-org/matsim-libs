@@ -36,9 +36,9 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 @SuppressWarnings("ClassEscapesDefinedScope")
@@ -82,7 +82,7 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment lspShipment : lsp.getLspShipments()) {
+      for (LspShipment lspShipment : lsp.getLspShipments()) {
         final String str1 = "Shipment: " + lspShipment;
         System.out.println(str1);
         writer.write(str1 + "\n");
@@ -99,13 +99,13 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment shipment : lsp.getLspShipments()) {
-        ArrayList<ShipmentPlanElement> elementList =
+      for (LspShipment shipment : lsp.getLspShipments()) {
+        ArrayList<LspShipmentPlanElement> elementList =
             new ArrayList<>(
-                ShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
+                LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId())
                     .getPlanElements()
                     .values());
-        elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
+        elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
         writeShipmentWithPlanElements(writer, shipment, elementList);
       }
     } catch (IOException e) {
@@ -114,12 +114,12 @@ public class ResourceImplementationUtils {
   }
 
   private static void writeShipmentWithPlanElements(
-      BufferedWriter writer, LSPShipment lspShipment, ArrayList<ShipmentPlanElement> elementList)
+          BufferedWriter writer, LspShipment lspShipment, ArrayList<LspShipmentPlanElement> elementList)
       throws IOException {
     final String str1 = "Shipment: " + lspShipment;
     System.out.println(str1);
     writer.write(str1 + "\n");
-    for (ShipmentPlanElement element : elementList) {
+    for (LspShipmentPlanElement element : elementList) {
       final String str2 =
           element.getLogisticChainElement().getId()
               + "\t\t"
@@ -151,10 +151,10 @@ public class ResourceImplementationUtils {
       final String str0 = "LSP: " + lsp.getId();
       System.out.println(str0);
       writer.write(str0 + "\n");
-      for (LSPShipment lspShipment : lsp.getLspShipments()) {
-        ArrayList<ShipmentPlanElement> elementList =
+      for (LspShipment lspShipment : lsp.getLspShipments()) {
+        ArrayList<LspShipmentPlanElement> elementList =
             new ArrayList<>(lspShipment.getShipmentLog().getPlanElements().values());
-        elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
+        elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
         writeShipmentWithPlanElements(writer, lspShipment, elementList);
       }
     } catch (IOException e) {

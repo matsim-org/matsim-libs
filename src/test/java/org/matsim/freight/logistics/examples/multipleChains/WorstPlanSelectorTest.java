@@ -52,8 +52,8 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -182,7 +182,7 @@ public class WorstPlanSelectorTest {
 				.build();
 		lsp.addPlan(lspPlan_twoChains);
 
-		for (LSPShipment shipment : createInitialLSPShipments(network)) {
+		for (LspShipment shipment : createInitialLSPShipments(network)) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
@@ -191,8 +191,8 @@ public class WorstPlanSelectorTest {
 		return lsp;
 	}
 
-	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-		List<LSPShipment> shipmentList = new ArrayList<>();
+	private static Collection<LspShipment> createInitialLSPShipments(Network network) {
+		List<LspShipment> shipmentList = new ArrayList<>();
 
 		Random rand2 = MatsimRandom.getLocalInstance();
 
@@ -208,8 +208,8 @@ public class WorstPlanSelectorTest {
 		}
 
 		for(int i = 1; i <= 10; i++) {
-			Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			Id<LspShipment> id = Id.create("Shipment_" + i, LspShipment.class);
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
 			int capacityDemand = 1;
 			builder.setCapacityDemand(capacityDemand);

@@ -20,44 +20,46 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import java.util.Collection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.TimeWindow;
-import org.matsim.freight.logistics.HasSimulationTrackers;
-import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
-/**
- * This is, for example, a shipment that DHL moves from A to B. It may use multiple carriers to
- * achieve that.
- *
- * <p>Questions/comments:
- *
- * <ul>
- *   <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not
- *       link IDs.
- * </ul>
- */
-public interface LSPShipment
-    extends Identifiable<LSPShipment>, Attributable, HasSimulationTrackers<LSPShipment> {
+/*package*/ class LoggedLspShipmentHandle implements LspShipmentPlanElement {
 
-  Id<Link> getFrom(); // same as in CarrierShipment
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
 
-  Id<Link> getTo(); // same as in CarrierShipment
+  LoggedLspShipmentHandle(LspShipmentUtils.LoggedShipmentHandleBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+  }
 
-  TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-  TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-  int getSize(); // same as in CarrierShipment
+  @Override
+  public String getElementType() {
+    return "HANDLE";
+  }
 
-  double getDeliveryServiceTime(); // same as in CarrierShipment
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-  double getPickupServiceTime(); // same as in CarrierShipment
-
-  ShipmentPlan getShipmentLog();
-
-  Collection<LSPShipmentRequirement> getRequirements();
-
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 }

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.freight.logistics.LSPDataObject;
 
-class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
+class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment {
 
   private final Id<Link> fromLinkId;
   private final Id<Link> toLinkId;
@@ -39,12 +39,12 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
   private final double pickupServiceTime;
   //	private final ShipmentPlan shipmentPlan;
   @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
-  private final ShipmentPlan shipmentLog;
-  private final List<LSPShipmentRequirement> lspShipmentRequirements;
+  private final LspShipmentPlan shipmentLog;
+  private final List<LspShipmentRequirement> lspShipmentRequirements;
 
   //	private Id<LSP> lspId;
 
-  LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
+  LspShipmentImpl(LspShipmentUtils.LspShipmentBuilder builder) {
     super(builder.id);
     this.fromLinkId = builder.fromLinkId;
     this.toLinkId = builder.toLinkId;
@@ -54,7 +54,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
     this.deliveryServiceTime = builder.deliveryServiceTime;
     this.pickupServiceTime = builder.pickupServiceTime;
     //		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
-    this.shipmentLog = new ShipmentPlanImpl(this.getId());
+    this.shipmentLog = new LspShipmentPlanImpl(this.getId());
     this.lspShipmentRequirements = new ArrayList<>();
     this.lspShipmentRequirements.addAll(builder.lspShipmentRequirements);
   }
@@ -81,7 +81,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 
     @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
   @Override
-  public ShipmentPlan getShipmentLog() {
+  public LspShipmentPlan getShipmentLog() {
     return shipmentLog;
   }
 
@@ -96,7 +96,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
   }
 
   @Override
-  public Collection<LSPShipmentRequirement> getRequirements() {
+  public Collection<LspShipmentRequirement> getRequirements() {
     return lspShipmentRequirements;
   }
 

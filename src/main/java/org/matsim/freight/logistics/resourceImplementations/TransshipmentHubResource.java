@@ -31,6 +31,7 @@ import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
@@ -40,7 +41,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
  *
  * <p>An entry is added to the schedule of the shipments that is an instance of
  * ScheduledShipmentHandle. There, the name of the Resource and the client element are entered, so
- * that the way that the {@link org.matsim.freight.logistics.shipment.LSPShipment} takes is
+ * that the way that the {@link LspShipment} takes is
  * specified. In addition, the planned start and end time of the handling (i.e. cross-docking) of
  * the shipment is entered. In the example, cross-docking starts as soon as the considered
  * LSPShipment arrives at the {@link TransshipmentHubResource} and ends after a fixed and a size

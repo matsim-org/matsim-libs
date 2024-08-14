@@ -17,7 +17,7 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
 import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -25,8 +25,8 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 public class LspEventsReaderTest {
 
 	private final List<Event> lspEvents = List.of(
-			new HandlingInHubStartsEvent(110.0, Id.createLinkId("TestLink1"), Id.create("shipment1", LSPShipment.class), Id.create("Hub1", LSPResource.class), 42.0),
-			new HandlingInHubStartsEvent(142.0, Id.createLinkId("TestLink2"), Id.create("shipment2", LSPShipment.class), Id.create("Hub2", LSPResource.class), 13.0),
+			new HandlingInHubStartsEvent(110.0, Id.createLinkId("TestLink1"), Id.create("shipment1", LspShipment.class), Id.create("Hub1", LSPResource.class), 42.0),
+			new HandlingInHubStartsEvent(142.0, Id.createLinkId("TestLink2"), Id.create("shipment2", LspShipment.class), Id.create("Hub2", LSPResource.class), 13.0),
 
 			//Check if also some of the regular CarrierEvents get read correctly -> Load their mapping in the LspEventsReaderMapping via createCustomEventMappers() works
 			new CarrierTourEndEvent(500, Id.create("c1", Carrier.class), Id.createLinkId("TestLinkC1"), Id.createVehicleId("myVehicle"), Id.create("myCarrierTour", Tour.class))

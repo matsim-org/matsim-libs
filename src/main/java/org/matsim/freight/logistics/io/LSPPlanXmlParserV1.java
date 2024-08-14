@@ -36,9 +36,9 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubResource;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -57,12 +57,12 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
   private final LSPs lsPs;
   private final Carriers carriers;
   private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
-  private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
+  private final Map<String, LspShipmentPlanElement> planElements = new LinkedHashMap<>();
   private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
   private final List<LogisticChain> logisticChains = new LinkedList<>();
   private LSP currentLsp = null;
   private Carrier currentCarrier = null;
-  private LSPShipment currentShipment = null;
+  private LspShipment currentShipment = null;
   private LSPPlan currentLspPlan = null;
   private CarrierCapabilities.Builder capabilityBuilder;
   private TransshipmentHubResource hubResource;
@@ -180,7 +180,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
       case SHIPMENT -> {
         String shipmentId = atts.getValue(ID);
         Gbl.assertNotNull(shipmentId);
-        Id<LSPShipment> id = Id.create(shipmentId, LSPShipment.class);
+        Id<LspShipment> id = Id.create(shipmentId, LspShipment.class);
 
         String from = atts.getValue(FROM);
         Gbl.assertNotNull(from);
@@ -189,8 +189,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         String sizeString = atts.getValue(SIZE);
         Gbl.assertNotNull(sizeString);
         int size = Integer.parseInt(sizeString);
-        ShipmentUtils.LSPShipmentBuilder shipmentBuilder =
-            ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+        LspShipmentUtils.LspShipmentBuilder shipmentBuilder =
+            LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
         shipmentBuilder.setFromLinkId(Id.createLinkId(from));
         shipmentBuilder.setToLinkId(Id.createLinkId(to));
@@ -258,32 +258,32 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         String resourceId = atts.getValue(RESOURCE_ID);
         Gbl.assertNotNull(resourceId);
 
-        ShipmentPlanElement planElement = null;
+        LspShipmentPlanElement planElement = null;
 
         switch (type) {
           case "LOAD" -> {
-            var planElementBuilder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+            var planElementBuilder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
           case "TRANSPORT" -> {
-            var planElementBuilder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+            var planElementBuilder = LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
           case "UNLOAD" -> {
-            var planElementBuilder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
+            var planElementBuilder = LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
           case "HANDLE" -> {
-            var planElementBuilder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
+            var planElementBuilder = LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
@@ -405,12 +405,12 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
       }
 
       case SHIPMENT_PLAN -> {
-        for (LSPShipment lspShipment : currentLsp.getLspShipments()) {
+        for (LspShipment lspShipment : currentLsp.getLspShipments()) {
           if (lspShipment.getId().toString().equals(shipmentPlanId)) {
-            for (Map.Entry<String, ShipmentPlanElement> planElement : planElements.entrySet()) {
-              ShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, lspShipment.getId())
+            for (Map.Entry<String, LspShipmentPlanElement> planElement : planElements.entrySet()) {
+              LspShipmentUtils.getOrCreateShipmentPlan(currentLspPlan, lspShipment.getId())
                   .addPlanElement(
-                      Id.create(planElement.getKey(), ShipmentPlanElement.class),
+                      Id.create(planElement.getKey(), LspShipmentPlanElement.class),
                       planElement.getValue());
             }
           }

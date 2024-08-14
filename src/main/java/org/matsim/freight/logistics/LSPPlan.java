@@ -22,8 +22,8 @@ package org.matsim.freight.logistics;
 
 import java.util.Collection;
 import org.matsim.api.core.v01.population.BasicPlan;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 
 /**
  * This interface has the following properties:
@@ -31,7 +31,7 @@ import org.matsim.freight.logistics.shipment.ShipmentPlan;
  * <ul>
  *   <li>As a {@link BasicPlan} it has a score, so it can be used for evolutionary learning. kai,
  *       may'22
- *   <li>An {@link LSPShipment} is added via lspPlan#getAssigner().assignToSolution(shipment). The
+ *   <li>An {@link LspShipment} is added via lspPlan#getAssigner().assignToSolution(shipment). The
  *       {@link InitialShipmentAssigner} assigns it deterministically to a {@link LogisticChain}.
  * </ul>
  */
@@ -49,9 +49,9 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 
   LSPPlan setInitialShipmentAssigner(InitialShipmentAssigner assigner);
 
-  Collection<ShipmentPlan> getShipmentPlans();
+  Collection<LspShipmentPlan> getShipmentPlans();
 
-  LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan);
+  LSPPlan addShipmentPlan(LspShipmentPlan lspShipmentPlan);
 
   String getType();
 

@@ -6,11 +6,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.HasLspShipmentId;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
  * A general logistic event contains the information (= {@link Id}) of the - the location (= {@link
- * Link}) - the lspShipment (= {@link LSPShipment}) belonging to it.
+ * Link}) - the lspShipment (= {@link LspShipment}) belonging to it.
  *
  * <p>Please note, that general _freight_ events can be found in the freight contrib.
  *
@@ -19,19 +19,19 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 public abstract class AbstractLogisticEvent extends Event implements HasLinkId, HasLspShipmentId {
 
   private final Id<Link> linkId;
-  private final Id<LSPShipment> lspShipmentId;
+  private final Id<LspShipment> lspShipmentId;
 
-  public AbstractLogisticEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId) {
+  public AbstractLogisticEvent(double time, Id<Link> linkId, Id<LspShipment> lspShipmentId) {
     super(time);
     this.linkId = linkId;
     this.lspShipmentId = lspShipmentId;
   }
 
   /**
-   * @return id of the {@link LSPShipment}
+   * @return id of the {@link LspShipment}
    */
   @Override
-  public final Id<LSPShipment> getLspShipmentId() {
+  public final Id<LspShipment> getLspShipmentId() {
     return lspShipmentId;
   }
 
@@ -41,7 +41,7 @@ public abstract class AbstractLogisticEvent extends Event implements HasLinkId, 
   }
 
   /**
-   * Adds the {@link Id<LSPShipment>} to the list of attributes. {@link Id<Link>} is handled by
+   * Adds the {@link Id< LspShipment >} to the list of attributes. {@link Id<Link>} is handled by
    * superclass {@link Event}
    *
    * @return The map of attributes

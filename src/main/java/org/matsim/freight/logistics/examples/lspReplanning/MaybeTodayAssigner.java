@@ -25,7 +25,7 @@ import java.util.Random;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /**
 * This class is deprecated and will be removed in the future.
@@ -45,7 +45,7 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
   }
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
+  public void assignToPlan(LSPPlan lspPlan, LspShipment lspShipment) {
     boolean assignToday = random.nextBoolean();
     if (assignToday) {
       Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);

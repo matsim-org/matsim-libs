@@ -20,19 +20,44 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import java.util.Map;
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.logistics.HasBackpointer;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.freight.carriers.TimeWindow;
+import org.matsim.freight.logistics.HasSimulationTrackers;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface ShipmentPlan extends HasBackpointer<Id<LSPShipment>> {
+/**
+ * This is, for example, a shipment that DHL moves from A to B. It may use multiple carriers to
+ * achieve that.
+ *
+ * <p>Questions/comments:
+ *
+ * <ul>
+ *   <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not
+ *       link IDs.
+ * </ul>
+ */
+public interface LspShipment
+    extends Identifiable<LspShipment>, Attributable, HasSimulationTrackers<LspShipment> {
 
-  Id<LSPShipment> getLspShipmentId();
+  Id<Link> getFrom(); // same as in CarrierShipment
 
-  Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
+  Id<Link> getTo(); // same as in CarrierShipment
 
-  void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element);
+  TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
 
-  ShipmentPlanElement getMostRecentEntry();
+  TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
 
-  void clear();
+  int getSize(); // same as in CarrierShipment
+
+  double getDeliveryServiceTime(); // same as in CarrierShipment
+
+  double getPickupServiceTime(); // same as in CarrierShipment
+
+  LspShipmentPlan getShipmentLog();
+
+  Collection<LspShipmentRequirement> getRequirements();
+
 }

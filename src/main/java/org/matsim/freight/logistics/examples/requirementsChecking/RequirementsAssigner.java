@@ -47,8 +47,8 @@ import java.util.Collection;
 import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.LSPShipmentRequirement;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
 
 class RequirementsAssigner implements InitialShipmentAssigner {
 
@@ -59,12 +59,12 @@ class RequirementsAssigner implements InitialShipmentAssigner {
   }
 
   @Override
-  public void assignToPlan(LSPPlan lspPlan, LSPShipment lspShipment) {
+  public void assignToPlan(LSPPlan lspPlan, LspShipment lspShipment) {
     feasibleLogisticChains.clear();
 
     label:
     for (LogisticChain solution : lspPlan.getLogisticChains()) {
-      for (LSPShipmentRequirement requirement : lspShipment.getRequirements()) {
+      for (LspShipmentRequirement requirement : lspShipment.getRequirements()) {
         if (!requirement.checkRequirement(solution)) {
 
           continue label;

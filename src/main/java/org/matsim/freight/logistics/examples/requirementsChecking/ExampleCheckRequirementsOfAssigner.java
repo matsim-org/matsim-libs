@@ -57,8 +57,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -173,17 +173,17 @@ class ExampleCheckRequirementsOfAssigner {
         .build();
   }
 
-  public static Collection<LSPShipment> createShipmentsWithRequirements(Network network) {
+  public static Collection<LspShipment> createShipmentsWithRequirements(Network network) {
     // Create ten shipments with either a red or blue requirement, i.e. that they only can be
     // transported in a solution with the matching color
-    ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+    ArrayList<LspShipment> shipmentList = new ArrayList<>();
     ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
     Random rand = new Random(1);
 
     for (int i = 1; i < 11; i++) {
-      Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-      ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+      Id<LspShipment> id = Id.create(i, LspShipment.class);
+      LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
       int capacityDemand = rand.nextInt(10);
       builder.setCapacityDemand(capacityDemand);
 
@@ -230,17 +230,17 @@ class ExampleCheckRequirementsOfAssigner {
 
     // Create LSP and lspShipments
     LSP lsp = createLSPWithProperties(scenario);
-    Collection<LSPShipment> lspShipments = createShipmentsWithRequirements(network);
+    Collection<LspShipment> lspShipments = createShipmentsWithRequirements(network);
 
     // assign the lspShipments to the LSP
-    for (LSPShipment lspShipment : lspShipments) {
+    for (LspShipment lspShipment : lspShipments) {
       lsp.assignShipmentToLSP(lspShipment);
     }
 
     for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
       if (logisticChain.getId().toString().equals("RedSolution")) {
-        for (Id<LSPShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
-          LSPShipment lspShipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+        for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+          LspShipment lspShipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
             if (lspShipment != null && !(lspShipment.getRequirements().iterator().next() instanceof RedRequirement)) {
                 break;
             }
@@ -248,8 +248,8 @@ class ExampleCheckRequirementsOfAssigner {
         System.out.println("All lspShipments in " + logisticChain.getId() + " are red");
       }
       if (logisticChain.getId().toString().equals("BlueSolution")) {
-        for (Id<LSPShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
-          LSPShipment shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
+        for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
+          LspShipment shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
             if (shipment != null && !(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
                 break;
             }
