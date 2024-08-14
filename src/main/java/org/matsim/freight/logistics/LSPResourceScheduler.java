@@ -41,7 +41,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 public abstract class LSPResourceScheduler {
 
   protected LSPResource resource;
-  protected ArrayList<LspShipmentWithTime> lspShipmentsWithTime;
+  protected ArrayList<LspShipment> lspShipmentsWithTime;
 
   protected LSPPlan lspPlan;
 
@@ -83,23 +83,23 @@ public abstract class LSPResourceScheduler {
     for (LogisticChainElement element : resource.getClientElements()) {
       lspShipmentsWithTime.addAll(element.getIncomingShipments().getLspShipmentsWTime());
     }
-    lspShipmentsWithTime.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
+    lspShipmentsWithTime.sort(Comparator.comparingDouble(LspShipment::getTime));
   }
 
   private void switchHandledShipments(int bufferTime) {
-    for (LspShipmentWithTime lspShipmentWithTime : lspShipmentsWithTime) {
+    for (LspShipment lspShipmentWithTime : lspShipmentsWithTime) {
       var shipmentPlan =
-          LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getLspShipment().getId());
+          LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
-      LspShipmentWithTime outgoingTuple =
-          new LspShipmentWithTime(endOfTransportTime, lspShipmentWithTime.getLspShipment());
+      LspShipment outgoingLspShipment = lspShipmentWithTime;
+      lspShipmentWithTime.setTime(endOfTransportTime);
       for (LogisticChainElement element : resource.getClientElements()) {
         if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipmentWithTime)) {
-          element.getOutgoingShipments().getLspShipmentsWTime().add(outgoingTuple);
+          element.getOutgoingShipments().getLspShipmentsWTime().add(outgoingLspShipment);
           element.getIncomingShipments().getLspShipmentsWTime().remove(lspShipmentWithTime);
           if (element.getNextElement() != null) {
-            element.getNextElement().getIncomingShipments().getLspShipmentsWTime().add(outgoingTuple);
-            element.getOutgoingShipments().getLspShipmentsWTime().remove(outgoingTuple);
+            element.getNextElement().getIncomingShipments().getLspShipmentsWTime().add(outgoingLspShipment);
+            element.getOutgoingShipments().getLspShipmentsWTime().remove(outgoingLspShipment);
           }
         }
       }

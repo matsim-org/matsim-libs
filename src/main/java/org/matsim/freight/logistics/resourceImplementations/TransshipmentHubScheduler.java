@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.LspShipmentWithTime;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
@@ -55,7 +55,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   protected void scheduleResource() {
-    for (LspShipmentWithTime tupleToBeAssigned : lspShipmentsWithTime) {
+    for (LspShipment tupleToBeAssigned : lspShipmentsWithTime) {
       updateSchedule(tupleToBeAssigned);
     }
   }
@@ -66,17 +66,17 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     log.error("This method is not implemented. Nothing will happen here. ");
   }
 
-  private void updateSchedule(LspShipmentWithTime tuple) {
+  private void updateSchedule(LspShipment tuple) {
     addShipmentHandleElement(tuple);
     addShipmentToEventHandler(tuple);
   }
 
-  private void addShipmentHandleElement(LspShipmentWithTime tuple) {
+  private void addShipmentHandleElement(LspShipment tuple) {
     LspShipmentUtils.ScheduledShipmentHandleBuilder builder =
         LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
     builder.setStartTime(tuple.getTime());
     builder.setEndTime(
-        tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getLspShipment().getSize());
+        tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getSize());
     builder.setResourceId(transshipmentHubResource.getId());
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
@@ -89,16 +89,16 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
             + String.valueOf(handle.getLogisticChainElement().getId())
             + handle.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getId())
         .addPlanElement(id, handle);
   }
 
-  private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
+  private void addShipmentToEventHandler(LspShipment tuple) {
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
         LspShipmentPlan lspShipmentPlan =
-            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getLspShipment().getId());
-        eventHandler.addShipment(tuple.getLspShipment(), element, lspShipmentPlan);
+            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getId());
+        eventHandler.addShipment(tuple, element, lspShipmentPlan);
         break;
       }
     }

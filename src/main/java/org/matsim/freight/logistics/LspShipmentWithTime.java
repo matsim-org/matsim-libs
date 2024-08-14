@@ -34,8 +34,8 @@ public class LspShipmentWithTime {
 
 
   public LspShipmentWithTime(double time, LspShipment lspShipment) {
+    LspShipmentUtils.setTimeOfLspShipment(lspShipment, time);
     this.lspShipment = lspShipment;
-    LspShipmentUtils.setTimeOfLspShipment(this.lspShipment, time);
   }
 
   public LspShipment getLspShipment() {

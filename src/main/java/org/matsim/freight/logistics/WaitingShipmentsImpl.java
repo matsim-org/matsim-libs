@@ -25,10 +25,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-  private final List<LspShipmentWithTime> shipments;
+  private final List<LspShipment> shipments;
 
   WaitingShipmentsImpl() {
     this.shipments = new ArrayList<>();
@@ -36,14 +37,14 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   public void addShipment(double time, LspShipment lspShipment) {
-    LspShipmentWithTime tuple = new LspShipmentWithTime(time, lspShipment);
-    this.shipments.add(tuple);
-    shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
+    lspShipment.setTime(time);
+    this.shipments.add(lspShipment);
+    shipments.sort(Comparator.comparingDouble(LspShipment::getTime));
   }
 
   @Override
-  public Collection<LspShipmentWithTime> getSortedLspShipments() {
-    shipments.sort(Comparator.comparingDouble(LspShipmentWithTime::getTime));
+  public Collection<LspShipment> getSortedLspShipments() {
+    shipments.sort(Comparator.comparingDouble(LspShipment::getTime));
     return shipments;
   }
 
@@ -52,7 +53,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   @Override
-  public Collection<LspShipmentWithTime> getLspShipmentsWTime() {
+  public Collection<LspShipment> getLspShipmentsWTime() {
     return shipments;
   }
 
@@ -62,8 +63,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
     strb.append("WaitingShipmentsImpl{").append("No of Shipments= ").append(shipments.size());
     if (!shipments.isEmpty()) {
       strb.append("; ShipmentIds=");
-      for (LspShipmentWithTime shipment : getSortedLspShipments()) {
-        strb.append("[").append(shipment.getLspShipment().getId()).append("]");
+      for (LspShipment shipment : getSortedLspShipments()) {
+        strb.append("[").append(shipment.getId()).append("]");
       }
     }
     strb.append('}');
