@@ -107,7 +107,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
                   && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
                 addShipmentLoadElement(lspShipment, tour, serviceActivity);
                 addShipmentTransportElement(lspShipment, tour, serviceActivity);
-                addShipmentUnloadElement(lspShipment, tour, serviceActivity);
+                addShipmentUnloadElement(lspShipment, tour);
                 addCollectionTourEndEventHandler(pair.carrierService, lspShipment, resource, tour);
                 addCollectionServiceEventHandler(pair.carrierService, lspShipment, resource);
               }
@@ -211,8 +211,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
   }
 
-  private void addShipmentUnloadElement(
-      LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+  private void addShipmentUnloadElement(LspShipment lspShipment, Tour tour) {
 
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
         LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();

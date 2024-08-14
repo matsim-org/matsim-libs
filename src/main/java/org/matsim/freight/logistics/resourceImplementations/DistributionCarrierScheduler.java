@@ -193,7 +193,7 @@ import org.matsim.vehicles.VehicleType;
             for (LSPCarrierPair pair : pairs) {
               if (pair.lspShipment == carrierPair.lspShipment
                   && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
-                addShipmentLoadElement(lspShipment, tour, serviceActivity);
+                addShipmentLoadElement(lspShipment, tour);
                 addShipmentTransportElement(lspShipment, tour, serviceActivity);
                 addShipmentUnloadElement(lspShipment, tour, serviceActivity);
                 addDistributionTourStartEventHandler(pair.carrierService, lspShipment, resource, tour);
@@ -206,9 +206,7 @@ import org.matsim.vehicles.VehicleType;
     }
   }
 
-  private void addShipmentLoadElement(
-      LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
-
+  private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
     LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
         LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
     builder.setResourceId(resource.getId());
@@ -219,8 +217,7 @@ import org.matsim.vehicles.VehicleType;
       }
     }
 
-    int startIndex =
-        tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
+    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
     double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     double cumulatedLoadingTime = 0;
@@ -253,8 +250,7 @@ import org.matsim.vehicles.VehicleType;
       }
     }
 
-    int startIndex =
-        tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
+    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     final Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
     final int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
     final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);

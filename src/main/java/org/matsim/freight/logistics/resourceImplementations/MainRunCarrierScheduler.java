@@ -248,7 +248,7 @@ import org.matsim.vehicles.VehicleType;
                   && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
                 addShipmentLoadElement(LspShipment, tour);
                 addShipmentTransportElement(LspShipment, tour, serviceActivity);
-                addShipmentUnloadElement(LspShipment, tour, serviceActivity);
+                addShipmentUnloadElement(LspShipment, tour);
                 addMainTourRunStartEventHandler(pair.carrierService, LspShipment, resource, tour);
                 addMainRunTourEndEventHandler(pair.carrierService, LspShipment, resource, tour);
               }
@@ -268,8 +268,7 @@ import org.matsim.vehicles.VehicleType;
         builder.setLogisticChainElement(element);
       }
     }
-    int startIndex =
-        tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
+    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
     double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     double cumulatedLoadingTime = 0;
@@ -300,8 +299,7 @@ import org.matsim.vehicles.VehicleType;
         builder.setLogisticChainElement(element);
       }
     }
-    int startIndex =
-        tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
+    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
     double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     builder.setStartTime(startTimeOfTransport);
@@ -320,7 +318,7 @@ import org.matsim.vehicles.VehicleType;
         .addPlanElement(id, transport);
   }
 
-  private void addShipmentUnloadElement(LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+  private void addShipmentUnloadElement(LspShipment lspShipment, Tour tour) {
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
         LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
     builder.setResourceId(resource.getId());
@@ -335,8 +333,7 @@ import org.matsim.vehicles.VehicleType;
         cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
       }
     }
-    int startIndex =
-        tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
+    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
     builder.setStartTime(
         legAfterStart.getExpectedDepartureTime() + legAfterStart.getExpectedTransportTime());
