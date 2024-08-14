@@ -60,6 +60,30 @@ public final class LspShipmentUtils {
     return newLspShipmentPlan;
   }
 
+  /**
+   * Stores a time as Attribute in the LspShipment.
+   * This is needed for some kind of tracking the shipment.
+   * <p>
+   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code.
+   * KMT Jul'24
+   * @param lspShipment the LspShipment to store the time in
+   * @param time the time to store
+   */
+  public static void setTimeOfLspShipment(LspShipment lspShipment, double time){
+    lspShipment.getAttributes().putAttribute("time", time);
+  }
+
+  /**
+   * Returns the time stored in the LspShipment.
+   * <p>
+   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code. KMT Jul'24
+   * @param lspShipment the LspShipment to get the time from
+   * @return the time as double
+   */
+  public static double getTimeOfLspShipment(LspShipment lspShipment) {
+    return (double) lspShipment.getAttributes().getAttribute("time");
+  }
+
   public static final class LspShipmentBuilder {
     final Id<LspShipment> id;
     final List<LspShipmentRequirement> lspShipmentRequirements;

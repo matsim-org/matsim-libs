@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics;
 
 import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 public class LspShipmentWithTime {
   // yyyyyy find better solution for this.  It is not so good to define an interface, and then
@@ -30,12 +31,11 @@ public class LspShipmentWithTime {
   // jun'22
 
   private final LspShipment lspShipment;
-//  private final double time;
+
 
   public LspShipmentWithTime(double time, LspShipment lspShipment) {
     this.lspShipment = lspShipment;
-    setTimeOfLspShipment(this.lspShipment, time);
-//    this.time = time;
+    LspShipmentUtils.setTimeOfLspShipment(this.lspShipment, time);
   }
 
   public LspShipment getLspShipment() {
@@ -43,31 +43,8 @@ public class LspShipmentWithTime {
   }
 
   public double getTime() {
-    return getTimeOfLspShipment(this.lspShipment);
+    return LspShipmentUtils.getTimeOfLspShipment(this.lspShipment);
 //    return time;
   }
 
-  /**
-   * Stores a time as Attribute in the LspShipment.
-   * This is needed for some kind of tracking the shipment.
-   * <p>
-   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code.
-   * KMT Jul'24
-   * @param lspShipment the LspShipment to store the time in
-   * @param time the time to store
-   */
-  private void setTimeOfLspShipment(LspShipment lspShipment, double time){
-    lspShipment.getAttributes().putAttribute("time", time);
-  }
-
-  /**
-   * Returns the time stored in the LspShipment.
-   * <p>
-   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code. KMT Jul'24
-   * @param lspShipment the LspShipment to get the time from
-   * @return the time as double
-   */
-  private double getTimeOfLspShipment(LspShipment lspShipment) {
-    return (double) lspShipment.getAttributes().getAttribute("time");
-  }
 }
