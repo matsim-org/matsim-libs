@@ -171,13 +171,11 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private CarrierService convertToCarrierService(LspShipment lspShipment) {
-    Id<CarrierService> serviceId =
-        Id.create(lspShipment.getId().toString(), CarrierService.class);
-    CarrierService.Builder builder =
-        CarrierService.Builder.newInstance(serviceId, lspShipment.getTo());
-    builder.setCapacityDemand(lspShipment.getSize());
-    builder.setServiceDuration(lspShipment.getDeliveryServiceTime());
-    CarrierService carrierService = builder.build();
+    Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
+    CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo())
+            .setCapacityDemand(lspShipment.getSize())
+            .setServiceDuration(lspShipment.getDeliveryServiceTime())
+            .build();
     pairs.add(new LSPCarrierPair(lspShipment, carrierService));
     return carrierService;
   }
@@ -189,10 +187,9 @@ import org.matsim.vehicles.VehicleType;
         Tour tour = scheduledTour.getTour();
         for (TourElement element : tour.getTourElements()) {
           if (element instanceof ServiceActivity serviceActivity) {
-            LSPCarrierPair carrierPair = new LSPCarrierPair(lspShipment, serviceActivity.getService());
             for (LSPCarrierPair pair : pairs) {
-              if (pair.lspShipment == carrierPair.lspShipment
-                  && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
+              if (pair.lspShipment == lspShipment
+                  && pair.carrierService.getId() == serviceActivity.getService().getId()) {
                 addShipmentLoadElement(lspShipment, tour);
                 addShipmentTransportElement(lspShipment, tour, serviceActivity);
                 addShipmentUnloadElement(lspShipment, tour, serviceActivity);

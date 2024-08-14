@@ -29,6 +29,7 @@ import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.Leg;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -82,14 +83,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private CarrierService convertToCarrierService(LspShipment lspShipment) {
-    Id<CarrierService> serviceId =
-        Id.create(lspShipment.getId().toString(), CarrierService.class);
-    CarrierService.Builder builder =
-        CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom());
-    builder.setServiceStartTimeWindow(lspShipment.getPickupTimeWindow());
-    builder.setCapacityDemand(lspShipment.getSize());
-    builder.setServiceDuration(lspShipment.getDeliveryServiceTime());
-    CarrierService carrierService = builder.build();
+    Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
+    CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom())
+            .setServiceStartTimeWindow(lspShipment.getPickupTimeWindow())
+            .setCapacityDemand(lspShipment.getSize())
+            .setServiceDuration(lspShipment.getDeliveryServiceTime())
+            .build();
     pairs.add(new LSPCarrierPair(lspShipment, carrierService));
     return carrierService;
   }
@@ -100,11 +99,10 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
       for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
         Tour tour = scheduledTour.getTour();
         for (TourElement element : tour.getTourElements()) {
-          if (element instanceof Tour.ServiceActivity serviceActivity) {
-            LSPCarrierPair carrierPair = new LSPCarrierPair(lspShipment, serviceActivity.getService());
+          if (element instanceof ServiceActivity serviceActivity) {
             for (LSPCarrierPair pair : pairs) {
-              if (pair.lspShipment == carrierPair.lspShipment
-                  && pair.carrierService.getId() == carrierPair.carrierService.getId()) {
+              if (pair.lspShipment == lspShipment
+                  && pair.carrierService.getId() == serviceActivity.getService().getId()) {
                 addShipmentLoadElement(lspShipment, tour, serviceActivity);
                 addShipmentTransportElement(lspShipment, tour, serviceActivity);
                 addShipmentUnloadElement(lspShipment, tour);
@@ -119,7 +117,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void addShipmentLoadElement(
-      LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+      LspShipment lspShipment, Tour tour, ServiceActivity serviceActivity) {
 
     LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
         LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
