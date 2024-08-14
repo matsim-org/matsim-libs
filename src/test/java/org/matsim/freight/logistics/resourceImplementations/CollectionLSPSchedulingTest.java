@@ -73,7 +73,6 @@ public class CollectionLSPSchedulingTest {
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -81,8 +80,8 @@ public class CollectionLSPSchedulingTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
+        Id.create("CollectionCarrierResource", LSPResource.class);
+        CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
 		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionResource = adapterBuilder.build();
@@ -123,7 +122,7 @@ public class CollectionLSPSchedulingTest {
 
 			while (true) {
 				Collections.shuffle(linkList, random);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -186,15 +185,15 @@ public class CollectionLSPSchedulingTest {
 			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());
 			assertTrue(planElements.get(0).getStartTime() >= (0));
-			assertTrue(planElements.get(0).getStartTime() <= (24*3600));
-			assertSame(planElements.get(0).getResourceId(), collectionResource.getId());
-			assertSame(planElements.get(0).getLogisticChainElement(), collectionElement);
+			assertTrue(planElements.getFirst().getStartTime() <= (24*3600));
+			assertSame(planElements.getFirst().getResourceId(), collectionResource.getId());
+			assertSame(planElements.getFirst().getLogisticChainElement(), collectionElement);
 
 			assertEquals(2, shipment.getSimulationTrackers().size());
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 
-			assertTrue(eventHandlers.get(0) instanceof LSPTourEndEventHandler);
-			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.get(0);
+			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
+			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -205,7 +204,7 @@ public class CollectionLSPSchedulingTest {
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
 
-			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
+			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());

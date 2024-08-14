@@ -90,7 +90,6 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		collectionCapabilitiesBuilder.addType(collectionType);
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
@@ -141,7 +140,6 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
@@ -191,7 +189,6 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
@@ -254,7 +251,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingToLink = linkList.get(0);
+				Link pendingToLink = linkList.getFirst();
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
@@ -269,7 +266,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&

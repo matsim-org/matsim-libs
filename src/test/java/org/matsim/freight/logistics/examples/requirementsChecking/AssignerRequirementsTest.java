@@ -4,27 +4,6 @@
   *                                                                         *
   * *********************************************************************** *
   *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
- */
-
-/*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
   * copyright       :  (C) 2022 by the members listed in the COPYING,       *
   *                   LICENSE and WARRANTY file.                            *
   * email           : info at matsim dot org                                *
@@ -42,7 +21,7 @@
 
 package org.matsim.freight.logistics.examples.requirementsChecking;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +73,6 @@ public class AssignerRequirementsTest {
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities redCapabilities  = CarrierCapabilities.Builder.newInstance()
-				.addType(collectionType)
 				.addVehicle(redVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
@@ -126,7 +104,6 @@ public class AssignerRequirementsTest {
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities blueCapabilities = CarrierCapabilities.Builder.newInstance()
-				.addType(collectionType)
 				.addVehicle(blueVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
@@ -171,7 +148,7 @@ public class AssignerRequirementsTest {
 
 			while (true) {
 				Collections.shuffle(linkList);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -203,11 +180,13 @@ public class AssignerRequirementsTest {
 	public void testAssignerRequirements() {
 		for (Id<LspShipment> shipmentId : blueChain.getLspShipmentIds()) {
 			LspShipment shipment = LSPUtils.findLspShipment(blueChain.getLSP(), shipmentId);
-			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
+			assert shipment != null;
+			assertInstanceOf(BlueRequirement.class, shipment.getRequirements().iterator().next());
 		}
 		for (Id<LspShipment> shipmentId : redChain.getLspShipmentIds()) {
 			LspShipment shipment = LSPUtils.findLspShipment(redChain.getLSP(), shipmentId);
-			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
+            assert shipment != null;
+            assertInstanceOf(RedRequirement.class, shipment.getRequirements().iterator().next());
 		}
 	}
 

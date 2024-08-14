@@ -260,7 +260,7 @@ public class WorstPlanSelectorTest {
 				final EventBasedCarrierScorer4MultipleChains carrierScorer = new EventBasedCarrierScorer4MultipleChains();
 
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
-				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
+				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);

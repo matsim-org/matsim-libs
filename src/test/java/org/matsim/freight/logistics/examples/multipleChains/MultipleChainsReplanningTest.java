@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -91,9 +90,9 @@ public class MultipleChainsReplanningTest {
 	}
 
 	private static LSP createLSP(Scenario scenario) {
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		// A plan with two different logistic chains on the left and right, with respective carriers is created
+        // A plan with two different logistic chains on the left and right, with respective carriers is created
 		LSPPlan multipleOneEchelonChainsPlan;
 		{
 			LogisticChainElement leftCarrierElement;
@@ -249,7 +248,7 @@ public class MultipleChainsReplanningTest {
 		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
 
 		initialPlanCount = lsp.getPlans().size();
-		initialPlanShipmentPlanCount = lsp.getPlans().get(0).getShipmentPlans().size();
+		initialPlanShipmentPlanCount = lsp.getPlans().getFirst().getShipmentPlans().size();
 
 		controler.run();
 

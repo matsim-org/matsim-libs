@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,8 +41,8 @@ import org.matsim.vehicles.VehicleType;
 
 public class DistributionResourceTest {
 
-	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
-	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
+	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
+	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType distributionType;
 	private CarrierVehicle distributionCarrierVehicle;
@@ -58,9 +57,9 @@ public class DistributionResourceTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
+        Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(10);
@@ -75,7 +74,6 @@ public class DistributionResourceTest {
 		distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
@@ -95,10 +93,7 @@ public class DistributionResourceTest {
 		assertNotNull(distributionResource.getClientElements());
 		assertTrue(distributionResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass())) {
-//				assertTrue(Carrier.class.isAssignableFrom(distributionResource.getClassOfResource()));
-			assertSame(distributionResource.getCarrier(), distributionCarrier);
-		}
+		assertSame(distributionResource.getCarrier(), distributionCarrier);
 		assertSame(distributionResource.getEndLinkId(), distributionLinkId);
 		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
 		assertNotNull(distributionResource.getSimulationTrackers());
@@ -118,7 +113,7 @@ public class DistributionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), distributionType);
+					assertSame(types.getFirst(), distributionType);
 					assertEquals(10, distributionType.getCapacity().getOther().intValue());
 					assertEquals(0.0004, distributionType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, distributionType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -128,7 +123,7 @@ public class DistributionResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), distributionCarrierVehicle);
+					assertSame(vehicles.getFirst(), distributionCarrierVehicle);
 					assertSame(distributionCarrierVehicle.getType(), distributionType);
 					assertSame(distributionCarrierVehicle.getLinkId(), distributionLinkId);
 				}

@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,10 +54,10 @@ public class MainRunResourceTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
 
-		Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
+        Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(30);
@@ -75,7 +74,6 @@ public class MainRunResourceTest {
 
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(mainRunType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
@@ -94,10 +92,7 @@ public class MainRunResourceTest {
 		assertNotNull(mainRunResource.getClientElements());
 		assertTrue(mainRunResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass())) {
-//			assertTrue(Carrier.class.isAssignableFrom(mainRunResource.getClassOfResource()));
-			assertSame(mainRunResource.getCarrier(), carrier);
-		}
+		assertSame(mainRunResource.getCarrier(), carrier);
 		assertSame(mainRunResource.getEndLinkId(), toLinkId);
 		assertSame(mainRunResource.getStartLinkId(), fromLinkId);
 		assertNotNull(mainRunResource.getSimulationTrackers());
@@ -116,7 +111,7 @@ public class MainRunResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), mainRunType);
+					assertSame(types.getFirst(), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
 					assertEquals(0.0008, mainRunType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, mainRunType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -125,7 +120,7 @@ public class MainRunResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), carrierVehicle);
+					assertSame(vehicles.getFirst(), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);
 					assertSame(carrierVehicle.getLinkId(), fromLinkId);
 				}

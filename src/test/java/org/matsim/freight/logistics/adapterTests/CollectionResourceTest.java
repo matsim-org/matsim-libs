@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -41,7 +40,7 @@ import org.matsim.vehicles.VehicleType;
 
 public class CollectionResourceTest {
 
-	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
+	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType collectionType;
@@ -57,9 +56,9 @@ public class CollectionResourceTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
+        Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(10);
@@ -74,7 +73,6 @@ public class CollectionResourceTest {
 		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
@@ -114,7 +112,7 @@ public class CollectionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), collectionType);
+					assertSame(types.getFirst(), collectionType);
 					assertEquals(10, collectionType.getCapacity().getOther().intValue());
 					assertEquals(0.0004, collectionType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, collectionType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -124,7 +122,7 @@ public class CollectionResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), collectionCarrierVehicle);
+					assertSame(vehicles.getFirst(), collectionCarrierVehicle);
 					assertSame(collectionCarrierVehicle.getType(), collectionType);
 					assertSame(collectionCarrierVehicle.getLinkId(), collectionLinkId);
 				}

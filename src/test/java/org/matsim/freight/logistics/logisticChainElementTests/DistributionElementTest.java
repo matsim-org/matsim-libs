@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,9 +52,9 @@ public class DistributionElementTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
+        Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(10);
@@ -77,8 +76,8 @@ public class DistributionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
-		adapter = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier)
+        Id.create("DistributionCarrierResource", LSPResource.class);
+        adapter = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.setLocationLinkId(distributionLinkId)
 				.build();

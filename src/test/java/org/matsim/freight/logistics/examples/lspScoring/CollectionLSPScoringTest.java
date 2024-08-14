@@ -77,7 +77,10 @@ public class CollectionLSPScoringTest {
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionVehicleType);
 
 		Carrier carrier = CarriersUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
-		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType).addVehicle(carrierVehicle).setFleetSize(FleetSize.INFINITE).build());
+		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance()
+				.addVehicle(carrierVehicle)
+				.setFleetSize(FleetSize.INFINITE)
+				.build());
 
 		LSPResource collectionResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier)
 				.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario)).setLocationLinkId(collectionLink.getId()).build();
@@ -116,7 +119,7 @@ public class CollectionLSPScoringTest {
 
 			while (true) {
 				Collections.shuffle(linkList, random);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
 						&& pendingFromLink.getFromNode().getCoord().getY() <= 4000
 						&& pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -149,7 +152,7 @@ public class CollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( () -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance(ExampleLSPScoring.TipScorer::new);
 			}
 		});
 

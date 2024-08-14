@@ -96,7 +96,6 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		collectionCapabilitiesBuilder.addType(collectionType);
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
@@ -147,7 +146,6 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
@@ -224,7 +222,7 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingToLink = linkList.get(0);
+				Link pendingToLink = linkList.getFirst();
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
@@ -239,7 +237,7 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -314,6 +312,6 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 	@Test
 	public void compareEvents(){
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
-		//Please note, that this result contains also reloding / hubHandlingStarts after the main run (even if there is no further distribution carrier)
+		//Please note, that this result contains also reloading / hubHandlingStarts after the main run (even if there is no further distribution carrier)
 	}
 }

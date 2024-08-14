@@ -100,7 +100,6 @@ public class CollectionLSPMobsimTest {
 		// define carrier:
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -155,7 +154,7 @@ public class CollectionLSPMobsimTest {
 
 				while (true) {
 					Collections.shuffle(linkList, MatsimRandom.getRandom());
-					Link pendingFromLink = linkList.get(0);
+					Link pendingFromLink = linkList.getFirst();
 					if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 							pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 							pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -183,12 +182,7 @@ public class CollectionLSPMobsimTest {
 			lsps = new LSPs(lspList);
 		}
 		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler(new BasicEventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				log.warn(event);
-			}
-		});
+		controler.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

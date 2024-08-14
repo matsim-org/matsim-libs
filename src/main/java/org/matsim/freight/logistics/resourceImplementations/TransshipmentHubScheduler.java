@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.LspShipmentWithTime;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
+import org.matsim.freight.logistics.shipment.LspShipment;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
@@ -43,7 +43,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private TransshipmentHubTourEndEventHandler eventHandler;
 
   TransshipmentHubScheduler(TranshipmentHubSchedulerBuilder builder) {
-    this.lspShipmentsWithTime = new ArrayList<>();
+    this.lspShipmentsToSchedule = new ArrayList<>();
     this.capacityNeedLinear = builder.getCapacityNeedLinear();
     this.capacityNeedFixed = builder.getCapacityNeedFixed();
   }
@@ -55,8 +55,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   protected void scheduleResource() {
-    for (LspShipmentWithTime tupleToBeAssigned : lspShipmentsWithTime) {
-      updateSchedule(tupleToBeAssigned);
+    for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
+      updateSchedule(lspShipmentToBeAssigned);
     }
   }
 
@@ -66,39 +66,39 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     log.error("This method is not implemented. Nothing will happen here. ");
   }
 
-  private void updateSchedule(LspShipmentWithTime tuple) {
-    addShipmentHandleElement(tuple);
-    addShipmentToEventHandler(tuple);
+  private void updateSchedule(LspShipment lspShipment) {
+    addShipmentHandleElement(lspShipment);
+    addShipmentToEventHandler(lspShipment);
   }
 
-  private void addShipmentHandleElement(LspShipmentWithTime tuple) {
+  private void addShipmentHandleElement(LspShipment lspShipment) {
     LspShipmentUtils.ScheduledShipmentHandleBuilder builder =
         LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
-    builder.setStartTime(tuple.getTime());
-    builder.setEndTime(
-        tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getLspShipment().getSize());
+    builder.setStartTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment));
+    builder.setEndTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment) + capacityNeedFixed + capacityNeedLinear * lspShipment.getSize());
     builder.setResourceId(transshipmentHubResource.getId());
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         builder.setLogisticsChainElement(element);
       }
     }
     LspShipmentPlanElement handle = builder.build();
+
     String idString =
         handle.getResourceId()
             + String.valueOf(handle.getLogisticChainElement().getId())
             + handle.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getLspShipment().getId())
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
         .addPlanElement(id, handle);
   }
 
-  private void addShipmentToEventHandler(LspShipmentWithTime tuple) {
+  private void addShipmentToEventHandler(LspShipment lspShipment) {
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LspShipmentPlan lspShipmentPlan =
-            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getLspShipment().getId());
-        eventHandler.addShipment(tuple.getLspShipment(), element, lspShipmentPlan);
+            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId());
+        eventHandler.addShipment(lspShipment, element, lspShipmentPlan);
         break;
       }
     }

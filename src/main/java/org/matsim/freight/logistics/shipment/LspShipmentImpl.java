@@ -105,6 +105,8 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
     return pickupServiceTime;
   }
 
+
+
     @Override
   public String toString() {
     return "LSPShipmentImpl{"

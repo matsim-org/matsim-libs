@@ -43,9 +43,9 @@ public interface WaitingShipments {
 
   void addShipment(double time, LspShipment lspShipment);
 
-  Collection<LspShipmentWithTime> getSortedLspShipments();
+  Collection<LspShipment> getSortedLspShipments();
 
-  Collection<LspShipmentWithTime> getLspShipmentsWTime();
+  Collection<LspShipment> getLspShipmentsWTime();
 
   void clear();
 }

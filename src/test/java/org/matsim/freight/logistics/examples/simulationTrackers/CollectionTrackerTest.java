@@ -21,9 +21,6 @@
 
 package org.matsim.freight.logistics.examples.simulationTrackers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +54,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionTrackerTest {
 	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
@@ -97,7 +96,6 @@ public class CollectionTrackerTest {
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -105,8 +103,8 @@ public class CollectionTrackerTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
-				CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
+        Id.create("CollectionCarrierResource", LSPResource.class);
+        CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
 		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionResource = adapterBuilder.build();
@@ -158,7 +156,7 @@ public class CollectionTrackerTest {
 
 			while (true) {
 				Collections.shuffle(linkList, random);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -209,7 +207,7 @@ public class CollectionTrackerTest {
 
 		assertEquals(1, logisticChain.getSimulationTrackers().size());
 		LSPSimulationTracker<LogisticChain> tracker = logisticChain.getSimulationTrackers().iterator().next();
-		assertTrue(tracker instanceof LinearCostTracker);
+		assertInstanceOf(LinearCostTracker.class, tracker);
 		LinearCostTracker linearTracker = (LinearCostTracker) tracker;
 		double totalScheduledCosts = 0;
 		double totalTrackedCosts = 0;
@@ -281,7 +279,7 @@ public class CollectionTrackerTest {
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}
 					}
-					log.warn("scheduledDistanceCosts=" + scheduledDistanceCosts);
+					log.warn("scheduledDistanceCosts={}", scheduledDistanceCosts);
 				}
 				totalScheduledCosts += scheduledDistanceCosts;
 				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts, trackedDistanceCosts) * 0.01);
@@ -293,7 +291,7 @@ public class CollectionTrackerTest {
 		double fixedTrackedCostsPerShipment = (totalTrackedCosts * shareOfFixedCosts) / totalNumberOfTrackedShipments;
 		double fixedScheduledCostsPerShipment = (totalScheduledCosts * shareOfFixedCosts) / totalNumberOfScheduledShipments;
 
-		assertEquals(totalTrackedWeight, totalTrackedWeight, 0);
+		assertEquals(totalTrackedWeight, totalScheduledWeight, 0);
 		assertEquals(totalNumberOfTrackedShipments, totalNumberOfScheduledShipments, 0);
 		assertEquals(totalTrackedCosts, totalScheduledCosts, Math.max(totalScheduledCosts, totalTrackedCosts) * 0.01);
 		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment) * 0.01);

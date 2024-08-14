@@ -98,7 +98,6 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		collectionCapabilitiesBuilder.addType(collectionType);
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
@@ -149,7 +148,6 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
@@ -199,7 +197,6 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
@@ -263,7 +260,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingToLink = linkList.get(0);
+				Link pendingToLink = linkList.getFirst();
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
@@ -278,7 +275,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 
 			while (true) {
 				Collections.shuffle(linkList, MatsimRandom.getRandom());
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
@@ -308,10 +305,10 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		LSPUtils.addLSPs(scenario, lsps);
 		controler.addOverridingModule(new LSPModule());
 		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
+            @Override public void install(){
 				bind( LSPStrategyManager.class ).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
+                    strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
 					return strategyManager;
 				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
@@ -338,7 +335,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 	@Test
 	public void testCompleteLSPMobsim() {
 		for (LspShipment shipment : completeLSP.getLspShipments()) {
-			log.info("comparing shipment: " + shipment.getId());
+			log.info("comparing shipment: {}", shipment.getId());
 			assertFalse(shipment.getShipmentLog().getPlanElements().isEmpty());
 			ArrayList<LspShipmentPlanElement> scheduleElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());

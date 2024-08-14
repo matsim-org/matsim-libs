@@ -93,7 +93,6 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
@@ -143,7 +142,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 			while (true) {
 				Collections.shuffle(linkList, random);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000
 						&& pendingFromLink.getFromNode().getCoord().getY() <= 4000
 						&& pendingFromLink.getToNode().getCoord().getX() <= 4000
@@ -175,7 +174,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScorerFactory.class ).toInstance( () -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance(ExampleLSPScoring.TipScorer::new);
 				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
 					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
