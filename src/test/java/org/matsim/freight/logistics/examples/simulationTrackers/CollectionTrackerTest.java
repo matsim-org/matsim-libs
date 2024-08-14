@@ -291,7 +291,7 @@ public class CollectionTrackerTest {
 		double fixedTrackedCostsPerShipment = (totalTrackedCosts * shareOfFixedCosts) / totalNumberOfTrackedShipments;
 		double fixedScheduledCostsPerShipment = (totalScheduledCosts * shareOfFixedCosts) / totalNumberOfScheduledShipments;
 
-		assertEquals(totalTrackedWeight, totalTrackedWeight, 0);
+		assertEquals(totalTrackedWeight, totalScheduledWeight, 0);
 		assertEquals(totalNumberOfTrackedShipments, totalNumberOfScheduledShipments, 0);
 		assertEquals(totalTrackedCosts, totalScheduledCosts, Math.max(totalScheduledCosts, totalTrackedCosts) * 0.01);
 		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment) * 0.01);

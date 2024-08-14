@@ -93,10 +93,7 @@ public class DistributionResourceTest {
 		assertNotNull(distributionResource.getClientElements());
 		assertTrue(distributionResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass())) {
-//				assertTrue(Carrier.class.isAssignableFrom(distributionResource.getClassOfResource()));
-			assertSame(distributionResource.getCarrier(), distributionCarrier);
-		}
+		assertSame(distributionResource.getCarrier(), distributionCarrier);
 		assertSame(distributionResource.getEndLinkId(), distributionLinkId);
 		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
 		assertNotNull(distributionResource.getSimulationTrackers());

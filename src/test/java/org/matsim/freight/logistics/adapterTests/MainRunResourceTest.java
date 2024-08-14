@@ -92,10 +92,7 @@ public class MainRunResourceTest {
 		assertNotNull(mainRunResource.getClientElements());
 		assertTrue(mainRunResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass())) {
-//			assertTrue(Carrier.class.isAssignableFrom(mainRunResource.getClassOfResource()));
-			assertSame(mainRunResource.getCarrier(), carrier);
-		}
+		assertSame(mainRunResource.getCarrier(), carrier);
 		assertSame(mainRunResource.getEndLinkId(), toLinkId);
 		assertSame(mainRunResource.getStartLinkId(), fromLinkId);
 		assertNotNull(mainRunResource.getSimulationTrackers());
