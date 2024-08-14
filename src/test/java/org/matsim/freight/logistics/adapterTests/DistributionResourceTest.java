@@ -41,8 +41,8 @@ import org.matsim.vehicles.VehicleType;
 
 public class DistributionResourceTest {
 
-	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
-	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
+	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
+	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType distributionType;
 	private CarrierVehicle distributionCarrierVehicle;

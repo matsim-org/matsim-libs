@@ -40,7 +40,7 @@ import org.matsim.vehicles.VehicleType;
 
 public class CollectionResourceTest {
 
-	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
+	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType collectionType;

@@ -312,6 +312,6 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 	@Test
 	public void compareEvents(){
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
-		//Please note, that this result contains also reloding / hubHandlingStarts after the main run (even if there is no further distribution carrier)
+		//Please note, that this result contains also reloading / hubHandlingStarts after the main run (even if there is no further distribution carrier)
 	}
 }
