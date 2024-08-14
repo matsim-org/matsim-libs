@@ -354,63 +354,73 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertSame(planElements.getFirst().getLogisticChainElement(), collectionElement);
 		}
 
-		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-		Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>> iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
+		{
+			assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
+			ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
+			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
+			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
+					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-		while (iter.hasNext()) {
-			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
-			CarrierService service = entry.getKey();
-			LspShipment shipment = entry.getValue().lspShipment;
-			LogisticChainElement element = entry.getValue().element;
-			assertSame(service.getLocationLinkId(), shipment.getFrom());
-			assertEquals(service.getCapacityDemand(), shipment.getSize());
-			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			boolean handledByTranshipmentHub = false;
-			for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
-				if (clientElement == element) {
-					handledByTranshipmentHub = true;
-					break;
+			while (iter.hasNext()) {
+				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>
+						entry = iter.next();
+				CarrierService service = entry.getKey();
+				LspShipment shipment = entry.getValue().lspShipment;
+				LogisticChainElement element = entry.getValue().element;
+				assertSame(service.getLocationLinkId(), shipment.getFrom());
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+				boolean handledByTranshipmentHub = false;
+				for (LogisticChainElement clientElement :
+						reloadEventHandler.getTranshipmentHub().getClientElements()) {
+					if (clientElement == element) {
+						handledByTranshipmentHub = true;
+						break;
+					}
 				}
-			}
-			assertTrue(handledByTranshipmentHub);
+				assertTrue(handledByTranshipmentHub);
 
-			assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
-			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
+				//There IS a next element following the 1st hub, so the outgoing shipments does NOT contain the shipment anymore (got handled).
+				assertFalse(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+				assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
+			}
 		}
 
-		assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
-		eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
-		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-		reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-		iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
+		{
+			assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
+			ArrayList<EventHandler> eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
+			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
+			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
+					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-		while (iter.hasNext()) {
-			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
-			CarrierService service = entry.getKey();
-			LspShipment shipment = entry.getValue().lspShipment;
-			LogisticChainElement element = entry.getValue().element;
-			assertSame(service.getLocationLinkId(), toLinkId);
-			assertEquals(service.getCapacityDemand(), shipment.getSize());
-			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			boolean handledByTranshipmentHub = false;
-			for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
-				if (clientElement == element) {
-					handledByTranshipmentHub = true;
-					break;
+			while (iter.hasNext()) {
+				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
+				CarrierService service = entry.getKey();
+				LspShipment shipment = entry.getValue().lspShipment;
+				LogisticChainElement element = entry.getValue().element;
+				assertSame(service.getLocationLinkId(), toLinkId);
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+				boolean handledByTranshipmentHub = false;
+				for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
+					if (clientElement == element) {
+						handledByTranshipmentHub = true;
+						break;
+					}
 				}
-			}
-			assertTrue(handledByTranshipmentHub);
+				assertTrue(handledByTranshipmentHub);
 
-			assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
-			assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
+				//There is NO next element following the 2nd hub, so the outgoing shipments remain in the list of the 2nd hub.
+				assertTrue(element.getOutgoingShipments().getLspShipmentsWTime().contains(shipment));
+				assertFalse(element.getIncomingShipments().getLspShipmentsWTime().contains(shipment));
+			}
 		}
 
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			assertEquals(4, shipment.getSimulationTrackers().size());
-			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
+			ArrayList<LSPSimulationTracker<LspShipment>> eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<LogisticChainElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());
