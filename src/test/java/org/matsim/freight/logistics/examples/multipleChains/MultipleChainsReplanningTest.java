@@ -91,9 +91,9 @@ public class MultipleChainsReplanningTest {
 	}
 
 	private static LSP createLSP(Scenario scenario) {
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		// A plan with two different logistic chains on the left and right, with respective carriers is created
+        // A plan with two different logistic chains on the left and right, with respective carriers is created
 		LSPPlan multipleOneEchelonChainsPlan;
 		{
 			LogisticChainElement leftCarrierElement;

@@ -61,9 +61,9 @@ public class CompleteLogisticChainTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+        scenario.getNetwork();
 
-		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
+        Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder collectionVehicleTypeBuilder = CarrierVehicleType.Builder
 				.newInstance(collectionVehicleTypeId);

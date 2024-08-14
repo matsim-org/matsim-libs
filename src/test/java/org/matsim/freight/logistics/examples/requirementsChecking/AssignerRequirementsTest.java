@@ -43,7 +43,6 @@
 package org.matsim.freight.logistics.examples.requirementsChecking;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
