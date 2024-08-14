@@ -74,7 +74,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   public void scheduleResource() {
-    for (LspShipment tupleToBeAssigned : lspShipmentsWithTime) {
+    for (LspShipment tupleToBeAssigned : lspShipmentsToScedule) {
       CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
       carrier.getServices().put(carrierService.getId(), carrierService);
     }
@@ -96,7 +96,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   protected void updateShipments() {
-    for (LspShipment tuple : lspShipmentsWithTime) {
+    for (LspShipment tuple : lspShipmentsToScedule) {
       for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
         Tour tour = scheduledTour.getTour();
         for (TourElement element : tour.getTourElements()) {

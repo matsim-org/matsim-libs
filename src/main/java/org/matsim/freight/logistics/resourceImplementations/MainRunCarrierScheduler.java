@@ -77,7 +77,7 @@ import org.matsim.vehicles.VehicleType;
   @Override
   protected void scheduleResource() {
     int load = 0;
-    List<LspShipment> copyOfAssignedShipments = new ArrayList<>(lspShipmentsWithTime);
+    List<LspShipment> copyOfAssignedShipments = new ArrayList<>(lspShipmentsToScedule);
     copyOfAssignedShipments.sort(Comparator.comparingDouble(LspShipment::getTime));
     ArrayList<LspShipment> shipmentsInCurrentTour = new ArrayList<>();
     //		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
@@ -235,7 +235,7 @@ import org.matsim.vehicles.VehicleType;
 
   @Override
   protected void updateShipments() {
-    for (LspShipment LspShipment : lspShipmentsWithTime) {
+    for (LspShipment LspShipment : lspShipmentsToScedule) {
       for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
         Tour tour = scheduledTour.getTour();
         for (TourElement element : tour.getTourElements()) {

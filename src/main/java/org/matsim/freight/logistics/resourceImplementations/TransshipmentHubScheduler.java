@@ -43,7 +43,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   private TransshipmentHubTourEndEventHandler eventHandler;
 
   TransshipmentHubScheduler(TranshipmentHubSchedulerBuilder builder) {
-    this.lspShipmentsWithTime = new ArrayList<>();
+    this.lspShipmentsToScedule = new ArrayList<>();
     this.capacityNeedLinear = builder.getCapacityNeedLinear();
     this.capacityNeedFixed = builder.getCapacityNeedFixed();
   }
@@ -55,7 +55,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   protected void scheduleResource() {
-    for (LspShipment tupleToBeAssigned : lspShipmentsWithTime) {
+    for (LspShipment tupleToBeAssigned : lspShipmentsToScedule) {
       updateSchedule(tupleToBeAssigned);
     }
   }
