@@ -110,7 +110,7 @@ import org.matsim.vehicles.VehicleType;
       shipmentsInCurrentTour.add(lspShipment);
       load = load + lspShipment.getSize();
       cumulatedLoadingTime = cumulatedLoadingTime + lspShipment.getDeliveryServiceTime();
-      availabilityTimeOfLastShipment = lspShipment.getTime();
+      availabilityTimeOfLastShipment = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
     }
 
     if (!shipmentsInCurrentTour.isEmpty()) {

@@ -60,8 +60,4 @@ public interface LspShipment
 
   Collection<LspShipmentRequirement> getRequirements();
 
-  ///---
-  double getTime();
-  void setTime(double time);
-
 }

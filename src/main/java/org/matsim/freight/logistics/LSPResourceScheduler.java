@@ -83,14 +83,14 @@ public abstract class LSPResourceScheduler {
     for (LogisticChainElement element : resource.getClientElements()) {
       lspShipmentsToSchedule.addAll(element.getIncomingShipments().getLspShipmentsWTime());
     }
-    lspShipmentsToSchedule.sort(Comparator.comparingDouble(LspShipment::getTime));
+    lspShipmentsToSchedule.sort(Comparator.comparingDouble(LspShipmentUtils::getTimeOfLspShipment));
   }
 
   private void switchHandledShipments(int bufferTime) {
     for (LspShipment lspShipmentWithTime : lspShipmentsToSchedule) {
       var shipmentPlan = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;
-      lspShipmentWithTime.setTime(endOfTransportTime);
+      LspShipmentUtils.setTimeOfLspShipment(lspShipmentWithTime, endOfTransportTime);
         for (LogisticChainElement element : resource.getClientElements()) {
         if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipmentWithTime)) {
           element.getIncomingShipments().getLspShipmentsWTime().remove(lspShipmentWithTime);

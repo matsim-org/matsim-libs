@@ -78,7 +78,7 @@ import org.matsim.vehicles.VehicleType;
   protected void scheduleResource() {
     int load = 0;
     List<LspShipment> copyOfAssignedShipments = new ArrayList<>(lspShipmentsToSchedule);
-    copyOfAssignedShipments.sort(Comparator.comparingDouble(LspShipment::getTime));
+    copyOfAssignedShipments.sort(Comparator.comparingDouble(LspShipmentUtils::getTimeOfLspShipment));
     ArrayList<LspShipment> shipmentsInCurrentTour = new ArrayList<>();
     //		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
     List<CarrierPlan> scheduledPlans = new LinkedList<>();
@@ -131,12 +131,12 @@ import org.matsim.vehicles.VehicleType;
     tourBuilder.scheduleStart(Id.create(resource.getStartLinkId(), Link.class));
 
     double totalLoadingTime = 0;
-    double latestTupleTime = 0;
+    double latestLspShipmentTime = 0;
 
     for (LspShipment lspShipment : lspShipments) {
       totalLoadingTime = totalLoadingTime + lspShipment.getDeliveryServiceTime();
-      if (lspShipment.getTime() > latestTupleTime) {
-        latestTupleTime = lspShipment.getTime();
+      if (LspShipmentUtils.getTimeOfLspShipment(lspShipment) > latestLspShipmentTime) {
+        latestLspShipmentTime = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
       }
       tourBuilder.addLeg(new Leg());
       CarrierService carrierService = convertToCarrierService(lspShipment);
@@ -158,7 +158,7 @@ import org.matsim.vehicles.VehicleType;
     Tour vehicleTour = tourBuilder.build();
     CarrierVehicle vehicle =
         carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
-    double tourStartTime = latestTupleTime + totalLoadingTime;
+    double tourStartTime = latestLspShipmentTime + totalLoadingTime;
     ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
 
     tours.add(sTour);

@@ -37,14 +37,14 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   public void addShipment(double time, LspShipment lspShipment) {
-    lspShipment.setTime(time);
+    LspShipmentUtils.setTimeOfLspShipment(lspShipment, time);
     this.shipments.add(lspShipment);
-    shipments.sort(Comparator.comparingDouble(LspShipment::getTime));
+    shipments.sort(Comparator.comparingDouble(LspShipmentUtils::getTimeOfLspShipment));
   }
 
   @Override
   public Collection<LspShipment> getSortedLspShipments() {
-    shipments.sort(Comparator.comparingDouble(LspShipment::getTime));
+    shipments.sort(Comparator.comparingDouble(LspShipmentUtils::getTimeOfLspShipment));
     return shipments;
   }
 

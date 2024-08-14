@@ -74,9 +74,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   private void addShipmentHandleElement(LspShipment lspShipment) {
     LspShipmentUtils.ScheduledShipmentHandleBuilder builder =
         LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
-    builder.setStartTime(lspShipment.getTime());
-    builder.setEndTime(
-        lspShipment.getTime() + capacityNeedFixed + capacityNeedLinear * lspShipment.getSize());
+    builder.setStartTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment));
+    builder.setEndTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment) + capacityNeedFixed + capacityNeedLinear * lspShipment.getSize());
     builder.setResourceId(transshipmentHubResource.getId());
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
@@ -84,6 +83,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
       }
     }
     LspShipmentPlanElement handle = builder.build();
+
     String idString =
         handle.getResourceId()
             + String.valueOf(handle.getLogisticChainElement().getId())

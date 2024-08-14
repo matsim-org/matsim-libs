@@ -101,16 +101,6 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
   }
 
   @Override
-  public double getTime() {
-    return LspShipmentUtils.getTimeOfLspShipment(this);
-  }
-
-  @Override
-  public void setTime(double time) {
-    LspShipmentUtils.setTimeOfLspShipment(this, time);
-  }
-
-  @Override
   public double getPickupServiceTime() {
     return pickupServiceTime;
   }
