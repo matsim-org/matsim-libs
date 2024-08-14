@@ -55,8 +55,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   protected void scheduleResource() {
-    for (LspShipment tupleToBeAssigned : lspShipmentsToSchedule) {
-      updateSchedule(tupleToBeAssigned);
+    for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
+      updateSchedule(lspShipmentToBeAssigned);
     }
   }
 
@@ -66,20 +66,20 @@ import org.matsim.freight.logistics.shipment.LspShipment;
     log.error("This method is not implemented. Nothing will happen here. ");
   }
 
-  private void updateSchedule(LspShipment tuple) {
-    addShipmentHandleElement(tuple);
-    addShipmentToEventHandler(tuple);
+  private void updateSchedule(LspShipment lspShipment) {
+    addShipmentHandleElement(lspShipment);
+    addShipmentToEventHandler(lspShipment);
   }
 
-  private void addShipmentHandleElement(LspShipment tuple) {
+  private void addShipmentHandleElement(LspShipment lspShipment) {
     LspShipmentUtils.ScheduledShipmentHandleBuilder builder =
         LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
-    builder.setStartTime(tuple.getTime());
+    builder.setStartTime(lspShipment.getTime());
     builder.setEndTime(
-        tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getSize());
+        lspShipment.getTime() + capacityNeedFixed + capacityNeedLinear * lspShipment.getSize());
     builder.setResourceId(transshipmentHubResource.getId());
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         builder.setLogisticsChainElement(element);
       }
     }
@@ -89,16 +89,16 @@ import org.matsim.freight.logistics.shipment.LspShipment;
             + String.valueOf(handle.getLogisticChainElement().getId())
             + handle.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getId())
+    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
         .addPlanElement(id, handle);
   }
 
-  private void addShipmentToEventHandler(LspShipment tuple) {
+  private void addShipmentToEventHandler(LspShipment lspShipment) {
     for (LogisticChainElement element : transshipmentHubResource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LspShipmentPlan lspShipmentPlan =
-            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, tuple.getId());
-        eventHandler.addShipment(tuple, element, lspShipmentPlan);
+            LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipment.getId());
+        eventHandler.addShipment(lspShipment, element, lspShipmentPlan);
         break;
       }
     }
