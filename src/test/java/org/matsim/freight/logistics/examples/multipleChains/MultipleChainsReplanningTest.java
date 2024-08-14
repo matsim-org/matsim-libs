@@ -249,7 +249,7 @@ public class MultipleChainsReplanningTest {
 		LSP lsp = LSPUtils.getLSPs(controler.getScenario()).getLSPs().values().iterator().next();
 
 		initialPlanCount = lsp.getPlans().size();
-		initialPlanShipmentPlanCount = lsp.getPlans().get(0).getShipmentPlans().size();
+		initialPlanShipmentPlanCount = lsp.getPlans().getFirst().getShipmentPlans().size();
 
 		controler.run();
 

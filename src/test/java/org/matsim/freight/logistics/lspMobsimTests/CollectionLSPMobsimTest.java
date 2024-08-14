@@ -155,7 +155,7 @@ public class CollectionLSPMobsimTest {
 
 				while (true) {
 					Collections.shuffle(linkList, MatsimRandom.getRandom());
-					Link pendingFromLink = linkList.get(0);
+					Link pendingFromLink = linkList.getFirst();
 					if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 							pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 							pendingFromLink.getToNode().getCoord().getX() <= 4000 &&

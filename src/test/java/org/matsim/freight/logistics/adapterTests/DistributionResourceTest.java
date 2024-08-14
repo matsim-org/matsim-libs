@@ -118,7 +118,7 @@ public class DistributionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), distributionType);
+					assertSame(types.getFirst(), distributionType);
 					assertEquals(10, distributionType.getCapacity().getOther().intValue());
 					assertEquals(0.0004, distributionType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, distributionType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -128,7 +128,7 @@ public class DistributionResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), distributionCarrierVehicle);
+					assertSame(vehicles.getFirst(), distributionCarrierVehicle);
 					assertSame(distributionCarrierVehicle.getType(), distributionType);
 					assertSame(distributionCarrierVehicle.getLinkId(), distributionLinkId);
 				}

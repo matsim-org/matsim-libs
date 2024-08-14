@@ -61,7 +61,7 @@ public class CompleteShipmentBuilderTest {
 
 			while (true) {
 				Collections.shuffle(linkList);
-				Link pendingToLink = linkList.get(0);
+				Link pendingToLink = linkList.getFirst();
 				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
@@ -76,7 +76,7 @@ public class CompleteShipmentBuilderTest {
 
 			while (true) {
 				Collections.shuffle(linkList);
-				Link pendingFromLink = linkList.get(0);
+				Link pendingFromLink = linkList.getFirst();
 				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&

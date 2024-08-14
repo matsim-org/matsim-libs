@@ -116,7 +116,7 @@ public class MainRunResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), mainRunType);
+					assertSame(types.getFirst(), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
 					assertEquals(0.0008, mainRunType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, mainRunType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -125,7 +125,7 @@ public class MainRunResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), carrierVehicle);
+					assertSame(vehicles.getFirst(), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);
 					assertSame(carrierVehicle.getLinkId(), fromLinkId);
 				}

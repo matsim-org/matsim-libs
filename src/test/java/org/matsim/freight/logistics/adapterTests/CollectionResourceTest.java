@@ -114,7 +114,7 @@ public class CollectionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.get(0), collectionType);
+					assertSame(types.getFirst(), collectionType);
 					assertEquals(10, collectionType.getCapacity().getOther().intValue());
 					assertEquals(0.0004, collectionType.getCostInformation().getCostsPerMeter(), 0.0);
 					assertEquals(0.38, collectionType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -124,7 +124,7 @@ public class CollectionResourceTest {
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
-					assertSame(vehicles.get(0), collectionCarrierVehicle);
+					assertSame(vehicles.getFirst(), collectionCarrierVehicle);
 					assertSame(collectionCarrierVehicle.getType(), collectionType);
 					assertSame(collectionCarrierVehicle.getLinkId(), collectionLinkId);
 				}
