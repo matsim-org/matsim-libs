@@ -30,11 +30,12 @@ public class LspShipmentWithTime {
   // jun'22
 
   private final LspShipment lspShipment;
-  private final double time;
+//  private final double time;
 
   public LspShipmentWithTime(double time, LspShipment lspShipment) {
     this.lspShipment = lspShipment;
-    this.time = time;
+    setTimeOfLspShipment(this.lspShipment, time);
+//    this.time = time;
   }
 
   public LspShipment getLspShipment() {
@@ -42,6 +43,31 @@ public class LspShipmentWithTime {
   }
 
   public double getTime() {
-    return time;
+    return getTimeOfLspShipment(this.lspShipment);
+//    return time;
+  }
+
+  /**
+   * Stores a time as Attribute in the LspShipment.
+   * This is needed for some kind of tracking the shipment.
+   * <p>
+   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code.
+   * KMT Jul'24
+   * @param lspShipment the LspShipment to store the time in
+   * @param time the time to store
+   */
+  private void setTimeOfLspShipment(LspShipment lspShipment, double time){
+    lspShipment.getAttributes().putAttribute("time", time);
+  }
+
+  /**
+   * Returns the time stored in the LspShipment.
+   * <p>
+   * This will replace the LSPShipmentWithTime class and thus reduce the complexity of the code. KMT Jul'24
+   * @param lspShipment the LspShipment to get the time from
+   * @return the time as double
+   */
+  private double getTimeOfLspShipment(LspShipment lspShipment) {
+    return (double) lspShipment.getAttributes().getAttribute("time");
   }
 }
