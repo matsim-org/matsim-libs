@@ -20,6 +20,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.common.zones.io.ZoneShpReader;
 import org.matsim.contrib.common.zones.io.ZoneXmlReader;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystem;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3ZoneSystem;
@@ -81,8 +83,9 @@ public final class ZoneSystemUtils {
 			case H3GridZoneSystemParams.SET_NAME -> {
 				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).h3Resolution);
 				Preconditions.checkNotNull(crs);
-				yield  new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
+				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
 			}
+			case GeometryFreeZoneSystemParams.SET_NAME -> new GeometryFreeZoneSystem(network);
 			default -> throw new IllegalStateException("Unexpected value: " + zoneSystemParams.getName());
 		};
 		return zoneSystem;
