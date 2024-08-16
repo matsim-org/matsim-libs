@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,13 +61,16 @@ class DistanceBasedPtFareCalculatorTest {
 		var params = new DistanceBasedPtFareParams();
 		params.setTransactionPartner(TRANSACTION_PARTNER);
 		//0-2000m: 1EUR + 1EUR/km
-		params.setNormalTripIntercept(1.0);
-		params.setNormalTripSlope(0.001);
+		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClass2kmFareParams =
+			params.getOrCreateDistanceClassFareParams(2000.0);
+		distanceClass2kmFareParams.setFareIntercept(1.0);
+		distanceClass2kmFareParams.setFareSlope(0.001);
 
 		//2000m+: 3EUR + 0.5EUR/km
-		params.setLongDistanceTripThreshold(2000.);
-		params.setLongDistanceTripIntercept(3.);
-		params.setLongDistanceTripSlope(0.0005);
+		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassLongFareParams =
+			params.getOrCreateDistanceClassFareParams(Double.POSITIVE_INFINITY);
+		distanceClassLongFareParams.setFareIntercept(3.0);
+		distanceClassLongFareParams.setFareSlope(0.0005);
 
 		params.setMinFare(1.0);
 		params.setFareZoneShp(shapeFile);

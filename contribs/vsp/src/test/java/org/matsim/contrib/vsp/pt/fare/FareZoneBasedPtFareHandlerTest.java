@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -49,6 +49,11 @@ public class FareZoneBasedPtFareHandlerTest {
 		fareZoneBased.setTransactionPartner(FARE_ZONE_TRANSACTION_PARTNER);
 
 		DistanceBasedPtFareParams distanceBased = new DistanceBasedPtFareParams();
+		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassFareParams =
+			distanceBased.getOrCreateDistanceClassFareParams(999_999_999.);
+		distanceClassFareParams.setFareSlope(0.00017);
+		distanceClassFareParams.setFareIntercept(1.6);
+		distanceBased.addParameterSet(distanceClassFareParams);
 		distanceBased.setOrder(2);
 		distanceBased.setTransactionPartner(DISTANCE_BASED_TRANSACTION_PARTNER);
 

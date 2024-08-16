@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;

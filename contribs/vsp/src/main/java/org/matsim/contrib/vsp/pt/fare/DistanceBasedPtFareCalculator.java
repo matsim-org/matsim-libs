@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +11,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
 
 /**
  * This class calculates the fare for a public transport trip based on the distance between the origin and destination. If a shape file is
@@ -21,11 +22,7 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 	private static final Logger log = LogManager.getLogger(DistanceBasedPtFareCalculator.class);
 
 	private final double minFare;
-	private final double shortTripIntercept;
-	private final double shortTripSlope;
-	private final double longTripIntercept;
-	private final double longTripSlope;
-	private final double longTripThreshold;
+	private final SortedMap<Double, DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams> distanceClassFareParams;
 	private ShpOptions shp = null;
 	private final String transactionPartner;
 
@@ -33,11 +30,7 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 
 	public DistanceBasedPtFareCalculator(DistanceBasedPtFareParams params) {
 		this.minFare = params.getMinFare();
-		this.shortTripIntercept = params.getNormalTripIntercept();
-		this.shortTripSlope = params.getNormalTripSlope();
-		this.longTripIntercept = params.getLongDistanceTripIntercept();
-		this.longTripSlope = params.getLongDistanceTripSlope();
-		this.longTripThreshold = params.getLongDistanceTripThreshold();
+		this.distanceClassFareParams = params.getDistanceClassFareParams();
 		this.transactionPartner = params.getTransactionPartner();
 
 		if (params.getFareZoneShp() != null) {
@@ -58,7 +51,7 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 
 		double distance = CoordUtils.calcEuclideanDistance(from, to);
 
-		double fare = computeFare(distance, longTripThreshold, minFare, shortTripIntercept, shortTripSlope, longTripIntercept, longTripSlope);
+		double fare = computeFare(distance, minFare, distanceClassFareParams);
 		return Optional.of(new FareResult(fare, transactionPartner));
 	}
 
@@ -73,12 +66,14 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 		return shp.readFeatures().stream().anyMatch(f -> MGC.coord2Point(coord).within((Geometry) f.getDefaultGeometry()));
 	}
 
-	public static double computeFare(double distance, double longTripThreshold, double minFare, double shortTripIntercept, double shortTripSlope,
-									 double longTripIntercept, double longTripSlope) {
-		if (distance <= longTripThreshold) {
-			return Math.max(minFare, shortTripIntercept + shortTripSlope * distance);
-		} else {
-			return Math.max(minFare, longTripIntercept + longTripSlope * distance);
+	public static double computeFare(double distance, double minFare,
+									 SortedMap<Double, DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams> distanceClassFareParams) {
+		for (DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassFareParam : distanceClassFareParams.values()) {
+			if (distance <= distanceClassFareParam.getMaxDistance()) {
+				return Math.max(minFare, distance * distanceClassFareParam.getFareSlope() + distanceClassFareParam.getFareIntercept());
+			}
 		}
+		log.error("No fare found for distance of " + distance + " meters.");
+		throw new RuntimeException("No fare found for distance of " + distance + " meters.");
 	}
 }

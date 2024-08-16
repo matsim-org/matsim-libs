@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
@@ -152,9 +152,7 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 		double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
 
 		double fareUtility = -context.scoring.marginalUtilityOfMoney * DistanceBasedPtFareCalculator.computeFare(dist,
-			ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(), ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(),
-			ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
-
+			ptFare.getMinFare(), ptFare.getDistanceClassFareParams());
 
 		estimate += context.scoring.marginalUtilityOfWaitingPt_s * totalWaitingTime;
 
@@ -221,17 +219,14 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 		// a single pt trip could never benefit from the upper bound
 		if (n == 1) {
-			return DistanceBasedPtFareCalculator.computeFare(minDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(),
-				ptFare.getLongDistanceTripSlope());
+			return DistanceBasedPtFareCalculator.computeFare(minDist, ptFare.getMinFare(), ptFare.getDistanceClassFareParams());
 		}
 
 		// the upper bound is the maximum single trip times a factor
 		// therefore the minimum upper bound is the fare for the second-longest trip
 		// the max costs are then assumed to be evenly distributed over all pt trips
 		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareCalculator.computeFare(secondMinDist,
-			ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(), ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(),
-			ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+			ptFare.getMinFare(), ptFare.getDistanceClassFareParams());
 	}
 
 	@Override

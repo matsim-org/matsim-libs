@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -66,12 +66,15 @@ public class PtTripFareEstimatorTest {
 		fare.setUpperBoundFactor(1.5);
 
 		distanceFare.setMinFare(0.1);
-		distanceFare.setNormalTripIntercept(0.5);
-		distanceFare.setNormalTripSlope(0.1);
+		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClass20kmFareParams =
+			distanceFare.getOrCreateDistanceClassFareParams(20000.0);
+		distanceClass20kmFareParams.setFareIntercept(0.5);
+		distanceClass20kmFareParams.setFareSlope(0.1);
 
-		distanceFare.setLongDistanceTripThreshold(20000);
-		distanceFare.setLongDistanceTripIntercept(1);
-		distanceFare.setLongDistanceTripSlope(0.01);
+		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassLongFareParams =
+			distanceFare.getOrCreateDistanceClassFareParams(Double.POSITIVE_INFINITY);
+		distanceClassLongFareParams.setFareIntercept(1.0);
+		distanceClassLongFareParams.setFareSlope(0.01);
 
 		fare.addParameterSet(distanceFare);
 
