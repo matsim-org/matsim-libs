@@ -1,9 +1,11 @@
 package playground.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class PtFareConfigGroup extends ReflectiveConfigGroup {
 	public static final String PT_FARE = "pt fare";
@@ -56,5 +58,26 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(UPPER_BOUND_FACTOR)
 	public void setUpperBoundFactor(double upperBoundFactor) {
 		this.upperBoundFactor = upperBoundFactor;
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		var distanceBasedParameterSets = getParameterSets(DistanceBasedPtFareParams.SET_NAME);
+		var fareZoneBasedParameterSets = getParameterSets(FareZoneBasedPtFareParams.SET_NAME);
+
+		if (distanceBasedParameterSets.isEmpty() && fareZoneBasedParameterSets.isEmpty()) {
+			throw new IllegalArgumentException("No parameter sets found for pt fare calculation. Please add at least one parameter set.");
+		}
+
+		long distinctPriorities = Stream.concat(distanceBasedParameterSets.stream(), fareZoneBasedParameterSets.stream())
+										.map(PtFareParams.class::cast)
+										.map(PtFareParams::getPriority)
+										.distinct().count();
+
+		if (distinctPriorities != distanceBasedParameterSets.size() + fareZoneBasedParameterSets.size()) {
+			throw new IllegalArgumentException("Duplicate priorities found in parameter sets. Please make sure that priorities are unique.");
+		}
 	}
 }

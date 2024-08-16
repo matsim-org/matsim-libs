@@ -29,12 +29,20 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> facilities;
 
 	@Inject
-	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config, DistanceBasedPtFareParams ptFare,
+	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config,
 												Scenario scenario) {
 		super(transitSchedule);
 		this.config = config;
-		this.ptFare = ptFare;
+		this.ptFare = extractPtFare(config);
 		this.facilities = scenario.getTransitSchedule().getFacilities();
+	}
+
+	private static DistanceBasedPtFareParams extractPtFare(PtFareConfigGroup config) {
+		//TODO
+		return config.getParameterSets(DistanceBasedPtFareParams.SET_NAME).stream()
+					 .map(DistanceBasedPtFareParams.class::cast)
+					 .findFirst()
+					 .orElseThrow(() -> new IllegalStateException("No distance based fare parameters found"));
 	}
 
 	@Override

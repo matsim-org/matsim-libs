@@ -14,8 +14,6 @@ public class PtFareModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		//TODO check consistency: order unique, cost set
-
 		getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
 		getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
 		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);

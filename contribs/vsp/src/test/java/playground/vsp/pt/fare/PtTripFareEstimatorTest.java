@@ -60,7 +60,7 @@ public class PtTripFareEstimatorTest {
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
-		DistanceBasedPtFareParams distanceFare = ConfigUtils.addOrGetModule(config, DistanceBasedPtFareParams.class);
+		DistanceBasedPtFareParams distanceFare = new DistanceBasedPtFareParams();
 
 		fare.setApplyUpperBound(true);
 		fare.setUpperBoundFactor(1.5);
@@ -72,6 +72,8 @@ public class PtTripFareEstimatorTest {
 		distanceFare.setLongDistanceTripThreshold(20000);
 		distanceFare.setLongDistanceTripIntercept(1);
 		distanceFare.setLongDistanceTripSlope(0.01);
+
+		fare.addParameterSet(distanceFare);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config);
 		injector = controler.getInjector();
@@ -98,8 +100,9 @@ public class PtTripFareEstimatorTest {
 
 			List<Leg> trip = model.getLegs(TransportMode.pt, i);
 
-			if (trip == null)
+			if (trip == null) {
 				continue;
+			}
 
 			MinMaxEstimate est = estimator.estimate(context, TransportMode.pt, model, trip, ModeAvailability.YES);
 
@@ -116,9 +119,9 @@ public class PtTripFareEstimatorTest {
 		System.out.println(est);
 
 		assertThat(est)
-				.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
-				.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
-				.isCloseTo(-379.4, Offset.offset(0.1));
+			.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
+			.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
+			.isCloseTo(-379.4, Offset.offset(0.1));
 
 	}
 
@@ -129,7 +132,7 @@ public class PtTripFareEstimatorTest {
 			List<MinMaxEstimate> est = estimateAgent(agent);
 
 			assertThat(est)
-					.allMatch(e -> e.getMin() <= e.getMax(), "Min smaller max");
+				.allMatch(e -> e.getMin() <= e.getMax(), "Min smaller max");
 
 		}
 	}
@@ -157,22 +160,22 @@ public class PtTripFareEstimatorTest {
 		double estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
-				.isLessThanOrEqualTo(maxSum)
-				.isGreaterThanOrEqualTo(minSum)
-				.isCloseTo(-2738.72, Offset.offset(0.1));
+			.isLessThanOrEqualTo(maxSum)
+			.isGreaterThanOrEqualTo(minSum)
+			.isCloseTo(-2738.72, Offset.offset(0.1));
 
 
 		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
-				.isLessThanOrEqualTo(maxSum)
-				.isGreaterThanOrEqualTo(minSum)
-				.isCloseTo(-1222.91, Offset.offset(0.1));
+			.isLessThanOrEqualTo(maxSum)
+			.isGreaterThanOrEqualTo(minSum)
+			.isCloseTo(-1222.91, Offset.offset(0.1));
 
 		// Essentially single trip
 		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
 		assertThat(estimate)
-				.isCloseTo(singleTrips.get(0).getMin(), Offset.offset(0.1));
+			.isCloseTo(singleTrips.get(0).getMin(), Offset.offset(0.1));
 
 	}
 }

@@ -49,7 +49,6 @@ public class FareZoneBasedPtFareHandlerTest {
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
 
 		FareZoneBasedPtFareParams fareZoneBased = new FareZoneBasedPtFareParams();
-		fareZoneBased.setCost(2.5);
 		fareZoneBased.setDescription("simple fare zone based");
 		fareZoneBased.setFareZoneShp(IOUtils.extendUrl(context, "ptTestArea/pt-area.shp").toString());
 		fareZoneBased.setPriority(10);

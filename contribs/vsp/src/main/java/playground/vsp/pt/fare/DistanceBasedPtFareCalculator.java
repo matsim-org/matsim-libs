@@ -1,16 +1,25 @@
 package playground.vsp.pt.fare;
 
-import org.geotools.api.feature.simple.SimpleFeature;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This class calculates the fare for a public transport trip based on the distance between the origin and destination. If a shape file is
+ * provided, the
+ * fare will be calculated only if the trip is within the shape.
+ */
 public class DistanceBasedPtFareCalculator implements PtFareCalculator {
+	private static final Logger log = LogManager.getLogger(DistanceBasedPtFareCalculator.class);
+
 	private final double minFare;
 	private final double shortTripIntercept;
 	private final double shortTripSlope;
@@ -19,6 +28,8 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 	private final double longTripThreshold;
 	private ShpOptions shp = null;
 	private final String transactionPartner;
+
+	private final Map<Coord, Boolean> inShapeCache = new HashMap<>();
 
 	public DistanceBasedPtFareCalculator(DistanceBasedPtFareParams params) {
 		this.minFare = params.getMinFare();
@@ -30,7 +41,12 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 		this.transactionPartner = params.getTransactionPartner();
 
 		if (params.getFareZoneShp() != null) {
+			log.info("For DistanceBasedPtFareCalculator '{}' a fare zone shape file was provided. During the computation, the fare will be " +
+				"calculated only if the trip is within the shape.", params.getDescription());
 			this.shp = new ShpOptions(params.getFareZoneShp(), null, null);
+		} else {
+			log.info("For DistanceBasedPtFareCalculator '{}' no fare zone shape file was provided. The fare will be calculated for all trips.",
+				params.getDescription());
 		}
 	}
 
@@ -50,12 +66,11 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 		if (shp == null) {
 			return true;
 		}
-
-		return inShape(from, shp.readFeatures()) && inShape(to, shp.readFeatures());
+		return inShapeCache.computeIfAbsent(from, this::inShape) && inShapeCache.computeIfAbsent(to, this::inShape);
 	}
 
-	boolean inShape(Coord coord, List<SimpleFeature> features) {
-		return features.stream().anyMatch(f -> MGC.coord2Point(coord).within((Geometry) f.getDefaultGeometry()));
+	private boolean inShape(Coord coord) {
+		return shp.readFeatures().stream().anyMatch(f -> MGC.coord2Point(coord).within((Geometry) f.getDefaultGeometry()));
 	}
 
 	public static double computeFare(double distance, double longTripThreshold, double minFare, double shortTripIntercept, double shortTripSlope,
@@ -66,6 +81,4 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 			return Math.max(minFare, longTripIntercept + longTripSlope * distance);
 		}
 	}
-
-
 }
