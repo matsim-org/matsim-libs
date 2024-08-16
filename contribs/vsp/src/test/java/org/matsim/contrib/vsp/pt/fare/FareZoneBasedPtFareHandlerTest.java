@@ -53,7 +53,6 @@ public class FareZoneBasedPtFareHandlerTest {
 			distanceBased.getOrCreateDistanceClassFareParams(999_999_999.);
 		distanceClassFareParams.setFareSlope(0.00017);
 		distanceClassFareParams.setFareIntercept(1.6);
-		distanceBased.addParameterSet(distanceClassFareParams);
 		distanceBased.setOrder(2);
 		distanceBased.setTransactionPartner(DISTANCE_BASED_TRANSACTION_PARTNER);
 

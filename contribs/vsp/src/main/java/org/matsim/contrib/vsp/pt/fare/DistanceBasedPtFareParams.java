@@ -46,6 +46,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	// in Deutschlandtarif, the linear function for the prices above 100km seem to have a different steepness
 	// hence the following difference in data points
 	// prices taken from https://deutschlandtarifverbund.de/wp-content/uploads/2024/07/20231201_TBDT_J_10_Preisliste_V07.pdf
+	// TODO: This fare will change. We might need a way to select the fare of a specific year
 	private static DistanceBasedPtFareParams germanWideFare() {
 		final double MIN_FARE = 1.70;
 
@@ -147,7 +148,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 
 	public static class DistanceClassLinearFareFunctionParams extends ReflectiveConfigGroup {
 
-		public static final String SET_NAME = "distanceClassLinearFareFunctionParams";
+		public static final String SET_NAME = "distanceClassLinearFare";
 		public static final String FARE_SLOPE = "fareSlope";
 		public static final String FARE_INTERCEPT = "fareIntercept";
 		public static final String MAX_DISTANCE = "maxDistance";
