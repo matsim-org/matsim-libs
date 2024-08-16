@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;

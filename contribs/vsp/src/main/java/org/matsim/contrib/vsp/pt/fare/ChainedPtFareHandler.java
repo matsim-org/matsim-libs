@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;

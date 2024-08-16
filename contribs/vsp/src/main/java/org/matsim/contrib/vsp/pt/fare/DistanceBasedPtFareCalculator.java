@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;

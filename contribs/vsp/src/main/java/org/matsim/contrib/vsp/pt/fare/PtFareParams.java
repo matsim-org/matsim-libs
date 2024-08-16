@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 

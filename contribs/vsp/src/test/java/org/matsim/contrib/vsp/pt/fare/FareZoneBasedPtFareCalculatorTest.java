@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
