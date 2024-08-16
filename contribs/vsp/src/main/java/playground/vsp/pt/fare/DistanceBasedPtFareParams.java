@@ -2,8 +2,9 @@ package playground.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Chengqi Lu (luchengqi7)
@@ -16,24 +17,9 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 
 	public static final String SET_NAME = "ptFareCalculationDistanceBased";
 	public static final String MIN_FARE = "minFare";
-	public static final String NORMAL_TRIP_SLOPE = "normalTripSlope";
-	public static final String NORMAL_TRIP_INTERCEPT = "normalTripIntercept";
-	public static final String LONG_DISTANCE_TRIP_THRESHOLD = "longDistanceTripThreshold";
-	public static final String LONG_DISTANCE_TRIP_SLOPE = "longDistanceTripSlope";
-	public static final String LONG_DISTANCE_TRIP_INTERCEPT = "longDistanceTripIntercept";
 
 	@PositiveOrZero
 	private double minFare = 2.0;
-	@PositiveOrZero
-	private double normalTripIntercept = 1.6;
-	@PositiveOrZero
-	private double normalTripSlope = 0.00017;
-	@PositiveOrZero
-	private double longDistanceTripThreshold = 50000.0;
-	@PositiveOrZero
-	private double longDistanceTripIntercept = 30.0;
-	@PositiveOrZero
-	private double longDistanceTripSlope = 0.00025;
 
 	public DistanceBasedPtFareParams() {
 		super(SET_NAME);
@@ -44,14 +30,6 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		Map<String, String> map = super.getComments();
 		map.put(MIN_FARE, "Minimum fare for a PT trip (e.g. Kurzstrecke/short distance ticket in cities, ticket for 1 zone in rural areas). " +
 			"Default is 2.0EUR.");
-		map.put(NORMAL_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for normal trips (e.g. within the city or region). Default is 0.00017" +
-			"EUR.");
-		map.put(NORMAL_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for normal trips. Default is 1.6EUR.");
-		map.put(LONG_DISTANCE_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for long distance trips (e.g. intercity trips). Default is 0" +
-			".00025EUR.");
-		map.put(LONG_DISTANCE_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for long trips. Default is 30.0EUR.");
-		map.put(LONG_DISTANCE_TRIP_THRESHOLD, "Threshold of the long trips in meters. Below this value, the trips are considered as normal trips. " +
-			"Above this value, the trips are considered as inter-city trips. Default is 50000.0m.");
 		return map;
 	}
 
@@ -65,91 +43,41 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		this.minFare = minFare;
 	}
 
-	@StringGetter(NORMAL_TRIP_SLOPE)
-	public double getNormalTripSlope() {
-		return normalTripSlope;
-	}
-
-	@StringSetter(NORMAL_TRIP_SLOPE)
-	public void setNormalTripSlope(double normalTripSlope) {
-		this.normalTripSlope = normalTripSlope;
-	}
-
-	@StringGetter(NORMAL_TRIP_INTERCEPT)
-	public double getNormalTripIntercept() {
-		return normalTripIntercept;
-	}
-
-	@StringSetter(NORMAL_TRIP_INTERCEPT)
-	public void setNormalTripIntercept(double normalTripIntercept) {
-		this.normalTripIntercept = normalTripIntercept;
-	}
-
-	@StringGetter(LONG_DISTANCE_TRIP_SLOPE)
-	public double getLongDistanceTripSlope() {
-		return longDistanceTripSlope;
-	}
-
-	@StringSetter(LONG_DISTANCE_TRIP_SLOPE)
-	public void setLongDistanceTripSlope(double longDistanceTripSlope) {
-		this.longDistanceTripSlope = longDistanceTripSlope;
-	}
-
-	@StringGetter(LONG_DISTANCE_TRIP_INTERCEPT)
-	public double getLongDistanceTripIntercept() {
-		return longDistanceTripIntercept;
-	}
-
-	@StringSetter(LONG_DISTANCE_TRIP_INTERCEPT)
-	public void setLongDistanceTripIntercept(double longDistanceTripIntercept) {
-		this.longDistanceTripIntercept = longDistanceTripIntercept;
-	}
-
-	@StringGetter(LONG_DISTANCE_TRIP_THRESHOLD)
-	public double getLongDistanceTripThreshold() {
-		return longDistanceTripThreshold;
-	}
-
-	@StringSetter(LONG_DISTANCE_TRIP_THRESHOLD)
-	public void setLongDistanceTripThreshold(double longDistanceTripThreshold) {
-		this.longDistanceTripThreshold = longDistanceTripThreshold;
-	}
-
 	// in Deutschlandtarif, the linear function for the prices above 100km seem to have a different steepness
 	// hence the following difference in data points
 	// prices taken from https://deutschlandtarifverbund.de/wp-content/uploads/2024/07/20231201_TBDT_J_10_Preisliste_V07.pdf
 	private static DistanceBasedPtFareParams germanWideFare() {
 		final double MIN_FARE = 1.70;
 
-		SimpleRegression normalDistanceTrip = new SimpleRegression();
-		normalDistanceTrip.addData(1, MIN_FARE);
-		normalDistanceTrip.addData(2, 1.90);
-		normalDistanceTrip.addData(3, 2.00);
-		normalDistanceTrip.addData(4, 2.10);
-		normalDistanceTrip.addData(5, 2.20);
-		normalDistanceTrip.addData(6, 3.20);
-		normalDistanceTrip.addData(7, 3.70);
-		normalDistanceTrip.addData(8, 3.80);
-		normalDistanceTrip.addData(9, 3.90);
-		normalDistanceTrip.addData(10, 4.10);
-		normalDistanceTrip.addData(11, 5.00);
-		normalDistanceTrip.addData(12, 5.40);
-		normalDistanceTrip.addData(13, 5.60);
-		normalDistanceTrip.addData(14, 5.80);
-		normalDistanceTrip.addData(15, 5.90);
-		normalDistanceTrip.addData(16, 6.40);
-		normalDistanceTrip.addData(17, 6.50);
-		normalDistanceTrip.addData(18, 6.60);
-		normalDistanceTrip.addData(19, 6.70);
-		normalDistanceTrip.addData(20, 6.90);
-		normalDistanceTrip.addData(30, 9.90);
-		normalDistanceTrip.addData(40, 13.70);
-		normalDistanceTrip.addData(50, 16.30);
-		normalDistanceTrip.addData(60, 18.10);
-		normalDistanceTrip.addData(70, 20.10);
-		normalDistanceTrip.addData(80, 23.20);
-		normalDistanceTrip.addData(90, 26.20);
-		normalDistanceTrip.addData(100, 28.10);
+		SimpleRegression under100kmTrip = new SimpleRegression();
+		under100kmTrip.addData(1, MIN_FARE);
+		under100kmTrip.addData(2, 1.90);
+		under100kmTrip.addData(3, 2.00);
+		under100kmTrip.addData(4, 2.10);
+		under100kmTrip.addData(5, 2.20);
+		under100kmTrip.addData(6, 3.20);
+		under100kmTrip.addData(7, 3.70);
+		under100kmTrip.addData(8, 3.80);
+		under100kmTrip.addData(9, 3.90);
+		under100kmTrip.addData(10, 4.10);
+		under100kmTrip.addData(11, 5.00);
+		under100kmTrip.addData(12, 5.40);
+		under100kmTrip.addData(13, 5.60);
+		under100kmTrip.addData(14, 5.80);
+		under100kmTrip.addData(15, 5.90);
+		under100kmTrip.addData(16, 6.40);
+		under100kmTrip.addData(17, 6.50);
+		under100kmTrip.addData(18, 6.60);
+		under100kmTrip.addData(19, 6.70);
+		under100kmTrip.addData(20, 6.90);
+		under100kmTrip.addData(30, 9.90);
+		under100kmTrip.addData(40, 13.70);
+		under100kmTrip.addData(50, 16.30);
+		under100kmTrip.addData(60, 18.10);
+		under100kmTrip.addData(70, 20.10);
+		under100kmTrip.addData(80, 23.20);
+		under100kmTrip.addData(90, 26.20);
+		under100kmTrip.addData(100, 28.10);
 
 		SimpleRegression longDistanceTrip = new SimpleRegression();
 		longDistanceTrip.addData(100, 28.10);
@@ -174,14 +102,109 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		longDistanceTrip.addData(2000, 244.00);
 
 		var params = new DistanceBasedPtFareParams();
-		params.setNormalTripSlope(normalDistanceTrip.getSlope());
-		params.setNormalTripIntercept(normalDistanceTrip.getIntercept());
-		params.setLongDistanceTripSlope(longDistanceTrip.getSlope());
-		params.setLongDistanceTripIntercept(longDistanceTrip.getIntercept());
-		params.setLongDistanceTripThreshold(100_000.);
+
+		DistanceClassLinearFareFunctionParams distanceClass100kmFareParams = params.getOrCreateDistanceClassFareParams(100_000.);
+		distanceClass100kmFareParams.setFareSlope(under100kmTrip.getSlope());
+		distanceClass100kmFareParams.setFareIntercept(under100kmTrip.getIntercept());
+
+		DistanceClassLinearFareFunctionParams distanceClassLongFareParams = params.getOrCreateDistanceClassFareParams(Double.POSITIVE_INFINITY);
+		distanceClassLongFareParams.setFareSlope(longDistanceTrip.getSlope());
+		distanceClassLongFareParams.setFareIntercept(longDistanceTrip.getIntercept());
+
 		params.setTransactionPartner("Deutschlandtarif");
 		params.setMinFare(MIN_FARE);
 
 		return params;
+	}
+
+	public SortedMap<Double, DistanceClassLinearFareFunctionParams> getDistanceClassFareParams() {
+		@SuppressWarnings("unchecked")
+		final Collection<DistanceClassLinearFareFunctionParams> distanceClassFareParams =
+			(Collection<DistanceClassLinearFareFunctionParams>) getParameterSets(DistanceClassLinearFareFunctionParams.SET_NAME);
+		final SortedMap<Double, DistanceClassLinearFareFunctionParams> map = new TreeMap<>();
+
+		for (DistanceClassLinearFareFunctionParams pars : distanceClassFareParams) {
+			if (this.isLocked()) {
+				pars.setLocked();
+			}
+			map.put(pars.getMaxDistance(), pars);
+		}
+		if (this.isLocked()) {
+			return Collections.unmodifiableSortedMap(map);
+		} else {
+			return map;
+		}
+	}
+
+	public DistanceClassLinearFareFunctionParams getOrCreateDistanceClassFareParams(double maxDistance) {
+		DistanceClassLinearFareFunctionParams distanceClassFareParams = this.getDistanceClassFareParams().get(maxDistance);
+		if (distanceClassFareParams == null) {
+			distanceClassFareParams = new DistanceClassLinearFareFunctionParams(maxDistance);
+			addParameterSet(distanceClassFareParams);
+		}
+		return distanceClassFareParams;
+	}
+
+	public static class DistanceClassLinearFareFunctionParams extends ReflectiveConfigGroup {
+
+		public static final String SET_NAME = "distanceClassLinearFareFunctionParams";
+		public static final String FARE_SLOPE = "fareSlope";
+		public static final String FARE_INTERCEPT = "fareIntercept";
+		public static final String MAX_DISTANCE = "maxDistance";
+
+		@PositiveOrZero
+		private double fareSlope;
+		@PositiveOrZero
+		private double fareIntercept;
+		@PositiveOrZero
+		private double maxDistance;
+
+		public DistanceClassLinearFareFunctionParams(double maxDistance) {
+			super(SET_NAME);
+			this.maxDistance = maxDistance;
+		}
+
+		@StringGetter(FARE_SLOPE)
+		public double getFareSlope() {
+			return fareSlope;
+		}
+
+		@StringSetter(FARE_SLOPE)
+		public void setFareSlope(double fareSlope) {
+			this.fareSlope = fareSlope;
+		}
+
+		@StringGetter(FARE_INTERCEPT)
+		public double getFareIntercept() {
+			return fareIntercept;
+		}
+
+
+		@StringSetter(FARE_INTERCEPT)
+		public void setFareIntercept(double fareIntercept) {
+			this.fareIntercept = fareIntercept;
+		}
+
+		@StringGetter(MAX_DISTANCE)
+		public double getMaxDistance() {
+			return maxDistance;
+		}
+
+		@StringSetter(MAX_DISTANCE)
+		public void setMaxDistance(double maxDistance) {
+			this.maxDistance = maxDistance;
+		}
+
+		@Override
+		public Map<String, String> getComments() {
+			Map<String, String> map = super.getComments();
+			map.put(FARE_SLOPE, "Linear function fare = slope * distance + intercept: the value of the slope factor in currency units / m" +
+				"(not km!).");
+			map.put(FARE_INTERCEPT, "Linear function fare = slope * distance + intercept: the value of the intercept in currency units.");
+			map.put(MAX_DISTANCE, "The given linear function is applied to trips up to this distance threshold in meters. If set to a finite value" +
+				", the linear function for the next distance class will be tried out. If no fare is defined with " + MAX_DISTANCE + " greater than" +
+				"pt trip length, an error is thrown.");
+			return map;
+		}
 	}
 }
