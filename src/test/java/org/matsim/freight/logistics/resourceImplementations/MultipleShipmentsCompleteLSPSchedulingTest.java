@@ -491,7 +491,8 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(0).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
@@ -508,7 +509,8 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(0).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), planElements.get(2).getLogisticChainElement());
