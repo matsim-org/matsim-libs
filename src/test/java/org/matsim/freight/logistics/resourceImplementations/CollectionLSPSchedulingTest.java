@@ -192,29 +192,35 @@ public class CollectionLSPSchedulingTest {
 			assertEquals(2, shipment.getSimulationTrackers().size());
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 
+			{
 			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
+			}
 
+			{
 			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
 			assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(serviceHandler.getLspShipment(), shipment);
 			assertSame(serviceHandler.getResourceId(), planElements.get(1).getResourceId());
 			assertSame(serviceHandler.getResourceId(), collectionLSP.getResources().iterator().next().getId());
+			}
 		}
 
 		for (LogisticChain solution : collectionLSP.getSelectedPlan().getLogisticChains()) {
