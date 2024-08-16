@@ -37,6 +37,8 @@ public class FareZoneBasedPtFareHandlerTest {
 
 	@Test
 	void testFareZoneBasedPtFareHandler() {
+		final String FARE_ZONE_TRANSACTION_PARTNER = "fare zone transaction partner";
+		final String DISTANCE_BASED_TRANSACTION_PARTNER = "distance based transaction partner";
 
 		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
@@ -45,11 +47,20 @@ public class FareZoneBasedPtFareHandlerTest {
 		config.controller().setLastIteration(0);
 
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
-		ptFareConfigGroup.setPtFareCalculationModel(PtFareConfigGroup.PtFareCalculationModels.fareZoneBased);
 
-		DistanceBasedPtFareParams fareParams = ConfigUtils.addOrGetModule(config, DistanceBasedPtFareParams.class);
-		fareParams.setFareZoneShp(IOUtils.extendUrl(context, "ptTestArea/pt-area.shp").toString());
+		FareZoneBasedPtFareParams fareZoneBased = new FareZoneBasedPtFareParams();
+		fareZoneBased.setCost(2.5);
+		fareZoneBased.setDescription("simple fare zone based");
+		fareZoneBased.setFareZoneShp(IOUtils.extendUrl(context, "ptTestArea/pt-area.shp").toString());
+		fareZoneBased.setPriority(10);
+		fareZoneBased.setTransactionPartner(FARE_ZONE_TRANSACTION_PARTNER);
 
+		DistanceBasedPtFareParams distanceBased = new DistanceBasedPtFareParams();
+		distanceBased.setPriority(5);
+		distanceBased.setTransactionPartner(DISTANCE_BASED_TRANSACTION_PARTNER);
+
+		ptFareConfigGroup.addParameterSet(fareZoneBased);
+		ptFareConfigGroup.addParameterSet(distanceBased);
 
 		ScoringConfigGroup scoring = ConfigUtils.addOrGetModule(config, ScoringConfigGroup.class);
 
@@ -69,13 +80,13 @@ public class FareZoneBasedPtFareHandlerTest {
 		Person person = fac.createPerson(Id.createPersonId("fareTestPerson"));
 		Plan plan = fac.createPlan();
 
-		Activity home = fac.createActivityFromCoord("home", new Coord(710300.624,5422165.737));
+		Activity home = fac.createActivityFromCoord("home", new Coord(710300.624, 5422165.737));
 //		bus to Saal (Donau) work location departs at 09:14
 		home.setEndTime(9 * 3600.);
-		Activity work = fac.createActivityFromCoord("work", new Coord(714940.65,5420707.78));
+		Activity work = fac.createActivityFromCoord("work", new Coord(714940.65, 5420707.78));
 //		rb17 to regensburg 2nd home location departs at 13:59
 		work.setEndTime(13 * 3600. + 45 * 60);
-		Activity home2 = fac.createActivityFromCoord("home", new Coord(726634.40,5433508.07));
+		Activity home2 = fac.createActivityFromCoord("home", new Coord(726634.40, 5433508.07));
 
 		Leg leg = fac.createLeg(TransportMode.pt);
 
@@ -118,7 +129,7 @@ public class FareZoneBasedPtFareHandlerTest {
 		}
 
 		Assertions.assertEquals(2, events.size());
-		Assertions.assertEquals(FareZoneBasedPtFareHandler.PT_FARE_ZONE_BASED, events.get(0)[4]);
-		Assertions.assertEquals(FareZoneBasedPtFareHandler.PT_GERMANWIDE_FARE_BASED, events.get(1)[4]);
+		Assertions.assertEquals(FARE_ZONE_TRANSACTION_PARTNER, events.get(0)[4]);
+		Assertions.assertEquals(DISTANCE_BASED_TRANSACTION_PARTNER, events.get(1)[4]);
 	}
 }

@@ -1,31 +1,50 @@
 package playground.vsp.pt.fare;
 
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
 public class PtFareModule extends AbstractModule {
 
-    @Override
-    public void install() {
-        getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
-        getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
-        PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
-		DistanceBasedPtFareParams distanceBasedPtFareParams = ConfigUtils.addOrGetModule(this.getConfig(), DistanceBasedPtFareParams.class);
+	@Override
+	public void install() {
+		//TODO check consistency: order unique, cost set
 
-        if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.distanceBased) {
-			addEventHandlerBinding().toInstance(new DistanceBasedPtFareHandler(distanceBasedPtFareParams));
-		} else if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.fareZoneBased) {
-			addEventHandlerBinding().toInstance(new FareZoneBasedPtFareHandler(distanceBasedPtFareParams));
-		} else {
-            throw new RuntimeException("Please choose from the following fare Calculation method: [" +
-                    PtFareConfigGroup.PtFareCalculationModels.distanceBased + ", " + PtFareConfigGroup.PtFareCalculationModels.fareZoneBased + "]");
-        }
+		getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
+		getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
+		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);
 
-        if (ptFareConfigGroup.getApplyUpperBound()) {
-            PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
-            addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
-            addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
-        }
-    }
+		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
+		Collection<? extends ConfigGroup> fareZoneBased = ptFareConfigGroup.getParameterSets(FareZoneBasedPtFareParams.SET_NAME);
+		Collection<? extends ConfigGroup> distanceBased = ptFareConfigGroup.getParameterSets(DistanceBasedPtFareParams.SET_NAME);
+
+		Stream.concat(fareZoneBased.stream(), distanceBased.stream())
+			  .map(c -> (PtFareParams) c)
+			  .sorted(Comparator.comparing(PtFareParams::getPriority).reversed())
+			  .forEach(p -> {
+				  if (p instanceof FareZoneBasedPtFareParams fareZoneBasedPtFareParams) {
+					  ptFareCalculator.addBinding().toInstance(new FareZoneBasedPtFareCalculator(fareZoneBasedPtFareParams));
+				  } else if (p instanceof DistanceBasedPtFareParams distanceBasedPtFareParams) {
+					  ptFareCalculator.addBinding().toInstance(new DistanceBasedPtFareCalculator(distanceBasedPtFareParams));
+				  } else {
+					  throw new RuntimeException("Unknown PtFareParams: " + p.getClass());
+				  }
+			  });
+
+		bind(ChainedPtFareCalculator.class);
+		bind(PtFareHandler.class).to(ChainedPtFareHandler.class);
+		addEventHandlerBinding().to(PtFareHandler.class);
+
+		if (ptFareConfigGroup.getApplyUpperBound()) {
+			PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
+			addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
+			addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
+		}
+	}
 }
