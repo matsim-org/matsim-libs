@@ -1,30 +1,30 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2022 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2022 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.resourceImplementations;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,9 +50,10 @@ import org.matsim.vehicles.VehicleType;
  */
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
+  Logger log = LogManager.getLogger(DistributionCarrierScheduler.class);
+
   private Carrier carrier;
   private DistributionCarrierResource resource;
-  private ArrayList<LSPCarrierPair> pairs;
   private int carrierCnt = 1;
   private final Scenario scenario;
 
@@ -64,13 +65,11 @@ import org.matsim.vehicles.VehicleType;
    * @param scenario the scenario
    */
   DistributionCarrierScheduler(Scenario scenario) {
-    this.pairs = new ArrayList<>();
     this.scenario = scenario;
   }
 
   @Override
   protected void initializeValues(LSPResource resource) {
-    this.pairs = new ArrayList<>();
     if (resource.getClass() == DistributionCarrierResource.class) {
       this.resource = (DistributionCarrierResource) resource;
       this.carrier = this.resource.getCarrier();
@@ -94,14 +93,14 @@ import org.matsim.vehicles.VehicleType;
       // das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere
       // gibt???
       VehicleType vehicleType =
-          ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
+              ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
       if ((load + lspShipment.getSize())
-          > vehicleType.getCapacity().getOther().intValue()) {
+              > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
         Carrier auxiliaryCarrier =
-            CarrierSchedulerUtils.solveVrpWithJsprit(
-                    createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-                    scenario);
+                CarrierSchedulerUtils.solveVrpWithJsprit(
+                        createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+                        scenario);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         carrier.getServices().putAll(auxiliaryCarrier.getServices());
         cumulatedLoadingTime = 0;
@@ -115,10 +114,10 @@ import org.matsim.vehicles.VehicleType;
 
     if (!shipmentsInCurrentTour.isEmpty()) {
       Carrier auxiliaryCarrier =
-          CarrierSchedulerUtils.solveVrpWithJsprit(
-              createAuxiliaryCarrier(
-                  shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-                  scenario);
+              CarrierSchedulerUtils.solveVrpWithJsprit(
+                      createAuxiliaryCarrier(
+                              shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+                      scenario);
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
       carrier.getServices().putAll(auxiliaryCarrier.getServices());
       shipmentsInCurrentTour.clear();
@@ -157,13 +156,13 @@ import org.matsim.vehicles.VehicleType;
     for (CarrierPlan carrierPlan : carrierPlans) {
       for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
         var newTour =
-            scheduledTour
-                .getTour()
-                .duplicateWithNewId(Id.create("dist_" + tourIdIndex, Tour.class));
+                scheduledTour
+                        .getTour()
+                        .duplicateWithNewId(Id.create("dist_" + tourIdIndex, Tour.class));
         tourIdIndex++;
         var newScheduledTour =
-            ScheduledTour.newInstance(
-                newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
+                ScheduledTour.newInstance(
+                        newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
         scheduledToursUnified.add(newScheduledTour);
       }
     }
@@ -176,7 +175,11 @@ import org.matsim.vehicles.VehicleType;
             .setCapacityDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
-    pairs.add(new LSPCarrierPair(lspShipment, carrierService));
+    //ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
+    if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
+      log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
+              new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+    }
     return carrierService;
   }
 
@@ -187,15 +190,12 @@ import org.matsim.vehicles.VehicleType;
         Tour tour = scheduledTour.getTour();
         for (TourElement element : tour.getTourElements()) {
           if (element instanceof ServiceActivity serviceActivity) {
-            for (LSPCarrierPair pair : pairs) {
-              if (pair.lspShipment == lspShipment
-                  && pair.carrierService.getId() == serviceActivity.getService().getId()) {
-                addShipmentLoadElement(lspShipment, tour);
-                addShipmentTransportElement(lspShipment, tour, serviceActivity);
-                addShipmentUnloadElement(lspShipment, tour, serviceActivity);
-                addDistributionTourStartEventHandler(pair.carrierService, lspShipment, resource, tour);
-                addDistributionServiceEventHandler(pair.carrierService, lspShipment, resource);
-              }
+            if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
+              addShipmentLoadElement(lspShipment, tour);
+              addShipmentTransportElement(lspShipment, tour, serviceActivity);
+              addShipmentUnloadElement(lspShipment, tour, serviceActivity);
+              addDistributionTourStartEventHandler(serviceActivity.getService(), lspShipment, resource, tour);
+              addDistributionServiceEventHandler(serviceActivity.getService(), lspShipment, resource);
             }
           }
         }
@@ -205,7 +205,7 @@ import org.matsim.vehicles.VehicleType;
 
   private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
     LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
-        LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+            LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
     builder.setResourceId(resource.getId());
 
     for (LogisticChainElement element : resource.getClientElements()) {
@@ -228,17 +228,17 @@ import org.matsim.vehicles.VehicleType;
 
     LspShipmentPlanElement load = builder.build();
     String idString =
-        load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
+            load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
     LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-        .addPlanElement(id, load);
+            .addPlanElement(id, load);
   }
 
   private void addShipmentTransportElement(
-      LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+          LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
 
     LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
-        LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+            LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
     builder.setResourceId(resource.getId());
 
     for (LogisticChainElement element : resource.getClientElements()) {
@@ -253,13 +253,13 @@ import org.matsim.vehicles.VehicleType;
     final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
     final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     final double endTimeOfTransport =
-        legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
+            legBeforeService.getExpectedTransportTime() + legBeforeService.getExpectedDepartureTime();
     Assert.isTrue(
-        endTimeOfTransport >= startTimeOfTransport,
-        "latest End must be later than earliest start. start: "
-            + startTimeOfTransport
-            + " ; end: "
-            + endTimeOfTransport);
+            endTimeOfTransport >= startTimeOfTransport,
+            "latest End must be later than earliest start. start: "
+                    + startTimeOfTransport
+                    + " ; end: "
+                    + endTimeOfTransport);
 
     builder.setStartTime(startTimeOfTransport);
     builder.setEndTime(endTimeOfTransport);
@@ -269,20 +269,20 @@ import org.matsim.vehicles.VehicleType;
     builder.setCarrierService(serviceActivity.getService());
     LspShipmentPlanElement transport = builder.build();
     String idString =
-        transport.getResourceId()
-            + ""
-            + transport.getLogisticChainElement().getId()
-            + transport.getElementType();
+            transport.getResourceId()
+                    + ""
+                    + transport.getLogisticChainElement().getId()
+                    + transport.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
     LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-        .addPlanElement(id, transport);
+            .addPlanElement(id, transport);
   }
 
   private void addShipmentUnloadElement(
-      LspShipment tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+          LspShipment tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
 
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
-        LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
+            LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
     builder.setResourceId(resource.getId());
 
     for (LogisticChainElement element : resource.getClientElements()) {
@@ -297,20 +297,20 @@ import org.matsim.vehicles.VehicleType;
     final double startTime = serviceAct.getExpectedArrival();
     final double endTime = startTime + serviceAct.getDuration();
     Assert.isTrue(
-        endTime >= startTime,
-        "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
+            endTime >= startTime,
+            "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
 
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
 
     LspShipmentPlanElement unload = builder.build();
     String idString =
-        unload.getResourceId()
-            + String.valueOf(unload.getLogisticChainElement().getId())
-            + unload.getElementType();
+            unload.getResourceId()
+                    + String.valueOf(unload.getLogisticChainElement().getId())
+                    + unload.getElementType();
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
     LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getId())
-        .addPlanElement(id, unload);
+            .addPlanElement(id, unload);
   }
 
   private Carrier createAuxiliaryCarrier(ArrayList<LspShipment> shipmentsInCurrentTour, double startTime) {
@@ -318,12 +318,12 @@ import org.matsim.vehicles.VehicleType;
     carrierCnt++;
     Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);
     CarrierVehicle carrierVehicle =
-        carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
+            carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
     final VehicleType vehicleType = carrierVehicle.getType();
 
     CarrierVehicle.Builder vBuilder =
-        CarrierVehicle.Builder.newInstance(
-            carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
+            CarrierVehicle.Builder.newInstance(
+                    carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
     vBuilder.setEarliestStart(startTime);
     vBuilder.setLatestEnd(24 * 60 * 60);
     CarrierVehicle cv = vBuilder.build();
@@ -338,12 +338,14 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addDistributionServiceEventHandler(
-      CarrierService carrierService, LspShipment lspShipment, LSPCarrierResource resource) {
+          CarrierService carrierService,
+          LspShipment lspShipment,
+          LSPCarrierResource resource) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         DistributionServiceStartEventHandler handler =
-            new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource);
+                new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource);
         lspShipment.addSimulationTracker(handler);
         break;
       }
@@ -351,20 +353,19 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addDistributionTourStartEventHandler(
-      CarrierService carrierService,
-      LspShipment lspShipment,
-      LSPCarrierResource resource,
-      Tour tour) {
+          CarrierService carrierService,
+          LspShipment lspShipment,
+          LSPCarrierResource resource,
+          Tour tour) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LSPTourStartEventHandler handler =
-            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
+                new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
         lspShipment.addSimulationTracker(handler);
         break;
       }
     }
   }
 
-  private record LSPCarrierPair(LspShipment lspShipment, CarrierService carrierService) {}
 }
