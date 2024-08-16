@@ -18,11 +18,11 @@ class PtFareConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
 		FareZoneBasedPtFareParams fareZoneBased = new FareZoneBasedPtFareParams();
-		fareZoneBased.setPriority(5);
+		fareZoneBased.setOrder(5);
 		ptFareConfigGroup.addParameterSet(fareZoneBased);
 
 		DistanceBasedPtFareParams distanceBased = new DistanceBasedPtFareParams();
-		distanceBased.setPriority(5);
+		distanceBased.setOrder(5);
 		ptFareConfigGroup.addParameterSet(distanceBased);
 
 		Assertions.assertThrows(IllegalArgumentException.class, () -> ptFareConfigGroup.checkConsistency(config));
@@ -33,11 +33,11 @@ class PtFareConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
 		FareZoneBasedPtFareParams fareZoneBased = new FareZoneBasedPtFareParams();
-		fareZoneBased.setPriority(5);
+		fareZoneBased.setOrder(5);
 		ptFareConfigGroup.addParameterSet(fareZoneBased);
 
 		DistanceBasedPtFareParams distanceBased = new DistanceBasedPtFareParams();
-		distanceBased.setPriority(10);
+		distanceBased.setOrder(10);
 		ptFareConfigGroup.addParameterSet(distanceBased);
 
 		ptFareConfigGroup.checkConsistency(config);

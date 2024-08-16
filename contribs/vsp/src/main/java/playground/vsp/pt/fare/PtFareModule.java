@@ -24,7 +24,7 @@ public class PtFareModule extends AbstractModule {
 
 		Stream.concat(fareZoneBased.stream(), distanceBased.stream())
 			  .map(c -> (PtFareParams) c)
-			  .sorted(Comparator.comparing(PtFareParams::getPriority).reversed())
+			  .sorted(Comparator.comparing(PtFareParams::getOrder))
 			  .forEach(p -> {
 				  if (p instanceof FareZoneBasedPtFareParams fareZoneBasedPtFareParams) {
 					  ptFareCalculator.addBinding().toInstance(new FareZoneBasedPtFareCalculator(fareZoneBasedPtFareParams));

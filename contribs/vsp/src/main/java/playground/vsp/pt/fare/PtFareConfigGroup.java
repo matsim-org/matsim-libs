@@ -52,9 +52,6 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 		return upperBoundFactor;
 	}
 
-	/**
-	 * @param upperBoundFactor -- {@value #UPPER_BOUND_FACTOR_CMT}
-	 */
 	@StringSetter(UPPER_BOUND_FACTOR)
 	public void setUpperBoundFactor(double upperBoundFactor) {
 		this.upperBoundFactor = upperBoundFactor;
@@ -71,13 +68,13 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 			throw new IllegalArgumentException("No parameter sets found for pt fare calculation. Please add at least one parameter set.");
 		}
 
-		long distinctPriorities = Stream.concat(distanceBasedParameterSets.stream(), fareZoneBasedParameterSets.stream())
-										.map(PtFareParams.class::cast)
-										.map(PtFareParams::getPriority)
-										.distinct().count();
+		long distinctOrders = Stream.concat(distanceBasedParameterSets.stream(), fareZoneBasedParameterSets.stream())
+									.map(PtFareParams.class::cast)
+									.map(PtFareParams::getOrder)
+									.distinct().count();
 
-		if (distinctPriorities != distanceBasedParameterSets.size() + fareZoneBasedParameterSets.size()) {
-			throw new IllegalArgumentException("Duplicate priorities found in parameter sets. Please make sure that priorities are unique.");
+		if (distinctOrders != distanceBasedParameterSets.size() + fareZoneBasedParameterSets.size()) {
+			throw new IllegalArgumentException("Duplicate order values found in parameter sets. Please make sure that order values are unique.");
 		}
 	}
 }

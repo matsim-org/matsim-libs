@@ -6,11 +6,11 @@ import java.util.Map;
 
 public abstract class PtFareParams extends ReflectiveConfigGroup {
 	public static final String FARE_ZONE_SHP = "fareZoneShp";
-	public static final String PRIORITY = "priority";
+	public static final String ORDER = "order";
 	public static final String TRANSACTION_PARTNER = "transactionPartner";
 	public static final String DESCRIPTION = "description";
 
-	private int priority;
+	private int order;
 	private String fareZoneShp;
 	private String transactionPartner;
 	private String description;
@@ -23,7 +23,7 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		var map = super.getComments();
 		map.put(FARE_ZONE_SHP, "Shp file with fare zone(s). This parameter is only used for PtFareCalculationModel 'fareZoneBased'.");
-		map.put(PRIORITY, "Priority of this fare calculation in the list of fare calculations. Higher values mean to be evaluated first.");
+		map.put(ORDER, "Order of this fare calculation in the list of fare calculations. Lower values mean to be evaluated first.");
 		map.put(TRANSACTION_PARTNER, "The transaction partner for the fare calculation. This is used in the PersonMoneyEvent.");
 		map.put(DESCRIPTION, "Description of the fare zone.");
 		return map;
@@ -39,14 +39,14 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 		this.fareZoneShp = fareZoneShp;
 	}
 
-	@StringGetter(PRIORITY)
-	public int getPriority() {
-		return priority;
+	@StringGetter(ORDER)
+	public int getOrder() {
+		return order;
 	}
 
-	@StringSetter(PRIORITY)
-	public void setPriority(int priority) {
-		this.priority = priority;
+	@StringSetter(ORDER)
+	public void setOrder(int order) {
+		this.order = order;
 	}
 
 	@StringGetter(TRANSACTION_PARTNER)
