@@ -27,10 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.ScheduledTour;
-import org.matsim.freight.carriers.Tour;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
@@ -87,7 +84,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private CarrierService convertToCarrierService(LspShipment lspShipment) {
     Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
     CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom())
-            .setServiceStartTimeWindow(lspShipment.getPickupTimeWindow())
+            .setServiceStartTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
             .setCapacityDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
