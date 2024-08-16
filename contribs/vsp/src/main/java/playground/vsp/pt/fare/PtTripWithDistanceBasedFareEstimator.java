@@ -29,11 +29,20 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> facilities;
 
 	@Inject
-	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config, DistanceBasedPtFareParams ptFare, Scenario scenario) {
+	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config,
+												Scenario scenario) {
 		super(transitSchedule);
 		this.config = config;
-		this.ptFare = ptFare;
+		this.ptFare = extractPtFare(config);
 		this.facilities = scenario.getTransitSchedule().getFacilities();
+	}
+
+	private static DistanceBasedPtFareParams extractPtFare(PtFareConfigGroup config) {
+		//TODO
+		return config.getParameterSets(DistanceBasedPtFareParams.SET_NAME).stream()
+					 .map(DistanceBasedPtFareParams.class::cast)
+					 .findFirst()
+					 .orElseThrow(() -> new IllegalStateException("No distance based fare parameters found"));
 	}
 
 	@Override
@@ -55,8 +64,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 			maxFareUtility = Math.max(fareUtility, maxFareUtility);
 
 			max = estimate + maxFareUtility;
-		} else
+		} else {
 			max = estimate + fareUtility;
+		}
 
 		// Distance fareUtility is the highest possible price, therefore the minimum utility
 		return MinMaxEstimate.of(estimate + fareUtility, max);
@@ -78,8 +88,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 				List<Leg> legs = plan.getLegs(mode, i);
 
 				// Legs can be null if there is a predefined pt trip
-				if (legs == null)
+				if (legs == null) {
 					continue;
+				}
 
 				//assert legs != null : "Legs must be not null at this point";
 
@@ -121,8 +132,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
-				if (access == null)
+				if (access == null) {
 					access = facilities.get(route.getAccessStopId());
+				}
 
 				egress = facilities.get(route.getEgressStopId());
 
@@ -139,8 +151,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 		double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
 
-		double fareUtility = -context.scoring.marginalUtilityOfMoney * DistanceBasedPtFareHandler.computeFare(dist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+		double fareUtility = -context.scoring.marginalUtilityOfMoney * DistanceBasedPtFareCalculator.computeFare(dist,
+			ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(), ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(),
+			ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
 
 
 		estimate += context.scoring.marginalUtilityOfWaitingPt_s * totalWaitingTime;
@@ -165,8 +178,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 			List<Leg> legs = plan.getLegs(TransportMode.pt, i);
 
-			if (legs == null)
+			if (legs == null) {
 				continue;
+			}
 
 			// first access and last egress
 			TransitStopFacility access = null;
@@ -183,8 +197,9 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 					TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
 					hasPT = true;
-					if (access == null)
+					if (access == null) {
 						access = facilities.get(route.getAccessStopId());
+					}
 
 					egress = facilities.get(route.getEgressStopId());
 				}
@@ -206,15 +221,17 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 		// a single pt trip could never benefit from the upper bound
 		if (n == 1) {
-			return DistanceBasedPtFareHandler.computeFare(minDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-					ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+			return DistanceBasedPtFareCalculator.computeFare(minDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
+				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(),
+				ptFare.getLongDistanceTripSlope());
 		}
 
 		// the upper bound is the maximum single trip times a factor
 		// therefore the minimum upper bound is the fare for the second-longest trip
 		// the max costs are then assumed to be evenly distributed over all pt trips
-		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareCalculator.computeFare(secondMinDist,
+			ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(), ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(),
+			ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
 	}
 
 	@Override
