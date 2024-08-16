@@ -59,7 +59,14 @@ public class FareZoneBasedPtFareHandlerTest {
 		ptFareConfigGroup.addParameterSet(fareZoneBased);
 		ptFareConfigGroup.addParameterSet(distanceBased);
 
-		MutableScenario scenario = setUpScenario(config);
+		// write config to file and read in again to check config reading and writing
+		ConfigUtils.writeConfig(config, utils.getOutputDirectory() + "configFromCode.xml");
+		Config configFromFile = ConfigUtils.loadConfig(utils.getOutputDirectory() + "configFromCode.xml");
+		// re-direct to correct input directory
+		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
+		configFromFile.setContext(context);
+
+		MutableScenario scenario = setUpScenario(configFromFile);
 
 		//Run
 		var fareAnalysis = new FareAnalysis();
