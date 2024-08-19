@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.shift;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.Optional;
 
@@ -15,8 +16,6 @@ public interface DrtShift extends Identifiable<DrtShift> {
 
 	double getEndTime();
 
-	Optional<DrtShiftBreak> getBreak();
-
 	boolean isStarted();
 
 	boolean isEnded();
@@ -26,4 +25,8 @@ public interface DrtShift extends Identifiable<DrtShift> {
 	void end();
 
 	Optional<Id<OperationFacility>> getOperationFacilityId();
+
+	Optional<DrtShiftBreak> getBreak();
+
+	Optional<Id<DvrpVehicle>> getDesignatedVehicleId();
 }
