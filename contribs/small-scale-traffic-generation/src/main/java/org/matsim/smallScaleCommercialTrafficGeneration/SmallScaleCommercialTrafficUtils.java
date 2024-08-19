@@ -42,6 +42,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -199,7 +200,6 @@ public class SmallScaleCommercialTrafficUtils {
 			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
 
 			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
-			double tourStartTime = 0;
 			for (PlanElement tourElement : tourElements) {
 
 				if (tourElement instanceof Activity activity) {
@@ -209,8 +209,18 @@ public class SmallScaleCommercialTrafficUtils {
 						newActivity.setEndTime(activity.getEndTime().seconds());
 						newActivity.setType("commercial_start");
 					} else
+//						TODO: this causes a crash when PersonPrepareForSim -> PlanRouter tries routing???
 						newActivity.setEndTimeUndefined();
 					if (activity.getType().equals("end")) {
+//						if tourStartTime = 0 it can happen that commecial_start.getEndTime > commercial_end.getStartTime
+//						this should not happen, hence below the tour start time is taken from the commercial_start act
+						double tourStartTime = TripStructureUtils.getActivities(plan.getPlanElements(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities)
+							.stream()
+							.filter(a -> a.getType().equals("commercial_start"))
+							.toList()
+							.getFirst()
+							.getEndTime()
+							.seconds();
 						newActivity.setStartTime(tourStartTime + 8 * 3600);
 						newActivity.setType("commercial_end");
 					}
