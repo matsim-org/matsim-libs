@@ -22,8 +22,8 @@ public class PtFareModule extends AbstractModule {
                     PtFareConfigGroup.PtFareCalculationModels.distanceBased + ", " + PtFareConfigGroup.PtFareCalculationModels.fareZoneBased + "]");
         }
 
-        if (ptFareConfigGroup.getApplyUpperBound()) {
-            PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
+        if (ptFareConfigGroup.isDailyCapApplied()) {
+            PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getDailyCapFactor());
             addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
             addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
         }

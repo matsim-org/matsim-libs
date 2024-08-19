@@ -94,7 +94,7 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 		double maxFare = fares.doubleStream().min().orElse(0);
 		double sumFares = fares.doubleStream().sum();
 
-		return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
+		return utility + Math.max(maxFare * config.getDailyCapFactor(), sumFares);
 	}
 
 	/**
@@ -213,12 +213,12 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 		// the upper bound is the maximum single trip times a factor
 		// therefore the minimum upper bound is the fare for the second-longest trip
 		// the max costs are then assumed to be evenly distributed over all pt trips
-		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
+		return 1d / n * config.getDailyCapFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
 				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
 	}
 
 	@Override
 	public boolean providesMinEstimate(EstimatorContext context, String mode, ModeAvailability option) {
-		return config.getApplyUpperBound();
+		return config.isDailyCapApplied();
 	}
 }

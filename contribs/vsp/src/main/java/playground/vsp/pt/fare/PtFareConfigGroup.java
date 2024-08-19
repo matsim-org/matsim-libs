@@ -10,21 +10,21 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String PT_FARE = "pt fare";
     public static final String MODULE_NAME = "ptFare";
     public static final String PT_FARE_CALCULATION = "ptFareCalculation";
-    public static final String APPLY_UPPER_BOUND = "applyUpperBound";
-    public static final String UPPER_BOUND_FACTOR = "upperBoundFactor";
+    public static final String APPLY_DAILY_CAP = "applyDailyCap";
+    public static final String DAILY_CAP_FACTOR = "dailyCapFactor";
 
     public enum PtFareCalculationModels {distanceBased, fareZoneBased} // More to come (e.g. zone based, hybrid...)
 
     private static final String PT_FARE_CALCULATION_CMT = "PT fare calculation scheme. Current implementation: distanceBased (more to come...)";
-    public static final String UPPER_BOUND_FACTOR_CMT = "When upper bound is applied, upperBound  = upperBoundFactor * max Fare of the day. " +
+    public static final String DAILY_CAP_FACTOR_CMT = "When daily cap is applied, upperBound  = dailyCapFactor * max Fare of the day. " +
                                                                         "This value is decided by the ratio between average daily cost of a ticket subscription and the single " +
                                                                         "trip ticket of the same trip. Usually this value should be somewhere between 1.0 and 2.0";
-    public static final String APPLY_UPPER_BOUND_CMT = "Enable the upper bound for daily PT fare to count for ticket subscription. Input value: true or false";
+    public static final String APPLY_DAILY_CAP_CMT = "Enable the daily cap for daily PT fare to count for ticket subscription. Input value: true or false";
 
     private PtFareCalculationModels ptFareCalculation = PtFareCalculationModels.distanceBased; // Use distance based calculation by default
-    private boolean applyUpperBound = true;
+    private boolean applyDailyCap = true;
     @PositiveOrZero
-    private double upperBoundFactor = 1.5;
+    private double dailyCapFactor = 1.5;
 
     public PtFareConfigGroup() {
         super(MODULE_NAME);
@@ -34,8 +34,8 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(PT_FARE_CALCULATION, PT_FARE_CALCULATION_CMT );
-        map.put(APPLY_UPPER_BOUND, APPLY_UPPER_BOUND_CMT );
-        map.put(UPPER_BOUND_FACTOR, UPPER_BOUND_FACTOR_CMT );
+        map.put(APPLY_DAILY_CAP, APPLY_DAILY_CAP_CMT);
+        map.put(DAILY_CAP_FACTOR, DAILY_CAP_FACTOR_CMT);
         return map;
     }
 
@@ -49,27 +49,27 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
         this.ptFareCalculation = ptFareCalculation;
     }
 
-    @StringGetter(APPLY_UPPER_BOUND)
-    public boolean getApplyUpperBound() {
-        return applyUpperBound;
+    @StringGetter(APPLY_DAILY_CAP)
+    public boolean isDailyCapApplied() {
+        return applyDailyCap;
     }
 
-    @StringSetter(APPLY_UPPER_BOUND)
-    public void setApplyUpperBound(boolean applyUpperBound) {
-        this.applyUpperBound = applyUpperBound;
+    @StringSetter(APPLY_DAILY_CAP)
+    public void setApplyDailyCap(boolean applyDailyCap) {
+        this.applyDailyCap = applyDailyCap;
     }
 
 
-    @StringGetter(UPPER_BOUND_FACTOR)
-    public double getUpperBoundFactor() {
-        return upperBoundFactor;
+    @StringGetter(DAILY_CAP_FACTOR)
+    public double getDailyCapFactor() {
+        return dailyCapFactor;
     }
 
     /**
-     * @param upperBoundFactor -- {@value #UPPER_BOUND_FACTOR_CMT}
+     * @param dailyCapFactor -- {@value #DAILY_CAP_FACTOR_CMT}
      */
-    @StringSetter(UPPER_BOUND_FACTOR)
-    public void setUpperBoundFactor(double upperBoundFactor) {
-        this.upperBoundFactor = upperBoundFactor;
+    @StringSetter(DAILY_CAP_FACTOR)
+    public void setDailyCapFactor(double dailyCapFactor) {
+        this.dailyCapFactor = dailyCapFactor;
     }
 }

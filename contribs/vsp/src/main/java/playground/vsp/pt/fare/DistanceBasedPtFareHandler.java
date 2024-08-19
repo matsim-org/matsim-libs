@@ -20,22 +20,22 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
     private EventsManager events;
 
     private final double minFare;
-    private final double shortTripIntercept;
-    private final double shortTripSlope;
-    private final double longTripIntercept;
-    private final double longTripSlope;
-    private final double longTripThreshold;
+    private final double localTripIntercept;
+    private final double localTripSlope;
+    private final double longDistanceTripIntercept;
+    private final double longDistanceTripSlope;
+    private final double longDistanceTripThreshold;
 
     private final Map<Id<Person>, Coord> personDepartureCoordMap = new HashMap<>();
     private final Map<Id<Person>, Coord> personArrivalCoordMap = new HashMap<>();
 
     public DistanceBasedPtFareHandler(DistanceBasedPtFareParams params) {
         this.minFare = params.getMinFare();
-        this.shortTripIntercept = params.getNormalTripIntercept();
-        this.shortTripSlope = params.getNormalTripSlope();
-        this.longTripIntercept = params.getLongDistanceTripIntercept();
-        this.longTripSlope = params.getLongDistanceTripSlope();
-        this.longTripThreshold = params.getLongDistanceTripThreshold();
+        this.localTripIntercept = params.getNormalTripIntercept();
+        this.localTripSlope = params.getNormalTripSlope();
+        this.longDistanceTripIntercept = params.getLongDistanceTripIntercept();
+        this.longDistanceTripSlope = params.getLongDistanceTripSlope();
+        this.longDistanceTripThreshold = params.getLongDistanceTripThreshold();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
                 double distance = CoordUtils.calcEuclideanDistance
                         (personDepartureCoordMap.get(personId), personArrivalCoordMap.get(personId));
 
-                double fare = computeFare(distance, longTripThreshold, minFare, shortTripIntercept, shortTripSlope, longTripIntercept, longTripSlope);
+                double fare = computeFare(distance, longDistanceTripThreshold, minFare, localTripIntercept, localTripSlope, longDistanceTripIntercept, longDistanceTripSlope);
                 // charge fare to the person
                 events.processEvent(
                         new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare,

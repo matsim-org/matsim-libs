@@ -17,11 +17,11 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
 
     public static final String SET_NAME = "ptFareCalculationDistanceBased";
     public static final String MIN_FARE = "minFare";
-    public static final String NORMAL_TRIP_SLOPE = "normalTripSlope";
-    public static final String NORMAL_TRIP_INTERCEPT = "normalTripIntercept";
-    public static final String LONG_DISTANCE_TRIP_THRESHOLD = "longDistanceTripThreshold";
+    public static final String LOCAL_TRIP_SLOPE = "localTripSlope";
+    public static final String LOCAL_TRIP_INTERCEPT = "localTripIntercept";
     public static final String LONG_DISTANCE_TRIP_SLOPE = "longDistanceTripSlope";
     public static final String LONG_DISTANCE_TRIP_INTERCEPT = "longDistanceTripIntercept";
+	public static final String THRESHOLD_FOR_LONG_DISTANCE_TRIP = "thresholdForLongDistanceTrip";
     public static final String FARE_ZONE_SHP = "fareZoneShp";
 
     @PositiveOrZero
@@ -47,13 +47,13 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         Map<String, String> map = super.getComments();
         map.put(MIN_FARE, "Minimum fare for a PT trip " +
                 "(e.g. Kurzstrecke/short distance ticket in cities, ticket for 1 zone in rural areas)");
-        map.put(NORMAL_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for normal trips (e.g. within the city or region)");
-        map.put(NORMAL_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for normal trips");
+        map.put(LOCAL_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for local trips (e.g. within the city or region)");
+        map.put(LOCAL_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for local trips");
         map.put(LONG_DISTANCE_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for long distance trips (e.g. intercity trips)");
         map.put(LONG_DISTANCE_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for long trips");
-        map.put(LONG_DISTANCE_TRIP_THRESHOLD, "Threshold of the long trips in meters. Below this value, " +
-                "the trips are considered as normal trips. Above this value, the trips are considered as " +
-                "inter-city trips");
+        map.put(THRESHOLD_FOR_LONG_DISTANCE_TRIP, "Threshold for the long trips in meters. Below this value, " +
+                "the trips are considered as local trips. Above this value, the trips are considered as " +
+                "intercity / long-distance trips");
 		map.put(FARE_ZONE_SHP, "Shp file with fare zone(s). This parameter is only used for PtFareCalculationModel 'fareZoneBased'.");
         return map;
     }
@@ -68,22 +68,22 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         this.minFare = minFare;
     }
 
-    @StringGetter(NORMAL_TRIP_SLOPE)
+    @StringGetter(LOCAL_TRIP_SLOPE)
     public double getNormalTripSlope() {
         return normalTripSlope;
     }
 
-    @StringSetter(NORMAL_TRIP_SLOPE)
+    @StringSetter(LOCAL_TRIP_SLOPE)
     public void setNormalTripSlope(double normalTripSlope) {
         this.normalTripSlope = normalTripSlope;
     }
 
-    @StringGetter(NORMAL_TRIP_INTERCEPT)
+    @StringGetter(LOCAL_TRIP_INTERCEPT)
     public double getNormalTripIntercept() {
         return normalTripIntercept;
     }
 
-    @StringSetter(NORMAL_TRIP_INTERCEPT)
+    @StringSetter(LOCAL_TRIP_INTERCEPT)
     public void setNormalTripIntercept(double normalTripIntercept) {
         this.normalTripIntercept = normalTripIntercept;
     }
@@ -108,12 +108,12 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         this.longDistanceTripIntercept = longDistanceTripIntercept;
     }
 
-    @StringGetter(LONG_DISTANCE_TRIP_THRESHOLD)
+    @StringGetter(THRESHOLD_FOR_LONG_DISTANCE_TRIP)
     public double getLongDistanceTripThreshold() {
         return longDistanceTripThreshold;
     }
 
-    @StringSetter(LONG_DISTANCE_TRIP_THRESHOLD)
+    @StringSetter(THRESHOLD_FOR_LONG_DISTANCE_TRIP)
     public void setLongDistanceTripThreshold(double longDistanceTripThreshold) {
         this.longDistanceTripThreshold = longDistanceTripThreshold;
     }
