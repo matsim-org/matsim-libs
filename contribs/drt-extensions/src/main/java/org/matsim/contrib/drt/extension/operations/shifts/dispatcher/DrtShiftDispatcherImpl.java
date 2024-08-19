@@ -228,33 +228,36 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 if(shift.getOperationFacilityId().isPresent()) {
                     Verify.verify(idleVehiclesQueues.get(shift.getOperationFacilityId().get()).contains(designatedVehicle));
                 }
+                vehicle = (ShiftDvrpVehicle) designatedVehicle;
             }
 
-            for (ShiftEntry active : activeShifts) {
-                if (active.shift().getEndTime() > shift.getStartTime()) {
-                    break;
-                }
-                if(shift.getOperationFacilityId().isPresent()) {
-                    //we have to check that the vehicle ends the previous shift at the same facility where
-                    //the new shift is to start.
-                    if(active.shift().getOperationFacilityId().isPresent()) {
-                        if(!active.shift().getOperationFacilityId().get().equals(shift.getOperationFacilityId().get())) {
-                            continue;
-                        }
-                    } else {
-                        Optional<ShiftChangeOverTask> nextShiftChangeover = ShiftSchedules.getNextShiftChangeover(active.vehicle().getSchedule());
-                        if(nextShiftChangeover.isPresent()) {
-                            Verify.verify(nextShiftChangeover.get().getShift().equals(active.shift()));
-                            if(!nextShiftChangeover.get().getFacility().getId().equals(shift.getOperationFacilityId().get())) {
-                                // there is already a shift changeover scheduled elsewhere
+            if(vehicle == null) {
+                for (ShiftEntry active : activeShifts) {
+                    if (active.shift().getEndTime() > shift.getStartTime()) {
+                        break;
+                    }
+                    if (shift.getOperationFacilityId().isPresent()) {
+                        //we have to check that the vehicle ends the previous shift at the same facility where
+                        //the new shift is to start.
+                        if (active.shift().getOperationFacilityId().isPresent()) {
+                            if (!active.shift().getOperationFacilityId().get().equals(shift.getOperationFacilityId().get())) {
                                 continue;
+                            }
+                        } else {
+                            Optional<ShiftChangeOverTask> nextShiftChangeover = ShiftSchedules.getNextShiftChangeover(active.vehicle().getSchedule());
+                            if (nextShiftChangeover.isPresent()) {
+                                Verify.verify(nextShiftChangeover.get().getShift().equals(active.shift()));
+                                if (!nextShiftChangeover.get().getFacility().getId().equals(shift.getOperationFacilityId().get())) {
+                                    // there is already a shift changeover scheduled elsewhere
+                                    continue;
+                                }
                             }
                         }
                     }
-                }
-                if (assignShiftToVehicleLogic.canAssignVehicleToShift(active.vehicle(), shift)) {
-                    vehicle = active.vehicle();
-                    break;
+                    if (assignShiftToVehicleLogic.canAssignVehicleToShift(active.vehicle(), shift)) {
+                        vehicle = active.vehicle();
+                        break;
+                    }
                 }
             }
 
