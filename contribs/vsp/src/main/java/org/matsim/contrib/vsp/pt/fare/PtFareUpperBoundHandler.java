@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
@@ -10,7 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.pt.PtConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
