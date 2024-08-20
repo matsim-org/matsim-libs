@@ -269,6 +269,8 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
             if(Schedules.getLastTask(schedule).equals(stayTask)) {
                 //nothing planned yet.
                 schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
+            } else {
+                Schedules.getNextTask(schedule).setBeginTime(now);
             }
         } else {
 			throw new IllegalStateException("Vehicle cannot start shift during task:" + stayTask.getTaskType().name());
@@ -296,7 +298,8 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         Schedule schedule = vehicle.getSchedule();
         StayTask stayTask = (StayTask) schedule.getCurrentTask();
         if (stayTask instanceof WaitForShiftTask) {
-            stayTask.setEndTime(Math.max(timeStep, shift.getStartTime()));
+            // set +1 to ensure this update happens after next shift start check
+            stayTask.setEndTime(Math.max(timeStep + 1, shift.getStartTime()));
         }
     }
 
