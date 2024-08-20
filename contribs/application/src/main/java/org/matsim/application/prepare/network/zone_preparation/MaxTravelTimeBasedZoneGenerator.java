@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
@@ -18,7 +17,6 @@ import java.util.*;
 
 public class MaxTravelTimeBasedZoneGenerator {
 	private final Network network;
-	private final String outputNetworkWithZonesPath;
 	private final double timeRadius;
 	private final Map<Id<Node>, Set<Id<Link>>> reachableLinksMap = new HashMap<>();
 	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
@@ -28,10 +26,9 @@ public class MaxTravelTimeBasedZoneGenerator {
 
 	private static final Logger log = LogManager.getLogger(MaxTravelTimeBasedZoneGenerator.class);
 
-	public MaxTravelTimeBasedZoneGenerator(Network network, String outputNetworkWithZonesPath, double timeRadius,
+	public MaxTravelTimeBasedZoneGenerator(Network network, double timeRadius,
 										   SparseMatrix freeSpeedTravelTimeSparseMatrix, int zoneIterations) {
 		this.network = network;
-		this.outputNetworkWithZonesPath = outputNetworkWithZonesPath;
 		this.timeRadius = timeRadius;
 		this.freeSpeedTravelTimeSparseMatrix = freeSpeedTravelTimeSparseMatrix;
 		this.zoneGenerationIterations = zoneIterations;
@@ -41,7 +38,6 @@ public class MaxTravelTimeBasedZoneGenerator {
 
 	public static class Builder {
 		private final Network network;
-		private final String outputNetworkWithZonesPath;
 
 		private double timeRadius = 300;
 		private double sparseMatrixMaxDistance = 10000;
@@ -49,9 +45,8 @@ public class MaxTravelTimeBasedZoneGenerator {
 		private TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 		private int zoneIterations = 0;
 
-		public Builder(Network network, String outputNetworkWithZonesPath) {
+		public Builder(Network network) {
 			this.network = network;
-			this.outputNetworkWithZonesPath = outputNetworkWithZonesPath;
 		}
 
 		public Builder setTimeRadius(double timeRadius) {
@@ -83,16 +78,17 @@ public class MaxTravelTimeBasedZoneGenerator {
 			SparseMatrix freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(
 					new TravelTimeMatrices.RoutingParams(network, travelTime, travelDisutility, Runtime.getRuntime().availableProcessors()),
 					sparseMatrixMaxDistance, 0, 0).orElseThrow();
-			return new MaxTravelTimeBasedZoneGenerator(network, outputNetworkWithZonesPath, timeRadius,
+			return new MaxTravelTimeBasedZoneGenerator(network, timeRadius,
 				freeSpeedTravelTimeSparseMatrix, zoneIterations);
 		}
 	}
 
-	public void compute(){
+	public Network compute(){
 		analyzeNetwork();
 		selectInitialCentroids();
 		generateZones();
-		writeOutputNetworkWithZones();
+		writeZonesInfoToAttributes();
+		return network;
 	}
 
 	private void analyzeNetwork() {
@@ -226,7 +222,7 @@ public class MaxTravelTimeBasedZoneGenerator {
 		}
 	}
 
-	private void writeOutputNetworkWithZones() {
+	private void writeZonesInfoToAttributes() {
 		// Identify the neighbours for each zone, such that we can color the neighboring zones in different colors
 		Map<String, Set<String>> zoneNeighborsMap = new HashMap<>();
 		zonalSystemData.keySet().forEach(nodeId -> zoneNeighborsMap.put(nodeId.toString(), new HashSet<>()));
@@ -303,10 +299,7 @@ public class MaxTravelTimeBasedZoneGenerator {
 				node.getAttributes().putAttribute("zone_color", Double.NaN);
 			}
 		}
-
-		new NetworkWriter(network).write(outputNetworkWithZonesPath);
 	}
-
 
 	private Map<Id<Node>, Set<Id<Link>>> createReachableLInksMapCopy() {
 		Map<Id<Node>, Set<Id<Link>>> reachableLinksMapCopy = new HashMap<>();

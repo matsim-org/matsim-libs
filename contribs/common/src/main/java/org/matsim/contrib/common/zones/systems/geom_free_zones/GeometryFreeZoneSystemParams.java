@@ -21,16 +21,11 @@ public class GeometryFreeZoneSystemParams extends ZoneSystemParams {
 		super(SET_NAME);
 	}
 
-	@Parameter
-	@Comment("size of square cells used for demand aggregation."
-		+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m")
-	@Positive
-	public double cellSize = 200.;// [m]
-
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 		Network network = ScenarioUtils.createScenario(config).getNetwork();
+		// Here, we check one arbitrary link from the (sub-)network used for DVRP/DRT vehicles and see if there is a zone ID attribute
 		Verify.verify(network.getLinks().values().iterator().next().getAttributes().getAttribute(ZONE_ID) != null,
 			"Zone id attribute not set");
 	}
