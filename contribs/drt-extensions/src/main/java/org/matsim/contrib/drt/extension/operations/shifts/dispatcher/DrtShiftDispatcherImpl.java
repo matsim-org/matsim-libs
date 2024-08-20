@@ -222,7 +222,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 DvrpVehicle designatedVehicle = fleet.getVehicles().get(shift.getDesignatedVehicleId().get());
                 Verify.verify(designatedVehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED);
                 Verify.verify(designatedVehicle instanceof ShiftDvrpVehicle);
-                if(!vehicle.getShifts().isEmpty()) {
+                if(!((ShiftDvrpVehicle) designatedVehicle).getShifts().isEmpty()) {
                     continue;
                 }
                 if(shift.getOperationFacilityId().isPresent()) {
