@@ -92,7 +92,9 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 										breakSpec.getLatestBreakEndTime(),
 										breakSpec.getDuration());
 							}
-							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), spec.getOperationFacilityId().orElse(null), shiftBreak);
+							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(),
+									spec.getOperationFacilityId().orElse(null), spec.getDesignatedVehicleId().orElse(null),
+									shiftBreak);
 						})
 						.collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
 				return () -> shifts;
