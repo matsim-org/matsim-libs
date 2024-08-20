@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -37,6 +38,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -65,9 +67,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	private final StopTimeCalculator stopTimeCalculator;
 	private final boolean scheduleWaitBeforeDrive;
 
-	public DefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer,
-			TravelTime travelTime, ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory,
-			StopTimeCalculator stopTimeCalculator, boolean scheduleWaitBeforeDrive) {
+	public DefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer, TravelTime travelTime,
+											ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory,
+											StopTimeCalculator stopTimeCalculator, boolean scheduleWaitBeforeDrive) {
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
@@ -143,7 +145,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private void verifyStructure(Schedule schedule) {
-		boolean previousDrive = false;
+		DriveTask previousDrive = null;
 
 		int startIndex = schedule.getStatus().equals(ScheduleStatus.STARTED) ? schedule.getCurrentTask().getTaskIdx()
 				: 0;
@@ -151,11 +153,18 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		for (int index = startIndex; index < schedule.getTaskCount(); index++) {
 			Task task = schedule.getTasks().get(index);
 
-			if (task instanceof DriveTask) {
-				Verify.verify(!previousDrive);
-				previousDrive = true;
+			if (task instanceof DriveTask driveTask) {
+				if(previousDrive != null) {
+					Verify.verify(previousDrive.getPath() instanceof DivertedVrpPath,
+							"The first of two subsequent drive tasks has to be a diverted path.");
+					Id<Link> firstEnd = previousDrive.getPath().getToLink().getId();
+					Id<Link> secondStart = driveTask.getPath().getFromLink().getId();
+					Verify.verify(firstEnd.equals(secondStart),
+							String.format("Subsequent drive tasks are not connected link %s !=> %s", firstEnd.toString(), secondStart.toString()));
+				}
+				previousDrive = driveTask;
 			} else {
-				previousDrive = false;
+				previousDrive = null;
 			}
 		}
 	}
@@ -343,7 +352,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private DrtStopTask insertDropoff(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData,
-			DrtStopTask pickupTask) {
+									  DrtStopTask pickupTask) {
 		final double now = timer.getTimeOfDay();
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
