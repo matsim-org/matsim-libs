@@ -39,8 +39,8 @@ public class PtFareModule extends AbstractModule {
 		bind(PtFareHandler.class).to(ChainedPtFareHandler.class);
 		addEventHandlerBinding().to(PtFareHandler.class);
 
-		if (ptFareConfigGroup.getApplyUpperBound()) {
-			PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
+		if (ptFareConfigGroup.isDailyCapApplied()) {
+			PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getDailyCapFactor());
 			addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
 			addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
 		}

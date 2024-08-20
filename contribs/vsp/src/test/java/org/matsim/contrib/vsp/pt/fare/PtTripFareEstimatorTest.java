@@ -62,8 +62,8 @@ public class PtTripFareEstimatorTest {
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
 		DistanceBasedPtFareParams distanceFare = new DistanceBasedPtFareParams();
 
-		fare.setApplyUpperBound(true);
-		fare.setUpperBoundFactor(1.5);
+		fare.setApplyDailyCap(true);
+		fare.setDailyCapFactor(1.5);
 
 		distanceFare.setMinFare(0.1);
 		DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClass20kmFareParams =
