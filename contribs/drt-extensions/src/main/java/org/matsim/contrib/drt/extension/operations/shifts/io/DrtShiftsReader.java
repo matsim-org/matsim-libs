@@ -8,6 +8,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreakSpecificationImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftSpecificationImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -27,6 +28,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
     public static final String OPERATION_FACILITY_ID = "operationFacilityId";
+    public static final String DESIGNATED_VEHICLE_ID = "designatedVehicleId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
@@ -55,8 +57,12 @@ public class DrtShiftsReader extends MatsimXmlParser {
 				builder.end(Double.parseDouble(atts.getValue(END_TIME)));
 				String operationFacilityId = atts.getValue(OPERATION_FACILITY_ID);
 				if(operationFacilityId != null) {
-					builder.operationFacility(Id.create(operationFacilityId, OperationFacility.class));
-				}
+                    builder.operationFacility(Id.create(operationFacilityId, OperationFacility.class));
+                }
+                String designatedVehicleId = atts.getValue(DESIGNATED_VEHICLE_ID);
+                if(designatedVehicleId != null) {
+                    builder.designatedVehicle(Id.create(designatedVehicleId, DvrpVehicle.class));
+                }
                 currentBuilder = builder;
                 break;
             case BREAK_NAME:
