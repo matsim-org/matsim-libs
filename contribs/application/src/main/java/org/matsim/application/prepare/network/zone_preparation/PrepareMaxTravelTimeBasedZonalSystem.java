@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.ConfigUtils;
@@ -70,6 +71,17 @@ public class PrepareMaxTravelTimeBasedZonalSystem implements MATSimAppCommand {
 				}
 			}
 		}
+		for (Id<Node> nodeId : subNetwork.getNodes().keySet()) {
+			Node nodeInSubNetwork = subNetwork.getNodes().get(nodeId);
+			Node nodeInFullNetwork = fullNetwork.getNodes().get(nodeId);
+			for (Map.Entry<String, Object> attribute : nodeInSubNetwork.getAttributes().getAsMap().entrySet()) {
+				// if the newly written attribute (related to zone) does not exist in full network, then add this attribute to the node in full network
+				if (nodeInFullNetwork.getAttributes().getAttribute(attribute.getKey()) == null) {
+					nodeInFullNetwork.getAttributes().putAttribute(attribute.getKey(), attribute.getValue());
+				}
+			}
+		}
+
 
 		// write down the processed full network to the output path
 		new NetworkWriter(fullNetwork).write(outputNetworkPath);
