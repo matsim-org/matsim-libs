@@ -137,5 +137,16 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_task_time_profiles"))).in(Singleton.class);
+
+		bindModal(RegularShiftDump.class).toProvider(modalProvider(
+				getter -> new RegularShiftDump(
+						getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
+						getter.get(OutputDirectoryHierarchy.class)
+				))
+		).asEagerSingleton();
+
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> getter.getModal(RegularShiftDump.class)
+		));
 	}
 }
