@@ -43,6 +43,10 @@ public class CarrierSchedulerUtils {
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
    */
   public static Carrier solveVrpWithJsprit(Carrier carrier, Scenario scenario) {
+    // Maybe it make sense to store this object instead of rebuilding it for each carrier (in each iteration) ???
+    // pro: save computation time
+    // con: interdependencies, if something changes in the network (load), the object is not up-to-date & it is not clear, if the object is thread safe
+    // Decision for the time being: rebuild it for each carrier to have a clear state KMT/KN Aug'24
     NetworkBasedTransportCosts netbasedTransportCosts;
     Network network = scenario.getNetwork();
     RoadPricingScheme roadPricingScheme = null;
