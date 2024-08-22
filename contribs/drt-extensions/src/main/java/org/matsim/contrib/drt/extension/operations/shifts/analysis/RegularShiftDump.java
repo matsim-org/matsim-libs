@@ -19,7 +19,6 @@ final public class RegularShiftDump implements IterationEndsListener {
 
     private final Provider<DrtShiftsSpecification> shifts;
 
-
     private final OutputDirectoryHierarchy controlerIO;
 
     public RegularShiftDump(Provider<DrtShiftsSpecification> shifts, OutputDirectoryHierarchy controlerIO) {

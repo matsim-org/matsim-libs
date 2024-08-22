@@ -5,12 +5,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
@@ -24,14 +26,13 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -82,13 +83,14 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		ShiftsParams shiftsParams = drtOperationsParams.getShiftsParams().orElseThrow();
+
+		DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
 		if (shiftsParams.shiftInputFile != null) {
-			bindModal(DrtShiftsSpecification.class).toProvider(() -> {
-				DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
-				new DrtShiftsReader(drtShiftsSpecification).readURL(shiftsParams.getShiftInputUrl(getConfig().getContext()));
-				return drtShiftsSpecification;
-			}).asEagerSingleton();
+			new DrtShiftsReader(drtShiftsSpecification).readURL(shiftsParams.getShiftInputUrl(getConfig().getContext()));
 		}
+
+		bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(drtShiftsSpecification)));
+		bindModal(DrtShiftsSpecification.class).toProvider(modalKey(ShiftScheduler.class));
 
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
 				getter -> new ShiftDurationXY(getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}), getMode())
@@ -99,7 +101,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		)).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
-				getter -> new ShiftHistogram(getter.get(Population.class), getMode(), getter.get(Config.class)))).asEagerSingleton();
+				getter -> new ShiftHistogram(getMode(), getter.get(Config.class)))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ShiftDurationXY.class));
 		addEventHandlerBinding().to(modalKey(BreakCorridorXY.class));
@@ -115,7 +117,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DumpShiftDataAtEndImpl.class).toProvider(modalProvider(
 				getter -> new DumpShiftDataAtEndImpl(
-						getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
+						getter.getModal(DrtShiftsSpecification.class),
 						getter.getModal(OperationFacilitiesSpecification.class),
 						getter.get(OutputDirectoryHierarchy.class)
 				))
