@@ -6,6 +6,8 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 
 import jakarta.inject.Provider;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ import java.util.List;
  */
 public interface ShiftScheduler extends Provider<DrtShiftsSpecification> {
 
-    List<DrtShift> schedule(double time);
+    List<DrtShift> schedule(double time, Fleet fleet);
     ImmutableMap<Id<DrtShift>, DrtShift> initialSchedule();
 
 }

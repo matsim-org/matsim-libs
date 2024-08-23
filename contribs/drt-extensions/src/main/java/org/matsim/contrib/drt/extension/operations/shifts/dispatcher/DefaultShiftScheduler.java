@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public final class DefaultShiftScheduler implements ShiftScheduler {
         this.shiftsSpecification = shiftsSpecification;
     }
     @Override
-    public List<DrtShift> schedule(double time) {
+    public List<DrtShift> schedule(double time, Fleet fleet) {
         return Collections.emptyList();
     }
 
