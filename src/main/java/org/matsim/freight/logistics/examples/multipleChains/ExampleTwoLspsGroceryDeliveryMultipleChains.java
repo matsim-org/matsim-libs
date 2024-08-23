@@ -67,6 +67,7 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
@@ -119,9 +120,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
+//    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+//    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+//    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
@@ -325,6 +326,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     distributionCarrier
             .getCarrierCapabilities()
             .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+   CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
     CarriersUtils.addCarrierVehicle(
             distributionCarrier,
@@ -400,6 +402,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     LogisticChain directChain;
     Carrier directCarrier = CarriersUtils.createCarrier(Id.create(lspName +"_directCarrier", Carrier.class));
     directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+    CarrierSchedulerUtils.setVrpLogic(directCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
     CarriersUtils.addCarrierVehicle(directCarrier,
             CarrierVehicle.newInstance(
