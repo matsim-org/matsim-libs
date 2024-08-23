@@ -95,4 +95,9 @@ public class DrtShiftImpl implements DrtShift {
 	public String toString() {
 		return "Shift " + id.toString() + " ["+start+"-"+end+"]";
 	}
+
+	@Override
+	public int compareTo(DrtShift shift) {
+		return this.id.compareTo(shift.getId());
+	}
 }

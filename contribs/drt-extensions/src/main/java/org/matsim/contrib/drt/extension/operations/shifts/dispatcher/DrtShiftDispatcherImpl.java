@@ -20,7 +20,6 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOv
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftSchedules;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShifts;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -51,7 +50,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final String mode;
 
-    private SortedSet<DrtShift> unscheduledShifts;
+    private SortedSet<DrtShift> unAssignedShifts;
     private SortedSet<ShiftEntry> assignedShifts;
     private SortedSet<ShiftEntry> activeShifts;
     private SortedSet<ShiftEntry> endingShifts;
@@ -59,7 +58,6 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private Map<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> idleVehiclesQueues;
 
     private final Fleet fleet;
-    private final DrtShifts shifts;
 
     private final MobsimTimer timer;
 
@@ -76,12 +74,14 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private final ShiftStartLogic shiftStartLogic;
     private final AssignShiftToVehicleLogic assignShiftToVehicleLogic;
 
-    public DrtShiftDispatcherImpl(String mode, DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
+    private final ShiftScheduler shiftScheduler;
+
+    public DrtShiftDispatcherImpl(String mode, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
                                   OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
                                   Network network, EventsManager eventsManager, ShiftsParams drtShiftParams,
-                                  ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic) {
+                                  ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic,
+                                  ShiftScheduler shiftScheduler) {
         this.mode = mode;
-        this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;
         this.operationFacilities = operationFacilities;
@@ -92,15 +92,25 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.drtShiftParams = drtShiftParams;
         this.shiftStartLogic = shiftStartLogic;
         this.assignShiftToVehicleLogic = assignShiftToVehicleLogic;
+        this.shiftScheduler = shiftScheduler;
     }
 
     @Override
     public void initialize() {
 
-        unscheduledShifts = new TreeSet<>(Comparator.comparingDouble(DrtShift::getStartTime));
-        unscheduledShifts.addAll(shifts.getShifts().values());
+        unAssignedShifts = new TreeSet<>(Comparator.comparingDouble(DrtShift::getStartTime).thenComparing(Comparator.naturalOrder()));
+        unAssignedShifts.addAll(shiftScheduler.initialSchedule().values());
 
-        assignedShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getStartTime()));
+        assignedShifts = new TreeSet<>(Comparator
+                .comparingDouble((ShiftEntry entry) -> entry.shift().getStartTime())
+                .thenComparing(ShiftEntry::shift));
+
+        activeShifts = new TreeSet<>(Comparator
+                .comparingDouble((ShiftEntry entry) -> entry.shift().getEndTime())
+                .thenComparing(ShiftEntry::shift));
+        endingShifts = new TreeSet<>(Comparator
+                .comparingDouble((ShiftEntry entry) -> entry.shift().getEndTime())
+                .thenComparing(ShiftEntry::shift));
 
         idleVehiclesQueues = new LinkedHashMap<>();
         for(OperationFacility facility: operationFacilities.getDrtOperationFacilities().values()) {
@@ -114,15 +124,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     queue
             );
         }
-        activeShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
-        endingShifts = new TreeSet<>(Comparator.comparingDouble(v -> v.shift().getEndTime()));
     }
 
     @Override
     public void dispatch(double timeStep) {
         if(timeStep % drtShiftParams.loggingInterval == 0) {
             logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
-                    activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
+                    activeShifts.size(), assignedShifts.size(), unAssignedShifts.size()));
             StringJoiner print = new StringJoiner(" | ");
             for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
                 print.add(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
@@ -133,6 +141,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
             updateShiftEnds(timeStep);
         }
+        scheduleShifts(timeStep);
         assignShifts(timeStep);
         startShifts(timeStep);
         checkBreaks();
@@ -160,6 +169,12 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 }
             }
         }
+    }
+
+
+    private void scheduleShifts(double timeStep) {
+        List<DrtShift> scheduled = shiftScheduler.schedule(timeStep);
+        unAssignedShifts.addAll(scheduled);
     }
 
     private void startShifts(double timeStep) {
@@ -194,7 +209,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private void assignShifts(double timeStep) {
         // Remove elapsed shifts
-        unscheduledShifts.removeIf(shift -> {
+        unAssignedShifts.removeIf(shift -> {
             if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
                 logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
                 return true;
@@ -204,7 +219,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
         // Assign shifts
         Set<DrtShift> assignableShifts = new LinkedHashSet<>();
-        Iterator<DrtShift> unscheduledShiftsIterator = unscheduledShifts.iterator();
+        Iterator<DrtShift> unscheduledShiftsIterator = unAssignedShifts.iterator();
         while(unscheduledShiftsIterator.hasNext()) {
             DrtShift unscheduledShift = unscheduledShiftsIterator.next();
             if(isSchedulable(unscheduledShift, timeStep)) {
@@ -292,7 +307,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             } else {
                 // logger.warn("Could not assign shift " + shift.getId().toString() + " to a
                 // vehicle. Will retry next time step.");
-                this.unscheduledShifts.add(shift);
+                this.unAssignedShifts.add(shift);
             }
         }
     }
