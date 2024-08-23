@@ -141,7 +141,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
             updateShiftEnds(timeStep);
         }
-        scheduleShifts(timeStep);
+        scheduleShifts(timeStep, this.fleet);
         assignShifts(timeStep);
         startShifts(timeStep);
         checkBreaks();
@@ -172,8 +172,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
 
-    private void scheduleShifts(double timeStep) {
-        List<DrtShift> scheduled = shiftScheduler.schedule(timeStep);
+    private void scheduleShifts(double timeStep, Fleet fleet) {
+        List<DrtShift> scheduled = shiftScheduler.schedule(timeStep, fleet);
         unAssignedShifts.addAll(scheduled);
     }
 

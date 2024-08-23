@@ -21,6 +21,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -182,7 +183,7 @@ public class RunOnTheFlyShiftDrtScenarioIT {
         }
 
         @Override
-        public List<DrtShift> schedule(double time) {
+        public List<DrtShift> schedule(double time, Fleet fleet) {
             List<DrtShiftSpecification> shifts = new ArrayList<>();
             if (time > 4 * 3600 && time < 15 * 3600 && time % 3600 == 0) {
                 for (int i = 0; i < iteration + 1 ; i++) {
