@@ -1,9 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.operations.shifts.events.*;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -12,35 +9,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
-import java.util.Set;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
-		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
+        DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
     private final String mode;
 
-	public static final int DEFAULT_END_TIME = 30 * 3600;
-	public static final int DEFAULT_BIN_SIZE = 300;
+    public static final int DEFAULT_END_TIME = 30 * 3600;
+    public static final int DEFAULT_BIN_SIZE = 300;
 
-    private Set<Id<DrtShift>> shiftIds;
     private int iteration = 0;
     private final int binSize;
     private final int nofBins;
     private DataFrame data = null;
 
 
-    public ShiftHistogram(Population population, String mode, Config config) {
-		super();
+    public ShiftHistogram(String mode, Config config) {
+        super();
         this.mode = mode;
         this.binSize = DEFAULT_BIN_SIZE;
-		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
-		reset(0);
-        if (population == null) {
-            this.shiftIds = null;
-        }
+        this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME)) / this.binSize + 1;
+        reset(0);
     }
 
     /**
@@ -63,10 +55,9 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     public void handleEvent(final DrtShiftStartedEvent event) {
         if (event.getMode().equals(mode)) {
             int index = getBinIndex(event.getTime());
-            if ((this.shiftIds == null || this.shiftIds.contains(event.getShiftId()))) {
-                DataFrame dataFrame = getData();
-                dataFrame.countsStart[index]++;
-            }
+            DataFrame dataFrame = getData();
+            dataFrame.countsStart[index]++;
+
         }
     }
 
@@ -74,10 +65,9 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     public void handleEvent(final DrtShiftEndedEvent event) {
         if (event.getMode().equals(mode)) {
             int index = getBinIndex(event.getTime());
-            if ((this.shiftIds == null || this.shiftIds.contains(event.getShiftId()))) {
-                DataFrame dataFrame = getData();
-                dataFrame.countsEnd[index]++;
-            }
+            DataFrame dataFrame = getData();
+            dataFrame.countsEnd[index]++;
+
         }
     }
 
