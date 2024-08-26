@@ -106,7 +106,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	// Option 3: Leerkamp (nur in RVR Modell).
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
-	private static IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
+	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 
 	private enum CreationOption {
 		useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution
@@ -174,11 +174,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Index indexZones;
 
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
+		this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 		log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial) {
-		GenerateSmallScaleCommercialTrafficDemand.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
+		this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
 		log.info("Using {} if existing models are integrated!", integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
 	}
 
