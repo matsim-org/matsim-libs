@@ -1305,6 +1305,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return new ValueSelectorUnderGivenProbability(tourDurationProbabilityDistribution, rnd);
 	}
 
+	/**
+	 * Creates the distribution of the tour start and the related duration.
+	 *
+	 * @param smallScaleCommercialTrafficType the type of the small scale commercial traffic
+	 * @return the distribution of the tour start and the related duration
+	 */
 	private EnumeratedDistribution<TourStartAndDuration> createTourDistribution(String smallScaleCommercialTrafficType) {
 		List<Pair<TourStartAndDuration, Double>> tourDurationProbabilityDistribution = new ArrayList<>();
 
