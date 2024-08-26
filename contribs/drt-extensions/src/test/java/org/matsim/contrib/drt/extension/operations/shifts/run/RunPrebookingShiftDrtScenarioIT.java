@@ -16,6 +16,8 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -175,10 +177,10 @@ public class RunPrebookingShiftDrtScenarioIT {
 
 
         Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(1)));
-        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(2)));
         Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(3)));
-        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(4)));
         Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(5)));
+        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(2)));
+        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(4)));
         Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(6)));
     }
 
@@ -208,7 +210,7 @@ public class RunPrebookingShiftDrtScenarioIT {
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(5000);
             start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 900.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5000.);
+            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5005.);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -311,7 +313,7 @@ public class RunPrebookingShiftDrtScenarioIT {
             public void install() {
                 bindModal(FleetSpecification.class).toInstance(fleetSpecification);
                 bindModal(OperationFacilitiesSpecification.class).toInstance(opFasSpecification);
-                bindModal(DrtShiftsSpecification.class).toInstance(shiftsSpecification);
+                bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(shiftsSpecification)));
             }
         });
 

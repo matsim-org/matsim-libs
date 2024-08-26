@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * @author nkuehnel, fzwick / MOIA
  */
-public interface DrtShift extends Identifiable<DrtShift> {
+public interface DrtShift extends Identifiable<DrtShift>, Comparable<DrtShift> {
 
 	double getStartTime();
 
