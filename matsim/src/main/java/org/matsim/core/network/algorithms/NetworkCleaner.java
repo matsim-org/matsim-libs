@@ -112,7 +112,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 	/**
 	 * Searches the biggest cluster in the given Network. The Network is not modified.
 	 */
-	private Map<Id<Node>, Node> searchBiggestCluster(Network network) {
+	public Map<Id<Node>, Node> searchBiggestCluster(Network network) {
 		final Map<Id<Node>, Node> visitedNodes = new TreeMap<>();
 		Map<Id<Node>, Node> biggestCluster = new TreeMap<>();
 
