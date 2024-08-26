@@ -22,6 +22,9 @@ package playground.vsp.demandde.commuterDemandCottbus;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
@@ -33,9 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -67,7 +67,7 @@ public class DgPopulation2ShapeWriter {
 					addAttribute("end_time", Double.class).
 					create();
 
-			List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+			List<SimpleFeature> features = new ArrayList<>();
 			SimpleFeature f = null;
 			for (Person p : this.pop.getPersons().values()){
 				Plan plan = p.getSelectedPlan();

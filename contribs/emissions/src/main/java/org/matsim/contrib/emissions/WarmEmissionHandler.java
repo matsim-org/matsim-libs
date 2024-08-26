@@ -123,12 +123,10 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				handleNullVehicle(vehicleId);
 			}
 		} else if ( this.vehicleEntersTrafficMap.containsKey( vehicleId ) ) {
-			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " enters and leaves traffic without" +
-					" having entered link " + event.getLinkId() + ". Thus, no emissions are calculated for travel along this link.");
+			logger.warn("At time {}, vehicle {} enters and leaves traffic without having entered link {}. Thus, no emissions are calculated for travel along this link.", event.getTime(), event.getVehicleId(), event.getLinkId());
 			sameLinkTrafficLeaveWarnCnt++;
 		} else {
-			logger.warn("At time " + event.getTime() + ", vehicle " + event.getVehicleId() + " left traffic without entering traffic " +
-					"or ANY link. Thus, no emissions are calculated for this unusual event.");
+			logger.warn("At time {}, vehicle {} left traffic without entering traffic or ANY link. Thus, no emissions are calculated for this unusual event.", event.getTime(), event.getVehicleId());
 			unusualTrafficLeaveWarnCnt++;
 		}
 }
@@ -191,7 +189,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private boolean linkLengthIsZero( Id<Link> linkId, double linkLength) {
 		if (linkLength == 0.) {
 			if (zeroLinkLengthWarnCnt == 0) {
-				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure that this is intentional.");
+				logger.warn("Length of the link {} is zero. No emissions will be estimated for this link. Make sure that this is intentional.", linkId);
 				logger.warn(Gbl.ONLYONCE);
 				zeroLinkLengthWarnCnt++;
 			}
@@ -211,8 +209,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 							+ " Aborting...");
 		} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
 			if (noVehWarnCnt < 10) {
-				logger.warn(
-						"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
+				logger.warn("No vehicle defined for id {}. The vehicle will be ignored.", vehicleId);
 				noVehWarnCnt++;
 				if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}

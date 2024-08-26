@@ -61,13 +61,12 @@ public class RunDrtWithH3ZonalSystemIT {
 						public void install() {
 							bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
 								getter -> new DrtZonalWaitTimesAnalyzer(drtConfig, getter.getModal(DrtEventSequenceCollector.class),
-									getter.getModal(ZoneSystem.class)))).asEagerSingleton();
+									getter.getModal(ZoneSystem.class), config.global().getDefaultDelimiter()))).asEagerSingleton();
 							addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 						}
 					});
 				}
 			});
-
 		}
 	}
 

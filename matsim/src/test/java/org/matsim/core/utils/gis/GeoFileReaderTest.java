@@ -23,7 +23,7 @@ package org.matsim.core.utils.gis;
 
 import java.io.IOException;
 
-import org.geotools.data.FeatureSource;
+import org.geotools.api.data.FeatureSource;
 import org.geotools.feature.NameImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

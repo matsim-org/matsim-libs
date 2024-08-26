@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<!-- ====================================================================== -->
+
+	<!-- Network Lausanne - Genève, the whole line is mesoscopic except the portion between MOR and REN, where it is divided into two microscopic links.
+	All the stations are 400m long
+	The following convention applies to all stations : (Node : Station1) - (Stop : Station) - (Node : Station2)
+																																		            /<=1=>\
+	GE1 <=7=> GE2 <=3=> COP1 <=3=> COP2 <=2=> NY1 <=3=> NY2 <=2=> GLA1 <=2=> GLA2 <=2=> ROL1 <=2=> ROL2 <=2=> ALL1 <=3=> ALL2 <=2=> MOR1 <=4=> MOR2        REN1 <=5=> REN2 <=4=> LS1 <=7=> LS2
+																																					\<=1=>/
+
+	-->
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="GE1" x="-60660" y="0"></node>
+		<node id="GE2" x="-60260" y="0"></node>
+		<node id="COP1" x="-47200" y="0"></node>
+		<node id="COP2" x="-46800" y="0"></node>
+		<node id="NY1" x="-38730" y="0"></node>
+		<node id="NY2" x="-38330" y="0"></node>
+		<node id="GLA1" x="-33990" y="0"></node>
+		<node id="GLA2" x="-33590" y="0"></node>
+		<node id="ROL1" x="-26860" y="0"></node>
+		<node id="ROL2" x="-26460" y="0"></node>
+		<node id="ALL1" x="-21680" y="0"></node>
+		<node id="ALL2" x="-21280" y="0"></node>
+		<node id="MOR1" x="-12700" y="0"></node>
+		<node id="MOR2" x="-12300" y="0"></node>
+		<node id="REN1" x="-4710" y="0"></node>
+		<node id="REN2" x="-4310" y="0"></node>
+		<node id="LS1" x="0" y="0"></node>
+		<node id="LS2" x="400" y="0"></node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="GE1-GE2" from="GE1" to="GE2" length="400" freespeed="32" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GE1GE2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">7</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="GE2-GE1" from="GE2" to="GE1" length="400" freespeed="32" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GE1GE2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">7</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="GE2-COP1" from="GE2" to="COP1" length="13060" freespeed="32" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GE2COP1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="COP1-GE2" from="COP1" to="GE2" length="13060" freespeed="32" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GE2COP1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="COP1-COP2" from="COP1" to="COP2" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">COP1COP2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="COP2-COP1" from="COP2" to="COP1" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">COP1COP2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+
+		<link id="COP2-NY1" from="COP2" to="NY1" length="8070" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">COP2NY1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="NY1-COP2" from="NY1" to="COP2" length="8070" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">COP2NY1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="NY1-NY2" from="NY1" to="NY2" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">NY1NY2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="NY2-NY1" from="NY2" to="NY1" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">NY1NY2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="NY2-GLA1" from="NY2" to="GLA1" length="4340" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">NY2GLA1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="GLA1-NY2" from="GLA1" to="NY2" length="4340" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">NY2GLA1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="GLA1-GLA2" from="GLA1" to="GLA2" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GLA1GLA2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="GLA2-GLA1" from="GLA2" to="GLA1" length="400" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GLA1GLA2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="GLA2-ROL1" from="GLA2" to="ROL1" length="6730" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GLA2ROL1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="ROL1-GLA2" from="ROL1" to="GLA2" length="6730" freespeed="38" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">GLA2ROL1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+
+		<link id="ROL1-ROL2" from="ROL1" to="ROL2" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ROL1ROL2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="ROL2-ROL1" from="ROL2" to="ROL1" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ROL1ROL2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="ROL2-ALL1" from="ROL2" to="ALL1" length="4780" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ROL2ALL1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="ALL1-ROL2" from="ALL1" to="ROL2" length="4780" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ROL2ALL1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="ALL1-ALL2" from="ALL1" to="ALL2" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ALL1ALL2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="ALL2-ALL1" from="ALL2" to="ALL1" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ALL1ALL2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="ALL2-MOR1" from="ALL2" to="MOR1" length="8580" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ALL2MOR1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="MOR1-ALL2" from="MOR1" to="ALL2" length="8580" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">ALL2MOR1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="MOR1-MOR2" from="MOR1" to="MOR2" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR1MOR2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">4</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="MOR2-MOR1" from="MOR2" to="MOR1" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR1MOR2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">4</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="MOR2_REN1-1" from="MOR2" to="REN1" length="7590" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR2REN1-1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="REN1-MOR2-1" from="REN1" to="MOR2" length="7590" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR2REN1-1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="MOR2_REN1-2" from="MOR2" to="REN1" length="7590" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR2REN1-2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="REN1-MOR2-2" from="REN1" to="MOR2" length="7590" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">MOR2REN1-2</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+
+		<link id="REN1-REN2" from="REN1" to="REN2" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">REN1REN2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="REN2-REN1" from="REN2" to="REN1" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">REN1REN2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="REN2-LS1" from="REN2" to="LS1" length="4310" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">REN2LS1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">4</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="LS1-REN2" from="LS1" to="REN2" length="4310" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">REN2LS1</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">4</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+		<link id="LS1-LS2" from="LS1" to="LS2" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">LS1LS2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">7</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+		<link id="LS2-LS1" from="LS2" to="LS1" length="400" freespeed="29" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimResourceId" class="java.lang.String">LS1LS2</attribute>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">7</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">fixedBlock</attribute>
+			</attributes>
+		</link>
+
+
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

@@ -73,11 +73,11 @@ public final class Plotly extends Viz {
 	public Map<String, String> multiIndex;
 
 	@JsonIgnore
-	private List<Trace> traces = new ArrayList<>();
+	private final List<Trace> traces = new ArrayList<>();
 	@JsonIgnore
-	private List<DataSet> data = new ArrayList<>();
+	private final List<DataSet> data = new ArrayList<>();
 	@JsonIgnore
-	private List<DataMapping> mappings = new ArrayList<>();
+	private final List<DataMapping> mappings = new ArrayList<>();
 
 	public Plotly() {
 		super("plotly");
@@ -138,7 +138,7 @@ public final class Plotly extends Viz {
 
 		Objects.requireNonNull(path, "Path argument can not be null");
 
-		String name = data.size() == 0 ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path)).replace("_", "");
+		String name = data.isEmpty() ? "dataset" : FilenameUtils.removeExtension(FilenameUtils.getName(path)).replace("_", "");
 		DataSet ds = new DataSet(path, name);
 		data.add(ds);
 		return ds;
@@ -167,7 +167,7 @@ public final class Plotly extends Viz {
 
 	@JsonProperty(value = "datasets", index = 20)
 	Map<String, Object> getDataSets() {
-		if (data.size() == 0)
+		if (data.isEmpty())
 			return null;
 
 		Map<String, Object> result = new LinkedHashMap<>();
@@ -322,7 +322,9 @@ public final class Plotly extends Viz {
 		TEXT,
 		SIZE,
 		COLOR,
-		OPACITY
+		OPACITY,
+		FACET_COL,
+		FACET_ROW,
 	}
 
 	/**
@@ -353,6 +355,8 @@ public final class Plotly extends Viz {
 		private Map<String, Object> pivot;
 		private Map<String, Object> constant;
 		private Map<String, Object> aggregate;
+		private Map<String, Object> normalize;
+		private Map<String, Object> rename;
 
 		private DataSet(String file, String name) {
 			this.file = file;
@@ -362,7 +366,9 @@ public final class Plotly extends Viz {
 		private Object toJSON() {
 			if (pivot == null &&
 				constant == null &&
-				aggregate == null)
+				aggregate == null &&
+				normalize == null &&
+				rename == null)
 				return file;
 
 			return this;
@@ -416,6 +422,30 @@ public final class Plotly extends Viz {
 			);
 			return this;
 		}
+
+		/**
+		 * Normalize data to 100% for each group.
+		 * @param groupBy group columns to group by.
+		 * @param target target column.
+		 */
+		public DataSet normalize(List<String> groupBy, String target) {
+			normalize = Map.of(
+				"groupBy", groupBy,
+				"target", target
+			);
+			return this;
+		}
+
+		/**
+		 * Rename values in the dataset. Useful after pivot or to rename certain entries.
+		 */
+		public DataSet rename(String oldName, String newName) {
+			if (rename == null)
+				rename = new LinkedHashMap<>();
+
+			rename.put(oldName, newName);
+			return this;
+		}
 	}
 
 	/**
@@ -424,7 +454,7 @@ public final class Plotly extends Viz {
 	public static final class DataMapping {
 
 		private final String ref;
-		private Map<ColumnType, String> columns = new EnumMap<>(ColumnType.class);
+		private final Map<ColumnType, String> columns = new EnumMap<>(ColumnType.class);
 
 		private String colorRamp;
 
@@ -504,6 +534,22 @@ public final class Plotly extends Viz {
 		 */
 		public DataMapping opacity(String columnName) {
 			columns.put(ColumnType.OPACITY, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for facet_col column.
+		 */
+		public DataMapping facetCol(String columnName) {
+			columns.put(ColumnType.FACET_COL, columnName);
+			return this;
+		}
+
+		/**
+		 * Mapping for facet_row column.
+		 */
+		public DataMapping facetRow(String columnName) {
+			columns.put(ColumnType.FACET_ROW, columnName);
 			return this;
 		}
 

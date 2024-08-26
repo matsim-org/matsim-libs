@@ -17,18 +17,18 @@ public interface ParkingInfrastructure {
 
 	void setPublicParkings(LinkedList<PublicParking> publicParkings);
 
-	void setRentableParking(LinkedList<RentableParking> rentableParkings);
+//	void setRentableParking(LinkedList<RentableParking> rentableParkings);
 
-	void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities);
+//	void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities);
 
-	void reset();
+	void notifyBeforeMobsim();
 
-	PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName);
+//	PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName);
 
-	void logArrivalEventAtTimeZero(PC2Parking parking);
+//	void logArrivalEventAtTimeZero(PC2Parking parking);
 
-	PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id<Person> personId,
-			double parkingDurationInSeconds, double arrivalTime);
+//	PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id<Person> personId,
+//			double parkingDurationInSeconds, double arrivalTime);
 
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to
@@ -42,7 +42,7 @@ public interface ParkingInfrastructure {
 
 	void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId);
 
-	ParkingScore getParkingScoreManager();
+//	ParkingScore getParkingScoreManager();
 
 	EventsManager getEventsManager();
 

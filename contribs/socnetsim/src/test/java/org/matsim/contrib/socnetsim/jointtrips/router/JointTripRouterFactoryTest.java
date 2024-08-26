@@ -48,6 +48,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
@@ -95,6 +96,8 @@ public class JointTripRouterFactoryTest {
 
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 		Network net = (Network) sc.getNetwork();
 		final Id<Node> id5 = node1;
 		Node node1inst = NetworkUtils.createAndAddNode(net, id5, new Coord((double) 0, (double) 1));

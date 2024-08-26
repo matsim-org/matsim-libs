@@ -8,8 +8,10 @@
  */
 package org.matsim.contrib.drt.extension.operations.shifts.config;
 
-import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import com.google.common.base.Verify;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
 import java.net.URL;
@@ -43,7 +45,7 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 
 	@Parameter
 	@Comment("Time of shift end rescheduling  (i.e. check whether shift should end" +
-			" at a different facillity) before end of shift in [seconds]")
+			" at a different facility) before end of shift in [seconds]")
 	public double shiftEndRescheduleLookAhead = 1800;
 
 	@Parameter
@@ -53,14 +55,14 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 
 	@Parameter
 	@Comment("set to true if shifts can start and end at in field operational facilities," +
-			" false if changerover is only allowed at hubs")
+			" false if changeover is only allowed at hubs")
 	public boolean allowInFieldChangeover = true;
 
 	//electric shifts
 	@Parameter
 	@Comment("defines the battery state of charge threshold at which vehicles will start charging" +
 			" at hubs when not in an active shift. values between [0,1)")
-	public double chargeAtHubThreshold = 0.5;
+	public double chargeAtHubThreshold = 0.6;
 
 	@Parameter
 	@Comment("defines the battery state of charge threshold at which vehicles will start charging" +
@@ -91,11 +93,25 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	@Comment("defines the logging interval in [seconds]")
 	public double loggingInterval = 600;
 
+	@Parameter
+	@Comment("Defines whether vehicles should be eligible for insertion when they have a shift assigned which has not yet started. " +
+			"Defaults to false. Should be set to true if used together with prebookings that are inserted before shift starts. " +
+			"In this case, make sure that 'shiftScheduleLookAhead' is larger than the prebboking slack.")
+	public boolean considerUpcomingShiftsForInsertion = false;
+
 	public ShiftsParams() {
 		super(SET_NAME);
 	}
 
 	public URL getShiftInputUrl(URL context) {
 		return shiftInputFile == null ? null : ConfigGroup.getInputFileURL(context, shiftInputFile);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		Verify.verify(chargeAtHubThreshold >= shiftAssignmentBatteryThreshold,
+				"chargeAtHubThreshold must be higher than shiftAssignmentBatteryThreshold to " +
+						"avoid deadlocks with undercharged vehicles in hubs.");
 	}
 }

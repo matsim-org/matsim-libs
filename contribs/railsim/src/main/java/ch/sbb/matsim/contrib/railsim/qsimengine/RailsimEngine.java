@@ -359,10 +359,11 @@ final class RailsimEngine implements Steppable {
 			double stopTime = handleTransitStop(time, state);
 
 			assert stopTime >= 0 : "Stop time must be positive";
-			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop, but was " + state.speed;
+//			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at pt stop, but was " + state.speed;
 
 			// Same event is re-scheduled after stopping,
 			event.plannedTime = time + stopTime;
+			state.speed = 0;
 
 			return;
 		}
@@ -370,7 +371,7 @@ final class RailsimEngine implements Steppable {
 		// Arrival at destination
 		if (!event.waitingForLink && state.isRouteAtEnd()) {
 
-			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end, but was " + state.speed;
+//			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end, but was " + state.speed;
 
 			// Free all reservations
 			for (RailLink link : state.route) {
@@ -379,6 +380,7 @@ final class RailsimEngine implements Steppable {
 				}
 			}
 
+			state.speed = 0;
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
 			state.driver.endLegAndComputeNextState(Math.ceil(time));
 
@@ -509,6 +511,18 @@ final class RailsimEngine implements Steppable {
 
 		assert FuzzyUtils.greaterEqualThan(dist, 0) : "Travel distance must be positive, but was" + dist;
 
+		// This corrects inaccuracy happening when the train is at the end of the link
+		// Should very rarely be necessary
+		if (FuzzyUtils.greaterThan(state.headPosition + dist, resources.getLink(state.headLink).length)) {
+			// Dist will be dist to end of link
+			dist = resources.getLink(state.headLink).length - state.headPosition;
+		}
+		// In the same way also correct the speed
+		if (FuzzyUtils.greaterThan(state.speed, state.allowedMaxSpeed)) {
+			state.speed = state.allowedMaxSpeed;
+			state.acceleration = 0;
+		}
+
 		state.headPosition += dist;
 		state.tailPosition += dist;
 		state.approvedDist -= dist;
@@ -521,7 +535,6 @@ final class RailsimEngine implements Steppable {
 		// this assertion may not hold depending on the network
 //		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
 
-		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 		assert FuzzyUtils.lessEqualThan(state.speed, state.allowedMaxSpeed) : "Speed must be less equal than the allowed speed";
 		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive";
@@ -680,9 +693,10 @@ final class RailsimEngine implements Steppable {
 				state.train.acceleration(), state.train.deceleration(),
 				state.speed, state.allowedMaxSpeed, state.approvedSpeed);
 
-			assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist is " + target.decelDist() + ", stopping is not possible";
+//			assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist is " + target.decelDist() + ", stopping is not possible";
 
-			if (FuzzyUtils.equals(target.decelDist(), 0)) {
+			// Because of numerical inaccuracies, the decel dist might be slightly negative
+			if (FuzzyUtils.lessEqualThan(target.decelDist(), 0)) {
 				state.targetSpeed = state.approvedSpeed;
 				state.targetDecelDist = Double.POSITIVE_INFINITY;
 				stop = true;

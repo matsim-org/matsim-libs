@@ -62,7 +62,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<CarrierVehicle>();
+				employedVehicles = new HashSet<>();
 			}
 
 
@@ -94,8 +94,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 			@Override
 			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
+				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
@@ -154,7 +153,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		 double startTimeOfEnd;
 
-		 double amountPerHour = 20.0;
+		 final double amountPerHour = 20.0;
 
 		@Override
 		public void startActivity(double time, Activity act) {
@@ -192,7 +191,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();

@@ -65,7 +65,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		DvrpVehicle vehicle = vehicleLookup.lookupVehicle(vehicleId);
 		VehicleEntry vEntry = vehicleEntryFactory.create(vehicle, now);
 
-		Waypoint.Stop pickupStop = null;
+		Waypoint pickupStop = null;
 		Waypoint.Stop dropoffStop = null;
 
 		DrtStopTask pickupStopTask = null;
@@ -89,6 +89,15 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 			}
 		}
 
+		if(pickupStopTask == null) {
+			if(vEntry.start.task.orElseThrow() instanceof DrtStopTask stopTask) {
+				if(stopTask.getPickupRequests().containsKey(requestId)) {
+					pickupStopTask = stopTask;
+					pickupStop = vEntry.start;
+				}
+			}
+		}
+
 		Verify.verifyNotNull(pickupStopTask, "Could not find request that I'm supposed to unschedule");
 		Verify.verifyNotNull(dropoffStopTask, "Could not find request that I'm supposed to unschedule");
 		Verify.verifyNotNull(pickupStop);
@@ -103,12 +112,13 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		// removed the pickup and the StopAction will handle the situation
 		// - or we found a stop, then it is not started yet and we can remove it
 
-		boolean removePickup = pickupStopTask.getPickupRequests().size() == 0
-				&& pickupStopTask.getDropoffRequests().size() == 0;
-		boolean removeDropoff = dropoffStopTask.getPickupRequests().size() == 0
-				&& dropoffStopTask.getDropoffRequests().size() == 0;
+		boolean removePickup = pickupStopTask.getPickupRequests().isEmpty()
+				&& pickupStopTask.getDropoffRequests().isEmpty()
+				&& pickupStop instanceof Waypoint.Stop;
+		boolean removeDropoff = dropoffStopTask.getPickupRequests().isEmpty()
+				&& dropoffStopTask.getDropoffRequests().isEmpty();
 
-		Replacement pickupReplacement = removePickup ? findReplacement(vEntry, pickupStop) : null;
+		Replacement pickupReplacement = removePickup ? findReplacement(vEntry, (Waypoint.Stop) pickupStop) : null;
 		Replacement dropoffReplacement = removeDropoff ? findReplacement(vEntry, dropoffStop) : null;
 
 		if (pickupReplacement != null && dropoffReplacement != null) {

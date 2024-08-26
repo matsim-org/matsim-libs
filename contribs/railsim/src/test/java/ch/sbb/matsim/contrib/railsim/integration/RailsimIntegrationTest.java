@@ -373,9 +373,9 @@ public class RailsimIntegrationTest {
 			type.setMaximumVelocity(30);
 			type.setLength(100);
 		}
-		
+
 		// simplify the activity types, e.g. home_3600 -> home
-		Set<String> activityTypes = new HashSet<>();	
+		Set<String> activityTypes = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pE : plan.getPlanElements()) {
@@ -388,7 +388,7 @@ public class RailsimIntegrationTest {
 				}
 			}
 		}
-		
+
 		for (String type : activityTypes) {
 			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(type).setTypicalDuration(1234.));
 		}
@@ -403,6 +403,11 @@ public class RailsimIntegrationTest {
 	@Test
 	void testScenarioMicroMesoCombination() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
+	}
+
+	@Test
+	void testScenarioMicroMesoConstructionSiteLsGe() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
 	}
 
 	private EventsCollector runSimulation(File scenarioDir) {

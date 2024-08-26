@@ -42,9 +42,9 @@ public class ShiftEDrtActionCreator implements DynActionCreator {
             task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
             DrtStopTask t = (DrtStopTask) task;
             return new ChargingChangeoverActivity(((EDrtShiftChangeoverTaskImpl) task).getChargingTask(), passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests());
-        } else if (task instanceof EDrtWaitForShiftStayTask && ((EDrtWaitForShiftStayTask) task).getChargingTask() != null) {
+        } else if (task instanceof EDrtWaitForShiftTask && ((EDrtWaitForShiftTask) task).getChargingTask() != null) {
             task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
-            return new ChargingWaitForShiftActivity(((EDrtWaitForShiftStayTask) task).getChargingTask());
+            return new ChargingWaitForShiftActivity(((EDrtWaitForShiftTask) task).getChargingTask());
         }
 
         DynAction dynAction = delegate.createAction(dynAgent, vehicle, now);

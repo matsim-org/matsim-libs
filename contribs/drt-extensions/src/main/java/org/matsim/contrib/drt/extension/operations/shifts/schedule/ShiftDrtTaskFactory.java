@@ -18,6 +18,6 @@ public interface ShiftDrtTaskFactory extends DrtTaskFactory {
     ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
                                                   Link link, DrtShift shift, OperationFacility facility);
 
-    WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-													OperationFacility facility);
+    WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
+                                                OperationFacility facility);
 }
