@@ -2,6 +2,7 @@ package org.matsim.contrib.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.*;
@@ -15,14 +16,14 @@ import java.util.*;
 public class DistanceBasedPtFareParams extends PtFareParams {
 	public static final DistanceBasedPtFareParams GERMAN_WIDE_FARE = germanWideFare();
 
-	public static final String SET_NAME = "ptFareCalculationDistanceBased";
+	public static final String SET_TYPE = "ptFareCalculationDistanceBased";
 	public static final String MIN_FARE = "minFare";
 
 	@PositiveOrZero
 	private double minFare = 2.0;
 
 	public DistanceBasedPtFareParams() {
-		super(SET_NAME);
+		super(SET_TYPE);
 	}
 
 	@Override
@@ -118,10 +119,20 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		return params;
 	}
 
+	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch (type) {
+			case DistanceClassLinearFareFunctionParams.SET_TYPE:
+				return new DistanceClassLinearFareFunctionParams();
+			default:
+				throw new IllegalArgumentException(type);
+		}
+	}
+
 	public SortedMap<Double, DistanceClassLinearFareFunctionParams> getDistanceClassFareParams() {
 		@SuppressWarnings("unchecked")
 		final Collection<DistanceClassLinearFareFunctionParams> distanceClassFareParams =
-			(Collection<DistanceClassLinearFareFunctionParams>) getParameterSets(DistanceClassLinearFareFunctionParams.SET_NAME);
+			(Collection<DistanceClassLinearFareFunctionParams>) getParameterSets(DistanceClassLinearFareFunctionParams.SET_TYPE);
 		final SortedMap<Double, DistanceClassLinearFareFunctionParams> map = new TreeMap<>();
 
 		for (DistanceClassLinearFareFunctionParams pars : distanceClassFareParams) {
@@ -140,7 +151,8 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	public DistanceClassLinearFareFunctionParams getOrCreateDistanceClassFareParams(double maxDistance) {
 		DistanceClassLinearFareFunctionParams distanceClassFareParams = this.getDistanceClassFareParams().get(maxDistance);
 		if (distanceClassFareParams == null) {
-			distanceClassFareParams = new DistanceClassLinearFareFunctionParams(maxDistance);
+			distanceClassFareParams = new DistanceClassLinearFareFunctionParams();
+			distanceClassFareParams.setMaxDistance(maxDistance);
 			addParameterSet(distanceClassFareParams);
 		}
 		return distanceClassFareParams;
@@ -148,7 +160,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 
 	public static class DistanceClassLinearFareFunctionParams extends ReflectiveConfigGroup {
 
-		public static final String SET_NAME = "distanceClassLinearFare";
+		public static final String SET_TYPE = "distanceClassLinearFare";
 		public static final String FARE_SLOPE = "fareSlope";
 		public static final String FARE_INTERCEPT = "fareIntercept";
 		public static final String MAX_DISTANCE = "maxDistance";
@@ -160,9 +172,8 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		@PositiveOrZero
 		private double maxDistance;
 
-		public DistanceClassLinearFareFunctionParams(double maxDistance) {
-			super(SET_NAME);
-			this.maxDistance = maxDistance;
+		public DistanceClassLinearFareFunctionParams() {
+			super(SET_TYPE);
 		}
 
 		@StringGetter(FARE_SLOPE)

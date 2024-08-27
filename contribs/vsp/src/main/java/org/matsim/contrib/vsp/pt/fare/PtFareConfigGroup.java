@@ -2,6 +2,7 @@ package org.matsim.contrib.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
@@ -58,11 +59,23 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch (type) {
+			case DistanceBasedPtFareParams.SET_TYPE:
+				return new DistanceBasedPtFareParams();
+			case FareZoneBasedPtFareParams.SET_TYPE:
+				return new FareZoneBasedPtFareParams();
+			default:
+				throw new IllegalArgumentException(type);
+		}
+	}
+
+	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		var distanceBasedParameterSets = getParameterSets(DistanceBasedPtFareParams.SET_NAME);
-		var fareZoneBasedParameterSets = getParameterSets(FareZoneBasedPtFareParams.SET_NAME);
+		var distanceBasedParameterSets = getParameterSets(DistanceBasedPtFareParams.SET_TYPE);
+		var fareZoneBasedParameterSets = getParameterSets(FareZoneBasedPtFareParams.SET_TYPE);
 
 		if (distanceBasedParameterSets.isEmpty() && fareZoneBasedParameterSets.isEmpty()) {
 			throw new IllegalArgumentException("No parameter sets found for pt fare calculation. Please add at least one parameter set.");
