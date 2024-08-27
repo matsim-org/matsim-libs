@@ -42,8 +42,8 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
@@ -205,25 +205,14 @@ public class SmallScaleCommercialTrafficUtils {
 				if (tourElement instanceof Activity activity) {
 					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
 						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
+					if (activity.getMaximumDuration() != OptionalTime.undefined())
+						newActivity.setMaximumDuration(activity.getMaximumDuration().seconds());
 					if (activity.getType().equals("start")) {
 						newActivity.setEndTime(activity.getEndTime().seconds());
 						newActivity.setType("commercial_start");
-					} else
-//						TODO: this causes a crash when PersonPrepareForSim -> PlanRouter tries routing???
-						newActivity.setEndTimeUndefined();
-					if (activity.getType().equals("end")) {
-//						if tourStartTime = 0 it can happen that commecial_start.getEndTime > commercial_end.getStartTime
-//						this should not happen, hence below the tour start time is taken from the commercial_start act
-						double tourStartTime = TripStructureUtils.getActivities(plan.getPlanElements(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities)
-							.stream()
-							.filter(a -> a.getType().equals("commercial_start"))
-							.toList()
-							.getFirst()
-							.getEndTime()
-							.seconds();
-						newActivity.setStartTime(tourStartTime + 8 * 3600);
-						newActivity.setType("commercial_end");
 					}
+					if (activity.getType().equals("end"))
+						newActivity.setType("commercial_end");
 					plan.addActivity(newActivity);
 				}
 				if (tourElement instanceof Leg) {
