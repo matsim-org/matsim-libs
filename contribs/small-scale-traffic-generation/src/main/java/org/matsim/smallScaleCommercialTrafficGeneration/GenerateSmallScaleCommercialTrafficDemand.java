@@ -289,8 +289,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/** Creates a map with the different facility types per building.
-	 * @param scenario
-	 * @param facilitiesPerZone
+	 * @param scenario 				complete Scenario
+	 * @param facilitiesPerZone 	Map with facilities per zone
 	 */
 	private void filterFacilitiesForZones(Scenario scenario, Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) {
 		scenario.getActivityFacilities().getFacilities().values().forEach((activityFacility -> {
@@ -834,11 +834,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Give a service duration based on the purpose and the trafficType under a given probability
 	 *
-	 * @param serviceDurationTimeSelector
-	 * @param employeeCategory
-	 * @param modeORvehType
-	 * @param smallScaleCommercialTrafficType
-	 * @return
+	 * @param serviceDurationTimeSelector 		the selector for the service duration
+	 * @param employeeCategory 					the category of the employee
+	 * @param modeORvehType 					the mode or vehicle type
+	 * @param smallScaleCommercialTrafficType 	the traffic type
+	 * @return 									the service duration
 	 */
 	private Integer getServiceTimePerStop(Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> serviceDurationTimeSelector,
 										  String employeeCategory,
@@ -1193,7 +1193,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * The values are given in [h] and have an upperBound.
 	 * Data source: KiD 2002
 	 *
-	 * @return
+	 * @return the probability distribution for the tour start times
 	 */
 
 	private ValueSelectorUnderGivenProbability createTourStartTimeDistribution(String smallScaleCommercialTrafficType) {
@@ -1257,7 +1257,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * The values are given in [h] and have an upperBound.
 	 * Data source: KiD 2002
 	 *
-	 * @return
+	 * @return the probability distribution for the tour duration
 	 */
 	private ValueSelectorUnderGivenProbability createTourDurationTimeDistribution(String smallScaleCommercialTrafficType) {
 		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourDurationProbabilityDistribution = new ArrayList<>();
@@ -1797,8 +1797,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * The values are given in [min] and have an upperBound.
 	 * Data source: KiD 2002
 	 *
-	 * @param smallScaleCommercialTrafficType
-	 * @return
+	 * @param smallScaleCommercialTrafficType 	the type of small scale commercial traffic
+	 * @return 									the probability distribution for the duration of the services
 	 */
 	private Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> createStopDurationTimeDistributionPerCategory(String smallScaleCommercialTrafficType) {
 

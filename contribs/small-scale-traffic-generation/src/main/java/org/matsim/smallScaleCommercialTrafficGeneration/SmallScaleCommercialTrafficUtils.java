@@ -117,7 +117,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Creates and return the Index of the regions shape.
+	 * Creates and return the Index of the regions shapes.
 	 *
 	 * @param shapeFileRegionsPath     Path to the shape file of the regions
 	 * @param shapeCRS                 CRS of the shape file
@@ -132,13 +132,13 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/** Finds the nearest possible link for the building polygon.
-	 * @param zone
-	 * @param noPossibleLinks
-	 * @param linksPerZone
-	 * @param newLink
-	 * @param centroidPointOfBuildingPolygon
-	 * @param numberOfPossibleLinks
-	 * @return
+	 * @param zone  							zone of the building
+	 * @param noPossibleLinks 					list of links that are not possible
+	 * @param linksPerZone 						map of links per zone
+	 * @param newLink 							new link
+	 * @param centroidPointOfBuildingPolygon 	centroid point of the building polygon
+	 * @param numberOfPossibleLinks 			number of possible links
+	 * @return 									new possible Link
 	 */
 	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
@@ -283,9 +283,9 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 	/** Reads the data distribution of the zones.
-	 * @param pathToDataDistributionToZones
-	 * @return
-	 * @throws IOException
+	 * @param pathToDataDistributionToZones Path to the data distribution of the zones
+	 * @return 								resultingDataPerZone
+	 * @throws IOException 					if the file is not found
 	 */
 	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {
