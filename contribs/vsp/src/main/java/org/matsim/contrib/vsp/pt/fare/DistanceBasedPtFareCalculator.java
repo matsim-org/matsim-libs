@@ -68,12 +68,13 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 
 	public static double computeFare(double distance, double minFare,
 									 SortedMap<Double, DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams> distanceClassFareParams) {
-		for (DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassFareParam : distanceClassFareParams.values()) {
-			if (distance <= distanceClassFareParam.getMaxDistance()) {
-				return Math.max(minFare, distance * distanceClassFareParam.getFareSlope() + distanceClassFareParam.getFareIntercept());
-			}
+		try {
+			DistanceBasedPtFareParams.DistanceClassLinearFareFunctionParams distanceClassFareParam = distanceClassFareParams.tailMap(distance).firstEntry().getValue();
+			return Math.max(minFare, distance * distanceClassFareParam.getFareSlope() + distanceClassFareParam.getFareIntercept());
+		} catch (IllegalArgumentException e) {
+			log.error("No fare found for distance of " + distance + " meters.");
+			log.error(e.getMessage());
+			throw new RuntimeException("No fare found for distance of " + distance + " meters.");
 		}
-		log.error("No fare found for distance of " + distance + " meters.");
-		throw new RuntimeException("No fare found for distance of " + distance + " meters.");
 	}
 }
