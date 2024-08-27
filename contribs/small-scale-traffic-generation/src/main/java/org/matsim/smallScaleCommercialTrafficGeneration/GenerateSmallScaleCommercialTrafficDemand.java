@@ -576,7 +576,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
 
-		// Only vehicle with cost information will work properly
+		// Only a vehicle with cost information will work properly
 		additionalCarrierVehicleTypes.values().stream()
 			.filter(vehicleType -> vehicleType.getCostInformation().getCostsPerSecond() != null)
 			.forEach(vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
@@ -602,6 +602,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								}
 						}
 					}
+					//TODO make vehcile selection configurable
 					if (isStartingLocation) {
 						double occupancyRate = 0;
 						String[] possibleVehicleTypes = null;
