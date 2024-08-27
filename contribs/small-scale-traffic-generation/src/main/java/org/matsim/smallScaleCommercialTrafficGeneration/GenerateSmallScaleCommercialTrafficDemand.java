@@ -698,7 +698,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							String[] serviceArea = new String[]{stopZone};
 							int serviceTimePerStop;
 							if (selectedStartCategory.equals("Inhabitants"))
-								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, startCategory.get(0), modeORvehType, smallScaleCommercialTrafficType);
+								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, startCategory.getFirst(), modeORvehType, smallScaleCommercialTrafficType);
 							else
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
 
