@@ -554,7 +554,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		EnumeratedDistribution<TourStartAndDuration> tourDistribution = createTourDistribution(smallScaleCommercialTrafficType);
 
-		Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> stopDurationTimeSelector = createStopDurationTimeDistributionPerCategory(
+		Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> stopDurationTimeSelector = createStopDurationDistributionPerCategory(
 			smallScaleCommercialTrafficType);
 
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
@@ -1800,7 +1800,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param smallScaleCommercialTrafficType 	the type of small scale commercial traffic
 	 * @return 									the probability distribution for the duration of the services
 	 */
-	private Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> createStopDurationTimeDistributionPerCategory(String smallScaleCommercialTrafficType) {
+	private Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> createStopDurationDistributionPerCategory(String smallScaleCommercialTrafficType) {
 
 		Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> stopDurationProbabilityDistribution = new HashMap<>();
 		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
