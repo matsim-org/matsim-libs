@@ -155,8 +155,8 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             for (TransitStopFacility stop : stops) {
                 final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get(stop.getId());
                 if (travelInfo != null) {
-                    double distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
-                    double egressWalkCost = - distance / walkSpeed_m_h  * betaWalkTT;
+                    double egressDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
+                    double egressWalkCost = - egressDistance / walkSpeed_m_h  * betaWalkTT;
                     //total travel cost include travel, access, egress and waiting costs
 					double cost = travelInfo.accessCost + travelInfo.travelCost + travelInfo.waitingCost + egressWalkCost;
 					travelCost = Math.min(travelCost, cost);
@@ -164,10 +164,16 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             }
 
             //check whether direct walk time is cheaper
-            travelCost = Math.min(travelCost, directWalkCost);
 
-            double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
-            expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
+			double modeSpecificConstant;
+			if(directWalkCost < travelCost) {
+				travelCost = directWalkCost;
+				modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup);
+			} else {
+				modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
+			}
+			// cost is a positive number, however we need negative utils.
+			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
         }
         return expSum;
 	}

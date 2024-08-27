@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
@@ -19,18 +18,16 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
-import org.matsim.matrices.Entry;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +53,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 	private final double betaDrtTT_h;
 	private final double betaDrtDist_m;
-	private final double walkSpeed_m_s;
+	private final double walkSpeed_m_h;
 
 	private Node fromNode = null;
 
@@ -64,7 +61,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 	private final LeastCostPathCalculator router;
-	TripRouter tripRouter ;// TODO: this Getter is a temporary hack. Talk to TS about other ways of accessing the stopFinder
+	TripRouter tripRouter ;
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
 	public EstimatedDrtAccessibilityContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario, TripRouter tripRouter) {
@@ -83,7 +80,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		betaDrtDist_m = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfDistance();
-		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_h = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
 
 		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();// todo
 //		this.drtEstimator = new EuclideanDistanceBasedDrtEstimator(scenario.getNetwork(), 1.2, 0.0842928, 337.1288522,  5 * 60, 0, 0, 0);
@@ -143,11 +140,15 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 		double utility_access = accessTime_h * betaWalkTT_h;
 
-
-		double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
-
-
 		for (AggregationObject destination : aggregatedOpportunities.values()) {
+
+
+			final Coord toCoord = destination.getNearestBasicLocation().getCoord();
+			// Does this have to be euclidean distance? Couldn't the walk be routed on the network, so that physical boundaries such as rivers would be respected.
+			double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
+			double directWalkUtility = directDistance_m / walkSpeed_m_h * betaWalkTT_h + AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup);
+
+			double travelUtility;
 
 			// Calculate main drt leg:
 			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
@@ -170,19 +171,28 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
+			double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
 
-			System.out.println("___________________________________");
-			System.out.println("Measuring Point: " + origin.getId().toString());
-			System.out.println("utility access: " + utility_access + " ----- =" + betaWalkTT_h + " * " + accessTime_h);
-			System.out.println("utility drt (time): " + utilityDrtTime + " ----- =" + betaDrtTT_h + " * " + totalTime_h);
-			System.out.println("utility drt (distance): " + utilityDrtDistance + " ----- =" + betaDrtDist_m + " * " + directRideDistance_m);
-			System.out.println("utility drt (constant): " + utilityDrtConstant);
-			System.out.println("utility egress: " + Math.log(sumExpVjkWalk));
+			double drtUtility = utility_access + utilityDrtTime + utilityDrtDistance + Math.log(sumExpVjkWalk) + utilityDrtConstant;
+
+
+
+//			System.out.println("___________________________________");
+//			System.out.println("Measuring Point: " + origin.getId().toString());
+//			System.out.println("utility access: " + utility_access + " ----- =" + betaWalkTT_h + " * " + accessTime_h);
+//			System.out.println("utility drt (time): " + utilityDrtTime + " ----- =" + betaDrtTT_h + " * " + totalTime_h);
+//			System.out.println("utility drt (distance): " + utilityDrtDistance + " ----- =" + betaDrtDist_m + " * " + directRideDistance_m);
+//			System.out.println("utility drt (constant): " + utilityDrtConstant);
+//			System.out.println("utility egress: " + Math.log(sumExpVjkWalk));
 //			System.out.println("utility egress: (sumExpVjkWalk) exponential of utility, sum over all opportunities near stop: : " + sumExpVjkWalk);
 
+			// Utilities for traveling are generally negative (unless there is a high ASC).
+			// We choose walk if it's utility is higher (less negative) than that of DRT
+			travelUtility = Math.max(directWalkUtility, drtUtility);
+
 			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() *
-				(utility_access + utilityDrtTime + utilityDrtDistance + utilityDrtConstant))
-				* sumExpVjkWalk;
+				(travelUtility));
+
 		}
 		return expSum;
 	}
