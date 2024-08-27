@@ -1196,6 +1196,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @return the probability distribution for the tour start times
 	 */
 
+	@Deprecated //use createTourDistribution(String smallScaleCommercialTrafficType) instead
 	private ValueSelectorUnderGivenProbability createTourStartTimeDistribution(String smallScaleCommercialTrafficType) {
 
 		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourStartProbabilityDistribution = new ArrayList<>();
@@ -1259,6 +1260,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 *
 	 * @return the probability distribution for the tour duration
 	 */
+	@Deprecated //use createTourDistribution(String smallScaleCommercialTrafficType) instead
 	private ValueSelectorUnderGivenProbability createTourDurationTimeDistribution(String smallScaleCommercialTrafficType) {
 		List<ValueSelectorUnderGivenProbability.ProbabilityForValue> tourDurationProbabilityDistribution = new ArrayList<>();
 		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
