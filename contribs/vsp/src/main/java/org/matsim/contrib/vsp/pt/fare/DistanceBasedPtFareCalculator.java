@@ -7,7 +7,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 
 	private final Map<Coord, Boolean> inShapeCache = new HashMap<>();
 
-	public DistanceBasedPtFareCalculator(DistanceBasedPtFareParams params) {
+	public DistanceBasedPtFareCalculator(DistanceBasedPtFareParams params, URL context) {
 		this.minFare = params.getMinFare();
 		this.distanceClassFareParams = params.getDistanceClassFareParams();
 		this.transactionPartner = params.getTransactionPartner();
@@ -36,7 +38,7 @@ public class DistanceBasedPtFareCalculator implements PtFareCalculator {
 		if (params.getFareZoneShp() != null) {
 			log.info("For DistanceBasedPtFareCalculator '{}' a fare zone shape file was provided. During the computation, the fare will be " +
 				"calculated only if the trip is within the shape.", params.getDescription());
-			this.shp = new ShpOptions(params.getFareZoneShp(), null, null);
+			this.shp = new ShpOptions(IOUtils.extendUrl(context, params.getFareZoneShp()).toString(), null, null);
 		} else {
 			log.info("For DistanceBasedPtFareCalculator '{}' no fare zone shape file was provided. The fare will be calculated for all trips.",
 				params.getDescription());
