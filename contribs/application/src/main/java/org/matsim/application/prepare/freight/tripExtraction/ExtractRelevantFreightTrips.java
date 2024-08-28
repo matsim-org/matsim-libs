@@ -312,7 +312,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 					timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
 				}
 				if (!isCoordSet) {
-					Coord originalCoord = route.links.get(0).getCoord();
+					Coord originalCoord = route.links.getFirst().getCoord();
 					act0.setCoord(ct.transform(originalCoord));
 					act0.setEndTime(departureTime);
 				}
