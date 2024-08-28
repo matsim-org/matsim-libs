@@ -5,7 +5,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +22,8 @@ public class FareZoneBasedPtFareCalculator implements PtFareCalculator {
 
 	public static final String FARE = "fare";
 
-	public FareZoneBasedPtFareCalculator(FareZoneBasedPtFareParams params) {
-		this.shp = new ShpOptions(params.getFareZoneShp(), null, null);
+	public FareZoneBasedPtFareCalculator(FareZoneBasedPtFareParams params, URL context) {
+		this.shp = new ShpOptions(IOUtils.extendUrl(context, params.getFareZoneShp()).toString(), null, null);
 		transactionPartner = params.getTransactionPartner();
 	}
 
