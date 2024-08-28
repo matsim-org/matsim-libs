@@ -13,6 +13,8 @@ import java.util.Optional;
 class DistanceBasedPtFareCalculatorTest {
 	private static final String TRANSACTION_PARTNER = "TP";
 
+	private static final URL context = ExamplesUtils.getTestScenarioURL("kelheim");
+
 	@Test
 	void testNormalDistance() {
 		//100m -> 1.1 EUR
@@ -33,7 +35,6 @@ class DistanceBasedPtFareCalculatorTest {
 
 	@Test
 	void testNotInShapeFile() {
-		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
 		String shape = IOUtils.extendUrl(context, "ptTestArea/pt-area.shp").toString();
 		Coord a = new Coord(726634.40, 5433508.07);
 		Coord b = new Coord(736634.40, 5533508.07);
@@ -43,7 +44,6 @@ class DistanceBasedPtFareCalculatorTest {
 
 	@Test
 	void testInShapeFile() {
-		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
 		String shape = IOUtils.extendUrl(context, "ptTestArea/pt-area.shp").toString();
 		Coord a = new Coord(710300.624, 5422165.737);
 		Coord b = new Coord(714940.65, 5420707.78);
@@ -74,7 +74,7 @@ class DistanceBasedPtFareCalculatorTest {
 
 		params.setMinFare(1.0);
 		params.setFareZoneShp(shapeFile);
-		return new DistanceBasedPtFareCalculator(params);
+		return new DistanceBasedPtFareCalculator(params, context);
 	}
 
 	@Test
@@ -102,7 +102,7 @@ class DistanceBasedPtFareCalculatorTest {
 
 		params.setMinFare(1.0);
 
-		DistanceBasedPtFareCalculator distanceBasedPtFareCalculator = new DistanceBasedPtFareCalculator(params);
+		DistanceBasedPtFareCalculator distanceBasedPtFareCalculator = new DistanceBasedPtFareCalculator(params, context);
 		PtFareCalculator.FareResult fareResult = distanceBasedPtFareCalculator.calculateFare(new Coord(0, 0), new Coord(0, 100)).orElseThrow();
 		Assertions.assertEquals(new PtFareCalculator.FareResult(2.2, TRANSACTION_PARTNER), fareResult);
 	}
@@ -126,7 +126,7 @@ class DistanceBasedPtFareCalculatorTest {
 		// add in a different way so no automatic overwrite
 		params.addParameterSet(distanceClass2kmDuplicateFareParams);
 
-		Assertions.assertThrows(RuntimeException.class, () -> new DistanceBasedPtFareCalculator(params),
+		Assertions.assertThrows(RuntimeException.class, () -> new DistanceBasedPtFareCalculator(params, context),
 			"DistanceBasedPtFareCalculator should crash if multiple DistanceClassLinearFareFunctionParams with the same max distance " +
 				" are present, because it is unclear which of them should be applied at that distance.");
 	}
