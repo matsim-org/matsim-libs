@@ -6,6 +6,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -19,17 +20,19 @@ public class PtFareModule extends AbstractModule {
 		Multibinder<PtFareCalculator> ptFareCalculator = Multibinder.newSetBinder(binder(), PtFareCalculator.class);
 
 		PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
-		Collection<? extends ConfigGroup> fareZoneBased = ptFareConfigGroup.getParameterSets(FareZoneBasedPtFareParams.SET_NAME);
-		Collection<? extends ConfigGroup> distanceBased = ptFareConfigGroup.getParameterSets(DistanceBasedPtFareParams.SET_NAME);
+		Collection<? extends ConfigGroup> fareZoneBased = ptFareConfigGroup.getParameterSets(FareZoneBasedPtFareParams.SET_TYPE);
+		Collection<? extends ConfigGroup> distanceBased = ptFareConfigGroup.getParameterSets(DistanceBasedPtFareParams.SET_TYPE);
+
+		URL context = getConfig().getContext();
 
 		Stream.concat(fareZoneBased.stream(), distanceBased.stream())
 			  .map(c -> (PtFareParams) c)
 			  .sorted(Comparator.comparing(PtFareParams::getOrder))
 			  .forEach(p -> {
 				  if (p instanceof FareZoneBasedPtFareParams fareZoneBasedPtFareParams) {
-					  ptFareCalculator.addBinding().toInstance(new FareZoneBasedPtFareCalculator(fareZoneBasedPtFareParams));
+					  ptFareCalculator.addBinding().toInstance(new FareZoneBasedPtFareCalculator(fareZoneBasedPtFareParams, context));
 				  } else if (p instanceof DistanceBasedPtFareParams distanceBasedPtFareParams) {
-					  ptFareCalculator.addBinding().toInstance(new DistanceBasedPtFareCalculator(distanceBasedPtFareParams));
+					  ptFareCalculator.addBinding().toInstance(new DistanceBasedPtFareCalculator(distanceBasedPtFareParams, context));
 				  } else {
 					  throw new RuntimeException("Unknown PtFareParams: " + p.getClass());
 				  }

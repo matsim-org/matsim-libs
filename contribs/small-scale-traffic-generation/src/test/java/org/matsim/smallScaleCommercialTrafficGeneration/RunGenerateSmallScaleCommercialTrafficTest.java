@@ -28,14 +28,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -47,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -68,19 +73,11 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String sample = "0.1";
 		String jspritIterations = "2";
 		String creationOption = "createNewCarrierFile";
-		String landuseConfiguration = "useExistingDataDistribution";
 		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
-		String regionsShapeFileName = utils.getPackageInputDirectory() + "/shp/testRegions.shp";
-		String regionsShapeRegionColumn = "region";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
-		String buildingsShapeFileName = utils.getPackageInputDirectory() + "/shp/testBuildings.shp";
-		String shapeFileBuildingTypeColumn = "type";
-		String landuseShapeFileName = utils.getPackageInputDirectory() + "/shp/testLanduse.shp";
-		String shapeFileLanduseTypeColumn = "fclass";
 		String shapeCRS = "EPSG:4326";
 		String resultPopulation = "testPopulation.xml.gz";
-
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 				pathToConfig,
@@ -118,6 +115,18 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("vehicles"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("subpopulation"));
 			Assertions.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
+
+			for (Plan plan : person.getPlans()) {
+				List<Activity> activities = TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+				Assertions.assertEquals("commercial_start", activities.getFirst().getType());
+				Assertions.assertEquals("commercial_end", activities.getLast().getType());
+				activities.forEach(activity -> {
+					Assertions.assertNotNull(activity.getCoord());
+					if (!activity.getType().equals("commercial_start") && !activity.getType().equals("commercial_end")) {
+						Assertions.assertNotEquals(OptionalTime.undefined(), activity.getMaximumDuration());
+					}
+				});
+			}
 		}
 
 		Assertions.assertEquals(CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().size(),
@@ -144,10 +153,10 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 	}
 
 	/**
-	 * Reads a CSV file and creates a map with the first column as key and the rest as a map with the header as key and the value as value
+	 * Reads a CSV file and creates a map with the first column as a key and the rest as a map with the header as key and the value as value
 	 *
 	 * @param calculatedFile the file to read
-	 * @return
+	 * @return the map with the data distribution
 	 */
 	private static Map<String, Object2DoubleMap<String>> readCSVInputAndCreateMap(String calculatedFile) {
 		Map<String, Object2DoubleMap<String>> dataDistribution = new HashMap<>();

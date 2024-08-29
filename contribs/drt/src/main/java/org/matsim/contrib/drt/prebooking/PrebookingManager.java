@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -21,10 +22,12 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
@@ -59,12 +62,16 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	private final VrpOptimizer optimizer;
 	private final RequestUnscheduler unscheduler;
+	private final boolean abortRejectedPrebookings;
 
 	private final MobsimTimer mobsimTimer;
 
+	private InternalInterface internalInterface;
+
+
 	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, MobsimTimer mobsimTimer, PassengerRequestValidator requestValidator,
-			EventsManager eventsManager, RequestUnscheduler unscheduler) {
+							 VrpOptimizer optimizer, MobsimTimer mobsimTimer, PassengerRequestValidator requestValidator,
+							 EventsManager eventsManager, RequestUnscheduler unscheduler, boolean abortRejectedPrebookings) {
 		this.network = network;
 		this.mode = mode;
 		this.requestCreator = requestCreator;
@@ -74,6 +81,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.unscheduler = unscheduler;
+		this.abortRejectedPrebookings = abortRejectedPrebookings;
 	}
 
 	// Functionality for ID management
@@ -386,6 +394,19 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				} else {
 					unscheduleUponVehicleAssignment.add(requestId);
 				}
+
+				if(abortRejectedPrebookings) {
+					for (Id<Person> passengerId : item.request.getPassengerIds()) {
+						MobsimAgent agent = internalInterface.getMobsim().getAgents().get(passengerId);
+						((Activity) WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.POSITIVE_INFINITY);
+						((Activity) WithinDayAgentUtils.getCurrentPlanElement(agent)).setMaximumDurationUndefined();
+						((HasModifiablePlan) agent).resetCaches();
+						internalInterface.getMobsim().rescheduleActivityEnd(agent);
+						eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
+								this.mode));
+						internalInterface.getMobsim().getAgentCounter().incLost();
+					}
+				}
 			}
 		}
 
@@ -454,5 +475,6 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 	}
 }

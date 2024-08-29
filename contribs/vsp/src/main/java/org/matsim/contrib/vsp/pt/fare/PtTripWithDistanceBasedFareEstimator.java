@@ -39,7 +39,7 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 	private static DistanceBasedPtFareParams extractPtFare(PtFareConfigGroup config) {
 		//TODO
-		return config.getParameterSets(DistanceBasedPtFareParams.SET_NAME).stream()
+		return config.getParameterSets(DistanceBasedPtFareParams.SET_TYPE).stream()
 					 .map(DistanceBasedPtFareParams.class::cast)
 					 .findFirst()
 					 .orElseThrow(() -> new IllegalStateException("No distance based fare parameters found"));
