@@ -38,4 +38,10 @@ public class PrebookingParams extends ReflectiveConfigGroup {
 	@NotNull
 	public UnschedulingMode unschedulingMode = UnschedulingMode.StopBased;
 
+	@Parameter
+	@Comment("Defines whether agents are set to stuck and abort when a prebooked request is rejected." +
+			"If false, prebooked agents will re-attempt to ride at their initially planned departure time." +
+			"Note that additional passenger events for submission, scheduling etc. will occur for re-attempts.")
+	public boolean abortRejectedPrebookings = true;
+
 }
