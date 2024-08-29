@@ -720,8 +720,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							else
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
 
-							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
-								24 * 3600); //TODO eventuell anpassen wegen veränderter Tourzeiten
+							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
 							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
 								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, linksPerZone);
 						}
