@@ -94,7 +94,9 @@ import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommerc
  *
  * @author Ricardo Ewert
  */
-//TODO: use EnumeratedDistribution for distributions with probabilities
+//TODO check if service duration is larger than tour duration
+//TODO make vehicle selection (see method createCarriers()) configurable in separate class (use interface)
+//TODO move generationRates in class TrafficVolumeGeneration in separate class in package data (similar to GetCommercialTourSpecifications)
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
 public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppCommand {
 	// freight traffic from extern:
@@ -601,7 +603,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								}
 						}
 					}
-					//TODO make vehcile selection configurable
+
 					if (isStartingLocation) {
 						double occupancyRate = 0;
 						String[] possibleVehicleTypes = null;
