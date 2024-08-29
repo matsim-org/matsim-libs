@@ -17,7 +17,7 @@ import java.util.*;
  * The values are based on the standard unit of meter (m) and Euro (EUR)
  */
 public class DistanceBasedPtFareParams extends PtFareParams {
-	public static final DistanceBasedPtFareParams GERMAN_WIDE_FARE = germanWideFare();
+	public static final DistanceBasedPtFareParams GERMAN_WIDE_FARE_2024 = germanWideFare2024();
 
 	public static final String SET_TYPE = "ptFareCalculationDistanceBased";
 	public static final String MIN_FARE = "minFare";
@@ -53,7 +53,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	// hence the following difference in data points
 	// prices taken from https://deutschlandtarifverbund.de/wp-content/uploads/2024/07/20231201_TBDT_J_10_Preisliste_V07.pdf
 	// TODO: This fare will change. We might need a way to select the fare of a specific year
-	private static DistanceBasedPtFareParams germanWideFare() {
+	private static DistanceBasedPtFareParams germanWideFare2024() {
 		final double MIN_FARE = 1.70;
 
 		SimpleRegression under100kmTrip = new SimpleRegression();
@@ -111,11 +111,12 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		var params = new DistanceBasedPtFareParams();
 
 		DistanceClassLinearFareFunctionParams distanceClass100kmFareParams = params.getOrCreateDistanceClassFareParams(100_000.);
-		distanceClass100kmFareParams.setFareSlope(under100kmTrip.getSlope());
+		// above values are per km, fare deduction is based on meter instead
+		distanceClass100kmFareParams.setFareSlope(under100kmTrip.getSlope() / 1000.0);
 		distanceClass100kmFareParams.setFareIntercept(under100kmTrip.getIntercept());
 
 		DistanceClassLinearFareFunctionParams distanceClassLongFareParams = params.getOrCreateDistanceClassFareParams(Double.POSITIVE_INFINITY);
-		distanceClassLongFareParams.setFareSlope(longDistanceTrip.getSlope());
+		distanceClassLongFareParams.setFareSlope(longDistanceTrip.getSlope() / 1000.0);
 		distanceClassLongFareParams.setFareIntercept(longDistanceTrip.getIntercept());
 
 		params.setTransactionPartner("Deutschlandtarif");
