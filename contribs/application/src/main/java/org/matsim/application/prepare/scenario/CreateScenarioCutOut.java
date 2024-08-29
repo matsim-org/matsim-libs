@@ -93,7 +93,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 
 	//private variables for computing
 	private static final GeometryFactory geoFactory = new GeometryFactory();
-	private static final Map<String, Network> mode2modeOnlyNetwork = new HashMap();
+	private static final Map<String, Network> mode2modeOnlyNetwork = new HashMap<>();
 	private static final Set<Id<Link>> linksToKeep = new HashSet<>(); //Links inside the shapefile
 	private static final Set<Id<Link>> linksToDelete = new HashSet<>(); //Links outside the shapefile
 	private static final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet(); // additional links to include (may be outside the shapefile)
@@ -109,6 +109,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	private static boolean useFacilities = false;
 	private static boolean useEvents = false;
 	private static boolean useNetworkChangeEvents = false;
+
+	private static int emptyNetworkWarnings = 0;
+	private static int noActCoordsWarnings = 0;
 
 	public static void main(String[] args) {
         new CreateScenarioCutOut().execute(args);
@@ -277,6 +280,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
     }
 
 	private Node getFromNode(Network network, Trip trip){
+		if(network.getLinks().isEmpty()){
+			if(emptyNetworkWarnings < 10) log.warn("Tried to get a from-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
+			emptyNetworkWarnings++;
+			return null;
+		}
+
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getOriginActivity().getLinkId() != null && modeLinks.get(trip.getOriginActivity().getLinkId()) != null) {
 			return modeLinks.get(trip.getOriginActivity().getLinkId()).getFromNode();
@@ -286,6 +295,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	}
 
 	private Node getToNode(Network network, Trip trip){
+		if(network.getLinks().isEmpty()){
+			if(emptyNetworkWarnings < 10) log.warn("Tried to get a to-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
+			emptyNetworkWarnings++;
+			return null;
+		}
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getDestinationActivity().getLinkId() != null && modeLinks.get(trip.getDestinationActivity().getLinkId()) != null) {
 			return modeLinks.get(trip.getDestinationActivity().getLinkId()).getFromNode();
@@ -299,6 +313,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 
 		Node fromNode = getFromNode(network, trip);
 		Node toNode = getToNode(network, trip);
+
+		if(fromNode == null || toNode == null) return null;
 
 		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 	}
@@ -318,6 +334,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	 * @return Sorted list with tuples (linkId, freespeed), containing the given links. Order is copied from route
 	 */
 	private List<Tuple<Id<Link>, Double>> computeApproximatedLinkFreespeedForLinks(NetworkRoute route){
+		// TODO fix method, return values are wrong
 		double theoreticalTT = 0;
 		List<Tuple<Id<Link>, Double>> freespeeds = new LinkedList<>();
 		//Compute the theoretical Travel Time if there would be no congestion
@@ -337,9 +354,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	 * a single reference value, which is not optimal.</i>
 	 * @param linkId link-id to compute the avereage freespeed for
 	 * @param fromTimeToTime Tuple (start, end) of representing the time interval
-	 * @return computed average freespeed
+	 * @return computed average freespeed, -1 if link has no attached information
 	 */
 	private double computeAverageLinkFreespeedDuringTimeFrame(Id<Link> linkId, Tuple<Double, Double> fromTimeToTime){
+		if(!linkId2travelTimesAtTime.containsKey(linkId)) return -1;
+
 		double sum = 0;
 		int found = 0;
 		for(Tuple<Double, Double> e : linkId2travelTimesAtTime.get(linkId)){
@@ -380,6 +399,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 			//Do this for the whole 36-hour simulation run
 			for(Link link : network.getLinks().values()){
 				double avgFreespeed = computeAverageLinkFreespeedDuringTimeFrame(link.getId(), new Tuple<>(time, time+timeFrameLength));
+				if(avgFreespeed == -1) return events; //Return empty list as indicator, that no events have been generated
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(
 					NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
@@ -402,13 +422,19 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		Set<Id<Link>> linkIds = new HashSet<>();
 
 		for (Trip trip : trips) {
-			// keep all agents starting or ending in area
-			if (geom.contains(MGC.coord2Point(getActivityCoord(trip.getOriginActivity()))) || geom.contains(MGC.coord2Point(getActivityCoord(trip.getDestinationActivity())))) {
-				keepPerson = true;
-			}
-
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
+
+			if(originCoord == null || destinationCoord == null){
+				if(noActCoordsWarnings < 10) log.info("Activity coords of trip is null. Skipping Trip...");
+				noActCoordsWarnings++;
+				continue;
+			}
+
+			// keep all agents starting or ending in area
+			if (geom.contains(MGC.coord2Point(originCoord)) || geom.contains(MGC.coord2Point(destinationCoord))) {
+				keepPerson = true;
+			}
 
 			LineString line = geoFactory.createLineString(new Coordinate[]{
 				MGC.coord2Coordinate(originCoord),
@@ -426,7 +452,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 			//Save route links
 			for (Leg leg : trip.getLegsOnly()) {
 				Route route = leg.getRoute();
-				if (route instanceof NetworkRoute) { // TODO Check how this behaves for pt/teleport routes
+				if (route instanceof NetworkRoute && !((NetworkRoute) route).getLinkIds().isEmpty()) { // TODO Check how this behaves for pt/teleport routes
 					// We have a NetworkRoute, thus we can just use it
 					linkIds.addAll(((NetworkRoute) route).getLinkIds());
 					if (((NetworkRoute) route).getLinkIds().stream().anyMatch(linksToKeep::contains)) {
@@ -437,6 +463,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 						List<Tuple<Id<Link>, Double>> linkId2freespeeds = computeApproximatedLinkFreespeedForLinks(((NetworkRoute) route));
 						double currentTime = linkId2freespeeds.getFirst().getSecond();
 						for(Tuple<Id<Link>, Double> e : linkId2freespeeds){
+							linkId2travelTimesAtTime.putIfAbsent(e.getFirst(), new LinkedList<>());
 							linkId2travelTimesAtTime.get(e.getFirst()).add(new Tuple<>(e.getSecond(), currentTime+e.getSecond()));
 							currentTime += e.getSecond();
 						}
@@ -453,7 +480,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 								keepPerson = true;
 							}
 						}
-						//There is no additional link freespeed information, that we could save.
+						//There is no additional link freespeed information, that we could save. So we are finished here
 					}
 				}
 			}
