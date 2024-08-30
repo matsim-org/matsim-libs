@@ -1,4 +1,4 @@
-package playground.vsp.pt.fare;
+package org.matsim.contrib.vsp.pt.fare;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
@@ -10,7 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.pt.PtConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +61,7 @@ public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMo
                 // Issue refund to person
                 events.processEvent(
                         new PersonMoneyEvent(getOrCalcCompensationTime(), personId, refund,
-                                PT_REFUND, TransportMode.pt, "Refund for person" + personId.toString()));
+                                PT_REFUND, TransportMode.pt, "Refund for person " + personId.toString()));
             }
         }
     }

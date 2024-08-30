@@ -31,6 +31,7 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
     public static final String OPERATION_FACILITY_ID = "operationFacilityId";
+    public static final String DESIGNATED_VEHICLE_ID = "designatedVehicleId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
@@ -71,6 +72,8 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
             atts.add(createTuple(END_TIME, shift.getEndTime()));
 			shift.getOperationFacilityId().ifPresent(operationFacilityId ->
 					atts.add(createTuple(OPERATION_FACILITY_ID, operationFacilityId.toString())));
+            shift.getDesignatedVehicleId().ifPresent(designatedVehicleId ->
+                    atts.add(createTuple(DESIGNATED_VEHICLE_ID, designatedVehicleId.toString())));
             this.writeStartTag(SHIFT_NAME, atts);
 
             //Write break, if present
