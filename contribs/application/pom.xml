@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
 			<artifactId>gtfs2matsim</artifactId>
-			<version>master-33809c4f0f-1</version>
+			<version>fc8b13954d</version>
 			<exclusions>
 				<!-- Exclude unneeded dependencies and these with known CVE -->
 				<exclusion>
@@ -117,7 +117,7 @@
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.7.5</version>
+			<version>4.7.6</version>
 		</dependency>
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>

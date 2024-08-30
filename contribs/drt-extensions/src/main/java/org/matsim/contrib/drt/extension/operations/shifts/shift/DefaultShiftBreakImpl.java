@@ -54,9 +54,4 @@ public class DefaultShiftBreakImpl implements DrtShiftBreak {
     public double getScheduledLatestArrival() {
         return latestArrivalTime;
     }
-
-    @Override
-    public void reset() {
-        this.latestArrivalTime = UNSCHEDULED_ARRIVAL_TIME;
-    }
 }

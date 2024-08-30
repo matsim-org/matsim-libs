@@ -1,12 +1,13 @@
 package org.matsim.contrib.noise;
 
-import org.opengis.geometry.DirectPosition;
+
+import org.geotools.api.geometry.Position;
 
 public interface DEMContext {
 
     /**
      * Returns the elevation at the given position.
      */
-    float getElevation(DirectPosition position);
+    float getElevation(Position position);
 
 }

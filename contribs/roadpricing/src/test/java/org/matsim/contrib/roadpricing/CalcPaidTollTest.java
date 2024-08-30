@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -58,6 +59,7 @@ public class CalcPaidTollTest {
 	@Test
 	void testDistanceToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing1.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -94,6 +96,7 @@ public class CalcPaidTollTest {
 	@Test
 	void testAreaToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing2.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -145,6 +148,7 @@ public class CalcPaidTollTest {
 	@Test
 	void testCordonToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing3.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);

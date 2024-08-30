@@ -1,13 +1,15 @@
 package org.matsim.contrib.drt.prebooking;
 
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -37,9 +39,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests;
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests;
 
-	private final IdMap<Request, Double> enterTimes = new IdMap<>(Request.class);
-	private final IdMap<Request, Double> leaveTimes = new IdMap<>(Request.class);
-	private final Set<Id<Request>> enteredRequests = new HashSet<>();
+	private final Queue<QueuedRequest> enterTimes = new PriorityQueue<>();
+	private final Queue<QueuedRequest> leaveTimes = new PriorityQueue<>();
+	
+	private final IdSet<Request> enteredRequests = new IdSet<>(Request.class);
+	
+	private final IdSet<Request> registeredPickups = new IdSet<>(Request.class);
+	private final IdMap<Request, AcceptedDrtRequest> expectedPickups = new IdMap<>(Request.class);
 
 	private final PrebookingManager prebookingManager;
 	private final PassengerHandler passengerHandler;
@@ -71,89 +77,125 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	@Override
 	protected boolean isLastStep(double now) {
 		boolean dropoffsReady = updateDropoffRequests(now);
-		boolean pickupsReady = updatePickupRequests(now);
+		boolean pickupsReady = updatePickupRequests(now, false);
 		return pickupsReady && dropoffsReady && now >= endTime.get();
 	}
 
 	@Override
 	protected void beforeFirstStep(double now) {
 		initDropoffRequests(now);
-		updatePickupRequests(now);
+		updatePickupRequests(now, true);
 	}
 
 	private void initDropoffRequests(double now) {
 		for (var request : dropoffRequests.values()) {
 			double leaveTime = now + stopDurationProvider.calcDropoffDuration(vehicle, request.getRequest());
-			leaveTimes.put(request.getId(), leaveTime);
+			leaveTimes.add(new QueuedRequest(request.getId(), leaveTime));
 		}
 
 		updateDropoffRequests(now);
 	}
 
 	private boolean updateDropoffRequests(double now) {
-		var iterator = leaveTimes.entrySet().iterator();
-
-		while (iterator.hasNext()) {
-			var entry = iterator.next();
-
-			if (entry.getValue() <= now) { // Request should leave now
-				passengerHandler.dropOffPassengers(driver, entry.getKey(), now);
-				prebookingManager.notifyDropoff(entry.getKey());
-				onboard -= dropoffRequests.get(entry.getKey()).getPassengerCount();
-				iterator.remove();
-			}
+		while (!leaveTimes.isEmpty() && leaveTimes.peek().time <= now) {
+			Id<Request> requestId = leaveTimes.poll().id;
+			passengerHandler.dropOffPassengers(driver, requestId, now);
+			prebookingManager.notifyDropoff(requestId);
+			onboard -= dropoffRequests.get(requestId).getPassengerCount();
 		}
 
-		return leaveTimes.size() == 0;
+		return leaveTimes.isEmpty();
 	}
 
-	private boolean updatePickupRequests(double now) {
-		var pickupIterator = pickupRequests.values().iterator();
+	private record QueuedRequest(Id<Request> id, double time) implements Comparable<QueuedRequest> {
+		@Override
+		public int compareTo(QueuedRequest o) {
+			return Double.compare(this.time, o.time);
+		}
+	}
 
-		while (pickupIterator.hasNext()) {
-			var request = pickupIterator.next();
+	private int cachedPickupRequestsHash = -1;
 
-			if (!enteredRequests.contains(request.getId()) && !enterTimes.containsKey(request.getId())) {
-				// this is a new request that has been added after the activity has been created
-				// or that had not arrived yet
-
-				if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
-					// agent starts to enter
-					queuePickup(request, now);
-				} else if (now > request.getEarliestStartTime()) {
-					if (abandonVoter.abandonRequest(now, vehicle, request)) {
-						prebookingManager.abandon(request.getId());
-					}
+	private boolean updatePickupRequests(double now, boolean isFirstStep) {
+		int pickupRequestsHash = pickupRequests.hashCode();
+		
+		// part 1: check if the pickup list has been updated dynamically
+		
+		if (isFirstStep || pickupRequestsHash != cachedPickupRequestsHash) {
+			cachedPickupRequestsHash = pickupRequestsHash;
+			
+			// added requests
+			for (AcceptedDrtRequest request : pickupRequests.values()) {
+				if (!registeredPickups.contains(request.getId())) {
+					// in the first step, this is a standard pickup request, later this is a request that has been added after the activity has been created
+					expectedPickups.put(request.getId(), request);
+					registeredPickups.add(request.getId());
+				}
+			}
+			
+			// removed requests (for instance via cancellation)
+			var expectedIterator = expectedPickups.iterator();
+			while (expectedIterator.hasNext()) {
+				if (!pickupRequests.containsKey(expectedIterator.next().getId())) {
+					// a request has been removed from the list of expected pickups
+					expectedIterator.remove();
 				}
 			}
 		}
+		
+		// part 2: handle the requests that we expect but which have not arrived yet
+		
+		var expectedIterator = expectedPickups.values().iterator();
+		while (expectedIterator.hasNext()) {
+			AcceptedDrtRequest request = expectedIterator.next();
+			
+			if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
+				// agent starts to enter
+				queuePickup(request, now);
+				expectedIterator.remove();
+			} else if (now > request.getEarliestStartTime() && !isFirstStep) {
+				if (abandonVoter.abandonRequest(now, vehicle, request)) {
+					// abandon the request, but not in the first time step for the sake of event timing
+					prebookingManager.abandon(request.getId());
+					expectedIterator.remove();
+				}
+			} 
+		}
+		
+		// part 3: handle the requests that are currently entering the vehicle
 
-		var enterIterator = enterTimes.entrySet().iterator();
+		var enterIterator = enterTimes.iterator();
+
+		// logic is as follows:
+		// - let people enter in the order at which they arrived + their interaction time
+		// - but in case there is no capacity (others still disembarking) they need to wait
 
 		while (enterIterator.hasNext()) {
-			if (onboard >= vehicle.getCapacity()) {
-				// only let people enter if there is currently free capacity
-				break;
-			}
-
 			var entry = enterIterator.next();
+			int availableCapacity = vehicle.getCapacity() - onboard;
 
-			if (entry.getValue() <= now) {
-				// let agent enter now
-				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
-				enteredRequests.add(entry.getKey());
-				onboard += pickupRequests.get(entry.getKey()).getPassengerCount();
-				enterIterator.remove();
+			if (entry.time <= now) {
+				int requiredCapacity = pickupRequests.get(entry.id).getPassengerCount();
+				
+				if (requiredCapacity <= availableCapacity) {
+					// let agent enter now
+					Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.id, now));
+					enteredRequests.add(entry.id);
+					onboard += requiredCapacity;
+					enterIterator.remove();
+				}
+			} else {
+				break;
 			}
 		}
 
-		return enterTimes.size() == 0 && pickupRequests.size() == enteredRequests.size();
+		return expectedPickups.size() == 0 && pickupRequests.size() == enteredRequests.size();
 	}
 
 	private void queuePickup(AcceptedDrtRequest request, double now) {
 		prebookingManager.notifyPickup(now, request);
 		double enterTime = now + stopDurationProvider.calcPickupDuration(vehicle, request.getRequest());
-		enterTimes.put(request.getId(), enterTime);
+		enterTimes.add(new QueuedRequest(request.getId(), enterTime));
 	}
 
 	@Override
@@ -165,6 +207,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
 		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
 		queuePickup(request, now);
+		expectedPickups.remove(request.getId());
 	}
 
 	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {

@@ -37,11 +37,15 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	private final OptionalTime departureOffset;
 	private final OptionalTime arrivalOffset;
 	private boolean awaitDepartureTime = false;
+	private boolean allowBoarding = true;
+	private boolean allowAlighting = true;
 
 	private TransitRouteStopImpl(Builder builder) {
-		stop = builder.stop;
-		departureOffset = builder.departureOffset;
-		arrivalOffset = builder.arrivalOffset;
+		this.stop = builder.stop;
+		this.departureOffset = builder.departureOffset;
+		this.arrivalOffset = builder.arrivalOffset;
+		this.allowBoarding = builder.allowBoarding;
+		this.allowAlighting = builder.allowAlighting;
 		setAwaitDepartureTime(builder.awaitDepartureTime);
 	}
 
@@ -66,6 +70,26 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	}
 
 	@Override
+	public boolean isAllowBoarding() {
+		return this.allowBoarding;
+	}
+
+	@Override
+	public void setAllowBoarding(boolean allowBoarding) {
+		this.allowBoarding = allowBoarding;
+	}
+
+	@Override
+	public boolean isAllowAlighting() {
+		return this.allowAlighting;
+	}
+
+	@Override
+	public void setAllowAlighting(boolean allowAlighting) {
+		this.allowAlighting = allowAlighting;
+	}
+
+	@Override
 	public boolean isAwaitDepartureTime() {
 		return this.awaitDepartureTime;
 	}
@@ -77,14 +101,13 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 
 	/**
 	 * TransitRouteStops are typical Value Objects, so we consider two stops equal if they are equal field-wise.
-	 * 
+	 *
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof TransitRouteStopImpl)) {
+		if (!(obj instanceof TransitRouteStopImpl other)) {
 			return false;
 		}
-		TransitRouteStopImpl other = (TransitRouteStopImpl) obj;
 		if (this.stop == null) {
 			if (other.getStopFacility() != null) {
 				return false;
@@ -96,8 +119,14 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		}
 		if (!this.departureOffset.equals(other.getDepartureOffset())) {
 			return false;
-		} 
+		}
 		if (!this.arrivalOffset.equals(other.getArrivalOffset())) {
+			return false;
+		}
+		if (this.allowBoarding != other.allowBoarding) {
+			return false;
+		}
+		if (this.allowAlighting != other.allowAlighting) {
 			return false;
 		}
 		if (this.awaitDepartureTime != other.isAwaitDepartureTime()) {
@@ -110,7 +139,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	public int hashCode() {
 		return stop.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[TransitRouteStop stop=" + this.stop.getId() + " offset=" + this.departureOffset +" ]";
@@ -120,6 +149,8 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		private TransitStopFacility stop;
 		private OptionalTime departureOffset = OptionalTime.undefined();
 		private OptionalTime arrivalOffset = OptionalTime.undefined();
+		private boolean allowBoarding = true;
+		private boolean allowAlighting = true;
 		private boolean awaitDepartureTime;
 
 		public Builder() {
@@ -154,6 +185,16 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 
 		public Builder arrivalOffset(OptionalTime val) {
 			arrivalOffset = val;
+			return this;
+		}
+
+		public Builder allowBoarding(boolean allowBoarding) {
+			this.allowBoarding = allowBoarding;
+			return this;
+		}
+
+		public Builder allowAlighting(boolean allowAlighting) {
+			this.allowAlighting = allowAlighting;
 			return this;
 		}
 

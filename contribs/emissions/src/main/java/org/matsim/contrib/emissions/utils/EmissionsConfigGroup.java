@@ -82,7 +82,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "file with HBEFA detailed cold emission factors";
 	private static final String HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL_CMT = "Define on which level the entries in the provided hbefa tables are checked for consistency" + "\n\t\t\t" +
 			HbefaTableConsistencyCheckingLevel.allCombinations.name() + " : check if entries for all combinations of HbefaTrafficSituation, HbefaVehicleCategory, HbefaVehicleAttributes, HbefaComponent. " +
-																"are available in the table. It only checks for paramters that are available in the table (e.g. if there is no HGV in the table, it can also pass. \n\t\t\t" +
+																"are available in the table. It only checks for parameters that are available in the table (e.g. if there is no HGV in the table, it can also pass. \n\t\t\t" +
 			HbefaTableConsistencyCheckingLevel.consistent.name() + " : check if the entries for the two HbefaTrafficSituations 'StopAndGo' and 'FreeFlow' (nov 2020, may be subject to change) are consistently available in the table. \n\t\t\t" + //TODO
 			HbefaTableConsistencyCheckingLevel.none.name() + " : There is no consistency check. This option is NOT recommended and only for backward capability to inputs from before spring 2020 . \n\t\t\t" +
 			"Default is " + HbefaTableConsistencyCheckingLevel.allCombinations.name();
@@ -172,7 +172,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	// ===============
 	// ===============
 	/**
-	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
+	 * @param detailedVsAverageLookupBehavior -- {@value  #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
 	 * @noinspection JavadocReference
 	 */
 	@StringSetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
@@ -187,7 +187,6 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	// ===============
 	/**
 	 * @param hbefaTableConsistencyCheckingLevel -- {@value #HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL}
-	 * @noinspection JavadocReference
 	 */
 	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
 	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
@@ -318,12 +317,8 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	protected final void checkConsistency(Config config){
 		switch( this.emissionsComputationMethod ){
-			case StopAndGoFraction -> log.info( "Please note that with setting of emissionsComputationMethod " + EmissionsComputationMethod.StopAndGoFraction + "" +
-									    " the emission factors for both freeFlow and StopAndGo fractions are looked up independently and are " +
-									    "therefore following the fallback behaviour set in " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR +
-									    " independently. --> Depending on the input, it may be that e.g. for ff the detailed value is taken, while for the stopAndGo part " +
-									    "a less detailed value is used, because the value with the same level of detail is missing." );
-			case AverageSpeed -> log.warn( "This setting of emissionsComputationMethod. " + EmissionsComputationMethod.AverageSpeed + " is not covered by many test cases." );
+			case StopAndGoFraction -> log.info("Please note that with setting of emissionsComputationMethod {} the emission factors for both freeFlow and StopAndGo fractions are looked up independently and are therefore following the fallback behaviour set in " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " independently. --> Depending on the input, it may be that e.g. for ff the detailed value is taken, while for the stopAndGo part a less detailed value is used, because the value with the same level of detail is missing.", EmissionsComputationMethod.StopAndGoFraction);
+			case AverageSpeed -> log.warn("This setting of emissionsComputationMethod. {} is not covered by many test cases.", EmissionsComputationMethod.AverageSpeed);
 			default -> throw new IllegalStateException( "Unexpected value: " + this.emissionsComputationMethod );
 		}
 	}

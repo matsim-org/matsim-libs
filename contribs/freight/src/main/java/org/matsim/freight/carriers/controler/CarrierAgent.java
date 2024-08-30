@@ -179,7 +179,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 		}
 		scoringFunction.finish();
 		final double score = scoringFunction.getScore();
-		log.warn("score=" + score);
+		log.debug("score of carrier {} = {}", carrier.getId(), score);
 		carrier.getSelectedPlan().setScore( score );
 	}
 	void handleEvent(Event event, Id<Person> driverId) {

@@ -14,7 +14,7 @@ import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
+import org.matsim.contrib.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
 
 import javax.annotation.Nullable;
 import java.net.URL;

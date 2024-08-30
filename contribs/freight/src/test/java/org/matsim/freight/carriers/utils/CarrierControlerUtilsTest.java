@@ -58,7 +58,6 @@ import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 
 public class CarrierControlerUtilsTest {
 
@@ -443,7 +442,7 @@ public class CarrierControlerUtilsTest {
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
 	@Test
-	void testRunJsprit_NoOfJspritIterationsMissing() throws ExecutionException, InterruptedException {
+	void testRunJsprit_NoOfJspritIterationsMissing() {
 		assertThrows(java.util.concurrent.ExecutionException.class, () -> {
 			Config config = prepareConfig();
 			config.controller().setOutputDirectory(utils.getOutputDirectory());

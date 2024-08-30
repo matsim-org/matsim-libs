@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -110,7 +111,7 @@ public class PtAlongALine2Test {
 		// === ROUTER: ===
 
 		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
@@ -229,11 +230,14 @@ public class PtAlongALine2Test {
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
-				drtConfigGroup.maxTravelTimeAlpha = 2.0;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
+				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
+				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -243,11 +247,14 @@ public class PtAlongALine2Test {
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
+				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
+				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -256,11 +263,14 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
-				drtConfigGroup.maxTravelTimeAlpha = 1.3;
-				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
+				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
-				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
-				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
+				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

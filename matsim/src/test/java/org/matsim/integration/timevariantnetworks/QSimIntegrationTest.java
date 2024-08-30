@@ -50,6 +50,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
@@ -82,6 +83,7 @@ public class QSimIntegrationTest {
 	@Test
 	void testFreespeed() {
 		Config config = utils.loadConfig((String)null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -132,6 +134,7 @@ public class QSimIntegrationTest {
 		final double capacityFactor = 0.5;
 
 		Config config = utils.loadConfig((String)null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -203,6 +206,7 @@ public class QSimIntegrationTest {
 		final double capacityFactor = 0.0;
 
 		Config config = utils.loadConfig((String)null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;

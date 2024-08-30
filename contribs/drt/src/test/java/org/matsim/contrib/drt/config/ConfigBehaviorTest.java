@@ -5,6 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -85,4 +88,85 @@ public class ConfigBehaviorTest{
         }
 
 
+    @Test
+    final void testMaterializeAfterReadDrtConstraints() {
+        {
+            Config config = ConfigUtils.createConfig();
+            MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+            config.addModule(multiModeDrtConfigGroup);
+
+            DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+            multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+
+            DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
+            DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet =
+                    (DefaultDrtOptimizationConstraintsSet) drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
+            optimizationConstraintsSet.maxTravelTimeAlpha = 2.;
+            optimizationConstraintsSet.maxTravelTimeBeta = 5. * 60;
+
+            ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config-default-optimization-constraints.xml");
+        }
+
+        {
+            Config config = ConfigUtils.loadConfig( new String[] { utils.getOutputDirectory() + "ad-hoc-config-default-optimization-constraints.xml"});
+
+            // materialize the config group
+            MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
+            DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+            // check if you are getting back the values from the config file:
+            DefaultDrtOptimizationConstraintsSet constraintsSet =
+                    (DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
+                            addOrGetDefaultDrtOptimizationConstraintsSet();
+            Assertions.assertEquals( 2., constraintsSet.maxTravelTimeAlpha, Double.MIN_VALUE );
+            Assertions.assertEquals( 300., constraintsSet.maxTravelTimeBeta, Double.MIN_VALUE );
+        }
+    }
+
+    @Test
+    final void testMaterializeAfterReadCustomDrtConstraints() {
+        {
+            // generate a test config that sets two values away from their defaults, and write it to file:
+            Config config = ConfigUtils.createConfig();
+            MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+            DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+            multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+            config.addModule(multiModeDrtConfigGroup);
+            DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
+
+            CustomConstraintsSet customConstraintsSet = new CustomConstraintsSet();
+            customConstraintsSet.customAlpha = 5;
+            customConstraintsSet.customBeta = 10;
+            drtOptimizationConstraintsParams.addParameterSet(customConstraintsSet);
+
+            //rtConfigGroup.addParameterSet(drtOptimizationConstraintsParams);
+            ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config-custom-optimization-constraints.xml");
+        }
+
+        {
+            // load config file without materializing the drt config group
+            MultiModeDrtConfigGroup multiModeDrtConfigGroup =
+                    new MultiModeDrtConfigGroup(() -> new DrtConfigGroup(CustomConstraintsSet::new));
+
+            Config config = ConfigUtils.loadConfig( new String[] { utils.getOutputDirectory() + "ad-hoc-config-custom-optimization-constraints.xml"}, multiModeDrtConfigGroup);
+
+            // materialize the config group
+            //MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
+            DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+            // check if you are getting back the values from the config file:
+            CustomConstraintsSet customConstraintsSet = (CustomConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets().getFirst();
+            Assertions.assertEquals( 5., customConstraintsSet.customAlpha, Double.MIN_VALUE );
+            Assertions.assertEquals( 10., customConstraintsSet.customBeta, Double.MIN_VALUE );
+        }
+    }
+
+
+    private static class CustomConstraintsSet extends DrtOptimizationConstraintsSet {
+        @Parameter
+        private double customAlpha = 0;
+        @Parameter
+        private double customBeta = 0;
+
+    }
 }

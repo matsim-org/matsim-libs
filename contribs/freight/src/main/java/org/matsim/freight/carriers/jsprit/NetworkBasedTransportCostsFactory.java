@@ -38,10 +38,10 @@ import java.util.Set;
  * @author steffenaxer
  */
 public class NetworkBasedTransportCostsFactory implements VRPTransportCostsFactory {
-    Scenario scenario;
-    Carriers carriers;
-    Map<String, TravelTime> travelTimes;
-    Config config;
+    final Scenario scenario;
+    final Carriers carriers;
+    final Map<String, TravelTime> travelTimes;
+    final Config config;
 
     public NetworkBasedTransportCostsFactory(Scenario scenario, Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
         this.scenario = scenario;

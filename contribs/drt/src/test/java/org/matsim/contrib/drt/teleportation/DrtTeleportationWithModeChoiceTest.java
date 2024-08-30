@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.DetourBasedDrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.EuclideanDistanceBasedDrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -72,8 +71,6 @@ public class DrtTeleportationWithModeChoiceTest {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
 			@Override
 			public void install() {
-//				bindModal(DrtEstimator.class).toInstance(DetourBasedDrtEstimator.normalDistributed(1.2, 32,
-//						0.3, 300, 0.4));
 				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new
 					EuclideanDistanceBasedDrtEstimator(getter.getModal(Network.class), 2.0, 0.1577493,
 					103.0972273, 120, 0.3, -0.1, 0.28)));

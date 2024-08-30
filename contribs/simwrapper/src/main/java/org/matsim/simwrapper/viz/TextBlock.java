@@ -10,8 +10,12 @@ public class TextBlock extends Viz {
 	/**
 	 * The filepath containing the data.
 	 */
-	@JsonProperty(required = true)
 	public String file;
+
+	/**
+	 * Content of the text block. Can be used instead of file to directly include content.
+	 */
+	public String content;
 
 	public TextBlock() {
 		super("text");

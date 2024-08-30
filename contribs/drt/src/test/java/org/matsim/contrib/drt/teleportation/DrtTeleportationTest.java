@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -45,9 +46,11 @@ class DrtTeleportationTest {
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfigGroup.maxTravelTimeAlpha = 1.2;
-		drtConfigGroup.maxTravelTimeBeta = 600;
-		drtConfigGroup.maxWaitTime = 300;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = (DefaultDrtOptimizationConstraintsSet) drtConfigGroup
+				.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxTravelTimeAlpha = 1.2;
+		defaultConstraintsSet.maxTravelTimeBeta = 600;
+		defaultConstraintsSet.maxWaitTime = 300;
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.baseFare = 1.0;
 		fareParams.distanceFare_m = 0.001;
@@ -75,12 +78,12 @@ class DrtTeleportationTest {
 
 			double waitAvg = Double.parseDouble(row.get("wait_average"));
 
-			assertThat(waitAvg).isEqualTo(drtConfigGroup.maxWaitTime);
+			assertThat(waitAvg).isEqualTo(defaultConstraintsSet.maxWaitTime);
 
 			double distMean = Double.parseDouble(row.get("distance_m_mean"));
 			double directDistMean = Double.parseDouble(row.get("directDistance_m_mean"));
 
-			assertThat(distMean / directDistMean).isCloseTo(drtConfigGroup.maxTravelTimeAlpha, Offset.offset(0.0001));
+			assertThat(distMean / directDistMean).isCloseTo(defaultConstraintsSet.maxTravelTimeAlpha, Offset.offset(0.0001));
 
 		}
 

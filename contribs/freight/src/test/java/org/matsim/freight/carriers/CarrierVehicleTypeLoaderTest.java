@@ -40,7 +40,7 @@ public class CarrierVehicleTypeLoaderTest {
 	private Carriers carriers;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 		types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory() + "vehicleTypes.xml");
 		carriers = new Carriers();
