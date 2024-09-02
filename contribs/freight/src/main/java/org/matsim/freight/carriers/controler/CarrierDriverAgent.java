@@ -97,6 +97,8 @@ final class CarrierDriverAgent{
 			case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
 			case ActivityEndEvent activityEndEvent -> handleEvent(activityEndEvent);
 			case ActivityStartEvent activityStartEvent -> handleEvent(activityStartEvent);
+			case PersonMoneyEvent personMoneyEvent -> handleEvent( personMoneyEvent );
+			case PersonScoreEvent personScoreEvent -> handleEvent( personScoreEvent );
 			case null, default -> createAdditionalEvents(event, null, scheduledTour, driverId, planElementCounter);
 		}
 	}
@@ -143,6 +145,22 @@ final class CarrierDriverAgent{
 		}
 		currentRoute.add( event.getLinkId() );
 		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
+	}
+
+	private void handleEvent( PersonScoreEvent event ){
+		if( scoringFunction != null ){
+			scoringFunction.handleEvent( event );
+		}
+//		currentRoute.add( event.getLinkId() );
+//		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
+	}
+
+	private void handleEvent( PersonMoneyEvent event ){
+		if( scoringFunction != null ){
+			scoringFunction.handleEvent( event );
+		}
+//		currentRoute.add( event.getLinkId() );
+//		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( ActivityEndEvent event ){
