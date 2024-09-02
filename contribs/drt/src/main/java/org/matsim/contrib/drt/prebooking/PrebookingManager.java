@@ -9,10 +9,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.unscheduler.RequestUnscheduler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -398,10 +395,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				if(abortRejectedPrebookings) {
 					for (Id<Person> passengerId : item.request.getPassengerIds()) {
 						MobsimAgent agent = internalInterface.getMobsim().getAgents().get(passengerId);
-						((Activity) WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.POSITIVE_INFINITY);
-						((Activity) WithinDayAgentUtils.getCurrentPlanElement(agent)).setMaximumDurationUndefined();
+						PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
+						if(planElement instanceof Activity activity) {
+							activity.setEndTime(Double.POSITIVE_INFINITY);
+							activity.setMaximumDurationUndefined();
+							internalInterface.getMobsim().rescheduleActivityEnd(agent);
+						}
 						((HasModifiablePlan) agent).resetCaches();
-						internalInterface.getMobsim().rescheduleActivityEnd(agent);
 						eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
 								this.mode));
 						internalInterface.getMobsim().getAgentCounter().incLost();
