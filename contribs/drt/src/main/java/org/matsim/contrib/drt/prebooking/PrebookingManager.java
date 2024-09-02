@@ -395,9 +395,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				if(abortRejectedPrebookings) {
 					for (Id<Person> passengerId : item.request.getPassengerIds()) {
 						MobsimAgent agent = internalInterface.getMobsim().getAgents().get(passengerId);
-						((HasModifiablePlan) agent).resetCaches();
-						agent.setStateToAbort(mobsimTimer.getTimeOfDay());
-						internalInterface.arrangeNextAgentState(agent);
+						PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
+						if(planElement instanceof Activity activity) {
+							activity.setEndTime(Double.POSITIVE_INFINITY);
+							activity.setMaximumDurationUndefined();
+							((HasModifiablePlan) agent).resetCaches();
+							internalInterface.getMobsim().rescheduleActivityEnd(agent);
+						}
 						eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
 								this.mode));
 						internalInterface.getMobsim().getAgentCounter().incLost();

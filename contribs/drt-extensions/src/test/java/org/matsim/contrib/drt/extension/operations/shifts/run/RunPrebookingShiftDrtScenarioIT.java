@@ -37,6 +37,8 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -71,10 +73,15 @@ public class RunPrebookingShiftDrtScenarioIT {
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
         final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
 
+        Multiset<Id<Person>> submittedPersons = HashMultiset.create();
+        Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
         Multiset<Id<Person>> rejectedPersons = HashMultiset.create();
+
         run.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                addEventHandlerBinding().toInstance((PassengerRequestSubmittedEventHandler) event -> submittedPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestScheduledEventHandler) event -> scheduledPersons.addAll(event.getPersonIds()));
                 addEventHandlerBinding().toInstance((PassengerRequestRejectedEventHandler) event -> rejectedPersons.addAll(event.getPersonIds()));
             }
         });
@@ -91,11 +98,25 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         run.run();
 
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1) ));
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
         Assertions.assertEquals(2, rejectedPersons.count(Id.createPersonId(6)));
     }
 
@@ -106,10 +127,15 @@ public class RunPrebookingShiftDrtScenarioIT {
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
         final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
 
+        Multiset<Id<Person>> submittedPersons = HashMultiset.create();
+        Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
         Multiset<Id<Person>> rejectedPersons = HashMultiset.create();
+
         run.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                addEventHandlerBinding().toInstance((PassengerRequestSubmittedEventHandler) event -> submittedPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestScheduledEventHandler) event -> scheduledPersons.addAll(event.getPersonIds()));
                 addEventHandlerBinding().toInstance((PassengerRequestRejectedEventHandler) event -> rejectedPersons.addAll(event.getPersonIds()));
             }
         });
@@ -126,11 +152,25 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         run.run();
 
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1) ));
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(6)));
     }
 
