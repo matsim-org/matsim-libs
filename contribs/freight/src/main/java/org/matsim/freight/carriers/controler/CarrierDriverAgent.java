@@ -97,6 +97,8 @@ final class CarrierDriverAgent{
 			case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
 			case ActivityEndEvent activityEndEvent -> handleEvent(activityEndEvent);
 			case ActivityStartEvent activityStartEvent -> handleEvent(activityStartEvent);
+			case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> handleEvent(vehicleEntersTrafficEvent);
+			case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> handleEvent(vehicleLeavesTrafficEvent);
 			case PersonMoneyEvent personMoneyEvent -> handleEvent( personMoneyEvent );
 			case PersonScoreEvent personScoreEvent -> handleEvent( personScoreEvent );
 			case null, default -> createAdditionalEvents(event, null, scheduledTour, driverId, planElementCounter);
@@ -151,16 +153,25 @@ final class CarrierDriverAgent{
 		if( scoringFunction != null ){
 			scoringFunction.handleEvent( event );
 		}
-//		currentRoute.add( event.getLinkId() );
-//		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( PersonMoneyEvent event ){
 		if( scoringFunction != null ){
 			scoringFunction.handleEvent( event );
 		}
-//		currentRoute.add( event.getLinkId() );
-//		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
+	}
+
+	private void handleEvent( VehicleEntersTrafficEvent event ){
+		if( scoringFunction != null ){
+			scoringFunction.handleEvent( event );
+		}
+		driver2EventHandler.handleAnEvent(event);
+	}
+
+	private void handleEvent( VehicleLeavesTrafficEvent event ){
+		if( scoringFunction != null ){
+			scoringFunction.handleEvent( event );
+		}
 	}
 
 	private void handleEvent( ActivityEndEvent event ){
@@ -214,7 +225,6 @@ final class CarrierDriverAgent{
 //		if( scoringFunction == null ){
 			// (means "called from LSP".  kai, jul'22)
 
-		driver2EventHandler.handleAnEvent(event);
 		Id<Vehicle> vehicleId = driver2EventHandler.getVehicleOfDriver(driverId);
 
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
@@ -290,9 +300,6 @@ final class CarrierDriverAgent{
 		}
 
 		public void handleAnEvent(Event event){
-			if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
-				driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
-			}
 			if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
 				driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
 			}
