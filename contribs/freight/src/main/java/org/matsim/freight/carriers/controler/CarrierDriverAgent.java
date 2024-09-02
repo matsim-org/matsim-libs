@@ -165,7 +165,9 @@ final class CarrierDriverAgent{
 		if( scoringFunction != null ){
 			scoringFunction.handleEvent( event );
 		}
-		driver2EventHandler.handleAnEvent(event);
+		if ((Event) event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
+			driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
+		}
 	}
 
 	private void handleEvent( VehicleLeavesTrafficEvent event ){
@@ -297,12 +299,6 @@ final class CarrierDriverAgent{
 		 */
 		public Id<Vehicle> getVehicleOfDriver(Id<Person> personId){
 			return driversVehicles.get(personId);
-		}
-
-		public void handleAnEvent(Event event){
-			if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
-				driver2EventHandler.handleEvent(vehicleEntersTrafficEvent);
-			}
 		}
 
 	}
