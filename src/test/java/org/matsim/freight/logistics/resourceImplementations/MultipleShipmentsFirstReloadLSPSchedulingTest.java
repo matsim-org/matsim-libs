@@ -256,7 +256,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LspShipment shipment = entry.getValue().lspShipment;
-			LogisticChainElement element = entry.getValue().element;
+			LogisticChainElement element = entry.getValue().logisticChainElement;
 			assertSame(service.getLocationLinkId(), shipment.getFrom());
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);

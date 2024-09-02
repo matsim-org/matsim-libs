@@ -433,7 +433,7 @@ public class CompleteLSPSchedulingTest {
 			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
 			LspShipment shipment = entry.getValue().lspShipment;
-			LogisticChainElement element = entry.getValue().element;
+			LogisticChainElement element = entry.getValue().logisticChainElement;
 			assertSame(service.getLocationLinkId(), shipment.getFrom());
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
@@ -460,7 +460,7 @@ public class CompleteLSPSchedulingTest {
 			Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
 			CarrierService service = entry.getKey();
 			LspShipment shipment = entry.getValue().lspShipment;
-			LogisticChainElement element = entry.getValue().element;
+			LogisticChainElement element = entry.getValue().logisticChainElement;
 			assertSame(service.getLocationLinkId(), toLinkId);
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
