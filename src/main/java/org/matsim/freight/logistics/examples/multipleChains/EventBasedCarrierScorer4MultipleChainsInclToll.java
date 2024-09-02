@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
@@ -37,8 +36,6 @@ import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
-import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
@@ -61,8 +58,6 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
     this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
-//    sf.addScoringFunction(new FindOtherEventsForDebuggingOnly_NO_Scoring());
-//    sf.addScoringFunction(new TollMoneyScoringForDebuggingOnly_NO_Scoring());
     return sf;
   }
 
@@ -117,8 +112,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
     private void handleEvent(CarrierTourEndEvent event) {
       v2c.handleEvent(event);
       // Fix costs for vehicle usage
-      final VehicleType vehicleType =
-              (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+      final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
       double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
@@ -163,75 +157,6 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         }
       }
     }
-
   }
-
-/**
- * Versuche nur mit dem Debugger die PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
- */
-private class FindOtherEventsForDebuggingOnly_NO_Scoring implements ArbitraryEventScoring {
-
-  final Logger log = LogManager.getLogger(FindOtherEventsForDebuggingOnly_NO_Scoring.class);
-
-
-  public FindOtherEventsForDebuggingOnly_NO_Scoring() {
-    super();
-  }
-
-  @Override
-  public void finish() {}
-
-  @Override
-  public double getScore() {
-    return Double.MIN_VALUE;
-  }
-
-  @Override
-  public void handleEvent(Event event) {
-    log.debug(event.toString());
-
-    switch (event) {
-      case CarrierTourStartEvent carrierTourStartEvent -> {}
-//        case CarrierTourEndEvent carrierTourEndEvent -> {}
-      case CarrierServiceStartEvent carrierServiceStartEvent -> {}
-      case CarrierServiceEndEvent carrierServiceEndEvent -> {}
-      case LinkEnterEvent linkEnterEvent ->{}
-      case LinkLeaveEvent linkLeaveEvent ->{}
-//        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
-      default -> {handleOtherEvent(event);}
-    }
-  }
-
-  private void handleOtherEvent(Event event) {
-    log.info("Found another event: {}", event.toString());
-  }
-
-}
-
-
-/**
- * Versuche nur mit dem Debugger die Einträge aus den PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
- */
-private static class TollMoneyScoringForDebuggingOnly_NO_Scoring implements SumScoringFunction.MoneyScoring, PersonMoneyEventHandler {
-
-  private double score = 0.0;
-  @Override
-  public void addMoney(double amount) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void finish() {    }
-
-  @Override
-  public double getScore() {
-    return this.score;
-  }
-
-  @Override
-  public void handleEvent(PersonMoneyEvent event) {
-    // Todo: implement
-  }
-}
 
 }
