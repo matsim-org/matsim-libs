@@ -43,6 +43,7 @@ import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
 import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -60,8 +61,8 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
     this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
-    sf.addScoringFunction(new FindOtherEventsForDebuggingOnly_NO_Scoring());
-    sf.addScoringFunction(new TollMoneyScoringForDebuggingOnly_NO_Scoring());
+//    sf.addScoringFunction(new FindOtherEventsForDebuggingOnly_NO_Scoring());
+//    sf.addScoringFunction(new TollMoneyScoringForDebuggingOnly_NO_Scoring());
     return sf;
   }
 
@@ -147,85 +148,90 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
       double tollValue = 0;
 
       if (event.getPurpose().equals("toll")) {
-        if (carrierId.equals(v2c.getCarrierOfVehicle(d2v.getVehicleOfDriver(event.getPersonId())))) {
+        Id<Vehicle> vehicleId = d2v.getVehicleOfDriver(event.getPersonId());
+        if (vehicleId != null) {
+          Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
+          if (carrierId.equals(carrierIdOfVehicle)) {
 //           toll a person only once.
-          if (!tolledPersons.contains(event.getPersonId())) {
-            log.info("Tolling caused by event: {}", event);
-            tolledPersons.add(event.getPersonId());
-            tollValue = event.getAmount();
+            if (!tolledPersons.contains(event.getPersonId())) {
+              log.info("Tolling caused by event: {}", event);
+              tolledPersons.add(event.getPersonId());
+              tollValue = event.getAmount();
+            }
           }
+          score = score - tollValue;
         }
       }
-      score = score - tollValue;
     }
+
   }
 
-  /**
-   * Versuche nur mit dem Debugger die PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
-   */
-  private class FindOtherEventsForDebuggingOnly_NO_Scoring implements ArbitraryEventScoring {
+/**
+ * Versuche nur mit dem Debugger die PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
+ */
+private class FindOtherEventsForDebuggingOnly_NO_Scoring implements ArbitraryEventScoring {
 
-    final Logger log = LogManager.getLogger(FindOtherEventsForDebuggingOnly_NO_Scoring.class);
+  final Logger log = LogManager.getLogger(FindOtherEventsForDebuggingOnly_NO_Scoring.class);
 
 
-    public FindOtherEventsForDebuggingOnly_NO_Scoring() {
-      super();
-    }
+  public FindOtherEventsForDebuggingOnly_NO_Scoring() {
+    super();
+  }
 
-    @Override
-    public void finish() {}
+  @Override
+  public void finish() {}
 
-    @Override
-    public double getScore() {
-      return Double.MIN_VALUE;
-    }
+  @Override
+  public double getScore() {
+    return Double.MIN_VALUE;
+  }
 
-    @Override
-    public void handleEvent(Event event) {
-      log.debug(event.toString());
+  @Override
+  public void handleEvent(Event event) {
+    log.debug(event.toString());
 
-      switch (event) {
-        case CarrierTourStartEvent carrierTourStartEvent -> {}
+    switch (event) {
+      case CarrierTourStartEvent carrierTourStartEvent -> {}
 //        case CarrierTourEndEvent carrierTourEndEvent -> {}
-        case CarrierServiceStartEvent carrierServiceStartEvent -> {}
-        case CarrierServiceEndEvent carrierServiceEndEvent -> {}
-        case LinkEnterEvent linkEnterEvent ->{}
-        case LinkLeaveEvent linkLeaveEvent ->{}
+      case CarrierServiceStartEvent carrierServiceStartEvent -> {}
+      case CarrierServiceEndEvent carrierServiceEndEvent -> {}
+      case LinkEnterEvent linkEnterEvent ->{}
+      case LinkLeaveEvent linkLeaveEvent ->{}
 //        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
-        default -> {handleOtherEvent(event);}
-      }
+      default -> {handleOtherEvent(event);}
     }
-
-    private void handleOtherEvent(Event event) {
-      log.info("Found another event: {}", event.toString());
-    }
-
   }
 
+  private void handleOtherEvent(Event event) {
+    log.info("Found another event: {}", event.toString());
+  }
 
-  /**
-   * Versuche nur mit dem Debugger die Einträge aus den PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
-   */
-  private static class TollMoneyScoringForDebuggingOnly_NO_Scoring implements SumScoringFunction.MoneyScoring, PersonMoneyEventHandler {
+}
 
-    private double score = 0.0;
-    @Override
-    public void addMoney(double amount) {
-        // TODO Auto-generated method stub
-    }
 
-    @Override
-    public void finish() {    }
+/**
+ * Versuche nur mit dem Debugger die Einträge aus den PersonMoneyEvents zu entdecken, die eigentlich da sein sollten.
+ */
+private static class TollMoneyScoringForDebuggingOnly_NO_Scoring implements SumScoringFunction.MoneyScoring, PersonMoneyEventHandler {
 
-    @Override
-    public double getScore() {
-      return this.score;
-    }
+  private double score = 0.0;
+  @Override
+  public void addMoney(double amount) {
+    // TODO Auto-generated method stub
+  }
 
-    @Override
-    public void handleEvent(PersonMoneyEvent event) {
+  @Override
+  public void finish() {    }
+
+  @Override
+  public double getScore() {
+    return this.score;
+  }
+
+  @Override
+  public void handleEvent(PersonMoneyEvent event) {
     // Todo: implement
-    }
   }
+}
 
 }
