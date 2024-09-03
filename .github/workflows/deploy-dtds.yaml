@@ -1,0 +1,24 @@
+name: deploy-dtds-on-website
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - matsim/src/main/resources/dtd
+
+jobs:
+  rsync-dtds:
+    name: sync DTDs to website
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: rsync dtds
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avz
+          path: matsim/src/main/resources/dtd/
+          remote_path: ~/httpdocs/files/dtd/
+          remote_host: ${{ secrets.WEBSITE_DEPLOY_HOST }}
+          remote_user: ${{ secrets.WEBSITE_DEPLOY_USER }}
+          remote_key: ${{ secrets.WEBSITE_SSH_PRIVATE_KEY }}
