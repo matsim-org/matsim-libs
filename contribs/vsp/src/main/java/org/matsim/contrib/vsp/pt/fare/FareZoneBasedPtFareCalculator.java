@@ -1,5 +1,6 @@
 package org.matsim.contrib.vsp.pt.fare;
 
+import com.google.common.base.Verify;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
@@ -42,6 +43,8 @@ public class FareZoneBasedPtFareCalculator implements PtFareCalculator {
 		}
 
 		Double fare = (Double) departureZone.get().getAttribute(FARE);
+		Verify.verifyNotNull(fare, "Fare zone without attribute " + FARE + " in " + shp.getShapeFile() +
+			" found. Terminating.");
 		return Optional.of(new FareResult(fare, transactionPartner));
 	}
 
