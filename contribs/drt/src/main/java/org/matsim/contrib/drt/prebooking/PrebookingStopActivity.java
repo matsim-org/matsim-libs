@@ -206,8 +206,10 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	@Override
 	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
 		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
-		queuePickup(request, now);
-		expectedPickups.remove(request.getId());
+		if(expectedPickups.containsKey(request.getId())) {
+			queuePickup(request, now);
+			expectedPickups.remove(request.getId());
+		}
 	}
 
 	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
