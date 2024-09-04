@@ -90,7 +90,7 @@ import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommerc
  *
  * @author Ricardo Ewert
  */
-//TODO check if service duration is larger than tour duration
+//TODO check if service duration is larger than tour duration -> (tried, untested)
 //TODO make vehicle selection (see method createCarriers()) configurable in separate class (use interface) -> (done, untested)
 //TODO move generationRates in class TrafficVolumeGeneration in separate class in package data (similar to GetCommercialTourSpecifications) -> (done, untested)
 @CommandLine.Command(name = "generate-small-scale-commercial-traffic", description = "Generates plans for a small scale commercial traffic model", showDefaultValues = true)
