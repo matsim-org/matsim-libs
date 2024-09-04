@@ -55,7 +55,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	private Collection<String> cachedModes = new HashSet<>();
 	@Positive
-	private int writeUtilitiesInterval = 0;
+	private int writeUtilitiesInterval = 1;
 	public static final String GROUP_NAME = "DiscreteModeChoice";
 
 	public static final String PERFORM_REROUTE = "performReroute";
