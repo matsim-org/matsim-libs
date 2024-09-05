@@ -77,7 +77,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			TravelTime travelTime, TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory,
 			EventsManager eventsManager, Fleet fleet, ScheduleTimingUpdater scheduleTimingUpdater) {
 		Preconditions.checkArgument(
-				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
+				fleet.getVehicles().keySet().containsAll(preplannedSchedules.vehicleToPreplannedStops.keySet()),
 				"Some schedules are preplanned for vehicles outside the fleet");
 
 		this.mode = drtCfg.getMode();
