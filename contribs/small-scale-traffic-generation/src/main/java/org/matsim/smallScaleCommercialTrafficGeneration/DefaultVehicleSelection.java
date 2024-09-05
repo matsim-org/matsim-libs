@@ -34,7 +34,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 	private final static Random rnd = MatsimRandom.getRandom();
 
 	//Needed for this computation
-	Map<Id<Carrier>, DefaultVehicleAvailabilityAllocator> carrierId2vehicleAvailabilityScheduler;
+	Map<Id<Carrier>, DefaultVehicleAvailabilityAllocator> carrierId2vehicleAvailabilityScheduler = new HashMap<>();
 	GetCommercialTourSpecifications getCommercialTourSpecifications;
 	Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone;
 	TripDistributionMatrix odMatrix;
@@ -75,8 +75,6 @@ public class DefaultVehicleSelection implements VehicleSelection{
 		this.odMatrix = odMatrix;
 		this.resultingDataPerZone = resultingDataPerZone;
 		this.linksPerZone = linksPerZone;
-
-		//TODO configuration with both smallScaleCommercialTrafficType
 
 		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
 			* odMatrix.getListOfModesOrVehTypes().size();
