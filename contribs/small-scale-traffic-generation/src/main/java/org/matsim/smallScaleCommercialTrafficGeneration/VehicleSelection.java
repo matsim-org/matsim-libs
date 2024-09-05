@@ -24,6 +24,7 @@ public interface VehicleSelection{
 	void createCarriers(Scenario scenario,
 						GetCommercialTourSpecifications getCommercialTourSpecifications,
 						Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
+						int jspritIterations,
 						TripDistributionMatrix odMatrix,
 						String smallScaleCommercialTrafficType,
 						Map<String, Object2DoubleMap<String>> resultingDataPerZone,

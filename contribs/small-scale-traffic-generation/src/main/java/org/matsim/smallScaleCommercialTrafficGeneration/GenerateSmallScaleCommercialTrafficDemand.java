@@ -179,7 +179,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
 		this.getCommercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 		log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
-		this.vehicleSelection = new DefaultVehicleSelection(jspritIterations);
+		this.vehicleSelection = new DefaultVehicleSelection();
 		log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 	}
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial, GetCommercialTourSpecifications getCommercialTourSpecifications, VehicleSelection vehicleSelection) {
@@ -198,7 +198,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			log.info("Using {} for tour specifications!", getCommercialTourSpecifications.getClass().getSimpleName());
 		}
 		if(vehicleSelection == null){
-			this.vehicleSelection = new DefaultVehicleSelection(jspritIterations);
+			this.vehicleSelection = new DefaultVehicleSelection();
 			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 		} else {
 			this.vehicleSelection = vehicleSelection;
@@ -492,6 +492,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			scenario,
 			getCommercialTourSpecifications,
 			facilitiesPerZone,
+			jspritIterations,
 			odMatrix,
 			smallScaleCommercialTrafficType,
 			resultingDataPerZone,

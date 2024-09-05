@@ -28,7 +28,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 
 	//Configurations
-	private final int jspritIterations;
+	private int jspritIterations = 0;
 
 	//Needed for all computations (static)
 	private final static Random rnd = MatsimRandom.getRandom();
@@ -42,19 +42,12 @@ public class DefaultVehicleSelection implements VehicleSelection{
 	Map<String, Map<Id<Link>, Link>> linksPerZone;
 
 	/**
-	 * Prepares the Vehicle Selection.
-	 * @param jspritIterations Configuration: Number of jsprit iterations (Given in {@link GenerateSmallScaleCommercialTrafficDemand})
-	 */
-	DefaultVehicleSelection(int jspritIterations) {
-		this.jspritIterations = jspritIterations;
-	}
-
-	/**
 	 * Creates the carriers and the related demand, based on the generated
 	 * TripDistributionMatrix.
 	 * @param scenario Scenario (loaded from your config), where the carriers will be put into
 	 * @param getCommercialTourSpecifications
 	 * @param facilitiesPerZone
+	 * @param jspritIterations
 	 * @param odMatrix Can be generated in {@link GenerateSmallScaleCommercialTrafficDemand}
 	 * @param smallScaleCommercialTrafficType Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
 	 * @param resultingDataPerZone Data distribution to zones (Given in {@link GenerateSmallScaleCommercialTrafficDemand}
@@ -64,6 +57,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 	public void createCarriers(Scenario scenario,
 							   GetCommercialTourSpecifications getCommercialTourSpecifications,
 							   Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
+							   int jspritIterations,
 							   TripDistributionMatrix odMatrix,
 							   String smallScaleCommercialTrafficType,
 							   Map<String, Object2DoubleMap<String>> resultingDataPerZone,
@@ -72,6 +66,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 		RandomGenerator rng = new MersenneTwister(scenario.getConfig().global().getRandomSeed());
 		this.getCommercialTourSpecifications = getCommercialTourSpecifications;
 		this.facilitiesPerZone = facilitiesPerZone;
+		this.jspritIterations = jspritIterations;
 		this.odMatrix = odMatrix;
 		this.resultingDataPerZone = resultingDataPerZone;
 		this.linksPerZone = linksPerZone;
