@@ -21,6 +21,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -100,7 +101,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	private static final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet(); // now delete irrelevant persons
 	private static final EventsManager manager = EventsUtils.createEventsManager();
 	private static final Map<Tuple<Id<Link>, Id<Vehicle>>, Double> linkIdVehicleId2enterTime = new HashMap<>();
-	private static final Map<Id<Link>, List<Tuple<Double, Double>>> linkId2travelTimesAtTime = new HashMap<>();
+	private static final Map<Id<Link>, List<Tuple<Double, Double>>> linkId2freespeedAtTime = new HashMap<>();
 	private static Population population;
 	private static Network network;
 	private static Geometry geom;
@@ -162,9 +163,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 			return 2;
 		}
 
+		//We need to make sure, that the network is a TimeVariantNetwork
+		NetworkConfigGroup ncg = new NetworkConfigGroup();
+		ncg.setTimeVariantNetwork(true);
+
 		// Prepare required input-data
         population = PopulationUtils.readPopulation(input.toString());
-		network = NetworkUtils.readNetwork(networkPath.toString());
+		network = NetworkUtils.readNetwork(networkPath.toString(), ncg);
 		geom = shp.getGeometry().buffer(buffer);
 		for(String mode : modes) mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(network, mode));
 		// Prepare optional input-data
@@ -196,13 +201,14 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
         }
 
 		// TODO: consider facilities, (see FilterRelevantAgents in OpenBerlin) -> (done, untested)
-		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested)
-		// TODO: Add optionality of events-file -> (done, untested)
-		// TODO: Output network change events should only be calculated when events are provided
-		// TODO: consider all network modes for routing, currently only car is considered -> (done, untested)
+		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> Check why eventsfile does not generate a complete ChangeEventsFile
 
 		//Cut out the population and mark needed network parts
-        ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
+        //ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
+		//TODO use multithreading
+		for(Person p : population.getPersons().values()){
+			run(p);
+		}
 
 		//Population
         log.info("Persons to delete: {}", personsToDelete.size());
@@ -334,7 +340,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	 * @return Sorted list with tuples (linkId, freespeed), containing the given links. Order is copied from route
 	 */
 	private List<Tuple<Id<Link>, Double>> computeApproximatedLinkFreespeedForLinks(NetworkRoute route){
-		// TODO fix method, return values are wrong
 		double theoreticalTT = 0;
 		List<Tuple<Id<Link>, Double>> freespeeds = new LinkedList<>();
 		//Compute the theoretical Travel Time if there would be no congestion
@@ -342,26 +347,23 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		//Now apply the actual travel time to the links by altering the freespeeds
 		for(Id<Link> linkId : route.getLinkIds()){
 			Link link = network.getLinks().get(linkId);
-			double actualTT = (link.getLength()/link.getFreespeed()) * (route.getTravelTime().seconds()/theoreticalTT);
-			freespeeds.add(new Tuple<>(link.getId(), link.getLength()/actualTT));
+			freespeeds.add(new Tuple<>(link.getId(), link.getFreespeed()/(route.getTravelTime().seconds()/theoreticalTT))); //-> speed/diff_factor
 		}
 		return freespeeds;
 	}
 
 	/**
 	 * Computes the average speed of a link for the given timeframe using the events file.
-	 * <i>NOTE: Do not make the time frames too small. If no linkEnter/Leave Events are found during a time period, the methods uses
-	 * a single reference value, which is not optimal.</i>
 	 * @param linkId link-id to compute the avereage freespeed for
 	 * @param fromTimeToTime Tuple (start, end) of representing the time interval
 	 * @return computed average freespeed, -1 if link has no attached information
 	 */
 	private double computeAverageLinkFreespeedDuringTimeFrame(Id<Link> linkId, Tuple<Double, Double> fromTimeToTime){
-		if(!linkId2travelTimesAtTime.containsKey(linkId)) return -1;
+		if(!linkId2freespeedAtTime.containsKey(linkId)) return -1;
 
 		double sum = 0;
 		int found = 0;
-		for(Tuple<Double, Double> e : linkId2travelTimesAtTime.get(linkId)){
+		for(Tuple<Double, Double> e : linkId2freespeedAtTime.get(linkId)){
 			if(e.getSecond() >= fromTimeToTime.getFirst() && e.getSecond() <= fromTimeToTime.getSecond()) {
 				//Vehicle left this link during the timeframe
 				sum += e.getFirst();
@@ -369,11 +371,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 			}
 		}
 		if(found == 0){
-			log.warn("No travel time for link {} during time window {}, {}. This may be caused by too small timeframes!", linkId, fromTimeToTime.getFirst(), fromTimeToTime.getSecond());
-
-			for(Tuple<Double, Double> e : linkId2travelTimesAtTime.get(linkId)) if(e.getSecond() >= fromTimeToTime.getFirst()) return network.getLinks().get(linkId).getLength()/e.getFirst();
+			//log.warn("No travel time for link {} during time window {}, {}. This may be caused by too small timeframes!", linkId, fromTimeToTime.getFirst(), fromTimeToTime.getSecond());
+			//for(Tuple<Double, Double> e : ParallelVariables.linkId2freespeedAtTime().get(linkId)) if(e.getSecond() >= fromTimeToTime.getFirst()) return network.getLinks().get(linkId).getLength()/e.getFirst();
+			return -1;
 		}
-		return network.getLinks().get(linkId).getLength()/(sum/found);
+		return (sum/found);
 	}
 
 	/**
@@ -384,35 +386,37 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	 */
 	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength){
 		List<NetworkChangeEvent> events = new LinkedList<>();
-		// Setting capacity outside of shapefile (and buffer) to infinite
-		for(Id<Link> linkId : linksToDelete){
-			if(linksToInclude.contains(linkId)){
-				NetworkChangeEvent event = new NetworkChangeEvent(0);
-				event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(
-					NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
-					Double.MAX_VALUE));
-				NetworkUtils.addNetworkChangeEvent(network, event);
-				events.add(event);
-			}
+		// Setting capacity outside shapefile (and buffer) to infinite
+		{
+			NetworkChangeEvent event = new NetworkChangeEvent(0);
+			event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(
+				NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
+				Double.MAX_VALUE));
+			for (Id<Link> linkId : linksToDelete) if(linksToInclude.contains(linkId)) event.addLink(network.getLinks().get(linkId));
+			NetworkUtils.addNetworkChangeEvent(network, event);
+			events.add(event);
 		}
+
+		//Setting freespeed to the link average
 		for(double time = 0; time < 129600; time+=timeFrameLength){
 			//Do this for the whole 36-hour simulation run
 			for(Link link : network.getLinks().values()){
 				double avgFreespeed = computeAverageLinkFreespeedDuringTimeFrame(link.getId(), new Tuple<>(time, time+timeFrameLength));
-				if(avgFreespeed == -1) return events; //Return empty list as indicator, that no events have been generated
+				if(avgFreespeed == -1) continue; //No freespeed-information available, skip this iteration
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(
 					NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
 					avgFreespeed));
 				NetworkUtils.addNetworkChangeEvent(network, event);
+				event.addLink(link);
 				events.add(event);
 			}
 		}
 		return events;
 	}
 
+	// TODO Make that this method thread safe
 	// Parallelized Implementation of PersonAlgorithm for cutout
-
 	@Override
 	public void run(Person person) {
 		boolean keepPerson = false;
@@ -446,31 +450,29 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 				keepPerson = true;
 			}
 
-			// TODO: only route if there is no route -> (done, untested)
-			// TODO: create network routes for all network modes -> (done, untested)
-
 			//Save route links
 			for (Leg leg : trip.getLegsOnly()) {
 				Route route = leg.getRoute();
-				if (route instanceof NetworkRoute && !((NetworkRoute) route).getLinkIds().isEmpty()) { // TODO Check how this behaves for pt/teleport routes
+				if (route instanceof NetworkRoute && !((NetworkRoute) route).getLinkIds().isEmpty()) {
 					// We have a NetworkRoute, thus we can just use it
 					linkIds.addAll(((NetworkRoute) route).getLinkIds());
 					if (((NetworkRoute) route).getLinkIds().stream().anyMatch(linksToKeep::contains)) {
 						keepPerson = true;
 					}
+
 					//If we are working without an events-file we need to save the travel time via route information
 					if(!useEvents){
 						List<Tuple<Id<Link>, Double>> linkId2freespeeds = computeApproximatedLinkFreespeedForLinks(((NetworkRoute) route));
-						double currentTime = linkId2freespeeds.getFirst().getSecond();
+						double currentTime = leg.getDepartureTime().seconds();
 						for(Tuple<Id<Link>, Double> e : linkId2freespeeds){
-							linkId2travelTimesAtTime.putIfAbsent(e.getFirst(), new LinkedList<>());
-							linkId2travelTimesAtTime.get(e.getFirst()).add(new Tuple<>(e.getSecond(), currentTime+e.getSecond()));
-							currentTime += e.getSecond();
+							linkId2freespeedAtTime.putIfAbsent(e.getFirst(), new LinkedList<>());
+							currentTime += network.getLinks().get(e.getFirst()).getLength()/e.getSecond(); // length/speed=time
+							linkId2freespeedAtTime.get(e.getFirst()).add(new Tuple<>(e.getSecond(), currentTime));
 						}
 					}
 				} else {
 					//No NetworkRoute is given. We need to route by ourselves using Shortest-Path.
-					//Search/Generate the route for every mode which is not included in the selected plan
+					//Search/Generate the route for every mode
 					for(String mode : modes){
 						LeastCostPathCalculator.Path path = getModeNetworkPath(mode2modeOnlyNetwork.get(mode), mode, trip);
 						if (path != null) {
@@ -518,8 +520,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 	public void handleEvent(LinkLeaveEvent event) {
 		assert linkIdVehicleId2enterTime.containsKey(new Tuple<>(event.getLinkId(), event.getVehicleId())); //If this fails, the events file may be corrupted
 		double travelTime = event.getTime() - linkIdVehicleId2enterTime.get(new Tuple<>(event.getLinkId(), event.getVehicleId()));
+		double linkLength = network.getLinks().get(event.getLinkId()).getLength();
 		linkIdVehicleId2enterTime.remove(new Tuple<>(event.getLinkId(), event.getVehicleId()));
-		linkId2travelTimesAtTime.putIfAbsent(event.getLinkId(), new LinkedList<>());
-		linkId2travelTimesAtTime.get(event.getLinkId()).add(new Tuple<>(travelTime, event.getTime()));
+		linkId2freespeedAtTime.putIfAbsent(event.getLinkId(), new LinkedList<>());
+		linkId2freespeedAtTime.get(event.getLinkId()).add(new Tuple<>(linkLength/travelTime, event.getTime()));
 	}
 }
