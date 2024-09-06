@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -230,6 +231,7 @@ public class FlowStorageSpillbackTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 
 		Config config = testUtils.loadConfig((String) null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 
 		Network network = (Network) scenario.getNetwork();

@@ -93,6 +93,7 @@ public class NoiseIT {
 
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities);
 
 		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , new AbstractModule(){
 			@Override public void install(){
@@ -197,6 +198,7 @@ public class NoiseIT {
 
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities);
 
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
@@ -984,6 +986,7 @@ public class NoiseIT {
 
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities);
 
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseConfigGroup.NoiseAllocationApproach.MarginalCost);
@@ -1073,6 +1076,7 @@ public class NoiseIT {
 
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities);
 
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);

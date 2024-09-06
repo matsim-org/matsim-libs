@@ -8,8 +8,10 @@
  */
 package org.matsim.contrib.drt.extension.operations.shifts.config;
 
+import com.google.common.base.Verify;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
 import java.net.URL;
@@ -60,7 +62,7 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 	@Parameter
 	@Comment("defines the battery state of charge threshold at which vehicles will start charging" +
 			" at hubs when not in an active shift. values between [0,1)")
-	public double chargeAtHubThreshold = 0.5;
+	public double chargeAtHubThreshold = 0.6;
 
 	@Parameter
 	@Comment("defines the battery state of charge threshold at which vehicles will start charging" +
@@ -97,11 +99,19 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 			"In this case, make sure that 'shiftScheduleLookAhead' is larger than the prebboking slack.")
 	public boolean considerUpcomingShiftsForInsertion = false;
 
-    public ShiftsParams() {
+	public ShiftsParams() {
 		super(SET_NAME);
 	}
 
 	public URL getShiftInputUrl(URL context) {
 		return shiftInputFile == null ? null : ConfigGroup.getInputFileURL(context, shiftInputFile);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		Verify.verify(chargeAtHubThreshold >= shiftAssignmentBatteryThreshold,
+				"chargeAtHubThreshold must be higher than shiftAssignmentBatteryThreshold to " +
+						"avoid deadlocks with undercharged vehicles in hubs.");
 	}
 }

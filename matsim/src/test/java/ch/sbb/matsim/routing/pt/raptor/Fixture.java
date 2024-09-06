@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -100,6 +101,7 @@ import org.matsim.vehicles.VehiclesFactory;
 	public Fixture() {
 		this.config = ConfigUtils.createConfig();
 		this.config.transit().setUseTransit(true);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		ScenarioBuilder scBuilder = new ScenarioBuilder(config) ;
 		this.scenario = (MutableScenario) scBuilder.build() ;

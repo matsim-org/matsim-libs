@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.PrepareForSimUtils;
@@ -222,7 +223,9 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Scenario scenario;
 
 		public Fixture() {
-			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			Config config = ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			this.scenario = ScenarioUtils.createScenario(config);
 
 			Id<Node>[] nodeIds = new Id[5];
 			for (int i = 0; i < nodeIds.length; i++) {

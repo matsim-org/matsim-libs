@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -77,6 +78,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		String outputDirectory = testUtils.getOutputDirectory() + "output_TTviaMobsimAfterSimStepListener/";
 
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);
