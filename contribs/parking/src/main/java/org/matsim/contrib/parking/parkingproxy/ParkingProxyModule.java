@@ -92,7 +92,9 @@ public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModul
 		if (parkingConfig.getObserveOnly()) {
 			super.addControlerListenerBinding().toInstance(walkObserver);
 		} else {
-			super.addControlerListenerBinding().toInstance(new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method()));
+			CarEgressWalkChanger walkChanger = new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method());
+			super.addControlerListenerBinding().toInstance(walkChanger);
+			super.addControlerListenerBinding().toInstance(walkChanger.getBackChanger());
 		}
 	}
 	
