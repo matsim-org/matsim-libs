@@ -120,6 +120,7 @@ public class CreatePseudoNetwork {
 			this.nodes.put(stop, node);
 
 			Link loopLink = this.network.getFactory().createLink(Id.createLinkId (this.prefix + stop.getId()), node, node);
+			loopLink.setAllowedModes(this.transitModes);
 			stop.setLinkId(loopLink.getId());
 			this.network.addLink(loopLink);
 			Tuple<Node, Node> connection = new Tuple<>(node, node);
