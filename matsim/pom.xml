@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>matsim-all</artifactId>
-		<version>15.0-SNAPSHOT</version>
+		<version>2025.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -91,6 +91,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
+							<goal>test-jar</goal>
 							<goal>jar</goal>
 						</goals>
 					</execution>
@@ -117,12 +118,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0-M7</version>
+				<version>3.3.1</version>
 			</plugin>
 		</plugins>
 	</reporting>
 
 	<dependencies>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil-core</artifactId>
+			<version>8.5.14</version>
+		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
@@ -140,6 +146,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
+			<artifactId>gt-geopkg</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
 			<version>${geotools.version}</version>
 			<scope>runtime</scope>
@@ -152,16 +163,24 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.5</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>15.0-SNAPSHOT</version>
+			<version>2025.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -188,7 +207,7 @@
 		<dependency>
 			<groupId>org.jgrapht</groupId>
 			<artifactId>jgrapht-core</artifactId>
-			<version>1.5.1</version>
+			<version>1.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
@@ -203,24 +222,24 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.2-3</version>
+			<version>1.5.6-3</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.2</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>7.0.5.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>7.0.5.Final</version>
+			<version>8.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -238,7 +257,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.9.0</version>
+			<version>1.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
@@ -260,6 +279,10 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -313,7 +336,7 @@
 									<packages>org.matsim.vis:org.matsim.vis.*</packages>
 								</group>
 							</groups>
-							<detectLinks>true</detectLinks>
+							<detectLinks>false</detectLinks>
 							<doclint>none</doclint>
 							<linksource>true</linksource>
 						</configuration>
@@ -321,7 +344,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.4.2</version>
+						<version>3.7.1</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

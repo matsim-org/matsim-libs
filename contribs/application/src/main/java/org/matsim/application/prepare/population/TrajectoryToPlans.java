@@ -39,7 +39,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Option(names = "--sample-size", description = "Sample size of the given input data in (0, 1]", required = true)
     private double sampleSize;
 
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]", arity = "1..*")
+	@Deprecated
+    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]. Deprecated: Use the separate down-sampling instead.", arity = "1..*")
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -54,7 +55,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Option(names = {"--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes. The default is 600s")
     private int activityBinSize = 600;
 
-    @CommandLine.Option(names = {"--max-typical-duraction", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
+    @CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
     private int maxTypicalDuration = 86400;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
@@ -105,7 +106,9 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
         }
 
-        splitActivityTypesBasedOnDuration(scenario.getPopulation());
+		if (maxTypicalDuration > 0) {
+			splitActivityTypesBasedOnDuration(scenario.getPopulation());
+		}
 
         PopulationUtils.writePopulation(scenario.getPopulation(),
                 output.resolve(String.format("%s-%dpct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
@@ -131,15 +134,16 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         return 0;
     }
 
+	@Deprecated
     /**
      * Split activities into typical durations to improve value of travel time savings calculation.
      */
     private void splitActivityTypesBasedOnDuration(Population population) {
 
-        final int maxCategories = maxTypicalDuration / activityBinSize;
 
         // Calculate activity durations for the next step
         for (Person p : population.getPersons().values()) {
+
             for (Plan plan : p.getPlans()) {
                 for (PlanElement el : plan.getPlanElements()) {
 
@@ -147,20 +151,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                         continue;
 
                     Activity act = (Activity) el;
-                    double duration = act.getEndTime().orElse(24 * 3600)
-                            - act.getStartTime().orElse(0);
-
-                    int durationCategoryNr = (int) Math.round((duration / activityBinSize));
-
-                    if (durationCategoryNr <= 0) {
-                        durationCategoryNr = 1;
-                    }
-
-                    if (durationCategoryNr >= maxCategories) {
-                        durationCategoryNr = maxCategories;
-                    }
-
-                    String newType = String.format("%s_%d", act.getType(), durationCategoryNr * activityBinSize);
+                    double duration = act.getEndTime().orElse(24 * 3600) - act.getStartTime().orElse(0);
+                    String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
                     act.setType(newType);
 
                 }
@@ -170,6 +162,28 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         }
     }
 
+	@Deprecated
+    /**
+     * Round duration according to bin size.
+     */
+    private int roundDuration(double duration) {
+
+        final int maxCategories = maxTypicalDuration / activityBinSize;
+
+        int durationCategoryNr = (int) Math.round((duration / activityBinSize));
+
+        if (durationCategoryNr <= 0) {
+            durationCategoryNr = 1;
+        }
+
+        if (durationCategoryNr >= maxCategories) {
+            durationCategoryNr = maxCategories;
+        }
+
+        return durationCategoryNr * activityBinSize;
+    }
+
+	@Deprecated
     private void mergeOvernightActivities(Plan plan) {
 
         if (plan.getPlanElements().size() > 1) {
@@ -182,8 +196,10 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             if (firstBaseActivity.equals(lastBaseActivity)) {
                 double mergedDuration = Double.parseDouble(firstActivity.getType().split("_")[1]) + Double.parseDouble(lastActivity.getType().split("_")[1]);
 
-                firstActivity.setType(String.format("%s_%d", firstBaseActivity, (int) mergedDuration));
-                lastActivity.setType(String.format("%s_%d", lastBaseActivity, (int) mergedDuration));
+                int merged = roundDuration(mergedDuration);
+
+                firstActivity.setType(String.format("%s_%d", firstBaseActivity, merged));
+                lastActivity.setType(String.format("%s_%d", lastBaseActivity, merged));
             }
         }  // skipping plans with just one activity
     }

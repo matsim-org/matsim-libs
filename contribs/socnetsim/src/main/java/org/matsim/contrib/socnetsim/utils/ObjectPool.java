@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import java.util.WeakHashMap;
  */
 public class ObjectPool<T extends Object> {
 	private static final Logger log =
-		Logger.getLogger(ObjectPool.class);
+		LogManager.getLogger(ObjectPool.class);
 
 	private final Map<T, WeakReference<T>> pool;
 	private long queries = 0;

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.drt.passenger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -30,11 +31,13 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import java.util.List;
+
 /**
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
-	private static final Logger log = Logger.getLogger(DrtRequestCreator.class);
+	private static final Logger log = LogManager.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
 
@@ -44,25 +47,27 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
-			double departureTime, double submissionTime) {
+	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
+									double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
+		double maxRideDuration = drtRoute.getMaxRideTime();
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerId, fromLink.getId(), toLink.getId(),
-						drtRoute.getDirectRideTime(), drtRoute.getDistance(), latestDepartureTime, latestArrivalTime));
+				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
+						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration));
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
-				.passengerId(passengerId)
+				.passengerIds(passengerIds)
 				.mode(mode)
 				.fromLink(fromLink)
 				.toLink(toLink)
 				.earliestStartTime(departureTime)
 				.latestStartTime(latestDepartureTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(maxRideDuration)
 				.submissionTime(submissionTime)
 				.build();
 

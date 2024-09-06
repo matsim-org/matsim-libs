@@ -20,7 +20,8 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -47,7 +48,7 @@ import java.util.concurrent.CyclicBarrier;
  */
 public abstract class ReplanningRunnable implements Runnable {
 
-	private final static Logger log = Logger.getLogger(ReplanningRunnable.class);
+	private final static Logger log = LogManager.getLogger(ReplanningRunnable.class);
 	
 	private Counter counter;
 	private double time = 0.0;

@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -60,7 +61,7 @@ import playground.vsp.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartur
  */
 public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
-	private final Logger log = Logger.getLogger(AgentId2StopDifferenceMap.class);
+	private final Logger log = LogManager.getLogger(AgentId2StopDifferenceMap.class);
 //	private final Level logLevel = Level.OFF;
 
 	private Population pop;

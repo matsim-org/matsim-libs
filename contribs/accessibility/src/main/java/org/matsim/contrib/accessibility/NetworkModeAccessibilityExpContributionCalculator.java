@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,7 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -31,7 +32,7 @@ import java.util.Set;
  * @author thibautd, dziemke
  */
 final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
+	private static final Logger LOG = LogManager.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -39,7 +40,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 	private final Scenario scenario;
 
 	private final TravelDisutility travelDisutility;
-	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private final ScoringConfigGroup scoringConfigGroup;
 	private final NetworkConfigGroup networkConfigGroup;
 
 	private Network subNetwork;
@@ -67,7 +68,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		Gbl.assertNotNull(travelDisutilityFactory);
 		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
+		scoringConfigGroup = scenario.getConfig().scoring();
 		networkConfigGroup = scenario.getConfig().network();
 
 		RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -77,9 +78,9 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		//FastMultiNodeDijkstraFactory fastMultiNodeDijkstraFactory = new FastMultiNodeDijkstraFactory(true);
 		//this.multiNodePathCalculator = (MultiNodePathCalculator) fastMultiNodeDijkstraFactory.createPathCalculator(network, travelDisutility, travelTime);
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 
@@ -136,7 +137,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
 		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
-		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
+		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
 
@@ -150,7 +151,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
-				expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
+				expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
 					+ congestedCarUtilityRoad2Node + congestedCarUtility)) * sumExpVjkWalk;
 		}
 		return expSum;

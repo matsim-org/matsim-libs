@@ -22,7 +22,8 @@ package playground.vsp.andreas.utils.ana;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -36,7 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class TagLinesInTransitSchedule {
 	
-	private final static Logger log = Logger.getLogger(TagLinesInTransitSchedule.class);
+	private final static Logger log = LogManager.getLogger(TagLinesInTransitSchedule.class);
 	
 	public static TransitSchedule tagLinesInTransitSchedule(TransitSchedule transitSchedule, String identifier){
 		int routesTagged = 0;

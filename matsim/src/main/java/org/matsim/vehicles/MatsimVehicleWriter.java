@@ -20,16 +20,11 @@
 package org.matsim.vehicles;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * This is the new default Writer for the vehicles file.
@@ -37,8 +32,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author kturner
  */
 public final class MatsimVehicleWriter extends MatsimXmlWriter {
-  
-	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
+
+	private static final Logger log = LogManager.getLogger(MatsimVehicleWriter.class);
 
 	private VehicleWriterV2 delegate;
 

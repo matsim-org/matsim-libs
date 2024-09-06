@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -34,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public final class PRouteProviderFactory {
 	private PRouteProviderFactory(){} // should not be instantiated
 
-	private final static Logger log = Logger.getLogger(PRouteProviderFactory.class);
+	private final static Logger log = LogManager.getLogger(PRouteProviderFactory.class);
 
 	public static PRouteProvider createRouteProvider(Network network, Population population, PConfigGroup pConfig, TransitSchedule pStopsOnly, String outputDir, EventsManager eventsManager) {
 

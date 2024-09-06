@@ -23,7 +23,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -35,7 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 @Deprecated
 public class CemdapPersonParser {
 
-	private final static Logger LOG = Logger.getLogger(CemdapPersonParser.class);
+	private final static Logger LOG = LogManager.getLogger(CemdapPersonParser.class);
 
 	// Cemdap adults/children file columns
 //	private static final int HH_ID = 0;

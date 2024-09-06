@@ -20,7 +20,9 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -39,7 +41,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.opengis.feature.simple.SimpleFeature;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -61,18 +62,18 @@ import java.util.Map;
  * @author dziemke
  */
 class LandUseBuildingSink implements Sink {
-	private final Logger log = Logger.getLogger(LandUseBuildingSink.class);
+	private final Logger log = LogManager.getLogger(LandUseBuildingSink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;
 	private Map<Long, RelationContainer> relationMap;
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
-	private Map<String, String> landUseTypeMap = new HashMap<>();
-	private Map<String, String> buildingTypeMap = new HashMap<>();
+	private final Map<String, String> landUseTypeMap;
+	private Map<String, String> buildingTypeMap;
 	private Map<String, Integer> typeCount = new HashMap<>();
 	
-	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
+	private List <SimpleFeature> features = new ArrayList<>();
 
 	private double buildingTypeFromVicinityRange;
 	private String[] tagsToIgnoreBuildings;

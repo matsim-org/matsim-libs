@@ -5,7 +5,8 @@ package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
@@ -70,11 +71,11 @@ public class PSimTravelTimeCalculator implements Provider<TravelTime>, LinkEnter
 
 	public void reset( int iteration ){
 		if (switcher == null || switcher.isQSimIteration()) {
-			Logger.getLogger( travelTimeCalculator.getClass() ).error(
+			LogManager.getLogger( travelTimeCalculator.getClass() ).error(
 					"Calling reset on traveltimecalc" );
 			travelTimeCalculator.reset( iteration );
 		} else {
-			Logger.getLogger( travelTimeCalculator.getClass() ).error(
+			LogManager.getLogger( travelTimeCalculator.getClass() ).error(
 					"Not resetting travel times as this is a PSim iteration" );
 		}
 	}

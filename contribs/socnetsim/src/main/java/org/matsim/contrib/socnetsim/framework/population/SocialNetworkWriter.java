@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
@@ -33,7 +34,7 @@ import java.util.*;
  */
 public class SocialNetworkWriter extends MatsimXmlWriter {
 	private static final Logger log =
-		Logger.getLogger(SocialNetworkWriter.class);
+		LogManager.getLogger(SocialNetworkWriter.class);
 
 	public static final String ROOT_TAG = "socialnet";
 	public static final String EGO_TAG = "ego";

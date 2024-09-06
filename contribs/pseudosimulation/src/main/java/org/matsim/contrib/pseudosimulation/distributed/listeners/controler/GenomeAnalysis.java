@@ -1,6 +1,7 @@
 package org.matsim.contrib.pseudosimulation.distributed.listeners.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,7 +37,7 @@ public class GenomeAnalysis implements IterationEndsListener {
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();
         Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
-        boolean append = event.getIteration() != event.getServices().getConfig().controler().getFirstIteration();
+        boolean append = event.getIteration() != event.getServices().getConfig().controller().getFirstIteration();
         try {
             PrintWriter writer = null;
             PrintWriter scoreComponentWriter = null;
@@ -91,7 +92,7 @@ public class GenomeAnalysis implements IterationEndsListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger logger = Logger.getLogger(this.getClass());
+        Logger logger = LogManager.getLogger(this.getClass());
         List<String> keys = new ArrayList<>();
         keys.addAll(fullGeneCount.keySet());
         Collections.sort(keys);

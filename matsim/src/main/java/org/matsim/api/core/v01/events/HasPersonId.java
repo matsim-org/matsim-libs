@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;

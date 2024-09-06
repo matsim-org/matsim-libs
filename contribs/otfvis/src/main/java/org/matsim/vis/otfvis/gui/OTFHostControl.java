@@ -30,14 +30,15 @@ import javax.swing.event.ChangeListener;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.Animator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 public class OTFHostControl implements GLEventListener {
 
-	private static final Logger log = Logger.getLogger(OTFHostControl.class);
+	private static final Logger log = LogManager.getLogger(OTFHostControl.class);
 	private final Component canvas;
 
 	private final BoundedRangeModel simTime;

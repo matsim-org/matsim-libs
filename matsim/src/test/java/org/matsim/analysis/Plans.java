@@ -91,8 +91,8 @@ public class Plans {
 		act3.setCoord(CoordUtils.createCoord(206.0, 226.0));
 		act3.setFacilityId(Id.create("id3", ActivityFacility.class));
 		act3.setLinkId(link1);
-		act3.setStartTime(23650.0);
-		act3.setEndTime(23651.0);
+//		act3.setStartTime(23650.0);
+//		act3.setEndTime(23651.0);
 		plan.addActivity(act3);
 		Leg leg3 = PopulationUtils.createLeg(TransportMode.car);
 		leg3.getAttributes().putAttribute("startcoord", act3.getCoord());
@@ -108,8 +108,8 @@ public class Plans {
 		plan.addLeg(leg3);
 		Activity act4 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		act4.setCoord(CoordUtils.createCoord(3529.0, 3309.0));
-		act4.setStartTime(24901.0);
-		act4.setEndTime(24902.0);
+//		act4.setStartTime(24901.0);
+//		act4.setEndTime(24902.0);
 		act4.setFacilityId(Id.create("id4", ActivityFacility.class));
 		act4.setLinkId(link2);
 		plan.addActivity(act4);
@@ -142,8 +142,8 @@ public class Plans {
 		plan.addLeg(leg5);
 		Activity act6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		act6.setCoord(CoordUtils.createCoord(3529.0, 3309.0));
-		act6.setStartTime(43502.0);
-		act6.setEndTime(43503.0);
+//		act6.setStartTime(43502.0);
+//		act6.setEndTime(43503.0);
 		act6.setFacilityId(Id.create("id6", ActivityFacility.class));
 		act6.setLinkId(link2);
 		plan.addActivity(act6);
@@ -161,8 +161,8 @@ public class Plans {
 		plan.addLeg(leg6);
 		Activity act7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		act7.setCoord(CoordUtils.createCoord(8478.0, 8258.0));
-		act7.setStartTime(45253.0);
-		act7.setEndTime(45254.0);
+//		act7.setStartTime(45253.0);
+//		act7.setEndTime(45254.0);
 		act7.setFacilityId(Id.create("id7", ActivityFacility.class));
 		act7.setLinkId(link3);
 		plan.addActivity(act7);
@@ -192,8 +192,8 @@ public class Plans {
 		plan.addLeg(leg8);
 		Activity act9 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		act9.setCoord(CoordUtils.createCoord(8478.0, 8258.0));
-		act9.setStartTime(47354.0);
-		act9.setEndTime(47355.0);
+//		act9.setStartTime(47354.0);
+//		act9.setEndTime(47355.0);
 		act9.setFacilityId(Id.create("id9", ActivityFacility.class));
 		act9.setLinkId(link3);
 		plan.addActivity(act9);
@@ -212,8 +212,8 @@ public class Plans {
 		Activity act10 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
 		act10.setCoord(CoordUtils.createCoord(12720.0, 12500.0));
-		act10.setStartTime(48855.0);
-		act10.setEndTime(48856.0);
+//		act10.setStartTime(48855.0);
+//		act10.setEndTime(48856.0);
 		act10.setFacilityId(Id.create("id10", ActivityFacility.class));
 		act10.setLinkId(link4);
 		plan.addActivity(act10);
@@ -246,8 +246,8 @@ public class Plans {
 		plan.addLeg(leg11);
 		Activity act12 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		act12.setCoord(CoordUtils.createCoord(13214.0, 12994.0));
-		act12.setStartTime(51356.0);
-		act12.setEndTime(51357.0);
+//		act12.setStartTime(51356.0);
+//		act12.setEndTime(51357.0);
 		act12.setFacilityId(Id.create("id12", ActivityFacility.class));
 		act12.setLinkId(link4);
 		plan.addActivity(act12);
@@ -271,8 +271,8 @@ public class Plans {
 		plan.addLeg(leg12);
 		Activity act13 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		act13.setCoord(CoordUtils.createCoord(13916.0, 13696.0));
-		act13.setStartTime(51617.0);
-		act13.setEndTime(51618.0);
+//		act13.setStartTime(51617.0);
+//		act13.setEndTime(51618.0);
 		act13.setFacilityId(Id.create("id13", ActivityFacility.class));
 		act13.setLinkId(link5);
 		plan.addActivity(act13);
@@ -302,8 +302,8 @@ public class Plans {
 		plan.addLeg(leg14);
 		Activity act15 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		act15.setCoord(CoordUtils.createCoord(13916.0, 13696.0));
-		act15.setStartTime(53818.0);
-		act15.setEndTime(53819.0);
+//		act15.setStartTime(53818.0);
+//		act15.setEndTime(53819.0);
 		act15.setFacilityId(Id.create("id15", ActivityFacility.class));
 		act15.setLinkId(link5);
 		plan.addActivity(act15);
@@ -318,8 +318,8 @@ public class Plans {
 		plan.addLeg(leg15);
 		Activity act16 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		act16.setCoord(CoordUtils.createCoord(13214.0, 12994.0));
-		act16.setStartTime(54079.0);
-		act16.setEndTime(54080.0);
+//		act16.setStartTime(54079.0);
+//		act16.setEndTime(54080.0);
 		act16.setFacilityId(Id.create("id16", ActivityFacility.class));
 		act16.setLinkId(link4);
 		plan.addActivity(act16);
@@ -336,8 +336,8 @@ public class Plans {
 		Activity act17 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
 		act17.setCoord(CoordUtils.createCoord(12720.0, 12500.0));
-		act17.setStartTime(54780.0);
-		act17.setEndTime(54781.0);
+//		act17.setStartTime(54780.0);
+//		act17.setEndTime(54781.0);
 		act17.setFacilityId(Id.create("id17", ActivityFacility.class));
 		act17.setLinkId(link4);
 		plan.addActivity(act17);
@@ -356,8 +356,8 @@ public class Plans {
 		Activity act18 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
 		act18.setCoord(CoordUtils.createCoord(206.0, 226.0));
-		act18.setStartTime(59281.0);
-		act18.setEndTime(59282.0);
+//		act18.setStartTime(59281.0);
+//		act18.setEndTime(59282.0);
 		act18.setFacilityId(Id.create("id18", ActivityFacility.class));
 		act18.setLinkId(link1);
 		plan.addActivity(act18);
@@ -412,8 +412,8 @@ public class Plans {
 		Activity actp2_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
 		actp2_2.setCoord(CoordUtils.createCoord(100.0, 120.0));
-		actp2_2.setStartTime(21700.0);
-		actp2_2.setEndTime(21701.0);
+//		actp2_2.setStartTime(21700.0);
+//		actp2_2.setEndTime(21701.0);
 		actp2_2.setFacilityId(Id.create("id2", ActivityFacility.class));
 		actp2_2.setLinkId(link1);
 		plan2.addActivity(actp2_2);
@@ -432,8 +432,8 @@ public class Plans {
 		Activity actp2_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
 		actp2_3.setCoord(CoordUtils.createCoord(4342.0, 4362.0));
-		actp2_3.setStartTime(23201.0);
-		actp2_3.setEndTime(23202.0);
+//		actp2_3.setStartTime(23201.0);
+//		actp2_3.setEndTime(23202.0);
 		actp2_3.setFacilityId(Id.create("id3", ActivityFacility.class));
 		actp2_3.setLinkId(link4);
 		plan2.addActivity(actp2_3);
@@ -495,8 +495,8 @@ public class Plans {
 		Activity actp2_7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
 		actp2_7.setCoord(CoordUtils.createCoord(4342.0, 4362.0));
-		actp2_7.setStartTime(54702.0);
-		actp2_7.setEndTime(54703.0);
+//		actp2_7.setStartTime(54702.0);
+//		actp2_7.setEndTime(54703.0);
 		actp2_7.setFacilityId(Id.create("id7", ActivityFacility.class));
 		actp2_7.setLinkId(link4);
 		plan2.addActivity(actp2_7);
@@ -512,8 +512,8 @@ public class Plans {
 		Activity actp2_8 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
 		actp2_8.setCoord(CoordUtils.createCoord(100.0, 120.0));
-		actp2_8.setStartTime(56203.0);
-		actp2_8.setEndTime(56204.0);
+//		actp2_8.setStartTime(56203.0);
+//		actp2_8.setEndTime(56204.0);
 		actp2_8.setFacilityId(Id.create("id8", ActivityFacility.class));
 		actp2_8.setLinkId(link1);
 		plan2.addActivity(actp2_8);
@@ -565,8 +565,8 @@ public class Plans {
 		Activity actp3_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
 		actp3_2.setCoord(CoordUtils.createCoord(100.0, 120.0));
-		actp3_2.setStartTime(21700.0);
-		actp3_2.setEndTime(21701.0);
+//		actp3_2.setStartTime(21700.0);
+//		actp3_2.setEndTime(21701.0);
 		actp3_2.setFacilityId(Id.create("id2", ActivityFacility.class));
 		actp3_2.setLinkId(link1);
 		plan3.addActivity(actp3_2);
@@ -585,8 +585,8 @@ public class Plans {
 		Activity actp3_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5,
 				TransportMode.car);
 		actp3_3.setCoord(CoordUtils.createCoord(5756.0, 5776.0));
-		actp3_3.setStartTime(23701.0);
-		actp3_3.setEndTime(23702.0);
+//		actp3_3.setStartTime(23701.0);
+//		actp3_3.setEndTime(23702.0);
 		actp3_3.setFacilityId(Id.create("id3", ActivityFacility.class));
 		actp3_3.setLinkId(link5);
 		plan3.addActivity(actp3_3);
@@ -617,8 +617,8 @@ public class Plans {
 		Activity actp3_5 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5,
 				TransportMode.car);
 		actp3_5.setCoord(CoordUtils.createCoord(5756.0, 5776.0));
-		actp3_5.setStartTime(26102.0);
-		actp3_5.setEndTime(26103.0);
+//		actp3_5.setStartTime(26102.0);
+//		actp3_5.setEndTime(26103.0);
 		actp3_5.setFacilityId(Id.create("id5", ActivityFacility.class));
 		actp3_5.setLinkId(link5);
 		plan3.addActivity(actp3_5);
@@ -634,8 +634,8 @@ public class Plans {
 		Activity actp3_6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
 		actp3_6.setCoord(CoordUtils.createCoord(100.0, 120.0));
-		actp3_6.setStartTime(28103.0);
-		actp3_6.setEndTime(28104.0);
+//		actp3_6.setStartTime(28103.0);
+//		actp3_6.setEndTime(28104.0);
 		actp3_6.setFacilityId(Id.create("id6", ActivityFacility.class));
 		actp3_6.setLinkId(link1);
 		plan3.addActivity(actp3_6);
@@ -687,8 +687,8 @@ public class Plans {
 		Activity actp4_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.pt);
 		actp4_2.setCoord(CoordUtils.createCoord(277.0, 297.0));
-		actp4_2.setStartTime(21950.0);
-		actp4_2.setEndTime(21951.0);
+//		actp4_2.setStartTime(21950.0);
+//		actp4_2.setEndTime(21951.0);
 		actp4_2.setFacilityId(Id.create("id2", ActivityFacility.class));
 		actp4_2.setLinkId(link1);
 		plan4.addActivity(actp4_2);
@@ -713,8 +713,8 @@ public class Plans {
 		Activity actp4_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3,
 				TransportMode.pt);
 		actp4_3.setCoord(CoordUtils.createCoord(4873.0, 4893.0));
-		actp4_3.setStartTime(23586.0);
-		actp4_3.setEndTime(23587.0);
+//		actp4_3.setStartTime(23586.0);
+//		actp4_3.setEndTime(23587.0);
 		actp4_3.setFacilityId(Id.create("id3", ActivityFacility.class));
 		actp4_3.setLinkId(link3);
 		plan4.addActivity(actp4_3);
@@ -745,8 +745,8 @@ public class Plans {
 		Activity actp4_5 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3,
 				TransportMode.pt);
 		actp4_5.setCoord(CoordUtils.createCoord(4873.0, 4893.0));
-		actp4_5.setStartTime(25887.0);
-		actp4_5.setEndTime(25888.0);
+//		actp4_5.setStartTime(25887.0);
+//		actp4_5.setEndTime(25888.0);
 		actp4_5.setFacilityId(Id.create("id5", ActivityFacility.class));
 		actp4_5.setLinkId(link3);
 		plan4.addActivity(actp4_5);
@@ -762,8 +762,8 @@ public class Plans {
 		Activity actp4_6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.pt);
 		actp4_6.setCoord(CoordUtils.createCoord(277.0, 297.0));
-		actp4_6.setStartTime(27523.0);
-		actp4_6.setEndTime(27524.0);
+//		actp4_6.setStartTime(27523.0);
+//		actp4_6.setEndTime(27524.0);
 		actp4_6.setFacilityId(Id.create("id6", ActivityFacility.class));
 		actp4_6.setLinkId(link1);
 		plan4.addActivity(actp4_6);

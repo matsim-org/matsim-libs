@@ -21,7 +21,8 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -50,7 +51,7 @@ import java.util.Map;
  */
 public class InternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener {
 	private static final Logger log =
-		Logger.getLogger(InternalizingPlansScoring.class);
+		LogManager.getLogger(InternalizingPlansScoring.class);
 
 
 	private EventsToScore eventsToScore;

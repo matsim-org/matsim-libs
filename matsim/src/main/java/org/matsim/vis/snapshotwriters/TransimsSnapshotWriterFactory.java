@@ -21,12 +21,10 @@
 package org.matsim.vis.snapshotwriters;
 
 import com.google.inject.Inject;
-import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.ReplanningContext;
 
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
 

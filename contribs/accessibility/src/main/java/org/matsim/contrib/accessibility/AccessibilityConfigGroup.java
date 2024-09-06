@@ -21,7 +21,8 @@ package org.matsim.contrib.accessibility;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
@@ -43,7 +44,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String BOUNDING_BOX_RIGHT = "boundingBoxRight";
 
 	@SuppressWarnings("unused")
-	private static final Logger LOG = Logger.getLogger(AccessibilityConfigGroup.class);
+	private static final Logger LOG = LogManager.getLogger(AccessibilityConfigGroup.class);
 
 	public static final String GROUP_NAME = "accessibility";
 	

@@ -26,7 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -44,7 +45,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author michalm (Michal Maciejewski)
  */
 public class DvrpRoutingModule implements RoutingModule {
-	private static final Logger logger = Logger.getLogger(DvrpRoutingModule.class);
+	private static final Logger logger = LogManager.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,

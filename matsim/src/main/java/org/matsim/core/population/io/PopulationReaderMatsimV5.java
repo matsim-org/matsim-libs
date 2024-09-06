@@ -112,6 +112,7 @@ import org.xml.sax.Attributes;
 	PopulationReaderMatsimV5(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
@@ -268,9 +269,9 @@ import org.xml.sax.Attributes;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
@@ -326,7 +327,7 @@ import org.xml.sax.Attributes;
 		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 		String routeType = atts.getValue("type");
-		
+
 		if (routeType == null) {
 			String legMode = this.currleg.getMode();
 			if ("pt".equals(legMode)) {
@@ -337,10 +338,10 @@ import org.xml.sax.Attributes;
 				routeType = "generic";
 			}
 		}
-		
+
 		RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
-		
+
 		this.currRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(routeClass, startLinkId == null ? null : Id.create(startLinkId, Link.class), endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
 
@@ -364,7 +365,7 @@ import org.xml.sax.Attributes;
 		this.currRoute.setStartLinkId(startLinkId);
 		this.currRoute.setEndLinkId(endLinkId);
 		this.currRoute.setRouteDescription(this.routeDescription.trim());
-		
+
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
@@ -375,9 +376,9 @@ import org.xml.sax.Attributes;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}

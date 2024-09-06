@@ -22,6 +22,10 @@ package org.matsim.integration;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +43,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSimUtils;
@@ -70,38 +75,43 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-public class SimulateAndScoreTest extends MatsimTestCase {
+public class SimulateAndScoreTest {
 
-	public void testRealPtScore() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
-		
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
-		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
-		config.planCalcScore().addActivityParams(h);
-		config.planCalcScore().addActivityParams(w);
-		config.planCalcScore().addActivityParams(transitActivityParams);
-		
+		config.scoring().setPerforming_utils_hr(0);
+		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
+		config.scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
+		config.scoring().addActivityParams(h);
+		config.scoring().addActivityParams(w);
+		config.scoring().addActivityParams(transitActivityParams);
+
 		// ---
-		
+
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
@@ -158,7 +168,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		vehicleType.getCapacity().setStandingRoom(70);
 //		vehicleType.setCapacity(vehicleCapacity);
 		vehicles.addVehicleType(vehicleType);
-		
+
 		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create("V1", Vehicle.class), vehicleType);
 		vehicles.addVehicle(vehicle);
 
@@ -205,7 +215,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		// ---
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
@@ -230,8 +240,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 	}
 
-	public void testTeleportationScore() {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	@Test
+	void testTeleportationScore() {
+		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
@@ -271,17 +284,17 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Netsim sim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, events);
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
-		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
+		scenario.getConfig().scoring().setPerforming_utils_hr(0);
 		final double travelingPt = -1.00;
-		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		double monetaryDistanceRatePt = -0.001;
-		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		scenario.getConfig().planCalcScore().addActivityParams(h);
-		scenario.getConfig().planCalcScore().addActivityParams(w);
+		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
+		scenario.getConfig().scoring().addActivityParams(h);
+		scenario.getConfig().scoring().addActivityParams(w);
 		EventsToScore scorer = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
@@ -291,7 +304,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scorer.finish();
 
 		Double score = plan.getScore();
-		assertEquals("Expecting -1.0 from travel time, -1.0 from travel distance.", -2.0, score, EPSILON);
+		assertEquals(-2.0, score, MatsimTestUtils.EPSILON, "Expecting -1.0 from travel time, -1.0 from travel distance.");
 
 	}
 

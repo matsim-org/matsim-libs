@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -56,7 +57,7 @@ import com.google.inject.Inject;
  */
 public class DelayAnalysisTool implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler {
 
-	private static final Logger LOG = Logger.getLogger(DelayAnalysisTool.class);
+	private static final Logger LOG = LogManager.getLogger(DelayAnalysisTool.class);
 	
 	private final Network network;
 	private boolean considerStuckedAgents = false;

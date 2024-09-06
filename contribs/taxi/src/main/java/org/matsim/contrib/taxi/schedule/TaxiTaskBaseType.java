@@ -36,11 +36,11 @@ public enum TaxiTaskBaseType {
 	STAY;
 
 	public static TaxiTaskBaseType getBaseTypeOrElseThrow(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).getBaseType()
+		return ((TaxiTaskType)task.getTaskType()).baseType()
 				.orElseThrow(() -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
 	}
 
 	public boolean isBaseTypeOf(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
+		return ((TaxiTaskType)task.getTaskType()).baseType().orElse(null) == this;
 	}
 }

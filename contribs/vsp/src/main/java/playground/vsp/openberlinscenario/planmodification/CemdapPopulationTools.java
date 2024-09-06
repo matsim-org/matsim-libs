@@ -19,7 +19,8 @@
 
 package playground.vsp.openberlinscenario.planmodification;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +36,7 @@ public class CemdapPopulationTools {
 	
 	private double maxEndTime = 0.;
 
-	private static final Logger log = Logger.getLogger(CemdapPopulationTools.class);
+	private static final Logger log = LogManager.getLogger(CemdapPopulationTools.class);
 
 	public void setActivityTypesAccordingToDurationAndMergeOvernightActivities(Population population, double timeCategorySize, double dayStartTime) {
 		log.info("First, setting activity types according to duration (time bin size: " + timeCategorySize + ")");				

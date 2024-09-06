@@ -21,6 +21,8 @@
 
  package org.matsim.core.mobsim.jdeqsim;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -62,31 +64,26 @@ import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+ public abstract class AbstractJDEQSimTest {
 
-public abstract class AbstractJDEQSimTest {
-
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	protected Map<Id<Vehicle>, Id<Person>> vehicleToDriver = null;
 	protected Map<Id<Person>, List<Event>> eventsByPerson = null;
 	public LinkedList<Event> allEvents = null;
 
-	@Before
+	@BeforeEach
 	public final void setUp() throws Exception {
 		this.eventsByPerson = new HashMap<Id<Person>, List<Event>>();
 		this.vehicleToDriver = new HashMap<>();
 		this.allEvents = new LinkedList<Event>();
 	}
 
-	@After
+	@AfterEach
 	public final void tearDown() throws Exception {
 		this.eventsByPerson = null;
 		this.vehicleToDriver = null;
@@ -231,7 +228,7 @@ public abstract class AbstractJDEQSimTest {
 
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(deqsimEventsFile);
 		for (int i=0;i<copyEventList.size();i++){
-			assertTrue("events not equal.", CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)));
+			assertTrue(CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)), "events not equal.");
 		}
 	}
 
@@ -252,7 +249,7 @@ public abstract class AbstractJDEQSimTest {
 	}
 
 
-	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, 
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler,
 			LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler {
 
 		@Override
@@ -263,7 +260,7 @@ public abstract class AbstractJDEQSimTest {
 		public void handleEvent(VehicleEntersTrafficEvent event) {
 			// save drivers
 			vehicleToDriver.put(event.getVehicleId(), event.getPersonId());
-			
+
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}
@@ -296,7 +293,7 @@ public abstract class AbstractJDEQSimTest {
 				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
 			eventsByPerson.get(driverId).add(event);
-			
+
 			allEvents.add(event);
 		}
 
@@ -307,7 +304,7 @@ public abstract class AbstractJDEQSimTest {
 				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
 			eventsByPerson.get(driverId).add(event);
-			
+
 			allEvents.add(event);
 		}
 

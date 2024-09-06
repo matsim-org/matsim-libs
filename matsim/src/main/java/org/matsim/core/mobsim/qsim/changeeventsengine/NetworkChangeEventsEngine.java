@@ -21,7 +21,8 @@
 
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.jdeqsim.Message;
@@ -32,11 +33,11 @@ import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Queue;
 
 class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
-	private static final Logger log = Logger.getLogger( NetworkChangeEventsEngine.class ) ;
+	private static final Logger log = LogManager.getLogger( NetworkChangeEventsEngine.class ) ;
 
 	private final MessageQueue messageQueue;
 	private final Network network;
@@ -55,7 +56,7 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			addNetworkChangeEventToMessageQ(changeEvent);
 		}
 	}
-	
+
 	private void addNetworkChangeEventToMessageQ(NetworkChangeEvent changeEvent) {
 		Message m = new Message() {
 			@Override
@@ -71,7 +72,7 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 		m.setMessageArrivalTime(changeEvent.getStartTime());
 		this.messageQueue.putMessage(m);
 	}
-	
+
 	private void applyTheChangeEvent(NetworkChangeEvent changeEvent) {
 		for (Link link : changeEvent.getLinks()) {
 			final NetsimLink netsimLink = this.internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
@@ -83,10 +84,10 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 
 		}
 	}
-	
+
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
 		log.warn("add within-day network change event:" + event);
-		
+
 		final Queue<NetworkChangeEvent> centralNetworkChangeEvents =
 				NetworkUtils.getNetworkChangeEvents(this.internalInterface.getMobsim().getScenario().getNetwork());
 		if ( centralNetworkChangeEvents.contains( event ) ) {
@@ -98,16 +99,16 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			// need to add this here since otherwise speed lookup in mobsim does not work. And need to hedge against
 			// code that may already have added it by itself.  kai, feb'18
 		}
-		
+
 		if ( event.getStartTime()<= this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ) {
 			this.applyTheChangeEvent(event);
 		} else {
 			this.addNetworkChangeEventToMessageQ(event);
 		}
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void afterSim() {
 

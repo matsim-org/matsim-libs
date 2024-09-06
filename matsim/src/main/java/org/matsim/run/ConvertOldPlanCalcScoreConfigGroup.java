@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -53,7 +54,7 @@ public class ConvertOldPlanCalcScoreConfigGroup {
 
 final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
-	private static final Logger log = Logger.getLogger(OldToNewPlanCalcScoreConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(OldToNewPlanCalcScoreConfigGroup.class);
 
 	public static final String GROUP_NAME = "planCalcScore";
 
@@ -547,7 +548,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		super.addParameterSet( params );
 	}
 
-	public static enum TypicalDurationScoreComputation { uniform, relative } ;
+	public static enum TypicalDurationScoreComputation { uniform, relative }
 
 	/* complex classes */
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -38,7 +39,7 @@ import java.util.HashMap;
  */
 final class CountDeparturesPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
-	private final static Logger log = Logger.getLogger(CountDeparturesPerMode.class);
+	private final static Logger log = LogManager.getLogger(CountDeparturesPerMode.class);
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<>();

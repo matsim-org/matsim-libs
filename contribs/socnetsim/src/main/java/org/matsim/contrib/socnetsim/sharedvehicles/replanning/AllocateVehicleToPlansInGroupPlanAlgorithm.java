@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,7 +51,7 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  */
 public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private static final Logger log =
-		Logger.getLogger(AllocateVehicleToPlansInGroupPlanAlgorithm.class);
+		LogManager.getLogger(AllocateVehicleToPlansInGroupPlanAlgorithm.class);
 
 	private final Random random;
 	private final VehicleRessources vehicleRessources;

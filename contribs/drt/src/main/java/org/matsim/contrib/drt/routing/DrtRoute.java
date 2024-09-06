@@ -47,6 +47,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
+  	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	public final static String ROUTE_TYPE = TransportMode.drt;
 	private RouteDescription routeDescription = null;
 
@@ -71,6 +72,10 @@ public class DrtRoute extends AbstractRoute {
 		return getTravelTime().seconds(); // currently DrtRoute.travelTime is set to the max allowed travel time
 	}
 
+	public double getMaxRideTime() {
+		return routeDescription.getMaxRideTime();
+	}
+
 	public void setDirectRideTime(double directRideTime) {
 		this.routeDescription.setDirectRideTime(directRideTime);
 	}
@@ -85,11 +90,15 @@ public class DrtRoute extends AbstractRoute {
 		this.routeDescription.setUnsharedPath(links);
 	}
 
+	public void setMaxRideTime(double maxRideTime) {
+		this.routeDescription.setMaxRideTime(maxRideTime);
+	}
+
 
 	@Override
 	public String getRouteDescription() {
 		try {
-			return new ObjectMapper().writeValueAsString(routeDescription);
+			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -109,7 +118,7 @@ public class DrtRoute extends AbstractRoute {
 			// Handle new routeDescription (json)
 		} else if (routeDescription.startsWith("{")) {
 			try {
-				this.routeDescription = new ObjectMapper().readValue(routeDescription, RouteDescription.class);
+				this.routeDescription = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -148,10 +157,16 @@ public class DrtRoute extends AbstractRoute {
 		private OptionalTime maxWaitTime = OptionalTime.undefined();
 		private OptionalTime directRideTime = OptionalTime.undefined();
 		private List<String> unsharedPath = new ArrayList<String>();
+		private OptionalTime maxRideTime = OptionalTime.undefined();
 
 		@JsonProperty("directRideTime")
 		public double getDirectRideTime() {
 			return directRideTime.isUndefined() ? OptionalTime.undefined().seconds() : directRideTime.seconds();
+		}
+
+		@JsonProperty("maxRideTime")
+		public double getMaxRideTime() {
+			return maxRideTime.seconds();
 		}
 
 		@JsonProperty("maxWaitTime")
@@ -168,6 +183,10 @@ public class DrtRoute extends AbstractRoute {
 			this.directRideTime = OptionalTime.defined(directRideTime);
 		}
 
+		public void setMaxRideTime(double maxRideTime) {
+			this.maxRideTime = OptionalTime.defined(maxRideTime);
+		}
+
 		public void setMaxWaitTime(double maxWaitTime) {
 			this.maxWaitTime = OptionalTime.defined(maxWaitTime);
 		}
@@ -175,6 +194,5 @@ public class DrtRoute extends AbstractRoute {
 		public void setUnsharedPath(List<String> unsharedPath) {
 			this.unsharedPath = unsharedPath;
 		}
-
 	}
 }

@@ -22,13 +22,14 @@ package org.matsim.core.router;
 import java.util.*;
 import java.util.function.Predicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -51,7 +52,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author thibautd
  */
 public final class TripStructureUtils {
-	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
+
+	private static final Logger log = LogManager.getLogger(TripStructureUtils.class);
+
+	public static final String routingMode = "routingMode";
 
 	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 
@@ -146,7 +150,7 @@ public final class TripStructureUtils {
 
 			if ( currentIndex - originActivityIndex > 1 ) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
-				// a trip.  
+				// a trip.
 
 				trips.add( new Trip(
 						(Activity) planElements.get( originActivityIndex ),
@@ -417,7 +421,7 @@ public final class TripStructureUtils {
 		public List<Leg> getLegsOnly() {
 			return legs;
 		}
-		
+
 		/**
 		 * Attributes of preceding activity are passed as trip attributes until more explicit encoding is found.
 		 */
@@ -592,15 +596,11 @@ public final class TripStructureUtils {
 	}
 
 	public static String getRoutingMode(Leg leg) {
-		return (String) leg.getAttributes().getAttribute("routingMode");
+		return leg.getRoutingMode();
 	}
 
 	public static void setRoutingMode(Leg leg, String mode) {
-		if ( mode != null ){
-			leg.getAttributes().putAttribute( "routingMode", mode );
-		} else {
-			leg.getAttributes().removeAttribute(  "routingMode" ) ;
-		}
+		leg.setRoutingMode(mode);
 	}
 
 	// if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
@@ -625,7 +625,7 @@ public final class TripStructureUtils {
 		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
 	}
 	public static String createStageActivityType( String mode ) {
-		return PlanCalcScoreConfigGroup.createStageActivityType( mode ) ;
+		return ScoringConfigGroup.createStageActivityType( mode ) ;
 	}
 
 }

@@ -20,16 +20,16 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
 import java.util.Map;
 
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.misc.Time;
 
 public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "TimeAllocationMutator";
-		
+	public static final String GROUP_NAME = "timeAllocationMutator";
+
+
 	public TimeAllocationMutatorConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -39,15 +39,49 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		Map<String, String> comments = super.getComments();
 		comments.put(MUTATION_RANGE, "Default:1800.0; Defines how many seconds a time mutation can maximally shift a time.");
 		comments.put(MUTATION_AFFECTS_DURATION, "Default:true; Defines whether time mutation changes an activity's duration.");
-		comments.put(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS, "false; Use individual settings for each subpopulation. "
-				+ "If enabled but no settings are found, regular settings are uses as fallback.");
+		comments.put(LATEST_ACTIVITY_END_TIME,"Latest Activity End Time. Default = 24:00:00");
+		comments.put(MUTATION_RANGE_STEP,"Mutation Range Step, default = 1 second");
+		comments.put(MUTATE_AROUND_INITIAL_END_TIME_ONLY,"Mutates times only around the initially defined end times.");
 		return comments;
 	}
-	
+
 	// ---
 
+	private static final String LATEST_ACTIVITY_END_TIME = "latestActivityEndTime";
+	private static final String MUTATE_AROUND_INITIAL_END_TIME_ONLY = "mutateAroundInitialEndTimeOnly";
+	private static final String MUTATION_RANGE_STEP = "mutationRangeStep";
 	private static final String MUTATION_RANGE = "mutationRange";
 	private double mutationRange = 1800.0;
+	private double latestActivityEndTime = 24*3600.0;
+	private boolean mutateAroundInitialEndTimeOnly = false;
+	private double mutationRangeStep = 1.0;
+
+	@StringGetter(MUTATION_RANGE_STEP)
+	public double getMutationRangeStep() {
+		return mutationRangeStep;
+	}
+	@StringSetter(MUTATION_RANGE_STEP)
+	public void setMutationRangeStep(double mutationRangeStep) {
+		this.mutationRangeStep = mutationRangeStep;
+	}
+	@StringGetter(LATEST_ACTIVITY_END_TIME)
+	public double getLatestActivityEndTime() {
+		return latestActivityEndTime;
+	}
+	@StringSetter(LATEST_ACTIVITY_END_TIME)
+	public void setLatestActivityEndTime(String latestActivityEndTime) {
+		this.latestActivityEndTime = Time.parseTime(latestActivityEndTime);
+	}
+
+	@StringGetter(MUTATE_AROUND_INITIAL_END_TIME_ONLY)
+	public boolean isMutateAroundInitialEndTimeOnly() {
+		return mutateAroundInitialEndTimeOnly;
+	}
+	@StringSetter(MUTATE_AROUND_INITIAL_END_TIME_ONLY)
+	public void setMutateAroundInitialEndTimeOnly(boolean mutateAroundInitialEndTimeOnly) {
+		this.mutateAroundInitialEndTimeOnly = mutateAroundInitialEndTimeOnly;
+	}
+
 	@StringGetter(MUTATION_RANGE)
 	public double getMutationRange() {
 		return this.mutationRange;
@@ -56,9 +90,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	public void setMutationRange(final double val) {
 		this.mutationRange = val;
 	}
-	
+
 	// ---
-	
+
 	private static final String MUTATION_AFFECTS_DURATION = "mutationAffectsDuration";
 	private boolean affectingDuration = true;
 	@StringGetter(MUTATION_AFFECTS_DURATION)
@@ -69,114 +103,6 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	public void setAffectingDuration(boolean affectingDuration) {
 		this.affectingDuration = affectingDuration;
 	}
-	
+
 	// ---
-	
-	private static final String USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS = "useIndividualSettingsForSubpopulations";
-	private boolean useIndividualSettingsForSubpopulations = false;
-//	@StringGetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS) // I am disabling the xml usage for the time being, see comment below. kai, may'19
-	public boolean isUseIndividualSettingsForSubpopulations() {
-		// yyyy is it really so plausible to have this?  If we continue in this direction, we will eventually have the PTV behaviorally homogeneous
-		// groups.  I would find it more natural to have behavior that depends continuously on person type, and then use Java in order to define that
-		// behaviour.  Rather than to overload the config mechanism.  kai, may'19
-		return this.useIndividualSettingsForSubpopulations;
-	}
-//	@StringSetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS) // I am disabling the xml usage for the time being, see comments.  kai, may'19
-	public void setUseIndividualSettingsForSubpopulations(boolean useIndividualSettingsForSubpopulations) {
-		// yyyy see comment under isUseIndividualSettingsForSubpopulations. kai, may'10
-		this.useIndividualSettingsForSubpopulations = useIndividualSettingsForSubpopulations;
-	}
-	
-	// ---
-	
-	public TimeAllocationMutatorSubpopulationSettings getTimeAllocationMutatorSubpopulationSettings(String subpopulation) {
-		
-		if (subpopulation == null) return null;
-		
-		Collection<? extends ConfigGroup> configGroups = this.getParameterSets(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
-		for (ConfigGroup group : configGroups) {
-			if (group instanceof TimeAllocationMutatorSubpopulationSettings) {
-				TimeAllocationMutatorSubpopulationSettings subpopulationSettings = (TimeAllocationMutatorSubpopulationSettings) group;
-				if (subpopulation.equals(subpopulationSettings.subpopulation)) return subpopulationSettings;
-			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public ConfigGroup createParameterSet(final String type) {
-		switch (type) {
-			case TimeAllocationMutatorSubpopulationSettings.SET_NAME:
-				return new TimeAllocationMutatorSubpopulationSettings();
-			default:
-				throw new IllegalArgumentException("unknown set type '" + type + "'");
-		}
-	}
-	
-	@Override
-	public void addParameterSet(final ConfigGroup set) {
-		switch (set.getName()) {
-			case TimeAllocationMutatorSubpopulationSettings.SET_NAME:
-				super.addParameterSet(set);
-				break;
-			default:
-				throw new IllegalArgumentException( set.getName() );
-		}
-	}
-	
-	public static class TimeAllocationMutatorSubpopulationSettings extends ReflectiveConfigGroup {
-		
-		public static final String SET_NAME = "subpopulationSettings";
-		private static final String MUTATION_RANGE = "mutationRange";
-		private static final String MUTATION_AFFECTS_DURATION = "mutationAffectsDuration";
-		private static final String SUBPOPULATION = "subpopulation";
-		
-		private double mutationRange = 1800.0;
-		private boolean affectingDuration = true;
-		private String subpopulation = null;
-		
-		public TimeAllocationMutatorSubpopulationSettings() {
-			super(SET_NAME);
-		}
-		
-		@Override
-		public final Map<String, String> getComments() {
-			Map<String,String> comments = super.getComments();
-			comments.put(MUTATION_RANGE, "Default:1800.0; Defines how many seconds a time mutation can maximally shift a time.");
-			comments.put(MUTATION_AFFECTS_DURATION, "Default:true; Defines whether time mutation changes an activity's duration.");
-			comments.put(SUBPOPULATION, "Subpopulation to which the values from this parameter set are applied.");
-			return comments;
-		}
-
-		@StringGetter(MUTATION_RANGE)
-		public double getMutationRange() {
-			return this.mutationRange;
-		}
-		
-		@StringSetter(MUTATION_RANGE)
-		public void setMutationRange(final double val) {
-			this.mutationRange = val;
-		}
-		
-		@StringGetter(MUTATION_AFFECTS_DURATION)
-		public boolean isAffectingDuration() {
-			return affectingDuration;
-		}
-		
-		@StringSetter(MUTATION_AFFECTS_DURATION)
-		public void setAffectingDuration(boolean affectingDuration) {
-			this.affectingDuration = affectingDuration;
-		}
-
-		@StringSetter(SUBPOPULATION)
-		public void setSubpopulation(final String subpopulation) {
-			this.subpopulation = subpopulation;
-		}
-
-		@StringGetter(SUBPOPULATION)
-		public String getSubpopulation() {
-			return this.subpopulation;
-		}
-	}
 }

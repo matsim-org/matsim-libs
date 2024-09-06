@@ -52,12 +52,12 @@ public final class DrtEventsReaders {
 				.append(nonStandardTaskTypes)
 				.collect(toImmutableMap(DrtTaskType::name, type -> type));
 
-		Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS = ImmutableMap.<String, CustomEventMapper>builder()
+		Map<String, CustomEventMapper> customEventMappers = ImmutableMap.<String, CustomEventMapper>builder()
 				.putAll(DvrpEventsReaders.createCustomEventMappers(taskTypeByString::get))
 				.put(DrtRequestSubmittedEvent.EVENT_TYPE, DrtRequestSubmittedEvent::convert)
 				.build();
 
-		CUSTOM_EVENT_MAPPERS.forEach(reader::addCustomEventMapper);
+		customEventMappers.forEach(reader::addCustomEventMapper);
 		return reader;
 	}
 }

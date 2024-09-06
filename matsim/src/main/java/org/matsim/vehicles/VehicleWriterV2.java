@@ -23,18 +23,19 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
@@ -46,7 +47,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 
 final class VehicleWriterV2 extends MatsimXmlWriter {
 
-	private static final Logger log = Logger.getLogger(VehicleWriterV2.class);
+	private static final Logger log = LogManager.getLogger(VehicleWriterV2.class);
 	private AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();

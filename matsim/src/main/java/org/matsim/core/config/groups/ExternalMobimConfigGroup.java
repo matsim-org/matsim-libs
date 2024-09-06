@@ -22,7 +22,8 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
@@ -30,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
 public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(ExternalMobimConfigGroup.class);
+	private final static Logger log = LogManager.getLogger(ExternalMobimConfigGroup.class);
 
 	public static final String GROUP_NAME = "externalMobsim";
 

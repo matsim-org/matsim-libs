@@ -2,33 +2,32 @@ package org.matsim.contrib.parking.parkingchoice.lib.obj;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Set;
 
 /**
  * Often one needs a HashMap, where the value can be incremented and
  * decremented. This data structure provides that facility for doubles.
- * 
+ *
  * @author rashid_waraich
- * 
+ *
  * @param <KeyClass>
  */
 public class DoubleValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Double> hm = new HashMap<KeyClass, Double>();
-	
+
 	public boolean containsKey(KeyClass id){
 		return hm.containsKey(id);
 	}
-	
+
 	public Collection<Double> values(){
 		return hm.values();
 	}
-	
+
 	public Set<KeyClass> keySet(){
 		return hm.keySet();
 	}
-	
+
 	public double get(KeyClass id) {
 		if (!hm.containsKey(id)) {
 			hm.put(id, 0.0);
@@ -61,37 +60,9 @@ public class DoubleValueHashMap<KeyClass> {
 	public void decrementBy(KeyClass id, Double decValue) {
 		incrementBy(id,-1.0*decValue);
 	}
-	
+
 	public void remove(KeyClass id){
 		hm.remove(id);
-	}
-	
-	public void printToConsole(){
-		CollectionLib.printHashmapToConsole(hm);
-	}
-	
-	public KeyClass getKeyForMaxValue(){
-		double maxValue=Double.MIN_VALUE;
-		KeyClass maxKey=null;
-		for (KeyClass key:hm.keySet()){
-			double curValue=hm.get(key);
-			if (curValue>maxValue){
-				maxValue=curValue;
-				maxKey=key;
-			}
-		}	
-		return maxKey;
-	}
-	
-	public LinkedList<KeyClass> getKeysWithHigherValueThanThresholdValue(double thresholdValue){
-		LinkedList<KeyClass> result = new LinkedList<KeyClass>();
-		for (KeyClass key:hm.keySet()){
-			double curValue=hm.get(key);
-			if (curValue>thresholdValue){
-				result.add(key);
-			}
-		}
-		return result;
 	}
 
 	// TODO: write test
@@ -103,9 +74,9 @@ public class DoubleValueHashMap<KeyClass> {
 		}
 		return sum / hm.size();
 	}
-	
+
 	public int size(){
 		return hm.size();
 	}
-	
+
 }

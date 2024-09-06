@@ -2,10 +2,6 @@ package org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit
 
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.MathRuntimeException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;

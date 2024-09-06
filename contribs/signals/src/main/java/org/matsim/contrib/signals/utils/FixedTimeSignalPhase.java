@@ -22,7 +22,8 @@ package org.matsim.contrib.signals.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -39,7 +40,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  */
 final class FixedTimeSignalPhase {
 
-	private static final Logger log = Logger.getLogger(FixedTimeSignalPhase.class);
+	private static final Logger log = LogManager.getLogger(FixedTimeSignalPhase.class);
 	private Integer on = null;
 	private Integer off = null;
 	private Map<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsByGroupId = new HashMap<>();

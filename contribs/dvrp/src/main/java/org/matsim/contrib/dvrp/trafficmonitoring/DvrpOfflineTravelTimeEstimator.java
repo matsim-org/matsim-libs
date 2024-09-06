@@ -27,7 +27,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -35,6 +36,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -57,24 +59,26 @@ public class DvrpOfflineTravelTimeEstimator
 
 	private final TimeDiscretizer timeDiscretizer;
 	private final int intervalCount;
-	private final int timeInterval;
+	private final double timeInterval;
 
 	private final double[][] linkTravelTimes;
 	private final double alpha;
 
+	private final String delimiter;
+
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
-			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
-			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
-			OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig),
-				dvrpConfig.getTravelTimeEstimationAlpha(), outputDirectoryHierarchy);
+										  @Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
+										  @Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
+										  TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
+										  OutputDirectoryHierarchy outputDirectoryHierarchy, GlobalConfigGroup globalConfig) {
+		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.travelTimeEstimationAlpha,
+				outputDirectoryHierarchy, globalConfig.getDefaultDelimiter());
 	}
 
 	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
 			TimeDiscretizer timeDiscretizer, double travelTimeEstimationAlpha,
-			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+			OutputDirectoryHierarchy outputDirectoryHierarchy, String delimiter) {
 		this.observedTT = observedTT;
 		this.network = network;
 
@@ -83,6 +87,7 @@ public class DvrpOfflineTravelTimeEstimator
 		this.timeInterval = timeDiscretizer.getTimeInterval();
 
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
+		this.delimiter = delimiter;
 
 		alpha = travelTimeEstimationAlpha;
 		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
@@ -104,15 +109,7 @@ public class DvrpOfflineTravelTimeEstimator
 	}
 
 	private int getIdx(double time) {
-		//handle negative times (e.g. in backward shortest path search)
-		if (time < 0) {
-			return 0;
-		}
-		int idx = (int)time / timeInterval;// rounding down
-		if (idx < intervalCount) {
-			return idx;
-		}
-		return intervalCount - 1;
+		return TimeBinUtils.getTimeBinIndex(time, timeInterval, intervalCount);
 	}
 
 	@Override
@@ -123,7 +120,8 @@ public class DvrpOfflineTravelTimeEstimator
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		DvrpOfflineTravelTimes.saveLinkTravelTimes(timeDiscretizer, linkTravelTimes,
-				outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "dvrp_travel_times.csv.gz"));
+				outputDirectoryHierarchy.getIterationFilename(event.getIteration(),
+						"dvrp_travel_times.csv.gz"), delimiter);
 	}
 
 	private void updateTTs(TravelTime travelTime, double alpha) {

@@ -30,7 +30,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalcontrol20.ObjectFactory;
@@ -55,7 +56,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerD
  */
 public final class SignalControlWriter20 extends MatsimJaxbXmlWriter {
 
-	private static final Logger log = Logger.getLogger(SignalControlWriter20.class);
+	private static final Logger log = LogManager.getLogger(SignalControlWriter20.class);
 	
 	private SignalControlData data;
 

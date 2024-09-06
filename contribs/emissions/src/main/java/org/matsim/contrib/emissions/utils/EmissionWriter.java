@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,40 +41,40 @@ import java.util.SortedMap;
 public final class EmissionWriter {
 	// is this useful as a publicly available class?  kai, jan'19
 
-	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
-	
+	private static final Logger logger = LogManager.getLogger(EmissionWriter.class);
+
 
 	public EmissionWriter(){
 	}
-	
+
 	public void writeHomeLocation2TotalEmissions(
 			Population population,
 			Map<Id<Person>, SortedMap<String, Double>> totalEmissions,
 			Collection<String> pollutants,
 			String outFile) {
 		try{
-			FileWriter fstream = new FileWriter(outFile);			
+			FileWriter fstream = new FileWriter(outFile);
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("personId \t xHome \t yHome \t");
 			for (String pollutant : pollutants){
-				out.append(pollutant + "[g] \t");
+				out.append(pollutant).append("[g] \t");
 			}
 			out.append("\n");
 
 			for(Person person: population.getPersons().values()){
 				Id<Person> personId = person.getId();
 				Plan plan = person.getSelectedPlan();
-				Activity homeAct = (Activity) plan.getPlanElements().get(0);
+				Activity homeAct = (Activity) plan.getPlanElements().getFirst();
 				Coord homeCoord = homeAct.getCoord();
 				Double xHome = homeCoord.getX();
 				Double yHome = homeCoord.getY();
 
-				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
+				out.append(String.valueOf(personId)).append("\t").append(String.valueOf(xHome)).append("\t").append(String.valueOf(yHome)).append("\t");
 
 				Map<String, Double> emissionType2Value = totalEmissions.get(personId);
 				for(String pollutant : pollutants){
 					if(emissionType2Value.get(pollutant) != null){
-						out.append(emissionType2Value.get(pollutant) + "\t");
+						out.append(String.valueOf(emissionType2Value.get(pollutant))).append("\t");
 					} else{
 						out.append("0.0" + "\t"); // TODO: do I still need this?
 					}
@@ -82,7 +83,7 @@ public final class EmissionWriter {
 			}
 			//Close the output stream
 			out.close();
-			logger.info("Finished writing output to " + outFile);
+			logger.info("Finished writing output to {}", outFile);
 		} catch (Exception e){
 			throw new RuntimeException(e);
 		}

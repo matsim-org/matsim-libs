@@ -23,8 +23,8 @@ package org.matsim.core.router;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -52,7 +52,7 @@ public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 	// This can happen for example when LinkToLink routing is switched on.  kai & theresa, feb'15
 	// To fix this, we create the PreProcessData when the first LeastCostPathCalculator object is created and store it in a map using
 	// the network as key. For the PreProcessDijkstra data this is fine, since it does not take travel times and disutilities into account.
-	// For the AStarLandmarks data, we would have to include the other two arguments into the lookup value as well... cdobler, sep'17 
+	// For the AStarLandmarks data, we would have to include the other two arguments into the lookup value as well... cdobler, sep'17
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if (this.usePreProcessData) {

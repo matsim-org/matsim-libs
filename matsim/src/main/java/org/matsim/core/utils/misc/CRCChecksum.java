@@ -29,10 +29,11 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CRCChecksum {
-	private static final Logger log = Logger.getLogger( CRCChecksum.class );
+	private static final Logger log = LogManager.getLogger( CRCChecksum.class );
 
 	private static long getCRCFromStream(final InputStream in) {
 		long check = 0;
@@ -54,14 +55,14 @@ public class CRCChecksum {
 
 	/**
 	 * Calculates the checksum of the content of the given file. If the filename ends in ".gz",
-	 * the file is assumed to be gzipped and the checksum over the <em>uncompressed</em> content 
+	 * the file is assumed to be gzipped and the checksum over the <em>uncompressed</em> content
 	 * will be calculated. If a file is not found at its expected place, it is searched via the class loader.
 	 * <p></p>
 	 * Comments:<ul>
 	 * <li> Some version of this method, possibly the variant with the class loader, does some caching: If I replace
 	 * the original file in a test case, I need to restart eclipse before it works correctly.  ???  kai, feb'14
 	 * </ul>
-	 * 
+	 *
 	 * @param filename
 	 * @return CRC32-Checksum of the file's content.
 	 */
@@ -95,7 +96,7 @@ public class CRCChecksum {
 			if (filename.endsWith(".gz")) {
 				log.info( "file ends in gz");
 				try ( InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename) ;
-					InputStream in = new GZIPInputStream(new BufferedInputStream(stream)); ) {
+					InputStream in = new GZIPInputStream(new BufferedInputStream(stream))) {
 					long result = getCRCFromStream(in);
 					in.close();
 					return result ;
@@ -105,7 +106,7 @@ public class CRCChecksum {
 			} else { // not work gz
 				log.info( "file does not end in gz");
 				try ( InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename) ;
-					InputStream in = new BufferedInputStream(stream); ) {
+					InputStream in = new BufferedInputStream(stream)) {
 					long result = getCRCFromStream(in);
 					in.close();
 					return result ;

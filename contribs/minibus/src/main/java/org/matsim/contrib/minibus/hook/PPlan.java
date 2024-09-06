@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -41,7 +42,7 @@ import java.util.TreeSet;
 public final class PPlan implements Comparable<PPlan>{
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(PPlan.class);
+	private final static Logger log = LogManager.getLogger(PPlan.class);
 	
 	private final Id<PPlan> planId;
 	private final String creator;

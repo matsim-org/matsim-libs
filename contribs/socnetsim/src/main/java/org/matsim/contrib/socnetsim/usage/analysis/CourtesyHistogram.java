@@ -23,7 +23,7 @@ import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
 import org.matsim.contrib.socnetsim.framework.events.CourtesyEventHandler;
 import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;

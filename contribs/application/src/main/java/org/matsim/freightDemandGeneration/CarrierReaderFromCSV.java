@@ -19,59 +19,48 @@
  * *********************************************************************** */
 package org.matsim.freightDemandGeneration;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.application.options.ShpOptions;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * This CarrierReaderFromCSV reads all carrier information given in the read CSV
- * file and creates the carriers. While the process of creating the carriers the
+ * file and creates the carriers. While the process of creating the carriers, the
  * consistency of the information will be checked.
- * 
+ *
  * @author Ricardo Ewert
  *
  */
 public final class CarrierReaderFromCSV {
-	private static final Logger log = Logger.getLogger(CarrierReaderFromCSV.class);
+	private static final Logger log = LogManager.getLogger(CarrierReaderFromCSV.class);
 
 	/**
 	 * CarrierInformationElement is a set of information being read from the input
 	 * file. For one carrier several CarrierInformationElement can be read in. This
 	 * is necessary for creating different configurations of the vehicles. Not every
 	 * parameter should be set for creating the carrier. While the process of
-	 * creating the carriers the consistency of the information will be checked.
+	 * creating the carriers, the consistency of the information will be checked.
 	 */
 	static class CarrierInformationElement {
 		/**
-		 * Name of carrier of this information element.
+		 * Name of the carrier of this information element.
 		 */
 		private final String carrierName;
 		/**
@@ -87,10 +76,10 @@ public final class CarrierReaderFromCSV {
 		 */
 		private List<String> vehicleDepots;
 		/**
-		 * Sets the area where the created depots should be located. Therefore a shape
+		 * Sets the area where the created depots should be located. Therefore, a shape
 		 * input is necessary.
 		 */
-		private final String[] areaOfAdditonalDepots;
+		private final String[] areaOfAdditionalDepots;
 		/**
 		 * Sets the fleetsize of this carrier. Options: finite or infinite
 		 */
@@ -108,23 +97,23 @@ public final class CarrierReaderFromCSV {
 		 */
 		private final int jspritIterations;
 		/**
-		 * Sets a the fixed number of vehicles per vehicleType and location. If this
-		 * number is e.g. 3.: for each vehicleType 3 vehicles at each location will be
-		 * created and the fleetsize is finite.
+		 * Sets a fixed number of vehicles per vehicleType and location. If this
+		 * number is e.g., 3.: for each vehicleType 3 vehicles at each location will be
+		 * created, and the fleetsize is finite.
 		 */
-		private int fixedNumberOfVehilcePerTypeAndLocation;
+		private int fixedNumberOfVehiclePerTypeAndLocation;
 
 		public static class Builder {
 			private final String carrierName;
 			private String[] vehicleTypes = null;
 			private int numberOfDepotsPerType = 0;
 			private List<String> vehicleDepots = null;
-			private String[] areaOfAdditonalDepots = null;
+			private String[] areaOfAdditionalDepots = null;
 			private FleetSize fleetSize = null;
 			private int vehicleStartTime = 0;
 			private int vehicleEndTime = 0;
 			private int jspritIterations = 0;
-			private int fixedNumberOfVehilcePerTypeAndLocation = 0;
+			private int fixedNumberOfVehiclePerTypeAndLocation = 0;
 
 			public static Builder newInstance(String carrierName) {
 				return new Builder(carrierName);
@@ -151,8 +140,8 @@ public final class CarrierReaderFromCSV {
 				this.vehicleDepots = vehicleDepots;
 			}
 
-			public void setAreaOfAdditonalDepots(String[] areaOfAdditonalDepots) {
-				this.areaOfAdditonalDepots = areaOfAdditonalDepots;
+			public void setAreaOfAdditionalDepots(String[] areaOfAdditionalDepots) {
+				this.areaOfAdditionalDepots = areaOfAdditionalDepots;
 			}
 
 			public void setFleetSize(FleetSize fleetSize) {
@@ -171,8 +160,8 @@ public final class CarrierReaderFromCSV {
 				this.jspritIterations = jspritIterations;
 			}
 
-			public void setFixedNumberOfVehilcePerTypeAndLocation(int fixedNumberOfVehilcePerTypeAndLocation) {
-				this.fixedNumberOfVehilcePerTypeAndLocation = fixedNumberOfVehilcePerTypeAndLocation;
+			public void setFixedNumberOfVehiclePerTypeAndLocation(int fixedNumberOfVehiclePerTypeAndLocation) {
+				this.fixedNumberOfVehiclePerTypeAndLocation = fixedNumberOfVehiclePerTypeAndLocation;
 			}
 
 			public CarrierInformationElement build() {
@@ -185,12 +174,12 @@ public final class CarrierReaderFromCSV {
 			vehicleTypes = builder.vehicleTypes;
 			numberOfDepotsPerType = builder.numberOfDepotsPerType;
 			vehicleDepots = builder.vehicleDepots;
-			areaOfAdditonalDepots = builder.areaOfAdditonalDepots;
+			areaOfAdditionalDepots = builder.areaOfAdditionalDepots;
 			fleetSize = builder.fleetSize;
 			vehicleStartTime = builder.vehicleStartTime;
 			vehicleEndTime = builder.vehicleEndTime;
 			jspritIterations = builder.jspritIterations;
-			fixedNumberOfVehilcePerTypeAndLocation = builder.fixedNumberOfVehilcePerTypeAndLocation;
+			fixedNumberOfVehiclePerTypeAndLocation = builder.fixedNumberOfVehiclePerTypeAndLocation;
 		}
 
 		public String getName() {
@@ -213,8 +202,8 @@ public final class CarrierReaderFromCSV {
 			this.vehicleDepots = vehicleDepots;
 		}
 
-		public String[] getAreaOfAdditonalDepots() {
-			return areaOfAdditonalDepots;
+		public String[] getAreaOfAdditionalDepots() {
+			return areaOfAdditionalDepots;
 		}
 
 		public FleetSize getFleetSize() {
@@ -233,48 +222,48 @@ public final class CarrierReaderFromCSV {
 			return jspritIterations;
 		}
 
-		public int getFixedNumberOfVehilcePerTypeAndLocation() {
-			return fixedNumberOfVehilcePerTypeAndLocation;
+		public int getFixedNumberOfVehiclePerTypeAndLocation() {
+			return fixedNumberOfVehiclePerTypeAndLocation;
 		}
 
-		public void setFixedNumberOfVehilcePerTypeAndLocation(int fixedNumberOfVehilcePerTypeAndLocation) {
-			this.fixedNumberOfVehilcePerTypeAndLocation = fixedNumberOfVehilcePerTypeAndLocation;
+		public void setFixedNumberOfVehiclePerTypeAndLocation(int fixedNumberOfVehiclePerTypeAndLocation) {
+			this.fixedNumberOfVehiclePerTypeAndLocation = fixedNumberOfVehiclePerTypeAndLocation;
 		}
 	}
 
 	/**
 	 * Reads and create the carriers with reading the information from the csv file.
-	 * 
-	 * @param scenario
-	 * @param allNewCarrier
-	 * @param freightConfigGroup
-	 * @param csvLocationCarrier
-	 * @param polygonsInShape
-	 * @param defaultJspritIterations
-	 * @param crsTransformationNetworkAndShape
-	 * @throws IOException
+	 *
+	 * @param scenario                         Scenario
+	 * @param freightCarriersConfigGroup       FreightCarriersConfigGroup
+	 * @param csvLocationCarrier               Path to the csv file with the carrier information
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param defaultJspritIterations          Default number of jsprit iterations
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape
+	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
+	 * @throws IOException IOException
 	 */
-	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightConfigGroup freightConfigGroup,
-			String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
-			CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightCarriersConfigGroup freightCarriersConfigGroup,
+												   Path csvLocationCarrier, ShpOptions.Index indexShape, int defaultJspritIterations,
+												   CoordinateTransformation crsTransformationNetworkAndShape, String shapeCategory) throws IOException {
 
 		Set<CarrierInformationElement> allNewCarrierInformation = readCarrierInformation(csvLocationCarrier);
-		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
+		checkNewCarrier(allNewCarrierInformation, freightCarriersConfigGroup, scenario, indexShape, shapeCategory);
 		log.info("The read carrier information from the csv are checked without errors.");
-		createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
+		createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup, indexShape,
 				defaultJspritIterations, crsTransformationNetworkAndShape);
 	}
 
 	/**
-	 * @param csvLocationCarrier
-	 * @return
-	 * @throws IOException
+	 * @param csvLocationCarrier Path to the csv file with the carrier information
+	 * @return Set<CarrierInformationElement> Set of CarrierInformationElements
+	 * @throws IOException IOException
 	 */
-	static Set<CarrierInformationElement> readCarrierInformation(String csvLocationCarrier) throws IOException {
-		log.info("Start reading carrier csv file: " + csvLocationCarrier);
+	static Set<CarrierInformationElement> readCarrierInformation(Path csvLocationCarrier) throws IOException {
+		log.info("Start reading carrier csv file: {}", csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
-				.parse(IOUtils.getBufferedReader(csvLocationCarrier));
+		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationCarrier),
+				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
 		for (CSVRecord record : parse) {
 			CarrierInformationElement.Builder builder;
 			if (!record.get("carrierName").isBlank())
@@ -289,11 +278,11 @@ public final class CarrierReaderFromCSV {
 			if (!record.get("selectedVehicleDepots").isBlank())
 				builder.setVehicleDepots(
 						new ArrayList<String>(Arrays.asList(record.get("selectedVehicleDepots").split(";"))));
-			if (!record.get("areaOfAdditonalDepots").isBlank())
-				builder.setAreaOfAdditonalDepots(record.get("areaOfAdditonalDepots").split(";"));
-			if (!record.get("fixedNumberOfVehilcePerTypeAndLocation").isBlank())
-				builder.setFixedNumberOfVehilcePerTypeAndLocation(
-						Integer.parseInt(record.get("fixedNumberOfVehilcePerTypeAndLocation")));
+			if (!record.get("areaOfAdditionalDepots").isBlank())
+				builder.setAreaOfAdditionalDepots(record.get("areaOfAdditionalDepots").split(";"));
+			if (!record.get("fixedNumberOfVehiclePerTypeAndLocation").isBlank())
+				builder.setFixedNumberOfVehiclePerTypeAndLocation(
+						Integer.parseInt(record.get("fixedNumberOfVehiclePerTypeAndLocation")));
 			if (!record.get("fleetSize").isBlank() && record.get("fleetSize").contentEquals("infinite"))
 				builder.setFleetSize(FleetSize.INFINITE);
 			else if (!record.get("fleetSize").isBlank() && record.get("fleetSize").contentEquals("finite"))
@@ -314,25 +303,26 @@ public final class CarrierReaderFromCSV {
 	}
 
 	/**
-	 * Checks if the read carrier information are consistent.
-	 * 
-	 * @param allNewCarrierInformation
-	 * @param freightConfigGroup
-	 * @param scenario
-	 * @param polygonsInShape
+	 * Checks if the read carrier information is consistent.
+	 *
+	 * @param allNewCarrierInformation   Set of CarrierInformationElements
+	 * @param freightCarriersConfigGroup FreightCarriersConfigGroup
+	 * @param scenario                   Scenario
+	 * @param indexShape                 ShpOptions.Index for the shape file
+	 * @param shapeCategory              Column name in the shape file for the data connection in the csv files
 	 */
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
-			FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape) {
+								FreightCarriersConfigGroup freightCarriersConfigGroup, Scenario scenario, ShpOptions.Index indexShape, String shapeCategory) {
 
-		FreightUtils.addOrGetCarriers(scenario);
+		CarriersUtils.addOrGetCarriers(scenario);
 		for (CarrierInformationElement carrierElement : allNewCarrierInformation) {
-			if (FreightUtils.getCarriers(scenario).getCarriers()
+			if (CarriersUtils.getCarriers(scenario).getCarriers()
 					.containsKey(Id.create(carrierElement.getName(), Carrier.class)))
 				throw new RuntimeException("The Carrier " + carrierElement.getName()
 						+ " being loaded from the csv is already in the given Carrier file. It is not possible to add to an existing Carrier. Please check!");
 			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 			new CarrierVehicleTypeReader(carrierVehicleTypes)
-					.readFile(freightConfigGroup.getCarriersVehicleTypesFile());
+					.readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 			if (carrierElement.getVehicleTypes() != null)
 				for (String type : carrierElement.getVehicleTypes()) {
 					if (!carrierVehicleTypes.getVehicleTypes().containsKey(Id.create(type, VehicleType.class)))
@@ -356,34 +346,30 @@ public final class CarrierReaderFromCSV {
 				throw new RuntimeException(
 						"If a vehicle type is selected in the input file, numberOfDepots or selectedVehicleDepots should be set. Please check carrier "
 								+ carrierElement.getName());
-			if (carrierElement.getVehicleDepots() != null
-					&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
-					&& carrierElement.getAreaOfAdditonalDepots() == null)
+			if ((carrierElement.getVehicleDepots() != null
+				&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
+				&& carrierElement.getAreaOfAdditionalDepots() == null) || (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
+				&& carrierElement.getAreaOfAdditionalDepots() == null))
 				log.warn(
-						"No possible area for addional depot given. Random choice in the hole network of a possible position");
-			if (carrierElement.getVehicleDepots() == null && (carrierElement.getNumberOfDepotsPerType() > 0)
-					&& carrierElement.getAreaOfAdditonalDepots() == null)
-				log.warn(
-						"No possible area for addional depot given. Random choice in the hole network of a possible position");
-			if (carrierElement.getAreaOfAdditonalDepots() != null) {
-				if (polygonsInShape == null)
+					"No possible area for additional depot given. Random choice in the hole network of a possible position");
+			if (carrierElement.getAreaOfAdditionalDepots() != null) {
+				if (indexShape == null)
 					throw new RuntimeException("For carrier " + carrierElement.getName()
 							+ " a certain area for depots is selected, but no shape is read in. Please check.");
-				for (String depotArea : carrierElement.getAreaOfAdditonalDepots()) {
+				for (String depotArea : carrierElement.getAreaOfAdditionalDepots()) {
 					boolean isInShape = false;
-					for (SimpleFeature singlePolygon : polygonsInShape) {
-						if (singlePolygon.getAttribute("Ortsteil").equals(depotArea)
-								|| singlePolygon.getAttribute("BEZNAME").equals(depotArea)) {
+					for (SimpleFeature singlePolygon : indexShape.getShp().readFeatures()) {
+						if (singlePolygon.getAttribute(shapeCategory).equals(depotArea)) {
 							isInShape = true;
 							break;
 						}
 					}
 					if (!isInShape)
 						throw new RuntimeException("The area " + depotArea + " of the possible depots of carrier"
-								+ carrierElement.getName() + " is not part of the given shapeFile");
+								+ carrierElement.getName() + " is not part of the given shapeFile. The areas should be in the shape file column " + shapeCategory);
 				}
 			}
-			if (carrierElement.getFixedNumberOfVehilcePerTypeAndLocation() != 0)
+			if (carrierElement.getFixedNumberOfVehiclePerTypeAndLocation() != 0)
 				for (CarrierInformationElement existingCarrier : allNewCarrierInformation)
 					if ((existingCarrier.getName().equals(carrierElement.getName())
 							&& existingCarrier.getFleetSize() == FleetSize.INFINITE)
@@ -417,41 +403,41 @@ public final class CarrierReaderFromCSV {
 
 	/**
 	 * Read and creates the carrier and the vehicle types.
-	 * 
-	 * @param scenario
-	 * @param allNewCarrierInformation
-	 * @param freightConfigGroup
-	 * @param polygonsInShape
-	 * @param defaultJspritIterations
-	 * @param crsTransformationNetworkAndShape
+	 *
+	 * @param scenario                         Scenario
+	 * @param allNewCarrierInformation         Set of CarrierInformationElements
+	 * @param freightCarriersConfigGroup       FreightCarriersConfigGroup
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param defaultJspritIterations          Default number of jsprit iterations
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape
 	 */
-	static void createNewCarrierAndAddVehilceTypes(Scenario scenario,
-			Set<CarrierInformationElement> allNewCarrierInformation, FreightConfigGroup freightConfigGroup,
-			Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
-			CoordinateTransformation crsTransformationNetworkAndShape) {
+	static void createNewCarrierAndAddVehicleTypes(Scenario scenario,
+												   Set<CarrierInformationElement> allNewCarrierInformation, FreightCarriersConfigGroup freightCarriersConfigGroup,
+												   ShpOptions.Index indexShape, int defaultJspritIterations,
+												   CoordinateTransformation crsTransformationNetworkAndShape) {
 
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		CarrierVehicleTypes usedCarrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightConfigGroup.getCarriersVehicleTypesFile());
+		CarrierVehicleTypes usedCarrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
+		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		for (CarrierInformationElement singleNewCarrier : allNewCarrierInformation) {
 			if (singleNewCarrier.getVehicleTypes() == null) {
 				continue;
 			}
-			Carrier thisCarrier = null;
-			CarrierCapabilities carrierCapabilities = null;
+			Carrier thisCarrier;
+			CarrierCapabilities carrierCapabilities;
 			if (carriers.getCarriers().containsKey(Id.create(singleNewCarrier.getName(), Carrier.class))) {
 				thisCarrier = carriers.getCarriers().get(Id.create(singleNewCarrier.getName(), Carrier.class));
 				carrierCapabilities = thisCarrier.getCarrierCapabilities();
 				if (carrierCapabilities.getFleetSize() == null && singleNewCarrier.getFleetSize() != null)
 					carrierCapabilities.setFleetSize(singleNewCarrier.getFleetSize());
 				if (singleNewCarrier.getJspritIterations() > 0)
-					CarrierUtils.setJspritIterations(thisCarrier, singleNewCarrier.getJspritIterations());
+					CarriersUtils.setJspritIterations(thisCarrier, singleNewCarrier.getJspritIterations());
 			} else {
-				thisCarrier = CarrierUtils.createCarrier(Id.create(singleNewCarrier.getName(), Carrier.class));
+				thisCarrier = CarriersUtils.createCarrier(Id.create(singleNewCarrier.getName(), Carrier.class));
 				if (singleNewCarrier.getJspritIterations() > 0)
-					CarrierUtils.setJspritIterations(thisCarrier, singleNewCarrier.getJspritIterations());
+					CarriersUtils.setJspritIterations(thisCarrier, singleNewCarrier.getJspritIterations());
 				carrierCapabilities = CarrierCapabilities.Builder.newInstance()
 						.setFleetSize(singleNewCarrier.getFleetSize()).build();
 				carriers.addCarrier(thisCarrier);
@@ -469,8 +455,8 @@ public final class CarrierReaderFromCSV {
 						&& !link.getId().toString().contains("pt")
 						&& (!link.getAttributes().getAsMap().containsKey("type")
 								|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
-						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
-								singleNewCarrier.getAreaOfAdditonalDepots(), crsTransformationNetworkAndShape)) {
+						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+								singleNewCarrier.getAreaOfAdditionalDepots(), crsTransformationNetworkAndShape)) {
 					singleNewCarrier.getVehicleDepots().add(link.getId().toString());
 				}
 			}
@@ -481,9 +467,9 @@ public final class CarrierReaderFromCSV {
 							.get(Id.create(thisVehicleType, VehicleType.class));
 					usedCarrierVehicleTypes.getVehicleTypes().putIfAbsent(Id.create(thisVehicleType, VehicleType.class),
 							thisType);
-					if (singleNewCarrier.getFixedNumberOfVehilcePerTypeAndLocation() == 0)
-						singleNewCarrier.setFixedNumberOfVehilcePerTypeAndLocation(1);
-					for (int i = 0; i < singleNewCarrier.getFixedNumberOfVehilcePerTypeAndLocation(); i++) {
+					if (singleNewCarrier.getFixedNumberOfVehiclePerTypeAndLocation() == 0)
+						singleNewCarrier.setFixedNumberOfVehiclePerTypeAndLocation(1);
+					for (int i = 0; i < singleNewCarrier.getFixedNumberOfVehiclePerTypeAndLocation(); i++) {
 						Id<Vehicle> vehilcelId = Id.create(
 								thisType.getId().toString() + "_" + thisCarrier.getId().toString() + "_" + singleDepot
 										+ "_start" + singleNewCarrier.getVehicleStartTime() + "_" + (i + 1),
@@ -507,10 +493,9 @@ public final class CarrierReaderFromCSV {
 			thisCarrier.setCarrierCapabilities(carrierCapabilities);
 		}
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			if (CarrierUtils.getJspritIterations(carrier) == Integer.MIN_VALUE) {
-				CarrierUtils.setJspritIterations(carrier, defaultJspritIterations);
-				log.warn("The jspritIterations are now set to the default value of " + defaultJspritIterations
-						+ " in this simulation!");
+			if (CarriersUtils.getJspritIterations(carrier) == Integer.MIN_VALUE) {
+				CarriersUtils.setJspritIterations(carrier, defaultJspritIterations);
+				log.warn("The jspritIterations are now set to the default value of {} in this simulation!", defaultJspritIterations);
 			}
 		}
 	}

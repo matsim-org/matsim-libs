@@ -21,53 +21,32 @@ package org.matsim.run;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.testcases.MatsimTestUtils.ExitTrappedException;
 
 /**
  * @author mrieser / Senozon AG
  */
 public class CreateFullConfigTest {
 
-	private final static Logger log = Logger.getLogger(CreateFullConfigTest.class);
+	private final static Logger log = LogManager.getLogger(CreateFullConfigTest.class);
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
-	public void testMain() {
+	void testMain() {
 		String[] args = new String[1];
 		args[0] = helper.getOutputDirectory() + "newConfig.xml";
 
 		File configFile = new File(args[0]);
-		Assert.assertFalse(configFile.exists());
+		Assertions.assertFalse(configFile.exists());
 
-		try {
-			MatsimTestUtils.forbidSystemExitCall();
-			CreateFullConfig.main(args);
-		} finally {
-			MatsimTestUtils.enableSystemExitCall();
-		}
+		CreateFullConfig.main(args);
 
-		Assert.assertTrue(configFile.exists());
-	}
-
-	@Test
-	public void testMain_MissingArgument() {
-		String[] args = new String[0];
-
-		try {
-			MatsimTestUtils.forbidSystemExitCall();
-			CreateFullConfig.main(args);
-			Assert.fail("Expected exception.");
-		} catch (ExitTrappedException e) {
-			log.info("caught the expected exception, everything is fine.");
-		} finally {
-			MatsimTestUtils.enableSystemExitCall();
-		}
-
+		Assertions.assertTrue(configFile.exists());
 	}
 }

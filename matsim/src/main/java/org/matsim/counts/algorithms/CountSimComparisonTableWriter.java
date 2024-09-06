@@ -28,7 +28,8 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.counts.CountSimComparison;
 
 /**
@@ -64,7 +65,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	 */
 	private final NumberFormat numberFormat;
 
-	private static final Logger log = Logger.getLogger(CountSimComparisonTableWriter.class);
+	private static final Logger log = LogManager.getLogger(CountSimComparisonTableWriter.class);
 
 	/**
 	 *

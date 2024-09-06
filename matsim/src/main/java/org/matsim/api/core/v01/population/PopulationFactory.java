@@ -44,6 +44,8 @@ public interface PopulationFactory extends MatsimFactory {
 	 * It might in fact make sense to add a creational method that takes coord <i>and</i> link id.  kai, aug'10
 	 */
 	Activity createActivityFromCoord(String actType, Coord coord);
+	
+	Activity createInteractionActivityFromCoord(String actType, Coord coord);
 
 	/**
 	 * Creates an Activity from a link id. No coordinate will be associated directly with this activity. This does
@@ -52,8 +54,12 @@ public interface PopulationFactory extends MatsimFactory {
 	 * @return the activity
 	 */
 	Activity createActivityFromLinkId(String actType, Id<Link> linkId);
+	
+	Activity createInteractionActivityFromLinkId(String actType, Id<Link> linkId);
 
 	Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
+	
+	Activity createInteractionActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
 
 	Leg createLeg(String legMode);
 

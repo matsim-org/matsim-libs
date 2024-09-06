@@ -22,8 +22,8 @@ package org.matsim.contrib.taxi.util;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.util.DvrpEventsReaders;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
@@ -40,9 +40,9 @@ import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 
 public final class TaxiEventsReaders {
 	public static final Map<String, TaxiTaskType> TASK_TYPE_MAP = //
-			List.of(TaxiEmptyDriveTask.TYPE, TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE,
-					TaxiStayTask.TYPE, ETaxiScheduler.DRIVE_TO_CHARGER, ETaxiChargingTask.TYPE)//
-					.stream().collect(toImmutableMap(TaxiTaskType::name, type -> type));
+			Stream.of(TaxiEmptyDriveTask.TYPE, TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE,
+							TaxiStayTask.TYPE, ETaxiScheduler.DRIVE_TO_CHARGER, ETaxiChargingTask.TYPE)//
+					.collect(toImmutableMap(TaxiTaskType::name, type -> type));
 
 	public static final Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS = DvrpEventsReaders.createCustomEventMappers(
 			TASK_TYPE_MAP::get);

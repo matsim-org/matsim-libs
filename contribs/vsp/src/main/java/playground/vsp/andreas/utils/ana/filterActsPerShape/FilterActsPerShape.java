@@ -1,7 +1,8 @@
 package playground.vsp.andreas.utils.ana.filterActsPerShape;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -16,12 +17,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 
 public class FilterActsPerShape {
 	
-	private static final Logger log = Logger.getLogger(FilterActsPerShape.class);
-	private static final Level logLevel = Level.INFO;
+	private static final Logger log = LogManager.getLogger(FilterActsPerShape.class);
 
 	public static void run(String networkFile, String plansFile, String shapeFile, Coord minXY, Coord maxXY, String actTypeOne, String actTypeTwo, String filename) {
-		
-		log.setLevel(logLevel);
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		

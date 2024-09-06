@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -50,16 +50,16 @@ public class RouterFilter implements TripFlowSink {
 	private TripFlowSink sink;
 
 	private Collection<Id> interestingNodeIds = new HashSet<Id>();
-	
+
 	private double travelTimeToLink = 0.0;
-	
+
 	private Coord entryCoord;
-	
+
 	private final Scenario sc ;
 
 	public RouterFilter(Network network) {
 		this.network = network;
-		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 	}
@@ -73,7 +73,7 @@ public class RouterFilter implements TripFlowSink {
 		if (isInteresting(path)) {
 //			Facility newQuelle = new Zone(quelle.getId(), quelle.workplaces, quelle.workingPopulation, entryCoord);
 			ActivityFacility newQuelle = factory.createActivityFacility(quelle.getId(), quelle.getCoord() ) ;
-			for ( ActivityOption option : quelle.getActivityOptions().values() ) { 
+			for ( ActivityOption option : quelle.getActivityOptions().values() ) {
 				newQuelle.addActivityOption(option) ;
 			}
 

@@ -28,7 +28,8 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import javax.xml.crypto.MarshalException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
@@ -46,8 +47,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesConverter;
  */
 public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
-	private static final Logger log = Logger
-			.getLogger(LanesWriter.class);
+	private static final Logger log = LogManager.getLogger(LanesWriter.class);
 
 	private Lanes laneDefinitions;
 

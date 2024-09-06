@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contribs.discrete_mode_choice.components.tour_finder.TourFinder;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel;
@@ -30,7 +31,7 @@ import org.matsim.core.utils.timing.TimeTracker;
  * @author sebhoerl
  */
 public class TourBasedModel implements DiscreteModeChoiceModel {
-	final private static Logger logger = Logger.getLogger(TourBasedModel.class);
+	final private static Logger logger = LogManager.getLogger(TourBasedModel.class);
 
 	final private TourFinder tourFinder;
 	final private TourFilter tourFilter;
@@ -92,7 +93,7 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 					TourCandidate candidate = estimator.estimateTour(person, tourModes, tourTrips, tourCandidates);
 
 					if (!Double.isFinite(candidate.getUtility())) {
-						logger.warn(buildIllegalUtilityMessage(tripIndex, person));
+						logger.warn(buildIllegalUtilityMessage(tripIndex, person, candidate));
 						continue;
 					}
 
@@ -172,9 +173,11 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 				tripIndex, person.getId().toString(), appendix);
 	}
 
-	private String buildIllegalUtilityMessage(int tripIndex, Person person) {
+	private String buildIllegalUtilityMessage(int tripIndex, Person person, TourCandidate candidate) {
+		TripCandidate trip = candidate.getTripCandidates().get(tripIndex);
+		
 		return String.format(
-				"Received illegal utility for for tour starting at trip %d of agent %s. Continuing with next candidate.",
-				tripIndex, person.getId().toString());
+				"Received illegal utility for for tour starting at trip %d (%s) of agent %s. Continuing with next candidate.",
+				tripIndex, trip.getMode(), person.getId().toString());
 	}
 }

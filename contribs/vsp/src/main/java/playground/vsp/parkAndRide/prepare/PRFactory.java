@@ -29,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,7 +48,7 @@ import playground.vsp.parkAndRide.PRFacility;
  */
 public class PRFactory {
 
-	private static final Logger log = Logger.getLogger(PRFactory.class);
+	private static final Logger log = LogManager.getLogger(PRFactory.class);
 	private PRFileWriter writer = new PRFileWriter();
 	private Map<Id, Node> id2nextCarLinkToNode = new HashMap<Id, Node>();
 	private List<Id> insertedIDs = new ArrayList<Id>();

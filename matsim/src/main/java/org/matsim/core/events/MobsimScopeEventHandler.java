@@ -20,9 +20,12 @@
 
 package org.matsim.core.events;
 
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
+ * Event handlers implementing this class are instantiated shortly before the mobsim is started, and removed as one of the {@link AfterMobsimEvent}s.
+ *
  * @author Michal Maciejewski (michalm)
  */
 public interface MobsimScopeEventHandler extends EventHandler {
@@ -40,7 +43,7 @@ public interface MobsimScopeEventHandler extends EventHandler {
 
 	/**
 	 * Gives the event handler the possibility to clean up its internal state.
-	 * This method is called directly after the handler is removed from event handlers (on AfterMobsimEvent).
+	 * This method is called directly after the handler is removed from event handlers (on {@link AfterMobsimEvent} ).
 	 *
 	 * @param iteration the iteration in which the handler was instantiated
 	 */

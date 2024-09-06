@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacility;
@@ -36,7 +37,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author dziemke
  */
 class AccessibilityAggregator implements FacilityDataExchangeInterface {
-	private final Logger LOG = Logger.getLogger(AccessibilityAggregator.class);
+	private final Logger LOG = LogManager.getLogger(AccessibilityAggregator.class);
 
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new ConcurrentHashMap<>();
 

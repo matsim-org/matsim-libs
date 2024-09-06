@@ -20,6 +20,7 @@ package org.matsim.vehicles;
 
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public final class CostInformation implements Attributable{
 
@@ -30,7 +31,7 @@ public final class CostInformation implements Attributable{
 	private Double fixed;
 	private Double perMeter;
 	private Double perSecond;
-	private Attributes attributes = new Attributes() ;
+	private Attributes attributes = new AttributesImpl() ;
 
 	/* package-private */  CostInformation() { }
 	public Double getFixedCosts() {

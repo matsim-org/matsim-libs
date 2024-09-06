@@ -25,35 +25,30 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
-import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.MatsimRandom;
 /**
  * This class is based on work by Andreas Horni related to location choice, located at:
  * org.matsim.contrib.locationchoice.bestresponse.DestinationScoring
- * 
+ *
  * @author wrashid, ahorni
  *
  */
 public class RandomErrorTermManager {
-	
+
 	private Random rnd = new Random();
 	HashMap<Id,Double> parkingKValue=new HashMap<Id,Double>();
 	HashMap<Id,Double> personKValue=new HashMap<Id,Double>();
 	String epsilonDistribution;
-	
+
 	public RandomErrorTermManager(String epsilonDistribution,
 			LinkedList<Id> parkingIds, Collection<? extends Person> persons, int seed) {
 				this.epsilonDistribution = epsilonDistribution;
-		
+
 		Random random = new Random();
 		random.setSeed(seed);
 		for (Id parkingId:parkingIds){
 			parkingKValue.put(parkingId, random.nextDouble());
 		}
-		
+
 		for (Person person: persons){
 			personKValue.put(person.getId(), random.nextDouble());
 		}
@@ -62,21 +57,21 @@ public class RandomErrorTermManager {
 	public double getEpsilonAlternative(Id parkingId, Id personId, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
-		 */		
+		 */
 		double kparking = parkingKValue.get(parkingId);
-		double kperson = personKValue.get(personId); 
-		
+		double kperson = personKValue.get(personId);
+
 		/* generate another stable random number for the activity
 		 */
 		rnd.setSeed(actIndex);
 		double kactIndex = rnd.nextDouble();
-		
+
 		/*
-		 * generates a uniform rnd seed in [0,1[ 
+		 * generates a uniform rnd seed in [0,1[
 		 */
 		long seed = (long) (((kperson + kparking + kactIndex) % 1.0) * Long.MAX_VALUE);
 		rnd.setSeed(seed);
-		
+
 		/*
 		 * generate the epsilons according to standard Gumbel or standard Gaussian distribution
 		 */
@@ -92,17 +87,17 @@ public class RandomErrorTermManager {
 			}
 			double r = 0.0 - 1.0 * Math.log(-Math.log(1.0 * uniform));
 			//scale to sigma^2 = 1.0: sigma_gumbel = PI / sqrt(6.0)
-			return (r * Math.sqrt(6.0) / Math.PI);	
+			return (r * Math.sqrt(6.0) / Math.PI);
 		}
 		else if (epsilonDistribution.equalsIgnoreCase("gaussian")) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextGaussian();
 			}
-			return rnd.nextGaussian();	
+			return rnd.nextGaussian();
 		} else {
-			DebugLib.stopSystemAndReportInconsistency("unknown epsilonDistribution: " + epsilonDistribution);
-			return 0;
+			throw new Error("system is in inconsistent state: " +
+			"unknown epsilonDistribution: " + epsilonDistribution);
 		}
 	}
 

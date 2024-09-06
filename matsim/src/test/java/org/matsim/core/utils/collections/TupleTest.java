@@ -20,17 +20,21 @@
 
 package org.matsim.core.utils.collections;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TupleTest extends TestCase {
-	public void testOf() {
+import org.junit.jupiter.api.Test;
+
+public class TupleTest {
+	@Test
+	void testOf() {
 		Tuple<Integer, Double> t1 = new Tuple<>(1, 1.1);
 		Tuple<Integer, Double> t2 = Tuple.of(1, 1.1);
 		assertEquals(t1, t2);
 	}
 
 
-	public void testEquals() {
+	@Test
+	void testEquals() {
 		// the basic Tuple we will usually compare against
 		Tuple<Integer, Double> t1 = new Tuple<Integer, Double>(1, 1.1);
 
@@ -67,7 +71,8 @@ public class TupleTest extends TestCase {
 		assertFalse(t1.equals(Integer.valueOf(1)));
 	}
 
-	public void testEquals_withNull() {
+	@Test
+	void testEquals_withNull() {
 		Integer i1 = Integer.valueOf(1);
 		Integer i2 = Integer.valueOf(2);
 		Tuple<Integer, Integer> tuple1a = new Tuple<Integer, Integer>(i1, null);
@@ -98,7 +103,8 @@ public class TupleTest extends TestCase {
 		assertFalse(tuple3a.equals(tuple4));
 	}
 
-	public void testHashCode_withNull() {
+	@Test
+	void testHashCode_withNull() {
 		Integer i1 = Integer.valueOf(1);
 		Integer i2 = Integer.valueOf(2);
 		Tuple<Integer, Integer> tuple = new Tuple<Integer, Integer>(i1, i2);

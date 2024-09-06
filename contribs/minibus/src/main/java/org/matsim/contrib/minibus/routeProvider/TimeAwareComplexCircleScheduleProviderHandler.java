@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -37,7 +38,7 @@ import java.util.LinkedHashMap;
 final class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
+	private final static Logger log = LogManager.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
 	
 	private final String pIdentifier;
 	private LinkedHashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<>();

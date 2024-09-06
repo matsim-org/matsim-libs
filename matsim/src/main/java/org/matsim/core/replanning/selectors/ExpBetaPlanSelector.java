@@ -23,10 +23,10 @@ package org.matsim.core.replanning.selectors;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -39,12 +39,12 @@ public class ExpBetaPlanSelector<T extends BasicPlan, I> implements PlanSelector
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
-	
+
 	public ExpBetaPlanSelector( final double logitScaleFactor ) {
 		this.beta = logitScaleFactor ;
 	}
 
-	public ExpBetaPlanSelector(PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
+	public ExpBetaPlanSelector(ScoringConfigGroup charyparNagelScoringConfigGroup) {
 		this( charyparNagelScoringConfigGroup.getBrainExpBeta() ) ;
 	}
 
@@ -109,7 +109,7 @@ public class ExpBetaPlanSelector<T extends BasicPlan, I> implements PlanSelector
 		double maxScore = Double.NEGATIVE_INFINITY;
 		for (T plan1 : person.getPlans()) {
 			if ( (plan1.getScore() != null) && plan1.getScore().isNaN() ) {
-				Logger.getLogger(this.getClass()).error("encountering getScore().isNaN().  This class is not well behaved in this situation.  Continuing anyway ...") ;
+				LogManager.getLogger(this.getClass()).error("encountering getScore().isNaN().  This class is not well behaved in this situation.  Continuing anyway ...") ;
 			}
 			if ((plan1.getScore() != null) && (plan1.getScore() > maxScore)) {
 				maxScore = plan1.getScore();

@@ -1,6 +1,7 @@
 package playground.vsp.andreas.osmBB.osm2counts;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class NodeSink implements Sink{
 	
-	static final Logger log = Logger.getLogger(NodeSink.class);
+	static final Logger log = LogManager.getLogger(NodeSink.class);
 
 	int count = 0;
 	HashMap<String, String> shortNameMap = new HashMap<String, String>();

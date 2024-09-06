@@ -20,11 +20,12 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 class FacilityLoad {
 	
-	//private final static Logger log = Logger.getLogger(FacilityLoad.class);
+	//private final static Logger log = LogManager.getLogger(FacilityLoad.class);
 	
 	private int [] arrivals = null;
 	private int [] departures = null;

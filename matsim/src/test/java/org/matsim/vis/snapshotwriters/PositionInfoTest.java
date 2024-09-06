@@ -20,15 +20,23 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PositionInfoTest extends MatsimTestCase {
+public class PositionInfoTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final double epsilon = 1e-8; // accuracy of double-comparisons
 
@@ -38,7 +46,8 @@ public class PositionInfoTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testDistanceOnLink_shortLink() {
+	@Test
+	void testDistanceOnLink_shortLink() {
 
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
@@ -74,7 +83,8 @@ public class PositionInfoTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	public void testDistanceOnLink_longLink() {
+	@Test
+	void testDistanceOnLink_longLink() {
 
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));

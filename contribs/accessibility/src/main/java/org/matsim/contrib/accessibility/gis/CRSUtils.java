@@ -22,19 +22,20 @@ package org.matsim.contrib.accessibility.gis;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.metadata.Identifier;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.NoSuchAuthorityCodeException;
+import org.geotools.api.referencing.crs.CRSAuthorityFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.opengis.metadata.Identifier;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * Utility-class providing functionality related to coordinate reference
@@ -45,7 +46,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 final class CRSUtils {
 
-	private static final Logger logger = Logger.getLogger(CRSUtils.class);
+	private static final Logger logger = LogManager.getLogger(CRSUtils.class);
 
 	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new ConcurrentHashMap<Integer, CoordinateReferenceSystem>();
 
@@ -93,7 +94,7 @@ final class CRSUtils {
 		/*
 		 * Randomly get one identifier.
 		 */
-		Identifier identifier = (Identifier) (crs.getIdentifiers().iterator().next());
+		Identifier identifier = crs.getIdentifiers().iterator().next();
 		if (identifier == null) {
 			return 0;
 		} else {
@@ -117,7 +118,7 @@ final class CRSUtils {
 		CoordinateReferenceSystem targetCRS = getCRS(target.getSRID());
 
 		try {
-			return CRS.findMathTransform(sourceCRS, targetCRS);
+            return CRS.findMathTransform(sourceCRS, targetCRS);
 		} catch (FactoryException e) {
 			e.printStackTrace();
 			return null;

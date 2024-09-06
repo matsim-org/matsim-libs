@@ -20,23 +20,32 @@
 
 package org.matsim.core.events;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author tthunig
  */
-public class VehicleAbortsEventTest extends MatsimTestCase {
+public class VehicleAbortsEventTest {
 
-	public void testWriteReadXml() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testWriteReadXml() {
 		final VehicleAbortsEvent event1 = new VehicleAbortsEvent(81153.3, Id.create("a007", Vehicle.class), Id.create("link1", Link.class));
-		final VehicleAbortsEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
+		final VehicleAbortsEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
 	}
-	
+
 }

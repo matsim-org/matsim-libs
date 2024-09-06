@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
@@ -12,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -40,7 +60,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Collects various data related to public transport during the execution of the plans (=during mobsim).
@@ -51,7 +71,7 @@ import javax.inject.Inject;
  */
 public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private final static Logger LOG = Logger.getLogger(OccupancyTracker.class);
+	private final static Logger LOG = LogManager.getLogger(OccupancyTracker.class);
 
 	private final OccupancyData data;
 	private final Scenario scenario;
@@ -225,10 +245,7 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 					break;
 				}
 				if (!searchStart) {
-					this.hasNext = true;
-					if (this.nextFromStop.getStopFacility().getId().equals(alightingStopId)) {
-						this.hasNext = false;
-					}
+					this.hasNext = !this.nextFromStop.getStopFacility().getId().equals(alightingStopId);
 					break;
 				}
 				this.nextFromStop = this.nextToStop;

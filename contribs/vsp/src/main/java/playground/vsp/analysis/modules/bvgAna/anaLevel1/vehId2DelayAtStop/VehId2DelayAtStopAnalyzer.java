@@ -29,7 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
@@ -41,7 +42,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class VehId2DelayAtStopAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(VehId2DelayAtStopAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(VehId2DelayAtStopAnalyzer.class);
 	private MutableScenario scenario;
 	
 	private VehId2DelayAtStopHandler handler;

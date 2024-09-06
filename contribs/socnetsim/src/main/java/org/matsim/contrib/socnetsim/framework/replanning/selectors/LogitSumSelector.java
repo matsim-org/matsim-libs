@@ -21,7 +21,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
@@ -37,7 +38,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweight
  */
 public class LogitSumSelector implements GroupLevelPlanSelector {
 	static final Logger log =
-		Logger.getLogger(LogitSumSelector.class);
+		LogManager.getLogger(LogitSumSelector.class);
 
 	private final GroupLevelPlanSelector delegate;
 

@@ -20,12 +20,17 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,20 +47,25 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 
 /**
  * @author mrieser
  */
-public class TransitScheduleReaderTest extends MatsimTestCase {
+public class TransitScheduleReaderTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
-	public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
-		final String inputDir = getClassInputDirectory();
+	@Test
+	void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
+		final String inputDir = utils.getClassInputDirectory();
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
@@ -65,32 +75,33 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, scenario.getPopulation().getFactory().getRouteFactories()).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
-		assertEquals("wrong line id.", Id.create("T1", TransitLine.class), schedule.getTransitLines().keySet().iterator().next());
+		assertEquals(1, schedule.getTransitLines().size(), "wrong number of transit lines.");
+		assertEquals(Id.create("T1", TransitLine.class), schedule.getTransitLines().keySet().iterator().next(), "wrong line id.");
 
 		TransitLine lineT1 = schedule.getTransitLines().get(Id.create("T1", TransitLine.class));
-		assertNotNull("could not find line with id T1.", lineT1);
+		assertNotNull(lineT1, "could not find line with id T1.");
 
 		TransitRoute route1 = lineT1.getRoutes().get(Id.create("1", TransitRoute.class));
-		assertNotNull("could not find route 1 in line T1.", route1);
+		assertNotNull(route1, "could not find route 1 in line T1.");
 
 		Map<Id<Departure>, Departure> departures = route1.getDepartures();
-		assertNotNull("could not get departures of route 1 in line T1.", departures);
-		assertEquals("wrong number of departures.", 3, departures.size());
+		assertNotNull(departures, "could not get departures of route 1 in line T1.");
+		assertEquals(3, departures.size(), "wrong number of departures.");
 
 		List<TransitRouteStop> stops = route1.getStops();
-		assertNotNull("could not get transit route stops.", stops);
-		assertEquals("wrong number of stops.", 6, stops.size());
+		assertNotNull(stops, "could not get transit route stops.");
+		assertEquals(6, stops.size(), "wrong number of stops.");
 
 		NetworkRoute route = route1.getRoute();
-		assertNotNull("could not get route.", route);
-		assertEquals("wrong start link.", network.getLinks().get(Id.create("1", Link.class)).getId(), route.getStartLinkId());
-		assertEquals("wrong end link.", network.getLinks().get(Id.create("8", Link.class)).getId(), route.getEndLinkId());
-		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
+		assertNotNull(route, "could not get route.");
+		assertEquals(network.getLinks().get(Id.create("1", Link.class)).getId(), route.getStartLinkId(), "wrong start link.");
+		assertEquals(network.getLinks().get(Id.create("8", Link.class)).getId(), route.getEndLinkId(), "wrong end link.");
+		assertEquals(4, route.getLinkIds().size(), "wrong number of links in route.");
 	}
 
-	public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
-		final String inputDir = getClassInputDirectory();
+	@Test
+	void testReadFile() throws IOException, SAXException, ParserConfigurationException {
+		final String inputDir = utils.getClassInputDirectory();
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
@@ -100,7 +111,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		new TransitScheduleReader(scenario).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		// only a minimal test, the actual reader used should be tested somewhere separately
-		assertEquals("wrong number of transit lines.", 1, scenario.getTransitSchedule().getTransitLines().size());
+		assertEquals(1, scenario.getTransitSchedule().getTransitLines().size(), "wrong number of transit lines.");
 		// in the end, we mostly test that there is no Exception when reading the file.
 
 	}

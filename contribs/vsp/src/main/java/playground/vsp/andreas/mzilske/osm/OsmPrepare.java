@@ -19,7 +19,8 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.merge.common.ConflictResolutionMethod;
 import org.openstreetmap.osmosis.core.progress.v0_6.EntityProgressLogger;
@@ -34,7 +35,7 @@ import java.util.*;
 
 public class OsmPrepare {
 	
-	private final static Logger log = Logger.getLogger(OsmPrepare.class);
+	private final static Logger log = LogManager.getLogger(OsmPrepare.class);
 	
 	private final String infFile;
 	private final String outFile;

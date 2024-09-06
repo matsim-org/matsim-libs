@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -37,7 +38,7 @@ import java.util.Map.Entry;
  */
 public final class BVGLines2PtModes implements LineId2PtMode{
 	
-	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
+	private final static Logger log = LogManager.getLogger(BVGLines2PtModes.class);
 	
 	private final static String BUS = "bvg_bus";
 	private final static String TRAM = "bvg_tram";

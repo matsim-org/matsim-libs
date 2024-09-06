@@ -20,40 +20,27 @@
 
 package playground.vsp.zzArchive.bvwpOld;
 
-
-import org.matsim.testcases.MatsimTestCase;
-
-import playground.vsp.zzArchive.bvwpOld.EconomicValues;
-import playground.vsp.zzArchive.bvwpOld.ScenarioForEvalData;
-import playground.vsp.zzArchive.bvwpOld.ScenarioForTest1;
-import playground.vsp.zzArchive.bvwpOld.UtilityChangesRuleOfHalf;
-import playground.vsp.zzArchive.bvwpOld.Values;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.testcases.MatsimTestUtils;
 
 
+public class BvwpTest {
 
-public class BvwpTest extends MatsimTestCase {
-	
-	public void testOne() {
-		
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testOne() {
+
 		Values economicValues = EconomicValues.createEconomicValuesForTest1();
-		
+
 		ScenarioForEvalData nullfall = ScenarioForTest1.createNullfallForTest();
-		
+
 		ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
-		
+
 		new UtilityChangesRuleOfHalf().computeAndPrintResults(economicValues, nullfall, planfall) ;
-		
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
 
 	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
 }

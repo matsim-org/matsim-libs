@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +42,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 public class DynamicGroupIdentifierTest {
 
 	@Test
-	public void testNGroupsNoJointPlansNoSocialNet() {
+	void testNGroupsNoJointPlansNoSocialNet() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
@@ -62,8 +62,8 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsNoJointPlansCompleteSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+	void testNGroupsNoJointPlansCompleteSocialNet() {
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
@@ -92,8 +92,8 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsWithJointPlansNoSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+	void testNGroupsWithJointPlansNoSocialNet() {
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();
@@ -139,8 +139,8 @@ public class DynamicGroupIdentifierTest {
 	}
 
 	@Test
-	public void testNGroupsWithJointPlansCompleteSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+	void testNGroupsWithJointPlansCompleteSocialNet() {
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();
@@ -198,18 +198,18 @@ public class DynamicGroupIdentifierTest {
 		final GroupIdentifier testee = new DynamicGroupIdentifier( fixture.scenario );
 
 		final Collection<ReplanningGroup> groups = testee.identifyGroups( fixture.scenario.getPopulation() );
-		Assert.assertEquals(
-				"unexpected number of groups",
+		Assertions.assertEquals(
 				fixture.expectedNGroups,
-				groups.size() );
+				groups.size(),
+				"unexpected number of groups" );
 
 		int n = 0;
 		for ( ReplanningGroup g : groups ) n += g.getPersons().size();
 
-		Assert.assertEquals(
-				"unexpected number of persons in groups",
+		Assertions.assertEquals(
 				fixture.scenario.getPopulation().getPersons().size(),
-				n );
+				n,
+				"unexpected number of persons in groups" );
 	}
 
 	private static class Fixture {

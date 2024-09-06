@@ -20,21 +20,30 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class TransitLineTest extends MatsimTestCase {
+public class TransitLineTest {
 
-	private static final Logger log = Logger.getLogger(TransitLineTest.class);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	private static final Logger log = LogManager.getLogger(TransitLineTest.class);
 
 	/**
 	 * In case we once should have more than one implementation of
@@ -48,14 +57,16 @@ public class TransitLineTest extends MatsimTestCase {
 		return new TransitLineImpl(id);
 	}
 
-	public void testInitialization() {
+	@Test
+	void testInitialization() {
 		Id<TransitLine> id = Id.create(511, TransitLine.class);
 		TransitLine tLine = createTransitLine(id);
 		assertNotNull(tLine);
-		assertEquals("different ids.", id.toString(), tLine.getId().toString());
+		assertEquals(id.toString(), tLine.getId().toString(), "different ids.");
 	}
 
-	public void testAddRoute() {
+	@Test
+	void testAddRoute() {
 		TransitLine tLine = createTransitLine(Id.create("0891", TransitLine.class));
 		TransitRoute route1 = new TransitRouteImpl(Id.create("1", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
 		TransitRoute route2 = new TransitRouteImpl(Id.create("2", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
@@ -69,7 +80,8 @@ public class TransitLineTest extends MatsimTestCase {
 		assertNotNull(tLine.getRoutes().get(route2.getId()));
 	}
 
-	public void testAddRouteException() {
+	@Test
+	void testAddRouteException() {
 		TransitLine tLine = createTransitLine(Id.create("0891", TransitLine.class));
 		TransitRoute route1a = new TransitRouteImpl(Id.create("1", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
 		TransitRoute route1b = new TransitRouteImpl(Id.create("1", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
@@ -95,7 +107,8 @@ public class TransitLineTest extends MatsimTestCase {
 
 	}
 
-	public void testRemoveRoute() {
+	@Test
+	void testRemoveRoute() {
 		TransitLine tLine = createTransitLine(Id.create("1980", TransitLine.class));
 		TransitRoute route1 = new TransitRouteImpl(Id.create("11", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
 		TransitRoute route2 = new TransitRouteImpl(Id.create("5", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
@@ -122,7 +135,8 @@ public class TransitLineTest extends MatsimTestCase {
 		assertNotNull(tLine.getRoutes().get(route1.getId()));
 	}
 
-	public void testGetRoutesImmutable() {
+	@Test
+	void testGetRoutesImmutable() {
 		TransitLine tLine = createTransitLine(Id.create("1980", TransitLine.class));
 		TransitRoute route1 = new TransitRouteImpl(Id.create("11", TransitRoute.class), null, new ArrayList<TransitRouteStop>(), "bus");
 		try {

@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -72,7 +73,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	private ReplanningContext replanningContext;
 
-	static final private Logger log = Logger.getLogger(AbstractMultithreadedModule.class);
+	static final private Logger log = LogManager.getLogger(AbstractMultithreadedModule.class);
 
 	/**
 	 * Design comments:<ul>

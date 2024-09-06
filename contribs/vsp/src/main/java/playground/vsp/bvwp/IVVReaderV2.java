@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -44,7 +45,7 @@ import playground.vsp.bvwp.MultiDimensionalArray.Mode;
  */
 public class IVVReaderV2 {
 
-	private static final Logger log = Logger.getLogger(IVVReaderV2.class);
+	private static final Logger log = LogManager.getLogger(IVVReaderV2.class);
 	private IVVReaderConfigGroup config;
 
 	static final double BAHNPREISPROKM = 0.12; //Expertenmeinung 10 bis 12 Cent Einnahme je KM

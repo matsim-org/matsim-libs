@@ -22,7 +22,8 @@ package playground.vsp.andreas.utils.ana.plans2gexf;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 
@@ -35,7 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 public class GridEdge {
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(GridEdge.class);
+	private static final Logger log = LogManager.getLogger(GridEdge.class);
 	private Id<GridEdge> id;
 	private GridNode fromNode;
 	private GridNode toNode;

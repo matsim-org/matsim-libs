@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.matsim.core.utils.collections.MapUtils;
 
@@ -90,7 +91,7 @@ public final class GroupStrategyRegistry {
 }
 
 class SubpopulationRegistry {
-	private static final Logger log = Logger.getLogger( SubpopulationRegistry.class );
+	private static final Logger log = LogManager.getLogger( SubpopulationRegistry.class );
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
 	private final List<Integer> lastIters = new ArrayList<Integer>();

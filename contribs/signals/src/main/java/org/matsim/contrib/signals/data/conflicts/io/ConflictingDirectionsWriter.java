@@ -21,33 +21,34 @@
 package org.matsim.contrib.signals.data.conflicts.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author tthunig
  */
 public final class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	private static final Logger LOG = Logger.getLogger(ConflictingDirectionsWriter.class);
-	
+	private static final Logger LOG = LogManager.getLogger(ConflictingDirectionsWriter.class);
+
 	private ConflictData conflictData;
 	private ConflictingDirectionsWriterHandlerImpl handler;
-	
-	
+
+
 	public ConflictingDirectionsWriter(ConflictData conflictData) {
 		this.conflictData = conflictData;
 		this.handler = new ConflictingDirectionsWriterHandlerImpl();
 	}
-	
+
 	@Override
 	public void write(String filename) {
 		LOG.info("Writing conflicting direction data to file: " + filename + "...");
-		
+
 		try {
 			this.openFile(filename);
 			this.handler.writeHeaderAndStartElement(this.writer);
@@ -56,11 +57,11 @@ public final class ConflictingDirectionsWriter extends MatsimXmlWriter implement
 			this.handler.endConflictData(this.writer);
 			LOG.info("Conflict data written to: " + filename);
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		} finally {
 			this.close();
 		}
-		
+
 		LOG.info("done.");
 	}
 

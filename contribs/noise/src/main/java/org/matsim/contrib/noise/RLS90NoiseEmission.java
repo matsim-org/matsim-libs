@@ -2,7 +2,8 @@ package org.matsim.contrib.noise;
 
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -13,7 +14,7 @@ import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
 
 class RLS90NoiseEmission implements NoiseEmission {
 
-    private final static Logger log = Logger.getLogger(RLS90NoiseEmission.class);
+    private final static Logger log = LogManager.getLogger(RLS90NoiseEmission.class);
 
     private final NoiseConfigGroup noiseParams;
     private final Network network;

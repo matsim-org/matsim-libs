@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import java.util.Set;
@@ -18,23 +33,19 @@ import org.matsim.pt.Umlauf;
  */
 public class SBBTransitDriverAgentFactory implements TransitDriverAgentFactory {
 
-    private final InternalInterface internalInterface;
-    private final TransitStopAgentTracker transitStopAgentTracker;
     private final Set<String> deterministicModes;
 
-    SBBTransitDriverAgentFactory(InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker, Set<String> deterministicModes) {
-        this.internalInterface = internalInterface;
-        this.transitStopAgentTracker = transitStopAgentTracker;
+    SBBTransitDriverAgentFactory(Set<String> deterministicModes) {
         this.deterministicModes = deterministicModes;
     }
 
     @Override
-    public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf) {
+    public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
         String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
         if (this.deterministicModes.contains(mode)) {
-            return new SBBTransitDriverAgent(umlauf, mode, this.transitStopAgentTracker, this.internalInterface);
+            return new SBBTransitDriverAgent(umlauf, mode,transitStopAgentTracker, internalInterface);
         }
-        return new TransitDriverAgentImpl(umlauf, TransportMode.car, this.transitStopAgentTracker, this.internalInterface);
+        return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
     }
 
 }

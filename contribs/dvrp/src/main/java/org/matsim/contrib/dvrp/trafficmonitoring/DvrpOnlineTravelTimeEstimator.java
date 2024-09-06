@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +37,7 @@ import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
  * DvrpOfflineTravelTimeEstimator. The beta coefficient is provided in seconds and should be either 0 (no online
  * estimation) or positive (mixed online-offline estimation). If beta is sufficiently large, 'beta >> 0', only the
  * currently observed TT is used
- * 
+ *
  * @author michalm
  */
 public class DvrpOnlineTravelTimeEstimator
@@ -53,7 +53,7 @@ public class DvrpOnlineTravelTimeEstimator
 		this.withinDayTT = withinDayTT;
 		this.offlineTTEstimator = offlineTTEstimator;
 
-		beta = dvrpConfig.getTravelTimeEstimationBeta();
+		beta = dvrpConfig.travelTimeEstimationBeta;
 		if (beta < 0) {
 			throw new IllegalArgumentException("travelTimeEstimationBeta must be zero or positive");
 		}

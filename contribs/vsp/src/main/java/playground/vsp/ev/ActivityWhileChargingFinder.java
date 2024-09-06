@@ -21,7 +21,9 @@
 package playground.vsp.ev;
 
 import com.google.common.base.Preconditions;
-import org.apache.log4j.Logger;
+import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,15 +38,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class ActivityWhileChargingFinder {
+	private static Logger log = LogManager.getLogger(ActivityWhileChargingFinder.class);
 
 	private final Collection<String> activityTypes;
 	private final double minimumActDuration;
 
-	private Logger log = Logger.getLogger(ActivityWhileChargingFinder.class);
 
-	public ActivityWhileChargingFinder(Collection<String> possibleWhileChargingStartActTypes, double minimumActDuration){
-		this.activityTypes = possibleWhileChargingStartActTypes;
-		this.minimumActDuration = minimumActDuration;
+//	public ActivityWhileChargingFinder(Collection<String> possibleWhileChargingStartActTypes, double minimumActDuration){
+//		this.activityTypes = possibleWhileChargingStartActTypes;
+//		this.minimumActDuration = minimumActDuration;
+//	}
+	@Inject ActivityWhileChargingFinder( UrbanEVConfigGroup urbanEVConfig ) {
+		this.activityTypes = urbanEVConfig.getWhileChargingActivityTypes();
+		this.minimumActDuration = urbanEVConfig.getMinWhileChargingActivityDuration_s();
 	}
 
 	/**
@@ -61,7 +67,7 @@ class ActivityWhileChargingFinder {
 		List<PlanElement> planElementsBeforeLeg = plan.getPlanElements().subList(0, plan.getPlanElements().indexOf(leg));
 
 		//collect precedent activitiesWhileCharging
-		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.toString().contains((UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER))).collect(Collectors.toList());
+		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.toString().contains((UrbanEVModule.PLUGIN_IDENTIFIER) ) ).collect(Collectors.toList() );
 		List<Activity> precedentActsWhileCharging = new ArrayList<>();
 		for (PlanElement precedentPluginInteraction : precedentPluginInteractions) {
 			int index = plan.getPlanElements().indexOf(precedentPluginInteraction);

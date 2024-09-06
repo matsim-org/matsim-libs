@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -66,12 +67,13 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	private final String targetCRS;
 	private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 
-	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV2.class);
+	private final static Logger log = LogManager.getLogger(NetworkReaderMatsimV2.class);
 
 	NetworkReaderMatsimV2(
 	        final String inputCRS,
 			final String targetCRS,
 			final Network network) {
+		super(ValidationType.DTD_ONLY);
 		this.externalInputCRS = inputCRS;
 		this.targetCRS = targetCRS;
 		if (externalInputCRS != null && targetCRS != null) {
@@ -185,7 +187,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		this.network.addNode(node);
 
 		NetworkUtils.setType(node,atts.getValue("type"));
-		// (did not have a null check when I found it.  kai, jul'16) 
+		// (did not have a null check when I found it.  kai, jul'16)
 
 		if (atts.getValue(NetworkUtils.ORIGID) != null) {
 			NetworkUtils.setOrigId( node, atts.getValue(NetworkUtils.ORIGID) ) ;
@@ -235,7 +237,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 				NetworkUtils.setType( (l), value); // will now put it into the attributes. kai, dec'16
 			}
 		}
-		
+
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].isEmpty()) {

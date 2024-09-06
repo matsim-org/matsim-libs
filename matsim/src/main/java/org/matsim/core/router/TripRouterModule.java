@@ -22,7 +22,7 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
@@ -40,27 +40,27 @@ public class TripRouterModule extends AbstractModule {
 
         bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
-        bind(AnalysisMainModeIdentifier.class).to(RoutingModeMainModeIdentifier.class);
+        bind(AnalysisMainModeIdentifier.class).to(DefaultAnalysisMainModeIdentifier.class);
 
         bind(MultimodalLinkChooser.class).to(MultimodalLinkChooserDefaultImpl.class);
 
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
         bind(SingleModeNetworksCache.class).asEagerSingleton();
-        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        RoutingConfigGroup routeConfigGroup = getConfig().routing();
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             if (getConfig().transit().isUseTransit() && getConfig().transit().getTransitModes().contains(mode)) {
                 // default config contains "pt" as teleported mode, but if we have simulated transit, this is supposed to override it
                 // better solve this on the config level eventually.
                 continue;
             }
-            addRoutingModuleBinding(mode).toProvider(new FreespeedFactorRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+            addRoutingModuleBinding(mode).toProvider(new FreespeedFactorRouting(getConfig().routing().getModeRoutingParams().get(mode)));
         }
         for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-            addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+            addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().routing().getModeRoutingParams().get(mode)));
         }
-        
-        boolean linkToLinkRouting = getConfig().controler().isLinkToLinkRoutingEnabled();
+
+        boolean linkToLinkRouting = getConfig().controller().isLinkToLinkRoutingEnabled();
         if (linkToLinkRouting) {
             bind(NetworkTurnInfoBuilderI.class).to(NetworkTurnInfoBuilder.class) ;
         }

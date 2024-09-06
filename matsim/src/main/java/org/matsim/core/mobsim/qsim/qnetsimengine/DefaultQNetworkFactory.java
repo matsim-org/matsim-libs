@@ -20,19 +20,24 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import java.util.Collections;
+import java.util.Set;
 
 
 /**
@@ -42,38 +47,37 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * it us truly needed yet.
  * <li> Mobsim-specific objects, such as {@link AgentCounter} or {@link QNetsimEngineWithThreadpool}.  Since the mobsim is re-created in every
  * iteration, they cannot be injected via guice, at least not via the global inject mechanism that has the override facility.
- * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@QNode}.  They are arguments to the 
+ * <li> The last level are link- oder node-specific objects such as {@link Link}  or {@QNode}.  They are arguments to the
  * creational methods.
  * <li> The main underlying implementations are {@link QueueWithBuffer}, the factory of which is inserted into {@link QLinkImpl}.  This
  * was the syntax that could subsume all other syntactic variants.  Builders are used to set defaults and to avoid overly long
  * constructors.
  * <li> {@link QLinkImpl} is essentially the container where vehicles are parked, agents perform activities, etc.  MATSim has some tendency to
- * have them centralized in the QSim (see, e.g., {@link TransitStopAgentTracker}), but both for parallel computing and for visualization, 
- * having agents on a decentralized location is helpful.  
+ * have them centralized in the QSim (see, e.g., {@link TransitStopAgentTracker}), but both for parallel computing and for visualization,
+ * having agents on a decentralized location is helpful.
  * <li> Most functionality of {@link QLinkImpl} is actually in {@link AbstractQLink}, which
- * can also be used as basic infrastructure by other qnetworks.  
- * <li> {@link QueueWithBuffer} is an instance of {@link QLaneI} and can be replaced accordingly.  
- * <li> One can also replace the {@link VehicleQ} that works inside {@link QueueWithBuffer}. 
+ * can also be used as basic infrastructure by other qnetworks.
+ * <li> {@link QueueWithBuffer} is an instance of {@link QLaneI} and can be replaced accordingly.
+ * <li> One can also replace the {@link VehicleQ} that works inside {@link QueueWithBuffer}.
  * </ul>
- * 
+ *
  * @author dgrether, knagel
- * 
+ *
  * @see ConfigurableQNetworkFactory
  */
 public final class DefaultQNetworkFactory implements QNetworkFactory {
-	private EventsManager events ;
-	private Scenario scenario ;
-	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
+	private final EventsManager events ;
+	private final Scenario scenario ;
+	private QLinkImpl.Builder linkBuilder;
+	private QNodeImpl.Builder nodeBuilder;
+	@Inject private Set<LinkSpeedCalculator> calculators = Collections.emptySet();
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
-	@Inject
-	DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
+	private NetsimInternalInterface netsimEngine1;
+	@Inject DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.events = events;
 		this.scenario = scenario;
 	}
-	@Override
-	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-		this.netsimEngine = netsimEngine1;
+	@Override public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -82,17 +86,29 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
-		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(), 
+		// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
+		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(),
 				mobsimTimer, linkWidthCalculator );
+
+		Gbl.assertNotNull(context);
+
+		this.netsimEngine1 = netsimEngine1;
+
+
 	}
-	@Override
-	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+	@Override public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
+		this.linkBuilder = new QLinkImpl.Builder( context, netsimEngine1 ) ;
+		// it is not possible to construct the builder in the initializeFactory method.  I do not know why.  kai, jun'23
+
+		DefaultLinkSpeedCalculator theCalculator = new DefaultLinkSpeedCalculator();
+		for( LinkSpeedCalculator calculator : calculators ){
+			theCalculator.addLinkSpeedCalculator( calculator );
+		}
+		this.linkBuilder.setLinkSpeedCalculator( theCalculator );
 		return linkBuilder.build(link, toQueueNode) ;
 	}
-	@Override
-	public QNodeI createNetsimNode( final Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
-		return builder.build( node ) ;
+	@Override public QNodeI createNetsimNode( final Node node ) {
+		this.nodeBuilder = new QNodeImpl.Builder( netsimEngine1, context, scenario.getConfig().qsim() ) ;
+		return nodeBuilder.build( node ) ;
 	}
 }

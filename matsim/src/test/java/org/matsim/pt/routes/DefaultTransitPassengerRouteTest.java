@@ -20,8 +20,11 @@
 
 package org.matsim.pt.routes;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,46 +34,47 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
-import junit.framework.TestCase;
-
 // Mainly copied from ExperimentalTransitRouteTest
-public class DefaultTransitPassengerRouteTest extends TestCase {
+public class DefaultTransitPassengerRouteTest {
 
-	public void testReadWrite_null() {
+	@Test
+	void testReadWrite_null() {
 		DefaultTransitPassengerRoute routeA = new DefaultTransitPassengerRoute(null, null);
 		String description = routeA.getRouteDescription();
-		
+
 		DefaultTransitPassengerRoute routeB = new DefaultTransitPassengerRoute(null, null);
 		routeB.setRouteDescription(description);
-		
+
 		assertNull(routeB.getAccessStopId());
 		assertNull(routeB.getEgressStopId());
 		assertNull(routeB.getLineId());
 		assertNull(routeB.getRouteId());
 	}
-	
-	public void testReadWrite() {
+
+	@Test
+	void testReadWrite() {
 		Id<TransitStopFacility> accessId = Id.create("access", TransitStopFacility.class);
 		Id<TransitStopFacility> egressId = Id.create("egress", TransitStopFacility.class);
 		Id<TransitLine> lineId = Id.create("line", TransitLine.class);
 		Id<TransitRoute> routeId = Id.create("route", TransitRoute.class);
-		
+
 		DefaultTransitPassengerRoute routeA = new DefaultTransitPassengerRoute(null, null, accessId, egressId, lineId, routeId);
 		String description = routeA.getRouteDescription();
-		
+
 		DefaultTransitPassengerRoute routeB = new DefaultTransitPassengerRoute(null, null);
 		routeB.setRouteDescription(description);
-		
+
 		assertEquals(accessId, routeB.getAccessStopId());
 		assertEquals(egressId, routeB.getEgressStopId());
 		assertEquals(lineId, routeB.getLineId());
 		assertEquals(routeId, routeB.getRouteId());
 	}
 
-	public void testInitializationLinks() {
+	@Test
+	void testInitializationLinks() {
 		Link link1 = new FakeLink(Id.create(1, Link.class));
 		Link link2 = new FakeLink(Id.create(2, Link.class));
 		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute(link1.getId(), link2.getId());
@@ -81,7 +85,8 @@ public class DefaultTransitPassengerRouteTest extends TestCase {
 		assertNull(route.getEgressStopId());
 	}
 
-	public void testInitializationStops() {
+	@Test
+	void testInitializationStops() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(5, 11), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(18, 7), false);
@@ -102,7 +107,8 @@ public class DefaultTransitPassengerRouteTest extends TestCase {
 		assertEquals(123.0, route.getBoardingTime().seconds(), 1e-3);
 	}
 
-	public void testLinks() {
+	@Test
+	void testLinks() {
 		Link link1 = new FakeLink(Id.create(1, Link.class));
 		Link link2 = new FakeLink(Id.create(2, Link.class));
 		Link link3 = new FakeLink(Id.create(3, Link.class));
@@ -116,22 +122,24 @@ public class DefaultTransitPassengerRouteTest extends TestCase {
 		assertEquals(link4.getId(), route.getEndLinkId());
 	}
 
-	public void testTravelTime() {
+	@Test
+	void testTravelTime() {
 		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute(null, null);
 		assertTrue(route.getTravelTime().isUndefined());
 		double traveltime = 987.65;
 		route.setTravelTime(traveltime);
-		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
-	public void testSetRouteDescription_PtRoute() {
+	@Test
+	void testSetRouteDescription_PtRoute() {
 		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute(null, null);
-		route.setRouteDescription("" + 
+		route.setRouteDescription("" +
 				"{" +
-					"\"accessFacilityId\" : \"5\"," + 
-					"\"egressFacilityId\" : \"1055\"," + 
-					"\"transitLineId\" : \"11\"," + 
-					"\"transitRouteId\" : \"1980\"" + 
+					"\"accessFacilityId\" : \"5\"," +
+					"\"egressFacilityId\" : \"1055\"," +
+					"\"transitLineId\" : \"11\"," +
+					"\"transitRouteId\" : \"1980\"" +
 				"}"
 		);
 		assertEquals("5", route.getAccessStopId().toString());
@@ -141,7 +149,8 @@ public class DefaultTransitPassengerRouteTest extends TestCase {
 		assertEquals("{\"transitRouteId\":\"1980\",\"boardingTime\":\"undefined\",\"transitLineId\":\"11\",\"accessFacilityId\":\"5\",\"egressFacilityId\":\"1055\"}", route.getRouteDescription());
 	}
 
-	public void testSetRouteDescription_NonPtRoute() {
+	@Test
+	void testSetRouteDescription_NonPtRoute() {
 		try {
 			DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute(null, null);
 			route.setRouteDescription("23 42 7 21");

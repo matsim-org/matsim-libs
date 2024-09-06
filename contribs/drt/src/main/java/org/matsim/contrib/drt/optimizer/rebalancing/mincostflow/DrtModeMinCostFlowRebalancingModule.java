@@ -21,17 +21,13 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDrtDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.DemandEstimatorAsTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualRebalancableVehicleDistributionTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualVehicleDensityTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualVehiclesToPopulationRatioTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -59,41 +55,37 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
-								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
+								getter.getModal(ZoneSystem.class), getter.getModal(Fleet.class),
 								getter.getModal(ZonalRelocationCalculator.class), params))).asEagerSingleton();
 
-				switch (strategyParams.getRebalancingTargetCalculatorType()) {
+				switch (strategyParams.rebalancingTargetCalculatorType) {
 					case EstimatedDemand:
-						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-								getter -> new DemandEstimatorAsTargetCalculator(
-										getter.getModal(ZonalDemandEstimator.class),
-										strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> new DemandEstimatorAsTargetCalculator(
+								getter.getModal(ZonalDemandEstimator.class), strategyParams.demandEstimationPeriod))).asEagerSingleton();
 						break;
 
 					case EqualRebalancableVehicleDistribution:
-						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-								getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
-										getter.getModal(ZonalDemandEstimator.class),
-										getter.getModal(DrtZonalSystem.class),
-										strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
+								getter.getModal(ZonalDemandEstimator.class),
+								getter.getModal(ZoneSystem.class), strategyParams.demandEstimationPeriod))).asEagerSingleton();
 						break;
 
 					case EqualVehicleDensity:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-								getter -> new EqualVehicleDensityTargetCalculator(getter.getModal(DrtZonalSystem.class),
+								getter -> new EqualVehicleDensityTargetCalculator(getter.getModal(ZoneSystem.class),
 										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 						break;
 
 					case EqualVehiclesToPopulationRatio:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new EqualVehiclesToPopulationRatioTargetCalculator(
-										getter.getModal(DrtZonalSystem.class), getter.get(Population.class),
+										getter.getModal(ZoneSystem.class), getter.get(Population.class),
 										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 						break;
 
 					default:
 						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
-								+ strategyParams.getZonalDemandEstimatorType());
+								+ strategyParams.zonalDemandEstimatorType);
 				}
 
 				bindModal(ZonalRelocationCalculator.class).toProvider(modalProvider(
@@ -102,13 +94,13 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		switch (strategyParams.getZonalDemandEstimatorType()) {
+		switch (strategyParams.zonalDemandEstimatorType) {
 			case PreviousIterationDemand:
-				bindModal(PreviousIterationDRTDemandEstimator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
-								strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
-				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
-				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
+				bindModal(PreviousIterationDrtDemandEstimator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationDrtDemandEstimator(getter.getModal(ZoneSystem.class), drtCfg,
+								strategyParams.demandEstimationPeriod))).asEagerSingleton();
+				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:
@@ -116,7 +108,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 			default:
 				throw new IllegalArgumentException(
-						"Unsupported zonalDemandEstimatorType=" + strategyParams.getZonalDemandEstimatorType());
+						"Unsupported zonalDemandEstimatorType=" + strategyParams.zonalDemandEstimatorType);
 		}
 	}
 }

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -38,7 +39,7 @@ import java.util.TreeSet;
 final class CountPVehHandler implements LinkEnterEventHandler{
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CountPVehHandler.class);
+	private static final Logger log = LogManager.getLogger(CountPVehHandler.class);
 	
 	private final String pIdentifier;
 	private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;

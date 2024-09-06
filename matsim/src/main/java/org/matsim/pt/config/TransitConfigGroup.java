@@ -51,7 +51,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedAttributeFiles" ;
 	private static final String USING_TRANSIT_IN_MOBSIM = "usingTransitInMobsim" ;
 
-	public enum TransitRoutingAlgorithmType {DijkstraBased, SwissRailRaptor}
+	public enum TransitRoutingAlgorithmType {@Deprecated DijkstraBased, SwissRailRaptor}
 
 	public static final String TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate transit stops and lines attribute files is deprecated." +
 			"  Add the information directly into each stop or line, using " +
@@ -67,7 +67,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 
 	private Set<String> transitModes;
 	private TransitRoutingAlgorithmType routingAlgorithmType = TransitRoutingAlgorithmType.SwissRailRaptor;
-	
+
 	// ---
 	private static final String USE_TRANSIT = "useTransit";
 	private boolean useTransit = false;
@@ -159,7 +159,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public String getTransitLinesAttributesFile() {
 		return transitLinesAttributesFile;
 	}
-	
+
 	@StringSetter( TRANSIT_LINES_ATTRIBUTES )
 	public void setTransitLinesAttributesFile(final String transitLinesAttributesFile) {
 		this.transitLinesAttributesFile = transitLinesAttributesFile;
@@ -172,12 +172,12 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public URL getTransitStopsAttributesFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, getTransitStopsAttributesFile()) ;
 	}
-	
+
 	@StringSetter( TRANSIT_STOPS_ATTRIBUTES )
 	public void setTransitStopsAttributesFile(final String transitStopsAttributesFile) {
 		this.transitStopsAttributesFile = transitStopsAttributesFile;
 	}
-	
+
 	@StringGetter( USE_TRANSIT )
 	public boolean isUseTransit() {
 		return this.useTransit;
@@ -207,7 +207,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public void setInputScheduleCRS(String inputScheduleCRS) {
 		this.inputScheduleCRS = inputScheduleCRS;
 	}
-	
+
 	public static final String BOARDING_ACCEPTANCE_CMT="under which conditions agent boards transit vehicle" ;
 	public enum BoardingAcceptance { checkLineAndStop, checkStopOnly }
 	private BoardingAcceptance boardingAcceptance = BoardingAcceptance.checkLineAndStop ;
@@ -217,7 +217,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public void setBoardingAcceptance(BoardingAcceptance boardingAcceptance) {
 		this.boardingAcceptance = boardingAcceptance;
 	}
-	
+
 	private boolean usingTransitInMobsim = true ;
 	@StringSetter( USING_TRANSIT_IN_MOBSIM )
 	public final void setUsingTransitInMobsim( boolean val ) {

@@ -22,7 +22,8 @@ package org.matsim.vis.otfvis.handler;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FacilityDrawer {
-	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
+	private static final Logger log = LogManager.getLogger(FacilityDrawer.class);
 
 	public static class Writer extends OTFDataWriter<Void> {
 

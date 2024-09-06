@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilityCandidate;
 
 public class NestCalculator {
 	private final Map<Nest, Collection<UtilityCandidate>> candidates = new HashMap<>();
 	private final NestStructure structure;
 
-	private final Logger logger = Logger.getLogger(NestCalculator.class);
+	private final Logger logger = LogManager.getLogger(NestCalculator.class);
 
 	public NestCalculator(NestStructure structure) {
 		this.structure = structure;

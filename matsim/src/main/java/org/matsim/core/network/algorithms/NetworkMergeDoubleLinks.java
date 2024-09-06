@@ -20,13 +20,13 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 
 import java.util.Iterator;
 
@@ -39,7 +39,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 		ADDITIVE,
 		/** max merge (max cap, max freespeed, max langes, max length */
 		MAXIMUM }
-	
+
 	public enum LogInfoLevel {
 		/** do not print any info on merged links */
 		NOINFO,
@@ -47,7 +47,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 		MAXIMUM
 	}
 
-	private final static Logger log = Logger.getLogger(NetworkMergeDoubleLinks.class);
+	private final static Logger log = LogManager.getLogger(NetworkMergeDoubleLinks.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -67,7 +67,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 	public NetworkMergeDoubleLinks(final MergeType mergetype) {
 		this(mergetype, LogInfoLevel.MAXIMUM);
 	}
-	
+
 	public NetworkMergeDoubleLinks(final MergeType mergetype, final LogInfoLevel logInfoLevel) {
 		this.mergetype = mergetype;
 		this.logInfoLevel = logInfoLevel;
@@ -83,7 +83,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 				if (logInfoLevel.equals(LogInfoLevel.MAXIMUM)) {
 					log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
 				}
-				
+
 				network.removeLink(link2.getId());
 				break;
 			case ADDITIVE:

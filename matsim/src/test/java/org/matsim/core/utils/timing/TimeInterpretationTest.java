@@ -22,7 +22,10 @@ package org.matsim.core.utils.timing;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,17 +39,24 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class TimeInterpretationTest extends MatsimTestCase {
+public class TimeInterpretationTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
 	@Test
-	public void testIgnoreDelays() {
+	void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
 		Controler controller = prepareController(config);
@@ -58,15 +68,17 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(43200.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(43200.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time was NOT shifted (although arrival is later), second departure is assumed at 12:00
 	}
 
+
 	@Test
-	public void testShiftActivityEndTime() {
+	void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 
 		Controler controller = prepareController(config);
@@ -78,20 +90,20 @@ public class TimeInterpretationTest extends MatsimTestCase {
 		Leg firstLeg = (Leg) elements.get(1);
 		Leg secondLeg = (Leg) elements.get(3);
 
-		assertEquals(15600.0, firstLeg.getTravelTime().seconds());
-		assertEquals(28800.0, firstLeg.getDepartureTime().seconds());
-		assertEquals(44400.0, secondLeg.getDepartureTime().seconds());
+		assertEquals(15600.0, firstLeg.getTravelTime().seconds(), 0);
+		assertEquals(28800.0, firstLeg.getDepartureTime().seconds(), 0);
+		assertEquals(44400.0, secondLeg.getDepartureTime().seconds(), 0);
 		// End time WAS shifted (because arrival is later), second departure is assumed at 12:20
 	}
 
 	private Controler prepareController(Config config) {
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(genericParams);
+		config.scoring().addActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

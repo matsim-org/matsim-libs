@@ -22,7 +22,6 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -76,7 +75,7 @@ public class FacilitiesSummary {
 					}
 					else {
 						throw new RuntimeException("ERROR: in " + this.getClass().getName() +
-															 " in run(Facilities facilities):" + 
+															 " in run(Facilities facilities):" +
 															 " do not know type = " + a.getType());
 					}
 				}

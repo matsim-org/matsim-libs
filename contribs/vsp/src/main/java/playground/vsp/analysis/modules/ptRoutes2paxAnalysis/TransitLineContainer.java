@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -34,8 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 public class TransitLineContainer {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(TransitLineContainer.class);
+	private static final Logger log = LogManager.getLogger(TransitLineContainer.class);
 	private Id<TransitLine> id;
 	private Map<Id<TransitRoute>, TransitRouteContainer> routeContainer;
 

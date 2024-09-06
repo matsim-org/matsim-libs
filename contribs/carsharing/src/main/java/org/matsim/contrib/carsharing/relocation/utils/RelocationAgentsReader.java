@@ -15,6 +15,11 @@ public class RelocationAgentsReader extends MatsimXmlParser {
 
 	private Counter counter;
 
+
+	public RelocationAgentsReader() {
+		super(ValidationType.DTD_ONLY);
+	}
+
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if ( name.equals("relocationAgentBases" ) ) {

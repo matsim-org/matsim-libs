@@ -10,10 +10,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
@@ -101,6 +101,14 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 			if (strategy.isMassConserving(st))
 				massConserving++;
+		}
+
+		if (person != null && persons.size() > 0) {
+
+			Person p = persons.get(0);
+
+			log.info(p.getAttributes());
+			log.info(p.getSelectedPlan());
 		}
 
 		log.info("Subtours: {} | closed: {}% | massConserving: {}%", subtours.size(), 100d * closed / subtours.size(), 100d * massConserving / subtours.size());

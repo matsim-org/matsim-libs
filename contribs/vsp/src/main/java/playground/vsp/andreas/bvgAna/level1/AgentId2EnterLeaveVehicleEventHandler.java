@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -40,7 +41,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class AgentId2EnterLeaveVehicleEventHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	private final Logger log = Logger.getLogger(AgentId2EnterLeaveVehicleEventHandler.class);
+	private final Logger log = LogManager.getLogger(AgentId2EnterLeaveVehicleEventHandler.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private Set<Id<Person>> agentIds;

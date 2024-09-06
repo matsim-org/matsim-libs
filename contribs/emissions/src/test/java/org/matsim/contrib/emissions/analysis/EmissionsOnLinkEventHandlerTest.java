@@ -1,6 +1,16 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.matsim.contrib.emissions.Pollutant.HC;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.time.TimeBinMap;
@@ -9,12 +19,6 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static junit.framework.TestCase.*;
-import static org.matsim.contrib.emissions.Pollutant.HC;
 
 public class EmissionsOnLinkEventHandlerTest {
 
@@ -33,8 +37,8 @@ public class EmissionsOnLinkEventHandlerTest {
         return result;
     }
 
-    @Test
-    public void handleWarmEmissionsEvent() {
+	@Test
+	void handleWarmEmissionsEvent() {
 
         Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());
@@ -62,8 +66,8 @@ public class EmissionsOnLinkEventHandlerTest {
         emissions.forEach((key, value) -> assertEquals(value, link2pollutantsMap.get(linkId).get(key), 0.0001));
     }
 
-    @Test
-    public void handleColdEmissionEvent() {
+	@Test
+	void handleColdEmissionEvent() {
 
         Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());
@@ -85,8 +89,8 @@ public class EmissionsOnLinkEventHandlerTest {
         emissions.forEach((key, value) -> assertEquals(value, link2pollutantsMap.get(linkId).get(key), 0.0001));
     }
 
-    @Test
-    public void handleMultipleEvents() {
+	@Test
+	void handleMultipleEvents() {
 
         final Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         final int numberOfEvents = 1000;
@@ -111,14 +115,14 @@ public class EmissionsOnLinkEventHandlerTest {
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> secondBin = summedEmissions.getTimeBin(20);
         assertTrue(secondBin.hasValue());
-        assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(HC));
+        assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(HC), 0);
 
         link2pollutantsMap.get(linkId).forEach((pollutant, value) ->
                 assertEquals(3 * numberOfEvents * emissionValue, value, 0.0001));
     }
 
-    @Test
-    public void handleSingleLinkWithSingleEvent() {
+	@Test
+	void handleSingleLinkWithSingleEvent() {
 
         Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());
@@ -140,8 +144,8 @@ public class EmissionsOnLinkEventHandlerTest {
         link2pollutantsMap.get(linkId).forEach((pollutant, value) -> assertEquals(emissionValue, value, 0.0001));
     }
 
-    @Test
-    public void handleSingleLinkWithMultipleEvents() {
+	@Test
+	void handleSingleLinkWithMultipleEvents() {
 
         Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());

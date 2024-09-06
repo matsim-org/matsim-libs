@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.ev.charging;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.contrib.ev.infrastructure.Charger;
-
-import java.util.Map;
+import org.matsim.vehicles.Vehicle;
 
 public class QuitQueueAtChargerEvent extends Event {
 	public static final String EVENT_TYPE = "quit_queue_at_charger";
@@ -32,9 +33,9 @@ public class QuitQueueAtChargerEvent extends Event {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id<Charger> chargerId;
-	private final Id<ElectricVehicle> vehicleId;
+	private final Id<Vehicle> vehicleId;
 
-	public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId) {
+	public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
 		super(time);
 		this.chargerId = chargerId;
 		this.vehicleId = vehicleId;
@@ -44,7 +45,7 @@ public class QuitQueueAtChargerEvent extends Event {
 		return chargerId;
 	}
 
-	public Id<ElectricVehicle> getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 
@@ -59,5 +60,13 @@ public class QuitQueueAtChargerEvent extends Event {
 		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
 		return attr;
+	}
+
+	public static QuitQueueAtChargerEvent convert(GenericEvent genericEvent) {
+		Map<String, String> attributes = genericEvent.getAttributes();
+		double time = genericEvent.getTime();
+		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(QuitQueueAtChargerEvent.ATTRIBUTE_VEHICLE));
+		Id<Charger> chargerId = Id.create(attributes.get(QuitQueueAtChargerEvent.ATTRIBUTE_CHARGER), Charger.class);
+		return new QuitQueueAtChargerEvent(time, chargerId, vehicleId);
 	}
 }

@@ -26,7 +26,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +55,7 @@ import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
 @Deprecated
 public class DistanceAnalysis {
 	//TODO [dr]debugging
-	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
+	private static final Logger log = LogManager.getLogger(DistanceAnalysis.class);
 	
 	private DistAnalysisHandler eventsHandler;
 

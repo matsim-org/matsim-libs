@@ -18,13 +18,18 @@
 
 package org.matsim.integration.events;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterJson;
@@ -32,15 +37,13 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 /**
  * @author mrieser / Simunto
  */
-public class PersonScoreEventTest extends TestCase {
+public class PersonScoreEventTest {
 
-	public void testWriteReadXml() {
+	@Test
+	void testWriteReadXml() {
 		final PersonScoreEvent event1 = new PersonScoreEvent(7.0*3600, Id.create(1, Person.class), 2.34, "act");
 		final PersonScoreEvent event2 = new PersonScoreEvent(8.5*3600, Id.create(2, Person.class), -3.45, "leg");
 
@@ -90,7 +93,8 @@ public class PersonScoreEventTest extends TestCase {
 		assertEquals(event2.getKind(), e2.getKind());
 	}
 
-	public void testWriteReadJson() {
+	@Test
+	void testWriteReadJson() {
 		final PersonScoreEvent event1 = new PersonScoreEvent(7.0*3600, Id.create(1, Person.class), 2.34, "act");
 		final PersonScoreEvent event2 = new PersonScoreEvent(8.5*3600, Id.create(2, Person.class), -3.45, "leg");
 

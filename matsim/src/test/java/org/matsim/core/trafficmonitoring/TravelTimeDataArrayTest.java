@@ -1,8 +1,9 @@
 package org.matsim.core.trafficmonitoring;
 
-import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -11,11 +12,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TravelTimeDataArrayTest{
-	private static final Logger log = Logger.getLogger( TravelTimeDataArrayTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger( TravelTimeDataArrayTest.class );
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test() {
+	void test() {
 		Network network = NetworkUtils.createNetwork();
         Node from = NetworkUtils.createNode(Id.createNodeId("1"));
 		Node to = NetworkUtils.createNode( Id.createNodeId( "2" ) );

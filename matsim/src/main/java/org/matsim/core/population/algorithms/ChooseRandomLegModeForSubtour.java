@@ -320,7 +320,19 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				}
 			}
 
-			usableModes.remove(getTransportMode(subtour));
+			if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints) {
+
+				// only remove candidates if the whole trip uses the same mode
+				usableModes.removeIf(mode -> subtour.getTrips().stream().allMatch(
+						trip-> mode.equals(mainModeIdentifier.identifyMainMode(trip.getTripElements()))
+				));
+
+			} else {
+				// The old behaviour removes candidates that could change trips to a different mode
+				usableModes.remove(getTransportMode(subtour));
+			}
+
+
 			// (remove current mode so we don't get it again; note that the parent plan is kept anyways)
 			for (String transportMode : usableModes) {
 				choiceSet.add(

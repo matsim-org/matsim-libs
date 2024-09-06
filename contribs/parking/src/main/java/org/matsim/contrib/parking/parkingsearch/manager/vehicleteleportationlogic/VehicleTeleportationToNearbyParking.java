@@ -34,23 +34,23 @@ import org.matsim.vehicles.Vehicle;
 /**
  * teleports vehicle to  a location near the agent, if vehicle is more than  a certain threshold in metres away
  * @author  jbischoff
- * 
+ *
  */
 public class VehicleTeleportationToNearbyParking implements VehicleTeleportationLogic {
-	
+
 	private double maximumWalkDistance  = 2000;
 	//TODO: Make this configurable
-	
+
 	private double beelineDistanceFactor;
 	@Inject
 	ParkingSearchManager manager;
-	
-	ParkingSearchLogic parkingLogic;  
+
+	ParkingSearchLogic parkingLogic;
 	Network network;
-	
+
 	@Inject
 	public VehicleTeleportationToNearbyParking(Config config, Network network) {
-		this.beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+		this.beelineDistanceFactor = config.routing().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
 		this.parkingLogic = new RandomParkingSearchLogic(network);
 		this.network = network;
 	}
@@ -60,7 +60,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(vehicleLinkId).getCoord(), network.getLinks().get(agentLinkId).getCoord()) * this.beelineDistanceFactor;
 		if (walkDistance<=this.maximumWalkDistance){
 			return vehicleLinkId;
-		} 
+		}
 		Id<Link> parkingLinkId = agentLinkId;
 		while (!this.manager.reserveSpaceIfVehicleCanParkHere(vehicleId, parkingLinkId)){
 			parkingLinkId = parkingLogic.getNextLink(parkingLinkId, vehicleId, mode);
@@ -68,5 +68,5 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 		manager.parkVehicleHere(vehicleId, parkingLinkId, time);
 		return parkingLinkId;
 	}
-	
+
 }

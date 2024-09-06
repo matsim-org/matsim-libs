@@ -22,7 +22,8 @@ package org.matsim.core.network.algorithms;
 
 import java.io.FileInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +46,7 @@ public final class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnab
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddSpeedRestrictions.class);
+	private final static Logger log = LogManager.getLogger(NetworkTeleatlasAddSpeedRestrictions.class);
 
 	/**
 	 * path and name to the Tele Atlas MultiNet speed restriction (sr) DBF file

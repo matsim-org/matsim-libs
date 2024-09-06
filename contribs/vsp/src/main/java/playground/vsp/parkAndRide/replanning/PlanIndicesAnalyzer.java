@@ -38,7 +38,7 @@ import playground.vsp.parkAndRide.PRConstants;
  *
  */
 public class PlanIndicesAnalyzer {
-//	private static final Logger log = Logger.getLogger(PlanIndicesAnalyzer.class);
+//	private static final Logger log = LogManager.getLogger(PlanIndicesAnalyzer.class);
 
 	private List<PlanElement> planElements = new ArrayList<PlanElement>();
 	

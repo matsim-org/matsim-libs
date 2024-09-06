@@ -26,8 +26,9 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 import com.google.inject.spi.LinkedKeyBinding;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
@@ -52,7 +53,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 public final class Injector {
 	private Injector(){} // namespace only, do not instantiate
 
-	private static final  Logger logger = Logger.getLogger(Injector.class);
+	private static final  Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {

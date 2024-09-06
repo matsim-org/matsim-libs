@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.boardingAlightingCount.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 public class VehicleLocation {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(VehicleLocation.class);
+	private static final Logger log = LogManager.getLogger(VehicleLocation.class);
 	private Id id;
 	private Id locationId;
 

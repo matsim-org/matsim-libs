@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.zonal;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.core.config.ConfigGroup;
@@ -32,31 +33,17 @@ public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams 
 
 	public ZonalTaxiOptimizerParams() {
 		super(SET_NAME, false, false);
+		initSingletonParameterSets();
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return new RuleBasedTaxiOptimizerParams();
-			case ZonalSystemParams.SET_NAME:
-				return new ZonalSystemParams();
-		}
-		return super.createParameterSet(type);
-	}
-
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		switch (set.getName()) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
-				break;
-			case ZonalSystemParams.SET_NAME:
-				zonalSystemParams = (ZonalSystemParams)set;
-				break;
-		}
-
-		super.addParameterSet(set);
+	private void initSingletonParameterSets() {
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(RuleBasedTaxiOptimizerParams.SET_NAME, RuleBasedTaxiOptimizerParams::new,
+			() -> ruleBasedTaxiOptimizerParams,
+			params -> ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)params);
+		addDefinition(ZonalSystemParams.SET_NAME, ZonalSystemParams::new,
+			() -> zonalSystemParams,
+			params -> zonalSystemParams = (ZonalSystemParams)params);
 	}
 
 	public ZonalSystemParams getZonalSystemParams() {
@@ -70,10 +57,5 @@ public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams 
 	@Override
 	public int getReoptimizationTimeStep() {
 		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
-	}
-
-	@Override
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
 	}
 }

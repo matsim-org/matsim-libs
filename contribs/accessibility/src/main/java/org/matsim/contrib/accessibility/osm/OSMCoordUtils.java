@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
@@ -22,7 +23,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
  * @author dziemke, jwjoubert
  */
 class OSMCoordUtils {
-	private final static Logger LOG = Logger.getLogger(OSMCoordUtils.class);
+	private final static Logger LOG = LogManager.getLogger(OSMCoordUtils.class);
 
 	public static Coord getCentroidCoord(Entity entity,	CoordinateTransformation ct,			
 			Map<Long, NodeContainer> nodeMap, Map<Long, WayContainer> wayMap, Map<Long, RelationContainer> relationMap){

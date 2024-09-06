@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
@@ -41,11 +42,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 class DestinationChoice extends AbstractMultithreadedModule {
 
-    private static final Logger log = Logger.getLogger(DestinationChoice.class);
+    private static final Logger log = LogManager.getLogger(DestinationChoice.class);
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
@@ -99,7 +100,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 	protected final void afterFinishReplanningHook() {
 		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 
-		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
+		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm)
 				|| DestinationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
             for (PlanAlgorithm plan_algo : this.planAlgoInstances) {
@@ -117,11 +118,11 @@ class DestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public final PlanAlgorithm getPlanAlgoInstance() {		
+	public final PlanAlgorithm getPlanAlgoInstance() {
 		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 		switch ( algorithm ) {
 		case random:
-			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
+			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchRecursive:
@@ -129,12 +130,12 @@ class DestinationChoice extends AbstractMultithreadedModule {
 					this.timeInterpretation, this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchSingleAct:
-			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
+			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType,
 					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case bestResponse:
 			throw new RuntimeException("wrong class for this locachoice algo; aborting ...") ;
-		}		
+		}
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 

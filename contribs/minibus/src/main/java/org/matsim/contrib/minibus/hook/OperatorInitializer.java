@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.replanning.CreateNew24hPlan;
@@ -41,7 +42,7 @@ import java.util.LinkedList;
  */
 final class OperatorInitializer {
 
-	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
+	private final static Logger log = LogManager.getLogger(OperatorInitializer.class);
 	private final PConfigGroup pConfig;
 	private final OperatorFactory operatorFactory;
 	private final PRouteProvider routeProvider;

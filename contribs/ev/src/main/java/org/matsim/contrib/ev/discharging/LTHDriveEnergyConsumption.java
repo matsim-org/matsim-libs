@@ -23,7 +23,7 @@ package org.matsim.contrib.ev.discharging;/*
 
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -31,7 +31,7 @@ import org.matsim.core.gbl.Gbl;
 
 import com.google.common.primitives.Doubles;
 
-public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
+public final class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private final PiecewiseBicubicSplineInterpolatingFunction function;
 
@@ -90,9 +90,9 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 				throw new IllegalArgumentException("Speed greater than the supported maxSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMaxSpeed) {
-					Logger.getLogger(getClass())
+					LogManager.getLogger(getClass())
 							.warn("Assuming maxSpeed, as Speed not covered by consumption data " + speed);
-					Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+					LogManager.getLogger(getClass()).warn(Gbl.ONLYONCE);
 					hasWarnedMaxSpeed = true;
 				}
 				speed = maxSpeed;
@@ -104,9 +104,9 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 				throw new IllegalArgumentException("Speed less than the supported minSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMinSpeed) {
-					Logger.getLogger(getClass())
+					LogManager.getLogger(getClass())
 							.warn("Assuming minSpeed, as Speed not covered by consumption data " + speed);
-					Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+					LogManager.getLogger(getClass()).warn(Gbl.ONLYONCE);
 					hasWarnedMinSpeed = true;
 				}
 				speed = minSpeed;
@@ -135,7 +135,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 				throw new IllegalArgumentException("Slope less than the supported minSlope; slope =" + currentSlope);
 			} else {
 				if (!hasWarnedMinSlope) {
-					Logger.getLogger(getClass())
+					LogManager.getLogger(getClass())
 							.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
 					hasWarnedMinSlope = true;
 				}
@@ -147,7 +147,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 				throw new IllegalArgumentException("Slope greater than the supported maxSlope; slope =" + currentSlope);
 			} else {
 				if (!hasWarnedMaxSlope) {
-					Logger.getLogger(getClass())
+					LogManager.getLogger(getClass())
 							.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
 					hasWarnedMaxSlope = true;
 				}

@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -39,7 +40,7 @@ public class Bins {
 	protected List<BinEntry> entries = new Vector<BinEntry>();
 	protected double [] bins;
 
-	private final static Logger log = Logger.getLogger(Bins.class);
+	private final static Logger log = LogManager.getLogger(Bins.class);
 
 	public Bins(double interval, double maxVal, String desc) {
 		this.interval = interval;

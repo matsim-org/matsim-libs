@@ -26,34 +26,32 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.zone.ZonalSystem;
-import org.matsim.contrib.zone.ZonalSystems;
-import org.matsim.contrib.zone.Zone;
-
-import com.google.common.collect.Maps;
 
 public class IdleTaxiZonalRegistry {
 	private final ScheduleInquiry scheduleInquiry;
 
-	private final ZonalSystem zonalSystem;
-	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
+	private final ZoneSystem zoneSystem;
+	private final IdMap<Zone, List<Zone>> zonesSortedByDistance;
 
-	private final Map<Id<Zone>, Map<Id<DvrpVehicle>, DvrpVehicle>> vehiclesInZones;
+	private final IdMap<Zone, Map<Id<DvrpVehicle>, DvrpVehicle>> vehiclesInZones = new IdMap<>(Zone.class);
 	private final Map<Id<DvrpVehicle>, DvrpVehicle> vehicles = new LinkedHashMap<>();
 
-	public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry) {
+	public IdleTaxiZonalRegistry(ZoneSystem zoneSystem, ScheduleInquiry scheduleInquiry) {
 		this.scheduleInquiry = scheduleInquiry;
 
-		this.zonalSystem = zonalSystem;
-		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
+		this.zoneSystem = zoneSystem;
+		zonesSortedByDistance = ZoneSystemUtils.initZonesByDistance(zoneSystem.getZones());
 
-		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
-		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
+		for (Id<Zone> id : zoneSystem.getZones().keySet()) {
 			vehiclesInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
@@ -89,13 +87,11 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	public Stream<DvrpVehicle> findNearestVehicles(Node node, int minCount, Predicate<DvrpVehicle> vehicleFilter) {
-		Predicate<DvrpVehicle> idleVehicleFilter = vehicleFilter == null ?
-				scheduleInquiry::isIdle :
-				vehicleFilter.and(scheduleInquiry::isIdle);
+		Predicate<DvrpVehicle> idleVehicleFilter = vehicleFilter == null ? scheduleInquiry::isIdle : vehicleFilter.and(scheduleInquiry::isIdle);
 
 		return minCount >= vehicles.size() ?
 				vehicles.values().stream().filter(idleVehicleFilter) :
-				zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+				zonesSortedByDistance.get(zoneSystem.getZoneForNodeId(node.getId()).orElseThrow().getId())
 						.stream()
 						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())
 						.filter(idleVehicleFilter)
@@ -103,7 +99,7 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	private Id<Zone> getZoneId(TaxiStayTask stayTask) {
-		return zonalSystem.getZone(stayTask.getLink().getToNode()).getId();
+		return zoneSystem.getZoneForLinkId(stayTask.getLink().getId()).orElseThrow().getId();
 	}
 
 	public Stream<DvrpVehicle> vehicles() {

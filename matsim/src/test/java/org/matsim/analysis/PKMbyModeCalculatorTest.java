@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -8,17 +8,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -39,11 +41,11 @@ public class PKMbyModeCalculatorTest {
 	Person person3 = PopulationUtils.getFactory().createPerson(Id.create(3, Person.class));
 	Person person4 = PopulationUtils.getFactory().createPerson(Id.create(4, Person.class));
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testPKMbyModeCalculator() {
+	void testPKMbyModeCalculator() {
 
 		final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 		Plans plans = new Plans();
@@ -51,7 +53,7 @@ public class PKMbyModeCalculatorTest {
 		/****************************
 		 * Person - creating person 1
 		 ************************************/
-		
+
 		Plan plan = plans.createPlanOne();
 
 		// counting the total distance traveled in each mode
@@ -153,16 +155,16 @@ public class PKMbyModeCalculatorTest {
 
 	private void performTest(IdMap<Person, Plan> map, HashMap<String, Double> modeCalcDist, String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controlerConfigGroup, controlerIO);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controlerIO, new GlobalConfigGroup());
 		// iteration 0
 		pkmbyModeCalculator.addIteration(0, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		Double totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person2CarDist")
 				+ modeCalcDist.get("person3CarDist");
 		Double totalPtDist = modeCalcDist.get("person1PtDist") + modeCalcDist.get("person4PtDist");
@@ -175,7 +177,7 @@ public class PKMbyModeCalculatorTest {
 		map.remove(person2.getId());
 		// iteration 1
 		pkmbyModeCalculator.addIteration(1, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person3CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person3WalkDist") + modeCalcDist.get("person4WalkDist");
@@ -186,7 +188,7 @@ public class PKMbyModeCalculatorTest {
 		map.remove(person3.getId());
 		// iteration 2
 		pkmbyModeCalculator.addIteration(2, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		totalCarDist = modeCalcDist.get("person1CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person4WalkDist");
@@ -198,27 +200,27 @@ public class PKMbyModeCalculatorTest {
 	/************ Reading and validating the output ************/
 	private void readAndValidateValues(int itr, Double totalCar, Double totalPt, Double totalWalk) {
 
-		String file = utils.getOutputDirectory() + "/PKMbyModeCalculator" + "/pkm_modestats.txt";
+		String file = utils.getOutputDirectory() + "/PKMbyModeCalculator" + "/pkm_modestats.csv";
 		BufferedReader br;
 		String line;
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String[] columnNames = firstRow.split(new GlobalConfigGroup().getDefaultDelimiter());
 			decideColumns(columnNames);
 			int iteration = 0;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(new GlobalConfigGroup().getDefaultDelimiter());
 					// checking if column number in greater than 0, because 0th column is always
 					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double carStat = (car > 0) ? Double.valueOf(column[car]) : 0;
-					Double ptStat = (pt > 0) ? Double.valueOf(column[pt]) : 0;
-					Double walkStat = (walk > 0) ? Double.valueOf(column[walk]) : 0;
+					double carStat = (car > 0) ? Double.parseDouble(column[car]) : 0;
+					double ptStat = (pt > 0) ? Double.parseDouble(column[pt]) : 0;
+					double walkStat = (walk > 0) ? Double.parseDouble(column[walk]) : 0;
 
-					Assert.assertEquals("Car stats score does not match", Math.round((totalCar / 1000)), carStat, 0);
-					Assert.assertEquals("PT stats score does not match", Math.round((totalPt / 1000)), ptStat, 0);
-					Assert.assertEquals("Walk stats score does not match", Math.round((totalWalk / 1000)), walkStat, 0);
+					Assertions.assertEquals(Math.round((totalCar / 1000)), carStat, 0, "Car stats score does not match");
+					Assertions.assertEquals(Math.round((totalPt / 1000)), ptStat, 0, "PT stats score does not match");
+					Assertions.assertEquals(Math.round((totalWalk / 1000)), walkStat, 0, "Walk stats score does not match");
 					break;
 				}
 				iteration++;

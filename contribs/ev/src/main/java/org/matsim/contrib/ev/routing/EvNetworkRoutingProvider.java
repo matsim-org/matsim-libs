@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -13,8 +14,8 @@ import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -29,7 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
+	private static final Logger log = LogManager.getLogger(EvNetworkRoutingProvider.class);
 
 	private final String routingMode;
 	@Inject
@@ -45,7 +46,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	private Config config;
 
 	@Inject
-	private PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private RoutingConfigGroup routingConfigGroup;
 
 	@Inject
 	private Network network;
@@ -128,7 +129,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(AccessEgressType.none)) {
+		if (!routingConfigGroup.getAccessEgressType().equals(AccessEgressType.none)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,

@@ -24,7 +24,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -38,8 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileReader;
 
 import playground.vsp.openberlinscenario.cemdap.output.Cemdap2MatsimUtils;
 import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansConverter;
@@ -68,7 +69,7 @@ import playground.vsp.openberlinscenario.cemdap.output.CemdapOutput2MatsimPlansC
 
 public class CORINELandCoverCoordsModifier {
 
-    private static final Logger LOG = Logger.getLogger(CORINELandCoverCoordsModifier.class);
+    private static final Logger LOG = LogManager.getLogger(CORINELandCoverCoordsModifier.class);
     private static final Coord fakeCoord = new Coord(-1, -1);
 
     private final CorineLandCoverData corineLandCoverData;
@@ -88,7 +89,7 @@ public class CORINELandCoverCoordsModifier {
         for (String shapeFile : shapeFileToFeatureKey.keySet()) {
             String key = shapeFileToFeatureKey.get(shapeFile);
             LOG.info("Processing zone file " + shapeFile + " with feature key " + key);
-            Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
+            Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(shapeFile);
             for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
                 String shapeId = Cemdap2MatsimUtils.removeLeadingZeroFromString((String) feature.getAttribute(key));
@@ -104,7 +105,7 @@ public class CORINELandCoverCoordsModifier {
 
         this.sameHomeActivity = sameHomeActivity;
         if (this.sameHomeActivity) LOG.info("Home activities for a person will be at the same location.");
-        
+
         this.homeActivityPrefix = homeActivityPrefix;
     }
 
@@ -156,7 +157,7 @@ public class CORINELandCoverCoordsModifier {
 
     public void process() {
         LOG.info("Start processing, this may take a while ... ");
-                
+
         int personCounter = 0;
         for (Person person : population.getPersons().values()) {
             Coord homeLocationCoord = null;
@@ -165,7 +166,7 @@ public class CORINELandCoverCoordsModifier {
             if (personCounter%1000 == 0) {
             		LOG.info("Person #" + personCounter);
             }
-            
+
             for (Plan plan : person.getPlans()) {
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Activity) {

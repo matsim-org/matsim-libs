@@ -27,9 +27,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
-import org.junit.Test;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
@@ -54,7 +56,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.network.NetworkUtils;
 
@@ -66,10 +68,10 @@ import com.google.common.collect.ImmutableMap;
  */
 public class DrtSpeedUpTest {
 	private final DrtSpeedUpParams drtSpeedUpParams = new DrtSpeedUpParams();
-	private final ControlerConfigGroup controlerConfig = new ControlerConfigGroup();
+	private final ControllerConfigGroup controlerConfig = new ControllerConfigGroup();
 
 	@Test
-	public final void test_computeMovingAverage() {
+	final void test_computeMovingAverage() {
 		List<Double> list = List.of(2., 5., 22.);
 		assertThat(computeMovingAverage(2, list)).isEqualTo(27. / 2);
 		assertThat(computeMovingAverage(3, list)).isEqualTo(29. / 3);
@@ -77,10 +79,10 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_isTeleportDrtUsers() {
-		drtSpeedUpParams.setFractionOfIterationsSwitchOn(0.1);
-		drtSpeedUpParams.setFractionOfIterationsSwitchOff(0.9);
-		drtSpeedUpParams.setIntervalDetailedIteration(10);
+	void test_isTeleportDrtUsers() {
+		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.1;
+		drtSpeedUpParams.fractionOfIterationsSwitchOff = 0.9;
+		drtSpeedUpParams.intervalDetailedIteration = 10;
 
 		controlerConfig.setLastIteration(100);
 
@@ -121,16 +123,16 @@ public class DrtSpeedUpTest {
 	private final DrtEventSequenceCollector requestAnalyzer = mock(DrtEventSequenceCollector.class);
 
 	@Test
-	public void test_useOnlyInitialEstimates_noRegression() {
+	void test_useOnlyInitialEstimates_noRegression() {
 		//iters 0 & 100 - simulated, iters 1...99 - teleported
-		drtSpeedUpParams.setFractionOfIterationsSwitchOn(0.0);
-		drtSpeedUpParams.setFractionOfIterationsSwitchOff(1.0);
-		drtSpeedUpParams.setIntervalDetailedIteration(100);
+		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
+		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;
+		drtSpeedUpParams.intervalDetailedIteration = 100;
 
 		//use always the initial estimates of waiting time (60) and beeline in-vehicle speed (10)
-		drtSpeedUpParams.setFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams(999);
-		drtSpeedUpParams.setInitialWaitingTime(60);
-		drtSpeedUpParams.setInitialInVehicleBeelineSpeed(15);
+		drtSpeedUpParams.firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams = 999;
+		drtSpeedUpParams.initialWaitingTime = 60;
+		drtSpeedUpParams.initialInVehicleBeelineSpeed = 15;
 
 		controlerConfig.setLastIteration(100);
 
@@ -158,19 +160,19 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_useAveragesFromLastTwoSimulations_noRegression() {
+	void test_useAveragesFromLastTwoSimulations_noRegression() {
 		//iters 0, 2, 4 - simulated, iters 1, 3 - teleported
-		drtSpeedUpParams.setFractionOfIterationsSwitchOn(0.0);
-		drtSpeedUpParams.setFractionOfIterationsSwitchOff(1.0);
-		drtSpeedUpParams.setIntervalDetailedIteration(2);
+		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
+		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;
+		drtSpeedUpParams.intervalDetailedIteration = 2;
 
 		//use the computed estimates of waiting time and beeline in-vehicle speed
-		drtSpeedUpParams.setFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams(0);
-		drtSpeedUpParams.setInitialWaitingTime(60);
-		drtSpeedUpParams.setInitialInVehicleBeelineSpeed(15);
+		drtSpeedUpParams.firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams = 0;
+		drtSpeedUpParams.initialWaitingTime = 60;
+		drtSpeedUpParams.initialInVehicleBeelineSpeed = 15;
 
 		//moving average
-		drtSpeedUpParams.setMovingAverageSize(2);
+		drtSpeedUpParams.movingAverageSize = 2;
 
 		controlerConfig.setLastIteration(4);
 
@@ -206,19 +208,19 @@ public class DrtSpeedUpTest {
 	}
 
 	@Test
-	public void test_linearRegression() {
+	void test_linearRegression() {
 		//iters 0, 2, 4 - simulated, iters 1, 3 - teleported
-		drtSpeedUpParams.setFractionOfIterationsSwitchOn(0.0);
-		drtSpeedUpParams.setFractionOfIterationsSwitchOff(1.0);
-		drtSpeedUpParams.setIntervalDetailedIteration(2);
+		drtSpeedUpParams.fractionOfIterationsSwitchOn = 0.0;
+		drtSpeedUpParams.fractionOfIterationsSwitchOff = 1.0;
+		drtSpeedUpParams.intervalDetailedIteration = 2;
 
 		//use the computed estimates of waiting time and beeline in-vehicle speed
-		drtSpeedUpParams.setFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams(0);
-		drtSpeedUpParams.setInitialWaitingTime(60);
-		drtSpeedUpParams.setInitialInVehicleBeelineSpeed(15);
+		drtSpeedUpParams.firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams = 0;
+		drtSpeedUpParams.initialWaitingTime = 60;
+		drtSpeedUpParams.initialInVehicleBeelineSpeed = 15;
 
 		//linear regression
-		drtSpeedUpParams.setWaitingTimeUpdateDuringSpeedUp(WaitingTimeUpdateDuringSpeedUp.LinearRegression);
+		drtSpeedUpParams.waitingTimeUpdateDuringSpeedUp = WaitingTimeUpdateDuringSpeedUp.LinearRegression;
 
 		controlerConfig.setLastIteration(5);
 
@@ -268,11 +270,12 @@ public class DrtSpeedUpTest {
 		when(requestAnalyzer.getPerformedRequestSequences()).thenReturn(sequences);
 	}
 
-	private EventSequence eventSequence(String id, double submittedTime, double waitTime,
-			double inVehicleSpeed) {
+	private EventSequence eventSequence(String id, double submittedTime, double waitTime, double inVehicleSpeed) {
 		var requestId = Id.create(id, Request.class);
-		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, null, linkAB.getId(),
-				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+		var personId = Id.create(id, Person.class);
+
+		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, List.of(personId), linkAB.getId(),
+				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,
@@ -281,8 +284,9 @@ public class DrtSpeedUpTest {
 				MODE, requestId.toString());
 		var departureEvent = mock(PersonDepartureEvent.class);
 
-		return new EventSequence(departureEvent, submittedEvent,
-				mock(PassengerRequestScheduledEvent.class), pickupEvent, dropoffEvent, List.of(drtFare));
+
+		return new EventSequence(Id.createPersonId("r1"), departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
+				pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 
 	DvrpVehicleSpecification vehicleSpecification(String id) {

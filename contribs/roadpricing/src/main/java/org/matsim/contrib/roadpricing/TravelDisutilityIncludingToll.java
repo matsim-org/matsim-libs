@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -29,7 +30,7 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Calculates the travel disutility for links, including tolls. Currently 
+ * Calculates the travel disutility for links, including tolls. Currently
  * supports distance, cordon and area tolls.
  *
  * @author mrieser
@@ -37,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
 class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( TravelDisutilityIncludingToll.class ) ;
+	private static final Logger log = LogManager.getLogger( TravelDisutilityIncludingToll.class ) ;
 
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
@@ -49,7 +50,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
 	{
-		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
+		this( normalTravelDisutility, scheme, config.scoring().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
 
@@ -61,7 +62,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
 		} else if ( scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_AREA ) ) {
 			this.tollCostHandler = new AreaTollCostBehaviour();
-			Logger.getLogger(this.getClass()).warn("area pricing is more brittle than the other toll schemes; " +
+			LogManager.getLogger(this.getClass()).warn("area pricing is more brittle than the other toll schemes; " +
 					"make sure you know what you are doing.  kai, apr'13 & sep'14") ;
 		} else if ( scheme.getType().equals( RoadPricingScheme.TOLL_TYPE_CORDON ) ) {
 			throw new RuntimeException("Use LINK toll type for cordon pricing (charge toll on links traversing cordon)");
@@ -73,7 +74,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		if ( utlOfMoneyWrnCnt < 1 && this.marginalUtilityOfMoney != 1. ) {
 			utlOfMoneyWrnCnt ++ ;
-			Logger.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
+			LogManager.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
 					"and delete this message.  kai, apr'13 ") ;
 		}
 
@@ -81,7 +82,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
 	{
 		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 
@@ -93,7 +94,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 		// end randomize
 
 		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
-		
+
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
@@ -131,7 +132,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 			 * route could be found if there is no other possibility. */
 			if ( wrnCnt2 < 1 ) {
 				wrnCnt2 ++ ;
-				Logger.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
+				LogManager.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
 						"This may work anyways, but without more explanation it is not obvious to me.  kai, mar'11") ;
 			}
 			return 1000;

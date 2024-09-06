@@ -22,11 +22,17 @@
 package org.matsim.core.population;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public final class PersonUtils {
     private PersonUtils() {
@@ -39,7 +45,8 @@ public final class PersonUtils {
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
     private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
-    private final static Logger log = Logger.getLogger(Person.class);
+    private static final String PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME = "modeConstants";
+    private final static Logger log = LogManager.getLogger(Person.class);
 
     @Deprecated // use methods of interface Person
     public static Plan createAndAddPlan(Person person, final boolean selected) {
@@ -86,6 +93,26 @@ public final class PersonUtils {
      */
     public static Double getIncome(Person person) {
         return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
+    }
+
+    /**
+     * convenience method for often used demographic attribute
+     * There is apparently no way to register a Map(String, Double) at ObjectAttributesConverter since all Maps default
+     * to StringStringMapConverter and there is no way to register a StringDoubleMapConverter. Therefore, the personal
+     * scoring mode constants uses a Map(String, String). If this attribute is read often an alternative similar to
+     * PersonVehicles can be considered.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> getModeConstants(Person person) {
+        try {
+
+            return (Map<String, String>) person.getAttributes().getAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME);
+        } catch (Exception e) {
+            log.error("Error retrieving personalScoringModeConstants from attribute " +
+                    PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME + ". Should be a Map<String,String>.");
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     /**
@@ -173,8 +200,12 @@ public final class PersonUtils {
      * convenience method for often used demographic attribute
      */
     public static void setIncome(Person person, final double income) {
-        person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+        person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income); // deprecated, should not be necessary anymore
         person.getAttributes().putAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+    }
+
+    public static void setModeConstants(Person person, Map<String, String> mode2scoringConstant) {
+        person.getAttributes().putAttribute(PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME, mode2scoringConstant);
     }
 
     @Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16
@@ -197,5 +228,24 @@ public final class PersonUtils {
 
     public static boolean isSelected(Plan plan) {
         return plan.getPerson().getSelectedPlan() == plan;
+    }
+
+    /**
+     * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+     * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+     */
+    public static void insertVehicleTypesIntoPersonAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType ) {
+        VehicleUtils.insertVehicleTypesIntoPersonAttributes( person, modeToVehicleType );
+    }
+    /**
+     * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+     *
+     * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+     *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+     *                      and provided values are merged into one map
+     *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
+     */
+    public static void insertVehicleIdsIntoPersonAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle ) {
+        VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
     }
 }

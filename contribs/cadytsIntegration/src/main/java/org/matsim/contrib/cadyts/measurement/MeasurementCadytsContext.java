@@ -22,7 +22,8 @@ package org.matsim.contrib.cadyts.measurement;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.demand.Plan;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -46,7 +47,7 @@ import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.buildCalibrato
 
 public class MeasurementCadytsContext implements CadytsContextI<Measurement>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	final static Logger log = Logger.getLogger(MeasurementCadytsContext.class);
+	final static Logger log = LogManager.getLogger(MeasurementCadytsContext.class);
 
 	private final static String COSTOFFSET_FILENAME = "costOffsets.xml";
 	private static final String ANALYSIS_FILENAME = "analysis.txt";

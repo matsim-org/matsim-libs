@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -57,7 +58,7 @@ import org.matsim.lanes.LanesToLinkAssignment;
 public final class SignalSystemsDataConsistencyChecker {
 
 	
-	private static final Logger log = Logger.getLogger(SignalSystemsDataConsistencyChecker.class);
+	private static final Logger log = LogManager.getLogger(SignalSystemsDataConsistencyChecker.class);
 	
 	private SignalsData signalsData;
 

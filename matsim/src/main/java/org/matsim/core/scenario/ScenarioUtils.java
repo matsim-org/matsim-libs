@@ -19,7 +19,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scenario;
+package org.matsim.core.scenario;
+
+import java.util.Collections;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -29,6 +32,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -75,9 +79,19 @@ public final class ScenarioUtils {
 	 *
 	 */
 	public static Scenario loadScenario(final Config config) {
+		return loadScenario(config, Collections.emptyMap());
+	}
+
+	/**
+	 *
+	 * Initializes a scenario and populates it with data read from the input files which are named in the config.
+	 * Uses provided {@link AttributeConverter}s when loading the scenario.
+	 *
+	 */
+	public static Scenario loadScenario(final Config config, Map<Class<?>, AttributeConverter<?>> attributeConverters) {
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
-		Scenario scenario = scenarioLoader.loadScenario();
-		return scenario;
+		scenarioLoader.setAttributeConverters(attributeConverters);
+		return scenarioLoader.loadScenario();
 	}
 
 	/**
@@ -87,7 +101,18 @@ public final class ScenarioUtils {
 	 *
 	 */
 	public static void loadScenario(final Scenario scenario) {
+		loadScenario(scenario, Collections.emptyMap());
+	}
+
+	/**
+	 *
+	 * Populates a scenario with data read from the input files which are named in the config which is wrapped
+	 * in the scenario. Uses provided {@link AttributeConverter}s when loading the scenario.
+	 *
+	 */
+	public static void loadScenario(final Scenario scenario, Map<Class<?>, AttributeConverter<?>> attributeConverters) {
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
+		scenarioLoader.setAttributeConverters(attributeConverters);
 		scenarioLoader.loadScenario();
 	}
 	

@@ -11,7 +11,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -81,7 +82,7 @@ public class PSim implements Mobsim {
     private Set<String> transitModes = new LinkedHashSet<>();
     
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
-        Logger.getLogger(getClass()).warn("Constructing PSim");
+        LogManager.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
         this.endTime = sc.getConfig().qsim().getEndTime().seconds();
         this.eventManager = eventsManager;
@@ -103,7 +104,7 @@ public class PSim implements Mobsim {
     @Override
     public void run() {
 
-        Logger.getLogger(this.getClass()).error("Executing " + plans.size() + " plans in pseudosimulation.");
+        LogManager.getLogger(this.getClass()).error("Executing " + plans.size() + " plans in pseudosimulation.");
 
         Network network = scenario.getNetwork();
 
@@ -184,7 +185,7 @@ public class PSim implements Mobsim {
                                                 TransportMode.car, 1.0 ) );
                                 eventQueue.add( new PersonLeavesVehicleEvent( prevEndTime + travelTime, personId, personVehicleId ) );
                             } catch( NullPointerException ne ){
-                                Logger.getLogger( this.getClass() ).error( "No route for car leg. Continuing with next leg" );
+                                LogManager.getLogger( this.getClass() ).error( "No route for car leg. Continuing with next leg" );
                                 continue;
                             }
                         } else if( transitModes.contains( prevLeg.getMode() ) ){
@@ -202,7 +203,7 @@ public class PSim implements Mobsim {
                         } else{
                                 Route route = prevLeg.getRoute();
                                 if (route == null) {
-                                    Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
+                                    LogManager.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
                                     continue;
                                 }
 

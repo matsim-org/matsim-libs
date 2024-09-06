@@ -22,7 +22,8 @@ package playground.vsp.airPollution.exposure;
 import java.util.Map;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
@@ -39,7 +40,7 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
  *
  */
 public class EmissionResponsibilityCostModule {
-	private static final Logger logger = Logger.getLogger(EmissionResponsibilityCostModule.class);
+	private static final Logger logger = LogManager.getLogger(EmissionResponsibilityCostModule.class);
 	
 	private final double emissionCostMultiplicationFactor = 1.;
 	private final ResponsibilityGridTools responsibilityGridTools;

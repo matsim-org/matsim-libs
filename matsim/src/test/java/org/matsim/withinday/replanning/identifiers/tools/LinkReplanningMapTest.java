@@ -20,8 +20,13 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -31,28 +36,30 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.withinday.controller.WithinDayModule;
-
-import javax.inject.Inject;
 
 /**
  * @author cdobler
  */
-public class LinkReplanningMapTest extends MatsimTestCase {
+public class LinkReplanningMapTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	public void testScenarioRun() {
+	@Test
+	void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());
@@ -124,7 +131,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 			// the agent hast moved to the next link
 			if (e.getSimulationTime() == t1 + 1) {
 				assertEquals(1, this.lrp.getUnrestrictedReplanningAgents(e.getSimulationTime()).size());
-				assertEquals(0, this.lrp.getRestrictedReplanningAgents(e.getSimulationTime()).size());				
+				assertEquals(0, this.lrp.getRestrictedReplanningAgents(e.getSimulationTime()).size());
 			}
 			if (e.getSimulationTime() == t1 + linkTravelTime) {
 				assertEquals(1, this.lrp.getReplanningAgents(e.getSimulationTime()).size());	// one agent could leave the second link in its route and should be identified as to be replanned

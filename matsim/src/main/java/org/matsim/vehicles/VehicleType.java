@@ -20,14 +20,16 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author dgrether
  */
-public final class VehicleType implements Attributable{
+public final class VehicleType implements Attributable, Identifiable<VehicleType> {
 	// deliberately final, please do not change.
 	// If something like inheritance is needed, please change this class to VehicleTypeImpl, and extract interface under previous name VehicleType.
 	// And then use delegation. kai, sep'19
@@ -46,7 +48,7 @@ public final class VehicleType implements Attributable{
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
 	private Id<VehicleType> id;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
@@ -57,9 +59,12 @@ public final class VehicleType implements Attributable{
 	public final VehicleCapacity getCapacity() {
 		return capacity;
 	}
+
+	@Override
 	public final Id<VehicleType> getId() {
 		return id;
 	}
+
 	public final double getPcuEquivalents() {
 		return pcuEquivalents;
 	}
@@ -111,8 +116,9 @@ public final class VehicleType implements Attributable{
 	public final String getNetworkMode() {
 		return networkMode;
 	}
-	public final void setNetworkMode( String networkMode ) {
+	public final VehicleType setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;
+		return this;
 	}
 
 	// the following are attributes that did not seem universal enough and thus were relegated to free-form Attributes for the time being.  kai/kai, sep'19

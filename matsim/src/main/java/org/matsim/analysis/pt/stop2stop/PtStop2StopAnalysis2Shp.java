@@ -21,7 +21,9 @@ package org.matsim.analysis.pt.stop2stop;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -31,10 +33,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.IOException;
 import java.util.*;
@@ -51,7 +52,7 @@ import static org.matsim.analysis.pt.stop2stop.PtStop2StopAnalysis.aggregateStop
 public class PtStop2StopAnalysis2Shp {
 
     private static final String[] headerCsv = {"link", "transitLine", "stop", "departures", "passengers", "totalVehicleCapacity"};
-    private static final Logger log = Logger.getLogger(PtStop2StopAnalysis2Shp.class);
+    private static final Logger log = LogManager.getLogger(PtStop2StopAnalysis2Shp.class);
 
     public static void writePtStop2StopAnalysisByTransitLine2ShpFile(
             final Scenario scenario, final List<PtStop2StopAnalysis.Stop2StopEntry> stop2StopEntriesForEachDeparture, String shpFileName, String coordinateSystem) {
@@ -103,7 +104,7 @@ public class PtStop2StopAnalysis2Shp {
         }
 
         // TODO: add stops?
-        ShapeFileWriter.writeGeometries(features, shpFileName);
+        GeoFileWriter.writeGeometries(features, shpFileName);
     }
 
     public static void writePtStop2StopAnalysisByTransitLine2CsvFile(

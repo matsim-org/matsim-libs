@@ -20,8 +20,9 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -36,7 +37,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
-	private static final Logger log = Logger.getLogger(DrtModeFeedforwardRebalanceModule.class);
+	private static final Logger log = LogManager.getLogger(DrtModeFeedforwardRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModeFeedforwardRebalanceModule(DrtConfigGroup drtCfg) {
@@ -55,7 +56,7 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
-						getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
+						getter -> new FeedforwardRebalancingStrategy(getter.getModal(ZoneSystem.class),
 								getter.getModal(Fleet.class), generalParams, strategySpecificParams,
 								getter.getModal(FeedforwardSignalHandler.class),
 								getter.getModal(DrtZoneTargetLinkSelector.class),
@@ -66,11 +67,11 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 
 		// Create PreviousIterationDepartureRecoder (this will be created only once)
 		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
-				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), strategySpecificParams,
+				getter -> new FeedforwardSignalHandler(getter.getModal(ZoneSystem.class), strategySpecificParams,
 						getter.getModal(NetDepartureReplenishDemandEstimator.class)))).asEagerSingleton();
 
 		bindModal(NetDepartureReplenishDemandEstimator.class).toProvider(modalProvider(
-				getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
+				getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(ZoneSystem.class), drtCfg,
 						strategySpecificParams))).asEagerSingleton();
 
 		bindModal(FastHeuristicZonalRelocationCalculator.class).toProvider(modalProvider(

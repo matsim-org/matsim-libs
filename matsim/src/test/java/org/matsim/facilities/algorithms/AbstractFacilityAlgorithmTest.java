@@ -20,15 +20,24 @@
 
 package org.matsim.facilities.algorithms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
+public class AbstractFacilityAlgorithmTest {
 
-	public void testRunAlgorithms() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
 		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(1.0, 1.0));
@@ -36,7 +45,7 @@ public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 		// create an algo and let it run over the facilities
 		MockAlgo1 algo1 = new MockAlgo1();
 		algo1.run(facilities);
-		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo1.getCounter());
+		assertEquals(2, algo1.getCounter(), "TestAlgo should have handled 2 facilities.");
 	}
 
 	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {

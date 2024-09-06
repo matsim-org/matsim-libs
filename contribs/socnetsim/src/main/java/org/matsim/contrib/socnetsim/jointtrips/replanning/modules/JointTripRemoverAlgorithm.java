@@ -28,7 +28,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -56,7 +57,7 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
  */
 public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private static final Logger log =
-		Logger.getLogger(JointTripRemoverAlgorithm.class);
+		LogManager.getLogger(JointTripRemoverAlgorithm.class);
 
 	private final Random random;
 	private final Set<String> stagesWithJointTypes;

@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus.hook;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
@@ -38,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
 final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(PScorePlansHandler.class);
+	private final static Logger log = LogManager.getLogger(PScorePlansHandler.class);
 	
 	private final TicketMachineI ticketMachine;
 	private Map<Id<Vehicle>, PScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();

@@ -20,7 +20,8 @@
 
 package org.matsim.counts.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
@@ -38,7 +39,7 @@ public class CountsHtmlAndGraphsWriter {
 	private OutputDelegate outputDelegate;
 	private List<CountsGraphsCreator> graphsCreators;
 
-	private static final Logger log = Logger.getLogger(CountsHtmlAndGraphsWriter.class);
+	private static final Logger log = LogManager.getLogger(CountsHtmlAndGraphsWriter.class);
 
 	public CountsHtmlAndGraphsWriter(final String iterationPath, final List<CountSimComparison> countSimComparisons, final int iteration) {
 		this.iterationPath = iterationPath + "/graphs/";

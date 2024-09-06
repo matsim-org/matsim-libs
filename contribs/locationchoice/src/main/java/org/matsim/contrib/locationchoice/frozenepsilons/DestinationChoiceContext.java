@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,19 +38,19 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -60,11 +62,11 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  *
  */
 class DestinationChoiceContext implements MatsimToplevelContainer {
-	
-	private static final Logger log = Logger.getLogger(DestinationChoiceContext.class);
-	
+
+	private static final Logger log = LogManager.getLogger(DestinationChoiceContext.class);
+
 	public static final String ELEMENT_NAME = "DestinationChoiceBestResponseContext";
-	
+
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
 //	private ActTypeConverter actTypeConverter;
@@ -85,9 +87,9 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
-	
+
 	public DestinationChoiceContext(Scenario scenario) {
-		this.scenario = scenario;	
+		this.scenario = scenario;
 		log.info("dc context created but not yet initialized");
 		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 
@@ -106,10 +108,10 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 
 	}
-	
+
 	public void init() {
 		if ( params==null ){
-			this.params = new ScoringParameters.Builder( scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ),
+			this.params = new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( null ),
 				  scenario.getConfig().scenario() ).build();
 			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
@@ -124,7 +126,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			log.info( "dc context initialized" );
 		}
 	}
-	
+
 	private void readOrCreateKVals(long seed) {
 		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, this.scenario);
 		this.arekValsRead = computer.run();
@@ -136,27 +138,27 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			this.personIndices.put(personId, personIndex);
 			this.personsKValuesArray[personIndex] = (Double) scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("k");
 			personIndex++;
-		}		
-		
+		}
+
 		this.facilityIndices = new TObjectIntHashMap<>();
 		this.faciliesWithIndexMap = new HashMap<>();
 		this.facilitiesKValuesArray = new double[this.scenario.getActivityFacilities().getFacilities().size()];
 		int facilityIndex = 0;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 			Id<ActivityFacility> facilityId = facility.getId();
-			
+
 			this.facilityIndices.put(facilityId, facilityIndex);
 			this.facilitiesKValuesArray[facilityIndex] = (Double) facility.getAttributes().getAttribute("k");
 			this.faciliesWithIndexMap.put(facilityId, new ActivityFacilityWithIndex(facility, facilityIndex));
-			
+
 			facilityIndex++;
 		}
 	}
-	
+
 	private void readFacilitesAttributesAndBetas() {
 		String pBetasFileName = this.dccg.getpBetasFile();
 		String fAttributesFileName = this.dccg.getfAttributesFile();
-		if (pBetasFileName != null && fAttributesFileName!= null) {			
+		if (pBetasFileName != null && fAttributesFileName!= null) {
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
 			try {
@@ -169,10 +171,10 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			}
 		}
 	}
-	
+
 	private void readPrefs() {
 		String prefsFileName = this.dccg.getPrefsFile();
-		if (prefsFileName != null) {			
+		if (prefsFileName != null) {
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {
 				prefsReader.readFile(prefsFileName);
@@ -183,7 +185,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			}
 		} else {
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
-			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
+			for (ActivityParams activityParams : this.scenario.getConfig().scoring().getActivityParams()) {
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
 							activityParams.getTypicalDuration());
@@ -197,7 +199,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			}
 		}
 	}
-	
+
 //	public boolean cacheQuadTrees() {
 //		return this.cacheQuadTrees;
 //	}
@@ -209,7 +211,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 //			this.facilitiesOfType.clear();
 //		}
 //	}
-	
+
 	Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities( String activityType ) {
 		/**
 		 * If this is set to true, QuadTrees are stored in memory.
@@ -233,22 +235,22 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			} else return new Tuple<>( quadTree, facilities );
 		} else return getTuple(activityType);
 	}
-	
+
 	private Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
 		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), this.dccg);
 //		treesBuilder.setActTypeConverter(this.getConverter());
 		treesBuilder.createTrees(scenario.getActivityFacilities());
-		
+
 		ActivityFacilityImpl[] facilities = treesBuilder.getFacilitiesOfType().get(activityType);
-		
+
 		/*
 		 * Create a copy of the treesBuilder.getQuadTreesOfType() outcome where the
 		 * ActivityFacility objects are replaced by ActivityFacilityWithIndex objects.
 		 * TODO: let the TreeBuilder use ActivityFacilityWithIndex objects directly?
 		 */
 		QuadTree<ActivityFacilityWithIndex> quadTree = null;
-		
+
 		QuadTree<ActivityFacility> qt = treesBuilder.getQuadTreesOfType().get(activityType);
 		if (qt != null) {
 			double minX = qt.getMinEasting();
@@ -258,12 +260,12 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			quadTree = new QuadTree<ActivityFacilityWithIndex>(minX, minY, maxX, maxY);
 			for (ActivityFacility activityFacility : qt.values()) {
 				quadTree.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), this.faciliesWithIndexMap.get(activityFacility.getId()));
-			}			
+			}
 		}
-		
+
 		return new Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
 	}
-	
+
 	public Scenario getScenario() {
 		return scenario;
 	}
@@ -291,7 +293,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 //	public ObjectAttributes getPersonsKValues() {
 //		return personsKValues;
 //	}
-	
+
 //	public ObjectAttributes getFacilitiesKValues() {
 //		return facilitiesKValues;
 //	}
@@ -299,7 +301,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	public double[] getPersonsKValuesArray() {
 		return personsKValuesArray;
 	}
-	
+
 	public double[] getFacilitiesKValuesArray() {
 		return facilitiesKValuesArray;
 	}
@@ -307,19 +309,19 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 //	public Map<Id<Person>, Integer> getPersonIndices() {
 //		return Collections.unmodifiableMap(this.personIndices);
 //	}
-	
+
 	public int getPersonIndex(Id<Person> id) {
 		return this.personIndices.get(id);
 	}
-	
+
 //	public Map<Id<ActivityFacility>, Integer> getFacilityIndices() {
 //		return Collections.unmodifiableMap(this.facilityIndices);
 //	}
-	
+
 	public int getFacilityIndex(Id<ActivityFacility> id) {
 		return this.facilityIndices.get(id);
 	}
-	
+
 	ObjectAttributes getPersonsBetas() {
 		return personsBetas;
 	}
@@ -340,17 +342,17 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
 		return facilityPenalties;
 	}
-	
+
 	public static final class ActivityFacilityWithIndex implements ActivityFacility, HasIndex {
 
 		private final ActivityFacility activityFacility;
 		private final int index;
-		
+
 		ActivityFacilityWithIndex( ActivityFacility activityFacility, int index ) {
 			this.activityFacility = activityFacility;
 			this.index = index;
 		}
-		
+
 		@Override
 		public Id<Link> getLinkId() {
 			return this.activityFacility.getLinkId();
@@ -393,7 +395,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 		@Override
 		public Attributes getAttributes() {
-			return new Attributes();
+			return new AttributesImpl();
 		}
 	}
 }

@@ -23,14 +23,15 @@ import java.util.Map;
 
 import jakarta.validation.constraints.Positive;
 
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author michalm
  */
-public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup {
+public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
-	static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
+	protected static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
 			+ " Must be a positive integer value. Smaller values mean lower reaction time."
 			+ " However, algorithms that find more than 1 taxi-request matching in each run,"
 			+ " such as AssignmentTaxiOptimizer, may produce better results"
@@ -59,9 +60,4 @@ public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup 
 	 */
 	@Positive
 	public abstract int getReoptimizationTimeStep();
-
-	/**
-	 * @param reoptimizationTimeStep {@value #REOPTIMIZATION_TIME_STEP_EXP}
-	 */
-	public abstract void setReoptimizationTimeStep(int reoptimizationTimeStep);
 }

@@ -21,7 +21,8 @@ package playground.vsp.openberlinscenario.cemdap.output;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +40,7 @@ import playground.vsp.corineLandcover.LandCoverUtils;
  * @author dziemke
  */
 public class Feature2Coord {
-    private final static Logger LOG = Logger.getLogger(Feature2Coord.class);
+    private final static Logger LOG = LogManager.getLogger(Feature2Coord.class);
 
     public Feature2Coord() {
     }

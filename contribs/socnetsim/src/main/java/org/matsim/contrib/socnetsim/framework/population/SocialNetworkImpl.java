@@ -26,7 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
@@ -36,7 +37,7 @@ import org.matsim.core.utils.misc.Counter;
  */
 public class SocialNetworkImpl implements SocialNetwork {
 	private static final Logger log =
-		Logger.getLogger(SocialNetworkImpl.class);
+		LogManager.getLogger(SocialNetworkImpl.class);
 
 	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
 	private final Map<Id<Person>, Set<Id<Person>>> map = new HashMap< >();

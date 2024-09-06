@@ -29,12 +29,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -50,12 +51,13 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 	private final EventsManager events;
 
 	@Inject
-	public TemperatureManager(Config config, EventsManager events) {
+	TemperatureManager(Config config, EventsManager events) {
 		this.events = events;
 		TemperatureChangeConfigGroup temperatureChangeConfigGroup = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		readTemperatureFile(temperatureChangeConfigGroup.getTemperatureFileURL(config.getContext()),
-				temperatureChangeConfigGroup.getDelimiter());
+		readTemperatureFile(
+				ConfigGroup.getInputFileURL(config.getContext(), temperatureChangeConfigGroup.temperatureChangeFile),
+				temperatureChangeConfigGroup.delimiter);
 	}
 
 	private void readTemperatureFile(URL temperatureFileURL, String delimiter) {

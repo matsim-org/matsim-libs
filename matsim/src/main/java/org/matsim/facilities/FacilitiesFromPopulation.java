@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -40,8 +41,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -58,7 +59,7 @@ import org.matsim.core.population.PopulationUtils;
  */
 public final class FacilitiesFromPopulation {
 
-	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
+	private final static Logger log = LogManager.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
 	private Scenario scenario;
@@ -66,7 +67,7 @@ public final class FacilitiesFromPopulation {
 	private String idPrefix = "";
 	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
-	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup = null;
+	private ScoringConfigGroup scoringConfigGroup = null;
 	private boolean addEmptyActivityOptions = false;
 
 	public FacilitiesFromPopulation(final ActivityFacilities facilities) {
@@ -77,7 +78,7 @@ public final class FacilitiesFromPopulation {
 	public FacilitiesFromPopulation( Scenario scenario ) {
 		// "fat" constructor, to configure via config etc.
 		this(scenario.getActivityFacilities());
-		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();;
+		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();
 		this.idPrefix = facilityConfigGroup.getIdPrefix();
 //		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
 		this.removeLinksAndCoordinates = false ;
@@ -85,7 +86,7 @@ public final class FacilitiesFromPopulation {
 		this.addEmptyActivityOptions = true ;
 		this.facilitiesSource = facilityConfigGroup.getFacilitiesSource();
 		this.network = scenario.getNetwork() ;
-		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scoringConfigGroup = scenario.getConfig().scoring() ;
 		this.scenario = scenario;
 	}
 	public void setFacilitiesSource( final FacilitiesSource facilitiesSource ) {
@@ -136,14 +137,14 @@ public final class FacilitiesFromPopulation {
 		this.removeLinksAndCoordinates = doRemoval;
 	}
 
-	public void assignOpeningTimes( final PlanCalcScoreConfigGroup calcScoreConfigGroup ) {
+	public void assignOpeningTimes( final ScoringConfigGroup calcScoreConfigGroup ) {
 		Gbl.assertNotNull( calcScoreConfigGroup );
-		this.planCalcScoreConfigGroup = calcScoreConfigGroup ;
+		this.scoringConfigGroup = calcScoreConfigGroup ;
 	}
 
 	public void run(final Population population) {
 		handleActivities(population);
-		if (this.planCalcScoreConfigGroup != null ) {
+		if (this.scoringConfigGroup != null ) {
 			if (this.addEmptyActivityOptions) {
 				this.assignOpeningTimes();
 			} else{
@@ -268,7 +269,7 @@ public final class FacilitiesFromPopulation {
 		for (ActivityFacility af : this.facilities.getFacilities().values()) {
 			for (ActivityOption ao : af.getActivityOptions().values()) {
 				String actType = ao.getType();
-				ActivityParams params = this.planCalcScoreConfigGroup.getActivityParams(actType);
+				ActivityParams params = this.scoringConfigGroup.getActivityParams(actType);
 				if (params == null) {
 					if (missingActTypes.add(actType)) {
 						log.error("No information for activity type " + actType + " found in given configuration.");

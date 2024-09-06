@@ -3,7 +3,8 @@ package org.matsim.contrib.noise;
 import com.google.inject.Inject;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.matsim.api.core.v01.Id;
@@ -18,7 +19,7 @@ import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
 public class RLS19NoiseImmission implements NoiseImmission {
 
-    private final static Logger log = Logger.getLogger(RLS19NoiseImmission.class);
+    private final static Logger log = LogManager.getLogger(RLS19NoiseImmission.class);
 
     private static final double AVERAGE_GROUND_HEIGHT = 2.5;
     private static final double MINIMUM_DISTANCE = 5.;

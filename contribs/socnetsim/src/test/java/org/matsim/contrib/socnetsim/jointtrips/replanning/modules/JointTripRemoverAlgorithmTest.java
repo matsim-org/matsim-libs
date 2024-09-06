@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -59,14 +58,14 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
  */
 public class JointTripRemoverAlgorithmTest {
 	private static final Logger log =
-		Logger.getLogger(JointTripRemoverAlgorithmTest.class);
+		LogManager.getLogger(JointTripRemoverAlgorithmTest.class);
 
 	private List<Fixture> fixtures;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// init routines
 	// /////////////////////////////////////////////////////////////////////////
-	@Before
+	@BeforeEach
 	public void initFixtures() {
 		fixtures = new ArrayList<Fixture>();
 
@@ -538,7 +537,7 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
-		
+
 		return new Fixture(
 				"complex access trip driver",
 				new JointPlanFactory().createJointPlan( plans ),
@@ -609,7 +608,7 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
-		
+
 		Set<String> stageActivityTypes = new HashSet<>();
 		stageActivityTypes.add(stageType);
 
@@ -934,7 +933,7 @@ public class JointTripRemoverAlgorithmTest {
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testRemoval() throws Exception {
+	void testRemoval() throws Exception {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );
@@ -982,9 +981,9 @@ public class JointTripRemoverAlgorithmTest {
 			final List<PlanElement> expected,
 			final List<PlanElement> actual) {
 		assertEquals(
-				fixtureName+": sizes do not match "+expected+" and "+actual,
 				expected.size(),
-				actual.size());
+				actual.size(),
+				fixtureName+": sizes do not match "+expected+" and "+actual);
 
 		Iterator<PlanElement> expectedIter = expected.iterator();
 		Iterator<PlanElement> actualIter = actual.iterator();
@@ -1020,43 +1019,43 @@ public class JointTripRemoverAlgorithmTest {
 
 	private void assertLegsMatch(final Leg exp,final Leg act) {
 		assertEquals(
-				"wrong mode",
 				exp.getMode(),
-				act.getMode());
+				act.getMode(),
+				"wrong mode");
 
 		if ( exp.getMode().equals( JointActingTypes.DRIVER ) ) {
 			Collection<Id<Person>> expIds = ((DriverRoute) exp.getRoute()).getPassengersIds();
 			Collection<Id<Person>> actIds = ((DriverRoute) act.getRoute()).getPassengersIds();
 			assertEquals(
-					"wrong number of passengers",
 					expIds.size(),
-					actIds.size());
+					actIds.size(),
+					"wrong number of passengers");
 
 			assertTrue(
-					"wrong passenger ids",
-					actIds.containsAll( expIds ));
+					actIds.containsAll( expIds ),
+					"wrong passenger ids");
 		}
 		else if ( exp.getMode().equals( JointActingTypes.PASSENGER ) ) {
 			Id expId = ((PassengerRoute) exp.getRoute()).getDriverId();
 			Id actId = ((PassengerRoute) act.getRoute()).getDriverId();
 
 			assertEquals(
-					"wrong driver Id",
 					expId,
-					actId);
+					actId,
+					"wrong driver Id");
 		}
 	}
 
 	private void assertActivitiesMatch(final Activity exp, final Activity act) {
 		assertEquals(
-				"wrong type",
 				exp.getType(),
-				act.getType());
+				act.getType(),
+				"wrong type");
 
 		assertEquals(
-				"wrong link",
 				exp.getLinkId(),
-				act.getLinkId());
+				act.getLinkId(),
+				"wrong link");
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

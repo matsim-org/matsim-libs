@@ -27,7 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -48,7 +49,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(OTFClientQuadTree.class);
+	private static final Logger log = LogManager.getLogger(OTFClientQuadTree.class);
 
 	private double minEasting;
 	private double maxEasting;

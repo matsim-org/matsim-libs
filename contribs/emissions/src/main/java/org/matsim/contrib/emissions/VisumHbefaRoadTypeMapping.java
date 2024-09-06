@@ -21,7 +21,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -37,7 +38,7 @@ import java.util.Map;
  * class to mimic the old org.matsim.contrib.emissions.roadTypeMapping that berlin uses with VISUM
  */
 public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
-    private static final Logger logger = Logger.getLogger(VisumHbefaRoadTypeMapping.class);
+    private static final Logger logger = LogManager.getLogger(VisumHbefaRoadTypeMapping.class);
 
     private final Map<String, String> mapping = new HashMap<>();
 
@@ -45,7 +46,7 @@ public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     }
 
     @Override
-    public String determineHebfaType(Link link) {
+    public String determineHbefaType(Link link) {
         String roadType = NetworkUtils.getType(link);
         return mapping.get(roadType);
     }

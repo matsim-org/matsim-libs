@@ -18,34 +18,64 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import java.net.URL;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 /**
  * @author michalm
  */
 public class RunETaxiScenarioIT {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
-	public void testOneTaxi() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
+	void testOneTaxi() {
+		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml").toString();
+		runScenario(configPath);
 	}
 
 	@Test
-	public void testRuleBased() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
+	void testRuleBased() {
+		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
+		runScenario(configPath);
 	}
 
 	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
-	public void testAssignment() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
-				"mielec_etaxi_config_assignment.xml");
-		RunETaxiScenario.run(configUrl, false);
+	void testAssignment() {
+		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml").toString();
+		runScenario(configPath);
+	}
+
+	private void runScenario(String configPath) {
+		Id.resetCaches();
+		String[] args = { configPath, "--config:controler.outputDirectory", utils.getOutputDirectory() };
+		RunETaxiScenario.run(args, false);
+		{
+			Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
+
+			Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
+
+			PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
+			Assertions.assertEquals(PopulationComparison.Result.equal, result);
+		}
+		{
+			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+		}
 	}
 }

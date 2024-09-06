@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -46,9 +45,8 @@ import java.util.List;
  *
  * @author thibautd
  */
-public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private static final Logger log = Logger.getLogger( PlanRouter.class ) ;
-	
+public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
+	private static final Logger log = LogManager.getLogger( PlanRouter.class ) ;
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 	private final TimeInterpretation timeInterpretation;
@@ -60,10 +58,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
 	 */
-	public PlanRouter(
-			final TripRouter tripRouter,
-			final ActivityFacilities facilities,
-			final TimeInterpretation timeInterpretation) {
+	public PlanRouter( final TripRouter tripRouter, final ActivityFacilities facilities, final TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 		this.timeInterpretation = timeInterpretation;
@@ -72,20 +67,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	/**
 	 * Short for initialising without facilities.
 	 */
-	public PlanRouter(
-			final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
+	public PlanRouter( final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
 		this( routingHandler , null, timeInterpretation );
-	}
-
-	/**
-	 * Gives access to the {@link TripRouter} used
-	 * to compute routes.
-	 *
-	 * @return the internal TripRouter instance.
-	 */
-	@Deprecated // get TripRouter out of injection instead. kai, feb'16
-	public TripRouter getTripRouter() {
-		return tripRouter;
 	}
 
 	@Override
@@ -96,9 +79,9 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
 			timeTracker.addActivity(oldTrip.getOriginActivity());
-			
+
 			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute( //
+			final List<? extends PlanElement> newTripElements = tripRouter.calcRoute( //
 					routingMode, //
 					FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities), //
 					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
@@ -106,15 +89,12 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 					plan.getPerson(), //
 					oldTrip.getTripAttributes() //
 			);
-			
-			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
-			TripRouter.insertTrip(
-					plan, 
-					oldTrip.getOriginActivity(),
-					newTrip,
-					oldTrip.getDestinationActivity());
-			
-			timeTracker.addElements(newTrip);
+
+			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTripElements);
+
+			TripRouter.insertTrip( plan, oldTrip.getOriginActivity(), newTripElements, oldTrip.getDestinationActivity());
+
+			timeTracker.addElements(newTripElements);
 		}
 	}
 
@@ -125,7 +105,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * @param oldTrip The old trip
 	 * @param newTrip The new trip
 	 */
-	private static void putVehicleFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
+	public static void putVehicleFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
 		Id<Vehicle> oldVehicleId = getUniqueVehicleId(oldTrip);
 		if (oldVehicleId != null) {
 			for (Leg leg : TripStructureUtils.getLegs(newTrip)) {

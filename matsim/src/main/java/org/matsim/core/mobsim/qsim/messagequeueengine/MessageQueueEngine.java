@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 class MessageQueueEngine implements MobsimBeforeSimStepListener {
 

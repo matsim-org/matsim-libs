@@ -22,7 +22,8 @@
  */
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
@@ -42,7 +43,7 @@ import java.util.*;
  *
  */
 final class NoiseWriter {
-	private static final Logger log = Logger.getLogger(NoiseWriter.class);
+	private static final Logger log = LogManager.getLogger(NoiseWriter.class);
 
 	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath, boolean useCompression) {
 
@@ -77,17 +78,17 @@ final class NoiseWriter {
 //		.addAttribute("Id", String.class)
 //		.create();
 //		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-//		
+//
 //		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-//					
+//
 //			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
 //			features.add(feature);
 //		}
-//		
+//
 //		String filePath = outputPath;
 //		File file = new File(filePath);
 //		file.mkdirs();
-//		
+//
 //		log.info("Writing receiver points to shapefile... ");
 //		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
 //		log.info("Writing receiver points to shapefile... Done. ");
@@ -317,13 +318,11 @@ final class NoiseWriter {
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
 			bw.newLine();
 
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-
-				bw.write(rp.getId() + ";" + rp.getDamageCosts());
+				bw.write(rp.getId() + ";" + rp.getDamageCosts() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 

@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -49,7 +50,7 @@ import org.matsim.vehicles.VehicleCapacity;
 
 public class QVehicleImpl implements QVehicle {
 
-	private static final Logger log = Logger.getLogger(QVehicleImpl.class);
+	private static final Logger log = LogManager.getLogger(QVehicleImpl.class);
 
 	private static int warnCount = 0;
 

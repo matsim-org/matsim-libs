@@ -45,20 +45,25 @@ import com.google.inject.Inject;
 public final class QSignalsNetworkFactory implements QNetworkFactory{
 
 	private final QNetworkFactory delegate;
-	
 	private final Scenario scenario;
 	private final EventsManager events;
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine ;
 	
-	@Inject
-	public QSignalsNetworkFactory(Scenario scenario, EventsManager events) {
+	@Inject QSignalsNetworkFactory(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
 		this.events = events;
 		if (scenario.getConfig().qsim().isUseLanes()) {
-			delegate = new QLanesNetworkFactory(events, scenario);
+			delegate = new QLanesNetworkFactory(events, scenario, new DefaultQNetworkFactory( events, scenario ) );
+			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
+			// bind( DefaultQNetworkFactory.class );
+			// bind( QLanesNetworkFactory.class );
+			// and then get it into the present class by injection.  kai, jun'23
 		} else {
 			delegate = new DefaultQNetworkFactory(events, scenario);
+			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
+			// bind( DefaultQNetworkFactory.class );
+			// and then get it into the present class by injection.  kai, jun'23
 		}
 	}
 	

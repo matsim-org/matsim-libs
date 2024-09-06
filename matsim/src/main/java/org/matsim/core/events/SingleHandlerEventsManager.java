@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -80,7 +81,7 @@ import org.matsim.core.utils.misc.ClassUtils;
  */
 public final class SingleHandlerEventsManager implements EventsManager {
 
-	private static final Logger log = Logger.getLogger(SingleHandlerEventsManager.class);
+	private static final Logger log = LogManager.getLogger(SingleHandlerEventsManager.class);
 	
 	/*
 	 * This cannot be just a map<Class, Method> since we need to differentiate between

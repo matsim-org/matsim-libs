@@ -20,11 +20,12 @@
 
 package org.matsim.core.population;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,13 +43,13 @@ import org.matsim.core.population.routes.RouteUtils;
 
 public class PlanImplTest {
 
-	static private final Logger log = Logger.getLogger(PlanImplTest.class);
+	static private final Logger log = LogManager.getLogger(PlanImplTest.class);
 
 	/**
 	 * @author mrieser
 	 */
 	@Test
-	public void testCreateAndAddActAndLeg() {
+	void testCreateAndAddActAndLeg() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		try {
 			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -67,7 +68,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_Between() {
+	void testInsertActLeg_Between() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -96,7 +97,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtEnd() {
+	void testInsertActLeg_AtEnd() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -125,7 +126,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtWrongPosition() {
+	void testInsertActLeg_AtWrongPosition() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -151,7 +152,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_AtStart() {
+	void testInsertActLeg_AtStart() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -178,7 +179,7 @@ public class PlanImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testInsertActLeg_BehindEnd() {
+	void testInsertActLeg_BehindEnd() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -211,7 +212,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void testCopyPlan_NetworkRoute() {
+	void testCopyPlan_NetworkRoute() {
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
@@ -234,15 +235,15 @@ public class PlanImplTest {
 		Plan plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
 		PopulationUtils.copyFromTo(plan, plan2);
 
-		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
-		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
+		assertEquals(Id.create(2, Person.class), plan2.getPerson().getId(), "person must not be copied.");
+		assertEquals(plan.getPlanElements().size(), plan2.getPlanElements().size(), "wrong number of plan elements.");
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof NetworkRoute);
 		assertEquals(98.76, route2.getTravelTime().seconds(), 1e-8);
 	}
 
 	@Test
-	public void testCopyPlan_GenericRoute() {
+	void testCopyPlan_GenericRoute() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
@@ -265,8 +266,8 @@ public class PlanImplTest {
 		Plan plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
 		PopulationUtils.copyFromTo(plan, plan2);
 
-		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
-		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
+		assertEquals(Id.create(2, Person.class), plan2.getPerson().getId(), "person must not be copied.");
+		assertEquals(plan.getPlanElements().size(), plan2.getPlanElements().size(), "wrong number of plan elements.");
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 //		assertTrue(route2 instanceof GenericRouteImpl);
 		assertEquals(98.76, route2.getTravelTime().seconds(), 1e-8);
@@ -276,7 +277,7 @@ public class PlanImplTest {
 	 * @author meisterk
 	 */
 	@Test
-	public void testRemoveActivity() {
+	void testRemoveActivity() {
 
 		Plan testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(testee, "h", new Coord(0, 0));
@@ -296,7 +297,7 @@ public class PlanImplTest {
 	 * @author meisterk
 	 */
 	@Test
-	public void testRemoveLeg() {
+	void testRemoveLeg() {
 		Plan testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(testee, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( testee, TransportMode.car );
@@ -312,7 +313,7 @@ public class PlanImplTest {
 	}
 
 	@Test
-	public void addMultipleLegs() {
+	void addMultipleLegs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
@@ -320,31 +321,31 @@ public class PlanImplTest {
 		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
 		p.addActivity(new ActivityImpl("w"));
 
-		Assert.assertEquals(5, p.getPlanElements().size());
-		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(2) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(3) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(4) instanceof Activity);
+		Assertions.assertEquals(5, p.getPlanElements().size());
+		Assertions.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(2) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(3) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(4) instanceof Activity);
 	}
 
 	@Test
-	public void addMultipleActs() {
+	void addMultipleActs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
 		p.addActivity(new ActivityImpl("w"));
 		p.addActivity(new ActivityImpl("l"));
 
-		Assert.assertEquals(4, p.getPlanElements().size());
-		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(2) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(3) instanceof Activity);
+		Assertions.assertEquals(4, p.getPlanElements().size());
+		Assertions.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(2) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(3) instanceof Activity);
 	}
 
 	@Test
-	public void createAndAddMultipleLegs() {
+	void createAndAddMultipleLegs() {
 		Plan p = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(p, "h");
 		PopulationUtils.createAndAddLeg( p, TransportMode.walk );
@@ -352,27 +353,27 @@ public class PlanImplTest {
 		PopulationUtils.createAndAddLeg( p, TransportMode.walk );
 		PopulationUtils.createAndAddActivity(p, "w");
 
-		Assert.assertEquals(5, p.getPlanElements().size());
-		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(2) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(3) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(4) instanceof Activity);
+		Assertions.assertEquals(5, p.getPlanElements().size());
+		Assertions.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(2) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(3) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(4) instanceof Activity);
 	}
 
 	@Test
-	public void createAndAddMultipleActs() {
+	void createAndAddMultipleActs() {
 		Plan p = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(p, "h");
 		PopulationUtils.createAndAddLeg( p, TransportMode.walk );
 		PopulationUtils.createAndAddActivity(p, "w");
 		PopulationUtils.createAndAddActivity(p, "l");
 
-		Assert.assertEquals(4, p.getPlanElements().size());
-		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
-		Assert.assertTrue(p.getPlanElements().get(2) instanceof Activity);
-		Assert.assertTrue(p.getPlanElements().get(3) instanceof Activity);
+		Assertions.assertEquals(4, p.getPlanElements().size());
+		Assertions.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assertions.assertTrue(p.getPlanElements().get(2) instanceof Activity);
+		Assertions.assertTrue(p.getPlanElements().get(3) instanceof Activity);
 	}
 
 }

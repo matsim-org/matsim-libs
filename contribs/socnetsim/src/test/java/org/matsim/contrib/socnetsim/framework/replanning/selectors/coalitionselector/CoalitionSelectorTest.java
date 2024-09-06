@@ -26,14 +26,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,10 +46,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 /**
  * @author thibautd
  */
-@RunWith(Parameterized.class)
 public class CoalitionSelectorTest {
-	private final FixtureFactory fixtureFactory;
-
 	public interface FixtureFactory {
 		public Fixture create();
 	}
@@ -71,13 +69,8 @@ public class CoalitionSelectorTest {
 		}
 	}
 
-	public CoalitionSelectorTest(final FixtureFactory fixture) {
-		this.fixtureFactory = fixture;
-	}
-
-	@Parameterized.Parameters
-	public static Collection<FixtureFactory[]> fixtures() {
-		return toArgList(
+	public static Stream<FixtureFactory> arguments() {
+		return Stream.of(
 				new FixtureFactory() {
 					@Override
 					public Fixture create() {
@@ -200,13 +193,6 @@ public class CoalitionSelectorTest {
 
 	}
 
-	private static Collection<FixtureFactory[]> toArgList(final FixtureFactory... args) {
-		final List<FixtureFactory[]> list = new ArrayList<FixtureFactory[]>();
-
-		for ( FixtureFactory arg : args ) list.add( new FixtureFactory[]{ arg } );
-		return list;
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// fixtures management
 	// /////////////////////////////////////////////////////////////////////////
@@ -214,8 +200,9 @@ public class CoalitionSelectorTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
-	@Test
-	public void testSelectedPlans() {
+	@ParameterizedTest
+	@MethodSource("arguments")
+	void testSelectedPlans(FixtureFactory fixtureFactory) {
 		final Fixture fixture = fixtureFactory.create();
 		final CoalitionSelector selector = new CoalitionSelector();
 
@@ -227,10 +214,10 @@ public class CoalitionSelectorTest {
 
 			final GroupPlans expected = fixture.expectedSelectedPlans;
 
-			Assert.assertEquals(
-					"unexpected selected plan in test instance <<"+fixture.name+">> ",
+			Assertions.assertEquals(
 					expected,
-					selected);
+					selected,
+					"unexpected selected plan in test instance <<"+fixture.name+">> ");
 		}
 		catch (Exception e) {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );

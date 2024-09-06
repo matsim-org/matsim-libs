@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,8 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author thibautd
  */
@@ -51,18 +55,13 @@ public class RandomSelectorsTest {
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
 	private JointPlans jointPlans = new JointPlans();
 
-	@After
+	@AfterEach
 	public void clear() {
 		testGroups.clear();
 		jointPlans = new JointPlans();
 	}
 
-	@Before
-	public void setTrace() {
-		if ( false ) Logger.getLogger( RandomGroupLevelSelector.class ).setLevel( Level.TRACE );
-	}
-
-	@Before
+	@BeforeEach
 	public void createIndividualPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -100,7 +99,7 @@ public class RandomSelectorsTest {
 		plan.setScore( -5000d );
 	}
 
-	@Before
+	@BeforeEach
 	public void createFullyJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -173,7 +172,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp3 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createPartiallyJointPlansMessOfJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -285,7 +284,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp8 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createPartiallyJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -339,7 +338,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp2 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createRandomFixtures() {
 		final Random random = new Random( 42 );
 		for ( int i=0; i < 100; i++ ) {
@@ -386,7 +385,7 @@ public class RandomSelectorsTest {
 	}
 
 	@Test
-	public void testDeterminism() throws Exception {
+	void testDeterminism() throws Exception {
 		final int seed = 1264;
 
 		final Counter count = new Counter( "selection # " );
@@ -403,9 +402,9 @@ public class RandomSelectorsTest {
 						jointPlans , group );
 				if (previous != null) {
 					assertEquals(
-							"different results with the same random seed",
 							previous,
-							selected);
+							selected,
+							"different results with the same random seed");
 				}
 
 				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
@@ -416,7 +415,7 @@ public class RandomSelectorsTest {
 	}
 
 	@Test
-	public void testNoFailuresWithVariousSeeds() throws Exception {
+	void testNoFailuresWithVariousSeeds() throws Exception {
 		final RandomGroupLevelSelector selector = new RandomGroupLevelSelector(
 				new Random( 123 ),
 				new EmptyIncompatiblePlansIdentifierFactory());
@@ -433,9 +432,9 @@ public class RandomSelectorsTest {
 
 				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
 
-				Assert.assertEquals( "unexpected selected plan size" ,
-						selected.getAllIndividualPlans().size(),
-						group.getPersons().size() );
+				Assertions.assertEquals( selected.getAllIndividualPlans().size(),
+						group.getPersons().size(),
+						"unexpected selected plan size" );
 			}
 		}
 		groupCount.printCounter();

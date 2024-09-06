@@ -22,14 +22,23 @@ package org.matsim.core.gbl;
 
 import java.awt.Image;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class MatsimResourceTest extends MatsimTestCase {
+public class MatsimResourceTest {
 
-	public final void testGetAsImage() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	final void testGetAsImage() {
 		final Image logo = MatsimResource.getAsImage("matsim_logo_transparent.png");
 
 		// verify that the correct image was correctly loaded by testing its dimension

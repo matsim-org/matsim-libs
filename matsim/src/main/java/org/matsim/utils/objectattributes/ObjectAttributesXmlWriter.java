@@ -19,24 +19,17 @@
 
 package org.matsim.utils.objectattributes;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.UncheckedIOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
-import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
-import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
-import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
-import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 
 /**
  * Writes object attributes to a file.
@@ -45,7 +38,7 @@ import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
  */
 public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 
-	private final static Logger log = Logger.getLogger(ObjectAttributesXmlWriter.class);
+	private final static Logger log = LogManager.getLogger(ObjectAttributesXmlWriter.class);
 
 	/*package*/ final static String TAG_OBJECT_ATTRIBUTES = "objectAttributes";
 	/*package*/ final static String TAG_OBJECT = "object";
@@ -75,9 +68,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			xmlAttributes.clear();
 			// sort attributes by name
 			Map<String, Object> objAttributes = new TreeMap<String, Object>();
-			for (Map.Entry<String, Object> objAttribute : entry.getValue().entrySet()) {
-				objAttributes.put(objAttribute.getKey(), objAttribute.getValue());
-			}
+			objAttributes.putAll(entry.getValue());
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				Class<?> clazz = objAttribute.getValue().getClass();

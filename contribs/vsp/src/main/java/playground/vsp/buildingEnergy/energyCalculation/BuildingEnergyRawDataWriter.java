@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,8 +39,7 @@ import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
  */
 public class BuildingEnergyRawDataWriter {
 
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyRawDataWriter.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyRawDataWriter.class);
 	
 	private String baseRunId;
 	private Map<String, Map<String, LinkOccupancyStats>> run2type2RawOccupancy;

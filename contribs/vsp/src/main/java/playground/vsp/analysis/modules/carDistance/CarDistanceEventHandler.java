@@ -22,7 +22,8 @@ package playground.vsp.analysis.modules.carDistance;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -47,7 +48,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  *
  */
 public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
-	private final static Logger logger = Logger.getLogger(CarDistanceEventHandler.class);
+	private final static Logger logger = LogManager.getLogger(CarDistanceEventHandler.class);
 
 	private Map<Id<Person>, Double> personId2CarDistance;
 	private int carTrips;

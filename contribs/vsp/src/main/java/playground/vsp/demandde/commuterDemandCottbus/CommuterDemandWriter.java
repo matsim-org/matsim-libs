@@ -27,7 +27,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
@@ -51,18 +55,15 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 /**
  * @author jbischoff
  * @author dgrether
- * 
+ *
  */
 public class CommuterDemandWriter {
 
-	private static final Logger log = Logger.getLogger(CommuterDemandWriter.class);
+	private static final Logger log = LogManager.getLogger(CommuterDemandWriter.class);
 	private HashMap<String, SimpleFeature> municipalityMap;
 	private List<CommuterDataElement> demand;
 	private double scalefactor = 1.0;
@@ -121,8 +122,8 @@ public class CommuterDemandWriter {
 
 	private void generatePopulation(Scenario scenario) {
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig()
-				.planCalcScore());
-		PlanAlgorithm router = 
+				.scoring());
+		PlanAlgorithm router =
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).get(

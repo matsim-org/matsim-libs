@@ -43,12 +43,12 @@ public class OnlineEDriveTaskTracker implements OnlineDriveTaskTracker, ETaskTra
 	}
 
 	@Override
-	public double predictSocAtEnd() {
+	public double predictChargeAtEnd() {
 		ElectricVehicle ev = vehicle.getElectricVehicle();
-		double currentSoc = ev.getBattery().getSoc();
+		double currentCharge = ev.getBattery().getCharge();
 		double driveEnergy = VrpPathEnergyConsumptions.calcRemainingTotalEnergy(ev, getPath(), getCurrentLinkIdx(),
 				getCurrentLinkEnterTime());
-		return currentSoc - driveEnergy;
+		return currentCharge - driveEnergy;
 	}
 
 	@Override

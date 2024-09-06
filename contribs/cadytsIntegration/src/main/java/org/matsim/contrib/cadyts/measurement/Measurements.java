@@ -6,13 +6,14 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.counts.Count;
 
 public final class Measurements implements LookUpItemFromId<Measurement> {
-	private static final Logger log = Logger.getLogger( Measurements.class );
+	private static final Logger log = LogManager.getLogger( Measurements.class );
 	
 	private final Map< Id<Measurement>,Measurement > map = new TreeMap<>() ;
 

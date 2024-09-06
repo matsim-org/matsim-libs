@@ -20,87 +20,82 @@
 
 package org.matsim.contrib.zone.skims;
 
-import java.util.Map;
-
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
+public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String SET_NAME = "travelTimeMatrix";
 
-	public static final String CELL_SIZE = "cellSize";
-	private static final String CELL_SIZE_EXP = "size of square cells (meters) used for computing travel time matrix."
-			+ " Default value is 200 m";
+	// Satisfying only one criterion (max distance or travel time) is enough to be considered a neighbour.
 
-	@Positive
-	private int cellSize = 200; //[m]
-
-	public static final String MAX_NEIGHBOR_DISTANCE = "maxNeighborDistance";
-	private static final String MAX_NEIGHBOR_DISTANCE_EXP =
-			"Max network distance from node A to node B for B to be considered a neighbor of A."
-					+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
-					+ " Typically, 'maxNeighborDistance' should be higher than 'cellSize' (e.g. 5-10 times)"
-					+ " in order to reduce the impact of imprecise zonal travel times for short distances."
-					+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
-					+ " The unit is meters. Default value is 1000 m.";
-
+	@Parameter
+	@Comment("Max network distance from node A to node B for B to be considered a neighbor of A."
+			+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
+			+ " Typically, 'maxNeighborDistance' should be higher than 'cellSize' (e.g. 5-10 times)"
+			+ " in order to reduce the impact of imprecise zonal travel times for short distances."
+			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
+			+ " The unit is meters. Default value is 1000 m.")
 	@PositiveOrZero
-	private int maxNeighborDistance = 1000; //[m]
+	public double maxNeighborDistance = 1000; //[m]
+
+	@Parameter
+	@Comment("Max network travel time from node A to node B for B to be considered a neighbor of A."
+			+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
+			+ " Typically, 'maxNeighborTravelTime' should correspond to a distance that are higher than 'cellSize' (e.g. 5-10 times)"
+			+ " in order to reduce the impact of imprecise zonal travel times for short distances."
+			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
+			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
+	@PositiveOrZero
+	public double maxNeighborTravelTime = 0; //[s]
+	private ZoneSystemParams zoneSystemParams;
+
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
+		initSingletonParameterSets();
+	}
+
+
+	private void initSingletonParameterSets() {
+
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
 	}
 
 	@Override
-	public Map<String, String> getComments() {
-		var map = super.getComments();
-		map.put(CELL_SIZE, CELL_SIZE_EXP);
-		map.put(MAX_NEIGHBOR_DISTANCE, MAX_NEIGHBOR_DISTANCE_EXP);
-		return map;
+	public void handleAddUnknownParam(String paramName, String value) {
+		if ("cellSize".equals(paramName)) {
+			SquareGridZoneSystemParams squareGridParams;
+			if(getZoneSystemParams() == null) {
+				squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+				addParameterSet(squareGridParams);
+			} else {
+				squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
+			}
+			squareGridParams.cellSize = Double.parseDouble(value);
+		} else {
+			super.handleAddUnknownParam(paramName, value);
+		}
 	}
 
-	/**
-	 * @return {@value #CELL_SIZE_EXP}
-	 */
-	@StringGetter(CELL_SIZE)
-	public int getCellSize() {
-		return cellSize;
-	}
-
-	/**
-	 * @param cellSize {@value #CELL_SIZE_EXP}
-	 */
-	@StringSetter(CELL_SIZE)
-	public DvrpTravelTimeMatrixParams setCellSize(int cellSize) {
-		this.cellSize = cellSize;
-		return this;
-	}
-
-	/**
-	 * @return {@value #MAX_NEIGHBOR_DISTANCE_EXP}
-	 */
-	@StringGetter(MAX_NEIGHBOR_DISTANCE)
-	public int getMaxNeighborDistance() {
-		return maxNeighborDistance;
-	}
-
-	/**
-	 * @param maxNeighborDistance {@value #MAX_NEIGHBOR_DISTANCE_EXP}
-	 */
-	@StringSetter(MAX_NEIGHBOR_DISTANCE)
-	public DvrpTravelTimeMatrixParams setMaxNeighborDistance(int maxNeighborDistance) {
-		this.maxNeighborDistance = maxNeighborDistance;
-		return this;
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return super.createParameterSet(type);
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }

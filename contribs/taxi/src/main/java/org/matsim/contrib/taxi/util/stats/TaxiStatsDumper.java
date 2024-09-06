@@ -69,7 +69,7 @@ public class TaxiStatsDumper implements ShutdownListener, AfterMobsimListener {
 				taxiEventSequenceCollector.getRequestSequences().values());
 
 		appendToMultiDayStats(calculator.getDailyStats(), iterationCounter.getIterationNumber());
-		if (taxiCfg.getDetailedStats()) {
+		if (taxiCfg.detailedStats) {
 			writeDetailedStats(calculator.getTaxiStats(), iterationCounter.getIterationNumber());
 		}
 	}

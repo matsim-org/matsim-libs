@@ -23,14 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 public class ResponsibilityGridTools {
 
-	private static final Logger LOGGER = org.apache.log4j.Logger.getLogger(ResponsibilityGridTools.class);
+	private static final Logger LOGGER = LogManager.getLogger(ResponsibilityGridTools.class);
 
 	private final Double dist0factor = 0.216;
 	private final Double dist1factor = 0.132;

@@ -21,6 +21,7 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
@@ -59,38 +60,40 @@ public class MultiModeTaxiModule extends AbstractModule {
 
 		var drtCfg = new DrtConfigGroup();
 
-		drtCfg.setMode(taxiCfg.getMode());
-		drtCfg.setUseModeFilteredSubnetwork(taxiCfg.isUseModeFilteredSubnetwork());
-		drtCfg.setStopDuration(Double.NaN);//used only inside the DRT optimiser
+		drtCfg.mode = taxiCfg.getMode();
+		drtCfg.useModeFilteredSubnetwork = taxiCfg.useModeFilteredSubnetwork;
+		drtCfg.stopDuration = Double.NaN;//used only inside the DRT optimiser
 
 		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
 		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
 		// manually after the TaxiAsDrtConfigGroup config is created.
-		drtCfg.setMaxWaitTime(3600);
-		drtCfg.setMaxTravelTimeAlpha(2);
-		drtCfg.setMaxTravelTimeBeta(3600);
-		drtCfg.setMaxAbsoluteDetour(Double.MAX_VALUE);
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.maxWaitTime = 3600;
+		defaultConstraintsSet.maxTravelTimeAlpha = 2;
+		defaultConstraintsSet.maxTravelTimeBeta = 3600;
+		defaultConstraintsSet.maxAbsoluteDetour = Double.MAX_VALUE;
 
-		drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
-		drtCfg.setChangeStartLinkToLastLinkInSchedule(taxiCfg.isChangeStartLinkToLastLinkInSchedule());
-		drtCfg.setIdleVehiclesReturnToDepots(false);
-		drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
-		drtCfg.setMaxWalkDistance(Double.MAX_VALUE);
-		drtCfg.setVehiclesFile(taxiCfg.getTaxisFile());
-		drtCfg.setTransitStopFile(null);
-		drtCfg.setDrtServiceAreaShapeFile(null);
-		drtCfg.setPlotDetailedCustomerStats(taxiCfg.getDetailedStats() || taxiCfg.getTimeProfiles());
-		drtCfg.setNumberOfThreads(taxiCfg.getNumberOfThreads());
-		drtCfg.setAdvanceRequestPlanningHorizon(0);
-		drtCfg.setStoreUnsharedPath(false);
+		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+		drtCfg.changeStartLinkToLastLinkInSchedule = taxiCfg.changeStartLinkToLastLinkInSchedule;
+		drtCfg.idleVehiclesReturnToDepots = false;
+		drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
+		defaultConstraintsSet.maxWalkDistance = Double.MAX_VALUE;
+		drtCfg.vehiclesFile = taxiCfg.taxisFile;
+		drtCfg.transitStopFile = null;
+		drtCfg.drtServiceAreaShapeFile = null;
+		drtCfg.plotDetailedCustomerStats = taxiCfg.detailedStats || taxiCfg.timeProfiles;
+		drtCfg.numberOfThreads = taxiCfg.numberOfThreads;
+		drtCfg.storeUnsharedPath = false;
 
 		taxiCfg.getTaxiFareParams().ifPresent(taxiFareParams -> {
 			var drtFareParams = new DrtFareParams();
-			drtFareParams.setBaseFare(taxiFareParams.getBasefare());
-			drtFareParams.setDistanceFare_m(taxiFareParams.getDistanceFare_m());
-			drtFareParams.setTimeFare_h(taxiFareParams.getTimeFare_h());
-			drtFareParams.setDailySubscriptionFee(taxiFareParams.getDailySubscriptionFee());
-			drtFareParams.setMinFarePerTrip(taxiFareParams.getMinFarePerTrip());
+			drtFareParams.baseFare = taxiFareParams.basefare;
+			drtFareParams.distanceFare_m = taxiFareParams.distanceFare_m;
+			drtFareParams.timeFare_h = taxiFareParams.timeFare_h;
+			drtFareParams.dailySubscriptionFee = taxiFareParams.dailySubscriptionFee;
+			drtFareParams.minFarePerTrip = taxiFareParams.minFarePerTrip;
 			drtCfg.addParameterSet(drtFareParams);
 		});
 

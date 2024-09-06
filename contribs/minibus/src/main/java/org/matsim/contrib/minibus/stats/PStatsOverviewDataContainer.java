@@ -23,7 +23,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -35,7 +36,7 @@ import org.apache.log4j.Logger;
 public class PStatsOverviewDataContainer {
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PStatsOverviewDataContainer.class);
+	private static final Logger log = LogManager.getLogger(PStatsOverviewDataContainer.class);
 	
 	final static String COMMENTTAG = "#";
 	final static String DELIMITER = "\t";

@@ -1,19 +1,20 @@
 package org.matsim.core.config;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class MaterializeConfigTest {
 
-	private static final Logger log = Logger.getLogger(MaterializeConfigTest.class);
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(MaterializeConfigTest.class);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void testMaterializeAfterReadParameterSets() {
+	final void testMaterializeAfterReadParameterSets() {
 		{
 			// generate a test config that sets two values away from their defaults, and
 			// write it to file:
@@ -26,9 +27,8 @@ public class MaterializeConfigTest {
 				configGroup.addParameterSet(set);
 			}
 
-			Assert.assertEquals(
-				"unexpected number of parameter sets in initial config group",
-				2, configGroup.getParameterSets("blabla").size());
+			Assertions.assertEquals(
+				2, configGroup.getParameterSets("blabla").size(), "unexpected number of parameter sets in initial config group");
 
 			ConfigUtils.writeConfig(config, utils.getOutputDirectory() + "ad-hoc-config.xml");
 		}
@@ -39,9 +39,8 @@ public class MaterializeConfigTest {
 
 			{
 				ConfigGroup configGroup = config.getModule(TestConfigGroup.GROUP_NAME);
-				Assert.assertEquals(
-					"unexpected number of parameter sets in non materialized config group",
-					2, configGroup.getParameterSets("blabla").size());
+				Assertions.assertEquals(
+					2, configGroup.getParameterSets("blabla").size(), "unexpected number of parameter sets in non materialized config group");
 			}
 
 			// materialize the config group
@@ -49,13 +48,12 @@ public class MaterializeConfigTest {
 					TestConfigGroup.class);
 
 			// this should have two parameter sets here
-			Assert.assertEquals(
-				"unexpected number of parameter sets in materialized config group",
-				2, configGroup.getParameterSets("blabla").size());
+			Assertions.assertEquals(
+				2, configGroup.getParameterSets("blabla").size(), "unexpected number of parameter sets in materialized config group");
 
 			// check if you are getting back the values from the config file:
 			for (TestParameterSet set : (Iterable<TestParameterSet>) configGroup.getParameterSets("blabla")) {
-				Assert.assertEquals("unexpected value for parameter in parameter set", "life is wonderful", set.getParameter());
+				Assertions.assertEquals("life is wonderful", set.getParameter(), "unexpected value for parameter in parameter set");
 			}
 
 		}

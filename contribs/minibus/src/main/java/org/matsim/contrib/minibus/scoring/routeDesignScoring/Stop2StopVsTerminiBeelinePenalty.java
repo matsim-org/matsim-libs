@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
@@ -43,7 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
-	private static final Logger log = Logger.getLogger(Stop2StopVsTerminiBeelinePenalty.class);
+	private static final Logger log = LogManager.getLogger(Stop2StopVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
 
 	public Stop2StopVsTerminiBeelinePenalty(RouteDesignScoreParams params) {

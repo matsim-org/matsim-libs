@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 /**
  * Implementation of {@link TravelTimeData} that stores the data per time bin
- * in simple arrays. Useful if not too many empty time bins (time bins with 
+ * in simple arrays. Useful if not too many empty time bins (time bins with
  * no traffic on a link) exist, so no memory is wasted.
  *
  * @author mrieser
@@ -111,7 +111,7 @@ class TravelTimeDataArray extends TravelTimeData {
 		double ttime = traveltime(val);
 		if (ttime >= 0.0) return ttime; // negative values are invalid.
 
-		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 9, so just use freespeed
+		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 0, so just use freespeed
 		double freespeed = this.link.getLength() / this.link.getFreespeed(now);
 		this.data[timeSlot] = encode(0, freespeed);
 		return freespeed;

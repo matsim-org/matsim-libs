@@ -21,7 +21,8 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
@@ -39,7 +40,7 @@ public final class DefaultRoutingModules {
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
-			ModeRoutingParams params ) {
+			RoutingConfigGroup.TeleportedModeParams params ) {
 		return new FreespeedFactorRoutingModule(
 				mode,
 				popFac,
@@ -48,7 +49,7 @@ public final class DefaultRoutingModules {
 				params) ;
 	}
 
-	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, ModeRoutingParams params ) {
+	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, TeleportedModeParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
 			  scenario,
@@ -59,6 +60,7 @@ public final class DefaultRoutingModules {
 	/**
 	 * Creates network router without access/egress.
 	 */
+	@Deprecated // use AccessEgressNetworkRouter instead
 	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
 		return new NetworkRoutingModule(
 				mode,
@@ -73,6 +75,7 @@ public final class DefaultRoutingModules {
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter,
 											 TimeInterpretation timeInterpretation, MultimodalLinkChooser multimodalLinkChooser) {
+
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,

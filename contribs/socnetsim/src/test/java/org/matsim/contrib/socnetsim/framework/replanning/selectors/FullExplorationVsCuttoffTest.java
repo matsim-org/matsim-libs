@@ -20,11 +20,12 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -38,28 +39,28 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.FullyExplored
 /**
  * @author thibautd
  */
-@Ignore( "expensive")
+@Disabled( "expensive")
 public class FullExplorationVsCuttoffTest {
 	private static final Logger log =
-		Logger.getLogger(FullExplorationVsCuttoffTest.class);
+		LogManager.getLogger(FullExplorationVsCuttoffTest.class);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testFullExplorationVsCuttoffNonBlocking() throws Exception {
+	void testFullExplorationVsCuttoffNonBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffNonBlocking()" );
 		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , false );
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffBlocking() throws Exception {
+	void testFullExplorationVsCuttoffBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffBlocking()" );
 		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , true );
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffIncompatibility() throws Exception {
+	void testFullExplorationVsCuttoffIncompatibility() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffIncompatibility()" );
 		testFullExplorationVsCuttoff(
 				new FewGroupsIncompatibilityFactory(),
@@ -67,7 +68,7 @@ public class FullExplorationVsCuttoffTest {
 	}
 
 	@Test
-	public void testFullExplorationVsCuttoffIncompatibilityBlocking() throws Exception {
+	void testFullExplorationVsCuttoffIncompatibilityBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffIncompatibilityBlocking()" );
 		testFullExplorationVsCuttoff(
 				new FewGroupsIncompatibilityFactory(),
@@ -97,13 +98,13 @@ public class FullExplorationVsCuttoffTest {
 			final double scoreFull = calcScore( fullResult );
 
 			// allow different results, as long as the scores are identical
-			Assert.assertEquals(
+			Assertions.assertEquals(
+					fastResult,
+					fullResult,
 					"different solutions with both exploration types."+
 					"          full score: "+scoreFull+
 					"          fast: "+scoreFast+
-					"          ",
-					fastResult,
-					fullResult);
+					"          ");
 			if ( fastResult == null ) countNull++;
 		}
 		count.printCounter();

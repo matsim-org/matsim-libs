@@ -2,10 +2,7 @@ package org.matsim.application.prepare.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -39,6 +36,9 @@ public class NormalizeTripModes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--duplicate-per-mode", description = "Duplicate selected plan for each mode", defaultValue = "false")
 	private boolean perMode;
 
+	@CommandLine.Option(names = "--remove-staging-activities", description = "Remove all staging activities.", defaultValue = "false")
+	private boolean rmStaging;
+
 	private final SplittableRandom rnd = new SplittableRandom(4117);
 
 	public static void main(String[] args) {
@@ -60,8 +60,12 @@ public class NormalizeTripModes implements MATSimAppCommand {
 			String subpop = PopulationUtils.getSubpopulation(person);
 			if (!subpop.equals(subpopulation)) continue;
 
-			if (perMode) duplicatePlans(person);
-			else skipped += selectMode(person) ? 0 : 1;
+			if (perMode)
+				duplicatePlans(person);
+			else if (rmStaging)
+				skipped += selectModeAndClean(population.getFactory(), person) ? 0 : 1;
+			else
+				skipped += selectMode(person) ? 0 : 1;
 
 			processed++;
 		}
@@ -70,6 +74,7 @@ public class NormalizeTripModes implements MATSimAppCommand {
 
 		if (skipped > 0)
 			log.warn("Skipped {} persons due to car availability", skipped);
+
 
 		PopulationUtils.writePopulation(population, output.toString());
 
@@ -128,6 +133,37 @@ public class NormalizeTripModes implements MATSimAppCommand {
 				TripStructureUtils.setRoutingMode(leg, mode);
 			}
 		}
+
+		return true;
+	}
+
+	private boolean selectModeAndClean(PopulationFactory f, Person person) {
+
+		List<String> select = new ArrayList<>(modes);
+
+		if (!PersonUtils.canUseCar(person))
+			select.removeIf(m -> m.equals("car"));
+
+		if (select.isEmpty()) {
+			// No modes to select from. Probably tried to set to all car plans, but person is not allowed to use car."
+			return false;
+		}
+
+		Plan plan = person.getSelectedPlan();
+		plan.setScore(null);
+
+		String mode = select.get(rnd.nextInt(select.size()));
+
+		List<Activity> activities = TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+
+		plan.getPlanElements().clear();
+
+		for (int i = 0; i < activities.size() - 1; i++) {
+			plan.addActivity(activities.get(i));
+			plan.addLeg(f.createLeg(mode));
+		}
+
+		plan.addActivity(activities.get(activities.size() - 1));
 
 		return true;
 	}

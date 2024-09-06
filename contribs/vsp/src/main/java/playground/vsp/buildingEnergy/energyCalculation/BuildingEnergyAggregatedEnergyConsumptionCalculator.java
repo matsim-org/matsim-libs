@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
@@ -37,8 +38,7 @@ import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 class BuildingEnergyAggregatedEnergyConsumptionCalculator {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyAggregatedEnergyConsumptionCalculator.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyAggregatedEnergyConsumptionCalculator.class);
 	private BuildingEnergyConsumptionRuleFactory rules;
 	private Map<String, EnergyConsumption> consumption;
 	private List<Id> links;

@@ -30,7 +30,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -40,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class ExeRunner {
 
-	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
+	/*package*/ final static Logger log = LogManager.getLogger(ExeRunner.class);
 
 	/**
 	 * Runs an executable and waits until the executable finishes or until
@@ -80,7 +81,7 @@ public abstract class ExeRunner {
 		final ExternalExecutor myExecutor = new ExternalExecutor(cmdArgs, stdoutFileName, workingDirectory);
 		return waitForFinish(myExecutor, timeout);
 	}
-	
+
 	public static int waitForFinish(final ExternalExecutor myExecutor, final int timeout) {
 		synchronized (myExecutor) {
 			try {
@@ -105,7 +106,7 @@ public abstract class ExeRunner {
 				log.info("ExeRunner.run() got interrupted while waiting for timeout", e);
 			}
 		}
-		
+
 		return myExecutor.erg;
 	}
 
@@ -135,7 +136,7 @@ public abstract class ExeRunner {
 				this.stderrFileName = null;
 			}
 		}
-		
+
 		public ExternalExecutor (final String[] cmdArgs, final String stdoutFileName, final String workingDirectory) {
 			this.cmdArgs = cmdArgs;
 			this.cmd = null;
@@ -151,7 +152,7 @@ public abstract class ExeRunner {
 				this.stderrFileName = null;
 			}
 		}
-		
+
 		public void killProcess() {
 			if (this.p != null) {
 				this.p.destroy();
@@ -174,10 +175,10 @@ public abstract class ExeRunner {
 						this.p = Runtime.getRuntime().exec(this.cmdArgs, null, new File(this.workingDirectory));
 					}
 				}
-				
+
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(this.p.getErrorStream()));
-				
+
 				BufferedWriter writerIn = null;
 				StreamHandler outputHandler = null;
 				if (this.stdoutFileName != null) {
@@ -237,19 +238,19 @@ public abstract class ExeRunner {
 					writerErr.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("problem running exe", e);
 				this.erg = -2;
 			}
 		}
 	}
-	
+
 	static class BlackHoleStreamHandler extends Thread {
 		private final BufferedReader in;
-		
+
 		public BlackHoleStreamHandler(final BufferedReader in) {
 			this.in = in;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
@@ -257,8 +258,7 @@ public abstract class ExeRunner {
 				while ((line = this.in.readLine()) != null) {
 				}
 			} catch (IOException e) {
-				log.info("StreamHandler got interrupted");
-				e.printStackTrace();
+				log.info("StreamHandler got interrupted", e);
 			}
 		}
 	}
@@ -290,8 +290,7 @@ public abstract class ExeRunner {
 				}
 				this.out.flush();
 			} catch (IOException e) {
-				log.info("StreamHandler got interrupted");
-				e.printStackTrace();
+				log.info("StreamHandler got interrupted", e);
 			}
 		}
 	}

@@ -24,7 +24,8 @@ package org.matsim.contrib.drt.extension.preplanned.run;
 
 import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -36,7 +37,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -50,7 +51,7 @@ import com.google.common.collect.ImmutableSet;
  * @author michalm (Michal Maciejewski)
  */
 public final class PreplannedDrtControlerCreator {
-	private static final Logger log = Logger.getLogger(PreplannedDrtControlerCreator.class);
+	private static final Logger log = LogManager.getLogger(PreplannedDrtControlerCreator.class);
 
 	/**
 	 * Creates a controller in one step.
@@ -61,7 +62,7 @@ public final class PreplannedDrtControlerCreator {
 	 */
 	public static Controler createControler(Config config, boolean otfvis) {
 		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute());
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

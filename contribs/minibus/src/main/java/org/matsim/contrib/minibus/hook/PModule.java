@@ -22,7 +22,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
@@ -33,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 public final class PModule extends AbstractModule {
-	private final static Logger log = Logger.getLogger(PModule.class);
+	private final static Logger log = LogManager.getLogger(PModule.class);
 
 	@Override public void install() {
 

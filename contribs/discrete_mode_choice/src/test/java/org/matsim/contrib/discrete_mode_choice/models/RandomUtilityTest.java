@@ -1,7 +1,5 @@
 package org.matsim.contrib.discrete_mode_choice.models;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contribs.discrete_mode_choice.components.estimators.UniformTripEstimator;
@@ -31,11 +31,11 @@ import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpreta
 import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class RandomUtilityTest {
 	@Test
-	public void testRandomUtility() throws NoFeasibleChoiceException {
+	void testRandomUtility() throws NoFeasibleChoiceException {
 		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
 		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
 		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
@@ -51,7 +51,7 @@ public class RandomUtilityTest {
 		originActivity.setEndTime(0.0);
 
 		List<DiscreteModeChoiceTrip> trips = Collections.singletonList(new DiscreteModeChoiceTrip(originActivity,
-				destinationActivity, null, Collections.emptyList(), 0, 0, 0, new Attributes()));
+				destinationActivity, null, Collections.emptyList(), 0, 0, 0, new AttributesImpl()));
 
 		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
 				selectorFactory, fallbackBehaviour,

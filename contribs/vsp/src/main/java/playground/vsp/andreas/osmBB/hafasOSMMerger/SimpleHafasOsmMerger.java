@@ -2,7 +2,8 @@ package playground.vsp.andreas.osmBB.hafasOSMMerger;
 
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -16,7 +17,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 
 public class SimpleHafasOsmMerger {
 
-	private static final Logger log = Logger.getLogger(SimpleHafasOsmMerger.class);
+	private static final Logger log = LogManager.getLogger(SimpleHafasOsmMerger.class);
 
 //	static final String hafasAlldat = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
 	private final String hafasTransitSchedule = "e:/_out/ts/hafas_transitSchedule.xml";

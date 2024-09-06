@@ -23,7 +23,8 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +33,6 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 public final class NetworkWriteAsTable implements NetworkRunnable {
 
@@ -40,7 +40,7 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkWriteAsTable.class);
+	private final static Logger log = LogManager.getLogger(NetworkWriteAsTable.class);
 
 	private final String outdir;
 	private final double offset;
@@ -106,7 +106,7 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 				offsetVector = CoordUtils.scalarMult(offset/CoordUtils.length(offsetVector),offsetVector);
 				Coord fc = CoordUtils.plus(f.getCoord(),offsetVector);
 				Coord tc = CoordUtils.plus(t.getCoord(),offsetVector);
-				
+
 				out_l.write(l.getId() + "\t" + fc.getX() + "\t" + fc.getY() + "\t");
 				out_l.write(tc.getX() + "\t" + tc.getY() + "\t" + l.getLength() + "\t");
 				out_l.write(l.getFreespeed()+"\t"

@@ -2,7 +2,8 @@ package playground.vsp.cadyts.marginals;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
@@ -14,7 +15,7 @@ class ModalDistanceCadytsBuilder {
 
 	static final String MARGINALS = "_marginals";
 
-	private static final Logger logger = Logger.getLogger(ModalDistanceCadytsBuilder.class);
+	private static final Logger logger = LogManager.getLogger(ModalDistanceCadytsBuilder.class);
 
 	private Config config = null;
 	private DistanceDistribution expectedDistanceDistribution;
@@ -39,7 +40,7 @@ class ModalDistanceCadytsBuilder {
 		validateTimeBinSize(cadytsConfig.getTimeBinSize());
 
 		AnalyticalCalibrator<Id<DistanceDistribution.DistanceBin>> calibrator = new AnalyticalCalibrator<>(
-				config.controler().getOutputDirectory() + "/cadyts" + MARGINALS + ".log",
+				config.controller().getOutputDirectory() + "/cadyts" + MARGINALS + ".log",
 				MatsimRandom.getLocalInstance().nextLong(),
 				cadytsConfig.getTimeBinSize()
 		);
@@ -50,7 +51,7 @@ class ModalDistanceCadytsBuilder {
 		calibrator.setFreezeIteration(cadytsConfig.getFreezeIteration());
 		calibrator.setPreparatoryIterations(cadytsConfig.getPreparatoryIterations());
 		calibrator.setVarianceScale(cadytsConfig.getVarianceScale());
-		calibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats"+MARGINALS+".txt");
+		calibrator.setStatisticsFile(config.controller().getOutputDirectory() + "/calibration-stats"+MARGINALS+".txt");
 
 		calibrator.setBruteForce(cadytsConfig.useBruteForce());
 		// I don't think this has an influence on any of the variants we are using. (Has an influence only when plan choice is left

@@ -2,7 +2,8 @@ package org.matsim.contrib.carsharing.relocation.infrastructure;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +32,7 @@ import java.util.*;
 
 public class AverageDemandRelocationListener implements IterationStartsListener, DispatchRelocationsEventHandler {
 
-	public static final Logger log = Logger.getLogger("dummy");
+	public static final Logger log = LogManager.getLogger("dummy");
 
 	@Inject
 	private CarsharingVehicleRelocationContainer carsharingVehicleRelocation;

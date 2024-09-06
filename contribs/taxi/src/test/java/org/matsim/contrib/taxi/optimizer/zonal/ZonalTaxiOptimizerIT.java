@@ -20,47 +20,59 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createDefaultTaxiConfigVariants;
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ZonalTaxiOptimizerIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testZonal() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
+	void testZonal_dse() {
 		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
+		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
+		rbParams.nearestRequestsLimit = 99999;
+		rbParams.nearestVehiclesLimit = 99999;
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
+		zoneParams.cellSize = 99999.;
+
 		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.setZonesShpFile("zones/zones.shp");
-		zsParams.setZonesXmlFile("zones/zones.xml");
-		zsParams.setExpansionDistance(3000);
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
+
+		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+		params.addParameterSet(zsParams);
+		params.addParameterSet(rbParams);
+
+		runBenchmark(false, params, utils);
+	}
+
+	@Test
+	void testZonal_minWaitTime() {
+		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
+		rbParams.goal = Goal.MIN_WAIT_TIME;
+		rbParams.nearestRequestsLimit = 10;
+		rbParams.nearestVehiclesLimit = 10;
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
+		zoneParams.cellSize = 1000.;
+
+		ZonalSystemParams zsParams = new ZonalSystemParams();
+		zsParams.zonesShpFile = "zones/zones.shp";
+		zsParams.zonesXmlFile = "zones/zones.xml";
+		zsParams.expansionDistance = 3000;
+
 		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
 		params.addParameterSet(rbParams);
 		params.addParameterSet(zsParams);
 
-		rbParams.setGoal(Goal.DEMAND_SUPPLY_EQUIL);
-		rbParams.setNearestRequestsLimit(99999);
-		rbParams.setNearestVehiclesLimit(99999);
-		rbParams.setCellSize(99999.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
-
-		rbParams.setGoal(Goal.MIN_WAIT_TIME);
-		rbParams.setNearestRequestsLimit(10);
-		rbParams.setNearestVehiclesLimit(10);
-		rbParams.setCellSize(1000.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
+		runBenchmark(false, params, utils);
 	}
 }

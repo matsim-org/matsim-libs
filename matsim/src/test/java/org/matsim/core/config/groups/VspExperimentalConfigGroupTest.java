@@ -20,21 +20,29 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
-import org.matsim.testcases.MatsimTestCase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class VspExperimentalConfigGroupTest extends MatsimTestCase {
+public class VspExperimentalConfigGroupTest {
 
-	private static final Logger log = Logger.getLogger(VspExperimentalConfigGroupTest.class);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	public void testVspConfigGroup() {
-		
+
+	private static final Logger log = LogManager.getLogger(VspExperimentalConfigGroupTest.class);
+
+	@Test
+	void testVspConfigGroup() {
+
 //		VspExperimentalConfigGroup vspConfig = ConfigUtils.createConfig().vspExperimental() ;
-//			
+//
 //		vspConfig.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.WARN) ;
 //		// this should (just) produce warning messages:
 //		vspConfig.checkConsistency() ;
-//		
+//
 //		vspConfig.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.ABORT) ;
 //		try {
 //			// should throw RuntimeException:
@@ -43,7 +51,7 @@ public class VspExperimentalConfigGroupTest extends MatsimTestCase {
 //		} catch ( RuntimeException e ) {
 //			log.info("Caught RuntimeException, as expected: " + e.getMessage());
 //		}
-		
+
 		// this type of checking level is only at the level of the config group itself, which is too low
 		// for many case that I need.
 		// In consequence, also the test is not very useful --> commenting it out; might be deleted eventually.

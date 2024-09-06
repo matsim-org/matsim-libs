@@ -25,7 +25,7 @@ import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Removes trips and replaces them by legs.
@@ -44,7 +44,7 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
 	}
-	
+
 	public TripsToLegsModule(GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
 	}

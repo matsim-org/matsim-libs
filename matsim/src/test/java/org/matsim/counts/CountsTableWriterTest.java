@@ -23,14 +23,23 @@ package org.matsim.counts;
 import java.io.File;
 import java.util.Locale;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 
-public class CountsTableWriterTest extends MatsimTestCase {
+public class CountsTableWriterTest {
 
-	public void testTableCreation() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testTableCreation() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 
@@ -38,9 +47,9 @@ public class CountsTableWriterTest extends MatsimTestCase {
 		cca.run();
 
 		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
-		ctw.writeFile(this.getOutputDirectory() + "/countTable.txt");
+		ctw.writeFile(utils.getOutputDirectory() + "/countTable.txt");
 
-		File f = new File(this.getOutputDirectory() + "/countTable.txt");
+		File f = new File(utils.getOutputDirectory() + "/countTable.txt");
 		assertTrue(f.length() > 0.0);
 	}
 }

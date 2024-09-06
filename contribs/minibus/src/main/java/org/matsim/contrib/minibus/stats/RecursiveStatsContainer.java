@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Collects average number of operators, routes, passengers and vehicles and its variance in a recursive manner
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
 final class RecursiveStatsContainer {
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(RecursiveStatsContainer.class);
+	private static final Logger log = LogManager.getLogger(RecursiveStatsContainer.class);
 	static final String toStringHeader = "# mean Operators; std dev Operators; mean Routes; std dev Routes; mean Pax; std dev Pax; mean Veh, std dev Veh"; 
 
 	private double numberOfEntries = Double.NaN;

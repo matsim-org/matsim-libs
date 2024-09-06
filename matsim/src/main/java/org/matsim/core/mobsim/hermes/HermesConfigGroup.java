@@ -19,7 +19,7 @@
 package org.matsim.core.mobsim.hermes;
 
 import jakarta.validation.constraints.Positive;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -37,8 +37,9 @@ public final class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final int MAX_LINK_ID = 16777216;
     // Maximum number of stops (limited to 20bits in the plan)
     public static final int MAX_STOP_ROUTE_ID = 65536;
-    // Maximum vehicle velocity (limited to 8 bits in the plan)
-    public static final int MAX_VEHICLE_VELOCITY = 255;
+    // Maximum vehicle velocity (limited to 8 bits in the plan: integers 0-99 reserved for speeds 0.0 - 9.9
+    // and 100-255 reserved for speeds 10 - 165)
+    public static final int MAX_VEHICLE_VELOCITY = 165;
     // Maximum vehicle PCE types (limited to 4 bits)
     public static final int MAX_VEHICLE_PCETYPES = 15;
     // Maximum number of events per agent (limited to 16 bits in the plan)
@@ -166,8 +167,8 @@ public final class HermesConfigGroup extends ReflectiveConfigGroup {
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);
-        if (config.parallelEventHandling().getOneThreadPerHandler()!=true && config.controler().getMobsim().equals("hermes")){
-            Logger.getLogger(getClass()).warn("Hermes should be run with one thread per handler.");
+        if (config.eventsManager().getOneThreadPerHandler()!=true && config.controller().getMobsim().equals("hermes")){
+            LogManager.getLogger(getClass()).warn("Hermes should be run with one thread per handler.");
         }
     }
 }

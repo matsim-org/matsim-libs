@@ -40,6 +40,13 @@ public class DrtTeleportedRouteCalculator implements TeleportedRouteCalculator {
 		this.averageInVehicleBeelineSpeed = averageInVehicleBeelineSpeed;
 	}
 
+	// TODO: from discussion from michal and rakow
+	// speedup is currently using very simple and not exchangeable estimators
+	// it could be possible to integrate the drt estimators used by the informed mode-choice
+	// this router should probably not use the beeline distance but the direct travel route
+	// speed-up would still be significant (oct'23)
+	// estimator have been moved to drt contrib, one can now use estimateAndTeleport for new functionality (mar'24)
+
 	@Override
 	public Route calculateRoute(PassengerRequest request) {
 		Link startLink = request.getFromLink();

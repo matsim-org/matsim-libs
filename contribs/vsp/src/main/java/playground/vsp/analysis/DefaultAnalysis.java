@@ -24,14 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
@@ -43,7 +44,7 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class DefaultAnalysis {
 	
-	private final static Logger log = Logger.getLogger(DefaultAnalysis.class);
+	private final static Logger log = LogManager.getLogger(DefaultAnalysis.class);
 	
 	private final String baseFolder;
 	private final String iterationOutputDir;

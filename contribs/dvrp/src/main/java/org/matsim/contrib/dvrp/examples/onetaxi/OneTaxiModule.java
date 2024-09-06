@@ -25,6 +25,7 @@ import java.net.URL;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
@@ -87,6 +88,9 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 
 				// converts scheduled tasks into simulated actions (legs and activities)
 				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class).in(Singleton.class);
+				
+				// no advance request
+				bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 			}
 		});
 	}

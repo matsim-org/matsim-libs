@@ -20,7 +20,8 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -45,7 +45,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 
 	private BasicPlanAgentImpl basicAgentDelegate;
 	private final BoardingAcceptance boardingAcceptance ;
-	
+
 	public TransitAgentImpl( BasicPlanAgentImpl basicAgent ) {
 		this( basicAgent, BoardingAcceptance.checkLineAndStop ) ;
 	}
@@ -55,7 +55,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 		this.boardingAcceptance = boardingAcceptance;
 	}
 
-	private static final Logger log = Logger.getLogger(TransitAgentImpl.class);
+	private static final Logger log = LogManager.getLogger(TransitAgentImpl.class);
 
 	@Override
 	public final  boolean getExitAtStop(final TransitStopFacility stop) {

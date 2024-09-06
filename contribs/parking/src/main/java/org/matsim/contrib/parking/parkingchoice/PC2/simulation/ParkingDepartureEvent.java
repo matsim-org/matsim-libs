@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 public class ParkingDepartureEvent extends Event {
 
@@ -36,11 +35,7 @@ public class ParkingDepartureEvent extends Event {
 
 	public ParkingDepartureEvent(double time, Id parkingId, Id personId) {
 		super(time);
-		
-		if (time>110000){
-			DebugLib.emptyFunctionForSettingBreakPoint();
-		}
-		
+
 		this.parkingId = parkingId;
 		this.personId = personId;
 	}
@@ -57,7 +52,7 @@ public class ParkingDepartureEvent extends Event {
 		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
 		return attributes;
 	}
-	
+
 	public static Id<Person> getPersonId(Map<String, String> attributes){
 		String personIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PERSON_ID);
 		if (personIdString==null){
@@ -66,7 +61,7 @@ public class ParkingDepartureEvent extends Event {
 			return Id.create(personIdString, Person.class);
 		}
 	}
-	
+
 	public static Id<PC2Parking> getParkingId(Map<String, String> attributes){
 		String parkingIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PARKING_ID);
 		if (parkingIdString==null){

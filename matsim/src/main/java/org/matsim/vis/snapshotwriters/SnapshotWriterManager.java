@@ -20,8 +20,8 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -86,7 +86,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 			doSnapshot(time, (VisMobsim) e.getQueueSimulation());
 		}
 	}
-	
+
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
 

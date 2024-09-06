@@ -19,33 +19,27 @@
 
 package org.matsim.contrib.ev.charging;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
-	private final ChargerSpecification charger;
+	protected final ChargerSpecification charger;
 	private final ChargingStrategy chargingStrategy;
 	private final EventsManager eventsManager;
 
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new LinkedHashMap<>();
+	private final Queue<ElectricVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
+	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
-	public ChargingWithQueueingLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
-			EventsManager eventsManager) {
+	public ChargingWithQueueingLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
 		this.chargingStrategy = Objects.requireNonNull(chargingStrategy);
 		this.charger = Objects.requireNonNull(charger);
 		this.eventsManager = Objects.requireNonNull(eventsManager);
@@ -58,12 +52,15 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			ev.getBattery().changeSoc(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
+			double oldCharge = ev.getBattery().getCharge();
+			double energy = ev.getChargingPower().calcChargingPower(charger) * chargePeriod;
+			double newCharge = Math.min(oldCharge + energy, ev.getBattery().getCapacity());
+			ev.getBattery().setCharge(newCharge);
+			eventsManager.processEvent(new EnergyChargedEvent(now, charger.getId(), ev.getId(), newCharge - oldCharge, newCharge));
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
-				eventsManager.processEvent(
-						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 				listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 			}
 		}
@@ -72,28 +69,35 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		for (int i = 0; i < queuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
 		}
+
+		var arrivingVehiclesIter = arrivingVehicles.iterator();
+		while (arrivingVehiclesIter.hasNext()) {
+			var ev = arrivingVehiclesIter.next();
+			if (pluggedVehicles.size() < charger.getPlugCount()) {
+				plugVehicle(ev, now);
+			} else {
+				queueVehicle(ev, now);
+			}
+			arrivingVehiclesIter.remove();
+		}
 	}
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, double now) {
-		addVehicle(ev, new ChargingListener() {}, now);
+		addVehicle(ev, new ChargingListener() {
+		}, now);
 	}
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
+		arrivingVehicles.add(ev);
 		listeners.put(ev.getId(), chargingListener);
-		if (pluggedVehicles.size() < charger.getPlugCount()) {
-			plugVehicle(ev, now);
-		} else {
-			queueVehicle(ev, now);
-		}
 	}
 
 	@Override
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
-			eventsManager.processEvent(
-					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
+			eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
 			if (!queuedVehicles.isEmpty()) {
@@ -101,8 +105,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		} else {
 			// make sure ev was in the queue
-			Preconditions.checkState(queuedVehicles.remove(ev),
-					"Vehicle (%s) is neither queued nor plugged at charger (%s)", ev.getId(), charger.getId());
+			Preconditions.checkState(queuedVehicles.remove(ev), "Vehicle (%s) is neither queued nor plugged at charger (%s)", ev.getId(),
+				charger.getId());
 			eventsManager.processEvent(new QuitQueueAtChargerEvent(now, charger.getId(), ev.getId()));
 		}
 	}
@@ -117,21 +121,18 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		if (pluggedVehicles.put(ev.getId(), ev) != null) {
 			throw new IllegalArgumentException();
 		}
-		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType(),
-				ev.getBattery().getSoc()));
+		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 
-	private final Collection<ElectricVehicle> unmodifiablePluggedVehicles = Collections.unmodifiableCollection(
-			pluggedVehicles.values());
+	private final Collection<ElectricVehicle> unmodifiablePluggedVehicles = Collections.unmodifiableCollection(pluggedVehicles.values());
 
 	@Override
 	public Collection<ElectricVehicle> getPluggedVehicles() {
 		return unmodifiablePluggedVehicles;
 	}
 
-	private final Collection<ElectricVehicle> unmodifiableQueuedVehicles = Collections.unmodifiableCollection(
-			queuedVehicles);
+	private final Collection<ElectricVehicle> unmodifiableQueuedVehicles = Collections.unmodifiableCollection(queuedVehicles);
 
 	@Override
 	public Collection<ElectricVehicle> getQueuedVehicles() {

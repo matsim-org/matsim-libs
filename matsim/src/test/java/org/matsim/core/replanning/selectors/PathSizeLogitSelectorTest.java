@@ -20,9 +20,16 @@
 
 package org.matsim.core.replanning.selectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -46,34 +53,30 @@ import org.matsim.core.population.routes.RouteUtils;
  */
 public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
+	private final static Logger log = LogManager.getLogger(RandomPlanSelectorTest.class);
 
 	private Network network = null;
 	private Config config = null;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
-		config.planCalcScore().setBrainExpBeta(2.0);
-		config.planCalcScore().setPathSizeLogitBeta(2.0);
+	@BeforeEach public void setUp() {
+		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
+		config.scoring().setBrainExpBeta(2.0);
+		config.scoring().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach public void tearDown() {
 		this.network = null;
 		this.config = null;
-		super.tearDown();
 	}
 
 	@Override
 	protected PlanSelector<Plan,Person> getPlanSelector() {
-		return new PathSizeLogitSelector(config.planCalcScore(), createNetwork());
+		return new PathSizeLogitSelector(config.scoring(), createNetwork());
 	}
 
 	@Override
-	public void testNegativeScore() {
+	@Test public void testNegativeScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 
@@ -181,7 +184,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	public void testZeroScore() {
+	@Test public void testZeroScore() {
 		this.network = createNetwork();
 		PlanSelector<Plan,Person> selector = getPlanSelector();
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
@@ -212,7 +215,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 	}
 
-	public void testPathSizeLogitSelector() {
+	@Test
+	void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
@@ -284,7 +288,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.planCalcScore(), network);
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.scoring(), network);
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

@@ -29,40 +29,39 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ExtensiveInsertionProviderTest {
-	@Rule
-	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
+	@RegisterExtension
+	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	@Test
-	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(120), null),
+	void getInsertions_noInsertionsGenerated() {
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(new DefaultStopTimeCalculator(120), null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
 
 	@Test
-	public void getInsertions_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
+	void getInsertions_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution gets discarded in the second stage (KNearestInsertionsAtEndFilter)
 		getInsertions_twoInsertionsGenerated(0);
 	}
 
 	@Test
-	public void getInsertions_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
+	void getInsertions_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution is NOT discarded in the second stage (KNearestInsertionsAtEndFilter)
 		getInsertions_twoInsertionsGenerated(10);
@@ -88,7 +87,8 @@ public class ExtensiveInsertionProviderTest {
 				any())).thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
-		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
+		var params = new ExtensiveInsertionSearchParams();
+		params.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
 		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, insertionGenerator,

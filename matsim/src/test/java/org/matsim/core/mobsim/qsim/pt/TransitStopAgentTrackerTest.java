@@ -20,9 +20,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,11 +38,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public class TransitStopAgentTrackerTest extends TestCase {
+public class TransitStopAgentTrackerTest {
 
-	private static final Logger log = Logger.getLogger(TransitStopAgentTrackerTest.class);
+	private static final Logger log = LogManager.getLogger(TransitStopAgentTrackerTest.class);
 
-	public void testAddAgent() {
+	@Test
+	void testAddAgent() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -65,7 +68,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		assertTrue(tracker.getAgentsAtFacility(stop2.getId()).contains(agent3));
 	}
 
-	public void testRemoveAgent() {
+	@Test
+	void testRemoveAgent() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -90,7 +94,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		assertEquals(1, tracker.getAgentsAtFacility(stop1.getId()).size()); // should stay the same
 	}
 
-	public void testGetAgentsAtStopImmutable() {
+	@Test
+	void testGetAgentsAtStopImmutable() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();

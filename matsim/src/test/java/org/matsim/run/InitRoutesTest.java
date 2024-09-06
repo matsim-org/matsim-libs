@@ -20,8 +20,12 @@
 
 package org.matsim.run;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +46,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.InitRoutes} functions properly, e.g. really
@@ -51,14 +55,19 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class InitRoutesTest extends MatsimTestCase {
+public class InitRoutesTest {
 
-	public void testMain() throws Exception {
-		Config config = loadConfig(null);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testMain() throws Exception {
+		Config config = utils.loadConfig((String)null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
-		final String PLANS_FILE_TESTINPUT = getOutputDirectory() + "plans.in.xml";
-		final String PLANS_FILE_TESTOUTPUT = getOutputDirectory() + "plans.out.xml";
-		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
+		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
+		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
+		final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -84,24 +93,24 @@ public class InitRoutesTest extends MatsimTestCase {
 		new ConfigWriter(config).write(CONFIG_FILE);
 
 		// some pre-tests
-		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
+		assertFalse(new File(PLANS_FILE_TESTOUTPUT).exists(), "Output-File should not yet exist.");
 
 		// now run the tested class
 		InitRoutes.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
 		// now perform some tests
-		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
+		assertTrue(new File(PLANS_FILE_TESTOUTPUT).exists(), "no output generated.");
 		Population population2 = scenario.getPopulation();
 		new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
-		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
+		assertEquals(1, population2.getPersons().size(), "wrong number of persons.");
 		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
-		assertNotNull("person 1 missing", person2);
-		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
+		assertNotNull(person2, "person 1 missing");
+		assertEquals(1, person2.getPlans().size(), "wrong number of plans in person 1");
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
 		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
-		assertNotNull("no route assigned.", route2);
-		assertEquals("wrong route", 2, route2.getLinkIds().size());
+		assertNotNull(route2, "no route assigned.");
+		assertEquals(2, route2.getLinkIds().size(), "wrong route");
 	}
 
 }

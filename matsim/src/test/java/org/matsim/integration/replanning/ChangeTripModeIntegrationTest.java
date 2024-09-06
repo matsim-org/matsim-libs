@@ -20,6 +20,11 @@
 
 package org.matsim.integration.replanning;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,7 +37,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
@@ -58,21 +64,27 @@ import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class ChangeTripModeIntegrationTest extends MatsimTestCase {
+public class ChangeTripModeIntegrationTest {
 
-	public void testStrategyManagerConfigLoaderIntegration() {
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
-		final Config config = loadConfig(null);
+		final Config config = utils.loadConfig((String)null);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+		config.replanning().addStrategySettings(strategySettings);
 		//		config.setParam("changeMode", "modes", "car,walk");
 		String[] str = {"car","walk"} ;
 		config.changeMode().setModes(str);
@@ -120,11 +132,11 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 		manager.run(population, 0, injector.getInstance(ReplanningContext.class));
 
 		// test that everything worked as expected
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
-		assertNotNull("the leg should now have a route.", newLeg.getRoute());
+		assertNotNull(newLeg.getRoute(), "the leg should now have a route.");
 	}
 
 }

@@ -22,16 +22,16 @@ package org.matsim.contrib.ev.charging;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
-import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableList;
 
@@ -41,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 public class FastThenSlowChargingTest {
 
 	@Test
-	public void calcChargingPower() {
+	void calcChargingPower() {
 		//fast charger (2 c)
 		assertCalcChargingPower(100, 0, 200, 175);
 		assertCalcChargingPower(100, 50, 200, 175);
@@ -67,16 +67,16 @@ public class FastThenSlowChargingTest {
 		assertCalcChargingPower(100, 100, 40, 40);
 	}
 
-	private void assertCalcChargingPower(double capacity_kWh, double soc_kWh, double chargerPower_kW,
+	private void assertCalcChargingPower(double capacity_kWh, double charge_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
 		ChargerSpecification charger = createCharger(chargerPower_kW);
-		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, charge_kWh);
 		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
 				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
 	}
 
 	@Test
-	public void calcChargingTime_singleSection() {
+	void calcChargingTime_singleSection() {
 		//fast charger (2 c)
 		assertCalcChargingTime(100, 0, 0, 200, 0);
 		assertCalcChargingTime(100, 0, 17.5, 200, 360);
@@ -106,7 +106,7 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcChargingTime_crossSection() {
+	void calcChargingTime_crossSection() {
 		//fast charger (2 c)
 		assertCalcChargingTime(100, 32.5, 17.5 + 12.5, 200, 2 * 360);
 		assertCalcChargingTime(100, 62.5, 12.5 + 5, 200, 2 * 360);
@@ -124,19 +124,19 @@ public class FastThenSlowChargingTest {
 	}
 
 	@Test
-	public void calcChargingTime_exceptions() {
+	void calcChargingTime_exceptions() {
 		Assertions.assertThatThrownBy(() -> assertCalcChargingTime(100, 0, -1, 200, 2 * 360))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Energy is negative: ");
 		Assertions.assertThatThrownBy(() -> assertCalcChargingTime(100, 90, 11, 200, 2 * 360))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
-				.hasMessageStartingWith("End SOC greater than battery capacity: ");
+				.hasMessageStartingWith("End charge greater than battery capacity: ");
 	}
 
-	private void assertCalcChargingTime(double capacity_kWh, double soc_kWh, double energy_kWh, double chargerPower_kW,
-			double expectedChargingTime_s) {
+	private void assertCalcChargingTime(double capacity_kWh, double charge_kWh, double energy_kWh,
+			double chargerPower_kW, double expectedChargingTime_s) {
 		ChargerSpecification charger = createCharger(chargerPower_kW);
-		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, charge_kWh);
 		Assertions.assertThat(((FastThenSlowCharging)electricVehicle.getChargingPower()).calcChargingTime(charger,
 				EvUnits.kWh_to_J(energy_kWh))).isCloseTo(expectedChargingTime_s, Percentage.withPercentage(1e-13));
 	}
@@ -151,24 +151,24 @@ public class FastThenSlowChargingTest {
 				.build();
 	}
 
-	private ElectricVehicle createElectricVehicle(double capacity_kWh, double soc_kWh) {
-		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
-				.id(Id.create("ev_id", ElectricVehicle.class))
-				.vehicleType("vt")
-				.chargerTypes(ImmutableList.of("ct"))
-				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
-				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
-				.build();
-		return ElectricVehicleImpl.create(specification, ev -> (link, travelTime, linkEnterTime) -> {
+	private ElectricVehicle createElectricVehicle(double capacity_kWh, double charge_kWh) {
+		// this record is a bit hacky implementation of ElectricVehicleSpecification just meant for tests
+		record TestEvSpecification(Id<Vehicle> getId, Vehicle getMatsimVehicle, String getVehicleType,
+								   ImmutableList<String> getChargerTypes, double getBatteryCapacity,
+								   double getInitialSoc) implements ElectricVehicleSpecification {
+		}
+		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
+				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), charge_kWh / capacity_kWh);
+
+		return ElectricFleetUtils.create(specification, ev -> ( link, travelTime, linkEnterTime) -> {
 			throw new UnsupportedOperationException();
 		}, ev -> (beginTime, duration, linkId) -> {
 			throw new UnsupportedOperationException();
-		}, FastThenSlowCharging::new);
+		}, FastThenSlowCharging::new );
 	}
 
-
 	@Test
-	public void calcEnergyCharge() {
+	void calcEnergyCharge() {
 		assertCalcEnergyCharge(100, 100, 200, 10, 0);
 		assertCalcEnergyCharge(100, 76, 200, 10, 500000);
 		assertCalcEnergyCharge(100, 51, 200, 10, 1250000);
@@ -176,35 +176,38 @@ public class FastThenSlowChargingTest {
 		assertCalcEnergyCharge(100, 0, 200, 10, 1750000);
 	}
 
-	private void assertCalcEnergyCharge(double capacity_kWh, double soc_kWh, double chargerPower_kW,
-										double chargingPeriod, double expectedEnergy) {
+	private void assertCalcEnergyCharge(double capacity_kWh, double charge_kWh, double chargerPower_kW,
+			double chargingPeriod, double expectedEnergy) {
 		ChargerSpecification charger = createCharger(chargerPower_kW);
-		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
-		double energy = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcEnergyCharged(charger, chargingPeriod);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, charge_kWh);
+		double energy = ((FastThenSlowCharging)electricVehicle.getChargingPower()).calcEnergyCharged(charger,
+				chargingPeriod);
 		Assertions.assertThat(energy).isCloseTo(expectedEnergy, Percentage.withPercentage(1e-13));
 	}
 
 	@Test
-	public void calcEnergyCharged_exceptions() {
+	void calcEnergyCharged_exceptions() {
 		Assertions.assertThatThrownBy(() -> assertCalcEnergyCharge(100, 100, 10, -1, 0))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Charging period is negative: ");
 	}
 
 	@Test
-	public void calcEnergyChargeAndVerifyWithDuration() {
+	void calcEnergyChargeAndVerifyWithDuration() {
 		assertEnergyAndDurationCalcCompliance(100, 76, 200, 100);
 		assertEnergyAndDurationCalcCompliance(100, 51, 200, 100);
 		assertEnergyAndDurationCalcCompliance(100, 50, 200, 100);
 		assertEnergyAndDurationCalcCompliance(100, 0, 200, 3000);
 	}
 
-	private void assertEnergyAndDurationCalcCompliance(double capacity_kWh, double soc_kWh, double chargerPower_kW,
-													   double chargingPeriod) {
+	private void assertEnergyAndDurationCalcCompliance(double capacity_kWh, double charge_kWh, double chargerPower_kW,
+			double chargingPeriod) {
 		ChargerSpecification charger = createCharger(chargerPower_kW);
-		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
-		double energyCharged_J = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcEnergyCharged(charger, chargingPeriod);
-		double chargingTime = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcChargingTime(charger, energyCharged_J);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, charge_kWh);
+		double energyCharged_J = ((FastThenSlowCharging)electricVehicle.getChargingPower()).calcEnergyCharged(charger,
+				chargingPeriod);
+		double chargingTime = ((FastThenSlowCharging)electricVehicle.getChargingPower()).calcChargingTime(charger,
+				energyCharged_J);
 		Assertions.assertThat(chargingTime).isCloseTo(chargingPeriod, Percentage.withPercentage(1e-13));
 	}
 

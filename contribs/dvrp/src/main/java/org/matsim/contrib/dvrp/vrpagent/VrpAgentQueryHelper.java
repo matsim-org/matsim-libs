@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -156,6 +157,36 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 
 		@Override
 		public void setType(String type) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getIterationCreated() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void setIterationCreated(int iteration) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Id<Plan> getId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setPlanId(Id<Plan> planId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getPlanMutator() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setPlanMutator(String planMutator) {
 			throw new UnsupportedOperationException();
 		}
 

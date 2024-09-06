@@ -22,16 +22,17 @@ package org.matsim.vehicles;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author dgrether
@@ -39,7 +40,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public final class VehicleWriterV1 extends MatsimXmlWriter {
 
-	private static final Logger log = Logger.getLogger(VehicleWriterV1.class);
+	private static final Logger log = LogManager.getLogger(VehicleWriterV1.class);
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
@@ -54,7 +55,7 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}
-	
+
 	public void writeFile(String filename) throws UncheckedIOException {
 		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
 		this.openFile(filename);
@@ -178,5 +179,5 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
 		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
 	}
-	
+
 }

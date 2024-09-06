@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.accessibility.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -37,7 +38,7 @@ import java.io.InputStream;
  * @author dziemke
  */
 public class AccessibilityOsmNetworkReader {
-	final private static Logger LOG = Logger.getLogger(AccessibilityOsmNetworkReader.class);
+	final private static Logger LOG = LogManager.getLogger(AccessibilityOsmNetworkReader.class);
 	
 	private String osmFileName;
 	private InputStream osmInputStream;

@@ -22,7 +22,8 @@ package org.matsim.core.scenario;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -47,7 +48,7 @@ import org.matsim.vehicles.Vehicles;
  */
 public final class MutableScenario implements Scenario, Lockable {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(MutableScenario.class);
+	private static final Logger log = LogManager.getLogger(MutableScenario.class);
 
 	private boolean locked = false ;
 

@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,7 +58,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class TransitScheduleReaderV2 extends MatsimXmlParser {
-	private static final  Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
+	private static final  Logger log = LogManager.getLogger(TransitScheduleReaderV2.class);
 
 	private final String externalInputCRS;
 	private final String targetCRS;
@@ -91,6 +92,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			String targetCRS,
 			TransitSchedule schedule,
 			RouteFactories routeFactory) {
+		super(ValidationType.DTD_ONLY);
 		this.externalInputCRS = externalInputCRS;
 		this.targetCRS = targetCRS;
 		this.schedule = schedule;
@@ -173,6 +175,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			if (departure != null) {
 				Time.parseOptionalTime(departure).ifDefined(stopBuilder::departureOffset);
 			}
+			stopBuilder.allowBoarding(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_BOARDING)));
+			stopBuilder.allowAlighting(Boolean.parseBoolean(atts.getValue(Constants.ALLOW_ALIGHTING)));
 			stopBuilder.awaitDepartureTime(Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE)));
 			this.currentTransitRoute.stopBuilders.add(stopBuilder);
 		} else if (Constants.RELATION.equals(name)) {
@@ -242,7 +246,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 
 	private static class TempTransitRoute {
 		protected final Id<TransitRoute> id;
-		protected final org.matsim.utils.objectattributes.attributable.Attributes attributes = new org.matsim.utils.objectattributes.attributable.Attributes();
+		protected final org.matsim.utils.objectattributes.attributable.Attributes attributes = new org.matsim.utils.objectattributes.attributable.AttributesImpl();
 		protected String description = null;
 		protected Map<Id<Departure>, Departure> departures = new LinkedHashMap<>();
 		/*package*/ List<TransitRouteStopImpl.Builder> stopBuilders = new ArrayList<>();

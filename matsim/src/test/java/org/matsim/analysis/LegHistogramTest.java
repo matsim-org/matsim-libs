@@ -20,8 +20,12 @@
 
 package org.matsim.analysis;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Set;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,19 +38,24 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class LegHistogramTest extends MatsimTestCase {
+public class LegHistogramTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * Tests that different modes of transport are recognized and accounted
 	 * accordingly.  Also tests that modes not defined as constants are
 	 * handled correctly.
 	 */
-	public void testDeparturesMiscModes() {
+	@Test
+	void testDeparturesMiscModes() {
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -99,7 +108,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * taken into account and that times larger than what is covered by the bins
 	 * do not lead to an exception.
 	 */
-	public void testNofBins() {
+	@Test
+	void testNofBins() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -139,7 +149,8 @@ public class LegHistogramTest extends MatsimTestCase {
 		assertEquals(2, histo.getArrivals()[10]);
 	}
 
-	public void testReset() {
+	@Test
+	void testReset() {
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
@@ -170,7 +181,7 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		histo.reset(1);
 		modes = histo.getLegModes();
-		assertEquals("After reset, there should be 0 known leg-modes", 0, modes.size());
+		assertEquals(0, modes.size(), "After reset, there should be 0 known leg-modes");
 		assertFalse(modes.contains(TransportMode.car));
 	}
 }

@@ -1,14 +1,15 @@
 package playground.vsp.cadyts.marginals;
 
 import cadyts.demand.PlanBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
 class ModalDistancePlansTranslator implements PlansTranslator<Id<DistanceDistribution.DistanceBin>> {
 
-	private static final Logger logger = Logger.getLogger(PlansTranslator.class);
+	private static final Logger logger = LogManager.getLogger(PlansTranslator.class);
 	private static final String BUILDER_KEY = "cadytsPlanBuilder-marginals";
 	private static final String ITERATION_KEY = "cadytsPlanBuilder-marinals-lastIteration";
 

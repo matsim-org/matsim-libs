@@ -20,10 +20,15 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.apache.log4j.Logger;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
@@ -36,31 +41,28 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = Logger.getLogger(ExpBetaPlanSelectorTest.class);
+	private final static Logger log = LogManager.getLogger(ExpBetaPlanSelectorTest.class);
 	private Config config = null;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
+	@BeforeEach public void setUp() {
+		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach public void tearDown() {
 		this.config = null;
-		super.tearDown();
 	}
 
 	@Override
 	protected ExpBetaPlanSelector<Plan, Person> getPlanSelector() {
-		return new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
+		return new ExpBetaPlanSelector<Plan, Person>(this.config.scoring());
 	}
 
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
-	public void testExpBeta2() {
-		this.config.planCalcScore().setBrainExpBeta(2.0);
+	@Test
+	void testExpBeta2() {
+		this.config.scoring().setBrainExpBeta(2.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false); // weight: 0.0003.35462627902512
@@ -73,8 +75,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		plan4.setScore(99.0);
 		Plan plan5 = PersonUtils.createAndAddPlan(person, false);// weight: 1
 		plan5.setScore(100.0);
-		
-		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
+
+		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.scoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -111,8 +113,9 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	/**
 	 * Test that plans are selected depending on their weight, use beta = 2.0.
 	 */
-	public void testExpBeta1() {
-		this.config.planCalcScore().setBrainExpBeta(1.0);
+	@Test
+	void testExpBeta1() {
+		this.config.scoring().setBrainExpBeta(1.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
@@ -131,9 +134,9 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		Plan plan5 = PersonUtils.createAndAddPlan(person, false);
 		plan5.setScore(100.0);
 
-		
-		
-		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
+
+
+		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.scoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -167,14 +170,15 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		assertEquals(6460, cnt5);
 	}
 
-	public void testGetSelectionProbability() {
-		
+	@Test
+	void testGetSelectionProbability() {
+
 		/*
 		 * the expected results were computed with R. The standard output of double precision numbers in R has 7 digits.
 		 */
 		final double EPSILON_R = 1e-7;
-		
-		this.config.planCalcScore().setBrainExpBeta(2.0);
+
+		this.config.scoring().setBrainExpBeta(2.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		plan1.setScore(180.0);
@@ -185,12 +189,12 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		Plan plan4 = PersonUtils.createAndAddPlan(person, false);
 		plan4.setScore(169.9);
 
-		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.planCalcScore());
-		
+		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.scoring());
+
 		assertEquals(0.2024421, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan1), EPSILON_R);
 		assertEquals(0.2472634, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan2), EPSILON_R);
 		assertEquals(0.5502947, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan3), EPSILON_R);
 		assertEquals(6.208075e-10, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan4), EPSILON_R);
 	}
-	
+
 }

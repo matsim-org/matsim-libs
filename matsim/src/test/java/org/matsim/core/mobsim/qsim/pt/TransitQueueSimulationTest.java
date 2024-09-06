@@ -20,16 +20,16 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,6 +63,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -87,7 +88,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -101,16 +102,17 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class TransitQueueSimulationTest {
 
-    /**
-     * Ensure that for each departure an agent is created and departs
-     */
-    @Test
-    public void testCreateAgents() {
+	/**
+	* Ensure that for each departure an agent is created and departs
+	*/
+	@Test
+	void testCreateAgents() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
-        
+
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
@@ -136,9 +138,9 @@ public class TransitQueueSimulationTest {
         vehicleType.getCapacity().setSeats(Integer.valueOf(101));
         vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
 //        vehicleType.setCapacity(capacity);
-        
+
         vehicles.addVehicleType(vehicleType);
-        
+
         vehicles.addVehicle(vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
         vehicles.addVehicle(vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
         vehicles.addVehicle(vb.createVehicle(Id.create("veh3", Vehicle.class), vehicleType));
@@ -228,24 +230,24 @@ public class TransitQueueSimulationTest {
         });
         assertEquals(5, agents.size());
         assertTrue(agents.get(0) instanceof TransitDriverAgent);
-        assertEquals(6.0*3600, agents.get(0).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(7.0*3600, agents.get(1).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.0*3600, agents.get(2).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.5*3600, agents.get(3).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(6.0*3600, agents.get(0).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(7.0*3600, agents.get(1).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(8.0*3600, agents.get(2).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(8.5*3600, agents.get(3).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestUtils.EPSILON);
     }
 
-    /**
-     * Tests that the simulation is adding an agent correctly to the transit stop
-     */
-    @Test
-    public void testAddAgentToStop() {
+	/**
+	* Tests that the simulation is adding an agent correctly to the transit stop
+	*/
+	@Test
+	void testAddAgentToStop() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-        
+
         // setup: network
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -293,95 +295,99 @@ public class TransitQueueSimulationTest {
 				.useDefaults() //
 				.build(scenario, events);
         qSim.run();
-        
+
         TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
 
         // check everything
         assertEquals(1, transitEngine.getAgentTracker().getAgentsAtFacility(stop1.getId()).size());
     }
 
-    /**
-     * Tests that the simulation refuses to let an agent teleport herself by starting a transit
-     * leg on a link where she isn't.
-     *
-     */
-    @Test(expected = TransitAgentTriesToTeleportException.class)
-    public void testAddAgentToStopWrongLink() {
+	/**
+	* Tests that the simulation refuses to let an agent teleport herself by starting a transit
+	* leg on a link where she isn't.
+	*
+	*/
+	@Test
+	void testAddAgentToStopWrongLink() {
+		assertThrows(TransitAgentTriesToTeleportException.class, () -> {
+			// setup: config
+			final Config config = ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.transit().setUseTransit(true);
+
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+
+			// setup: network
+			Network network = scenario.getNetwork();
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+			network.addNode(node1);
+			network.addNode(node2);
+			network.addNode(node3);
+			Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+			Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
+			setDefaultLinkAttributes(link1);
+			network.addLink(link1);
+			setDefaultLinkAttributes(link2);
+			network.addLink(link2);
+
+			// setup: transit schedule
+			TransitSchedule schedule = scenario.getTransitSchedule();
+			TransitScheduleFactory builder = schedule.getFactory();
+			TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
+
+			TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+			stop1.setLinkId(link1.getId());
+			TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+			stop2.setLinkId(link2.getId());
+			schedule.addStopFacility(stop1);
+			schedule.addStopFacility(stop2);
+
+			// setup: population
+			Population population = scenario.getPopulation();
+			PopulationFactory pb = population.getFactory();
+			Person person = pb.createPerson(Id.create("1", Person.class));
+			Plan plan = pb.createPlan();
+			person.addPlan(plan);
+			Activity homeAct = pb.createActivityFromLinkId("home", Id.create("2", Link.class));
+
+			homeAct.setEndTime(7.0 * 3600 - 10.0);
+			// as no transit line runs, make sure to stop the simulation manually.
+			scenario.getConfig().qsim().setEndTime(7.0 * 3600);
+
+			Leg leg = pb.createLeg(TransportMode.pt);
+			leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
+			Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
+			plan.addActivity(homeAct);
+			plan.addLeg(leg);
+			plan.addActivity(workAct);
+			population.addPerson(person);
+
+			// run simulation
+			EventsManager events = EventsUtils.createEventsManager();
+			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+			new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, events) //
+					.run();
+		});
+	}
+
+	/**
+	* Tests that a vehicle's handleStop() method is correctly called, e.g.
+	* it is re-called again when returning a delay > 0, and that is is correctly
+	* called when the stop is located on the first link of the network route, on the last
+	* link of the network route, or any intermediary link.
+	*/
+	@Test
+	void testHandleStop() {
         // setup: config
         final Config config = ConfigUtils.createConfig();
-        config.transit().setUseTransit(true);
-        
-        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-   
-        // setup: network
-        Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-        Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-        network.addNode(node1);
-        network.addNode(node2);
-        network.addNode(node3);
-        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
-        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
-        setDefaultLinkAttributes(link1);
-        network.addLink(link1);
-        setDefaultLinkAttributes(link2);
-        network.addLink(link2);
-
-        // setup: transit schedule
-        TransitSchedule schedule = scenario.getTransitSchedule();
-        TransitScheduleFactory builder = schedule.getFactory();
-        TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
-
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        stop1.setLinkId(link1.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        stop2.setLinkId(link2.getId());
-        schedule.addStopFacility(stop1);
-        schedule.addStopFacility(stop2);
-
-        // setup: population
-        Population population = scenario.getPopulation();
-        PopulationFactory pb = population.getFactory();
-        Person person = pb.createPerson(Id.create("1", Person.class));
-        Plan plan = pb.createPlan();
-        person.addPlan(plan);
-        Activity homeAct = pb.createActivityFromLinkId("home", Id.create("2", Link.class));
-
-        homeAct.setEndTime(7.0*3600 - 10.0);
-        // as no transit line runs, make sure to stop the simulation manually.
-        scenario.getConfig().qsim().setEndTime(7.0*3600);
-
-        Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
-        Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
-        plan.addActivity(homeAct);
-        plan.addLeg(leg);
-        plan.addActivity(workAct);
-        population.addPerson(person);
-
-        // run simulation
-        EventsManager events = EventsUtils.createEventsManager();
-        PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, events) //
-				.run();
-    }
-
-    /**
-     * Tests that a vehicle's handleStop() method is correctly called, e.g.
-     * it is re-called again when returning a delay > 0, and that is is correctly
-     * called when the stop is located on the first link of the network route, on the last
-     * link of the network route, or any intermediary link.
-     */
-    @Test
-    public void testHandleStop() {
-        // setup: config
-        final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
-        
+
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
@@ -497,12 +503,12 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(1);
         assertEquals(stop1, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
 
         data = spyData.get(2);
         assertEquals(stop2, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
 
         data = spyData.get(3);
         assertEquals(stop3, data.stopFacility);
@@ -512,8 +518,8 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(4);
         assertEquals(stop3, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
 
         data = spyData.get(5);
         assertEquals(stop4, data.stopFacility);
@@ -523,8 +529,8 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(6);
         assertEquals(stop4, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
     }
 
     private void setDefaultLinkAttributes(final Link link) {
@@ -550,12 +556,12 @@ public class TransitQueueSimulationTest {
 				.build(scenario, events);
 
 			TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
-			
+
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public void insertAgentsIntoMobsim() {
-                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, 
-                    		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
+                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line,
+                    		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure,
                     		transitEngine.getAgentTracker(), transitEngine);
 
                     VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("transitVehicleType", VehicleType.class ) );
@@ -571,7 +577,7 @@ public class TransitQueueSimulationTest {
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
                     TestHandleStopSimulation.this.departure.setVehicleId(veh.getVehicle().getId());
                     qSim.addParkedVehicle(veh, route.getRoute().getStartLinkId());
-                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver); 
+                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver);
                 }
             });
 
@@ -612,7 +618,7 @@ public class TransitQueueSimulationTest {
     }
 
     private static class SpyHandleStopData {
-        private static final Logger log = Logger.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
+        private static final Logger log = LogManager.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
 
         public final TransitStopFacility stopFacility;
         public final double time;
@@ -626,13 +632,14 @@ public class TransitQueueSimulationTest {
         }
     }
 
-    @Test
-    public void testStartAndEndTime() {
+	@Test
+	void testStartAndEndTime() {
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-      
+
         // build simple network with 2 links
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
@@ -687,8 +694,8 @@ public class TransitQueueSimulationTest {
 				.useDefaults() //
 				.build(scenario, events) //
 				.run();
-        assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-        assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+        assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+        assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
         collector.reset(0);
 
         // second test with special start/end times
@@ -700,8 +707,8 @@ public class TransitQueueSimulationTest {
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-        assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-        assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+        assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+        assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
     }
 
     /*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
@@ -723,13 +730,14 @@ public class TransitQueueSimulationTest {
         }
     }
 
-    @Test
-    public void testEvents() {
+	@Test
+	void testEvents() {
         final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-     
+
         // build simple network with 2 links
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));

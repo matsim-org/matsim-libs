@@ -30,23 +30,13 @@ import jakarta.validation.constraints.Positive;
 public class SelectiveInsertionSearchParams extends DrtInsertionSearchParams {
 	public static final String SET_NAME = "SelectiveInsertionSearch";
 
-	public static final String RESTRICTIVE_BEELINE_SPEED_FACTOR = "restrictiveBeelineSpeedFactor";
 	//use values that underestimate the actual speed, so the risk that the pre-filtering returns an insertion that
 	//violates time windows constraints (for existing passengers, given the actual path)
+	@Parameter
 	@Positive
-	private double restrictiveBeelineSpeedFactor = 0.5;
+	public double restrictiveBeelineSpeedFactor = 0.5;
 
 	public SelectiveInsertionSearchParams() {
 		super(SET_NAME);
-	}
-
-	@StringGetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
-	public double getRestrictiveBeelineSpeedFactor() {
-		return restrictiveBeelineSpeedFactor;
-	}
-
-	@StringSetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
-	public void setRestrictiveBeelineSpeedFactor(double restrictiveBeelineSpeedFactor) {
-		this.restrictiveBeelineSpeedFactor = restrictiveBeelineSpeedFactor;
 	}
 }

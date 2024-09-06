@@ -28,17 +28,17 @@ import java.util.Map.Entry;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.SingleHandlerEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 class Worker extends Thread implements BasicEventHandler{
 
-	private static final Logger log = Logger.getLogger(Worker.class);
+	private static final Logger log = LogManager.getLogger(Worker.class);
 
 	private final EventsManager eventsManager;
 	private final String eFile;
@@ -144,6 +144,7 @@ class Worker extends Thread implements BasicEventHandler{
 				switch( key ){
 					case Event.ATTRIBUTE_X:
 					case Event.ATTRIBUTE_Y:
+					case Event.ATTRIBUTE_TIME:
 						continue;
 				}
 			}
@@ -159,6 +160,7 @@ class Worker extends Thread implements BasicEventHandler{
 			eventStr.append(" | ");
 			eventStr.append(str);
 		}
+
 		eventStr.append(" | ") ;
 		return eventStr.toString();
 	}

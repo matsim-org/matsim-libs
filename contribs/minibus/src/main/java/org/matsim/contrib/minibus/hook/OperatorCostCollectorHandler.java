@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -40,7 +41,7 @@ import java.util.*;
  */
 final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
 	
-	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
+	private final static Logger log = LogManager.getLogger(OperatorCostCollectorHandler.class);
 	
 	private Network network;
 	private final String pIdentifier;

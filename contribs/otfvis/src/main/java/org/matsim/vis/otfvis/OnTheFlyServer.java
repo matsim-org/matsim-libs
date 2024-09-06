@@ -23,7 +23,8 @@ package org.matsim.vis.otfvis;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -132,7 +133,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	    Activity getCurrentActivity(MobsimAgent mobsimAgent);
 	}
 
-	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
+	private static final Logger log = LogManager.getLogger(OnTheFlyServer.class);
 
 	private OTFServerQuadTree quad;
 

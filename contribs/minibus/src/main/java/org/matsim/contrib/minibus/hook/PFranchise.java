@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.genericUtils.GridNode;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -36,7 +37,7 @@ import java.util.TreeSet;
  */
 public final class PFranchise {
 
-	private final static Logger log = Logger.getLogger(PFranchise.class);
+	private final static Logger log = LogManager.getLogger(PFranchise.class);
 	
 	private final boolean activated;
 	private final double gridSize;

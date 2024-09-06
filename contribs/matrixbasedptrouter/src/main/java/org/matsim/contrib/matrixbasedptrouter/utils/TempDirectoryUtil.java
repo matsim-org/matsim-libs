@@ -30,7 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 
@@ -47,7 +48,7 @@ import org.apache.log4j.Logger;
 public final class TempDirectoryUtil {
 	
 	// logger
-	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);
+	private static final Logger log = LogManager.getLogger(TempDirectoryUtil.class);
 	// storage for created custom directories
 	private static ArrayList<File> tempDirectoryList = null;
 	

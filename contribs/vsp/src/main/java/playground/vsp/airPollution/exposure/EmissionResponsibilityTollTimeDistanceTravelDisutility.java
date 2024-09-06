@@ -22,7 +22,8 @@ package playground.vsp.airPollution.exposure;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +42,7 @@ import org.matsim.vehicles.Vehicles;
 
 public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements TravelDisutility {
 
-    private static final Logger log = Logger.getLogger(EmissionResponsibilityTollTimeDistanceTravelDisutility.class);
+    private static final Logger log = LogManager.getLogger(EmissionResponsibilityTollTimeDistanceTravelDisutility.class);
 
     private final TravelDisutility randomizedTimeDistanceTravelDisutility;
     private final TravelTime timeCalculator;
@@ -83,7 +84,7 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
             if (person == null){
                 // additionally, no person is given -> a default vehicle type is used
                 log.warn("No person and no vehicle is given to calculate the link travel disutility. The default vehicle type is used to estimate emission disutility.");
-                emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
+                emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.createDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
                 emissionVehicle = this.emissionVehicles.getVehicles().get(Id.createVehicleId(person.getId()));

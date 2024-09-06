@@ -3,7 +3,7 @@ package playground.vsp.demandde.pendlermatrix;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -21,7 +21,7 @@ public class TravelTimeToWorkCalculator implements TripFlowSink {
 
 	public TravelTimeToWorkCalculator(Network network) {
 		this.network = network;
-		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
 	}
 

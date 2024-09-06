@@ -34,21 +34,21 @@ import com.google.common.base.Preconditions;
 public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to BatteryCharging
 
 	public static class Point {
-		private final double relativeSoc;
+		private final double soc;
 		private final double relativePower;
 
-		public Point(double relativeSoc, double relativeSpeed) {
-			Preconditions.checkArgument(relativeSoc >= 0 && relativeSoc <= 1, "Relative SOC must be in [0,1]");
+		public Point(double soc, double relativeSpeed) {
+			Preconditions.checkArgument(soc >= 0 && soc <= 1, "SOC must be in [0,1]");
 			//XXX To avoid infinite charging simulation (e.g. at SOC==0 or close to 1.0)
 			Preconditions.checkArgument(relativeSpeed > 0, "Relative speed must be positive");
-			this.relativeSoc = relativeSoc;
+			this.soc = soc;
 			this.relativePower = relativeSpeed;
 		}
 
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
-					.add("relativeSoc", relativeSoc)
+					.add("soc", soc)
 					.add("relativePower", relativePower)
 					.toString();
 		}
@@ -79,12 +79,12 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	public VariableSpeedCharging(ElectricVehicle electricVehicle, Point pointA, Point pointB, Point pointC,
 			Point pointD) {
 		//checks whether the A-B-C-D profile
-		Preconditions.checkArgument(pointA.relativeSoc == 0, "PointA.relativeSoc must be 0");
-		Preconditions.checkArgument(pointD.relativeSoc == 1, "PointB.relativeSoc must be 1");
-		Preconditions.checkArgument(pointB.relativeSoc != 0, "PointB.relativeSoc must be greater than 0");
-		Preconditions.checkArgument(pointC.relativeSoc != 1, "PointB.relativeSoc must be less than 1");
-		Preconditions.checkArgument(pointB.relativeSoc < pointC.relativeSoc,
-				"PointB.relativeSoc must be less than PointC.relativeSoc");
+		Preconditions.checkArgument(pointA.soc == 0, "PointA.soc must be 0");
+		Preconditions.checkArgument(pointD.soc == 1, "PointB.soc must be 1");
+		Preconditions.checkArgument(pointB.soc != 0, "PointB.soc must be greater than 0");
+		Preconditions.checkArgument(pointC.soc != 1, "PointB.soc must be less than 1");
+		Preconditions.checkArgument(pointB.soc < pointC.soc,
+				"PointB.soc must be less than PointC.soc");
 		Preconditions.checkArgument(pointA.relativePower <= pointB.relativePower,
 				"PointA.relativePower must not be greater than PointB.relativePower");
 		Preconditions.checkArgument(pointD.relativePower <= pointC.relativePower,
@@ -100,27 +100,27 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	@Override
 	public double calcChargingPower(ChargerSpecification charger) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getSoc() / b.getCapacity();
+		double soc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 
-		if (relativeSoc <= pointB.relativeSoc) {
-			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
-		} else if (relativeSoc <= pointC.relativeSoc) {
-			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
+		if (soc <= pointB.soc) {
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(soc, pointA, pointB));
+		} else if (soc <= pointC.soc) {
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(soc, pointB, pointC));
 		} else {
-			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(soc, pointC, pointD));
 		}
 	}
 
-	private double approxRelativePower(double relativeSoc, Point point0, Point point1) {
-		double a = (relativeSoc - point0.relativeSoc) / (point1.relativeSoc - point0.relativeSoc);
+	private double approxRelativePower(double soc, Point point0, Point point1) {
+		double a = (soc - point0.soc) / (point1.soc - point0.soc);
 		return point0.relativePower + a * (point1.relativePower - point0.relativePower);
 	}
 
 	//TODO convert to: calcChargingTime(Charger charger, double energy)
 	public double calcRemainingTimeToCharge(Charger charger) {
 		Battery b = electricVehicle.getBattery();
-		double relativeSoc = b.getSoc() / b.getCapacity();
+		double soc = b.getCharge() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 		double relativeChargerPower = charger.getPlugPower() / c;
 
@@ -128,7 +128,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		final Point adjustedPointB;
 		if (pointA.relativePower >= relativeChargerPower) {
 			adjustedPointA = new Point(0, relativeChargerPower);
-			adjustedPointB = new Point(pointB.relativeSoc, relativeChargerPower);
+			adjustedPointB = new Point(pointB.soc, relativeChargerPower);
 		} else {
 			adjustedPointA = pointA;
 			adjustedPointB = adjustPointIfSlowerCharging(relativeChargerPower, pointA, pointB);
@@ -138,21 +138,21 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		final Point adjustedPointC;
 		if (pointD.relativePower >= relativeChargerPower) {//rather unlikely
 			adjustedPointD = new Point(1, relativeChargerPower);
-			adjustedPointC = new Point(pointC.relativeSoc, relativeChargerPower);
+			adjustedPointC = new Point(pointC.soc, relativeChargerPower);
 		} else {
 			adjustedPointD = pointD;
 			adjustedPointC = adjustPointIfSlowerCharging(relativeChargerPower, pointD, pointC);
 		}
 
-		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			return approximateRemainingChargeTime(relativeSoc, adjustedPointA, adjustedPointB)//
+		if (soc <= adjustedPointB.soc) {
+			return approximateRemainingChargeTime(soc, adjustedPointA, adjustedPointB)//
 					+ approxChargeTime(adjustedPointB, adjustedPointC)//
 					+ approxChargeTime(adjustedPointC, adjustedPointD);
-		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
-			return approximateRemainingChargeTime(relativeSoc, adjustedPointB, adjustedPointC)//
+		} else if (soc <= adjustedPointC.soc) {
+			return approximateRemainingChargeTime(soc, adjustedPointB, adjustedPointC)//
 					+ approxChargeTime(adjustedPointC, adjustedPointD);
 		} else {
-			return approximateRemainingChargeTime(relativeSoc, adjustedPointC, adjustedPointD);
+			return approximateRemainingChargeTime(soc, adjustedPointC, adjustedPointD);
 		}
 	}
 
@@ -163,16 +163,16 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 
 		double a = (relativeChargerPower - lowerPoint.relativePower) / (higherPoint.relativePower
 				- lowerPoint.relativePower);
-		double relativeSoc = lowerPoint.relativeSoc + a * (higherPoint.relativeSoc - lowerPoint.relativeSoc);
-		return new Point(relativeSoc, relativeChargerPower);
+		double soc = lowerPoint.soc + a * (higherPoint.soc - lowerPoint.soc);
+		return new Point(soc, relativeChargerPower);
 	}
 
-	private double approximateRemainingChargeTime(double relativeSoc, Point point0, Point point1) {
-		Point currentPoint = new Point(relativeSoc, approxRelativePower(relativeSoc, point0, point1));
+	private double approximateRemainingChargeTime(double soc, Point point0, Point point1) {
+		Point currentPoint = new Point(soc, approxRelativePower(soc, point0, point1));
 		return approxChargeTime(currentPoint, point1);
 	}
 
 	private double approxChargeTime(Point point0, Point point1) {
-		return 3600. * (point1.relativeSoc - point0.relativeSoc) / (point1.relativePower + point0.relativePower);
+		return 3600. * (point1.soc - point0.soc) / (point1.relativePower + point0.relativePower);
 	}
 }

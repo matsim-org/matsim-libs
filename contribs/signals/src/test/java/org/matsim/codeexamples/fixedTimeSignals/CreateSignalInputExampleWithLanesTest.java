@@ -23,9 +23,9 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -36,30 +36,30 @@ import org.matsim.testcases.MatsimTestUtils;
 public class CreateSignalInputExampleWithLanesTest {
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
-	
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
+	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	@Test
-	public void testCreateSignalInputExampleWithLanes(){
+	void testCreateSignalInputExampleWithLanes(){
 		try {
 			(new CreateSignalInputWithLanesExample()).run(testUtils.getOutputDirectory());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assertions.fail("something went wrong") ;
 		}
 		// compare signal output
-		Assert.assertEquals("different signal system files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_systems.xml"), 
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_systems.xml"));
-		Assert.assertEquals("different signal group files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
-		Assert.assertEquals("different signal control files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
-		Assert.assertEquals("different lane files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "lane_definitions_v2.0.xml"),
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "lane_definitions_v2.0.xml"));
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_systems.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_systems.xml"),
+				"different signal system files");
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"),
+				"different signal group files");
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"),
+				"different signal control files");
+		Assertions.assertEquals(CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "lane_definitions_v2.0.xml"),
+				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "lane_definitions_v2.0.xml"),
+				"different lane files");
 	}
-	
+
 }

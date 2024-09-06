@@ -21,7 +21,7 @@
 
  package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +32,7 @@ import org.matsim.core.router.TripStructureUtils;
 
 public class ModeAndRouteConsistencyChecker implements PlanStrategyModule {
 	@Override public void prepareReplanning(ReplanningContext replanningContext) { }
-	
+
 	@Override public void handlePlan(Plan plan) {
 		for (Leg leg : TripStructureUtils.getLegs(plan)) {
 			if (leg.getRoute() instanceof NetworkRoute) {
@@ -42,13 +42,13 @@ public class ModeAndRouteConsistencyChecker implements PlanStrategyModule {
 					case TransportMode.walk:
 						break;
 					default:
-						Logger.getLogger(this.getClass()).warn( "route is of type=" + leg.getRoute().getClass() ) ;
-						Logger.getLogger(this.getClass()).warn( "mode=" + leg.getMode() ) ;
+						LogManager.getLogger(this.getClass()).warn( "route is of type=" + leg.getRoute().getClass() ) ;
+						LogManager.getLogger(this.getClass()).warn( "mode=" + leg.getMode() ) ;
 						throw new RuntimeException("inconsistent");
 				}
 			}
 		}
 	}
-	
+
 	@Override public void finishReplanning() { }
 }

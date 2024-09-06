@@ -23,49 +23,49 @@ package org.matsim.pt.transitSchedule;
 import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Helper class for commonly used operations on TransitSchedules
- * 
+ *
  * @author Thibaut Dubernet, gleich
  *
  */
 public final class TransitScheduleUtils {
-	// Logic gotten from PopulationUtils, but I am actually a bit unsure about the value of those methods now that
-	// attributable is the only way to get attributes...
 
-	public static Object getStopFacilityAttribute(TransitStopFacility facility, String key) {
-		return facility.getAttributes().getAttribute( key );
+	public final static String ACCESSTIME_ATTRIBUTE = "accessTime";
+	public final static String EGRESSTIME_ATTRIBUTE = "egressTime";
+	private TransitScheduleUtils() {
 	}
 
-	public static void putStopFacilityAttribute(TransitStopFacility facility, String key, Object value ) {
-		facility.getAttributes().putAttribute( key, value ) ;
+	public static double getStopAccessTime(TransitStopFacility stopFacility){
+		Object accessTime = stopFacility.getAttributes().getAttribute(ACCESSTIME_ATTRIBUTE);
+		return accessTime!=null?(double) accessTime:0.0;
 	}
 
-	public static Object removeStopFacilityAttribute( TransitStopFacility facility, String key ) {
-		return facility.getAttributes().removeAttribute( key );
+	public static void setStopAccessTime(TransitStopFacility stopFacility, double stopAccessTime){
+		stopFacility.getAttributes().putAttribute(ACCESSTIME_ATTRIBUTE,stopAccessTime);
 	}
 
-	public static Object getLineAttribute(TransitLine facility, String key) {
-		return facility.getAttributes().getAttribute( key );
+	public static double getStopEgressTime(TransitStopFacility stopFacility){
+		Object egressTime = stopFacility.getAttributes().getAttribute(EGRESSTIME_ATTRIBUTE);
+		return egressTime!=null?(double) egressTime:0.0;
+	}
+	public static void setStopEgressTime(TransitStopFacility stopFacility, double stopEgressTime){
+		stopFacility.getAttributes().putAttribute(EGRESSTIME_ATTRIBUTE,stopEgressTime);
 	}
 
-	public static void putLineAttribute(TransitLine facility, String key, Object value ) {
-		facility.getAttributes().putAttribute( key, value ) ;
+	public static void setSymmetricStopAccessEgressTime(TransitStopFacility stopFacility, double stopAccessEgressTime){
+		setStopAccessTime(stopFacility,stopAccessEgressTime);
+		setStopEgressTime(stopFacility,stopAccessEgressTime);
 	}
 
-	public static Object removeLineAttribute( TransitLine facility, String key ) {
-		return facility.getAttributes().removeAttribute( key );
-	}
-	
-	public final static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(TransitSchedule transitSchedule) {
+	public static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(TransitSchedule transitSchedule) {
 		return createQuadTreeOfTransitStopFacilities(transitSchedule.getFacilities().values());
 	}
-	
-	public final static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(Collection<TransitStopFacility> transitStopFacilities) {
+
+	public static QuadTree<TransitStopFacility> createQuadTreeOfTransitStopFacilities(Collection<TransitStopFacility> transitStopFacilities) {
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;

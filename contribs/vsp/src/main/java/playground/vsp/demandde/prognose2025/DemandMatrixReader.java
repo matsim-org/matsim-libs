@@ -24,7 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -40,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -48,14 +50,13 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.Facility;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.demandde.pendlermatrix.TripFlowSink;
 
 
 public class DemandMatrixReader {
 
-	private static final Logger log = Logger.getLogger(DemandMatrixReader.class);
+	private static final Logger log = LogManager.getLogger(DemandMatrixReader.class);
 
 	// PV Matrix enthält keine Richtungs-Info für den Pendlerverkehr --> Pendlerstatistik
 	//	private static final String PV_MATRIX = "../../shared-svn/studies/countries/de/prognose_2025/orig/pv-matrizen/2004_nuts_102r6x6.csv";
@@ -156,8 +157,8 @@ public class DemandMatrixReader {
 	}
 
 	private void readShape() {
-		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
-		final ActivityFacilitiesFactory factory = ((MutableScenario)this.sc).getActivityFacilities().getFactory();
+		Collection<SimpleFeature> landkreise = GeoFileReader.getAllFeatures(this.shapeFile);
+		final ActivityFacilitiesFactory factory = this.sc.getActivityFacilities().getFactory();
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();

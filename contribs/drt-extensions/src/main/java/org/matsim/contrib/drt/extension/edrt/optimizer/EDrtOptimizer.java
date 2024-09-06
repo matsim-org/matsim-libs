@@ -39,7 +39,7 @@ public class EDrtOptimizer implements DrtOptimizer {
 
 	public EDrtOptimizer(DrtConfigGroup drtConfigGroup, DefaultDrtOptimizer optimizer,
 			EmptyVehicleChargingScheduler chargingScheduler) {
-		Verify.verify(drtConfigGroup.getIdleVehiclesReturnToDepots(),
+		Verify.verify(drtConfigGroup.idleVehiclesReturnToDepots,
 				"DrtConfigGroup(mode=%s).idleVehiclesReturnToDepots is false."
 						+ " Recharging is possible only if idle vehicles return to depots", drtConfigGroup.getMode());
 		this.optimizer = optimizer;

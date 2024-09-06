@@ -21,7 +21,7 @@ package org.matsim.utils.objectattributes.attributeconverters;/*
  * created by jbischoff, 22.08.2018
  */
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class DoubleArrayConverter implements AttributeConverter<double[]> {
@@ -41,7 +41,7 @@ public class DoubleArrayConverter implements AttributeConverter<double[]> {
     @Override
     public String convertToString(Object o) {
         if (!(o instanceof double[])) {
-            Logger.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
+            LogManager.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
             return null;
         }
         double[] s = (double[]) o;

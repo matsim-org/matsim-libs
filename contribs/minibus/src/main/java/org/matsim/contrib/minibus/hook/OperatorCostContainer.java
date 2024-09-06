@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -42,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 final class OperatorCostContainer {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(OperatorCostContainer.class);
+	private final static Logger log = LogManager.getLogger(OperatorCostContainer.class);
 
 	private final double costPerVehicleAndDay;
 	private final double expensesPerMeter;

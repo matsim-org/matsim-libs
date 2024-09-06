@@ -20,7 +20,7 @@ package org.matsim.core.scenario;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -35,7 +35,7 @@ import java.net.URL;
 public class LoadScenarioByHTTPIT {
 
 	@Test
-	public void testLoadingScenarioFromURLWorks() throws MalformedURLException {
+	void testLoadingScenarioFromURLWorks() throws MalformedURLException {
 //		Config config = ConfigUtils.loadConfig(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
 		Config config = ConfigUtils.loadConfig(new URL("https://github.com/matsim-org/matsim/raw/master/examples/scenarios/lesson-3/config.xml"));
 		Scenario scenario = ScenarioUtils.loadScenario(config);

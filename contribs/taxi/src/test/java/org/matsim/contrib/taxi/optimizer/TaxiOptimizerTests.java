@@ -20,95 +20,67 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.Config;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class TaxiOptimizerTests {
-	public static class TaxiConfigVariant {
-		final boolean destinationKnown;
-		final boolean vehicleDiversion;
-		final double pickupDuration;
-		final double dropoffDuration;
-		final boolean onlineVehicleTracker;
+	public static void runBenchmark(boolean vehicleDiversion, AbstractTaxiOptimizerParams taxiOptimizerParams, MatsimTestUtils utils) {
+		Id.resetCaches();
 
-		private TaxiConfigVariant(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-				double dropoffDuration, boolean onlineVehicleTracker) {
-			this.destinationKnown = destinationKnown;
-			this.vehicleDiversion = vehicleDiversion;
-			this.pickupDuration = pickupDuration;
-			this.dropoffDuration = dropoffDuration;
-			this.onlineVehicleTracker = onlineVehicleTracker;
-		}
+		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfig.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
 
-		void updateTaxiConfig(TaxiConfigGroup taxiCfg) {
-			taxiCfg.setDestinationKnown(destinationKnown);
-			taxiCfg.setVehicleDiversion(vehicleDiversion);
-			taxiCfg.setPickupDuration(pickupDuration);
-			taxiCfg.setDropoffDuration(dropoffDuration);
-			taxiCfg.setOnlineVehicleTracker(onlineVehicleTracker);
-		}
-	}
 
-	public static List<TaxiConfigVariant> createDefaultTaxiConfigVariants(boolean diversionSupported) {
-		List<TaxiConfigVariant> variants = new ArrayList<>();
+		// mielec taxi mini benchmark contains only the morning peak (6:00 - 12:00) that is shifted by -6 hours (i.e. 0:00 - 6:00).
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_mini_benchmark_config.xml");
+		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), dvrpConfig);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		// onlineVehicleTracker == false ==> vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, false));
-		variants.add(new TaxiConfigVariant(true, false, 1, 1, false));
-
-		if (diversionSupported) {
-			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, true, 1, 1, true));
-			variants.add(new TaxiConfigVariant(true, true, 120, 60, true));
-		} else {
-			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, false, 1, 1, true));
-			variants.add(new TaxiConfigVariant(true, false, 120, 60, true));
-		}
-
-		return variants;
-	}
-
-	public static class PreloadedBenchmark {
-		private final Config config;
-		private final Controler controler;
-
-		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
-					"mielec_taxi_benchmark_config.xml");
-
-			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
-
-			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
-
-			controler = RunTaxiBenchmark.createControler(config, 1);
-		}
-	}
-
-	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
-			PreloadedBenchmark benchmark, String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
+		taxiCfg.vehicleDiversion = vehicleDiversion;
 
-		int i = 0;
-		for (TaxiConfigVariant v : variants) {
-			v.updateTaxiConfig(taxiCfg);
-			benchmark.config.controler().setOutputDirectory(outputDir + "/" + i++);
-			benchmark.controler.run();
+		var controler = RunTaxiBenchmark.createControler(config, 1);
+		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to adjust them
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setDumpDataAtEnd(true);
+
+		controler.run();
+
+		{
+			Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
+
+			Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
+
+			PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
+			Assertions.assertEquals(PopulationComparison.Result.equal, result);
+		}
+		{
+			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 		}
 	}
 }

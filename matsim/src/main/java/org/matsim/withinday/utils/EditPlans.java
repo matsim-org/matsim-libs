@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +42,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 
 public final class EditPlans {
-	private static final Logger log = Logger.getLogger( EditPlans.class ) ;
+	private static final Logger log = LogManager.getLogger( EditPlans.class ) ;
 
 	private final QSim mobsim;
 	private final EditTrips editTrips;
@@ -68,21 +69,21 @@ public final class EditPlans {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
-		
+
 		boolean retVal1 = false;
-		
+
 		if (isAtRealActivity(agent)) {
 			retVal1 = planElements.add(pf.createLeg(routingMode));
 		}
-		
+
 		final boolean retVal = planElements.add(activity);
 		// (need the terminating activity in order to find the current trip. kai, nov'17)
-		
+
 		if (!isAtRealActivity(agent)) {
 			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay(),routingMode);
 		}
-		
-		
+
+
 		WithinDayAgentUtils.resetCaches(agent);
 		this.mobsim.rescheduleActivityEnd(agent);
 		return (retVal1 && retVal);
@@ -104,7 +105,7 @@ public final class EditPlans {
 				throw new ReplanningException("mode not given and mode before removed activity != mode after removed activity; don't know which mode to use") ;
 			}
 		}
-		PlanElement pe = planElements.remove(index) ; 
+		PlanElement pe = planElements.remove(index) ;
 		if ( checkIfTripHasAlreadyStarted( agent, tripBefore.getTripElements() ) ) {
 			editTrips.replanCurrentTrip(agent, mobsim.getSimTimer().getTimeOfDay() , mode);
 		} else {
@@ -127,8 +128,8 @@ public final class EditPlans {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		WithinDayAgentUtils.printPlan(plan) ;
 		System.err.println("here330");
-		
-		
+
+
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
 		// make sure we have indeed an activity position:
@@ -206,13 +207,13 @@ public final class EditPlans {
 			if ( actAfter != null ) {
 				EditTrips.insertEmptyTrip(plan, activity, actAfter, downstreamMode, pf ) ;
 			}
-		}			
+		}
 		WithinDayAgentUtils.resetCaches(agent);
 		this.mobsim.rescheduleActivityEnd(agent);
 	}
-	
+
 	// === convenience methods: ===
-	/** 
+	/**
 	 * Convenience method, clarifying that this can be called without giving the mode.
 	 */
 	public PlanElement removeActivity(MobsimAgent agent, int index) {
@@ -267,7 +268,7 @@ public final class EditPlans {
 	public static Activity findRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
-		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ; 
+		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ;
 	}
 	public static int findIndexOfRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
@@ -309,7 +310,7 @@ public final class EditPlans {
 	//		}
 	//		return hereFacility;
 	//	}
-	
+
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 		// this is mostly for retrofitting existing code.  but maybe also useful by itself
 		this.mobsim.rescheduleActivityEnd(agent);
@@ -325,7 +326,7 @@ public final class EditPlans {
 	public boolean isRealActivity(PlanElement pe) {
 		return pe instanceof Activity && ! ( StageActivityTypeIdentifier.isStageActivity( ((Activity)pe).getType() ) );
 	}
-	
+
 	public String getModeOfCurrentOrNextTrip(MobsimAgent agent) {
 		Trip trip ;
 		if ( isAtRealActivity( agent ) ) {
@@ -347,9 +348,9 @@ public final class EditPlans {
 		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ;
 		this.rescheduleActivityEndtime(agent, index, newEndTime);
 	}
-	
+
 	public Activity createFinalActivity(String type, Id<Link> newLinkId) {
-		Activity newAct = this.pf.createActivityFromLinkId(type, newLinkId);;
+		Activity newAct = this.pf.createActivityFromLinkId(type, newLinkId);
 		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
 		return newAct ;
 	}

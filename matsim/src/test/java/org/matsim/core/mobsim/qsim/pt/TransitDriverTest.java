@@ -20,14 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +63,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -73,12 +73,12 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class TransitDriverTest {
 
-	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
+	private static final Logger log = LogManager.getLogger(TransitDriverTest.class);
 
 	public MatsimTestUtils util = new MatsimTestUtils();
-	
+
 	@Test
-	public void testInitializationNetworkRoute() {
+	void testInitializationNetworkRoute() {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -165,7 +165,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testInitializationDeparture() {
+	void testInitializationDeparture() {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -190,11 +190,11 @@ public class TransitDriverTest {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
-		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
+		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testInitializationStops() {
+	void testInitializationStops() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -235,18 +235,18 @@ public class TransitDriverTest {
 		driver.setVehicle(queueVehicle);
 
 		assertEquals(stop1, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON);
 		assertEquals(stop2, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestUtils.EPSILON);
 		assertEquals(stop3, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestCase.EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestUtils.EPSILON);
 		assertEquals(stop4, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop4, 360), MatsimTestCase.EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop4, 360), MatsimTestUtils.EPSILON);
 		assertEquals(null, driver.getNextTransitStop());
 	}
 
 	@Test
-	public void testHandleStop_EnterPassengers() {
+	void testHandleStop_EnterPassengers() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -267,7 +267,7 @@ public class TransitDriverTest {
 
 		final Config config = ConfigUtils.createConfig() ;
 		config.vspExperimental().setGeneratingBoardingDeniedEvent(true);
-		
+
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		final EventHandlerForTesting handler = new EventHandlerForTesting();
@@ -280,7 +280,7 @@ public class TransitDriverTest {
 				.build(sc, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		
+
 		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(4));
@@ -304,16 +304,12 @@ public class TransitDriverTest {
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("driver must not proceed in stop list when persons entered.",
-				stop1, driver.getNextTransitStop());
+		assertEquals(stop1, driver.getNextTransitStop(), "driver must not proceed in stop list when persons entered.");
 		assertEquals(0, tracker.getAgentsAtFacility(stop1.getId()).size());
-		assertEquals("stop time must be 0 when nobody enters or leaves",
-				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON, "stop time must be 0 when nobody enters or leaves");
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("driver must proceed in stop list when no persons entered.",
-				stop2, driver.getNextTransitStop());
-		assertEquals("driver must return same stop again when queried again without handling stop.",
-				stop2, driver.getNextTransitStop());
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must proceed in stop list when no persons entered.");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must return same stop again when queried again without handling stop.");
 
 		tracker.addAgentToStop(100, agent3, stop2.getId());
 		double stoptime1 = driver.handleTransitStop(stop2, 150);
@@ -324,16 +320,15 @@ public class TransitDriverTest {
 		double stoptime2 = driver.handleTransitStop(stop2, 160);
 		assertTrue(stoptime2 > 0);
 		assertEquals(4, queueVehicle.getPassengers().size());
-		assertTrue("The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2,
-				stoptime1 > stoptime2);
+		assertTrue(stoptime1 > stoptime2,
+				"The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2);
 		tracker.addAgentToStop(163, agent5, stop2.getId());
-		assertEquals("vehicle should have reached capacity, so not more passenger can enter.",
-				0.0, driver.handleTransitStop(stop2, 170), MatsimTestCase.EPSILON);
-		
+		assertEquals(0.0, driver.handleTransitStop(stop2, 170), MatsimTestUtils.EPSILON, "vehicle should have reached capacity, so not more passenger can enter.");
+
 		eventsManager.finishProcessing();
 		assertTrue(handler.isOk);
 	}
-	
+
 	private static class EventHandlerForTesting implements EventHandler, BasicEventHandler {
 		boolean isOk = false;
 		@Override
@@ -351,7 +346,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_ExitPassengers() {
+	void testHandleStop_ExitPassengers() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -402,23 +397,19 @@ public class TransitDriverTest {
 		assertEquals(4, queueVehicle.getPassengers().size());
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
-		assertEquals("driver must not proceed in stop list when persons entered.",
-				stop1, driver.getNextTransitStop());
+		assertEquals(stop1, driver.getNextTransitStop(), "driver must not proceed in stop list when persons entered.");
 		assertEquals(2, queueVehicle.getPassengers().size());
-		assertEquals("stop time must be 0 when nobody enters or leaves",
-				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
-		assertEquals("driver must proceed in stop list when no persons entered.",
-				stop2, driver.getNextTransitStop());
-		assertEquals("driver must return same stop again when queried again without handling stop.",
-				stop2, driver.getNextTransitStop());
+		assertEquals(0.0, driver.handleTransitStop(stop1, 60), MatsimTestUtils.EPSILON, "stop time must be 0 when nobody enters or leaves");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must proceed in stop list when no persons entered.");
+		assertEquals(stop2, driver.getNextTransitStop(), "driver must return same stop again when queried again without handling stop.");
 
 		assertTrue(driver.handleTransitStop(stop2, 150) > 0);
 		assertEquals(0, queueVehicle.getPassengers().size());
-		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testHandleStop_CorrectIdentification() {
+	void testHandleStop_CorrectIdentification() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -442,7 +433,7 @@ public class TransitDriverTest {
 				.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		
+
 		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
@@ -461,7 +452,7 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testHandleStop_AwaitDepartureTime() {
+	void testHandleStop_AwaitDepartureTime() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -495,7 +486,7 @@ public class TransitDriverTest {
 				.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
-		
+
 		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
@@ -507,20 +498,20 @@ public class TransitDriverTest {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
-		assertEquals(50.0, driver.handleTransitStop(stop1, departureTime + 10), MatsimTestCase.EPSILON);
-		assertEquals(40.0, driver.handleTransitStop(stop1, departureTime + 20), MatsimTestCase.EPSILON);
-		assertEquals(30.0, driver.handleTransitStop(stop1, departureTime + 30), MatsimTestCase.EPSILON);
-		assertEquals(0.0, driver.handleTransitStop(stop1, departureTime + 60), MatsimTestCase.EPSILON);
+		assertEquals(50.0, driver.handleTransitStop(stop1, departureTime + 10), MatsimTestUtils.EPSILON);
+		assertEquals(40.0, driver.handleTransitStop(stop1, departureTime + 20), MatsimTestUtils.EPSILON);
+		assertEquals(30.0, driver.handleTransitStop(stop1, departureTime + 30), MatsimTestUtils.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop1, departureTime + 60), MatsimTestUtils.EPSILON);
 
 		// stop2 is not awaitDepartureTime
-		assertEquals(0.0, driver.handleTransitStop(stop2, departureTime + 110), MatsimTestCase.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop2, departureTime + 110), MatsimTestUtils.EPSILON);
 
 		// stop3 has no departure time
-		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestCase.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testExceptionWhenNotEmptyAfterLastStop() {
+	void testExceptionWhenNotEmptyAfterLastStop() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
@@ -569,10 +560,10 @@ public class TransitDriverTest {
 		assertTrue(driver.handleTransitStop(stop2, 160) > 0);
 		assertEquals(stop2, driver.getNextTransitStop());
 		assertEquals(1, queueVehicle.getPassengers().size());
-		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestUtils.EPSILON);
 		assertEquals(stop3, driver.getNextTransitStop());
 		try {
-			assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestCase.EPSILON);
+			assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestUtils.EPSILON);
 			fail("missing exception: driver still has passengers, although it handled the last stop.");
 		}
 		catch (RuntimeException e) {
@@ -581,11 +572,11 @@ public class TransitDriverTest {
 	}
 
 	@Test
-	public void testExceptionWhenNotAllStopsServed() {
+	void testExceptionWhenNotAllStopsServed() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
-		
+
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
@@ -615,12 +606,12 @@ public class TransitDriverTest {
 		vehType.getCapacity().setSeats(5);
 //		vehType.setCapacity(capacity);
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
-		
+
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
-		
+
 		driver.handleTransitStop(stop1, 60);
 		assertEquals(Id.create("2", Link.class), driver.chooseNextLinkId());
 		driver.notifyMoveOverNode(Id.create("2", Link.class));
@@ -633,7 +624,7 @@ public class TransitDriverTest {
 			log.info("catched expected exception.", e);
 		}
 	}
-	
+
 	protected static class SpyAgent implements PTPassengerAgent {
 		public TransitLine offeredLine;
 
@@ -663,12 +654,12 @@ public class TransitDriverTest {
 		public Id<TransitStopFacility> getDesiredAccessStopId() {
 			return null;
 		}
-		
+
 		@Override
 		public Id<TransitStopFacility> getDesiredDestinationStopId() {
 			return null;
 		}
-		
+
 		@Override
 		public void setVehicle(MobsimVehicle veh) {
 		}

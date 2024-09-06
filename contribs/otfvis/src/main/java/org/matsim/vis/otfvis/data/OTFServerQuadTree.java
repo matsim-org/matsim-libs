@@ -28,7 +28,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
@@ -48,7 +49,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
  */
 public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 
-	private static final Logger log = Logger.getLogger(OTFServerQuadTree.class);
+	private static final Logger log = LogManager.getLogger(OTFServerQuadTree.class);
 
 	private final List<OTFDataWriter> additionalElements = new LinkedList<OTFDataWriter>();
 

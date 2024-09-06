@@ -19,45 +19,48 @@
 
 package org.matsim.contrib.drt.run;
 
-import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
-
-import java.net.URL;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
-	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
@@ -68,157 +71,103 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return drtConfigGroups.iterator().next();
 	}
 
-	public static final String MODE = "mode";
-	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
-			+ "(passengers'/customers' perspective)";
-
-	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
-	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
-			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
-					+ " network) with 'allowedModes' containing this 'mode'."
-					+ " For backward compatibility, the value is set to false by default"
-					+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
-					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
-
-	public static final String STOP_DURATION = "stopDuration";
-	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
-
-	public static final String MAX_WAIT_TIME = "maxWaitTime";
-	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
-
-	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
-	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
-			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "Alpha should not be smaller than 1.";
-
-	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
-	static final String MAX_TRAVEL_TIME_BETA_EXP =
-			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "Beta should not be smaller than 0.";
-
-	public static final String MAX_ABSOLUTE_DETOUR = "maxAbsoluteDetour";
-	static final String MAX_ABSOLUTE_DETOUR_EXP =
-			"Defines the maximum allowed absolute detour in seconds of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
-					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.";
-
-	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
-	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
-			"If true, the max travel and wait times of a submitted request"
-					+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-					+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-					+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-					+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-					+ " InsertionCostCalculator.PenaltyCalculator";
-
-	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
-	static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP =
-			"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
-					+ "day at the link where it stopped operating the day before. False by default.";
-
-	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
-	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
-
-	public static final String OPERATIONAL_SCHEME = "operationalScheme";
-	static final String OPERATIONAL_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
-
-	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
-	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
-
-	public static final String VEHICLES_FILE = "vehiclesFile";
-	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet."
-			+ " The file format according to dvrp_vehicles_v1.dtd"
-			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
-			+ " See FleetModule.";
-
-	public static final String TRANSIT_STOP_FILE = "transitStopFile";
-	static final String TRANSIT_STOP_FILE_EXP =
-			"Stop locations file (transit schedule format, but without lines) for DRT stops. "
-					+ "Used only for the stopbased mode";
-
-	private static final String DRT_SERVICE_AREA_SHAPE_FILE = "drtServiceAreaShapeFile";
-	private static final String DRT_SERVICE_AREA_SHAPE_FILE_EXP = "allows to configure a service area per drt mode."
-			+ "Used with serviceArea Operational Scheme";
-
-	public static final String WRITE_DETAILED_CUSTOMER_STATS = "writeDetailedCustomerStats";
-	static final String WRITE_DETAILED_CUSTOMER_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
-
-	public static final String NUMBER_OF_THREADS = "numberOfThreads";
-	static final String NUMBER_OF_THREADS_EXP =
-			"Number of threads used for parallel evaluation of request insertion into existing schedules."
-					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
-					+ " using up to 4 threads."
-					+ " Default value is the number of cores available to JVM.";
-
-	public static final String STORE_UNSHARED_PATH = "storeUnsharedPath";
-	static final String STORE_UNSHARED_PATH_EXP = "Store planned unshared drt route as a link sequence";
-
+	@Parameter
+	@Comment("Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective)")
 	@NotBlank
-	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
+	public String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
-	private boolean useModeFilteredSubnetwork = false;
+	@Parameter
+	@Comment("Limit the operation of vehicles to links (of the 'dvrp_routing'"
+			+ " network) with 'allowedModes' containing this 'mode'."
+			+ " For backward compatibility, the value is set to false by default"
+			+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+			+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)")
+	public boolean useModeFilteredSubnetwork = false;
 
+	@Parameter
+	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
-	private double stopDuration = Double.NaN;// seconds
+	public double stopDuration = Double.NaN;// seconds
 
-	@PositiveOrZero
-	private double maxWaitTime = Double.NaN;// seconds
+	@Parameter
+	@Comment("If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
+			+ "day at the link where it stopped operating the day before. False by default.")
+	public boolean changeStartLinkToLastLinkInSchedule = false;
 
-	// max arrival time defined as:
-	// min(unshared_ride_travel_time(fromLink, toLink) + maxAbsoluteDetour, maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta),
-	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
-	@DecimalMin("1.0")
-	private double maxTravelTimeAlpha = Double.NaN;// [-]
+	@Parameter
+	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
+	public boolean idleVehiclesReturnToDepots = false;
 
-	@PositiveOrZero
-	private double maxTravelTimeBeta = Double.NaN;// [s]
+	@Parameter
+	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
+		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
+	public double returnToDepotTimeout = 60;
 
-	@PositiveOrZero
-	private double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
-
-	private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-
-	private boolean changeStartLinkToLastLinkInSchedule = false;
-
-	private boolean idleVehiclesReturnToDepots = false;
-
-	@NotNull
-	private OperationalScheme operationalScheme = OperationalScheme.door2door;
-
-	@PositiveOrZero // used only for stopbased DRT scheme
-	private double maxWalkDistance = Double.MAX_VALUE;// [m];
-
-	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
-	private String vehiclesFile = null;
-
-	@Nullable
-	private String transitStopFile = null; // only for stopbased DRT scheme
-
-	@Nullable
-	private String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
-
-	private boolean plotDetailedCustomerStats = true;
-
-	@Positive
-	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
-
-	@PositiveOrZero
-	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
-
-	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
+	@Parameter
+	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
+	public double returnToDepotEvaluationInterval = 60;
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}
 
+	@Parameter
+	@Comment("Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default")
+	@NotNull
+	public OperationalScheme operationalScheme = OperationalScheme.door2door;
+
+	@Parameter
+	@Comment("An XML file specifying the vehicle fleet."
+			+ " The file format according to dvrp_vehicles_v1.dtd"
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See FleetModule.")
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
+	public String vehiclesFile = null;
+
+	@Parameter
+	@Comment("Stop locations file (transit schedule format, but without lines) for DRT stops. "
+			+ "Used only for the stopbased mode")
+	@Nullable
+	public String transitStopFile = null; // only for stopbased DRT scheme
+
+	@Parameter
+	@Comment("Allows to configure a service area per drt mode. Used with serviceArea Operational Scheme")
+	@Nullable
+	public String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
+
+	@Parameter("writeDetailedCustomerStats")
+	@Comment("Writes out detailed DRT customer stats in each iteration. True by default.")
+	public boolean plotDetailedCustomerStats = true;
+
+	@Parameter
+	@Comment("Number of threads used for parallel evaluation of request insertion into existing schedules."
+			+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
+			+ " using up to 4 threads."
+			+ " Default value is the number of cores available to JVM.")
+	@Positive
+	public int numberOfThreads = Runtime.getRuntime().availableProcessors();
+
+	@Parameter
+	@Comment("Store planned unshared drt route as a link sequence")
+	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
+
+
+	public enum SimulationType {
+		fullSimulation, estimateAndTeleport
+	}
+
+	@Parameter
+	@Comment("Whether full simulation drt is employed")
+	public SimulationType simulationType = SimulationType.fullSimulation;
+
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@NotNull
+	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
+
 	@Nullable
-	private DrtZonalSystemParams zonalSystemParams;
+	private DrtZoneSystemParams zonalSystemParams;
 
 	@Nullable
 	private RebalancingParams rebalancingParams;
@@ -230,29 +179,48 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtSpeedUpParams drtSpeedUpParams;
 
 	@Nullable
+	private PrebookingParams prebookingParams;
+
+	@Nullable
+	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+
+	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
-		super(GROUP_NAME);
-		initSingletonParameterSets();
+		this(DefaultDrtOptimizationConstraintsSet::new);
 	}
 
-	private void initSingletonParameterSets() {
+	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+		super(GROUP_NAME);
+		initSingletonParameterSets(constraintsSetSupplier);
+	}
+
+	private void initSingletonParameterSets(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
+
+		//optimization constraints (mandatory)
+		addDefinition(DrtOptimizationConstraintsParams.SET_NAME, () -> new DrtOptimizationConstraintsParams(constraintsSetSupplier),
+				() -> drtOptimizationConstraintsParams,
+				params -> drtOptimizationConstraintsParams = (DrtOptimizationConstraintsParams) params);
+
 		//rebalancing (optional)
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
 				params -> rebalancingParams = (RebalancingParams)params);
 
 		//zonal system (optional)
-		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
-				params -> zonalSystemParams = (DrtZonalSystemParams)params);
+		addDefinition(DrtZoneSystemParams.SET_NAME, DrtZoneSystemParams::new, () -> zonalSystemParams,
+				params -> zonalSystemParams = (DrtZoneSystemParams)params);
 
-		//insertion search params (one of: extensive, selective)
+		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (ExtensiveInsertionSearchParams)params);
 		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+		addDefinition(RepeatedSelectiveInsertionSearchParams.SET_NAME, RepeatedSelectiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (RepeatedSelectiveInsertionSearchParams)params);
 
 		//drt fare (optional)
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
@@ -266,6 +234,37 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
+
+		//prebooking (optional)
+		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
+				() -> prebookingParams,
+				params -> prebookingParams = (PrebookingParams)params);
+
+		// estimator (optional)
+		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
+			() -> drtEstimatorParams,
+			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+	}
+
+	/**
+	 * for backwards compatibility with old drt config groups
+	 */
+	public void handleAddUnknownParam(final String paramName, final String value) {
+		switch (paramName) {
+			case "maxWaitTime":
+			case "maxTravelTimeAlpha":
+			case "maxTravelTimeBeta":
+			case "maxAbsoluteDetour":
+			case "maxDetourAlpha":
+			case "maxDetourBeta":
+			case "maxAllowedPickupDelay":
+			case "rejectRequestIfMaxWaitOrTravelTimeViolated":
+			case "maxWalkDistance":
+				addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().addParam(paramName, value);
+            	break;
+            default:
+                super.handleAddUnknownParam(paramName, value);
+        }
 	}
 
 	@Override
@@ -282,30 +281,30 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		Verify.verify(getMaxWaitTime() >= getStopDuration(),
-				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
+		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
+		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
+			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
+					"maxWaitTime must not be smaller than stopDuration");
+		}
 
-		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
-				TRANSIT_STOP_FILE
-						+ " must not be null when "
-						+ OPERATIONAL_SCHEME
-						+ " is "
-						+ OperationalScheme.stopbased);
+		Verify.verify(operationalScheme != OperationalScheme.stopbased || transitStopFile != null,
+				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 
-		Verify.verify(
-				getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
-				DRT_SERVICE_AREA_SHAPE_FILE
-						+ " must not be null when "
-						+ OPERATIONAL_SCHEME
-						+ " is "
+		Verify.verify(operationalScheme != OperationalScheme.serviceAreaBased || drtServiceAreaShapeFile != null,
+				"drtServiceAreaShapeFile must not be null when operationalScheme is "
 						+ OperationalScheme.serviceAreaBased);
 
-		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
-				NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+		Verify.verify(numberOfThreads <= Runtime.getRuntime().availableProcessors(),
+				"numberOfThreads is higher than the number of logical cores available to JVM");
 
-		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
+		if (config.global().getNumberOfThreads() < numberOfThreads) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
 					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
+
+		if (this.idleVehiclesReturnToDepots && this.returnToDepotTimeout < this.returnToDepotEvaluationInterval) {
+			log.warn("idleVehiclesReturnToDepots is active and returnToDepotTimeout < returnToDepotEvaluationInterval. " +
+				"Vehicles will be send back to depot after {} seconds",returnToDepotEvaluationInterval);
 		}
 
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
@@ -314,372 +313,33 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+
+		if (simulationType == SimulationType.estimateAndTeleport) {
+			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
+				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
+		}
 	}
 
 	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(MODE, MODE_EXP);
-		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
-		map.put(STOP_DURATION, STOP_DURATION_EXP);
-		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
-		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAVEL_TIME_ALPHA_EXP);
-		map.put(MAX_TRAVEL_TIME_BETA, MAX_TRAVEL_TIME_BETA_EXP);
-		map.put(MAX_ABSOLUTE_DETOUR, MAX_ABSOLUTE_DETOUR_EXP);
-		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
-		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
-		map.put(WRITE_DETAILED_CUSTOMER_STATS, WRITE_DETAILED_CUSTOMER_STATS_EXP);
-		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS, IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP);
-		map.put(OPERATIONAL_SCHEME, OPERATIONAL_SCHEME_EXP);
-		map.put(MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_EXP);
-		map.put(TRANSIT_STOP_FILE, TRANSIT_STOP_FILE_EXP);
-		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
-		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
-				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
-		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
-		map.put(STORE_UNSHARED_PATH, STORE_UNSHARED_PATH_EXP);
-		return map;
-	}
-
-	/**
-	 * @return {@value #MODE_EXP}
-	 */
-	@Override
-	@StringGetter(MODE)
 	public String getMode() {
 		return mode;
 	}
 
-	/**
-	 * @param mode {@value #MODE_EXP}
-	 */
-	@StringSetter(MODE)
-	public DrtConfigGroup setMode(String mode) {
-		this.mode = mode;
-		return this;
-	}
 
-	/**
-	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
-	 */
-	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
-	public boolean isUseModeFilteredSubnetwork() {
-		return useModeFilteredSubnetwork;
-	}
-
-	/**
-	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
-	 */
-	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
-	public DrtConfigGroup setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
-		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #STOP_DURATION_EXP}
-	 */
-	@StringGetter(STOP_DURATION)
-	public double getStopDuration() {
-		return stopDuration;
-	}
-
-	/**
-	 * @param -- {@value #STOP_DURATION_EXP}
-	 */
-	@StringSetter(STOP_DURATION)
-	public DrtConfigGroup setStopDuration(double stopDuration) {
-		this.stopDuration = stopDuration;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #MAX_WAIT_TIME_EXP}
-	 */
-	@StringGetter(MAX_WAIT_TIME)
-	public double getMaxWaitTime() {
-		return maxWaitTime;
-	}
-
-	/**
-	 * @param maxWaitTime -- {@value #MAX_WAIT_TIME_EXP}
-	 */
-	@StringSetter(MAX_WAIT_TIME)
-	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
-		this.maxWaitTime = maxWaitTime;
-		return this;
-	}
-
-	/**
-	 * @return {@link #DRT_SERVICE_AREA_SHAPE_FILE_EXP}
-	 */
-	@StringGetter(DRT_SERVICE_AREA_SHAPE_FILE)
-	public String getDrtServiceAreaShapeFile() {
-		return drtServiceAreaShapeFile;
-	}
-
-	public URL getDrtServiceAreaShapeFileURL(URL context) {
-		return ConfigGroup.getInputFileURL(context, drtServiceAreaShapeFile);
-	}
-
-	/**
-	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_SHAPE_FILE_EXP}
-	 */
-	@StringSetter(DRT_SERVICE_AREA_SHAPE_FILE)
-	public DrtConfigGroup setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
-		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #MAX_TRAVEL_TIME_ALPHA_EXP}
-	 */
-	@StringGetter(MAX_TRAVEL_TIME_ALPHA)
-	public double getMaxTravelTimeAlpha() {
-		return maxTravelTimeAlpha;
-	}
-
-	/**
-	 * @param maxTravelTimeAlpha {@value #MAX_TRAVEL_TIME_ALPHA_EXP}
-	 */
-	@StringSetter(MAX_TRAVEL_TIME_ALPHA)
-	public DrtConfigGroup setMaxTravelTimeAlpha(double maxTravelTimeAlpha) {
-		this.maxTravelTimeAlpha = maxTravelTimeAlpha;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
-	 */
-	@StringGetter(MAX_TRAVEL_TIME_BETA)
-	public double getMaxTravelTimeBeta() {
-		return maxTravelTimeBeta;
-	}
-
-	/**
-	 * @param maxTravelTimeBeta -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
-	 */
-	@StringSetter(MAX_TRAVEL_TIME_BETA)
-	public DrtConfigGroup setMaxTravelTimeBeta(double maxTravelTimeBeta) {
-		this.maxTravelTimeBeta = maxTravelTimeBeta;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #MAX_ABSOLUTE_DETOUR_EXP}
-	 */
-	@StringGetter(MAX_ABSOLUTE_DETOUR)
-	public double getMaxAbsoluteDetour() {
-		return maxAbsoluteDetour;
-	}
-
-	/**
-	 * @param maxAbsoluteDetour -- {@value #MAX_ABSOLUTE_DETOUR_EXP}
-	 */
-	@StringSetter(MAX_ABSOLUTE_DETOUR)
-	public DrtConfigGroup setMaxAbsoluteDetour(double maxAbsoluteDetour) {
-		this.maxAbsoluteDetour = maxAbsoluteDetour;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
-	 */
-	@StringGetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
-	public boolean isRejectRequestIfMaxWaitOrTravelTimeViolated() {
-		return rejectRequestIfMaxWaitOrTravelTimeViolated;
-	}
-
-	/**
-	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
-	 */
-	@StringSetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
-	public DrtConfigGroup setRejectRequestIfMaxWaitOrTravelTimeViolated(
-			boolean rejectRequestIfMaxWaitOrTravelTimeViolated) {
-		this.rejectRequestIfMaxWaitOrTravelTimeViolated = rejectRequestIfMaxWaitOrTravelTimeViolated;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
-	 */
-	@StringGetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
-	public boolean isChangeStartLinkToLastLinkInSchedule() {
-		return changeStartLinkToLastLinkInSchedule;
-	}
-
-	/**
-	 * @param changeStartLinkToLastLinkInSchedule -- {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
-	 */
-	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
-	public DrtConfigGroup setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
-		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #VEHICLES_FILE_EXP}
-	 */
-	@StringGetter(VEHICLES_FILE)
-	public String getVehiclesFile() {
-		return vehiclesFile;
-	}
-
-	/**
-	 * @param vehiclesFile -- {@value #VEHICLES_FILE_EXP}
-	 */
-	@StringSetter(VEHICLES_FILE)
-	public DrtConfigGroup setVehiclesFile(String vehiclesFile) {
-		this.vehiclesFile = vehiclesFile;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #VEHICLES_FILE_EXP}
-	 */
-	public URL getVehiclesFileUrl(URL context) {
-		return vehiclesFile == null ? null : ConfigGroup.getInputFileURL(context, vehiclesFile);
-	}
-
-	/**
-	 * @return -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}}
-	 */
-	@StringGetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
-	public boolean getIdleVehiclesReturnToDepots() {
-		return idleVehiclesReturnToDepots;
-	}
-
-	/**
-	 * @param idleVehiclesReturnToDepots -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
-	 */
-	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
-	public DrtConfigGroup setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
-		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #OPERATIONAL_SCHEME_EXP}
-	 */
-	@StringGetter(OPERATIONAL_SCHEME)
-	public OperationalScheme getOperationalScheme() {
-		return operationalScheme;
-	}
-
-	/**
-	 * @param operationalScheme -- {@value #OPERATIONAL_SCHEME_EXP}
-	 */
-	@StringSetter(OPERATIONAL_SCHEME)
-	public DrtConfigGroup setOperationalScheme(OperationalScheme operationalScheme) {
-		this.operationalScheme = operationalScheme;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
-	 */
-	@StringGetter(TRANSIT_STOP_FILE)
-	public String getTransitStopFile() {
-		return transitStopFile;
-	}
-
-	/**
-	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
-	 */
-	public URL getTransitStopsFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, transitStopFile);
-	}
-
-	/**
-	 * @param-- {@value #TRANSIT_STOP_FILE_EXP}
-	 */
-	@StringSetter(TRANSIT_STOP_FILE)
-	public DrtConfigGroup setTransitStopFile(String transitStopFile) {
-		this.transitStopFile = transitStopFile;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #MAX_WALK_DISTANCE_EXP}
-	 */
-	@StringGetter(MAX_WALK_DISTANCE)
-	public double getMaxWalkDistance() {
-		return maxWalkDistance;
-	}
-
-	/**
-	 * @param-- {@value #MAX_WALK_DISTANCE_EXP}
-	 */
-	@StringSetter(MAX_WALK_DISTANCE)
-	public DrtConfigGroup setMaxWalkDistance(double maximumWalkDistance) {
-		this.maxWalkDistance = maximumWalkDistance;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #WRITE_DETAILED_CUSTOMER_STATS_EXP}
-	 */
-	@StringGetter(WRITE_DETAILED_CUSTOMER_STATS)
-	public boolean isPlotDetailedCustomerStats() {
-		return plotDetailedCustomerStats;
-	}
-
-	/**
-	 * @param -- {@value #WRITE_DETAILED_CUSTOMER_STATS_EXP}
-	 */
-	@StringSetter(WRITE_DETAILED_CUSTOMER_STATS)
-	public DrtConfigGroup setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
-		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #NUMBER_OF_THREADS_EXP}
-	 */
-	@StringGetter(NUMBER_OF_THREADS)
-	public int getNumberOfThreads() {
-		return numberOfThreads;
-	}
-
-	/**
-	 * @param-- {@value #NUMBER_OF_THREADS_EXP}
-	 */
-	@StringSetter(NUMBER_OF_THREADS)
-	public DrtConfigGroup setNumberOfThreads(final int numberOfThreads) {
-		this.numberOfThreads = numberOfThreads;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
-	 */
-	@StringGetter(STORE_UNSHARED_PATH)
-	public boolean getStoreUnsharedPath() {
-		return storeUnsharedPath;
-	}
-
-	/**
-	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
-	 */
-	@StringSetter(STORE_UNSHARED_PATH)
-	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
-		this.storeUnsharedPath = storeUnsharedPath;
-	}
-
-	public double getAdvanceRequestPlanningHorizon() {
-		return advanceRequestPlanningHorizon;
-	}
-
-	public DrtConfigGroup setAdvanceRequestPlanningHorizon(double advanceRequestPlanningHorizon) {
-		this.advanceRequestPlanningHorizon = advanceRequestPlanningHorizon;
-		return this;
-	}
 
 	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
 		return drtInsertionSearchParams;
 	}
 
-	public Optional<DrtZonalSystemParams> getZonalSystemParams() {
+	public DrtOptimizationConstraintsParams addOrGetDrtOptimizationConstraintsParams() {
+		if (drtOptimizationConstraintsParams == null) {
+			DrtOptimizationConstraintsParams params = new DrtOptimizationConstraintsParams();
+			this.addParameterSet(params);
+		}
+		return drtOptimizationConstraintsParams;
+	}
+
+	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
 		return Optional.ofNullable(zonalSystemParams);
 	}
 
@@ -699,11 +359,27 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
 	}
 
+	public Optional<PrebookingParams> getPrebookingParams() {
+		return Optional.ofNullable(prebookingParams);
+	}
+
+	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
+		return Optional.ofNullable(drtEstimatorParams);
+	}
+
 	/**
-	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 *
+	 * @deprecated -- use {@link #setDrtInsertionSearchParams(DrtInsertionSearchParams) instead}
 	 */
+	@Deprecated
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);
 	}
-
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
+	 */
+	public final void setDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet(pars);
+	}
 }

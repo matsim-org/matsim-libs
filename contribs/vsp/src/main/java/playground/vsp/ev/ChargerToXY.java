@@ -1,7 +1,13 @@
 package playground.vsp.ev;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Coord;
@@ -13,21 +19,16 @@ import org.matsim.contrib.ev.charging.ChargingEndEvent;
 import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
 import org.matsim.contrib.ev.charging.ChargingStartEvent;
 import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.*;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Inject;
 
 
 class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventHandler, MobsimBeforeCleanupListener
@@ -42,7 +43,7 @@ class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventHandler,
 
     private final ChargingInfrastructureSpecification chargingInfrastructureSpecification;
     private final Network network;
-    Map<Id<Charger>, List<Id<ElectricVehicle>>> crtChargers = new HashMap<>();
+    Map<Id<Charger>, List<Id<Vehicle>>> crtChargers = new HashMap<>();
     static List<XYDataContainer> dataContainers = new ArrayList<>();
 /*
 * This class collects the XY-Coordinates of every charger. During every iteration it monitors the charging vehicles of every charger.

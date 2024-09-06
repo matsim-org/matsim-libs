@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -42,13 +43,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import static java.lang.Math.min;
+
 
 /**
  * @author dgrether
  * @author knagel
  */
 abstract class AbstractAgentSnapshotInfoBuilder {
-	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
+	private static final Logger log = LogManager.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 	private static int wrnCnt = 0;
 
 	private final Scenario scenario;
@@ -136,12 +139,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		positions.add(position);
 	}
 
-	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
-			double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
-			Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
-			int numberOfLanesAsInt, Queue<Hole> holes)
+	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine( Collection<AgentSnapshotInfo> positions,
+									      double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
+									      Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
+									      int numberOfLanesAsInt, Queue<Hole> holes, AbstractQLink.QLinkInternalInterface qLinkInternalInterface )
 	{
 		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
+		// ("vehs" is needed since the link may be more than full because of squeezing.  In this case, spacingOfOnePCE is smaller than one "cell".)
 
 		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H*1000./3600.);
 
@@ -183,7 +187,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
 					if ( wrnCnt < 10 ) {
 						wrnCnt++ ;
-						if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
+						if ( spaceConsumptionOfHoles > spaceAvailableForHoles ) {
 							log.warn("we have a problem: holes consume too much space:" ) ;
 							log.warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
 							log.warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
@@ -208,9 +212,18 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			// (starts off relatively small (rightmost vehicle))
 
 			final double vehicleSpacing = mveh.getSizeInEquivalents() * spacingOfOnePCE;
+
+			double speed = min( freeSpeed, veh.getMaximumVelocity() );
+			if ( qLinkInternalInterface!=null ){
+				speed = qLinkInternalInterface.getMaximumVelocityFromLinkSpeedCalculator( veh, now );
+			}
+
 			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(
-					now, curvedLength, freeSpeed, vehicleSpacing, distanceFromFromNode, remainingTravelTime
+					now, curvedLength,
+					speed, // min( freeSpeed, veh.getMaximumVelocity()),
+					vehicleSpacing, distanceFromFromNode, remainingTravelTime
 			);
+			// yyyy if the LinkSpeedCalculator says something that is not free speed, we are out of luck here.  kai, jan'23
 
 			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt);
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);

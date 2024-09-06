@@ -26,10 +26,10 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
-import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -42,7 +42,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
-	// TODO MIN_RELATIVE_SOC should depend on the weather and time of day
+	// TODO MIN_SOC should depend on the weather and time of day
 	private final RuleBasedETaxiOptimizerParams params;
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final BestChargerFinder eDispatchFinder;
@@ -63,7 +63,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.getSocCheckTimeStep())) {
+		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
 			@SuppressWarnings("unchecked")
 			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends DvrpVehicle>)idleTaxiRegistry.vehicles();
 			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
@@ -94,6 +94,6 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	private boolean isUndercharged(EvDvrpVehicle v) {
 		Battery b = v.getElectricVehicle().getBattery();
-		return b.getSoc() < params.getMinRelativeSoc() * b.getCapacity();
+		return b.getCharge() < params.minSoc * b.getCapacity();
 	}
 }

@@ -25,7 +25,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -36,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public class MoneyEventHandler implements PersonMoneyEventHandler {
-	private static final Logger log = Logger.getLogger(MoneyEventHandler.class);
+	private static final Logger log = LogManager.getLogger(MoneyEventHandler.class);
 
 	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
 	private Set<Id<Person>> stuckingAgents = null;

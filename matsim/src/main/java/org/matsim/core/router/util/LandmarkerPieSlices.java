@@ -28,7 +28,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -43,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 	private final Rectangle2D.Double travelZone;
 
-	private static final Logger log = Logger.getLogger(LandmarkerPieSlices.class);
+	private static final Logger log = LogManager.getLogger(LandmarkerPieSlices.class);
 
 	private static final double ZONE_EXPANSION = 0.1;
 

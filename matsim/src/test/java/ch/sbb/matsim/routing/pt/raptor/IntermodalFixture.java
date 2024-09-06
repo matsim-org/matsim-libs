@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
@@ -15,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,6 +97,7 @@ class IntermodalFixture {
     IntermodalFixture() {
         this.srrConfig = new SwissRailRaptorConfigGroup();
         this.config = ConfigUtils.createConfig(this.srrConfig);
+		this.config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         this.scenario = ScenarioUtils.createScenario(this.config);
 
         TransitSchedule schedule = this.scenario.getTransitSchedule();

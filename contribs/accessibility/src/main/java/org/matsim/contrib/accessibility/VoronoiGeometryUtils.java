@@ -25,7 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -39,14 +42,12 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author dziemke
  */
 class VoronoiGeometryUtils {
-	private final static Logger LOG = Logger.getLogger(VoronoiGeometryUtils.class);
+	private final static Logger LOG = LogManager.getLogger(VoronoiGeometryUtils.class);
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	

@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -52,7 +53,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  *
  */
 public class TransitEventHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	private final static Logger log = Logger.getLogger(PtOperatorAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(PtOperatorAnalyzer.class);
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 	private Network network;
 	private double vehicleKm;

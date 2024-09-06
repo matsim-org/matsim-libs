@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -39,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
  */
 public class StopId2LineId2Pulk implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
-	private final Logger log = Logger.getLogger(StopId2LineId2Pulk.class);
+	private final Logger log = LogManager.getLogger(StopId2LineId2Pulk.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private TreeMap<Id, Id> vehId2LineMap = new TreeMap<Id, Id>();

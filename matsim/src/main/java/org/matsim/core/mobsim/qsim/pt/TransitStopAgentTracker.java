@@ -20,7 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class TransitStopAgentTracker implements AgentTracker {
 
-	private final static Logger log = Logger.getLogger(TransitStopAgentTracker.class);
+	private final static Logger log = LogManager.getLogger(TransitStopAgentTracker.class);
 	
 	private final EventsManager events;
 	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new ConcurrentHashMap<>();

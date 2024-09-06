@@ -24,7 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
@@ -45,7 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 	
-	private final static Logger log = Logger.getLogger(SidewaysRouteExtension.class);
+	private final static Logger log = LogManager.getLogger(SidewaysRouteExtension.class);
 	public static final String STRATEGY_NAME = "SidewaysRouteExtension";
 	private final double bufferSize;
 	private final double ratio;

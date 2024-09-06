@@ -21,9 +21,9 @@
 
  package org.matsim.core.population.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -38,33 +38,33 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class PopulationAttributeConversionTest {
-	@Rule
+	public class PopulationAttributeConversionTest {
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
+	 @Test
+	 void testDefaults() {
 		final String path = utils.getOutputDirectory()+"/plans.xml";
 
 		testWriteAndReread(w -> w.write(path), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testDefaultsStream() {
+	 @Test
+	 void testDefaultsStream() {
 		final String path = utils.getOutputDirectory()+"/plans.xml";
 
 		testWriteAndReread(w -> w.write(IOUtils.getOutputStream(IOUtils.getFileUrl(path), false)), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testV6() {
+	 @Test
+	 void testV6() {
 		final String path = utils.getOutputDirectory()+"/plans.xml";
 
 		testWriteAndReread(w -> w.writeV6(path), w -> w.readFile(path));
 	}
 
-	@Test
-	public void testV7() {
+	 @Test
+	 void testV7() {
 		final String path = utils.getOutputDirectory()+"/plans.xml";
 
 		testWriteAndReread(w -> w.writeV6(IOUtils.getOutputStream(IOUtils.getFileUrl(path), false)), w -> w.readFile(path));
@@ -95,10 +95,10 @@ public class PopulationAttributeConversionTest {
 		final Person readPerson = readScenario.getPopulation().getPersons().get(personId);
 		final Object readAttribute = readPerson.getAttributes().getAttribute("job");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
+		Assertions.assertEquals(
 				attribute,
-				readAttribute);
+				readAttribute,
+				"unexpected read attribute");
 	}
 
 	private static class CustomClass {

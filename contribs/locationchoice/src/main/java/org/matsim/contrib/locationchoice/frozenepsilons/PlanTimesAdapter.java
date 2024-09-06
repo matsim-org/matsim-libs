@@ -24,7 +24,8 @@ import static org.matsim.core.router.TripStructureUtils.getTrips;
 
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -39,7 +40,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
 class PlanTimesAdapter {
-	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
+	private static final Logger log = LogManager.getLogger( PlanTimesAdapter.class ) ;
 
 	private final TimeInterpretation timeInterpretation;
 

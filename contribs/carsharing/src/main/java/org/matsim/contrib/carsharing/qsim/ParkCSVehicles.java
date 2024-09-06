@@ -24,7 +24,7 @@ public class ParkCSVehicles implements AgentSource {
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
 	private CarsharingSupplyInterface carsharingSupply;
-	//private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
+	//private final static Logger log = LogManager.getLogger(ParkCSVehicles.class);
 	
 	public ParkCSVehicles(QSim qSim,
 			CarsharingSupplyInterface carsharingSupply) {
@@ -34,13 +34,13 @@ public class ParkCSVehicles implements AgentSource {
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 	
 		for (String mode : mainModes) {
-			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+			modeVehicleTypes.put(mode, VehicleUtils.createDefaultVehicleType());
 		}
 		this.carsharingSupply =  carsharingSupply;
-		modeVehicleTypes.put("twoway", VehicleUtils.getDefaultVehicleType());
-		modeVehicleTypes.put("freefloating", VehicleUtils.getDefaultVehicleType());
+		modeVehicleTypes.put("twoway", VehicleUtils.createDefaultVehicleType());
+		modeVehicleTypes.put("freefloating", VehicleUtils.createDefaultVehicleType());
 
-		modeVehicleTypes.put("oneway", VehicleUtils.getDefaultVehicleType());
+		modeVehicleTypes.put("oneway", VehicleUtils.createDefaultVehicleType());
 		
 		
 	}

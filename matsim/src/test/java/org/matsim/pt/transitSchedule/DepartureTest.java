@@ -20,15 +20,24 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
  */
-public class DepartureTest extends MatsimTestCase {
+public class DepartureTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * In case we once should have more than one implementation of
@@ -43,15 +52,17 @@ public class DepartureTest extends MatsimTestCase {
 		return new DepartureImpl(id, time);
 	}
 
-	public void testInitialization() {
+	@Test
+	void testInitialization() {
 		Id<Departure> id = Id.create(1591, Departure.class);
 		double time = 11.0 * 3600;
 		Departure dep = createDeparture(id, time);
 		assertEquals(id, dep.getId());
-		assertEquals(time, dep.getDepartureTime(), EPSILON);
+		assertEquals(time, dep.getDepartureTime(), MatsimTestUtils.EPSILON);
 	}
 
-	public void testVehicleId() {
+	@Test
+	void testVehicleId() {
 		Departure dep = createDeparture(Id.create(6791, Departure.class), 7.0*3600);
 		assertNull(dep.getVehicleId());
 		Id<Vehicle> vehId = Id.create(2491, Vehicle.class);

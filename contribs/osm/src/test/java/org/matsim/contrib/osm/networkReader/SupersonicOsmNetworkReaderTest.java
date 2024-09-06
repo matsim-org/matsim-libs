@@ -7,9 +7,10 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
-import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -29,17 +30,17 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SupersonicOsmNetworkReaderTest {
 
-	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReaderTest.class);
+	private static final Logger log = LogManager.getLogger(SupersonicOsmNetworkReaderTest.class);
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final String MOTORWAY = "motorway";
 	private static final String TERTIARY = "tertiary";
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
@@ -61,7 +62,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 	@SuppressWarnings("ConstantConditions")
 	@Test
-	public void singleLink() {
+	void singleLink() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 
@@ -107,7 +108,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 	@SuppressWarnings("ConstantConditions")
 	@Test
-	public void singleLinkPreserveMiddleNodes() {
+	void singleLinkPreserveMiddleNodes() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 
@@ -143,7 +144,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag() {
+	void singleLink_withMaxSpeedTag() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
@@ -169,7 +170,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_milesPerHour() {
+	void singleLink_withMaxSpeedTag_milesPerHour() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -193,7 +194,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_urbanLink() {
+	void singleLink_withMaxSpeedTag_urbanLink() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -220,7 +221,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_cantParseMaxSpeed() {
+	void singleLink_withMaxSpeedTag_cantParseMaxSpeed() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -245,7 +246,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noMaxSpeedTag_ruralLink() {
+	void singleLink_noMaxSpeedTag_ruralLink() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 1000, 1000);
@@ -271,7 +272,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noMaxSpeedTag_urbanLink() {
+	void singleLink_noMaxSpeedTag_urbanLink() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
@@ -299,7 +300,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noLanesTag() {
+	void singleLink_noLanesTag() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
@@ -324,7 +325,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withLanesTag() {
+	void singleLink_withLanesTag() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
@@ -350,7 +351,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_lanesTagOneWay() {
+	void singleLink_lanesTagOneWay() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -375,7 +376,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_lanesForwardAndBackwardTag() {
+	void singleLink_lanesForwardAndBackwardTag() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -402,7 +403,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_capacityLongLink() {
+	void singleLink_capacityLongLink() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
@@ -426,7 +427,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_capacityShortLink() {
+	void singleLink_capacityShortLink() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 10, 10);
@@ -450,7 +451,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_overridingLinkProperties() {
+	void singleLink_overridingLinkProperties() {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
@@ -479,7 +480,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void twoIntersectingLinks() {
+	void twoIntersectingLinks() {
 
 		var twoLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 		var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
@@ -526,7 +527,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void twoIntersectingLinks_withAfterLinkCreatedHook() {
+	void twoIntersectingLinks_withAfterLinkCreatedHook() {
 
 		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
 		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
@@ -573,7 +574,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void twoIntersectingLinks_oneShouldBeSimplified() {
+	void twoIntersectingLinks_oneShouldBeSimplified() {
 
 		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
 		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0),
@@ -600,7 +601,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void linkGrid_oneWayNotInFilter() {
+	void linkGrid_oneWayNotInFilter() {
 
 		Utils.OsmData grid = Utils.createGridWithDifferentLevels();
 		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "grid-with-filter.pbf");
@@ -631,7 +632,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void twoIntersectingLinks_oneWithLoop() {
+	void twoIntersectingLinks_oneWithLoop() {
 
 		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
 		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
@@ -666,7 +667,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void simplifiedLinksWithPreservedOriginalGeometry() {
+	void simplifiedLinksWithPreservedOriginalGeometry() {
 
 		var file = Paths.get(matsimTestUtils.getOutputDirectory() + "file.osm.bbf");
 		var osmData = Utils.createSingleLink(List.of(new Tag(OsmTags.HIGHWAY, OsmTags.LIVING_STREET)));

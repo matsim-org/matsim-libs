@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -15,7 +16,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 
 public class SharingConfigGroup extends ReflectiveConfigGroup {
-	private final static Logger logger = Logger.getLogger(SharingConfigGroup.class);
+	private final static Logger logger = LogManager.getLogger(SharingConfigGroup.class);
 	public static final String GROUP_NAME = "sharing";
 
 	public SharingConfigGroup() {

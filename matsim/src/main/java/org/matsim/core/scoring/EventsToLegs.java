@@ -20,7 +20,7 @@
 package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
@@ -305,13 +305,13 @@ public final class EventsToLegs
 
 			final Id<TransitStopFacility> lastFacilityId = lineAndRoute.lastFacilityId;
 			if (lastFacilityId == null) {
-				Logger.getLogger(this.getClass()).warn("breakpoint");
+				LogManager.getLogger(this.getClass()).warn("breakpoint");
 			}
 			assert lastFacilityId != null;
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
 			assert egressFacility != null;
-			
+
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
 			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);
 			passengerRoute.setTravelTime(travelTime);

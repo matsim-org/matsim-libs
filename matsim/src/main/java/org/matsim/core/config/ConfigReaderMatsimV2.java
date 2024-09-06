@@ -30,20 +30,38 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 /**
  * @author thibautd
+ * @author mrieser (alias-functionality)
  */
- class ConfigReaderMatsimV2 extends MatsimXmlParser {
+class ConfigReaderMatsimV2 extends MatsimXmlParser {
+	private final static Logger LOG = LogManager.getLogger(ConfigReaderMatsimV2.class);
+
 	private final Config config;
 
-	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<ConfigGroup>();
+	private final ConfigAliases aliases;
+	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<>();
+	private final Deque<String> pathStack = new ArrayDeque<>();
 
-	ConfigReaderMatsimV2(
-			final Config config) {
+	ConfigReaderMatsimV2(final Config config) {
+		super(ValidationType.DTD_ONLY);
 		this.config = config;
+		this.aliases = new ConfigAliases();
+	}
+
+	ConfigReaderMatsimV2(final Config config, final ConfigAliases aliases) {
+		super(ValidationType.DTD_ONLY);
+		this.config = config;
+		this.aliases = aliases;
+	}
+
+	public ConfigAliases getConfigAliases() {
+		return this.aliases;
 	}
 
 	@Override
@@ -51,6 +69,7 @@ import org.xml.sax.Attributes;
 			final String name,
 			final Attributes atts,
 			final Stack<String> context) {
+
 		if ( name.equals( MODULE ) ) {
 			startModule(atts);
 		}
@@ -63,27 +82,32 @@ import org.xml.sax.Attributes;
 		else if ( !name.equals( "config" ) ) {
 			// this is the job of the dtd validation,
 			// but better too much safety than too little...
-			throw new IllegalArgumentException( "unkown tag "+name );
+			throw new IllegalArgumentException( "unknown tag "+name );
 		}
 	}
 
 	private void startParameter(final Attributes atts) {
-		moduleStack.getFirst().addParam(
-				atts.getValue( NAME ),
+		String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
+		this.moduleStack.getFirst().addParam(
+				name,
 				atts.getValue( VALUE ) );
 	}
 
 	private void startParameterSet(final Attributes atts) {
-		final ConfigGroup m = moduleStack.getFirst().createParameterSet( atts.getValue( TYPE ) );
-		moduleStack.addFirst( m );
+		String type = this.aliases.resolveAlias(atts.getValue(TYPE), this.pathStack);
+		final ConfigGroup m = this.moduleStack.getFirst().createParameterSet( type );
+		this.moduleStack.addFirst(m);
+		this.pathStack.addFirst(m.getName());
 	}
 
 	private void startModule(final Attributes atts) {
-		final ConfigGroup m = config.getModule( atts.getValue( NAME ) );
-		moduleStack.addFirst(
-				m == null ?
-				config.createModule( atts.getValue( NAME ) ) :
-				m );
+		String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
+		ConfigGroup m = this.config.getModule(name);
+		if (m == null) {
+			m = this.config.createModule(name);
+		}
+		this.moduleStack.addFirst(m);
+		this.pathStack.addFirst(m.getName());
 	}
 
 	@Override
@@ -92,10 +116,12 @@ import org.xml.sax.Attributes;
 			final String content,
 			final Stack<String> context) {
 		if ( name.equals( MODULE ) || name.equals( PARAMETER_SET ) ) {
-			final ConfigGroup head = moduleStack.removeFirst();
-			
-			if ( !moduleStack.isEmpty() ) moduleStack.getFirst().addParameterSet( head );
+			final ConfigGroup head = this.moduleStack.removeFirst();
+			this.pathStack.removeFirst();
+
+			if ( !this.moduleStack.isEmpty() ) this.moduleStack.getFirst().addParameterSet( head );
 		}
 	}
+
 }
 

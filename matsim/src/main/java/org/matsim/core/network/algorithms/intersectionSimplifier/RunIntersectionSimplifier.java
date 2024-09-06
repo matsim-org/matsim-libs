@@ -18,12 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -35,11 +33,11 @@ import org.matsim.core.network.io.NetworkWriter;
 /**
  * Example to illustrate how the density-based algorithm is used to simplify a
  * network's intersections.
- * 
+ *
  * @author jwjoubert
  */
 public class RunIntersectionSimplifier {
-	final private static Logger LOG = Logger.getLogger(RunIntersectionSimplifier.class);
+	final private static Logger LOG = LogManager.getLogger(RunIntersectionSimplifier.class);
 
 	/**
 	 * @param args
@@ -47,24 +45,24 @@ public class RunIntersectionSimplifier {
 	public static void main(String[] args) {
 		run(args);
 	}
-	
+
 	public static void run(String[] args) {
 		String input = args[0];
 		String output = args[1];
-		
+
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(input);
-		
+
 		IntersectionSimplifier ns = new IntersectionSimplifier(30.0, 2);
 		Network newNetwork = ns.simplify(network);
 		NetworkCalcTopoType nct = new NetworkCalcTopoType();
 		nct.run(newNetwork);
-		
+
 		LOG.info("Simplifying the network...");
 		new NetworkSimplifier().run(newNetwork);
 		LOG.info("Cleaning the network...");
 		new NetworkCleaner().run(newNetwork);
-		
+
 		IntersectionSimplifier.reportNetworkStatistics(newNetwork);
 		new NetworkWriter(newNetwork).write(output);
 	}

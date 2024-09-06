@@ -20,13 +20,14 @@
 
 package org.matsim.pt.router;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -39,7 +40,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  *
  */
 public class TransitRouterConfig implements MatsimParameters {
-	private static final Logger log = Logger.getLogger( TransitRouterConfig.class ) ;
+	private static final Logger log = LogManager.getLogger( TransitRouterConfig.class ) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -90,7 +91,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	private double marginalUtilityOfWaitingPt_utl_s;
 
 	private double marginalUtilityOfTravelDistanceWalk_utl_m;
-	
+
 	private double marginalUtilityOfTravelDistanceTransit_utl_m;
 
 	private double utilityOfLineSwitch_utl;
@@ -98,40 +99,40 @@ public class TransitRouterConfig implements MatsimParameters {
 	private Double beelineDistanceFactor;
 
 	private final double directWalkFactor ;
-	
+
 	private boolean cacheTree;
 
 	public TransitRouterConfig(final Config config) {
-		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+		this(config.scoring(), config.routing(), config.transitRouter(), config.vspExperimental());
 	}
-	
-	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, 
-			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
+
+	public TransitRouterConfig(final ScoringConfigGroup pcsConfig, final RoutingConfigGroup pcrConfig,
+														 final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig )
 	{
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
-		
+
 		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
-			Logger.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
+			LogManager.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
 					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
 					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
 		}
-		
+
 		// walk:
 		{
-			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
+			TeleportedModeParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
 			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;
 		}
 		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
 		// apr'19
-		
+
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
-		
+
 		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
 				pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate() +
 				pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		
+
 		// pt:
 		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
@@ -176,11 +177,11 @@ public class TransitRouterConfig implements MatsimParameters {
 	public void setMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
 		this.marginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
 	}
-	
+
 	public void setMarginalUtilityOfTravelDistanceWalk_utl_m(final double marginalUtilityOfTravelDistanceWalk_utl_m) {
 		this.marginalUtilityOfTravelDistanceWalk_utl_m = marginalUtilityOfTravelDistanceWalk_utl_m;
 	}
-	
+
 	/**
 	 * @return the marginal utility of travel time by public transit.
 	 */
@@ -211,7 +212,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	public double getMarginalUtilityOfTravelDistanceWalk_utl_m() {
 		return this.marginalUtilityOfTravelDistanceWalk_utl_m;
 	}
-	
+
 	public void setBeelineWalkSpeed(final double beelineWalkSpeed) {
 		this.beelineWalkSpeed = beelineWalkSpeed;
 	}

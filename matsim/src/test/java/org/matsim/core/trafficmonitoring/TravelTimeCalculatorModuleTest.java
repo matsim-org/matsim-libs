@@ -24,8 +24,8 @@
 import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,15 +50,15 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TravelTimeCalculatorModuleTest {
+ public class TravelTimeCalculatorModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testOneTravelTimeCalculatorForAll() {
+	 @Test
+	 void testOneTravelTimeCalculatorForAll() {
 		Config config = ConfigUtils.createConfig();
 		config.travelTimeCalculator().setSeparateModes(false);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -93,12 +93,12 @@ public class TravelTimeCalculatorModuleTest {
 	}
 
 
-	@Test
-	public void testOneTravelTimeCalculatorPerMode() {
+	 @Test
+	 void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
 
 //		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
-		config.plansCalcRoute().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
+		config.routing().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
 		// (this is now newly taken from the router network modes. kai, feb'19)
 
 		config.travelTimeCalculator().setSeparateModes(true);

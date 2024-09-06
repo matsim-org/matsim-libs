@@ -20,7 +20,8 @@
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class VehicleAllocationConsistencyChecker implements IterationEndsListener, IterationStartsListener {
-	private final static Logger log = Logger.getLogger( VehicleAllocationConsistencyChecker.class );
+	private final static Logger log = LogManager.getLogger( VehicleAllocationConsistencyChecker.class );
 
 	private boolean gotError = false;
 

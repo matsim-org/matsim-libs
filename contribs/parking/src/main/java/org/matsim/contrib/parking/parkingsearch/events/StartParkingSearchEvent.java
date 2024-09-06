@@ -27,8 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 
 public class StartParkingSearchEvent extends Event {
@@ -42,21 +41,22 @@ public class StartParkingSearchEvent extends Event {
 		super(time);
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
-		
+
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();

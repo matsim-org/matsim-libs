@@ -18,10 +18,6 @@
 
 package org.matsim.contrib.drt.extension.edrt.run;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -29,8 +25,8 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.EvBaseModule;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -45,16 +41,18 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class EDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute());
-
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
+		return createControler(config, scenario, otfvis);
+	}
+	public static Controler createControler(Config config, Scenario scenario, boolean otfvis) {
+		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvBaseModule());
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(drtCfg.getMode()));
@@ -63,12 +61,13 @@ public class EDrtControlerCreator {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
 			}
 		});
 
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
-				multiModeDrtConfig.modes().collect(toList())));
+//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+//				multiModeDrtConfig.modes().collect(toList())));
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( multiModeDrtConfig.modes().toArray(String[]::new ) ) );
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

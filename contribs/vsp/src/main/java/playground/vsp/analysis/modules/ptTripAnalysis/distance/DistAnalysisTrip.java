@@ -22,7 +22,8 @@ package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +44,7 @@ import playground.vsp.analysis.modules.ptTripAnalysis.utils.GeoCalculator;
  */
 public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalysisTripI{
 	
-	private static final Logger log = Logger.getLogger(DistAnalysisTrip.class);
+	private static final Logger log = LogManager.getLogger(DistAnalysisTrip.class);
 	
 	private int nrOfExpEvents;
 	private boolean finished = false;

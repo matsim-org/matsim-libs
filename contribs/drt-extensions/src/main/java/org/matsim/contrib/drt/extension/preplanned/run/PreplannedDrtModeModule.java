@@ -23,13 +23,15 @@ package org.matsim.contrib.drt.extension.preplanned.run;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
-import org.matsim.contrib.drt.schedule.StopDurationEstimator;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -52,13 +54,15 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
-		bindModal(StopDurationEstimator.class).toInstance((vehicle, dropoffRequests, pickupRequests) -> drtCfg.getStopDuration());
+		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
 
-		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
-				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
+		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
+				null :
+				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
+				drtCfg.changeStartLinkToLastLinkInSchedule));
 
 		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
 				+ " It would interfere with simulation of pre-calculated vehicle schedules."

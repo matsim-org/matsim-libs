@@ -22,9 +22,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierVehicle;
+import org.matsim.freight.carriers.Carriers;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -66,6 +66,14 @@ public class JointDemandUtils {
         copy.set(COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX, carrier.toString());
         activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, copy);
     }
+
+	public static void setJobDuration(Activity activity, int commercialJobIndex, double duration) {
+		Collection<String> commercialJobProperties = getCommercialJob(activity, commercialJobIndex);
+		List<String> copy = new ArrayList<>();
+		copy.addAll(commercialJobProperties);
+		copy.set(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX, String.valueOf(duration));
+		activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, copy);
+	}
 
     public static Set<Id<Carrier>> getExistingOperatorsForMarket(Carriers carriers, String market) {
         return carriers.getCarriers().values().

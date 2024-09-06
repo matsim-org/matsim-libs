@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -19,12 +20,11 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 public final class GridUtils {
 	// used from outside, e.g. in vsp playgrounds
 
-	private static final Logger LOG = Logger.getLogger(GridUtils.class);
+	private static final Logger LOG = LogManager.getLogger(GridUtils.class);
 
 	/**
 	 * @param shapeFileName

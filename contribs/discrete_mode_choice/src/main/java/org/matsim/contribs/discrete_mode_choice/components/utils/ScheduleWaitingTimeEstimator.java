@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
@@ -32,7 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sebhoerl
  */
 public class ScheduleWaitingTimeEstimator implements PTWaitingTimeEstimator {
-	private static final Logger logger = Logger.getLogger(ScheduleWaitingTimeEstimator.class);
+	private static final Logger logger = LogManager.getLogger(ScheduleWaitingTimeEstimator.class);
 
 	private final TransitSchedule transitSchedule;
 	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, List<Double>> orderedDepartureTimes = new HashMap<>();
@@ -53,17 +55,14 @@ public class ScheduleWaitingTimeEstimator implements PTWaitingTimeEstimator {
 		return new Tuple<>(transitLine.getId(), transitRoute.getId());
 	}
 
+	@Override
 	public double estimateWaitingTime(List<? extends PlanElement> elements) {
 		double totalWaitingTime = 0.0;
 
 		for (PlanElement element : elements) {
-			if (element instanceof Leg) {
-				Leg leg = (Leg) element;
-
-				if (leg.getMode().equals("pt")) {
-					TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-					totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
-				}
+			if (element instanceof Leg leg && leg.getMode().equals(TransportMode.pt)) {
+				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
+				totalWaitingTime += this.estimateWaitingTime(leg.getDepartureTime().seconds(), route);
 			}
 		}
 

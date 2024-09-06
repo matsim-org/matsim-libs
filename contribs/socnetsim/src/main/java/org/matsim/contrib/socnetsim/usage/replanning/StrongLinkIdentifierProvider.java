@@ -20,7 +20,8 @@ package org.matsim.contrib.socnetsim.usage.replanning;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.SocialNetworkPlanLinkIdentifier;
@@ -34,7 +35,7 @@ import org.matsim.contrib.socnetsim.usage.PlanLinkConfigGroup;
  * @author thibautd
  */
 public class StrongLinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
-	private static final Logger log = Logger.getLogger( StrongLinkIdentifierProvider.class );
+	private static final Logger log = LogManager.getLogger( StrongLinkIdentifierProvider.class );
 	private final PlanLinkConfigGroup configGroup;
 	private final SocialNetwork socialNetwork;
 

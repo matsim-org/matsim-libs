@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.stuckAgents;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -38,8 +39,7 @@ import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 public class GetStuckEventsAndPlans extends AbstractAnalysisModule{
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(GetStuckEventsAndPlans.class);
+	private static final Logger log = LogManager.getLogger(GetStuckEventsAndPlans.class);
 	private GetStuckEvents stuckEventHandler;
 	private Scenario sc;
 	private GetPlansSubset plans;

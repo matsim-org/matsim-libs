@@ -21,7 +21,8 @@ package org.matsim.contrib.socnetsim.framework.cliques.config;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 
 /**
@@ -30,7 +31,7 @@ import org.matsim.core.config.ConfigGroup;
  */
 public class CliquesConfigGroup extends ConfigGroup {
 
-	private static final Logger log = Logger.getLogger(CliquesConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(CliquesConfigGroup.class);
 
 	public static final String GROUP_NAME = "Cliques";
 

@@ -20,16 +20,20 @@
 
 package org.matsim.core.utils.misc;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link Time}.
  *
  * @author mrieser
  */
-public class TimeTest extends TestCase {
+public class TimeTest {
 
-	public void testFormats() {
+	@Test
+	void testFormats() {
 		double time = 12*3600 + 34*60 + 56.789;
 		assertEquals("12:34:56", Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
 		assertEquals("12:34", Time.writeTime(time, Time.TIMEFORMAT_HHMM));
@@ -80,7 +84,8 @@ public class TimeTest extends TestCase {
 		} catch (IllegalArgumentException expected) {}
 	}
 
-	public void testSeparators() {
+	@Test
+	void testSeparators() {
 		// test writing
 		double dTime = 12*3600 + 34*60 + 56.789;
 		assertEquals("12:34:56", Time.writeTime(dTime, ':'));
@@ -99,7 +104,8 @@ public class TimeTest extends TestCase {
 		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-').seconds(), 0.0);
 	}
 
-	public void testUndefined() {
+	@Test
+	void testUndefined() {
 		// test writing
 		assertEquals("undefined", Time.writeTime(OptionalTime.undefined()));
 
@@ -109,7 +115,8 @@ public class TimeTest extends TestCase {
 		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(null));
 	}
 
-	public void testSetDefault() {
+	@Test
+	void testSetDefault() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals("12:34:56", Time.writeTime(12*3600 + 34*60 + 56.789));
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
@@ -117,14 +124,15 @@ public class TimeTest extends TestCase {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_SSSS);
 		assertEquals(Integer.toString(12*3600 + 34*60 + 56), Time.writeTime(12*3600 + 34*60 + 56.789));
 
-	
+
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSSDOTSS);
 		assertEquals("12:34:56.78", Time.writeTime(12*3600 + 34*60 + 56.789).substring(0, 11));
-		// (conversion to double of .789 looks like .788999999999... thus that dirty trick.  
+		// (conversion to double of .789 looks like .788999999999... thus that dirty trick.
 		//  kai/gregor, nov'11)
 }
 
-	public void testWriting() {
+	@Test
+	void testWriting() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals( "12:34:56", Time.writeTime( 12*3600 + 34*60 + 56.789));// positive
 		assertEquals( "01:02:03", Time.writeTime(  1*3600 +  2*60 +  3.4)); // positive with leading zero
@@ -139,7 +147,8 @@ public class TimeTest extends TestCase {
 		assertEquals("-596523:14:08", Time.writeTime(Integer.MIN_VALUE));
 	}
 
-	public void testParsing() {
+	@Test
+	void testParsing() {
 		assertEquals( 12*3600.0 + 34*60.0 + 56.0, Time.parseTime( "12:34:56"), 0.0);
 		assertEquals( 12*3600.0 + 34*60.0 + 56.7, Time.parseTime( "12:34:56.7"), 0.0);
 		assertEquals(  1*3600.0 +  2*60.0 +  3.0, Time.parseTime( "01:02:03"), 0.0);
@@ -151,10 +160,11 @@ public class TimeTest extends TestCase {
 		 */
 		assertEquals(Long.MAX_VALUE, Time.parseTime("2562047788015215:28:07"), 0.0);
 	}
-	
-	public void testConvertHHMMInteger() {
+
+	@Test
+	void testConvertHHMMInteger() {
 		assertEquals( 12*3600.0 + 34*60.0, Time.convertHHMMInteger(Integer.valueOf("1234")), 0.0);
 		assertEquals(  1*3600.0 +  2*60.0, Time.convertHHMMInteger(Integer.valueOf("0102")), 0.0);
 	}
-	
+
 }

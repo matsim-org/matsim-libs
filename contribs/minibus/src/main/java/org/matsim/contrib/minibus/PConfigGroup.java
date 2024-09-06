@@ -22,7 +22,8 @@ package org.matsim.contrib.minibus;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.hook.BasicOperator;
@@ -46,7 +47,7 @@ public final class PConfigGroup extends ConfigGroup{
 	 * TODO [AN] This one has to be checked
 	 */
 	private static final long serialVersionUID = 4840713748058034511L;
-	private static final Logger log = Logger.getLogger(PConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(PConfigGroup.class);
 	
 	public static enum StopLocationSelector {allCarLinks ("allCarLinks"), 
 		junctionApproachesAndBetweenJunctions ("junctionApproachesAndBetweenJunctions");

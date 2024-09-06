@@ -20,20 +20,31 @@
 
 package org.matsim.core.controler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.testcases.MatsimTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
  */
-public class ControlerEventsTest extends MatsimTestCase {
+public class ControlerEventsTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private List<Integer> calledStartupListener = null;
 
@@ -41,20 +52,17 @@ public class ControlerEventsTest extends MatsimTestCase {
 		this.calledStartupListener.add(i);
 	}
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@BeforeEach public void setUp() {
 		this.calledStartupListener = new ArrayList<>(3);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@AfterEach public void tearDown() {
 		this.calledStartupListener = null;
 	}
 
-	public void testCoreListenerExecutionOrder() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+	@Test
+	void testCoreListenerExecutionOrder() {
+		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
@@ -70,8 +78,9 @@ public class ControlerEventsTest extends MatsimTestCase {
 		assertEquals(1, this.calledStartupListener.get(2).intValue());
 	}
 
-	public void testEvents() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+	@Test
+	void testEvents() {
+		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
@@ -79,10 +88,10 @@ public class ControlerEventsTest extends MatsimTestCase {
 		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();
-		assertNotNull("No ControlerStartupEvent fired!", startup);
+		assertNotNull(startup, "No ControlerStartupEvent fired!");
 		//test for shutdown
 		ShutdownEvent shutdown = listener.getShutdownEvent();
-		assertNotNull("No ControlerShutdownEvent fired!", shutdown);
+		assertNotNull(shutdown, "No ControlerShutdownEvent fired!");
 		//test for iterations
 		//setup
 		List<IterationStartsEvent> setupIt = listener.getIterationStartsEvents();
@@ -100,7 +109,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 		public TestController(Config config) {
 			this.config = config;
-			super.setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
+			super.setupOutputDirectory(new OutputDirectoryHierarchy(config.controller()));
 		}
 
 		@Override
@@ -117,19 +126,19 @@ public class ControlerEventsTest extends MatsimTestCase {
 		protected void prepareForSim() {
 
 		}
-		
+
 		@Override
 		protected void prepareForMobsim() {
 		}
 
 		@Override
 		protected boolean mayTerminateAfterIteration(int iteration) {
-			return iteration >= config.controler().getLastIteration();
+			return iteration >= config.controller().getLastIteration();
 		}
 
 		@Override
 		protected boolean shouldTerminate(int iteration) {
-			return iteration >= config.controler().getLastIteration();
+			return iteration >= config.controller().getLastIteration();
 		}
 	}
 

@@ -20,24 +20,33 @@
 
 package org.matsim.core.events;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class ActStartEventTest extends MatsimTestCase {
+public class ActStartEventTest {
 
-	public void testWriteReadXml() {
-		final ActivityStartEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testWriteReadXml() {
+		final ActivityStartEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
 				new ActivityStartEvent(5668.27, Id.create("a92", Person.class), Id.create("l081", Link.class), Id.create("f792", ActivityFacility.class),
 						"work", new Coord( 234., 5.67 ) ) );
-		assertEquals(5668.27, event.getTime(), EPSILON);
+		assertEquals(5668.27, event.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals("a92", event.getPersonId().toString());
 		assertEquals("l081", event.getLinkId().toString());
 		assertEquals("f792", event.getFacilityId().toString());

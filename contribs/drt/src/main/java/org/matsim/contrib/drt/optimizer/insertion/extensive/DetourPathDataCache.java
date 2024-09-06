@@ -32,14 +32,14 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
  * Contains detour data for all potential insertions (i.e. pickup and dropoff indices).
  * Typically, all path data of a given type (i.e. to/from pickup/delivery) are precomputed in one go and then cached.
  */
-class DetourPathDataCache {
+public final class DetourPathDataCache {
 	private final Map<Link, PathData> detourToPickup;
 	private final Map<Link, PathData> detourFromPickup;
 	private final Map<Link, PathData> detourToDropoff;
 	private final Map<Link, PathData> detourFromDropoff;
 	private final PathData zeroDetour;
 
-	DetourPathDataCache(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
+	public DetourPathDataCache(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
 			Map<Link, PathData> detourToDropoff, Map<Link, PathData> detourFromDropoff, PathData zeroDetour) {
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
@@ -48,7 +48,7 @@ class DetourPathDataCache {
 		this.zeroDetour = zeroDetour;
 	}
 
-	InsertionDetourData createInsertionDetourData(Insertion insertion) {
+	public InsertionDetourData createInsertionDetourData(Insertion insertion) {
 		PathData toPickup = detourToPickup.get(insertion.pickup.previousWaypoint.getLink());
 		PathData fromPickup = detourFromPickup.get(insertion.pickup.nextWaypoint.getLink());
 		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?

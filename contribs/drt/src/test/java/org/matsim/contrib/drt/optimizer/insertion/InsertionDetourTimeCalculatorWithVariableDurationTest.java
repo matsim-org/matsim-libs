@@ -20,9 +20,11 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableTable;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -33,15 +35,17 @@ import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableTable;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -57,32 +61,36 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 
 	private static final int STOP_DURATION_INITIAL = 10;
 	private static final int STOP_DURATION_ADDED = 5;
-	public static final IncrementalStopDurationEstimator INCREMENTAL_STOP_DURATION_ESTIMATOR = new IncrementalStopDurationEstimator() {
+	
+	public static final PassengerStopDurationProvider STOP_DURATION_PROVIDER = new PassengerStopDurationProvider() {
 		@Override
-		public double calcForPickup(DvrpVehicle vehicle, DrtStopTask stopTask, DrtRequest pickupRequest) {
-			double time = 0;
-			if (pickupRequest.equals(drtRequestInitial)) {
-				time += STOP_DURATION_INITIAL;
-			} else if (pickupRequest.equals(drtRequestAdded)) {
-				time += STOP_DURATION_ADDED;
-			}
-			return time;
-		}
-
-		@Override
-		public double calcForDropoff(DvrpVehicle vehicle, DrtStopTask stopTask, DrtRequest dropoffRequest) {
-			double time = 0;
-			if (dropoffRequest.equals(drtRequestInitial)) {
+		public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
+			if (request.equals(drtRequestInitial)) {
 				return STOP_DURATION_INITIAL;
-			} else if (dropoffRequest.equals(drtRequestAdded)) {
+			} else if (request.equals(drtRequestAdded)) {
 				return STOP_DURATION_ADDED;
 			}
-			return time;
+			
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
+			if (request.equals(drtRequestInitial)) {
+				return STOP_DURATION_INITIAL;
+			} else if (request.equals(drtRequestAdded)) {
+				return STOP_DURATION_ADDED;
+			}
+			
+			throw new IllegalStateException();
 		}
 	};
+	
+	public static final StopTimeCalculator STOP_TIME_CALCULATOR = 
+			new CumulativeStopTimeCalculator(STOP_DURATION_PROVIDER);
 
 	@Test
-	public void detourTimeLoss_start_pickup_dropoff() {
+	void detourTimeLoss_start_pickup_dropoff() {
 		Waypoint.Start start = start(null, 10, link("start"));
 		VehicleEntry entry = entry(start);
 		var detour = new Detour(100., 15., 0., 0.);
@@ -100,11 +108,12 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
+	void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
 		DrtStopTask stopTask = new DefaultDrtStopTask(20, 20 + STOP_DURATION_INITIAL, fromLink);
 		stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
-		Waypoint.Start start = start(stopTask, STOP_DURATION_INITIAL, fromLink);
+		// sh 03/08/23: Updated this test, according to VehicleDataEntryFactoryImpl start time should be task end time
+		Waypoint.Start start = start(stopTask, 20 + STOP_DURATION_INITIAL, fromLink);
 		VehicleEntry entry = entry(start);
 		var detour = new Detour(0., 15., 0., 0.);//toPickup/Dropoff unused
 		var insertion = insertion(entry, 0, 0, detour);
@@ -119,7 +128,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void detourTimeLoss_start_pickup_dropoff_stop() {
+	void detourTimeLoss_start_pickup_dropoff_stop() {
 		Waypoint.Start start = start(null, 5, link("start"));
 		Waypoint.Stop stop0 = stop(10, link("stop0"));
 		VehicleEntry entry = entry(start, stop0);
@@ -136,7 +145,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void calculatePickupDetourTimeLoss_start_pickup_stop_dropoff() {
+	void calculatePickupDetourTimeLoss_start_pickup_stop_dropoff() {
 		Waypoint.Start start = start(null, 5, link("start"));
 		Waypoint.Stop stop0 = stop(10, link("stop0"));
 		VehicleEntry entry = entry(start, stop0);
@@ -153,7 +162,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void calculatePickupDetourTimeLoss_start_pickup_stop_dropoff_stop() {
+	void calculatePickupDetourTimeLoss_start_pickup_stop_dropoff_stop() {
 		Waypoint.Start start = start(null, 5, link("start"));
 		Waypoint.Stop stop0 = stop(10, link("stop0"));
 		Waypoint.Stop stop1 = stop(200, link("stop1"));
@@ -171,7 +180,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void calculatePickupDetourTimeLoss_start_pickupNotAppended_stop_dropoffAppended_stop() {
+	void calculatePickupDetourTimeLoss_start_pickupNotAppended_stop_dropoffAppended_stop() {
 		Waypoint.Start start = start(null, 5, fromLink);//not a STOP -> pickup cannot be appended
 		Waypoint.Stop stop0 = stop(10, toLink);
 		Waypoint.Stop stop1 = stop(200, link("stop1"));
@@ -189,7 +198,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void calculatePickupDetourTimeLoss_start_stop_pickupAppended_stop_dropoffAppended() {
+	void calculatePickupDetourTimeLoss_start_stop_pickupAppended_stop_dropoffAppended() {
 		Waypoint.Start start = start(null, 5, link("start"));
 		Waypoint.Stop stop0 = stop(10, fromLink);
 		Waypoint.Stop stop1 = stop(200, toLink);
@@ -207,7 +216,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	@Test
-	public void replacedDriveTimeEstimator() {
+	void replacedDriveTimeEstimator() {
 		Waypoint.Start start = start(null, 0, link("start"));
 		Waypoint.Stop stop0 = stop(10, link("stop0"));
 		Waypoint.Stop stop1 = stop(200, link("stop1"));
@@ -222,7 +231,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 				.put(stop0.getLink(), stop1.getLink(), dropoffDetourReplacedDriveEstimate)
 				.build();
 
-		var detourTimeCalculator = new InsertionDetourTimeCalculator(INCREMENTAL_STOP_DURATION_ESTIMATOR,
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_TIME_CALCULATOR,
 				new DetourTimeEstimator() {
 					@Override
 					public double estimateTime(Link from, Link to, double departureTime) {
@@ -245,7 +254,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private void assertDetourTimeInfo(InsertionWithDetourData insertion, DetourTimeInfo expected) {
-		var detourTimeCalculator = new InsertionDetourTimeCalculator(INCREMENTAL_STOP_DURATION_ESTIMATOR, null);
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_TIME_CALCULATOR, null);
 		DetourTimeInfo detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData, drtRequestAdded);
 		assertThat(detourTimeInfo.pickupDetourInfo).isEqualToComparingFieldByField(expected.pickupDetourInfo);
 		assertThat(detourTimeInfo.dropoffDetourInfo).isEqualToComparingFieldByField(expected.dropoffDetourInfo);
@@ -266,7 +275,8 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null);
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
 	}
 
 	private InsertionWithDetourData insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,

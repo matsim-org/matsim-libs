@@ -6,11 +6,11 @@ import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 /**
@@ -26,8 +26,8 @@ public class EventWriterJson implements EventWriter, BasicEventHandler {
 			this.out = IOUtils.getOutputStream(outfile.toURI().toURL(), false);
 			this.jsonGenerator = new JsonFactory().createGenerator(this.out);
 			this.jsonGenerator.setPrettyPrinter(new MinimalPrettyPrinter("\n"));
-		} catch (UncheckedIOException | IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class EventWriterJson implements EventWriter, BasicEventHandler {
 			this.jsonGenerator = new JsonFactory().createGenerator(this.out);
 			this.jsonGenerator.setPrettyPrinter(new MinimalPrettyPrinter("\n"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class EventWriterJson implements EventWriter, BasicEventHandler {
 			}
 			this.jsonGenerator.writeEndObject();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 

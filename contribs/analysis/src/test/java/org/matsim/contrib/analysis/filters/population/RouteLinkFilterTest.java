@@ -20,6 +20,11 @@
 
 package org.matsim.contrib.analysis.filters.population;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,12 +46,18 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class RouteLinkFilterTest extends MatsimTestCase {
+public class RouteLinkFilterTest {
 
-	public void testRouteLinkFilter() {
-		loadConfig(null); // used to set the default dtd-location
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test
+	void testRouteLinkFilter() {
+		// used to set the default dtd-location
+		utils.loadConfig((String)null);
 		Population population = getTestPopulation();
 
 		TestAlgorithm tester = new TestAlgorithm();

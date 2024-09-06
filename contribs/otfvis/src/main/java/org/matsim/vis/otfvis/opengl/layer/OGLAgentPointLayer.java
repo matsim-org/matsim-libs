@@ -22,7 +22,8 @@ package org.matsim.vis.otfvis.opengl.layer;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.texture.Texture;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -73,7 +74,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 	private static Texture texture;
 
-	private static final Logger log = Logger.getLogger(OGLAgentPointLayer.class);
+	private static final Logger log = LogManager.getLogger(OGLAgentPointLayer.class);
 
 	public OGLAgentPointLayer() {
 		if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme()== OTFVisConfigGroup.ColoringScheme.infection){
@@ -274,7 +275,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 		if ( bvg2cnt < 1 ) {
 			bvg2cnt++ ;
-			Logger.getLogger(this.getClass()).info( "using bvg2 coloring scheme ...") ;
+			LogManager.getLogger(this.getClass()).info( "using bvg2 coloring scheme ...") ;
 		}
 
 		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {

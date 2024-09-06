@@ -20,7 +20,8 @@
 
 package org.matsim.analysis.linkpaxvolumes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
@@ -52,7 +53,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 		VehicleLeavesTrafficEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
 
-	private final static Logger log = Logger.getLogger(LinkPaxVolumesAnalysis.class);
+	private final static Logger log = LogManager.getLogger(LinkPaxVolumesAnalysis.class);
 	private final int timeBinSize;
 	private final int maxTime; // TODO: maybe 24h is too restrictive with plans rather 3:00 - 27:00
 	private final int maxSlotIndex;
@@ -62,7 +63,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 	private final Vehicles vehicles;
 	private final Vehicles transitVehicles;
 	private final Id<VehicleType> nullVehicleType = Id.create("nullVehicleType", VehicleType.class);
-	
+
 	// for multi-modal / multi vehicle type support
 	final boolean observeNetworkModes;
 	final boolean observePassengerModes;
@@ -99,7 +100,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 		this.vehicleType2timeOnNetwork = new IdMap<>(VehicleType.class);
 		this.vehicleType2numberSeen = new IdMap<>(VehicleType.class);
 		this.vehicleIdsSeen = new IdSet<>(Vehicle.class);
-		
+
 		this.observeNetworkModes = observeNetworkModes;
 		if (this.observeNetworkModes) {
 			this.linkVehicleVolumesPerNetworkMode = new IdMap<>(Link.class);
@@ -186,7 +187,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 			this.linkPaxVolumes.put(event.getLinkId(), passengerVolumesAll);
 		}
 		passengerVolumesAll[timeslot] += currentPaxAllPassengerModes;
-		
+
 		if (this.observeNetworkModes) {
 			String mode = vehicleData.networkMode;
 
@@ -301,7 +302,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 	int[] getVehicleVolumesForLink(final Id<Link> linkId) {
 		return this.linkVehicleVolumes.get(linkId);
 	}
-	
+
 	/**
 	 * @param linkId
 	 * @param networkMode
@@ -312,7 +313,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 		if (observeNetworkModes) {
 			Map<String, int[]> modeVolumes = this.linkVehicleVolumesPerNetworkMode.get(linkId);
 			if (modeVolumes != null) return modeVolumes.get(networkMode);
-		} 
+		}
 		return null;
 	}
 
@@ -403,10 +404,10 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 	int getVolumesArraySize() {
 		return this.maxSlotIndex + 1;
 	}
-	
+
 	/*
 	 * This procedure is only working if (hour % timeBinSize == 0)
-	 * 
+	 *
 	 * Example: 15 minutes bins
 	 *  ___________________
 	 * |  0 | 1  | 2  | 3  |
@@ -416,11 +417,11 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 	 * | 	  hour 0	   |
 	 * |___________________|
 	 * 0   				  3600
-	 * 
+	 *
 	 * hour 0 = bins 0,1,2,3
 	 * hour 1 = bins 4,5,6,7
 	 * ...
-	 * 
+	 *
 	 * getTimeSlotIndex = (int)time / this.timeBinSize => jumps at 3600.0!
 	 * Thus, starting time = (hour = 0) * 3600.0
 	 */
@@ -456,17 +457,17 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 	Map<Id<VehicleType>, Double> getVehicleType2timeOnNetwork() {
 		return Collections.unmodifiableMap(vehicleType2timeOnNetwork);
 	}
-	
+
 	/**
 	 * @return Set of Strings containing all modes for which counting-values are available.
 	 */
 	Set<String> getNetworkModes() {
 		Set<String> modes = new TreeSet<>();
-		
+
 		for (Map<String, int[]> map : this.linkVehicleVolumesPerNetworkMode.values()) {
 			modes.addAll(map.keySet());
 		}
-		
+
 		return modes;
 	}
 
@@ -495,7 +496,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 
 		return vehicleTypes;
 	}
-	
+
 	/**
 	 * @return Set of Strings containing all link ids for which counting-values are available.
 	 */
@@ -514,7 +515,7 @@ public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, Vehi
 		this.person2passengerMode.clear();
 		this.vehiclesAboutToLeave.clear();
 		this.vehiclesData.clear();
-		this.vehicleIdsSeen.clear();;
+		this.vehicleIdsSeen.clear();
 		this.vehicleType2numberSeen.clear();
 		this.vehicleType2timeOnNetwork.clear();
 

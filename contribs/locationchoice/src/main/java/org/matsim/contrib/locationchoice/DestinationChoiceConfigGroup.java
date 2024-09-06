@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.locationchoice;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DestinationChoiceConfigGroup extends ReflectiveConfigGroup implements DestinationChoiceConfigGroupI {
-	private final static Logger log = Logger.getLogger(DestinationChoiceConfigGroup.class);
+	private final static Logger log = LogManager.getLogger(DestinationChoiceConfigGroup.class);
 
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
 	public enum EpsilonDistributionTypes { gumbel, gaussian };

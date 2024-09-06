@@ -1,6 +1,7 @@
 package org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -11,7 +12,7 @@ import org.matsim.core.population.PersonUtils;
  * Created by fouriep on 11/28/14.
  */
 public class SlaveScoreStatsCalculator{
-    Logger log = Logger.getLogger(this.getClass());
+    Logger log = LogManager.getLogger(this.getClass());
 
     final public static int INDEX_WORST = 0;
     final public static int INDEX_BEST = 1;

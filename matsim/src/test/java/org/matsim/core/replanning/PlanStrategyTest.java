@@ -20,17 +20,26 @@
 
 package org.matsim.core.replanning;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class PlanStrategyTest extends MatsimTestCase {
+public class PlanStrategyTest {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * @author mrieser
 	 */
-	public void testGetNumberOfStrategyModules() {
+	@Test
+	void testGetNumberOfStrategyModules() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		assertEquals(0, strategy.getNumberOfStrategyModules());
 		strategy.addStrategyModule(new DummyStrategyModule());
