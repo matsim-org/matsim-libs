@@ -103,7 +103,9 @@ public class RunEDrtScenarioIT {
 				new OTFVisConfigGroup(), new EvConfigGroup());
 
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfig.addParameterSet(new PrebookingParams());
+		PrebookingParams prebookingParams = new PrebookingParams();
+		prebookingParams.abortRejectedPrebookings = false;
+		drtConfig.addParameterSet(prebookingParams);
 
 		Controler controller = RunEDrtScenario.createControler(config, false);
 		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);

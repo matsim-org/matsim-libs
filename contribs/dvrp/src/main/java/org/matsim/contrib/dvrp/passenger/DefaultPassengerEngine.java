@@ -153,7 +153,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private void handleDepartureImpl(double now, List<MobsimPassengerAgent> group) {
 		List<Id<Person>> groupIds = group.stream().map(Identifiable::getId).toList();
 
-		MobsimPassengerAgent representative = group.get(0);
+		MobsimPassengerAgent representative = group.getFirst();
 
 		Id<Link> fromLinkId = representative.getCurrentLinkId();
 		Id<Link> toLinkId = representative.getDestinationLinkId();

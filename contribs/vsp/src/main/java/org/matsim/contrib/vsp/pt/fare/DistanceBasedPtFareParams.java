@@ -2,6 +2,10 @@ package org.matsim.contrib.vsp.pt.fare;
 
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.*;
@@ -13,16 +17,18 @@ import java.util.*;
  * The values are based on the standard unit of meter (m) and Euro (EUR)
  */
 public class DistanceBasedPtFareParams extends PtFareParams {
-	public static final DistanceBasedPtFareParams GERMAN_WIDE_FARE = germanWideFare();
+	public static final DistanceBasedPtFareParams GERMAN_WIDE_FARE_2024 = germanWideFare2024();
 
-	public static final String SET_NAME = "ptFareCalculationDistanceBased";
+	public static final String SET_TYPE = "ptFareCalculationDistanceBased";
 	public static final String MIN_FARE = "minFare";
 
+	private static final Logger log = LogManager.getLogger(DistanceBasedPtFareParams.class);
+
 	@PositiveOrZero
-	private double minFare = 2.0;
+	private double minFare = 0.0;
 
 	public DistanceBasedPtFareParams() {
-		super(SET_NAME);
+		super(SET_TYPE);
 	}
 
 	@Override
@@ -47,7 +53,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	// hence the following difference in data points
 	// prices taken from https://deutschlandtarifverbund.de/wp-content/uploads/2024/07/20231201_TBDT_J_10_Preisliste_V07.pdf
 	// TODO: This fare will change. We might need a way to select the fare of a specific year
-	private static DistanceBasedPtFareParams germanWideFare() {
+	private static DistanceBasedPtFareParams germanWideFare2024() {
 		final double MIN_FARE = 1.70;
 
 		SimpleRegression under100kmTrip = new SimpleRegression();
@@ -105,11 +111,12 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		var params = new DistanceBasedPtFareParams();
 
 		DistanceClassLinearFareFunctionParams distanceClass100kmFareParams = params.getOrCreateDistanceClassFareParams(100_000.);
-		distanceClass100kmFareParams.setFareSlope(under100kmTrip.getSlope());
+		// above values are per km, fare deduction is based on meter instead
+		distanceClass100kmFareParams.setFareSlope(under100kmTrip.getSlope() / 1000.0);
 		distanceClass100kmFareParams.setFareIntercept(under100kmTrip.getIntercept());
 
 		DistanceClassLinearFareFunctionParams distanceClassLongFareParams = params.getOrCreateDistanceClassFareParams(Double.POSITIVE_INFINITY);
-		distanceClassLongFareParams.setFareSlope(longDistanceTrip.getSlope());
+		distanceClassLongFareParams.setFareSlope(longDistanceTrip.getSlope() / 1000.0);
 		distanceClassLongFareParams.setFareIntercept(longDistanceTrip.getIntercept());
 
 		params.setTransactionPartner("Deutschlandtarif");
@@ -118,15 +125,36 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		return params;
 	}
 
+	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch (type) {
+			case DistanceClassLinearFareFunctionParams.SET_TYPE:
+				return new DistanceClassLinearFareFunctionParams();
+			default:
+				throw new IllegalArgumentException(type);
+		}
+	}
+
+	@Override
+	protected final void checkConsistency(final Config config) {
+		super.checkConsistency(config);
+		getDistanceClassFareParams();
+	}
+
 	public SortedMap<Double, DistanceClassLinearFareFunctionParams> getDistanceClassFareParams() {
 		@SuppressWarnings("unchecked")
 		final Collection<DistanceClassLinearFareFunctionParams> distanceClassFareParams =
-			(Collection<DistanceClassLinearFareFunctionParams>) getParameterSets(DistanceClassLinearFareFunctionParams.SET_NAME);
+			(Collection<DistanceClassLinearFareFunctionParams>) getParameterSets(DistanceClassLinearFareFunctionParams.SET_TYPE);
 		final SortedMap<Double, DistanceClassLinearFareFunctionParams> map = new TreeMap<>();
 
 		for (DistanceClassLinearFareFunctionParams pars : distanceClassFareParams) {
 			if (this.isLocked()) {
 				pars.setLocked();
+			}
+			if (map.containsKey(pars.getMaxDistance())) {
+				log.error("Multiple " + DistanceClassLinearFareFunctionParams.class +
+					" with same max distance in same DistanceBasedPtFareParams. Max distance must be unique.");
+				throw new RuntimeException("Multiple " + DistanceClassLinearFareFunctionParams.class);
 			}
 			map.put(pars.getMaxDistance(), pars);
 		}
@@ -140,7 +168,8 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	public DistanceClassLinearFareFunctionParams getOrCreateDistanceClassFareParams(double maxDistance) {
 		DistanceClassLinearFareFunctionParams distanceClassFareParams = this.getDistanceClassFareParams().get(maxDistance);
 		if (distanceClassFareParams == null) {
-			distanceClassFareParams = new DistanceClassLinearFareFunctionParams(maxDistance);
+			distanceClassFareParams = new DistanceClassLinearFareFunctionParams();
+			distanceClassFareParams.setMaxDistance(maxDistance);
 			addParameterSet(distanceClassFareParams);
 		}
 		return distanceClassFareParams;
@@ -148,7 +177,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 
 	public static class DistanceClassLinearFareFunctionParams extends ReflectiveConfigGroup {
 
-		public static final String SET_NAME = "distanceClassLinearFare";
+		public static final String SET_TYPE = "distanceClassLinearFare";
 		public static final String FARE_SLOPE = "fareSlope";
 		public static final String FARE_INTERCEPT = "fareIntercept";
 		public static final String MAX_DISTANCE = "maxDistance";
@@ -160,9 +189,8 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 		@PositiveOrZero
 		private double maxDistance;
 
-		public DistanceClassLinearFareFunctionParams(double maxDistance) {
-			super(SET_NAME);
-			this.maxDistance = maxDistance;
+		public DistanceClassLinearFareFunctionParams() {
+			super(SET_TYPE);
 		}
 
 		@StringGetter(FARE_SLOPE)
@@ -204,7 +232,8 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 			map.put(FARE_INTERCEPT, "Linear function fare = slope * distance + intercept: the value of the intercept in currency units.");
 			map.put(MAX_DISTANCE, "The given linear function is applied to trips up to this distance threshold in meters. If set to a finite value" +
 				", the linear function for the next distance class will be tried out. If no fare is defined with " + MAX_DISTANCE + " greater than" +
-				"pt trip length, an error is thrown.");
+				"pt trip length, an error is thrown. If multiple distance classes have the same max distance it is unclear which applies, therefore " +
+				"an error is thrown.");
 			return map;
 		}
 	}

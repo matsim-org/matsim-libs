@@ -43,6 +43,7 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
@@ -116,7 +117,7 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/**
-	 * Creates and return the Index of the regions shape.
+	 * Creates and return the Index of the regions shapes.
 	 *
 	 * @param shapeFileRegionsPath     Path to the shape file of the regions
 	 * @param shapeCRS                 CRS of the shape file
@@ -131,13 +132,13 @@ public class SmallScaleCommercialTrafficUtils {
 	}
 
 	/** Finds the nearest possible link for the building polygon.
-	 * @param zone
-	 * @param noPossibleLinks
-	 * @param linksPerZone
-	 * @param newLink
-	 * @param centroidPointOfBuildingPolygon
-	 * @param numberOfPossibleLinks
-	 * @return
+	 * @param zone  							zone of the building
+	 * @param noPossibleLinks 					list of links that are not possible
+	 * @param linksPerZone 						map of links per zone
+	 * @param newLink 							new link
+	 * @param centroidPointOfBuildingPolygon 	centroid point of the building polygon
+	 * @param numberOfPossibleLinks 			number of possible links
+	 * @return 									new possible Link
 	 */
 	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
@@ -199,21 +200,19 @@ public class SmallScaleCommercialTrafficUtils {
 			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
 
 			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
-			double tourStartTime = 0;
 			for (PlanElement tourElement : tourElements) {
 
 				if (tourElement instanceof Activity activity) {
 					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
 						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
+					if (activity.getMaximumDuration() != OptionalTime.undefined())
+						newActivity.setMaximumDuration(activity.getMaximumDuration().seconds());
 					if (activity.getType().equals("start")) {
 						newActivity.setEndTime(activity.getEndTime().seconds());
 						newActivity.setType("commercial_start");
-					} else
-						newActivity.setEndTimeUndefined();
-					if (activity.getType().equals("end")) {
-						newActivity.setStartTime(tourStartTime + 8 * 3600);
-						newActivity.setType("commercial_end");
 					}
+					if (activity.getType().equals("end"))
+						newActivity.setType("commercial_end");
 					plan.addActivity(newActivity);
 				}
 				if (tourElement instanceof Leg) {
@@ -284,9 +283,9 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 	/** Reads the data distribution of the zones.
-	 * @param pathToDataDistributionToZones
-	 * @return
-	 * @throws IOException
+	 * @param pathToDataDistributionToZones Path to the data distribution of the zones
+	 * @return 								resultingDataPerZone
+	 * @throws IOException 					if the file is not found
 	 */
 	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {
