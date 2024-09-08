@@ -23,6 +23,7 @@ package org.matsim.contrib.zone.skims;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
@@ -77,6 +78,10 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
 			() -> zoneSystemParams,
 			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
