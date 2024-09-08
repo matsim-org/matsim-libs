@@ -13,13 +13,14 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.NoFeasibleChoiceException;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.RoutedTripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
+import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilityCandidate;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 
 /**
  * This replanning algorithm uses a predefined discrete mode choice model to
  * perform mode decisions for a given plan.
- * 
+ *
  * @author sebhoerl
  */
 public class DiscreteModeChoiceAlgorithm implements PlanAlgorithm {
@@ -68,6 +69,7 @@ public class DiscreteModeChoiceAlgorithm implements PlanAlgorithm {
 
 				TripRouter.insertTrip(plan, trip.getOriginActivity(), insertElements, trip.getDestinationActivity());
 			}
+			plan.getAttributes().putAttribute("utility", chosenCandidates.stream().mapToDouble(UtilityCandidate::getUtility).sum());
 		} catch (NoFeasibleChoiceException e) {
 			throw new IllegalStateException(e);
 		}
