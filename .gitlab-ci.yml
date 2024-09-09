@@ -1,0 +1,11 @@
+image: maven:latest
+
+cache:
+  paths:
+    - .m2/repository/
+
+test:
+  stage: test
+  script:
+    - mvn install --batch-mode --also-make --projects contribs/drt -DskipTests -Dsource.skip
+    - cd contribs/drt && mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
