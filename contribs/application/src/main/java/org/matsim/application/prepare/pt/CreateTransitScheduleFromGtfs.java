@@ -267,7 +267,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(busVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(busVehicleType, 1.0 / 3.0); // 1s per boarding agent, distributed on 3 doors
 			VehicleUtils.setEgressTime(busVehicleType, 1.0 / 3.0); // 1s per alighting agent, distributed on 3 doors
-			scenario.getTransitVehicles().addVehicleType(busVehicleType);
 
 			addHbefaMapping(busVehicleType, HbefaVehicleCategory.URBAN_BUS);
 			scenario.getTransitVehicles().addVehicleType(busVehicleType);
