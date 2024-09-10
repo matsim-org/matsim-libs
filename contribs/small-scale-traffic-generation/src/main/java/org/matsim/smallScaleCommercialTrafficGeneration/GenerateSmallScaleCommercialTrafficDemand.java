@@ -67,6 +67,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
@@ -305,6 +306,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
 		controler.run();
+
+		//Analysis
+		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
+		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(output, output.resolve("Carrier_Analysis"), controler.getConfig().global().getCoordinateSystem());
+		freightAnalysis.runAnalysis();
+		System.out.println("Finishing Analysis of Carrier.");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
 			usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
