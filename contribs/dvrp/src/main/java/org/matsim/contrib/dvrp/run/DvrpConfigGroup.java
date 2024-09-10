@@ -19,23 +19,20 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
-import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
-import org.matsim.core.config.Config;
-
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
+import org.matsim.core.config.Config;
+
+import javax.annotation.Nullable;
+import java.util.Set;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = LogManager.getLogger(DvrpConfigGroup.class);
@@ -68,13 +65,14 @@ public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParame
 	@Parameter
 	@Comment("Used for OFFLINE estimation of travel times for VrpOptimizer"
 			+ " by means of the exponential moving average."
-			+ " The weighting decrease, alpha, must be in (0,1]."
+			+ " The weighting decrease, alpha, must be in [0,1]."
 			+ " We suggest small values of alpha, e.g. 0.05."
 			+ " The averaging starts from the initial travel time estimates. If not provided,"
-			+ " the free-speed TTs is used as the initial estimates")
-	@Positive
+			+ " the free-speed TTs is used as the initial estimates. If alpha is set to 0, the initial"
+			+ "travel times stay fixed.")
+	@PositiveOrZero
 	@DecimalMax("1.0")
-	public double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only
+	public double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only, 0 ==> initial TTs only
 
 	@Parameter
 	@Comment(""
@@ -145,6 +143,12 @@ public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParame
 		}
 		if (!config.eventsManager().getSynchronizeOnSimSteps()) {
 			throw new RuntimeException("Synchronization on sim steps is required");
+		}
+		if(initialTravelTimesFile == null && travelTimeEstimationAlpha == 0.0) {
+			throw new RuntimeException("Initial travel times file is required if travel times should not be updated.");
+		}
+		if(travelTimeEstimationAlpha == 0.0 && travelTimeEstimationBeta > 0) {
+			throw new RuntimeException("Online estimation beta should be 0 if travel time should not be updated.");
 		}
 	}
 
