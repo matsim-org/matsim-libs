@@ -28,7 +28,9 @@ public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 			.newBuilder()
 			.request(request)
 			.earliestStartTime(request.getEarliestStartTime())
+			.maxRideDuration(request.getMaxRideDuration())
 			.latestArrivalTime(Math.min(updatedLatestStartTime + request.getMaxRideDuration(), request.getLatestArrivalTime()))
-			.latestStartTime(updatedLatestStartTime).build());
+			.latestStartTime(updatedLatestStartTime)
+			.build());
 	}
 }
