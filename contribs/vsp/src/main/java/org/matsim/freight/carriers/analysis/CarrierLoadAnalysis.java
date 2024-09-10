@@ -37,6 +37,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -92,10 +93,10 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeLoadPerVehicle(Path analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory + "Load_perVehicle.tsv";
+		String fileName = analysisOutputDirectory.resolve("Load_perVehicle.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 

@@ -43,6 +43,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -156,10 +157,10 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		}
 	}
 
-	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeTravelTimeAndDistancePerVehicle(Path analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
-		String fileName = analysisOutputDirectory + "TimeDistance_perVehicle.tsv";
+		String fileName = analysisOutputDirectory.resolve("TimeDistance_perVehicle.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
@@ -216,7 +217,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 
-	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeTravelTimeAndDistancePerVehicleType(Path analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
@@ -226,7 +227,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
 		}
 
-		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
+		String fileName = analysisOutputDirectory.resolve("TimeDistance_perVehicleType.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 		//Write headline:

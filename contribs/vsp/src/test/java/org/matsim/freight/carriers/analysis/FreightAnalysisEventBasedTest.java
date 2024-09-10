@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class FreightAnalysisEventBasedTest {
 
@@ -35,7 +36,7 @@ public class FreightAnalysisEventBasedTest {
 	@Test
 	void runFreightAnalysisEventBasedTest() throws IOException {
 
-		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(testUtils.getClassInputDirectory(), testUtils.getOutputDirectory(),null);
+		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(Path.of(testUtils.getClassInputDirectory()), Path.of(testUtils.getOutputDirectory()),null);
 		analysisEventBased.runAnalysis();
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carrier_stats.tsv",  testUtils.getOutputDirectory() + "Carrier_stats.tsv");

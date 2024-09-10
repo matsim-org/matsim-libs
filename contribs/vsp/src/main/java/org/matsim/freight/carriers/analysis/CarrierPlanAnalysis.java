@@ -32,6 +32,7 @@ import org.matsim.freight.carriers.CarriersUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.TreeMap;
 
 /**
@@ -55,10 +56,10 @@ public class CarrierPlanAnalysis  {
 		this.carriers = carriers;
 	}
 
-	public void runAnalysisAndWriteStats(String analysisOutputDirectory) throws IOException {
+	public void runAnalysisAndWriteStats(Path analysisOutputDirectory) throws IOException {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory + "Carrier_stats.tsv";
+		String fileName = analysisOutputDirectory.resolve("Carrier_stats.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
