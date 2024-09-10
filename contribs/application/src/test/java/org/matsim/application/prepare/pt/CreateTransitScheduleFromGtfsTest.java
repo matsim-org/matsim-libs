@@ -30,6 +30,7 @@ public class CreateTransitScheduleFromGtfsTest {
 				"--network", network.toString(),
 				"--target-crs", "EPSG:4326",
 				"--date", "2019-01-01",
+				"--validate=true",
 				"--output", output
 		);
 
