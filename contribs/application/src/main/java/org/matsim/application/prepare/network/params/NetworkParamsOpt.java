@@ -113,6 +113,7 @@ class NetworkParamsOpt {
 
 		String highwayType = NetworkUtils.getHighwayType(link);
 		categories.put("highway_type", highwayType);
+		ft.put("idx", link.getId().index());
 		ft.put("speed", NetworkUtils.getAllowedSpeed(link));
 		ft.put("num_lanes", link.getNumberOfLanes());
 		ft.put("length", link.getLength());

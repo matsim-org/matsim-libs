@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -199,7 +200,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		Scenario scenario = builder.build();
 
 		// add pseudo network for pt
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "pt_", 0.1, 100000.0).createNetwork();
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), ptNetworkIdentifier, 0.1, 100000.0).createNetwork();
 
 		// create TransitVehicle types
 		// see https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-24/ for veh capacities
@@ -219,7 +220,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
 
 			addHbefaMapping(reRbVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
-
 			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
 		}
 		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));
@@ -230,6 +230,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(sBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(sBahnVehicleType, 1.0 / 24.0); // 1s per boarding agent, distributed on 8*3 doors
 			VehicleUtils.setEgressTime(sBahnVehicleType, 1.0 / 24.0); // 1s per alighting agent, distributed on 8*3 doors
+
+			addHbefaMapping(sBahnVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(sBahnVehicleType);
 		}
 		VehicleType uBahnVehicleType = vehicleFactory.createVehicleType(Id.create("U-Bahn_veh_type", VehicleType.class));
@@ -240,9 +242,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(uBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(uBahnVehicleType, 1.0 / 18.0); // 1s per boarding agent, distributed on 6*3 doors
 			VehicleUtils.setEgressTime(uBahnVehicleType, 1.0 / 18.0); // 1s per alighting agent, distributed on 6*3 doors
-			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
 
 			addHbefaMapping(uBahnVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
+			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
 
 		}
 		VehicleType tramVehicleType = vehicleFactory.createVehicleType(Id.create("Tram_veh_type", VehicleType.class));
@@ -253,6 +255,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(tramVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(tramVehicleType, 1.0 / 5.0); // 1s per boarding agent, distributed on 5 doors
 			VehicleUtils.setEgressTime(tramVehicleType, 1.0 / 5.0); // 1s per alighting agent, distributed on 5 doors
+
+			addHbefaMapping(tramVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(tramVehicleType);
 		}
 		VehicleType busVehicleType = vehicleFactory.createVehicleType(Id.create("Bus_veh_type", VehicleType.class));
@@ -263,7 +267,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(busVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(busVehicleType, 1.0 / 3.0); // 1s per boarding agent, distributed on 3 doors
 			VehicleUtils.setEgressTime(busVehicleType, 1.0 / 3.0); // 1s per alighting agent, distributed on 3 doors
+
+			addHbefaMapping(busVehicleType, HbefaVehicleCategory.URBAN_BUS);
 			scenario.getTransitVehicles().addVehicleType(busVehicleType);
+
 		}
 		VehicleType ferryVehicleType = vehicleFactory.createVehicleType(Id.create("Ferry_veh_type", VehicleType.class));
 		{
@@ -273,6 +280,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(ferryVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ferryVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+
+			addHbefaMapping(ferryVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(ferryVehicleType);
 		}
 
@@ -284,6 +293,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(ptVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+
+			addHbefaMapping(ptVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(ptVehicleType);
 		}
 
@@ -432,6 +443,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
 		VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
 		VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
+		vehicleType.setNetworkMode(TransportMode.pt);
 	}
 
 	private static void increaseLinkFreespeedIfLower(Link link, double newFreespeed) {
