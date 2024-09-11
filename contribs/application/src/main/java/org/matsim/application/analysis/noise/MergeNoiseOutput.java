@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.avro.XYTData;
+import org.matsim.application.options.CsvOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -92,7 +93,7 @@ final class MergeNoiseOutput {
 	/**
 	 * Merges noise data from multiple files into one file.
 	 */
-	public void run() {
+	public void run() throws IOException {
 		mergeReceiverPointData(outputDirectory + "/immissions/", "immission");
 		mergeReceiverPointData(outputDirectory + "/damages_receiverPoint/", "damages_receiverPoint");
 		mergeLinkData(outputDirectory.toString() + "/emissions/", "emission");
@@ -116,7 +117,7 @@ final class MergeNoiseOutput {
 		}
 	}
 
-	private void mergeLinkData(String pathParameter, String label) {
+	private void mergeLinkData(String pathParameter, String label) throws IOException {
 		log.info("Merging emissions data for label {}", label);
 		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
 		Table csvOutputMerged = Table.create(TextColumn.create("Link Id"), DoubleColumn.create("value"));
@@ -126,9 +127,10 @@ final class MergeNoiseOutput {
 
 			// Read the file
 			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("Link Id", ColumnType.TEXT))
+				.columnTypesPartial(Map.of("Link Id", ColumnType.TEXT,
+					"Noise Emission " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS), ColumnType.DOUBLE))
 				.sample(false)
-				.separator(';').build());
+				.separator(CsvOptions.detectDelimiter(path)).build());
 
 			for (Row row : table) {
 				String linkId = row.getString("Link Id");
@@ -157,7 +159,7 @@ final class MergeNoiseOutput {
 	 * @param outputDir path to the receiverPoint data
 	 * @param label         label for the receiverPoint data (which kind of data)
 	 */
-	private void mergeReceiverPointData(String outputDir, String label) {
+	private void mergeReceiverPointData(String outputDir, String label) throws IOException {
 
 		// data per time step, maps coord to value
 		Int2ObjectMap<Object2FloatMap<FloatFloatPair>> data = new Int2ObjectOpenHashMap<>();
@@ -188,7 +190,7 @@ final class MergeNoiseOutput {
 					"t", ColumnType.DOUBLE,
 					valueHeader, ColumnType.DOUBLE))
 				.sample(false)
-				.separator(';').build());
+				.separator(CsvOptions.detectDelimiter(timeDataFile)).build());
 
 			// Loop over all rows in the data file
 			for (Row row : dataTable) {
@@ -265,7 +267,7 @@ final class MergeNoiseOutput {
 	// Merges the immissions data
 
 	@Deprecated
-	private void mergeImmissionsCSV(String pathParameter, String label) {
+	private void mergeImmissionsCSV(String pathParameter, String label) throws IOException {
 		log.info("Merging immissions data for label {}", label);
 		Object2DoubleMap<Coord> mergedData = new Object2DoubleOpenHashMap<>();
 
@@ -284,7 +286,7 @@ final class MergeNoiseOutput {
 					"Receiver Point Id", ColumnType.INTEGER,
 					"t", ColumnType.DOUBLE))
 				.sample(false)
-				.separator(';').build());
+				.separator(CsvOptions.detectDelimiter(path)).build());
 
 			// Loop over all rows in the file
 			for (Row row : table) {
