@@ -69,7 +69,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParame
 			+ " We suggest small values of alpha, e.g. 0.05."
 			+ " The averaging starts from the initial travel time estimates. If not provided,"
 			+ " the free-speed TTs is used as the initial estimates. If alpha is set to 0, the initial"
-			+ "travel times stay fixed.")
+			+ " travel times stay fixed.")
 	@PositiveOrZero
 	@DecimalMax("1.0")
 	public double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only, 0 ==> initial TTs only
