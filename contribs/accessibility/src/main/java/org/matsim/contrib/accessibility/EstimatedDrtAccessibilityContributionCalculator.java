@@ -159,8 +159,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 //			getAlphaBeta(null, null, null);
 
-			double waitTime_s = 103.34; //TODO
-			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
+			double waitTime_s = 421.87; //TODO
+			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m;
