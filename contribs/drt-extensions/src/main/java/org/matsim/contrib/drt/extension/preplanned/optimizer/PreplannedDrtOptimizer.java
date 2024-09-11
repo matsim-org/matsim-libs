@@ -174,17 +174,22 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
 
-			var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
-			if (nextStop.pickup) {
-				var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
-						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+			if(nextStop.preplannedRequest.key.passengerIds.isEmpty() && nonVisitedPreplannedStops.isEmpty()) {
+				var stayTask = taskFactory.createStayTask(vehicle, currentTime, vehicle.getServiceEndTime(), currentLink);
+				schedule.addTask(stayTask);
 			} else {
-				var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
-						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
+				if (nextStop.pickup) {
+					var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
+							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
+					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				} else {
+					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
+							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
+					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				}
+				schedule.addTask(stopTask);
 			}
-			schedule.addTask(stopTask);
 		}
 
 		// switch to the next task and update currentTasks
