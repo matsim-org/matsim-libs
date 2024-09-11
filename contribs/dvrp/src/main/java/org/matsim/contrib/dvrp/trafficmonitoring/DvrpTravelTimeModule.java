@@ -64,7 +64,7 @@ public class DvrpTravelTimeModule extends AbstractModule {
 		addMobsimListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 		addControlerListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 
-		if (dvrpCfg.travelTimeEstimationBeta > 0) {// online estimation
+		if (dvrpCfg.travelTimeEstimationBeta > 0 && dvrpCfg.travelTimeEstimationAlpha > 0) {// online estimation
 			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
 			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
 			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);
