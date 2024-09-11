@@ -3,13 +3,18 @@ package org.matsim.contrib.accessibility;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
+import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouterModule;
@@ -74,6 +79,19 @@ public final class AccessibilityFromEvents{
 				install( new ScenarioByInstanceModule( scenario ) ) ;
 				install( new TripRouterModule() ) ;
 				install( new TimeInterpretationModule() );
+				install(new EventsManagerModule());
+				install(new DvrpModule());
+				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
+				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+					install(new DrtModeModule(drtCfg));
+					installQSimModule(new DrtModeQSimModule(drtCfg));
+					install(new DrtModeAnalysisModule(drtCfg));
+				}
+
+
+//				install(new MultiModeDrtModule());
+//				install(new MultiModeDrtCompanionModule());
+
 				for( String mode : getConfig().routing().getNetworkModes() ){
 					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
 				}

@@ -3,14 +3,15 @@ package org.matsim.contrib.accessibility;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
+import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -19,18 +20,16 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
-import org.matsim.matrices.Entry;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,19 +51,18 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 	private Network subNetwork;
 
-	private final double betaWalkTT_h;
-
 	private final double betaDrtTT_h;
 	private final double betaDrtDist_m;
-	private final double walkSpeed_m_s;
-
+	private final double walkSpeed_m_h;
+	private final double betaWalkTT_h;
+	private final double betaWalkDist_m;
 	private Node fromNode = null;
 
 	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 	private final LeastCostPathCalculator router;
-	TripRouter tripRouter ;// TODO: this Getter is a temporary hack. Talk to TS about other ways of accessing the stopFinder
+	TripRouter tripRouter ;
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
 	public EstimatedDrtAccessibilityContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario, TripRouter tripRouter) {
@@ -80,10 +78,14 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 		this.router = new SpeedyALTFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 
-		betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		betaDrtDist_m = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfDistance();
-		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
+		// drt params
+		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		this.betaDrtDist_m = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfDistance();
+
+		// walk params
+		this.walkSpeed_m_h = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
+		this.betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();// todo
 //		this.drtEstimator = new EuclideanDistanceBasedDrtEstimator(scenario.getNetwork(), 1.2, 0.0842928, 337.1288522,  5 * 60, 0, 0, 0);
@@ -97,25 +99,37 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 
-
-
 		LOG.warn("Initializing calculator for mode " + mode + "...");
-		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
-		subNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-		Set<String> modeSet = new HashSet<>();
-		modeSet.add(TransportMode.car);
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		filter.filter(subNetwork, modeSet);
-		if (subNetwork.getNodes().size() == 0) {
-			throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+
+
+		// Prepare measure points
+		aggregatedMeasurePoints = new ConcurrentHashMap<>();
+		Gbl.assertNotNull(measuringPoints);
+		Gbl.assertNotNull(measuringPoints.getFacilities());
+
+		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
+			Id<ActivityFacility> facilityId = measuringPoint.getId();
+			if(!aggregatedMeasurePoints.containsKey(facilityId)) {
+				aggregatedMeasurePoints.put(facilityId, new ArrayList<>());
+			}
+			aggregatedMeasurePoints.get(facilityId).add(measuringPoint);
 		}
-		LOG.warn("sub-network for mode " + modeSet + " now has " + subNetwork.getNodes().size() + " nodes.");
 
-		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
-//		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());
+//		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
+//		subNetwork = NetworkUtils.createNetwork(networkConfigGroup);
+//		Set<String> modeSet = new HashSet<>();
+//		modeSet.add(TransportMode.car);
+//		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+//		filter.filter(subNetwork, modeSet);
+//		if (subNetwork.getNodes().size() == 0) {
+//			throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+//		}
+//		LOG.warn("sub-network for mode " + modeSet + " now has " + subNetwork.getNodes().size() + " nodes.");
+//
+//		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
 
-//		this.aggregatedMeasurePoints = measuringPoints;
-		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, subNetwork, scenario.getConfig());
+
+		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, scenario.getConfig());
 
 
 	}
@@ -123,7 +137,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 	@Override
 	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
-		this.fromNode = subNetwork.getNodes().get(fromNodeId);
+//		this.fromNode = subNetwork.getNodes().get(fromNodeId);
 //		this.lcpt.calculate(subNetwork, fromNode, departureTime);
 
 	}
@@ -132,28 +146,27 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin,
 												   Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+		// initialize sum of utilities
 		double expSum = 0.;
 
-		Optional<Pair<Facility, Facility>> facilities = stopFinder.findFacilities(origin, origin, null); //todo: cleanup
-		Facility nearestStopAccess = facilities.get().getKey();
+		// find closest stop to measuring point.
+		Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
+		Facility nearestStopAccess = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(origin);
 
+		// use walk router to calculate access walk time. Since it is a walk trip, there should only be a single leg.
 		List<? extends PlanElement> planElementsAccess = tripRouter.calcRoute(TransportMode.walk, origin, nearestStopAccess, departureTime, null, null);
-
 		double accessTime_h = ((Leg) planElementsAccess.get(0)).getTravelTime().seconds() / 3600;
-
 		double utility_access = accessTime_h * betaWalkTT_h;
 
-
-		double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
-
-
+		// now we iterate through drt stops, each of which has a set of opportunities connected to it (those which are closest to that stop)
+		// we calculate sum of utilities to travel from the origin drt stop to all drt stops that have at least one opportunity close to it
 		for (AggregationObject destination : aggregatedOpportunities.values()) {
 
-			// Calculate main drt leg:
+			// Calculate utility of main drt leg:
 			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
 
-			// Doesn't work because we need a person... //TODO: replace actual person with a fake person, or find workaround.
-			List<? extends PlanElement> planElementsMain = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, 10 * 3600, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
+			//TODO: replace actual person with a fake person, or find workaround.
+			List<? extends PlanElement> planElementsMain = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
 
 			double directRideDistance_m = ((Leg) planElementsMain.get(2)).getRoute().getDistance();
 
@@ -165,24 +178,29 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m;
 
-
-
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
+			double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
 
-			System.out.println("___________________________________");
-			System.out.println("Measuring Point: " + origin.getId().toString());
-			System.out.println("utility access: " + utility_access + " ----- =" + betaWalkTT_h + " * " + accessTime_h);
-			System.out.println("utility drt (time): " + utilityDrtTime + " ----- =" + betaDrtTT_h + " * " + totalTime_h);
-			System.out.println("utility drt (distance): " + utilityDrtDistance + " ----- =" + betaDrtDist_m + " * " + directRideDistance_m);
-			System.out.println("utility drt (constant): " + utilityDrtConstant);
-			System.out.println("utility egress: " + Math.log(sumExpVjkWalk));
-//			System.out.println("utility egress: (sumExpVjkWalk) exponential of utility, sum over all opportunities near stop: : " + sumExpVjkWalk);
+			double drtUtility = utility_access + utilityDrtTime + utilityDrtDistance + Math.log(sumExpVjkWalk) + utilityDrtConstant;
 
-			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() *
-				(utility_access + utilityDrtTime + utilityDrtDistance + utilityDrtConstant ))
-				* sumExpVjkWalk;
+			// Calculate utility of direct walk
+			// Does this have to be euclidean distance? Couldn't the walk be routed on the network, so that physical boundaries such as rivers would be respected.
+			final Coord toCoord = destination.getNearestBasicLocation().getCoord();
+			double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
+			double directWalkUtility =
+				directDistance_m / walkSpeed_m_h * betaWalkTT_h + // utility based on travel time
+				directDistance_m * betaWalkDist_m + // utility based on travel distance
+				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup); // ASC
+
+			// Utilities for traveling are generally negative (unless there is a high ASC).
+			// We choose walk if it's utility is higher (less negative) than that of DRT
+			double travelUtility = Math.max(directWalkUtility, drtUtility);
+
+			// this is added to the sum of utilities from the measuring point
+			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * travelUtility);
+
 		}
 		return expSum;
 	}
@@ -212,23 +230,20 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	}
 
 
-	public final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestDrtStop(
-		final ActivityFacilities opportunities, Network network, Config config ) {
-		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
-		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
+	private Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestDrtStop(
+		final ActivityFacilities opportunities, Config config ) {
 
-//		double walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
-		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
+		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest drt stop...");
 		Map<Id<? extends BasicLocation>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
 
 		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
 
-			Optional<Pair<Facility, Facility>> facilities = stopFinder.findFacilities(opportunity, opportunity, null);
-			DrtStopFacility nearestStop = (DrtStopFacility) facilities.get().getKey();
+			Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
+			DrtStopFacility nearestStop = (DrtStopFacility) ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
 
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, nearestStop, opportunity, 10 * 3600., null, null);// departure time should matter for walk
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, nearestStop, opportunity, 10 * 3600., null, null);// departure time shouldn't matter for walk
 			double egressTime_s = ((Leg) planElements.get(0)).getTravelTime().seconds();
 
 			double VjkWalkTravelTime = egressTime_s / 3600 * betaWalkTT_h; // a.k.a utility_egress
@@ -237,7 +252,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 
 			// add Vjk to sum
-			AggregationObject jco = opportunityClusterMap.get(nearestStop.getId()); // Why "jco"?
+			AggregationObject jco = opportunityClusterMap.get(nearestStop.getId());
 			if (jco == null) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestStop, 0.);
 				opportunityClusterMap.put(nearestStop.getId(), jco);
@@ -253,7 +268,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 				jco.addObject(opportunity.getId(), expVjk);
 			}
 		}
-		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
+		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " drt stops.");
 		return opportunityClusterMap;
 	}
 }
