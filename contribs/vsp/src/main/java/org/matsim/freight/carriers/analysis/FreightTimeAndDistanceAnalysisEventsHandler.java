@@ -213,7 +213,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		}
 
 		bw1.close();
-		log.info("Output written to " + fileName);
+		log.info("Output written to {}", fileName);
 	}
 
 
@@ -275,6 +275,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		}
 
 		bw1.close();
-		log.info("Output written to " + fileName);
+		log.info("Output written to {}", fileName);
 	}
 }

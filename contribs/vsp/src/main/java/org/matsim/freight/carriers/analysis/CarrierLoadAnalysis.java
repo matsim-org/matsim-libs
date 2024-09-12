@@ -120,6 +120,6 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		}
 
 		bw1.close();
-		log.info("Output written to " + fileName);
+		log.info("Output written to {}", fileName);
 	}
 }
