@@ -74,15 +74,16 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		DrtOptimizationConstraintsSet constraintsSet =
 				constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes)
 						.orElse(drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
-		double maxTravelTime = routeConstraintsCalculator.getMaxTravelTime(constraintsSet, unsharedRideTime);
-		double maxRideDuration = routeConstraintsCalculator.getMaxRideTime(constraintsSet, unsharedRideTime);
+		double maxTravelTime = routeConstraintsCalculator.getMaxTravelTime(constraintsSet, unsharedRideTime, person, tripAttributes);
+		double maxRideDuration = routeConstraintsCalculator.getMaxRideTime(constraintsSet, unsharedRideTime, person, tripAttributes);
+		double maxWaitTime = routeConstraintsCalculator.getMaxWaitTime(constraintsSet, unsharedRideTime, person, tripAttributes);
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
 		route.setMaxRideTime(maxRideDuration);
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(constraintsSet.maxWaitTime);
+		route.setMaxWaitTime(maxWaitTime);
 
 		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);

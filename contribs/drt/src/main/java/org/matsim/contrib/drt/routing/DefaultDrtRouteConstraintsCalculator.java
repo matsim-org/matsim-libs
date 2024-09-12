@@ -1,7 +1,9 @@
 package org.matsim.contrib.drt.routing;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author nkuehnel / MOIA
@@ -16,7 +18,7 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
      * @return maximum travel time
      */
     @Override
-    public double getMaxTravelTime(DrtOptimizationConstraintsSet constraintsSet, double unsharedRideTime) {
+    public double getMaxTravelTime(DrtOptimizationConstraintsSet constraintsSet, double unsharedRideTime, Person person, Attributes attributes) {
         if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultSet) {
             return defaultSet.maxTravelTimeAlpha * unsharedRideTime
                 + defaultSet.maxTravelTimeBeta;
@@ -33,7 +35,7 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
      * @return maximum ride time
      */
     @Override
-    public double getMaxRideTime(DrtOptimizationConstraintsSet constraintsSet, double unsharedRideTime) {
+    public double getMaxRideTime(DrtOptimizationConstraintsSet constraintsSet, double unsharedRideTime, Person person, Attributes attributes) {
         if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultSet) {
             return Math.min(unsharedRideTime + defaultSet.maxAbsoluteDetour,
                     defaultSet.maxDetourAlpha * unsharedRideTime
@@ -42,4 +44,14 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
             throw new IllegalArgumentException("Constraint set is not a default set");
         }
     }
+
+	@Override
+	public double getMaxWaitTime(DrtOptimizationConstraintsSet constraintsSet, double unsharedRideTime, Person person,
+			Attributes tripAttributes) {
+        if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultSet) {
+            return constraintsSet.maxWaitTime;
+        } else {
+            throw new IllegalArgumentException("Constraint set is not a default set");
+        }
+	}
 }
