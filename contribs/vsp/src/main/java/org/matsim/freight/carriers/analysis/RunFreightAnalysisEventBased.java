@@ -87,10 +87,6 @@ public class RunFreightAnalysisEventBased {
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(globFile(SIM_OUTPUT_PATH, "*output_carriersVehicleTypes.*").toString());
 
 		//Were to store the analysis output?
-//		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
-//		if (!analysisOutputDirectory.endsWith("/")) {
-//			analysisOutputDirectory = analysisOutputDirectory + "/";
-//		}
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		folder.mkdirs();
 
