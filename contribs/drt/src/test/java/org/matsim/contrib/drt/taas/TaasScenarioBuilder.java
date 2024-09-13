@@ -21,6 +21,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.prebooking.PassengerRequestBookedEvent;
@@ -30,6 +33,7 @@ import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.drt.taas.TaasDrtRouteCreator.TaasRouteParameters;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
@@ -44,10 +48,12 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
+import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
@@ -57,6 +63,9 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -159,6 +168,21 @@ public class TaasScenarioBuilder {
 		return this;
 	}
 
+	double passengerMaxWaitTime = 300.0;
+	double passengerMaxDelay = 600.0;
+	double parcelLatestDeliveryTime = 20.0 * 3600.0;
+
+	public TaasScenarioBuilder setPassengerParameters(double maxWaitTime, double maxDelay) {
+		this.passengerMaxWaitTime = maxWaitTime;
+		this.passengerMaxDelay = maxDelay;
+		return this;
+	}
+
+	public TaasScenarioBuilder setParcelParameters(double latestDeliveryTime) {
+		this.parcelLatestDeliveryTime = latestDeliveryTime;
+		return this;
+	}
+
 	private void prepareService(Controler controller) {
 		FleetSpecificationImpl fleet = new FleetSpecificationImpl();
 
@@ -184,21 +208,30 @@ public class TaasScenarioBuilder {
 			@Override
 			public void install() {
 				bindModal(FleetSpecification.class).toInstance(fleet);
+
+				bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(modalProvider(getter -> {
+					DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(getConfig());
+
+					return new TaasDrtRouteCreator(drtCfg, getter.getModal(Network.class), new SpeedyALTFactory(),
+							getter.getModal(TravelTime.class), getter.getModal(TravelDisutilityFactory.class),
+							new TaasRouteParameters(passengerMaxWaitTime, passengerMaxDelay, parcelLatestDeliveryTime));
+				}));
 			}
 		});
 	}
 
 	// DEMAND PART
 
-	record DemandItem(String identifer, double departureTime, int originX, int originY, int destinationX,
-			int destinationY) {
+	record DemandItem(String requestType, String identifer, double departureTime, int originX, int originY,
+			int destinationX, int destinationY) {
 	}
 
 	private List<DemandItem> demand = new LinkedList<>();
 
-	public TaasScenarioBuilder addDemand(String identifier, double departureTime, int originX, int originY,
-			int destinationX, int destinationY) {
-		demand.add(new DemandItem(identifier, departureTime, originX, originY, destinationX, destinationY));
+	public TaasScenarioBuilder addDemand(String requestType, String identifier, double departureTime, int originX,
+			int originY, int destinationX, int destinationY) {
+		demand.add(
+				new DemandItem(requestType, identifier, departureTime, originX, originY, destinationX, destinationY));
 		return this;
 	}
 
@@ -217,6 +250,7 @@ public class TaasScenarioBuilder {
 					"Invalid destination for demand " + item.identifer);
 
 			Person person = populationFactory.createPerson(Id.createPersonId(item.identifer));
+			person.getAttributes().putAttribute(TaasDrtRouteCreator.REQUEST_TYPE, item.requestType);
 			population.addPerson(person);
 
 			Plan plan = populationFactory.createPlan();
@@ -278,6 +312,12 @@ public class TaasScenarioBuilder {
 		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
 		config.addModule(dvrpConfig);
 
+		SquareGridZoneSystemParams zoneSystemParams = new SquareGridZoneSystemParams();
+		zoneSystemParams.cellSize = 100.0;
+
+		DvrpTravelTimeMatrixParams matrixParams = DvrpConfigGroup.get(config).getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(zoneSystemParams);
+
 		MultiModeDrtConfigGroup multiModeDrtConfig = new MultiModeDrtConfigGroup();
 		config.addModule(multiModeDrtConfig);
 
@@ -289,6 +329,16 @@ public class TaasScenarioBuilder {
 
 		DrtInsertionSearchParams insertionParams = new ExtensiveInsertionSearchParams();
 		drtConfig.addParameterSet(insertionParams);
+
+		DrtOptimizationConstraintsParams constraintsContainer = new DrtOptimizationConstraintsParams();
+		drtConfig.addParameterSet(constraintsContainer);
+
+		DefaultDrtOptimizationConstraintsSet constraints = new DefaultDrtOptimizationConstraintsSet();
+		constraints.name = "default";
+		constraints.maxWaitTime = 300.0;
+		constraints.maxTravelTimeBeta = 1.0;
+		constraints.maxTravelTimeAlpha = 600.0;
+		constraintsContainer.addParameterSet(constraints);
 
 		return config;
 	}
