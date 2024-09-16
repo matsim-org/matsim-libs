@@ -102,6 +102,9 @@ public final class ConfigReader extends MatsimXmlParser {
 		}
 		else if ( CONFIG_V2.equals( doctype ) ) {
 			this.delegate = new ConfigReaderMatsimV2( this.config );
+			config.global().setInsistingOnDeprecatedConfigVersion(false);
+			// Currently, V2 is the current version.
+			// IMO: The default should be "false". -> Change in {@link GlobalConfigGroup}.  kmt, Aug'24
 			log.info( "using config_v2-reader" );
 		}
 		else {
