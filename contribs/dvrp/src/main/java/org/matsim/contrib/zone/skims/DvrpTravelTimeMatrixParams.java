@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.zone.skims;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
@@ -55,6 +56,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
 	@PositiveOrZero
 	public double maxNeighborTravelTime = 0; //[s]
+	@NotNull
 	private ZoneSystemParams zoneSystemParams;
 
 
@@ -101,6 +103,11 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 	}
 
 	public ZoneSystemParams getZoneSystemParams() {
+		if(this.zoneSystemParams == null) {
+			SquareGridZoneSystemParams squareGridZoneSystemParams = new SquareGridZoneSystemParams();
+			squareGridZoneSystemParams.cellSize = 200;
+			this.zoneSystemParams = squareGridZoneSystemParams;
+		}
 		return zoneSystemParams;
 	}
 }
