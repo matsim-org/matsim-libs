@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  * <p>
  * This class allows to implicitly apply penalties to plans by changing the duration of the egress walk after car interactions.
  * By construction this only works for plans involving car trips and can not be used if you want to penalize all plans that
- * fulfill a certain condition.
+ * fulfill a certain condition. <b>Note that if you bind this, you should also bind the return value of {@link #getBackChanger()}!</b>
  * </p>
  * <p>
  * More precisely, the class will... </br> 
@@ -49,13 +49,14 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  * @author tkohl / Senozon
  *
  */
-class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener {
+class CarEgressWalkChanger implements BeforeMobsimListener {
 	
 	public static final String PENALTY_ATTRIBUTE = "parkingPenalty";
 	
 	private final CarEgressWalkObserver observer;
 	private final AccessEgressFinder egressFinder = new AccessEgressFinder(TransportMode.car);
 	private final Iter0Method iter0Method;
+	private final CarEgressWalkBackChanger backChanger;
 	
 	/**
 	 * Sets the class up with the specified {@linkplain PenaltyGenerator} and {@linkplain PenaltyFunction}.
@@ -66,6 +67,21 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, CarEgressWalkObserver observer, Iter0Method iter0Method) {
 		this.observer = observer;
 		this.iter0Method = iter0Method;
+		this.backChanger = new CarEgressWalkBackChanger(this);
+	}
+	
+	@Override
+	public double priority() { //we want this to happen very late, because it should only affect the mobsim, not other listeners
+		return -1001;
+	}
+	
+	/**
+	 * Returns the class that changes the egress walks bag in AfterMobsim. Note that you need to bind this separately!
+	 * 
+	 * @return the {@linkplain CarEgressWalkBackChanger} to this class
+	 */
+	public CarEgressWalkBackChanger getBackChanger() {
+		return this.backChanger;
 	}
 
 	/**
@@ -93,33 +109,6 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), false);
 		}
 	}
-	
-	/**
-	 * resets egress times before scoring / replanning
-	 */
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// we need to roll back the changes we made before the mobsim, otherwise we can't apply
-		// a different penalty next iteration.
-		if (event.getIteration() == 0) {
-			switch (this.iter0Method) {
-			case noPenalty:
-			case hourPenalty:
-			case estimateFromPlans:
-				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
-				break;
-			case takeFromAttributes:
-				this.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), true);
-				break;
-			default:
-				throw new RuntimeException("Unknown iter0 mode");
-			}
-		} else {
-			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
-		}
-		// yyyy this is something we do not like: to just "fake" something and take it back afterwards.  Would be good to find some other design
-		// eventually.  Not so obvious, though ...   kai, mar'20
-	}
 
 	/**
 	 * Changes the egress times of all agents using cars according to the penalty for the corresponding space-time-gridcell and writes the penalty
@@ -130,12 +119,13 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 	 * by that time (calling this method twice, first with {@code false}, then with {@code true} should yield the original plans)
 	 */
 	private void changeEgressTimesByGridcell(Collection<? extends Person> population, boolean reverse) {
-		int sign = reverse ? -1 : 1;
 		for (Person p : population) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
-				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
-				setTimes(walkActPair, penalty);
-				if (!reverse) {
+				double penalty = Math.round(this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord()));
+				if (reverse) {
+					setTimes(walkActPair, -penalty);
+				} else {
+					setTimes(walkActPair, penalty);
 					walkActPair.leg.getAttributes().putAttribute(PENALTY_ATTRIBUTE, penalty);
 				}
 			}
@@ -170,5 +160,51 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime().seconds() + penalty);
 		walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime().seconds() + penalty);
 		walkActPair.act.setStartTime(walkActPair.act.getStartTime().seconds() + penalty);
+	}
+	
+	/**
+	 * The reverse to {@linkplain CarEgressWalkChanger}
+	 * 
+	 * @author tkohl
+	 *
+	 */
+	static class CarEgressWalkBackChanger implements AfterMobsimListener {
+		private final CarEgressWalkChanger forwardChanger;
+		
+		CarEgressWalkBackChanger(CarEgressWalkChanger forwardChanger) {
+			this.forwardChanger = forwardChanger;
+		}
+		
+		@Override
+		public double priority() { //we want this to happen very early to undo what we did before the mobsim before other listeners can pick it up
+			return 1001;
+		}
+		
+		/**
+		 * resets egress times before scoring / replanning
+		 */
+		@Override
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
+			// we need to roll back the changes we made before the mobsim, otherwise we can't apply
+			// a different penalty next iteration.
+			if (event.getIteration() == 0) {
+				switch (forwardChanger.iter0Method) {
+				case noPenalty:
+				case hourPenalty:
+				case estimateFromPlans:
+					forwardChanger.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+					break;
+				case takeFromAttributes:
+					forwardChanger.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+					break;
+				default:
+					throw new RuntimeException("Unknown iter0 mode");
+				}
+			} else {
+				forwardChanger.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+			}
+			// yyyy this is something we do not like: to just "fake" something and take it back afterwards.  Would be good to find some other design
+			// eventually.  Not so obvious, though ...   kai, mar'20
+		}
 	}
 }

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -40,6 +41,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  * @author Kai Nagel
+ * @author Sebastian Hörl, IRT SystemX
  */
 public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final DrtConfigGroup drtCfg;
@@ -48,16 +50,13 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 
 	private final DrtRouteConstraintsCalculator routeConstraintsCalculator;
 
-	private final ConstraintSetChooser constraintSetChooser;
-
 	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork,
                            LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TravelTime travelTime,
                            TravelDisutilityFactory travelDisutilityFactory,
-                           DrtRouteConstraintsCalculator routeConstraintsCalculator, ConstraintSetChooser constraintSetChooser) {
+                           DrtRouteConstraintsCalculator routeConstraintsCalculator) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
         this.routeConstraintsCalculator = routeConstraintsCalculator;
-        this.constraintSetChooser = constraintSetChooser;
         router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
@@ -71,18 +70,15 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
-		DrtOptimizationConstraintsSet constraintsSet =
-				constraintSetChooser.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes)
-						.orElse(drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
-		double maxTravelTime = routeConstraintsCalculator.getMaxTravelTime(constraintsSet, unsharedRideTime);
-		double maxRideDuration = routeConstraintsCalculator.getMaxRideTime(constraintsSet, unsharedRideTime);
+		DrtRouteConstraints constraints = routeConstraintsCalculator.calculateRouteConstraints(departureTime, accessActLink, egressActLink, person,
+				tripAttributes, unsharedRideTime, unsharedDistance);
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
-		route.setTravelTime(maxTravelTime);
-		route.setMaxRideTime(maxRideDuration);
+		route.setTravelTime(constraints.maxTravelTime());
+		route.setMaxRideTime(constraints.maxRideTime());
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(constraintsSet.maxWaitTime);
+		route.setMaxWaitTime(constraints.maxWaitTime());
 
 		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);
