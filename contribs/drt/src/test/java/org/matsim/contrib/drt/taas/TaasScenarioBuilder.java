@@ -28,12 +28,12 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.prebooking.PassengerRequestBookedEvent;
 import org.matsim.contrib.drt.prebooking.PassengerRequestBookedEventHandler;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.drt.taas.TaasDrtRouteCreator.TaasRouteParameters;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
@@ -48,7 +48,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
-import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -63,9 +62,6 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -183,7 +179,7 @@ public class TaasScenarioBuilder {
 		return this;
 	}
 
-	private void prepareService(Controler controller) {
+	private TaasServiceModule prepareService(Controler controller) {
 		FleetSpecificationImpl fleet = new FleetSpecificationImpl();
 
 		for (VehicleItem item : vehicles) {
@@ -208,16 +204,12 @@ public class TaasScenarioBuilder {
 			@Override
 			public void install() {
 				bindModal(FleetSpecification.class).toInstance(fleet);
-
-				bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(modalProvider(getter -> {
-					DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(getConfig());
-
-					return new TaasDrtRouteCreator(drtCfg, getter.getModal(Network.class), new SpeedyALTFactory(),
-							getter.getModal(TravelTime.class), getter.getModal(TravelDisutilityFactory.class),
-							new TaasRouteParameters(passengerMaxWaitTime, passengerMaxDelay, parcelLatestDeliveryTime));
-				}));
 			}
 		});
+
+		TaasServiceModule serviceModule = new TaasServiceModule(mode);
+		controller.addOverridingModule(serviceModule);
+		return serviceModule;
 	}
 
 	// DEMAND PART
@@ -340,6 +332,9 @@ public class TaasScenarioBuilder {
 		constraints.maxTravelTimeAlpha = 600.0;
 		constraintsContainer.addParameterSet(constraints);
 
+		PrebookingParams prebookingParams = new PrebookingParams();
+		drtConfig.addParameterSet(prebookingParams);
+
 		return config;
 	}
 
@@ -367,15 +362,15 @@ public class TaasScenarioBuilder {
 		Scenario scenario = prepareScenario(config);
 		Controler controller = prepareController(scenario);
 
-		prepareService(controller);
+		TaasServiceModule service = prepareService(controller);
 		Tracker tracker = prepareTracker(controller);
 
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		return new TestScenario(config, scenario, controller, tracker, drtConfig);
+		return new TestScenario(config, scenario, controller, tracker, drtConfig, service);
 	}
 
 	public record TestScenario(Config config, Scenario scenario, Controler controller, Tracker tracker,
-			DrtConfigGroup drt) {
+			DrtConfigGroup drt, TaasServiceModule service) {
 	}
 
 	private Tracker prepareTracker(Controler controller) {
