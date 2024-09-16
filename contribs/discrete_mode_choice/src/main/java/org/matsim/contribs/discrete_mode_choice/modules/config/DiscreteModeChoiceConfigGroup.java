@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.validation.constraints.Positive;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.FallbackBehaviour;
 import org.matsim.contribs.discrete_mode_choice.modules.ConstraintModule;
@@ -27,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Main config group for the DiscreteModeChoice extension.
- * 
+ *
  * @author sebhoerl
  */
 public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
@@ -53,7 +54,8 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private Collection<String> tripFilters = new HashSet<>();
 
 	private Collection<String> cachedModes = new HashSet<>();
-
+	@Positive
+	private int writeUtilitiesInterval = 1;
 	public static final String GROUP_NAME = "DiscreteModeChoice";
 
 	public static final String PERFORM_REROUTE = "performReroute";
@@ -109,6 +111,9 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String CACHED_MODES = "cachedModes";
 	public static final String CACHED_MODES_CMT = "Trips tested with the modes listed here will be cached for each combination of trip and agent during one replanning pass.";
+
+	public static final String WRITE_UTILITIES_INTERVAL = "writeUtilitiesInterval";
+	public static final String WRITE_UTILITIES_INTERVAL_CMT = "Specifies the interval, in iterations, at which the dmc_utilities.csv file is written. If set to 0, the file is written only at the end of the simulation";
 
 	public DiscreteModeChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -434,6 +439,22 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(CACHED_MODES)
 	public String getCachedModesAsString() {
 		return String.join(", ", cachedModes);
+	}
+
+	/**
+	 * @param writeUtilitiesInterval -- {@value #WRITE_UTILITIES_INTERVAL_CMT}
+	 */
+	@StringSetter(WRITE_UTILITIES_INTERVAL)
+	public void setWriteUtilitiesInterval(int writeUtilitiesInterval) {
+		this.writeUtilitiesInterval = writeUtilitiesInterval;
+	}
+
+	/**
+	 * @return -- {@value #WRITE_UTILITIES_INTERVAL_CMT}
+	 */
+	@StringGetter(WRITE_UTILITIES_INTERVAL)
+	public int getWriteUtilitiesInterval() {
+		return this.writeUtilitiesInterval;
 	}
 
 	// --- Component configuration ---
