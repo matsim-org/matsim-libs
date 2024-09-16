@@ -85,6 +85,10 @@ public class TripAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--shp-filter", description = "Define how the shp file filtering should work", defaultValue = "home")
 	private LocationFilter filter;
 
+	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
+		"The attribute needs to be contained by output_persons.csv", split = ",")
+	private Map<String, String> personFilters = new HashMap<>();
+
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
@@ -144,6 +148,30 @@ public class TripAnalysis implements MATSimAppCommand {
 		if (matchId != null) {
 			log.info("Using id filter {}", matchId);
 			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
+		}
+
+//		filter persons according to person (attribute) filter
+		if (!personFilters.isEmpty()) {
+			IntList filteredRowIds = new IntArrayList();
+			for (Map.Entry<String, String> entry : personFilters.entrySet()) {
+				if (!persons.containsColumn(entry.getKey())) {
+					log.warn("Persons table does not contain column for filter attribute {}. Filter on {} will not be applied.", entry.getKey(), entry.getValue());
+					continue;
+				}
+				log.info("Using person filter for attribute {} and value {}", entry.getKey(), entry.getValue());
+
+				for (int i = 0; i < persons.rowCount(); i++) {
+					Row row = persons.row(i);
+					String value = row.getString(entry.getKey());
+//					only add value once
+					if (value.equals(entry.getValue()) && !filteredRowIds.contains(i)) {
+						filteredRowIds.add(i);
+					}
+				}
+			}
+//			TODO: persons are not filtered correctly here. find reason for that
+			persons.where(Selection.with(filteredRowIds.toIntArray()));
+			persons.write().csv("C:/Users/Simon/Desktop/wd/2024-09-16/persons-filter.csv");
 		}
 
 		// Home filter by standard attribute
