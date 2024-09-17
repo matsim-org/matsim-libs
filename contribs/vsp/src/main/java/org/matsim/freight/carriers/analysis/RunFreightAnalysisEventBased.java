@@ -36,6 +36,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.matsim.application.ApplicationUtils.globFile;
 
 
 /**
@@ -53,16 +56,16 @@ public class RunFreightAnalysisEventBased {
 	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventBased.class);
 
 	//Were is your simulation output, that should be analysed?
-	private final String SIM_OUTPUT_PATH ;
-	private final String ANALYSIS_OUTPUT_PATH;
+	private final Path SIM_OUTPUT_PATH ;
+	private final Path ANALYSIS_OUTPUT_PATH;
 	private final String GLOBAL_CRS;
 
 	/**
-	 * @param simOutputPath      The output directory of the simulation run
-	 * @param analysisOutputPath The directory where the result of the analysis should go to
-	 * @param globalCrs
+	 * @param simOutputPath      	The output directory of the simulation run
+	 * @param analysisOutputPath 	The directory where the result of the analysis should go to
+	 * @param globalCrs				The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(String simOutputPath, String analysisOutputPath, String globalCrs) {
+	public RunFreightAnalysisEventBased(Path simOutputPath, Path analysisOutputPath, String globalCrs) {
 		this.SIM_OUTPUT_PATH = simOutputPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 		this.GLOBAL_CRS = globalCrs;
@@ -71,8 +74,8 @@ public class RunFreightAnalysisEventBased {
 	public void runAnalysis() throws IOException {
 
 		Config config = ConfigUtils.createConfig();
-		config.vehicles().setVehiclesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
-		config.network().setInputFile(SIM_OUTPUT_PATH + "output_network.xml.gz");
+		config.vehicles().setVehiclesFile(globFile(SIM_OUTPUT_PATH, "*output_allVehicles.*").toString());
+		config.network().setInputFile(globFile(SIM_OUTPUT_PATH, "*output_network.*").toString());
 		config.global().setCoordinateSystem(GLOBAL_CRS);
 		config.plans().setInputFile(null);
 		config.eventsManager().setNumberOfThreads(null);
@@ -80,18 +83,14 @@ public class RunFreightAnalysisEventBased {
 		config.global().setNumberOfThreads(1);
 		//freight settings
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
-		freightCarriersConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_carriersVehicleTypes.xml.gz");
+		freightCarriersConfigGroup.setCarriersFile(globFile(SIM_OUTPUT_PATH, "*output_carriers.*").toString());
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(globFile(SIM_OUTPUT_PATH, "*output_carriersVehicleTypes.*").toString());
 
 		//Were to store the analysis output?
-		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;
-		if (!analysisOutputDirectory.endsWith("/")) {
-			analysisOutputDirectory = analysisOutputDirectory + "/";
-		}
-		File folder = new File(analysisOutputDirectory);
+		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		folder.mkdirs();
 
-		final String eventsFile = SIM_OUTPUT_PATH + "output_events.xml.gz";
+		final String eventsFile = globFile(SIM_OUTPUT_PATH, "*output_events.*").toString();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -101,7 +100,7 @@ public class RunFreightAnalysisEventBased {
 
 		// CarrierPlanAnalysis
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(CarriersUtils.getCarriers(scenario));
-		carrierPlanAnalysis.runAnalysisAndWriteStats(analysisOutputDirectory);
+		carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
 
 		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -120,9 +119,9 @@ public class RunFreightAnalysisEventBased {
 
 		log.info("Analysis completed.");
 		log.info("Writing output...");
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(analysisOutputDirectory, scenario);
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
-		carrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
+		carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
 	}
 
 }
