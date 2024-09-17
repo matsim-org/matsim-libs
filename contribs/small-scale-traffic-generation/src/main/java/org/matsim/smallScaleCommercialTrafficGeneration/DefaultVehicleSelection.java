@@ -34,7 +34,6 @@ public class DefaultVehicleSelection implements VehicleSelection{
 	private final static Random rnd = MatsimRandom.getRandom();
 
 	//Needed for this computation
-	Map<Id<Carrier>, DefaultVehicleAvailabilityAllocator> carrierId2vehicleAvailabilityScheduler = new HashMap<>();
 	GetCommercialTourSpecifications getCommercialTourSpecifications;
 	Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone;
 	TripDistributionMatrix odMatrix;
@@ -266,16 +265,12 @@ public class DefaultVehicleSelection implements VehicleSelection{
 		String stopZone = serviceArea[0];
 
 		for (int i = 0; i < numberOfJobs; i++) {
-			//Allocate the vehicleTime. If there is not enough vehicle time, then reduce the service duration to a viable value
-			int serviceDuration = carrierId2vehicleAvailabilityScheduler.get(Id.create(carrierName, Carrier.class)).makeServiceDurationViable(serviceTimePerStop);
-			carrierId2vehicleAvailabilityScheduler.get(Id.create(carrierName, Carrier.class)).scheduleServiceDuration(serviceDuration);
-
 			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 			Id<CarrierService> idNewService = Id.create(carrierName + "_" + linkId + "_" + rnd.nextInt(10000),
 				CarrierService.class);
 
 			CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
-				.setServiceDuration(serviceDuration).setServiceStartTimeWindow(serviceTimeWindow).build();
+				.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
 			CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class)).getServices()
 				.put(thisService.getId(), thisService);
 		}
@@ -321,7 +316,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 			vehicleDepots.add(linkId.toString());
 		}
 
-		List<Integer> availableVehicles = new LinkedList<>();
+		List<Double> availableVehicles = new LinkedList<>();
 
 		for (String singleDepot : vehicleDepots) {
 			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourStartTimeSelector.sample();
@@ -343,15 +338,13 @@ public class DefaultVehicleSelection implements VehicleSelection{
 								Vehicle.class),
 							Id.createLinkId(singleDepot), thisType)
 						.setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
-					availableVehicles.add(tourDuration);
+					availableVehicles.add((double) (tourDuration));
 					carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
 					if (!carrierCapabilities.getVehicleTypes().contains(thisType))
 						carrierCapabilities.getVehicleTypes().add(thisType);
 				}
 			}
 
-			if(carrierId2vehicleAvailabilityScheduler.containsKey(Id.create(carrierName, Carrier.class))) log.warn("It looks like {} was created twice. This should not happen!", carrierName);
-			carrierId2vehicleAvailabilityScheduler.put(Id.create(carrierName, Carrier.class), new DefaultVehicleAvailabilityAllocator(availableVehicles));
 			thisCarrier.setCarrierCapabilities(carrierCapabilities);
 		}
 	}
