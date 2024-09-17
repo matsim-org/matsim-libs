@@ -759,84 +759,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 
 					if (isStartingLocation) {
-						double occupancyRate = 0;
-						String[] possibleVehicleTypes = null;
-						ArrayList<String> startCategory = new ArrayList<>();
-						ArrayList<String> stopCategory = new ArrayList<>();
-						stopCategory.add("Employee Primary Sector");
-						stopCategory.add("Employee Construction");
-						stopCategory.add("Employee Secondary Sector Rest");
-						stopCategory.add("Employee Retail");
-						stopCategory.add("Employee Traffic/Parcels");
-						stopCategory.add("Employee Tertiary Sector Rest");
-						stopCategory.add("Inhabitants");
-						if (purpose == 1) {
-							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
-								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-								occupancyRate = 1.5;
-							}
-							startCategory.add("Employee Secondary Sector Rest");
-							stopCategory.clear();
-							stopCategory.add("Employee Secondary Sector Rest");
-						} else if (purpose == 2) {
-							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
-								possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
-								occupancyRate = 1.6;
-							}
-							startCategory.add("Employee Secondary Sector Rest");
-						} else if (purpose == 3) {
-							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
-								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
-								occupancyRate = 1.2;
-							}
-							startCategory.add("Employee Retail");
-							startCategory.add("Employee Tertiary Sector Rest");
-						} else if (purpose == 4) {
-							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
-								possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
-								occupancyRate = 1.2;
-							}
-							startCategory.add("Employee Traffic/Parcels");
-						} else if (purpose == 5) {
-							if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
-								possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
-								occupancyRate = 1.7;
-							}
-							startCategory.add("Employee Construction");
-						} else if (purpose == 6) {
-							startCategory.add("Inhabitants");
-						}
-						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
-							occupancyRate = 1.;
-							switch (modeORvehType) {
-								case "vehTyp1" ->
-									possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"}; // possible to add more types, see source
-								case "vehTyp2" ->
-									possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
-								case "vehTyp3", "vehTyp4" ->
-									possibleVehicleTypes = new String[]{"light8t", "light8t_electro"};
-								case "vehTyp5" ->
-									possibleVehicleTypes = new String[]{"medium18t", "medium18t_electro", "heavy40t", "heavy40t_electro"};
-							}
-						}
+						VehicleSelection.OdMatrixEntryInformation information = vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
-						assert possibleVehicleTypes != null;
+						assert information.possibleVehicleTypes != null;
 
-						for (String possibleVehicleType : possibleVehicleTypes) {
+						for (String possibleVehicleType : information.possibleVehicleTypes) {
 							if (CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
 								Id.create(possibleVehicleType, VehicleType.class)))
 								vehicleTypes.add(possibleVehicleType);
 						}
 						// find a start category with existing employees in this zone
-						Collections.shuffle(startCategory, rnd);
-						String selectedStartCategory = startCategory.getFirst();
+						Collections.shuffle(information.startCategory, rnd);
+						String selectedStartCategory = information.startCategory.getFirst();
 						for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
-							if (count <= startCategory.size())
-								selectedStartCategory = startCategory.get(rnd.nextInt(startCategory.size()));
+							if (count <= information.startCategory.size())
+								selectedStartCategory = information.startCategory.get(rnd.nextInt(information.startCategory.size()));
 							else
-								selectedStartCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+								selectedStartCategory = information.stopCategory.get(rnd.nextInt(information.stopCategory.size()));
 						}
 						String carrierName = null;
 						if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
@@ -851,7 +792,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						log.info("Create carrier number {} of a maximum Number of {} carriers.", createdCarrier, maxNumberOfCarrier);
 						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots,
 							(int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
-								purpose, smallScaleCommercialTrafficType) / occupancyRate));
+								purpose, smallScaleCommercialTrafficType) / information.occupancyRate));
 						createNewCarrierAndAddVehicleTypes(scenario, purpose, startZone,
 							selectedStartCategory, carrierName, vehicleTypes, numberOfDepots, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation, vehicleDepots, linksPerZone, smallScaleCommercialTrafficType,
@@ -860,17 +801,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						for (String stopZone : odMatrix.getListOfZones()) {
 							int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(startZone,
 								stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
-							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / occupancyRate);
+							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / information.occupancyRate);
 							if (numberOfJobs == 0)
 								continue;
 							// find a category for the tour stop with existing employees in this zone
-							String selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+							String selectedStopCategory = information.stopCategory.get(rnd.nextInt(information.stopCategory.size()));
 							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-								selectedStopCategory = stopCategory.get(rnd.nextInt(stopCategory.size()));
+								selectedStopCategory = information.stopCategory.get(rnd.nextInt(information.stopCategory.size()));
 							String[] serviceArea = new String[]{stopZone};
 							int serviceTimePerStop;
 							if (selectedStartCategory.equals("Inhabitants"))
-								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, startCategory.getFirst(), modeORvehType, smallScaleCommercialTrafficType);
+								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, information.startCategory.getFirst(), modeORvehType, smallScaleCommercialTrafficType);
 							else
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
 
@@ -967,8 +908,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			vehicleDepots.add(linkId.toString());
 		}
 
-		List<Double> availableVehicles = new LinkedList<>();
-
 		for (String singleDepot : vehicleDepots) {
 			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourStartTimeSelector.sample();
 
@@ -989,7 +928,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								Vehicle.class),
 							Id.createLinkId(singleDepot), thisType)
 						.setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
-					availableVehicles.add((double) (tourDuration));
 					carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
 					if (!carrierCapabilities.getVehicleTypes().contains(thisType))
 						carrierCapabilities.getVehicleTypes().add(thisType);
