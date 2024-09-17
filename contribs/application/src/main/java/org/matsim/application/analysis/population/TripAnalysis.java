@@ -154,7 +154,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 //		filter persons according to person (attribute) filter
 		if (!personFilters.isEmpty()) {
-			IntSet generalFilteredRowIds = new IntOpenHashSet();
+			IntSet generalFilteredRowIds = null;
 			for (Map.Entry<String, String> entry : personFilters.entrySet()) {
 				if (!persons.containsColumn(entry.getKey())) {
 					log.warn("Persons table does not contain column for filter attribute {}. Filter on {} will not be applied.", entry.getKey(), entry.getValue());
@@ -173,15 +173,18 @@ public class TripAnalysis implements MATSimAppCommand {
 					}
 				}
 
-				if (generalFilteredRowIds.isEmpty()) {
+				if (generalFilteredRowIds == null) {
 					// If generalFilteredRowIds is empty, add all elements from filteredRowIds to generalFilteredRowIds
-					generalFilteredRowIds.addAll(filteredRowIds);
+					generalFilteredRowIds = filteredRowIds;
 				} else {
 					// If generalFilteredRowIds is not empty, retain only the elements that are also in filteredRowIds
 					generalFilteredRowIds.retainAll(filteredRowIds);
 				}
 			}
-			persons = persons.where(Selection.with(generalFilteredRowIds.intStream().toArray()));
+
+			if (generalFilteredRowIds != null) {
+				persons = persons.where(Selection.with(generalFilteredRowIds.intStream().toArray()));
+			}
 		}
 
 		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
