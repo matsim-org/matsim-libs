@@ -1,5 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -16,6 +19,8 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -32,6 +37,8 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -60,11 +67,115 @@ public class RunPrebookingShiftDrtScenarioIT {
 
 
     @Test
-    void test() {
+    void testWithReattempts() {
 
         MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
-
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
+
+        Multiset<Id<Person>> submittedPersons = HashMultiset.create();
+        Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
+        Multiset<Id<Person>> rejectedPersons = HashMultiset.create();
+
+        run.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addEventHandlerBinding().toInstance((PassengerRequestSubmittedEventHandler) event -> submittedPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestScheduledEventHandler) event -> scheduledPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestRejectedEventHandler) event -> rejectedPersons.addAll(event.getPersonIds()));
+            }
+        });
+
+        PrebookingParams prebookingParams = new PrebookingParams();
+        prebookingParams.maximumPassengerDelay = 600;
+        prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
+        prebookingParams.scheduleWaitBeforeDrive = true;
+        prebookingParams.abortRejectedPrebookings = false;
+        drtWithShiftsConfigGroup.addParameterSet(prebookingParams);
+
+        run.addOverridingQSimModule(new PrebookingModeQSimModule(drtWithShiftsConfigGroup.getMode(),
+                prebookingParams));
+
+        run.run();
+
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(2, rejectedPersons.count(Id.createPersonId(6)));
+    }
+
+    @Test
+    void testWithoutReattempts() {
+
+        MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
+        DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
+
+        Multiset<Id<Person>> submittedPersons = HashMultiset.create();
+        Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
+        Multiset<Id<Person>> rejectedPersons = HashMultiset.create();
+
+        run.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addEventHandlerBinding().toInstance((PassengerRequestSubmittedEventHandler) event -> submittedPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestScheduledEventHandler) event -> scheduledPersons.addAll(event.getPersonIds()));
+                addEventHandlerBinding().toInstance((PassengerRequestRejectedEventHandler) event -> rejectedPersons.addAll(event.getPersonIds()));
+            }
+        });
+
+        PrebookingParams prebookingParams = new PrebookingParams();
+        prebookingParams.maximumPassengerDelay = 600;
+        prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
+        prebookingParams.scheduleWaitBeforeDrive = true;
+        prebookingParams.abortRejectedPrebookings = true;
+        drtWithShiftsConfigGroup.addParameterSet(prebookingParams);
+
+        run.addOverridingQSimModule(new PrebookingModeQSimModule(drtWithShiftsConfigGroup.getMode(),
+                prebookingParams));
+
+        run.run();
+
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(6)));
+    }
+
+    @NotNull
+    private Controler prepare(DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup, MultiModeDrtConfigGroup multiModeDrtConfigGroup) {
         drtWithShiftsConfigGroup.mode = TransportMode.drt;
         DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
                 (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
@@ -146,11 +257,6 @@ public class RunPrebookingShiftDrtScenarioIT {
         shiftsParams.shiftEndLookAhead = 900.;
         drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-        PrebookingParams prebookingParams = new PrebookingParams();
-        prebookingParams.maximumPassengerDelay = 600;
-        prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
-        prebookingParams.scheduleWaitBeforeDrive = true;
-        drtWithShiftsConfigGroup.addParameterSet(prebookingParams);
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
         prepareNetwork(scenario);
@@ -159,27 +265,9 @@ public class RunPrebookingShiftDrtScenarioIT {
         final Controler run = DrtOperationsControlerCreator.createControler(config, scenario, false);
         prepareOperations(run, drtWithShiftsConfigGroup);
 
-        run.addOverridingQSimModule(new PrebookingModeQSimModule(drtWithShiftsConfigGroup.getMode(),
-                prebookingParams));
+
         AttributeBasedPrebookingLogic.install(run, drtWithShiftsConfigGroup);
-
-        Set<Id<Person>> rejectedPersons = new HashSet<>();
-        run.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addEventHandlerBinding().toInstance((PassengerRequestRejectedEventHandler) event -> rejectedPersons.addAll(event.getPersonIds()));
-            }
-        });
-
-        run.run();
-
-
-        Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(1)));
-        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(2)));
-        Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(3)));
-        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(4)));
-        Assertions.assertFalse(rejectedPersons.contains(Id.createPersonId(5)));
-        Assertions.assertTrue(rejectedPersons.contains(Id.createPersonId(6)));
+        return run;
     }
 
     private void preparePopulation(Scenario scenario) {
@@ -208,7 +296,7 @@ public class RunPrebookingShiftDrtScenarioIT {
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(5000);
             start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 900.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5000.);
+            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5005.);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -311,7 +399,7 @@ public class RunPrebookingShiftDrtScenarioIT {
             public void install() {
                 bindModal(FleetSpecification.class).toInstance(fleetSpecification);
                 bindModal(OperationFacilitiesSpecification.class).toInstance(opFasSpecification);
-                bindModal(DrtShiftsSpecification.class).toInstance(shiftsSpecification);
+                bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(shiftsSpecification)));
             }
         });
 

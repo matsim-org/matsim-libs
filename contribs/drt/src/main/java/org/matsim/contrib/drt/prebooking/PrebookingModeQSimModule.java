@@ -59,7 +59,7 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
 
 			return new PrebookingManager(getMode(), network, requestCreator, optimizer, mobsimTimer, requestValidator,
-					eventsManager, requestUnscheduler);
+					eventsManager, requestUnscheduler, prebookingParams.abortRejectedPrebookings);
 		})).in(Singleton.class);
 		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
 

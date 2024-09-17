@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.GridZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
@@ -65,6 +66,10 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
 			() -> zoneSystemParams,
 			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
@@ -84,6 +89,9 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 						case "H3": {
 							addParameterSet(createParameterSet(H3GridZoneSystemParams.SET_NAME));
 							break;
+						}
+						case "GeometryFree":{
+							addParameterSet(createParameterSet(GeometryFreeZoneSystemParams.SET_NAME));
 						}
 						default:
 							super.handleAddUnknownParam(paramName, value);
