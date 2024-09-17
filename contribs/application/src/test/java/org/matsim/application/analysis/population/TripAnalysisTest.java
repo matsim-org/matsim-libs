@@ -1,7 +1,6 @@
 package org.matsim.application.analysis.population;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class TripAnalysisTest {
+class TripAnalysisTest {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 	private final CsvOptions csv = new CsvOptions(CSVFormat.Predefined.Default);
@@ -89,8 +88,6 @@ public class TripAnalysisTest {
 			.isDirectoryContaining("glob:**population_trip_stats.csv")
 			.isDirectoryContaining("glob:**trip_purposes_by_hour.csv")
 			.isDirectoryContaining("glob:**mode_share_distance_distribution.csv");
-
-		CSVParser reader = csv.createParser(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv"));
 
 		Table modeShare = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString()))
 			.columnTypesPartial(Map.of("person", ColumnType.TEXT))

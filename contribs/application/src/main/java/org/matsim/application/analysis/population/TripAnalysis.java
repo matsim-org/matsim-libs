@@ -169,10 +169,11 @@ public class TripAnalysis implements MATSimAppCommand {
 					}
 				}
 			}
-//			TODO: persons are not filtered correctly here. find reason for that
-			persons.where(Selection.with(filteredRowIds.toIntArray()));
+			persons = persons.where(Selection.with(filteredRowIds.toIntArray()));
 			persons.write().csv("C:/Users/Simon/Desktop/wd/2024-09-16/persons-filter.csv");
 		}
+
+		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
 		// Home filter by standard attribute
 		if (shp.isDefined() && filter == LocationFilter.home) {
