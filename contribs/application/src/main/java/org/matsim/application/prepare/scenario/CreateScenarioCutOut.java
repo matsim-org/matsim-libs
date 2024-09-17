@@ -9,10 +9,6 @@ import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -40,123 +36,130 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.facilities.*;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
+ *
+ * How the network is cut out:
+ * <ul>
+ * 		<li>Keep all links in shape file</li>
+ * 		<li>Keep all links that are used by any agent in its route</li>
+ * 		<li>if an agent has not route, a shortest-path route is calculated and used instead</li>
+ * 		<li>This is done for all network modes</li>
+ * </ul>
+ *
+ * How the population is cut out:
+ * <ul>
+ * 		<li>All agents having any activity in the shape file are kept</li>
+ * 		<li>Agents traveling through the shape file are kept, this is determined by the route</li>
+ * 		<li>The buffer is not considered for the population cut out</li>
+ * </ul>
+ *
+ * How the network change events are generated:
+ * <ul>
+ *     <li>Travel time is computed using the given events</li>
+ *     <li>Travel times for all links outside the shape file + buffer will be fixed</li>
+ *     <li>The capacity of these links will be set to infinity</li>
+ * </ul>
+ *
+ * <b>Limitations:</b><br>
+ * Cutting out agents and fixing the speed is a challenging problem, because we lose sensitivity to policy cases
+ * We can not use the speed limit and use the original capacity because this underestimates speed (because congestion can only decrease the speed)
+ * Therefore the capacity is set to infinity, but these road don't react to changes<br>
+ *
+ * The cut-out will create a buffer area around the shape in which the speed is simulated with the original network, so that it is sensitive to changes
+ * Therefore, the buffer should not be too small
+ * One should be careful creating too small cut-outs because of the mentioned limitations.
+ *
+ * @return 0 if successful, 2 if CRS is null
+ */
 @CommandLine.Command(name = "scenario-cutout", description = "Cut out a scenario based on a shape file. Reduce population and network to the relevant area.")
-public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
-    private static final Logger log = LogManager.getLogger(CreateScenarioCutOut.class);
-    private final Map<String, ThreadLocal<LeastCostPathCalculator>> routerCache = new HashMap<>(); //Router for every mode
-
-    @CommandLine.Option(names = "--input", description = "Path to input population", required = true)
-    private Path input;
-
-    @CommandLine.Option(names = "--network", description = "Path to network", required = true)
-    private Path networkPath;
-
-    @CommandLine.Option(names = "--facilities", description = "Path to facilities file. Only needed if there are agents with no coordinates or links", required = false)
-    private Path facilityPath;
-
-    @CommandLine.Option(names = "--events", description = "Input events used for travel time calculation. NOTE: Making a cutout without the events file will make the scenario inaccurate!", required = false)
-    private Path eventPath;
-
-    @CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "5000")
-    private double buffer;
-
-    @CommandLine.Option(names = "--output-network", description = "Path to output network", required = true)
-    private Path outputNetwork;
-
-    @CommandLine.Option(names = "--output-population", description = "Path to output population", required = true)
-    private Path outputPopulation;
-
-    @CommandLine.Option(names = "--output-network-change-events", description = "Path to network change event output", required = false)
-    private Path outputEvents;
-
-	@CommandLine.Option(names = "--network-change-events-interval", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue="900", required = false)
-	private double changeEventsInterval;
-
-    @CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
-    private Set<String> modes;
-
-    @CommandLine.Mixin
-    private CrsOptions crs;
-
-    @CommandLine.Mixin
-    private ShpOptions shp;
-
-	//private variables for computing
-	private static final GeometryFactory geoFactory = new GeometryFactory();
-	private static final Map<String, Network> mode2modeOnlyNetwork = new HashMap<>();
-	private static final Set<Id<Link>> linksToKeep = new HashSet<>(); //Links inside the shapefile
-	private static final Set<Id<Link>> linksToDelete = new HashSet<>(); //Links outside the shapefile
-	private static final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet(); // additional links to include (may be outside the shapefile)
-	private static final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet(); // now delete irrelevant persons
-	private static final EventsManager manager = EventsUtils.createEventsManager();
-	private static final Map<Tuple<Id<Link>, Id<Vehicle>>, Double> linkIdVehicleId2enterTime = new HashMap<>();
-	private static final Map<Id<Link>, List<Tuple<Double, Double>>> linkId2freespeedAtTime = new HashMap<>();
-	private static Population population;
-	private static Network network;
-	private static Geometry geom;
-	private static ActivityFacilities facilities;
-
-	private static boolean useFacilities = false;
-	private static boolean useEvents = false;
-	private static boolean useNetworkChangeEvents = false;
-
-	private static int emptyNetworkWarnings = 0;
-	private static int noActCoordsWarnings = 0;
-
-	public static void main(String[] args) {
-        new CreateScenarioCutOut().execute(args);
-    }
+	private static final Logger log = LogManager.getLogger(CreateScenarioCutOut.class);
 
 	/**
-	 * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
-	 *
-	 * How the network is cut out:
-	 * <ul>
-	 * 		<li>Keep all links in shape file + configured buffer area</li>
-	 * 		<li>Keep all links that are used by any agent in its route</li>
-	 * 		<li>if an agent has not route, a shortest-path route is calculated and used instead</li>
-	 * 		<li>This is done for all network modes</li>
-	 * </ul>
-	 *
-	 * How the population is cut out:
-	 * <ul>
-	 * 		<li>All agents having any activity in the shape file are kept</li>
-	 * 		<li>Agents traveling through the shape file are kept, this is determined by the route</li>
-	 * 		<li>The buffer is not considered for the population cut out</li>
-	 * </ul>
-	 *
-	 * How the network change events are generated:
-	 * <ul>
-	 *     <li>Travel time is computed using the given events</li>
-	 *     <li>Travel times for all links outside the shape file + buffer will be fixed</li>
-	 *     <li>The capacity of these links will be set to infinity</li>
-	 * </ul>
-	 *
-	 * <b>Limitations:</b><br>
-	 * Cutting out agents and fixing the speed is a challenging problem, because we lose sensitivity to policy cases
-	 * We can not use the speed limit and use the original capacity because this underestimates speed (because congestion can only decrease the speed)
-	 * Therefore the capacity is set to infinity, but these road don't react to changes<br>
-	 *
-	 * The cut-out will create a buffer area around the shape in which the speed is simulated with the original network, so that it is sensitive to changes
-	 * Therefore, the buffer should not be too small
-	 * One should be careful creating too small cut-outs because of the mentioned limitations.
-	 *
-	 * @return 0 if successfull, 2 if CRS is null
-	 * @throws Exception
+	 * Router cache for every mode. This is a thread-local cache, so that we can use the same router for every thread.
 	 */
-    @Override
-    public Integer call() throws Exception {
+	private final Map<String, ThreadLocal<LeastCostPathCalculator>> routerCache = new ConcurrentHashMap<>();
+
+	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
+	private Path input;
+
+	@CommandLine.Option(names = "--network", description = "Path to network", required = true)
+	private Path networkPath;
+
+	@CommandLine.Option(names = "--facilities", description = "Path to facilities file. Only needed if there are agents with no coordinates or links", required = false)
+	private Path facilityPath;
+
+	@CommandLine.Option(names = "--events", description = "Input events used for travel time calculation. NOTE: Making a cutout without the events file will make the scenario inaccurate!", required = false)
+	private Path eventPath;
+
+	@CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "5000")
+	private double buffer;
+
+	@CommandLine.Option(names = "--output-network", description = "Path to output network", required = true)
+	private Path outputNetwork;
+
+	@CommandLine.Option(names = "--output-population", description = "Path to output population", required = true)
+	private Path outputPopulation;
+
+	@CommandLine.Option(names = "--output-network-change-events", description = "Path to network change event output", required = false)
+	private Path outputEvents;
+
+	@CommandLine.Option(names = "--network-change-events-interval", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "900", required = false)
+	private double changeEventsInterval;
+
+	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
+	private Set<String> modes;
+
+	@CommandLine.Mixin
+	private CrsOptions crs;
+
+	@CommandLine.Mixin
+	private ShpOptions shp;
+
+	// TODO: put comments as javadoc
+
+	//private variables for computing
+	private final GeometryFactory geoFactory = new GeometryFactory();
+	private final Map<String, Network> mode2modeOnlyNetwork = new HashMap<>();
+	//Links inside the shapefile
+	private final Set<Id<Link>> linksToKeep = ConcurrentHashMap.newKeySet();
+	//Links outside the shapefile
+	private final Set<Id<Link>> linksToDelete = ConcurrentHashMap.newKeySet();
+	// additional links to include (may be outside the shapefile)
+	private final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet();
+	// now delete irrelevant persons
+	private final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet();
+
+	private Network network;
+	private Geometry geom;
+	private Geometry geomBuffer;
+	private ActivityFacilities facilities;
+	private TravelTimeCalculator tt;
+
+	private boolean useFacilities = false;
+	private boolean useNetworkChangeEvents = false;
+
+	private int emptyNetworkWarnings = 0;
+	private int noActCoordsWarnings = 0;
+
+	public static void main(String[] args) {
+		new CreateScenarioCutOut().execute(args);
+	}
+
+	@Override
+	public Integer call() throws Exception {
 		//Check CRS
 		if (crs.getInputCRS() == null) {
 			log.error("Input CRS must be specified");
@@ -168,127 +171,138 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		ncg.setTimeVariantNetwork(true);
 
 		// Prepare required input-data
-        population = PopulationUtils.readPopulation(input.toString());
+		Population population = PopulationUtils.readPopulation(input.toString());
 		network = NetworkUtils.readNetwork(networkPath.toString(), ncg);
-		geom = shp.getGeometry().buffer(buffer);
-		for(String mode : modes) mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(network, mode));
+
+		geom = shp.getGeometry();
+		geomBuffer = geom.buffer(buffer);
+
+		for (String mode : modes)
+			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(network, mode));
+
 		// Prepare optional input-data
-		if(facilityPath != null){
+		if (facilityPath != null) {
 			useFacilities = true;
 			facilities = FacilitiesUtils.createActivityFacilities();
 			new MatsimFacilitiesReader(crs.getInputCRS(), crs.getTargetCRS(), facilities).readFile(facilityPath.toString());
 		}
-		if(eventPath != null){
-			useEvents = true;
-			manager.addHandler(new TravelTimeCalculator.Builder(network).build());
+
+		if (eventPath != null) {
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
+			builder.setTimeslice(changeEventsInterval);
+
+			EventsManager manager = EventsUtils.createEventsManager();
+
+			tt = builder.build();
+			manager.addHandler(tt);
+
+			manager.initProcessing();
 			EventsUtils.readEvents(manager, eventPath.toString());
+			manager.finishProcessing();
 		}
-		if(outputEvents != null){
+		if (outputEvents != null) {
 			useNetworkChangeEvents = true;
 		}
 
 		// Cut out the network: Filter for links inside the shapefile
-        for (Link link : network.getLinks().values()) {
-            if (geom.contains(MGC.coord2Point(link.getCoord()))
-                    || geom.contains(MGC.coord2Point(link.getFromNode().getCoord()))
-                    || geom.contains(MGC.coord2Point(link.getToNode().getCoord()))
-                    || link.getAllowedModes().contains(TransportMode.pt)) {
-                // keep the link
-                linksToKeep.add(link.getId());
-            } else {
-                linksToDelete.add(link.getId());
-            }
-        }
+		for (Link link : network.getLinks().values()) {
+			if (geom.contains(MGC.coord2Point(link.getCoord()))
+				|| geom.contains(MGC.coord2Point(link.getFromNode().getCoord()))
+				|| geom.contains(MGC.coord2Point(link.getToNode().getCoord()))
+				|| link.getAllowedModes().contains(TransportMode.pt)) {
+				// keep the link
+				linksToKeep.add(link.getId());
+			} else {
+				linksToDelete.add(link.getId());
+			}
+		}
 
 		// TODO: consider facilities, (see FilterRelevantAgents in OpenBerlin) -> (done, untested)
 		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> Check why eventsfile does not generate a complete ChangeEventsFile
 
-		//Cut out the population and mark needed network parts
-        //ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
-		//TODO use multithreading
-		for(Person p : population.getPersons().values()){
-			run(p);
-		}
+		// Cut out the population and mark needed network parts
+		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
 
 		//Population
-        log.info("Persons to delete: {}", personsToDelete.size());
-        for (Id<Person> personId : personsToDelete) {
-            population.removePerson(personId);
-        }
+		log.info("Persons to delete: {}", personsToDelete.size());
+		for (Id<Person> personId : personsToDelete) {
+			population.removePerson(personId);
+		}
 
-        log.info("Persons in the scenario: {}", population.getPersons().size());
+		log.info("Persons in the scenario: {}", population.getPersons().size());
 
-        PopulationUtils.writePopulation(population, outputPopulation.toString());
+		PopulationUtils.writePopulation(population, outputPopulation.toString());
 
 		//Network
-        log.info("Links to add: {}", linksToKeep.size());
+		log.info("Links to add: {}", linksToKeep.size());
 
-        log.info("Additional links from routes to include: {}", linksToInclude.size());
+		log.info("Additional links from routes to include: {}", linksToInclude.size());
 
-        log.info("number of links in original network: {}", network.getLinks().size());
+		log.info("number of links in original network: {}", network.getLinks().size());
 
-        for (Id<Link> linkId : linksToDelete) {
-            if (!linksToInclude.contains(linkId))
-                network.removeLink(linkId);
-        }
+		for (Id<Link> linkId : linksToDelete) {
+			if (!linksToInclude.contains(linkId))
+				network.removeLink(linkId);
+		}
 
-        // clean the network
-        log.info("number of links before cleaning: {}", network.getLinks().size());
-        log.info("number of nodes before cleaning: {}", network.getNodes().size());
+		// clean the network
+		log.info("number of links before cleaning: {}", network.getLinks().size());
+		log.info("number of nodes before cleaning: {}", network.getNodes().size());
 
-        MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
-        cleaner.removeNodesWithoutLinks();
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
+		cleaner.removeNodesWithoutLinks();
 
-        for (String mode : modes) {
-            log.info("Cleaning mode {}", mode);
-            cleaner.run(Set.of(mode));
-        }
+		for (String mode : modes) {
+			log.info("Cleaning mode {}", mode);
+			cleaner.run(Set.of(mode));
+		}
 
-        log.info("number of links after cleaning: {}", network.getLinks().size());
-        log.info("number of nodes after cleaning: {}", network.getNodes().size());
+		log.info("number of links after cleaning: {}", network.getLinks().size());
+		log.info("number of nodes after cleaning: {}", network.getNodes().size());
 
 		List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
 
-        NetworkUtils.writeNetwork(network, outputNetwork.toString());
+		NetworkUtils.writeNetwork(network, outputNetwork.toString());
 
-		if(useNetworkChangeEvents){
+		if (useNetworkChangeEvents) {
 			new NetworkChangeEventsWriter().write(outputEvents.toString(), events);
 		}
 
-        return 0;
-    }
+		return 0;
+	}
 
 	// Helper-Functions
 
-    private Network filterNetwork(Network network, String mode) {
-        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+	private Network filterNetwork(Network network, String mode) {
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 
-        Network carOnlyNetwork = NetworkUtils.createNetwork();
-        filter.filter(carOnlyNetwork, Set.of(mode));
-        return carOnlyNetwork;
-    }
+		Network carOnlyNetwork = NetworkUtils.createNetwork();
+		filter.filter(carOnlyNetwork, Set.of(mode));
+		return carOnlyNetwork;
+	}
 
-    private LeastCostPathCalculator createRouter(Network network, String mode) {
+	private LeastCostPathCalculator createRouter(Network network, String mode) {
 		routerCache.putIfAbsent(mode, new ThreadLocal<>());
-        LeastCostPathCalculator c = routerCache.get(mode).get();
-        if (c == null) {
-            FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
-            LeastCostPathCalculatorFactory fastAStarLandmarksFactory = new SpeedyALTFactory();
+		LeastCostPathCalculator c = routerCache.get(mode).get();
+		if (c == null) {
+			FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
+			LeastCostPathCalculatorFactory fastAStarLandmarksFactory = new SpeedyALTFactory();
 
-            OnlyTimeDependentTravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+			OnlyTimeDependentTravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 
-            c = fastAStarLandmarksFactory.createPathCalculator(network, travelDisutility, travelTime);
-            routerCache.putIfAbsent(mode, new ThreadLocal<>());
+			c = fastAStarLandmarksFactory.createPathCalculator(network, travelDisutility, travelTime);
+			routerCache.putIfAbsent(mode, new ThreadLocal<>());
 			routerCache.get(mode).set(c);
-        }
+		}
 
-        return c;
-    }
+		return c;
+	}
 
-	private Node getFromNode(Network network, Trip trip){
-		if(network.getLinks().isEmpty()){
-			if(emptyNetworkWarnings < 10) log.warn("Tried to get a from-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
-			emptyNetworkWarnings++;
+	private Node getFromNode(Network network, Trip trip) {
+		if (network.getLinks().isEmpty()) {
+			if (emptyNetworkWarnings++ < 10)
+				log.warn("Tried to get a from-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
+
 			return null;
 		}
 
@@ -300,10 +314,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		}
 	}
 
-	private Node getToNode(Network network, Trip trip){
-		if(network.getLinks().isEmpty()){
-			if(emptyNetworkWarnings < 10) log.warn("Tried to get a to-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
-			emptyNetworkWarnings++;
+	private Node getToNode(Network network, Trip trip) {
+		if (network.getLinks().isEmpty()) {
+			if (emptyNetworkWarnings++ < 10)
+				log.warn("Tried to get a to-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
+
 			return null;
 		}
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
@@ -314,104 +329,56 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		}
 	}
 
-	private LeastCostPathCalculator.Path getModeNetworkPath(Network network, String mode, Trip trip){
+	private LeastCostPathCalculator.Path getModeNetworkPath(Network network, String mode, Trip trip) {
 		LeastCostPathCalculator router = createRouter(network, mode);
 
 		Node fromNode = getFromNode(network, trip);
 		Node toNode = getToNode(network, trip);
 
-		if(fromNode == null || toNode == null) return null;
+		if (fromNode == null || toNode == null) return null;
 
 		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 	}
 
 	private Coord getActivityCoord(Activity activity) {
-		if(!useFacilities) return activity.getCoord();
+		if (!useFacilities)
+			return activity.getCoord();
+
 		return facilities.getFacilities().get(activity.getFacilityId()).getCoord();
-	}
-
-	// TravelTime Calculation
-
-	/**
-	 * This function approximates the travel time on each link by distributing the travelTime along the links via the euclidean length and freespeed.<br>
-	 * <i>NOTE: This is not accurate but better than noting. It is advised to use an events file, which will use
-	 * {@link CreateScenarioCutOut#computeAverageLinkFreespeedDuringTimeFrame} and  greatly improve the accuracy!</i>
-	 * @param route Route for which links we want to calculate the freespeeds
-	 * @return Sorted list with tuples (linkId, freespeed), containing the given links. Order is copied from route
-	 */
-	private List<Tuple<Id<Link>, Double>> computeApproximatedLinkFreespeedForLinks(NetworkRoute route){
-		double theoreticalTT = 0;
-		List<Tuple<Id<Link>, Double>> freespeeds = new LinkedList<>();
-		//Compute the theoretical Travel Time if there would be no congestion
-		for(Id<Link> linkId : route.getLinkIds()) theoreticalTT += network.getLinks().get(linkId).getLength() / network.getLinks().get(linkId).getFreespeed();
-		//Now apply the actual travel time to the links by altering the freespeeds
-		for(Id<Link> linkId : route.getLinkIds()){
-			Link link = network.getLinks().get(linkId);
-			freespeeds.add(new Tuple<>(link.getId(), link.getFreespeed()/(route.getTravelTime().seconds()/theoreticalTT))); //-> speed/diff_factor
-		}
-		return freespeeds;
-	}
-
-	/**
-	 * Computes the average speed of a link for the given timeframe using the events file.
-	 * @param linkId link-id to compute the avereage freespeed for
-	 * @param fromTimeToTime Tuple (start, end) of representing the time interval
-	 * @return computed average freespeed, -1 if link has no attached information
-	 */
-	private double computeAverageLinkFreespeedDuringTimeFrame(Id<Link> linkId, Tuple<Double, Double> fromTimeToTime){
-		if(!linkId2freespeedAtTime.containsKey(linkId)) return -1;
-
-		double sum = 0;
-		int found = 0;
-		for(Tuple<Double, Double> e : linkId2freespeedAtTime.get(linkId)){
-			if(e.getSecond() >= fromTimeToTime.getFirst() && e.getSecond() <= fromTimeToTime.getSecond()) {
-				//Vehicle left this link during the timeframe
-				sum += e.getFirst();
-				found++;
-			}
-		}
-		if(found == 0){
-			//log.warn("No travel time for link {} during time window {}, {}. This may be caused by too small timeframes!", linkId, fromTimeToTime.getFirst(), fromTimeToTime.getSecond());
-			//for(Tuple<Double, Double> e : ParallelVariables.linkId2freespeedAtTime().get(linkId)) if(e.getSecond() >= fromTimeToTime.getFirst()) return network.getLinks().get(linkId).getLength()/e.getFirst();
-			return -1;
-		}
-		return (sum/found);
 	}
 
 	/**
 	 * Creates and applies the {@link NetworkChangeEvent}s to the network. It sets the capacity for all links outside the shapefile and bufferzone
 	 * to infinite and reduces the freespeed of the links so that the agents behave somehow realistically outside the cutout-area.
+	 *
 	 * @param timeFrameLength interval length of time frames in seconds
 	 * @return a list of the generated NetworkChangeEvents. Use is optional.
 	 */
-	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength){
+	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength) {
 		List<NetworkChangeEvent> events = new LinkedList<>();
-		// Setting capacity outside shapefile (and buffer) to infinite
-		{
-			NetworkChangeEvent event = new NetworkChangeEvent(0);
-			event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(
-				NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
-				Double.MAX_VALUE));
-			for (Id<Link> linkId : linksToDelete) if(linksToInclude.contains(linkId)) event.addLink(network.getLinks().get(linkId));
-			NetworkUtils.addNetworkChangeEvent(network, event);
-			events.add(event);
-		}
 
-		//Setting freespeed to the link average
-		for(double time = 0; time < 129600; time+=timeFrameLength){
-			//Do this for the whole 36-hour simulation run
-			for(Link link : network.getLinks().values()){
-				double avgFreespeed = computeAverageLinkFreespeedDuringTimeFrame(link.getId(), new Tuple<>(time, time+timeFrameLength));
-				if(avgFreespeed == -1) continue; //No freespeed-information available, skip this iteration
+		for (Link link : network.getLinks().values()) {
+
+			// Don't generate events for links thar are in the shapefile + buffer
+			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
+				continue;
+
+			// Setting capacity outside shapefile (and buffer) to infinite
+			link.setCapacity(Double.MAX_VALUE);
+
+			// Do this for the whole 24-hour simulation run
+			for (double time = 0; time < 86400; time += timeFrameLength) {
+
+				// Setting freespeed to the link average
+				double travelTime = tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
-				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(
-					NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,
-					avgFreespeed));
+				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, travelTime));
 				NetworkUtils.addNetworkChangeEvent(network, event);
 				event.addLink(link);
 				events.add(event);
 			}
 		}
+
 		return events;
 	}
 
@@ -429,8 +396,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
-			if(originCoord == null || destinationCoord == null){
-				if(noActCoordsWarnings < 10) log.info("Activity coords of trip is null. Skipping Trip...");
+			if (originCoord == null || destinationCoord == null) {
+				if (noActCoordsWarnings < 10)
+					log.info("Activity coords of trip is null. Skipping Trip...");
 				noActCoordsWarnings++;
 				continue;
 			}
@@ -459,21 +427,10 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 					if (((NetworkRoute) route).getLinkIds().stream().anyMatch(linksToKeep::contains)) {
 						keepPerson = true;
 					}
-
-					//If we are working without an events-file we need to save the travel time via route information
-					if(!useEvents){
-						List<Tuple<Id<Link>, Double>> linkId2freespeeds = computeApproximatedLinkFreespeedForLinks(((NetworkRoute) route));
-						double currentTime = leg.getDepartureTime().seconds();
-						for(Tuple<Id<Link>, Double> e : linkId2freespeeds){
-							linkId2freespeedAtTime.putIfAbsent(e.getFirst(), new LinkedList<>());
-							currentTime += network.getLinks().get(e.getFirst()).getLength()/e.getSecond(); // length/speed=time
-							linkId2freespeedAtTime.get(e.getFirst()).add(new Tuple<>(e.getSecond(), currentTime));
-						}
-					}
 				} else {
 					//No NetworkRoute is given. We need to route by ourselves using Shortest-Path.
 					//Search/Generate the route for every mode
-					for(String mode : modes){
+					for (String mode : modes) {
 						LeastCostPathCalculator.Path path = getModeNetworkPath(mode2modeOnlyNetwork.get(mode), mode, trip);
 						if (path != null) {
 							// add all these links directly
@@ -507,22 +464,5 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm, 
 		}
 
 		PopulationUtils.resetRoutes(person.getSelectedPlan());
-	}
-
-	// XMLParser methods
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		linkIdVehicleId2enterTime.put(new Tuple<>(event.getLinkId(), event.getVehicleId()), event.getTime());
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		assert linkIdVehicleId2enterTime.containsKey(new Tuple<>(event.getLinkId(), event.getVehicleId())); //If this fails, the events file may be corrupted
-		double travelTime = event.getTime() - linkIdVehicleId2enterTime.get(new Tuple<>(event.getLinkId(), event.getVehicleId()));
-		double linkLength = network.getLinks().get(event.getLinkId()).getLength();
-		linkIdVehicleId2enterTime.remove(new Tuple<>(event.getLinkId(), event.getVehicleId()));
-		linkId2freespeedAtTime.putIfAbsent(event.getLinkId(), new LinkedList<>());
-		linkId2freespeedAtTime.get(event.getLinkId()).add(new Tuple<>(linkLength/travelTime, event.getTime()));
 	}
 }
