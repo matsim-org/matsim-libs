@@ -122,6 +122,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
 	private Set<String> modes;
 
+	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept", defaultValue = TransportMode.pt, split = ",")
+	private Set<String> keepModes;
+
 	@CommandLine.Mixin
 	private CrsOptions crs;
 
@@ -147,9 +150,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private Geometry geomBuffer;
 	private ActivityFacilities facilities;
 	private TravelTimeCalculator tt;
-
-	private boolean useFacilities = false;
-	private boolean useNetworkChangeEvents = false;
 
 	private int emptyNetworkWarnings = 0;
 	private int noActCoordsWarnings = 0;
@@ -182,7 +182,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		// Prepare optional input-data
 		if (facilityPath != null) {
-			useFacilities = true;
 			facilities = FacilitiesUtils.createActivityFacilities();
 			new MatsimFacilitiesReader(crs.getInputCRS(), crs.getTargetCRS(), facilities).readFile(facilityPath.toString());
 		}
@@ -200,16 +199,15 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			EventsUtils.readEvents(manager, eventPath.toString());
 			manager.finishProcessing();
 		}
-		if (outputEvents != null) {
-			useNetworkChangeEvents = true;
-		}
+
+		boolean useNetworkChangeEvents = outputEvents != null;
 
 		// Cut out the network: Filter for links inside the shapefile
 		for (Link link : network.getLinks().values()) {
 			if (geom.contains(MGC.coord2Point(link.getCoord()))
 				|| geom.contains(MGC.coord2Point(link.getFromNode().getCoord()))
 				|| geom.contains(MGC.coord2Point(link.getToNode().getCoord()))
-				|| link.getAllowedModes().contains(TransportMode.pt)) {
+				|| link.getAllowedModes().stream().anyMatch(keepModes::contains)) {
 				// keep the link
 				linksToKeep.add(link.getId());
 			} else {
@@ -323,9 +321,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getDestinationActivity().getLinkId() != null && modeLinks.get(trip.getDestinationActivity().getLinkId()) != null) {
-			return modeLinks.get(trip.getDestinationActivity().getLinkId()).getFromNode();
+			return modeLinks.get(trip.getDestinationActivity().getLinkId()).getToNode();
 		} else {
-			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity())).getFromNode();
+			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity())).getToNode();
 		}
 	}
 
@@ -335,16 +333,17 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		Node fromNode = getFromNode(network, trip);
 		Node toNode = getToNode(network, trip);
 
-		if (fromNode == null || toNode == null) return null;
+		if (fromNode == null || toNode == null)
+			return null;
 
 		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 	}
 
 	private Coord getActivityCoord(Activity activity) {
-		if (!useFacilities)
-			return activity.getCoord();
+		if (facilities != null && activity.getFacilityId() != null && facilities.getFacilities().containsKey(activity.getFacilityId()))
+			return facilities.getFacilities().get(activity.getFacilityId()).getCoord();
 
-		return facilities.getFacilities().get(activity.getFacilityId()).getCoord();
+		return activity.getCoord();
 	}
 
 	/**
@@ -397,9 +396,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
 			if (originCoord == null || destinationCoord == null) {
-				if (noActCoordsWarnings < 10)
+				if (noActCoordsWarnings++ < 10)
 					log.info("Activity coords of trip is null. Skipping Trip...");
-				noActCoordsWarnings++;
+
 				continue;
 			}
 
@@ -421,6 +420,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			//Save route links
 			for (Leg leg : trip.getLegsOnly()) {
 				Route route = leg.getRoute();
+
+				// TODO: selected plans may only contain one mode
+				// Need to search for routes in all plans, but probably these plans are not really different
+				// Need to route modes that are not present, e.g if there is a car plan, route bike as well
+				// TODO currently only one mode is considered if a route is present
+
+
 				if (route instanceof NetworkRoute && !((NetworkRoute) route).getLinkIds().isEmpty()) {
 					// We have a NetworkRoute, thus we can just use it
 					linkIds.addAll(((NetworkRoute) route).getLinkIds());
@@ -444,7 +450,10 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				}
 			}
 
+			// TODO: this assumption must be reconsidered
+			// TODO: facilities might be cut-out as well
 			// activity link ids are reset, because it is not guaranteed they can be retained
+
 			if (trip.getOriginActivity().getLinkId() != null) {
 				linkIds.add(trip.getOriginActivity().getLinkId());
 				trip.getOriginActivity().setLinkId(null);
