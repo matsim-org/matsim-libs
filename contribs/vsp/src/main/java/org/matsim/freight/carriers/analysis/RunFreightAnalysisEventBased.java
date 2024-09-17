@@ -72,7 +72,6 @@ public class RunFreightAnalysisEventBased {
 	}
 
 	public void runAnalysis() throws IOException {
-
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(globFile(SIM_OUTPUT_PATH, "*output_allVehicles.*").toString());
 		config.network().setInputFile(globFile(SIM_OUTPUT_PATH, "*output_network.*").toString());

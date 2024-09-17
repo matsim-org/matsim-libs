@@ -25,17 +25,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -51,7 +55,13 @@ import java.util.TreeMap;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHandler {
+public class FreightTimeAndDistanceAnalysisEventsHandler implements
+	CarrierTourStartEventHandler,
+	CarrierTourEndEventHandler,
+	LinkEnterEventHandler,
+	LinkLeaveEventHandler,
+	VehicleEntersTrafficEventHandler,
+	VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
 
@@ -79,17 +89,19 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		this.scenario = scenario;
 	}
 
-	private void handleEvent(CarrierTourStartEvent event) {
+	@Override
+	public void handleEvent(CarrierTourStartEvent event) {
 		// Save time of freight tour start
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		tourStartTime.put(key, event.getTime());
 	}
 
 	//Fix costs for vehicle usage
-	private void handleEvent(CarrierTourEndEvent event) {
+	@Override
+	public void handleEvent(CarrierTourEndEvent event) {
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		double tourDuration = event.getTime() - tourStartTime.get(key);
-		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration);
+		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration); //TODO, check if this may overwrite old data and if this is intended to do so
 		VehicleType vehType = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType();
 		vehicleTypeId2SumOfTourDuration.merge(vehType.getId(), tourDuration, Double::sum);
 
@@ -100,7 +112,13 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		vehicleId2VehicleType.putIfAbsent(event.getVehicleId(), vehType);
 	}
 
-	private void handleEvent(LinkEnterEvent event) {
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event){
+		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime());
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
 		final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		vehicleId2TourLength.merge(event.getVehicleId(), distance, Double::sum);
 		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime()); //Safe time when entering the link.
@@ -110,7 +128,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 	//If the vehicle leaves a link at the end, the travelTime is calculated and stored.
-	private void handleEvent(LinkLeaveEvent event){
+	@Override
+	public void handleEvent(LinkLeaveEvent event){
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -124,7 +143,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 	//If the vehicle leaves a link because it reached its destination, the travelTime is calculated and stored.
-	private void handleEvent(VehicleLeavesTrafficEvent event){
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event){
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -134,26 +154,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			vehicleTypeId2TravelTime.merge(vehTypeId, tt, Double::sum); // per VehType
 
 			vehicleEnteredLinkTime.remove(vehicleId); //remove from that list.
-		}
-	}
-
-	private void handleEvent(VehicleEntersTrafficEvent event){
-		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime());
-	}
-
-	@Override public void handleEvent(Event event) {
-		if (event instanceof CarrierTourStartEvent carrierTourStartEvent) {
-			handleEvent(carrierTourStartEvent);
-		} else if (event instanceof CarrierTourEndEvent carrierTourEndEvent) {
-			handleEvent(carrierTourEndEvent);
-		} else if (event instanceof LinkEnterEvent linkEnterEvent) {
-			handleEvent(linkEnterEvent);
-		} else if (event instanceof LinkLeaveEvent linkLeaveEvent) {
-			handleEvent(linkLeaveEvent);
-		} else if (event instanceof VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent) {
-			handleEvent(vehicleLeavesTrafficEvent);
-		} else if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
-			handleEvent(vehicleEntersTrafficEvent);
 		}
 	}
 
@@ -215,7 +215,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		bw1.close();
 		log.info("Output written to {}", fileName);
 	}
-
 
 	void writeTravelTimeAndDistancePerVehicleType(Path analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");

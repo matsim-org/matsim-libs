@@ -25,11 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentPickupStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -48,7 +48,7 @@ import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUT
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class CarrierLoadAnalysis implements BasicEventHandler {
+public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 
@@ -60,15 +60,8 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		this.carriers = carriers;
 	}
 
-	@Override public void handleEvent(Event event) {
-		if (event.getEventType().equals(CarrierShipmentPickupStartEvent.EVENT_TYPE)) {
-			handlePickup( event);
-		} if (event.getEventType().equals(CarrierShipmentDeliveryStartEvent.EVENT_TYPE)) {
-			handleDelivery(event);
-		}
-	}
-
-	private void handlePickup(Event event) {
+	@Override
+	public void handleEvent(CarrierShipmentPickupStartEvent event) {
 		Id<Vehicle> vehicleId = Id.createVehicleId(event.getAttributes().get("vehicle"));
 		Integer demand = Integer.valueOf(event.getAttributes().get(ATTRIBUTE_CAPACITYDEMAND));
 
@@ -83,8 +76,8 @@ public class CarrierLoadAnalysis implements BasicEventHandler {
 		vehicle2Load.put(vehicleId, list);
 	}
 
-
-	private void handleDelivery(Event event) {
+	@Override
+	public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
 		Id<Vehicle> vehicleId = Id.createVehicleId(event.getAttributes().get("vehicle"));
 		Integer demand = Integer.valueOf(event.getAttributes().get(ATTRIBUTE_CAPACITYDEMAND));
 
