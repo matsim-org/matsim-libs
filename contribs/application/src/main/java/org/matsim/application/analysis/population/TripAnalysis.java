@@ -2,6 +2,8 @@ package org.matsim.application.analysis.population;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -55,15 +57,15 @@ public class TripAnalysis implements MATSimAppCommand {
 	/**
 	 * Attributes which relates this person to a reference person.
 	 */
-	public static String ATTR_REF_ID = "ref_id";
+	public static final String ATTR_REF_ID = "ref_id";
 	/**
 	 * Person attribute that contains the reference modes of a person. Multiple modes are delimited by "-".
 	 */
-	public static String ATTR_REF_MODES = "ref_modes";
+	public static final String ATTR_REF_MODES = "ref_modes";
 	/**
 	 * Person attribute containing its weight for analysis purposes.
 	 */
-	public static String ATTR_REF_WEIGHT = "ref_weight";
+	public static final String ATTR_REF_WEIGHT = "ref_weight";
 
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
@@ -86,8 +88,8 @@ public class TripAnalysis implements MATSimAppCommand {
 	private LocationFilter filter;
 
 	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
-		"The attribute needs to be contained by output_persons.csv", split = ",")
-	private Map<String, String> personFilters = new HashMap<>();
+		"The attribute needs to be contained by output_persons.csv. Persons who do not match all filters are filtered out.", split = ",")
+	private final Map<String, String> personFilters = new HashMap<>();
 
 	@CommandLine.Mixin
 	private ShpOptions shp;
@@ -152,7 +154,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 //		filter persons according to person (attribute) filter
 		if (!personFilters.isEmpty()) {
-			IntList filteredRowIds = new IntArrayList();
+			IntSet generalFilteredRowIds = new IntOpenHashSet();
 			for (Map.Entry<String, String> entry : personFilters.entrySet()) {
 				if (!persons.containsColumn(entry.getKey())) {
 					log.warn("Persons table does not contain column for filter attribute {}. Filter on {} will not be applied.", entry.getKey(), entry.getValue());
@@ -160,17 +162,26 @@ public class TripAnalysis implements MATSimAppCommand {
 				}
 				log.info("Using person filter for attribute {} and value {}", entry.getKey(), entry.getValue());
 
+				IntSet filteredRowIds = new IntOpenHashSet();
+
 				for (int i = 0; i < persons.rowCount(); i++) {
 					Row row = persons.row(i);
 					String value = row.getString(entry.getKey());
 //					only add value once
-					if (value.equals(entry.getValue()) && !filteredRowIds.contains(i)) {
+					if (value.equals(entry.getValue())) {
 						filteredRowIds.add(i);
 					}
 				}
+
+				if (generalFilteredRowIds.isEmpty()) {
+					// If generalFilteredRowIds is empty, add all elements from filteredRowIds to generalFilteredRowIds
+					generalFilteredRowIds.addAll(filteredRowIds);
+				} else {
+					// If generalFilteredRowIds is not empty, retain only the elements that are also in filteredRowIds
+					generalFilteredRowIds.retainAll(filteredRowIds);
+				}
 			}
-			persons = persons.where(Selection.with(filteredRowIds.toIntArray()));
-			persons.write().csv("C:/Users/Simon/Desktop/wd/2024-09-16/persons-filter.csv");
+			persons = persons.where(Selection.with(generalFilteredRowIds.intStream().toArray()));
 		}
 
 		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
