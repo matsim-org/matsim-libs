@@ -4,15 +4,20 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
+import org.matsim.application.options.CsvOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.io.csv.CsvReadOptions;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 
@@ -70,6 +75,23 @@ public class DashboardTests {
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
 			.isDirectoryContaining("glob:**mode_share.csv");
+	}
+
+	@Test
+	void tripPersonFilter() throws IOException {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		run(new TripDashboard().setAnalysisArgs("--person-filter", "subpopulation=person"));
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**trip_stats.csv")
+			.isDirectoryContaining("glob:**mode_share.csv");
+
+		Table tripStats = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats.csv").toString()))
+			.sample(false)
+			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString())).build());
+
+		Assertions.assertThat(tripStats.containsColumn("freight")).isFalse();
 	}
 
 	@Test
