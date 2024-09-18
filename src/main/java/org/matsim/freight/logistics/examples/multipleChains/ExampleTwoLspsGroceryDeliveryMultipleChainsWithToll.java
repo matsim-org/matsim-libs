@@ -21,6 +21,7 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
+import java.io.IOException;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,7 @@ import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
@@ -162,7 +164,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controler.run();
 
-    log.info("Done.");
+    //Carrier Analysis
+    final String outputPath = controler.getControlerIO().getOutputPath();
+    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
+      try {
+          freightAnalysis.runAnalysis();
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+
+      log.info("Done.");
   }
 
   /*

@@ -36,6 +36,12 @@
 			<artifactId>freight</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>vsp</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		
 		<!--MATSim examples. Not transitive -->
 		<dependency>
