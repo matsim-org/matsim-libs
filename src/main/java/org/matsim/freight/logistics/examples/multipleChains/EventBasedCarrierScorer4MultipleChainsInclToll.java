@@ -95,7 +95,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
         case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
         case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);     //FIXME: Aus irgendwelchen Gründen kommen hier keine PersonMoneyEvents an...
+        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
         case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> d2v.handleEvent(vehicleEntersTrafficEvent);
         case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> d2v.handleEvent(vehicleLeavesTrafficEvent);
         default -> {}
