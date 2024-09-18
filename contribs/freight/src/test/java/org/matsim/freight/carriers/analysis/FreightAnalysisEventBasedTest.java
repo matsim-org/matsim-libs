@@ -23,14 +23,10 @@ package org.matsim.freight.carriers.analysis;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FreightAnalysisEventBasedTest {
 
@@ -38,13 +34,13 @@ public class FreightAnalysisEventBasedTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	void runServiceEventTest() throws IOException, URISyntaxException {
+	void runServiceEventTest() throws IOException {
 		// Note: I had to manually change the files for this test to run, as I did not have access to the original input file of the events-file
 		// This results in the carrier-plans not being related to the actual events. This is however no problem for testing the core functionality,
 		// as those are two disjunct analysis outputs, which do not depend on each other. (aleks Sep'24)
 
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
-			Paths.get(new URL(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml").toURI()),
+			Path.of(testUtils.getInputDirectory() + "in/grid9x9.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierWithServices.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
@@ -60,9 +56,9 @@ public class FreightAnalysisEventBasedTest {
 	}
 
 	@Test
-	void runShipmentEventTest() throws IOException, URISyntaxException {
+	void runShipmentEventTest() throws IOException {
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
-			Paths.get(new URL(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml").toURI()),
+			Path.of(testUtils.getInputDirectory() + "in/grid9x9.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierWithShipments.xml"),
 			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),

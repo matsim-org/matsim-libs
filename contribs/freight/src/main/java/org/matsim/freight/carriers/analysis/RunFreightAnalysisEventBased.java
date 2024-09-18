@@ -95,13 +95,7 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(Path networkPath, //TODO Change to path object
-										Path vehiclesPath,
-										Path carriersPath,
-										Path carriersVehicleTypesPath,
-										Path eventsPath,
-										Path analysisOutputPath,
-										String globalCrs) {
+	public RunFreightAnalysisEventBased(Path networkPath, Path vehiclesPath, Path carriersPath, Path carriersVehicleTypesPath, Path eventsPath, Path analysisOutputPath, String globalCrs) {
 		this.SIM_OUTPUT_PATH = null;
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
@@ -137,7 +131,7 @@ public class RunFreightAnalysisEventBased {
 
 
 		// CarrierPlanAnalysis
-		if(allCarriersHavePlans()){
+		if (allCarriersHavePlans()) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(CarriersUtils.getCarriers(scenario));
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
 		}
@@ -166,8 +160,7 @@ public class RunFreightAnalysisEventBased {
 
 	private boolean allCarriersHavePlans() {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values())
-			if (carrier.getSelectedPlan() == null)
-				return false;
+			if (carrier.getSelectedPlan() == null) return false;
 
 		return true;
 	}
