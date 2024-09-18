@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="heavy">
+
+		<capacity seats="0" standingRoomInPersons="0" weightInTons="5.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<costInformation fixedCostsPerDay="200.0" costsPerMeter="5.7E-4" costsPerSecond="0.016">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.016</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.016</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="freight_carrier1_veh_heavyVehicle_1" type="heavy"/>
+
+</vehicleDefinitions>
