@@ -95,7 +95,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10";
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_1000";
 
 
 
@@ -121,9 +121,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
+//    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+//    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+//    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
@@ -202,7 +202,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
       ConfigUtils.applyCommandline(config, args);
     } else {
       config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
-      config.controller().setLastIteration(1);
+      config.controller().setLastIteration(0);
     }
 
     config.network().setInputFile(
@@ -210,7 +210,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     config.global().setCoordinateSystem("EPSG:31468");
     config.global().setRandomSeed(4177);
     config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-    config.controller().setWriteEventsInterval(1);
 
     FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
