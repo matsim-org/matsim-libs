@@ -153,7 +153,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
               tollValue = event.getAmount();
             }
           }
-          score = score - tollValue;
+          score = score + tollValue;
         }
       }
     }
