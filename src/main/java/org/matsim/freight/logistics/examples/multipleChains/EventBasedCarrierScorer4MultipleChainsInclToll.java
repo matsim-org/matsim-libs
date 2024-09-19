@@ -146,9 +146,11 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         if (vehicleId != null) {
           Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
           if (carrierId.equals(carrierIdOfVehicle)) {
-              tollValue = event.getAmount();
+            tollValue = event.getAmount();
+            log.info("Tolling caused by event: {}, tollvalue {}", event, tollValue);
+            score = score + tollValue;
           }
-          score = score + tollValue;
+
         }
       }
     }
