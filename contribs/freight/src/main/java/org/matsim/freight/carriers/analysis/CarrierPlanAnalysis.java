@@ -40,14 +40,20 @@ import java.util.TreeMap;
  * - score of the selected plan
  * - number of tours (= vehicles) of the selected plan
  * - number of Services (input)
+ * - number of Services (handled)
  * - number of shipments (input)
+ * - number of shipments (handled)
+ * - number of not handled jobs
+ * - number of planned demand size
+ * - number of handled demand size
  * to a tsv-file.
  *
- * @author Kai Martins-Turner (kturner)
+ * @author Kai Martins-Turner (kturner), Ricardo Ewert
  */
 public class CarrierPlanAnalysis {
 
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
+	public static final String delimiter = "\t";
 
 	Carriers carriers;
 
@@ -55,7 +61,6 @@ public class CarrierPlanAnalysis {
 		this.carriers = carriers;
 	}
 
-	//TODO add added parameters to comment at the top
 	public void runAnalysisAndWriteStats(Path analysisOutputDirectory) throws IOException {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
@@ -64,7 +69,7 @@ public class CarrierPlanAnalysis {
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 
 			//Write headline:
-			bw1.write(String.join("\t",
+			bw1.write(String.join(delimiter,
 				"carrierId",
 				"MATSimScoreSelectedPlan",
 				"jSpritScoreSelectedPlan",
@@ -123,20 +128,20 @@ public class CarrierPlanAnalysis {
 						carrier.getId(), numberOfHandledPickups, numberOfHandledDeliveries);
 				}
 				bw1.write(carrier.getId().toString());
-				bw1.write("\t" + carrier.getSelectedPlan().getScore());
-				bw1.write("\t" + carrier.getSelectedPlan().getJspritScore());
-				bw1.write("\t" + carrier.getSelectedPlan().getScheduledTours().size());
-				bw1.write("\t" + numberOfPlanedShipments);
-				bw1.write("\t" + numberOfHandledPickups);
-				bw1.write("\t" + numberOfPlanedServices);
-				bw1.write("\t" + nuOfServiceHandled);
-				bw1.write("\t" + notHandledJobs);
-				bw1.write("\t" + numberOfPlanedDemandSize);
-				bw1.write("\t" + numberOfHandledDemandSize);
+				bw1.write(delimiter + carrier.getSelectedPlan().getScore());
+				bw1.write(delimiter + carrier.getSelectedPlan().getJspritScore());
+				bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
+				bw1.write(delimiter + numberOfPlanedShipments);
+				bw1.write(delimiter + numberOfHandledPickups);
+				bw1.write(delimiter + numberOfPlanedServices);
+				bw1.write(delimiter + nuOfServiceHandled);
+				bw1.write(delimiter + notHandledJobs);
+				bw1.write(delimiter + numberOfPlanedDemandSize);
+				bw1.write(delimiter + numberOfHandledDemandSize);
 				if (CarriersUtils.getJspritComputationTime(carrier) != Integer.MIN_VALUE)
-					bw1.write("\t" + Time.writeTime(CarriersUtils.getJspritComputationTime(carrier), Time.TIMEFORMAT_HHMMSS));
+					bw1.write(delimiter + Time.writeTime(CarriersUtils.getJspritComputationTime(carrier), Time.TIMEFORMAT_HHMMSS));
 				else
-					bw1.write("\t" + "null");
+					bw1.write(delimiter + "null");
 
 				bw1.newLine();
 			}
