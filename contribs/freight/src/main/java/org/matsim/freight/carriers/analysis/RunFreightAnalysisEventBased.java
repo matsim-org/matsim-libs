@@ -92,10 +92,16 @@ public class RunFreightAnalysisEventBased {
 	/**
 	 * Alternative if you want to set the paths to the necessary resources directly.
 	 *
-	 * @param analysisOutputPath The directory where the result of the analysis should go to
-	 * @param globalCrs          The CRS of the simulation
+	 * @param networkPath              Path to the network file
+	 * @param vehiclesPath             Path to the vehicle file
+	 * @param carriersPath             Path to the carriers file
+	 * @param carriersVehicleTypesPath Path to the carriersVehicleTypes file
+	 * @param eventsPath               Path to the events file
+	 * @param analysisOutputPath       Path to the output directory
+	 * @param globalCrs                The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(Path networkPath, Path vehiclesPath, Path carriersPath, Path carriersVehicleTypesPath, Path eventsPath, Path analysisOutputPath, String globalCrs) {
+	public RunFreightAnalysisEventBased(Path networkPath, Path vehiclesPath, Path carriersPath, Path carriersVehicleTypesPath, Path eventsPath,
+										Path analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
