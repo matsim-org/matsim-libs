@@ -62,8 +62,20 @@ public class CarrierPlanAnalysis  {
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 
 		//Write headline:
-		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfShipments(handled) \t nuOfServices(input) \t nuOfServices(handled) \t nuOfPlanedDemandSize \t nuOfHandledDemandSize \t jspritComputationTime[HH:mm:ss]");
-		bw1.newLine();
+			bw1.write(String.join("\t",
+				"carrierId",
+				"MATSimScoreSelectedPlan",
+				"jSpritScoreSelectedPlan",
+				"nuOfTours",
+				"nuOfShipments(input)",
+				"nuOfShipments(handled)",
+				"nuOfServices(input)",
+				"nuOfServices(handled)",
+				"noOfNotHandledJobs",
+				"nuOfPlanedDemandSize",
+				"nuOfHandledDemandSize",
+				"jspritComputationTime[HH:mm:ss]"
+			));		bw1.newLine();
 
 		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
 
@@ -76,12 +88,15 @@ public class CarrierPlanAnalysis  {
 			int nuOfServiceHandled = (int)carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
 			int numberOfPlanedDemandSize;
 			int numberOfHandledDemandSize;
+			int notHandledJobs;
 			if (numberOfPlanedShipments > 0) {
 				numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getSize).sum();
 				numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(te -> ( ((Tour.Pickup) te).getShipment().getSize())).sum()).sum();
+				notHandledJobs = numberOfPlanedShipments - numberOfHandledPickups;
 			} else {
 				numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getCapacityDemand).sum();
 				numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
+				notHandledJobs = numberOfPlanedServices - nuOfServiceHandled;
 			}
 
 			if(numberOfPlanedServices != nuOfServiceHandled) {
@@ -101,6 +116,7 @@ public class CarrierPlanAnalysis  {
 			bw1.write("\t" + numberOfHandledPickups);
 			bw1.write("\t" + numberOfPlanedServices);
 			bw1.write("\t" + nuOfServiceHandled);
+			bw1.write("\t" + notHandledJobs);
 			bw1.write("\t" + numberOfPlanedDemandSize);
 			bw1.write("\t" + numberOfHandledDemandSize);
 			if (CarriersUtils.getJspritComputationTime(carrier) != Integer.MIN_VALUE)
