@@ -313,8 +313,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		//Analysis
 		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
-		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(output, output.resolve("Carrier_Analysis"), controler.getConfig().global().getCoordinateSystem());
-		freightAnalysis.runAnalysis();
+		//TODO perhaps change to complete carrier analysis
+		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis"));
+		freightAnalysis.runCarriersAnalysis();
 		System.out.println("Finishing Analysis of Carrier.");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
