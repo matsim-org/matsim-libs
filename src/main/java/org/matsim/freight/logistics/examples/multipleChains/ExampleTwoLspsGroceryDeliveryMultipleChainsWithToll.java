@@ -129,15 +129,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     log.info("Done.");
   }
 
-  private static void runCarrierAnalysis(String outputPath, Config config) {
-    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
-    try {
-        freightAnalysis.runAnalysis();
-    } catch (IOException e) {
-        throw new RuntimeException(e);
-    }
-  }
-
 
   private static Config prepareConfig(String[] args) {
     Config config = ConfigUtils.createConfig();
@@ -212,6 +203,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
    *  Set up roadpricing --- this is a copy paste from KMT lecture in GVSim --> need some adaptions
    * TODO Adapt settings
    */
+
   private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
 
     //Create Rp Scheme from code.
@@ -246,6 +238,14 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             };
 
     return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
+  }
+  private static void runCarrierAnalysis(String outputPath, Config config) {
+    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
+    try {
+      freightAnalysis.runAnalysis();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

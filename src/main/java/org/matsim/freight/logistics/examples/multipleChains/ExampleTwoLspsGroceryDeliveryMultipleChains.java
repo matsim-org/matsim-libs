@@ -47,6 +47,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -121,13 +122,55 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-//    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-//    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-//    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
+    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
+    Controler controler = prepareControler(scenario);
+
+    log.info("Run MATSim");
+
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    controler
+            .getConfig()
+            .vspExperimental()
+            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+    controler.run();
+
+    runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
+
+    log.info("Done.");
+  }
+
+  private static Config prepareConfig(String[] args) {
+    Config config = ConfigUtils.createConfig();
+    if (args.length != 0) {
+      for (String arg : args) {
+        log.warn(arg);
+      }
+      ConfigUtils.applyCommandline(config, args);
+    } else {
+      config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
+      config.controller().setLastIteration(0);
+    }
+
+    config.network().setInputFile(
+            "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+    config.global().setCoordinateSystem("EPSG:31468");
+    config.global().setRandomSeed(4177);
+    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
+
+    return config;
+  }
+
+  private static @NotNull Controler prepareControler(Scenario scenario) {
     log.info("Prepare controler");
     Controler controler = new Controler(scenario);
     controler.addOverridingModule(
@@ -170,51 +213,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 });
               }
             });
+    return controler;
+  }
 
-    log.info("Run MATSim");
-
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
-    controler
-            .getConfig()
-            .vspExperimental()
-            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
-
-    //Carrier Analysis
-    final String outputPath = controler.getControlerIO().getOutputPath();
+  private static void runCarrierAnalysis(String outputPath, Config config) {
     RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
       freightAnalysis.runAnalysis();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
-    log.info("Done.");
-  }
-
-  private static Config prepareConfig(String[] args) {
-    Config config = ConfigUtils.createConfig();
-    if (args.length != 0) {
-      for (String arg : args) {
-        log.warn(arg);
-      }
-      ConfigUtils.applyCommandline(config, args);
-    } else {
-      config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
-      config.controller().setLastIteration(0);
-    }
-
-    config.network().setInputFile(
-            "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
-    config.global().setCoordinateSystem("EPSG:31468");
-    config.global().setRandomSeed(4177);
-    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-
-    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-    freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
-
-    return config;
   }
 
   /**
