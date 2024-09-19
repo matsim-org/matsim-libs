@@ -23,6 +23,7 @@ package org.matsim.freight.logistics.examples.multipleChains;
 
 import java.io.IOException;
 import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,7 @@ import org.matsim.vehicles.VehicleUtils;
 final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
   private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.class);
+
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double HUBCOSTS_FIX = 100;
 
@@ -105,9 +107,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-//    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-//    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-//    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
+    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+    lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
@@ -129,7 +131,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     log.info("Done.");
   }
 
-
   private static Config prepareConfig(String[] args) {
     Config config = ConfigUtils.createConfig();
     if (args.length != 0) {
@@ -139,7 +140,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
       ConfigUtils.applyCommandline(config, args);
     } else {
       config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
-      config.controller().setLastIteration(5);
+      config.controller().setLastIteration(1);
     }
 
     config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
@@ -239,6 +240,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
     return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
   }
+
   private static void runCarrierAnalysis(String outputPath, Config config) {
     RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
@@ -448,15 +450,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                     depotLinkFromVehicles,
                     vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource singleCarrierResource =
-            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            directCarrier)
-                    .setDistributionScheduler(
-                              ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
+                    .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement singleCarrierElement =
-            LSPUtils.LogisticChainElementBuilder.newInstance(
-                            Id.create("directCarrierElement", LogisticChainElement.class))
+            LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierElement", LogisticChainElement.class))
                     .setResource(singleCarrierResource)
                     .build();
 
