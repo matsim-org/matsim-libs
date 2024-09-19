@@ -34,12 +34,39 @@ public class FreightAnalysisEventBasedTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	void runFreightAnalysisEventBasedTest() throws IOException {
+	void runServiceEventTest() throws IOException {
+		// Note: I had to manually change the files for this test to run, as I did not have access to the original input file of the events-file
+		// This results in the carrier-plans not being related to the actual events. This is however no problem for testing the core functionality,
+		// as those are two disjunct analysis outputs, which do not depend on each other. (aleks Sep'24)
 
-		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(Path.of(testUtils.getClassInputDirectory()), Path.of(testUtils.getOutputDirectory()),null);
-		analysisEventBased.runAnalysis();
+		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
+			Path.of(testUtils.getInputDirectory() + "in/grid9x9.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierWithServices.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/serviceBasedEvents.xml"),
+			Path.of(testUtils.getOutputDirectory()),
+			null);
+		analysisEventBased.runCompleteAnalysis();
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carrier_stats.tsv",  testUtils.getOutputDirectory() + "Carrier_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicle.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicleType.tsv");
+	}
+
+	@Test
+	void runShipmentEventTest() throws IOException {
+		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
+			Path.of(testUtils.getInputDirectory() + "in/grid9x9.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierWithShipments.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
+			Path.of(testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml"),
+			Path.of(testUtils.getOutputDirectory()),
+			null);
+		analysisEventBased.runCompleteAnalysis();
+
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicle.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicleType.tsv");
