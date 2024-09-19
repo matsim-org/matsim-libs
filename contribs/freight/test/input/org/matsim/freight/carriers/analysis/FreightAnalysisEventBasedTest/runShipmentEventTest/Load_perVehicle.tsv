@@ -1,2 +1,2 @@
-vehicleId 	 capacity 	 maxLoad 	 load state during tour
+vehicleId	capacity	maxLoad	load state during tour
 freight_carrier1_veh_heavyVehicle_1	Infinity	26	[3, 8, 18, 25, 26, 23, 13, 12, 7, 0]

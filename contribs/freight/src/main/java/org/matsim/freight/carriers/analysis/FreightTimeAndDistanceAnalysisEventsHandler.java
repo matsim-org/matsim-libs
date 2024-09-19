@@ -64,6 +64,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 	VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
+	private final String delimiter;
 
 	private final Scenario scenario;
 	private final Map<Id<Vehicle>, Double> vehicleId2TourDuration = new LinkedHashMap<>();
@@ -85,7 +86,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 	private final Map<Id<Vehicle>, Double> vehicleEnteredLinkTime = new LinkedHashMap<>();
 
 
-	public FreightTimeAndDistanceAnalysisEventsHandler(Scenario scenario) {
+	public FreightTimeAndDistanceAnalysisEventsHandler(String delimiter, Scenario scenario) {
+		this.delimiter = delimiter;
 		this.scenario = scenario;
 	}
 
@@ -165,11 +167,23 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("vehicleId \t carrierId \t vehicleTypeId \t tourId \t "
-			+ "tourDuration[s] \t tourDuration[h] \t"
-			+ "travelDistance[m] \t travelDistance[km] \t " +
-				"travelTime[s] \t travelTime[h] \t" +
-			"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
+		bw1.write(String.join(delimiter,
+			"vehicleId",
+			"carrierId",
+			"vehicleTypeId",
+			"tourId",
+			"tourDuration[s]",
+			"tourDuration[h]",
+			"travelDistance[m]",
+			"travelDistance[km]",
+			"travelTime[s]",
+			"travelTime[h]",
+			"costPerSecond[EUR/s]",
+			"costPerMeter[EUR/m]",
+			"fixedCosts[EUR]",
+			"varCostsTime[EUR]",
+			"varCostsDist[EUR]",
+			"totalCosts[EUR]"));
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
@@ -189,25 +203,25 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 			final double totalVehCosts = fixedCost + varCostsTime + varCostsDist;
 
 			bw1.write(vehicleId.toString());
-			bw1.write("\t" + vehicleId2CarrierId.get(vehicleId));
-			bw1.write("\t" + vehicleType.getId().toString());
-			bw1.write("\t" + vehicleId2TourId.get(vehicleId));
+			bw1.write(delimiter + vehicleId2CarrierId.get(vehicleId));
+			bw1.write(delimiter + vehicleType.getId().toString());
+			bw1.write(delimiter + vehicleId2TourId.get(vehicleId));
 
-			bw1.write("\t" + durationInSeconds);
-			bw1.write("\t" + durationInSeconds /3600);
+			bw1.write(delimiter + durationInSeconds);
+			bw1.write(delimiter + durationInSeconds /3600);
 
-			bw1.write("\t" + distanceInMeters);
-			bw1.write("\t" + distanceInMeters/1000);
+			bw1.write(delimiter + distanceInMeters);
+			bw1.write(delimiter + distanceInMeters/1000);
 
-			bw1.write("\t" + travelTimeInSeconds);
-			bw1.write("\t" + travelTimeInSeconds /3600);
+			bw1.write(delimiter + travelTimeInSeconds);
+			bw1.write(delimiter + travelTimeInSeconds /3600);
 
-			bw1.write("\t" + costsPerSecond);
-			bw1.write("\t" + costsPerMeter);
-			bw1.write("\t" + fixedCost);
-			bw1.write("\t" + varCostsTime);
-			bw1.write("\t" + varCostsDist);
-			bw1.write("\t" + totalVehCosts);
+			bw1.write(delimiter + costsPerSecond);
+			bw1.write(delimiter + costsPerMeter);
+			bw1.write(delimiter + fixedCost);
+			bw1.write(delimiter + varCostsTime);
+			bw1.write(delimiter + varCostsDist);
+			bw1.write(delimiter + totalVehCosts);
 
 			bw1.newLine();
 		}
@@ -230,12 +244,22 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 		//Write headline:
-		bw1.write("vehicleTypeId \t nuOfVehicles \t " +
-			 "SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
-			 "SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
-			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
-				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
-				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
+		bw1.write(String.join(delimiter,
+			"vehicleTypeId",
+			"nuOfVehicles",
+			"SumOfTourDuration[s]",
+			"SumOfTourDuration[h]",
+			"SumOfTravelDistances[m]",
+			"SumOfTravelDistances[km]",
+			"SumOfTravelTime[s]",
+			"SumOfTravelTime[h]",
+			"costPerSecond[EUR/s]",
+			"costPerMeter[EUR/m]",
+			"fixedCosts[EUR/veh]",
+			"varCostsTime[EUR]",
+			"varCostsDist[EUR]",
+			"fixedCosts[EUR]",
+			"totalCosts[EUR]"));
 		bw1.newLine();
 
 		for (VehicleType vehicleType : vehicleTypesMap.values()) {
@@ -255,20 +279,20 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements
 
 			bw1.write(vehicleType.getId().toString());
 
-			bw1.write("\t" + nuOfVehicles);
-			bw1.write("\t" + sumOfTourDurationInSeconds);
-			bw1.write("\t" + sumOfTourDurationInSeconds / 3600);
-			bw1.write("\t" + sumOfDistanceInMeters);
-			bw1.write("\t" + sumOfDistanceInMeters / 1000);
-			bw1.write("\t" + sumOfTravelTimeInSeconds);
-			bw1.write("\t" + sumOfTravelTimeInSeconds / 3600);
-			bw1.write("\t" + costRatePerSecond);
-			bw1.write("\t" + costRatePerMeter);
-			bw1.write("\t" + fixedCostPerVeh);
-			bw1.write("\t" + sumOfVarCostsTime);
-			bw1.write("\t" + sumOfVarCostsDistance);
-			bw1.write("\t" + sumOfFixCosts);
-			bw1.write("\t" + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
+			bw1.write(delimiter + nuOfVehicles);
+			bw1.write(delimiter + sumOfTourDurationInSeconds);
+			bw1.write(delimiter + sumOfTourDurationInSeconds / 3600);
+			bw1.write(delimiter + sumOfDistanceInMeters);
+			bw1.write(delimiter + sumOfDistanceInMeters / 1000);
+			bw1.write(delimiter + sumOfTravelTimeInSeconds);
+			bw1.write(delimiter + sumOfTravelTimeInSeconds / 3600);
+			bw1.write(delimiter + costRatePerSecond);
+			bw1.write(delimiter + costRatePerMeter);
+			bw1.write(delimiter + fixedCostPerVeh);
+			bw1.write(delimiter + sumOfVarCostsTime);
+			bw1.write(delimiter + sumOfVarCostsDistance);
+			bw1.write(delimiter + sumOfFixCosts);
+			bw1.write(delimiter + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
 
 			bw1.newLine();
 		}

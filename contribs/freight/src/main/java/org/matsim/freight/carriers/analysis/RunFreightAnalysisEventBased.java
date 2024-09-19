@@ -62,6 +62,7 @@ public class RunFreightAnalysisEventBased {
 	private final Path ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
+	private final String delimiter = "\t";
 
 	//TODO discuss renaming without EventBased. If this becomes the standard carrier output
 	/**
@@ -148,7 +149,7 @@ public class RunFreightAnalysisEventBased {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		folder.mkdirs();
 		if (allCarriersHavePlans(carriers)) {
-			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(carriers);
+			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
 		}
 		else  {
@@ -161,10 +162,10 @@ public class RunFreightAnalysisEventBased {
 		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(scenario);
+		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
 		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
-		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(CarriersUtils.getCarriers(scenario));
+		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
 		eventsManager.addHandler(carrierLoadAnalysis);
 
 		eventsManager.initProcessing();

@@ -53,11 +53,12 @@ import java.util.TreeMap;
 public class CarrierPlanAnalysis {
 
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
-	public static final String delimiter = "\t";
+	public final String delimiter;
 
 	Carriers carriers;
 
-	public CarrierPlanAnalysis(Carriers carriers) {
+	public CarrierPlanAnalysis(String delimiter, Carriers carriers) {
+		this.delimiter = delimiter;
 		this.carriers = carriers;
 	}
 

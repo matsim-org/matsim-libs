@@ -51,12 +51,13 @@ import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUT
 public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
-
+	private final String delimiter;
 	Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 
-	public CarrierLoadAnalysis(Carriers carriers) {
+	public CarrierLoadAnalysis(String delimiter, Carriers carriers) {
+		this.delimiter = delimiter;
 		this.carriers = carriers;
 	}
 
@@ -94,7 +95,10 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("vehicleId \t capacity \t maxLoad \t load state during tour");
+		bw1.write(String.join(delimiter,"vehicleId",
+			"capacity",
+			"maxLoad",
+			"load state during tour"));
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
@@ -106,9 +110,9 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			bw1.write(vehicleId.toString());
-			bw1.write("\t" + capacity);
-			bw1.write("\t" + maxLoad);
-			bw1.write("\t" + load);
+			bw1.write(delimiter + capacity);
+			bw1.write(delimiter + maxLoad);
+			bw1.write(delimiter + load);
 			bw1.newLine();
 		}
 
