@@ -53,7 +53,7 @@ public class CarrierPlanAnalysis  {
 	public CarrierPlanAnalysis(Carriers carriers) {
 		this.carriers = carriers;
 	}
-
+	//TODO add added parameters to comment at the top
 	public void runAnalysisAndWriteStats(Path analysisOutputDirectory) throws IOException {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
