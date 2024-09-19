@@ -40,7 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static org.matsim.application.ApplicationUtils.globFile;
+//import static org.matsim.application.ApplicationUtils.globFile;
 
 
 /**
@@ -72,13 +72,19 @@ public class RunFreightAnalysisEventBased {
 	 * @param globalCrs          The CRS of the simulation
 	 */
 	public RunFreightAnalysisEventBased(Path simOutputPath, Path analysisOutputPath, String globalCrs) {
-		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
-		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
-		Path vehiclesPath = globFile(simOutputPath, "*output_allVehicles.*");
-		Path networkPath = globFile(simOutputPath, "*output_network.*");
-		Path carriersPath = globFile(simOutputPath, "*output_carriers.*");
-		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
+		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
+//		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
+//		Path vehiclesPath = globFile(simOutputPath, "*output_allVehicles.*");
+//		Path networkPath = globFile(simOutputPath, "*output_network.*");
+//		Path carriersPath = globFile(simOutputPath, "*output_carriers.*");
+//		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
+
+		this.EVENTS_PATH = simOutputPath.resolve("*output_events.xml.gz");
+		Path vehiclesPath = simOutputPath.resolve("*output_allVehicles.xml.gz");
+		Path networkPath = simOutputPath.resolve("*output_network.xml.gz");
+		Path carriersPath = simOutputPath.resolve("*output_carriers.xml.gz");
+		Path carriersVehicleTypesPath = simOutputPath.resolve("*output_carriersVehicleTypes.xml.gz");
 
 		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
