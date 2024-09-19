@@ -59,7 +59,7 @@ public class CarrierPlanAnalysis  {
 		//Load per vehicle
 		String fileName = analysisOutputDirectory.resolve("Carrier_stats.tsv").toString();
 
-		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
+		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 
 		//Write headline:
 		bw1.write("carrierId \t MATSimScoreSelectedPlan \t jSpritScoreSelectedPlan \t nuOfTours \t nuOfShipments(input) \t nuOfShipments(handled) \t nuOfServices(input) \t nuOfServices(handled) \t nuOfPlanedDemandSize \t nuOfHandledDemandSize \t jspritComputationTime[HH:mm:ss]");
@@ -111,7 +111,11 @@ public class CarrierPlanAnalysis  {
 			bw1.newLine();
 		}
 
-		bw1.close();
-		log.info("Output written to {}", fileName);
+			bw1.close();
+			log.info("Output written to {}", fileName);
+		} catch (IOException e) {
+			log.error("Error writing output to file: {}", fileName);
+			throw e;
+		}
 	}
 }
