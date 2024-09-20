@@ -87,7 +87,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double HUBCOSTS_FIX = 100;
 
-  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
+  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS;
   private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
   private static final double TOLL_VALUE = 1000;
 
@@ -96,7 +96,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_1000";
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_1000_1LSPb";
 
 
   private ExampleTwoLspsGroceryDeliveryMultipleChains() {}
