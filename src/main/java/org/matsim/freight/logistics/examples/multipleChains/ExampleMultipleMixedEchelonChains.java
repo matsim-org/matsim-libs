@@ -103,7 +103,7 @@ final class ExampleMultipleMixedEchelonChains {
             bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
             carrierScorer.setToll(TOLL_VALUE);
             carrierScorer.setTolledVehicleTypes( List.of("heavy40t"));
-            carrierScorer.setTolledLinks(ExampleConstants.TOLLED_LINK_LIST_BERLIN);
+            carrierScorer.setTolledLinks(ExampleConstants.TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS);
             bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
             bind(CarrierStrategyManager.class)
                 .toProvider(

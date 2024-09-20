@@ -47,6 +47,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -86,8 +87,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
   private static final double HUBCOSTS_FIX = 100;
 
-  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN;
-  private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t");
+  private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS;
+  private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
   private static final double TOLL_VALUE = 1000;
 
   private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
@@ -95,8 +96,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_10";
-
+  private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_1000_1LSPb";
 
 
   private ExampleTwoLspsGroceryDeliveryMultipleChains() {}
@@ -128,6 +128,47 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
+    Controler controler = prepareControler(scenario);
+
+    log.info("Run MATSim");
+
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    controler
+            .getConfig()
+            .vspExperimental()
+            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+    controler.run();
+
+    runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
+
+    log.info("Done.");
+  }
+
+  private static Config prepareConfig(String[] args) {
+    Config config = ConfigUtils.createConfig();
+    if (args.length != 0) {
+      for (String arg : args) {
+        log.warn(arg);
+      }
+      ConfigUtils.applyCommandline(config, args);
+    } else {
+      config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
+      config.controller().setLastIteration(1);
+    }
+
+    config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+    config.global().setCoordinateSystem("EPSG:31468");
+    config.global().setRandomSeed(4177);
+    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
+
+    return config;
+  }
+
+  private static @NotNull Controler prepareControler(Scenario scenario) {
     log.info("Prepare controler");
     Controler controler = new Controler(scenario);
     controler.addOverridingModule(
@@ -170,52 +211,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 });
               }
             });
+    return controler;
+  }
 
-    log.info("Run MATSim");
-
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
-    controler
-            .getConfig()
-            .vspExperimental()
-            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
-
-    //Carrier Analysis
-    final String outputPath = controler.getControlerIO().getOutputPath();
+  private static void runCarrierAnalysis(String outputPath, Config config) {
     RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
       freightAnalysis.runAnalysis();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
-    log.info("Done.");
-  }
-
-  private static Config prepareConfig(String[] args) {
-    Config config = ConfigUtils.createConfig();
-    if (args.length != 0) {
-      for (String arg : args) {
-        log.warn(arg);
-      }
-      ConfigUtils.applyCommandline(config, args);
-    } else {
-      config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
-      config.controller().setLastIteration(1);
-    }
-
-    config.network().setInputFile(
-            "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
-    config.global().setCoordinateSystem("EPSG:31468");
-    config.global().setRandomSeed(4177);
-    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-    config.controller().setWriteEventsInterval(1);
-
-    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-    freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
-
-    return config;
   }
 
   /**
@@ -335,6 +340,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
             CarriersUtils.createCarrier(Id.create(lspName +"_distributionCarrier", Carrier.class));
     distributionCarrier
             .getCarrierCapabilities()
+            //.setNumberOfJspritIterations // TODO Das mal hier einbauen. --> Ist aktuell in CarrierUtils.
             .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
     CarriersUtils.addCarrierVehicle(
@@ -348,8 +354,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     LSPResource distributionCarrierResource =
             ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
                             distributionCarrier)
-                    .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+                    .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement distributionCarrierElement =
@@ -383,11 +388,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
 
-      LSPPlan lspPlan = LSPUtils.createLSPPlan()
+    LSPPlan lspPlan = LSPUtils.createLSPPlan()
             .addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
             .setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
-      LSP lsp =
+    LSP lsp =
             LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
                     .setInitialPlan(lspPlan)
                     .setLogisticChainScheduler(
@@ -418,15 +423,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                     depotLinkFromVehicles,
                     vehicleTypes.getVehicleTypes().get(Id.create("heavy40t", VehicleType.class))));
     LSPResource singleCarrierResource =
-            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                            directCarrier)
-                    .setDistributionScheduler(
-                            ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+            ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
+                    .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
                     .build();
 
     LogisticChainElement singleCarrierElement =
-            LSPUtils.LogisticChainElementBuilder.newInstance(
-                            Id.create("directCarrierElement", LogisticChainElement.class))
+            LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierElement", LogisticChainElement.class))
                     .setResource(singleCarrierResource)
                     .build();
 

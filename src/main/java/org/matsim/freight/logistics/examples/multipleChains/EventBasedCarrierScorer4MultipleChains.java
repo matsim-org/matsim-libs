@@ -1,22 +1,22 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.examples.multipleChains;
@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
@@ -37,7 +36,6 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
 import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -51,12 +49,14 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
   @Inject private Network network;
   @Inject private Scenario scenario;
 
+  private Id<Carrier> carrierId;
 
   private double toll;
   private List<String> tolledVehicleTypes = new ArrayList<>();
   private List<String> tolledLinks = new ArrayList<>();
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
+    this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
     sf.addScoringFunction(new EventBasedScoring());
     sf.addScoringFunction(new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks));
@@ -118,7 +118,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     private void handleEvent(CarrierTourEndEvent event) {
       // Fix costs for vehicle usage
       final VehicleType vehicleType =
-          (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+              (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
       double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
@@ -133,10 +133,10 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     private void handleEvent(LinkEnterEvent event) {
       final double distance = network.getLinks().get(event.getLinkId()).getLength();
       final double costPerMeter =
-          (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
-              .getType()
-              .getCostInformation()
-              .getCostsPerMeter();
+              (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
+                      .getType()
+                      .getCostInformation()
+                      .getCostsPerMeter();
       // variable costs per distance
       score = score - (distance * costPerMeter);
     }
@@ -152,9 +152,9 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 
     private final double toll;
     private final List<String> vehicleTypesToBeTolled;
-    private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
-    private double score;
-    private List<String> tolledLinkList = new ArrayList<>();
+      private double score;
+    private List<String> tolledLinkList;
+    private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
 
     public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {
       super();
@@ -173,21 +173,25 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 
     @Override
     public void handleEvent(Event event) {
-      if (event instanceof LinkEnterEvent linkEnterEvent) {
-        handleEvent(linkEnterEvent);
-      }
-    }
-    
-    private void handleEvent(LinkEnterEvent event) {
-      final Id<VehicleType> vehicleTypeId =
-          (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
 
-      // toll a vehicle only once.
-      if (!tolledVehicles.contains(event.getVehicleId())) {
-        if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
-          if (tolledLinkList.contains(event.getLinkId().toString())) {
-            log.info("Tolling caused by event: {}", event);
-            tolledVehicles.add(event.getVehicleId());
+      switch (event) {
+        case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+        case CarrierTourStartEvent carrierTourStartEvent -> v2c.handleEvent(carrierTourStartEvent);
+        case CarrierTourEndEvent carrierTourEndEvent -> v2c.handleEvent(carrierTourEndEvent);
+        default -> {}
+      }
+
+    }
+
+    private void handleEvent(LinkEnterEvent event) {
+      final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
+
+      Id<Vehicle> vehicleId = event.getVehicleId();
+      if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
+        if (tolledLinkList.contains(event.getLinkId().toString())) {
+          Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
+          if (carrierId.equals(carrierIdOfVehicle)) {
+            log.info("Tolling caused by event: {}, tollvalue {}", event, toll);
             score = score - toll;
           }
         }
