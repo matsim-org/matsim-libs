@@ -844,14 +844,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates the services for one carrier.
 	 */
-	private void createServices(Scenario scenario,
-								ArrayList<String> noPossibleLinks,
-								String selectedStopCategory,
-								String carrierName,
-								int numberOfJobs,
-								String[] serviceArea,
-								Integer serviceTimePerStop,
-								TimeWindow serviceTimeWindow,
+	private void createServices(Scenario scenario, ArrayList<String> noPossibleLinks, String selectedStopCategory, String carrierName,
+								int numberOfJobs, String[] serviceArea, Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
 								Map<String, Map<Id<Link>, Link>> linksPerZone) {
 
 		String stopZone = serviceArea[0];
@@ -871,17 +865,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates the carrier and the related vehicles.
 	 */
-	private void createNewCarrierAndAddVehicleTypes(Scenario scenario,
-													Integer purpose,
-													String startZone,
-													String selectedStartCategory,
-													String carrierName,
-													List<String> vehicleTypes,
-													int numberOfDepots,
-													CarrierCapabilities.FleetSize fleetSize,
-													int fixedNumberOfVehiclePerTypeAndLocation,
-													List<String> vehicleDepots,
-													Map<String, Map<Id<Link>, Link>> linksPerZone,
+	private void createNewCarrierAndAddVehicleTypes(Scenario scenario, Integer purpose, String startZone, String selectedStartCategory,
+													String carrierName, List<String> vehicleTypes, int numberOfDepots,
+													CarrierCapabilities.FleetSize fleetSize, int fixedNumberOfVehiclePerTypeAndLocation,
+													List<String> vehicleDepots, Map<String, Map<Id<Link>, Link>> linksPerZone,
 													String smallScaleCommercialTrafficType,
 													EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration> tourStartTimeSelector) {
 
@@ -962,14 +949,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param modeORvehType 					the mode or vehicle type
 	 * @return 									the service duration
 	 */
-	private Integer getServiceTimePerStop(Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector,
-										  String employeeCategory,
-										  String modeORvehType,
-										  String smallScaleCommercialTrafficType) {
+	private Integer getServiceTimePerStop(
+		Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector,
+		String employeeCategory, String modeORvehType, String smallScaleCommercialTrafficType, double maxVehicleAvailability) {
+
 		GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey key = null;
-		if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
+		if (smallScaleCommercialTrafficType.equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
 			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(employeeCategory, null);
-		else if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+		else if (smallScaleCommercialTrafficType.equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
 			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(employeeCategory, modeORvehType);
 		}
 		GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
