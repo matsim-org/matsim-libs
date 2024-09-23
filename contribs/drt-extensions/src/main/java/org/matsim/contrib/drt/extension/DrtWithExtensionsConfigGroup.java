@@ -20,11 +20,14 @@
 package org.matsim.contrib.drt.extension;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
@@ -41,6 +44,11 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	private DrtOperationsParams drtOperationsParams;
 
 	public DrtWithExtensionsConfigGroup() {
+		this(DefaultDrtOptimizationConstraintsSet::new);
+	}
+
+	public DrtWithExtensionsConfigGroup(Supplier<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSetSupplier) {
+		super(drtOptimizationConstraintsSetSupplier);
 		// Optional
 		addDefinition(DrtCompanionParams.SET_NAME, DrtCompanionParams::new, () -> drtCompanionParams,
 				params -> drtCompanionParams = (DrtCompanionParams) params);
