@@ -20,17 +20,13 @@
 
 package org.matsim.freight.logistics;
 
-import com.google.inject.Provides;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -40,17 +36,12 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.logistics.analysis.LspScoreStatsModule;
 
 public class LSPModule extends AbstractModule {
   private static final Logger log = LogManager.getLogger(LSPModule.class);
-
-  //	private final FreightCarriersConfigGroup carrierConfig = new FreightCarriersConfigGroup();
 
   @Override
   public void install() {
@@ -60,12 +51,7 @@ public class LSPModule extends AbstractModule {
     bind(LSPControlerListener.class).in(Singleton.class);
     addControlerListenerBinding().to(LSPControlerListener.class);
 
-    bind(CarrierControlerListener.class).in(Singleton.class);
-    addControlerListenerBinding().to(CarrierControlerListener.class);
-
-    bind(CarrierAgentTracker.class).in(Singleton.class);
-    addEventHandlerBinding().to(CarrierAgentTracker.class);
-
+    install(new CarrierModule());
     install(new LspScoreStatsModule());
 
     // this switches on certain qsim components:
@@ -113,20 +99,13 @@ public class LSPModule extends AbstractModule {
         });
 
     // the scorers are necessary to run a zeroth iteration to the end:
-    bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFactoryDummyImpl.class);
     bind(LSPScorerFactory.class).to(LSPScoringFunctionFactoryDummyImpl.class);
 
     // for iterations, one needs to replace the following with something meaningful.  If nothing
     // else, there are "empty implementations" that do nothing.  kai, jul'22
-    bind(CarrierStrategyManager.class).toProvider(() -> null);
     bind(LSPStrategyManager.class).toProvider(() -> null);
 
     this.addControlerListenerBinding().to(DumpLSPPlans.class);
-  }
-
-  @Provides
-  Carriers provideCarriers(LSPControlerListener lspControlerListener) {
-    return lspControlerListener.getCarriersFromLSP();
   }
 
   private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory {
@@ -140,39 +119,6 @@ public class LSPModule extends AbstractModule {
 
         @Override
         public void setEmbeddingContainer(LSP pointer) {}
-      };
-    }
-  }
-
-  private static class CarrierScoringFactoryDummyImpl implements CarrierScoringFunctionFactory {
-    @Override
-    public ScoringFunction createScoringFunction(Carrier carrier) {
-      return new ScoringFunction() {
-        @Override
-        public void handleActivity(Activity activity) {}
-
-        @Override
-        public void handleLeg(Leg leg) {}
-
-        @Override
-        public void agentStuck(double time) {}
-
-        @Override
-        public void addMoney(double amount) {}
-
-        @Override
-        public void addScore(double amount) {}
-
-        @Override
-        public void finish() {}
-
-        @Override
-        public double getScore() {
-          return Double.NEGATIVE_INFINITY;
-        }
-
-        @Override
-        public void handleEvent(Event event) {}
       };
     }
   }
@@ -191,10 +137,7 @@ public class LSPModule extends AbstractModule {
         int iteration,
         ReplanningContext replanningContext) {
       log.warn("Running iterations without a strategy may lead to unclear results."); // "run" is
-      // possible, but
-      // will not do
-      // anything. kai,
-      // jul'22
+      // possible, but will not do anything. kai, jul'22
     }
 
     @Override
@@ -203,11 +146,7 @@ public class LSPModule extends AbstractModule {
     }
 
     @Override
-    public void addChangeRequest(
-        int iteration,
-        GenericPlanStrategy<LSPPlan, LSP> strategy,
-        String subpopulation,
-        double newWeight) {
+    public void addChangeRequest(int iteration, GenericPlanStrategy<LSPPlan, LSP> strategy, String subpopulation, double newWeight) {
       throw new RuntimeException("not implemented");
     }
 

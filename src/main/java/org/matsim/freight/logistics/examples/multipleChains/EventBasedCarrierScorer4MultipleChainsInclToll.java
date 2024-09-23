@@ -95,7 +95,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
         case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
         case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);     //FIXME: Aus irgendwelchen Gründen kommen hier keine PersonMoneyEvents an...
+        case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
         case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> d2v.handleEvent(vehicleEntersTrafficEvent);
         case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> d2v.handleEvent(vehicleLeavesTrafficEvent);
         default -> {}
@@ -146,14 +146,11 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
         if (vehicleId != null) {
           Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
           if (carrierId.equals(carrierIdOfVehicle)) {
-//           toll a person only once.
-            if (!tolledPersons.contains(event.getPersonId())) {
-              log.info("Tolling caused by event: {}", event);
-              tolledPersons.add(event.getPersonId());
-              tollValue = event.getAmount();
-            }
+            tollValue = event.getAmount();
+            log.info("Tolling caused by event: {}, tollvalue {}", event, tollValue);
+            score = score + tollValue;
           }
-          score = score - tollValue;
+
         }
       }
     }

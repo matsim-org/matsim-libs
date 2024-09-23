@@ -46,7 +46,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ExampleConstants {
-  public static final List<String> TOLLED_LINK_LIST_BERLIN =
+  //Both, the ingoing and outgoing links are tolled. -> Please be aware of it.
+  public static final List<String> TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS =
       Arrays.asList(
           "70831", "14691", "49319", "70830", "17284", "65008", "65007", "62413", "17283", "144164",
           "144165", "4606", "118311", "4607", "15423", "53820", "15422", "138286", "69167",
