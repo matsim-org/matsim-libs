@@ -64,6 +64,30 @@ public abstract class AbstractLeastCostPathCalculatorTestWithTurnRestrictions ex
 		Assertions.assertNotNull(path);
 	}
 
+	@Test
+	void testCalcLeastCostPath_TurnRestrictions_simple() {
+		Network network = createTurnRestrictionsTestNetwork();
+
+		Node nodeS = network.getNodes().get(Id.create("S", Node.class));
+		Node node1 = network.getNodes().get(Id.create("1", Node.class));
+
+		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
+		Path path = routerAlgo.calcLeastCostPath(nodeS, node1, 8.0 * 3600, null, null);
+		Assertions.assertNotNull(path);
+	}
+
+	@Test
+	void testCalcLeastCostPath_noTurnRestrictions_simple() {
+		Network network = createTurnRestrictionsTestNetwork();
+
+		Node nodeS = network.getNodes().get(Id.create("5", Node.class));
+		Node node1 = network.getNodes().get(Id.create("T", Node.class));
+
+		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
+		Path path = routerAlgo.calcLeastCostPath(nodeS, node1, 8.0 * 3600, null, null);
+		Assertions.assertNotNull(path);
+	}
+
 	//@formatter:off
     /**
      * Creates a test network where the shortest path is impossible due to turn restrictions
