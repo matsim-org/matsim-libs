@@ -82,7 +82,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			CarriersUtils.setJspritIterations(carrier, 20);
 		}
-		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.addNewPLansToExistingPlansOfCarrier);
+		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveForAllCarriersAndAddPLans);
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
 		}
@@ -112,7 +112,7 @@ public class IntegrationIT {
 			CarriersUtils.setJspritIterations(carrier, 1);
 		}
 
-		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.overwriteAllPlansAndCreateNewSolution);
+		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveForAllCarriersAndOverrideExistingPlans);
 		double scoreWithRunJsprit = 0;
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();

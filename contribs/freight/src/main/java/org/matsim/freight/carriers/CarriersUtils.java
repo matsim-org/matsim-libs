@@ -25,6 +25,7 @@ import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.logging.log4j.LogManager;
@@ -64,20 +65,14 @@ public class CarriersUtils {
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
 	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
 
+	/**
+	 * Enum to decide for which carriers a new solution should be created.
+	 * This makes only a difference if the carriers already have a plan.
+	 */
 	public enum CarrierSelectionForSolution {
-
-		/**
-		 * Overwrite all existing plans of the carriers and create new solutions.
-		 */
-		overwriteAllPlansAndCreateNewSolution,
-		/**
-		 * Create new solutions only for carriers with no plans. Existing plans of other carriers are not changed.
-		 */
-		solutionOnlyForCarrierWithNoPlans,
-		/**
-		 * Add new plans to existing plans of carriers. The new plans are set as selected plans.
-		 */
-		addNewPLansToExistingPlansOfCarrier
+		solveForAllCarriersAndOverrideExistingPlans, //Overwrite all existing plans of the carriers and create new solutions.
+		solveOnlyForCarrierWithoutPlans, //Create new solutions only for carriers with no plans. Existing plans of other carriers are not changed.
+		solveForAllCarriersAndAddPLans // Add new plans to existing plans of carriers. The new plans are set as selected plans.
 	}
 
 	public static Carrier createCarrier(Id<Carrier> id) {
@@ -194,6 +189,23 @@ public class CarriersUtils {
 	/**
 	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
 	 * - creating NetBasedCosts based on the network
+	 * - building and solving the VRP for all carriers using jsprit
+	 * - take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 * <p>
+	 *
+	 * @param scenario the scenario
+	 * @throws ExecutionException, InterruptedException
+	 */
+	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException {
+		CarrierSelectionForSolution usedCarriersSolutionType = CarrierSelectionForSolution.solveForAllCarriersAndOverrideExistingPlans;
+		log.warn("Running jsprit for all carriers with default solution type: {}", usedCarriersSolutionType);
+		log.warn("This will overwrite all existing plans of the carriers and create new solutions.");
+		runJsprit(scenario, usedCarriersSolutionType);
+	}
+
+	/**
+	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
+	 * - creating NetBasedCosts based on the network
 	 * - building and solving the VRP using jsprit for the carriers based on the selected CarrierSelectionForSolution
 	 * - take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 * <p>
@@ -201,8 +213,7 @@ public class CarriersUtils {
 	 * @param scenario             the scenario
 	 * @param carriersSolutionType the type of which carriers should be solved
 	 */
-	public static void runJsprit(Scenario scenario,
-								 CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
+	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
@@ -218,20 +229,17 @@ public class CarriersUtils {
 		// This also selects the carriers for which a new solution should be created
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			switch (carriersSolutionType) {
-				case overwriteAllPlansAndCreateNewSolution:
-					carrier.clearPlans();
-					break;
-				case solutionOnlyForCarrierWithNoPlans:
-					if (carrier.getSelectedPlan() != null) {
+				case solveForAllCarriersAndOverrideExistingPlans -> carrier.clearPlans();
+				case solveOnlyForCarrierWithoutPlans -> {
+					if (!carrier.getPlans().isEmpty()) {
 						continue;
 					}
-					break;
-				case addNewPLansToExistingPlansOfCarrier:
-					break;
+				}
+				case solveForAllCarriersAndAddPLans -> {}
+				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
 			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
-			carrierActivityCounterMap.put(carrier.getId(),
-				carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
@@ -258,23 +266,6 @@ public class CarriersUtils {
 		}
 	}
 
-	/**
-	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
-	 * - creating NetBasedCosts based on the network
-	 * - building and solving the VRP for all carriers using jsprit
-	 * - take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
-	 * <p>
-	 *
-	 * @param scenario the scenario
-	 * @throws ExecutionException, InterruptedException
-	 */
-	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException {
-
-		CarrierSelectionForSolution usedCarriersSolutionType = CarrierSelectionForSolution.overwriteAllPlansAndCreateNewSolution;
-		log.warn("Running jsprit for all carriers with default solution type: {}", usedCarriersSolutionType);
-		log.warn("This will overwrite all existing plans of the carriers and create new solutions.");
-		runJsprit(scenario, usedCarriersSolutionType);
-	}
 
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s
@@ -426,7 +417,7 @@ public class CarriersUtils {
 	}
 
 	/**
-	 * Adds a skill to the vehicle's {@link org.matsim.vehicles.VehicleType}.
+	 * Adds a skill to the vehicle's {@link VehicleType}.
 	 *
 	 * @param vehicleType the vehicle type to change;
 	 * @param skill       the skill.
@@ -472,7 +463,7 @@ public class CarriersUtils {
 	}
 
 	/**
-	 * Adds a skill to the {@link com.graphhopper.jsprit.core.problem.job.Shipment}.
+	 * Adds a skill to the {@link Shipment}.
 	 *
 	 * @param shipment the vehicle type to change;
 	 * @param skill    the skill.
