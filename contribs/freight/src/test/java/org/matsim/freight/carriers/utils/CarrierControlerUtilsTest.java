@@ -149,7 +149,7 @@ public class CarrierControlerUtilsTest {
 			//Routing bestPlan to Network
 		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrierWServices, bestSolution) ;
 		NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
-		carrierWServices.setSelectedPlan(carrierPlanServicesAndShipments) ;
+		carrierWServices.addPlan(carrierPlanServicesAndShipments) ;
 
 		/*
 		 * Now convert it to a only shipment-based VRP.

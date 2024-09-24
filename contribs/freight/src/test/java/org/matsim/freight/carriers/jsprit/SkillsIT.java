@@ -93,7 +93,7 @@ public class SkillsIT {
 		CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
 
 		NetworkRouter.routePlan(newPlan, networkBasedTransportCosts);
-		carrier.setSelectedPlan(newPlan);
+		carrier.addPlan(newPlan);
 		SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
 //		new CarrierPlanXmlWriterV3(CarrierControlerUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");

@@ -146,7 +146,7 @@ public class IntegrationIT {
 			// (maybe not optimal, but since re-routing is a matsim strategy,
 			// certainly ok as initial solution)
 
-			carrier.setSelectedPlan(newPlan);
+			carrier.addPlan(newPlan);
 
 			SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 			score = score + newPlan.getJspritScore();
