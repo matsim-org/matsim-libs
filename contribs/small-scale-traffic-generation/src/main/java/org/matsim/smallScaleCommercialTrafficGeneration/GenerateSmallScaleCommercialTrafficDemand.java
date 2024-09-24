@@ -816,9 +816,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							else
 								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
 
-							TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
-							createServices(scenario, vehicleDepots, selectedStopCategory, carrierName,
-								numberOfJobs, serviceArea, serviceTimePerStop, serviceTimeWindow, linksPerZone);
+								TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
+									36 * 3600); // extended time window, so that late tours can handle it
+								createServices(newCarrier, vehicleDepots, selectedStopCategory, serviceArea, serviceTimePerStop, serviceTimeWindow,
+									linksPerZone);
+							}
 						}
 					}
 				}
@@ -844,22 +846,19 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates the services for one carrier.
 	 */
-	private void createServices(Scenario scenario, ArrayList<String> noPossibleLinks, String selectedStopCategory, String carrierName,
-								int numberOfJobs, String[] serviceArea, Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
+	private void createServices(Carrier newCarrier, ArrayList<String> noPossibleLinks, String selectedStopCategory, String[] serviceArea,
+								Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
 								Map<String, Map<Id<Link>, Link>> linksPerZone) {
 
 		String stopZone = serviceArea[0];
 
-		for (int i = 0; i < numberOfJobs; i++) {
 			Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, linksPerZone);
-			Id<CarrierService> idNewService = Id.create(carrierName + "_" + linkId + "_" + rnd.nextInt(10000),
+			Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + rnd.nextInt(10000),
 				CarrierService.class);
 
 			CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
 				.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
-			CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class)).getServices()
-				.put(thisService.getId(), thisService);
-		}
+			newCarrier.getServices().put(thisService.getId(), thisService);
 	}
 
 	/**
@@ -928,10 +927,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * Gives a duration for the created tour under the given probability.
-	 *
 	 */
 	private int getVehicleTourDuration(TourStartAndDuration t) {
-		return (int) rnd.nextDouble(t.minDuration * 60, t.maxDuration * 60);
+		if (t.minDuration == 0.)
+			return (int) t.maxDuration * 60;
+		else
+			return (int) rnd.nextDouble(t.minDuration * 60, t.maxDuration * 60);
 	}
 
 	/**
