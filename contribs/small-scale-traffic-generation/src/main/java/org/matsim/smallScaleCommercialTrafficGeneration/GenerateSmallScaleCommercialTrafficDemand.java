@@ -759,7 +759,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						}
 					}
 
-					if (isStartingLocation) {
+					if (isStartingLocation) { //TODO für Aleksander: bessere Bezeichnungen wählen
 						VehicleSelection.OdMatrixEntryInformation information = vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
 
 						// use only types of the possibleTypes which are in the given types file
