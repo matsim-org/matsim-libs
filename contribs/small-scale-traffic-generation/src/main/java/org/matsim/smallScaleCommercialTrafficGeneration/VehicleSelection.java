@@ -12,8 +12,8 @@ public interface VehicleSelection{
 	class OdMatrixEntryInformation {
 		double occupancyRate;
 		String[] possibleVehicleTypes;
-		List<String> startCategory = new ArrayList<>();
-		List<String> stopCategory = new ArrayList<>();
+		List<String> possibleStartCategories = new ArrayList<>();
+		List<String> possibleStopCategories = new ArrayList<>();
 	}
 
 	/**
