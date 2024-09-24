@@ -64,6 +64,22 @@ public class CarriersUtils {
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
 	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
 
+	public enum CarrierSelectionForSolution {
+
+		/**
+		 * Overwrite all existing plans of the carriers and create new solutions.
+		 */
+		overwriteAllPlansAndCreateNewSolution,
+		/**
+		 * Create new solutions only for carriers with no plans. Existing plans of other carriers are not changed.
+		 */
+		solutionOnlyForCarrierWithNoPlans,
+		/**
+		 * Add new plans to existing plans of carriers. The new plans are set as selected plans.
+		 */
+		addNewPLansToExistingPlansOfCarrier
+	}
+
 	public static Carrier createCarrier( Id<Carrier> id ){
 		return new CarrierImpl(id);
 	}
@@ -167,29 +183,40 @@ public class CarriersUtils {
 		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
 	}
 
-
 	/**
 	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
-	 * 	- creating NetbasedCosts based on the network
-	 * 	- building and solving the VRP for all carriers using jsprit
+	 * 	- creating NetBasedCosts based on the network
+	 * 	- building and solving the VRP using jsprit for the carriers based on the selected CarrierSelectionForSolution
 	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 * <p>
 	 *
-	 * @param scenario
-	 * @throws ExecutionException, InterruptedException
+	 * @param scenario             the scenario
+	 * @param carriersSolutionType the type of which carriers should be solved
 	 */
-	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightCarriersConfigGroup.class );
+	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-				scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values() ).build() ;
+			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values() ).build() ;
 
 		Carriers carriers = getCarriers(scenario);
 
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
 		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
+		// This also selects the carriers for which a new solution should be created
 		for (Carrier carrier : carriers.getCarriers().values()) {
+			switch (carriersSolutionType) {
+				case overwriteAllPlansAndCreateNewSolution:
+					carrier.clearPlans();
+					break;
+				case solutionOnlyForCarrierWithNoPlans:
+					if (carrier.getSelectedPlan() != null) {
+						continue;
+					}
+					break;
+				case addNewPLansToExistingPlansOfCarrier:
+					break;
+			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2*carrier.getShipments().size());
 		}
@@ -203,18 +230,35 @@ public class CarriersUtils {
 
 		List<Future<?>> futures = new ArrayList<>();
 		List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-																				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
-																				.toList();
+			.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+			.toList();
 
 		for (Map.Entry<Id<Carrier>, Integer> entry : sorted){
 			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts, startedVRPCounter, carriers.getCarriers().size());
 			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
-            futures.add(executor.submit(task));
+			futures.add(executor.submit(task));
 		}
 
 		for (Future<?> future : futures) {
 			future.get();
 		}
+	}
+	/**
+	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
+	 * 	- creating NetBasedCosts based on the network
+	 * 	- building and solving the VRP for all carriers using jsprit
+	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 * <p>
+	 *
+	 * @param scenario
+	 * @throws ExecutionException, InterruptedException
+	 */
+	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
+
+		CarrierSelectionForSolution usedCarriersSolutionType = CarrierSelectionForSolution.overwriteAllPlansAndCreateNewSolution;
+		log.warn("Running jsprit for all carriers with default solution type: {}", usedCarriersSolutionType);
+		log.warn("This will overwrite all existing plans of the carriers and create new solutions.");
+		runJsprit(scenario, usedCarriersSolutionType);
 	}
 
 	/**

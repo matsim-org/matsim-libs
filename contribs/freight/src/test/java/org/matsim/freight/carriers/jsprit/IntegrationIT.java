@@ -78,6 +78,47 @@ public class IntegrationIT {
 		}
 		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
+
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			CarriersUtils.setJspritIterations(carrier, 20);
+		}
+		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.addNewPLansToExistingPlansOfCarrier);
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
+		}
+	}
+
+	@Test
+	void testJspritWithDefaultSolutionOption() throws ExecutionException, InterruptedException {
+		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
+		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
+
+		Config config = ConfigUtils.createConfig();
+		config.global().setRandomSeed(4177);
+
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
+		freightCarriersConfigGroup.setTravelTimeSliceWidth(24*3600);
+		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			CarriersUtils.setJspritIterations(carrier, 1);
+		}
+
+		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.overwriteAllPlansAndCreateNewSolution);
+		double scoreWithRunJsprit = 0;
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
+		}
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 	}
 
 	private static double generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
