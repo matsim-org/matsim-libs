@@ -447,13 +447,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 			}
 			//Now check if the sub-carrier-plans are viable
-			makeSubCarrierPlansViable(subCarriers.values());
+//			makeSubCarrierPlansViable(subCarriers.values());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
 			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario);
-			checkCarrierPlans(originalScenario);
+//			checkCarrierPlans(originalScenario);
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			if (!splitVRPs)
@@ -810,11 +810,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 								selectedStopCategory = information.stopCategory.get(rnd.nextInt(information.stopCategory.size()));
 							String[] serviceArea = new String[]{stopZone};
-							int serviceTimePerStop;
-							if (selectedStartCategory.equals("Inhabitants"))
-								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, information.startCategory.getFirst(), modeORvehType, smallScaleCommercialTrafficType);
-							else
-								serviceTimePerStop = getServiceTimePerStop(stopDurationTimeSelector, selectedStartCategory, modeORvehType, smallScaleCommercialTrafficType);
+							Carrier newCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class));
+							for (int i = 0; i < numberOfJobs; i++) {
+								int serviceTimePerStop;
+								if (selectedStartCategory.equals("Inhabitants"))
+									serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, information.startCategory.getFirst(),
+										modeORvehType, smallScaleCommercialTrafficType);
+								else
+									serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, selectedStartCategory, modeORvehType,
+										smallScaleCommercialTrafficType);
 
 								TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
 									36 * 3600); // extended time window, so that late tours can handle it
@@ -826,21 +830,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 			}
 		}
-
-//		System.out.println("Final results for the start time distribution");
-//		tourStartTimeSelector.writeResults();
-
-//		System.out.println("Final results for the tour duration distribution");
-//		tourDurationTimeSelector.writeResults();
-
-//		for (StopDurationGoodTrafficKey sector : stopDurationTimeSelector.keySet()) {
-//			System.out.println("Final results for the stop duration distribution in sector " + sector);
-//			stopDurationTimeSelector.get(sector);
-//		}
-
 		log.warn("The jspritIterations are now set to {} in this simulation!", jspritIterations);
 		log.info("Finished creating {} carriers including related services.", createdCarrier);
-
 	}
 
 	/**
@@ -945,14 +936,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Give a service duration based on the purpose and the trafficType under a given probability
 	 *
-	 * @param serviceDurationTimeSelector 		the selector for the service duration
-	 * @param employeeCategory 					the category of the employee
-	 * @param modeORvehType 					the mode or vehicle type
-	 * @return 									the service duration
+	 * @param serviceDurationTimeSelector the selector for the service duration
+	 * @param tourDistribution            the distribution for the tour start and duration
+	 * @param employeeCategory            the category of the employee
+	 * @param modeORvehType               the mode or vehicle type
+	 * @return the service duration
 	 */
-	private Integer getServiceTimePerStop(
-		Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector,
-		String employeeCategory, String modeORvehType, String smallScaleCommercialTrafficType, double maxVehicleAvailability) {
+	private Integer getServiceTimePerStop(Carrier newCarrier,
+										  Map<StopDurationGoodTrafficKey, EnumeratedDistribution<DurationsBounds>> serviceDurationTimeSelector,
+										  EnumeratedDistribution<TourStartAndDuration> tourDistribution, String employeeCategory,
+										  String modeORvehType, String smallScaleCommercialTrafficType) {
 
 		GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey key = null;
 		if (smallScaleCommercialTrafficType.equals(
@@ -962,10 +955,50 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
 			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(employeeCategory, modeORvehType);
 		}
-		GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
-		int serviceDurationLowerBound = serviceDurationBounds.minDuration();
-		int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
-		return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
+		// old Version
+//		GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
+//		int serviceDurationLowerBound = serviceDurationBounds.minDuration();
+//		int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
+//		return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
+
+		//possible new Version by Ricardo
+		double maxVehicleAvailability = newCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
+		int usedTravelTimeBuffer = 120 * 60; // 120 min buffer for the driving time
+		for (int j = 0; j < 200; j++) {
+			GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
+
+			for (int i = 0; i < 10; i++) {
+				int serviceDurationLowerBound = serviceDurationBounds.minDuration();
+				int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
+				int possibleValue = rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
+				// checks if the service duration will not exceed the vehicle availability including the buffer
+				if (possibleValue + usedTravelTimeBuffer <= maxVehicleAvailability)
+					return possibleValue;
+			}
+			if (j > 100){
+				CarrierVehicle carrierVehicleToChange = newCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream().sorted(Comparator.comparingDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime())).toList().getFirst();
+				log.info("Changing vehicle availability for carrier {}. Old maxVehicleAvailability: {}", newCarrier.getId(), maxVehicleAvailability);
+				int tourDuration = 0;
+				int vehicleStartTime = 0;
+				int vehicleEndTime = 0;
+				while (tourDuration < maxVehicleAvailability) {
+					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.sample();
+					vehicleStartTime = getVehicleStartTime(t);
+					tourDuration = getVehicleTourDuration(t);
+					vehicleEndTime = vehicleStartTime + tourDuration;
+				}
+				CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(carrierVehicleToChange.getId(), carrierVehicleToChange.getLinkId(),
+					carrierVehicleToChange.getType()).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
+				newCarrier.getCarrierCapabilities().getCarrierVehicles().remove(carrierVehicleToChange.getId());
+				newCarrier.getCarrierCapabilities().getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
+				maxVehicleAvailability = newCarrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
+				log.info("New maxVehicleAvailability: {}", maxVehicleAvailability);
+			}
+		}
+
+		throw new RuntimeException("No possible service duration found for employee category '" + employeeCategory + "' and mode '"
+			+ modeORvehType + "' in traffic type '" + smallScaleCommercialTrafficType + "'");
+
 	}
 
 	/**
