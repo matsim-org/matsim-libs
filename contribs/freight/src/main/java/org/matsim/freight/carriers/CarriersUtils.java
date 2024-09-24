@@ -235,7 +235,7 @@ public class CarriersUtils {
 						continue;
 					}
 				}
-				case solveForAllCarriersAndAddPLans -> {}
+				case solveForAllCarriersAndAddPLans -> {carrier.setSelectedPlan(null);} // Keep existing plan(s), but make them not selected.
 				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
 			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
@@ -720,7 +720,7 @@ public class CarriersUtils {
 			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds. Thread id: {}", carrier.getId(),
 				timeForPlanningAndRouting, Thread.currentThread().getId());
 
-			carrier.setSelectedPlan(newPlan);
+			carrier.addPlan(newPlan);
 			setJspritComputationTime(carrier, timeForPlanningAndRouting);
 		}
 	}
