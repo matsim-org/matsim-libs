@@ -204,6 +204,9 @@ public class CarriersUtils {
 	public static void runJsprit(Scenario scenario,
 								 CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
+		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
+
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
 			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
 
