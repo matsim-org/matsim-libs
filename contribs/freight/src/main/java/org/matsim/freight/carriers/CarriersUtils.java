@@ -52,7 +52,7 @@ public class CarriersUtils {
 
 	static final String CARRIER_VEHICLE = "carrierVehicle";
 	@SuppressWarnings("unused")
-	private static final  Logger log = LogManager.getLogger(CarriersUtils.class);
+	private static final Logger log = LogManager.getLogger(CarriersUtils.class);
 	/**
 	 * From the outside, rather use {@link CarriersUtils#getCarriers(Scenario)} .
 	 * This string constant will eventually become private.
@@ -80,67 +80,72 @@ public class CarriersUtils {
 		addNewPLansToExistingPlansOfCarrier
 	}
 
-	public static Carrier createCarrier( Id<Carrier> id ){
+	public static Carrier createCarrier(Id<Carrier> id) {
 		return new CarrierImpl(id);
 	}
 
 	/**
-	 * Adds an carrierVehicle to the CarrierCapabilities of the Carrier.
-	 * @param carrier
-	 * @param carrierVehicle
+	 * Adds a carrierVehicle to the CarrierCapabilities of the Carrier.
+	 *
+	 * @param carrier        the carrier
+	 * @param carrierVehicle the vehicle to add
 	 */
-	public static void addCarrierVehicle(Carrier carrier, CarrierVehicle carrierVehicle){
+	public static void addCarrierVehicle(Carrier carrier, CarrierVehicle carrierVehicle) {
 		carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle.getId(), carrierVehicle);
 	}
 
-	public static CarrierVehicle getCarrierVehicle(Carrier carrier, Id<Vehicle> vehicleId){
+	public static CarrierVehicle getCarrierVehicle(Carrier carrier, Id<Vehicle> vehicleId) {
 		CarrierVehicle veh = carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-		if(veh != null){
+		if (veh != null) {
 			return veh;
 		}
-		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Vehicle with Id does not exists",
+			new IllegalStateException("vehicle with id " + vehicleId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
 	/**
 	 * Adds an {@link CarrierService} to the {@link Carrier}.
-	 * @param carrier
-	 * @param carrierService
+	 *
+	 * @param carrier        the carrier
+	 * @param carrierService the service
 	 */
-	public static void addService(Carrier carrier, CarrierService carrierService){
+	public static void addService(Carrier carrier, CarrierService carrierService) {
 		carrier.getServices().put(carrierService.getId(), carrierService);
 	}
 
-	public static CarrierService getService(Carrier carrier, Id<CarrierService> serviceId){
+	public static CarrierService getService(Carrier carrier, Id<CarrierService> serviceId) {
 		CarrierService service = carrier.getServices().get(serviceId);
-		if(service != null){
+		if (service != null) {
 			return service;
 		}
-		log.error("Service with Id does not exists", new IllegalStateException("Service with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Service with Id does not exists",
+			new IllegalStateException("Service with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
 	/**
 	 * Adds an {@link CarrierShipment} to the {@link Carrier}.
-	 * @param carrier
-	 * @param carrierShipment
+	 *
+	 * @param carrier         the carrier
+	 * @param carrierShipment the shipment
 	 */
-	public static void addShipment(Carrier carrier, CarrierShipment carrierShipment){
+	public static void addShipment(Carrier carrier, CarrierShipment carrierShipment) {
 		carrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 	}
 
-	public static CarrierShipment getShipment(Carrier carrier, Id<CarrierShipment> serviceId){
+	public static CarrierShipment getShipment(Carrier carrier, Id<CarrierShipment> serviceId) {
 		CarrierShipment shipment = carrier.getShipments().get(serviceId);
-		if(shipment != null){
+		if (shipment != null) {
 			return shipment;
 		}
-		log.error("Shipment with Id does not exists", new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Shipment with Id does not exists",
+			new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
 
-
-	public static CarrierPlan copyPlan( CarrierPlan plan2copy ) {
+	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
 		List<ScheduledTour> tours = new ArrayList<>();
 		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
 			double depTime = sTour.getDeparture();
@@ -155,48 +160,52 @@ public class CarriersUtils {
 
 	}
 
-	private static final String CARRIER_MODE = "carrierMode" ;
-	public static String getCarrierMode( Carrier carrier ) {
-		String result = (String) carrier.getAttributes().getAttribute( CARRIER_MODE );
-		if ( result == null ){
-			return TransportMode.car ;
+	private static final String CARRIER_MODE = "carrierMode";
+
+	public static String getCarrierMode(Carrier carrier) {
+		String result = (String) carrier.getAttributes().getAttribute(CARRIER_MODE);
+		if (result == null) {
+			return TransportMode.car;
 		} else {
-			return result ;
+			return result;
 		}
 	}
-	public static void setCarrierMode( Carrier carrier,  String carrierMode ) {
-		carrier.getAttributes().putAttribute( CARRIER_MODE, carrierMode ) ;
+
+	public static void setCarrierMode(Carrier carrier, String carrierMode) {
+		carrier.getAttributes().putAttribute(CARRIER_MODE, carrierMode);
 	}
 
-	private static final String JSPRIT_ITERATIONS="jspritIterations" ;
-	public static int getJspritIterations( Carrier carrier ) {
-		Integer result = (Integer) carrier.getAttributes().getAttribute( JSPRIT_ITERATIONS );
-		if (result == null){
+	private static final String JSPRIT_ITERATIONS = "jspritIterations";
+
+	public static int getJspritIterations(Carrier carrier) {
+		Integer result = (Integer) carrier.getAttributes().getAttribute(JSPRIT_ITERATIONS);
+		if (result == null) {
 			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		} else {
-			return result ;
+			return result;
 		}
 	}
 
-	public static void setJspritIterations( Carrier carrier, int jspritIterations ) {
-		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
+	public static void setJspritIterations(Carrier carrier, int jspritIterations) {
+		carrier.getAttributes().putAttribute(JSPRIT_ITERATIONS, jspritIterations);
 	}
 
 	/**
 	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
-	 * 	- creating NetBasedCosts based on the network
-	 * 	- building and solving the VRP using jsprit for the carriers based on the selected CarrierSelectionForSolution
-	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 * - creating NetBasedCosts based on the network
+	 * - building and solving the VRP using jsprit for the carriers based on the selected CarrierSelectionForSolution
+	 * - take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 * <p>
 	 *
 	 * @param scenario             the scenario
 	 * @param carriersSolutionType the type of which carriers should be solved
 	 */
-	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
+	public static void runJsprit(Scenario scenario,
+								 CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values() ).build() ;
+			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
 
 		Carriers carriers = getCarriers(scenario);
 
@@ -218,12 +227,13 @@ public class CarriersUtils {
 					break;
 			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
-			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2*carrier.getShipments().size());
+			carrierActivityCounterMap.put(carrier.getId(),
+				carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
-        int nThreads = Runtime.getRuntime().availableProcessors();
+		int nThreads = Runtime.getRuntime().availableProcessors();
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
 
 		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
@@ -233,8 +243,9 @@ public class CarriersUtils {
 			.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
 			.toList();
 
-		for (Map.Entry<Id<Carrier>, Integer> entry : sorted){
-			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts, startedVRPCounter, carriers.getCarriers().size());
+		for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
+			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
+				startedVRPCounter, carriers.getCarriers().size());
 			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
 			futures.add(executor.submit(task));
 		}
@@ -243,17 +254,18 @@ public class CarriersUtils {
 			future.get();
 		}
 	}
+
 	/**
 	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
-	 * 	- creating NetBasedCosts based on the network
-	 * 	- building and solving the VRP for all carriers using jsprit
-	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 * - creating NetBasedCosts based on the network
+	 * - building and solving the VRP for all carriers using jsprit
+	 * - take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 * <p>
 	 *
-	 * @param scenario
+	 * @param scenario the scenario
 	 * @throws ExecutionException, InterruptedException
 	 */
-	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
+	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException {
 
 		CarrierSelectionForSolution usedCarriersSolutionType = CarrierSelectionForSolution.overwriteAllPlansAndCreateNewSolution;
 		log.warn("Running jsprit for all carriers with default solution type: {}", usedCarriersSolutionType);
@@ -296,11 +308,11 @@ public class CarriersUtils {
 	 * @deprecated -- please inline.  Reason: move syntax closer to how it is done in {@link ConfigUtils}.
 	 */
 	@Deprecated
-	public static Carriers getOrCreateCarriers(Scenario scenario){
-		return addOrGetCarriers( scenario );
+	public static Carriers getOrCreateCarriers(Scenario scenario) {
+		return addOrGetCarriers(scenario);
 	}
 
-	public static Carriers addOrGetCarriers(Scenario scenario ) {
+	public static Carriers addOrGetCarriers(Scenario scenario) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
@@ -315,9 +327,9 @@ public class CarriersUtils {
 	public static Carriers getCarriers(Scenario scenario) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
 		// not found. kai, oct'19
-		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
-			throw new RuntimeException( "cannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
-								    "CarrierControlerUtils.getOrCreateCarriers(...) or CarrierControlerUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
+		if (scenario.getScenarioElement(CARRIERS) == null) {
+			throw new RuntimeException("cannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+				"CarrierControlerUtils.getOrCreateCarriers(...) or CarrierControlerUtils.loadCarriersAccordingToFreightConfig(...) early enough\n");
 		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
@@ -334,16 +346,18 @@ public class CarriersUtils {
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
 	 *
-	 * @param scenario
+	 * @param scenario the scenario
 	 */
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()) );
+		new CarrierVehicleTypeReader(vehTypes).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()));
 
-		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
-		new CarrierPlanXmlReader( carriers, vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile() ) );
+		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
+		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
 
 //		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
@@ -394,16 +408,16 @@ public class CarriersUtils {
 		for (CarrierService carrierService : carrier.getServices().values()) {
 			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
-									  .newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-											  depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
-											  carrierService.getCapacityDemand())
-									  .setDeliveryServiceTime(carrierService.getServiceDuration())
-									  // .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
-									  // have now time for that. Maybe change it later, kmt sep18
-									  .setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-										// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-									  .setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
-									  .build();
+				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
+					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
+					carrierService.getCapacityDemand())
+				.setDeliveryServiceTime(carrierService.getServiceDuration())
+				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
+				// have now time for that. Maybe change it later, kmt sep18
+				.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
+				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
+				.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
+				.build();
 			addShipment(carrierWS, carrierShipment);
 		}
 	}
@@ -424,8 +438,8 @@ public class CarriersUtils {
 	 * @param type  the {@link VehicleType};
 	 * @param skill the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
-	 *         <code>false</code> if the skill is not in the skill set, or there is
-	 *         no skill set available/set.
+	 * <code>false</code> if the skill is not in the skill set, or there is
+	 * no skill set available/set.
 	 */
 	public static boolean hasSkill(VehicleType type, String skill) {
 		return hasSkill(type.getAttributes(), skill);
@@ -470,8 +484,8 @@ public class CarriersUtils {
 	 * @param shipment the {@link CarrierShipment};
 	 * @param skill    the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
-	 *         <code>false</code> if the skill is not in the skill set, or there is
-	 *         no skill set available/set.
+	 * <code>false</code> if the skill is not in the skill set, or there is
+	 * no skill set available/set.
 	 */
 	public static boolean hasSkill(CarrierShipment shipment, String skill) {
 		return hasSkill(shipment.getAttributes(), skill);
@@ -516,8 +530,8 @@ public class CarriersUtils {
 	 * @param service the {@link CarrierService};
 	 * @param skill   the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
-	 *         <code>false</code> if the skill is not in the skill set, or there is
-	 *         no skill set available/set.
+	 * <code>false</code> if the skill is not in the skill set, or there is
+	 * no skill set available/set.
 	 */
 	public static boolean hasSkill(CarrierService service, String skill) {
 		return hasSkill(service.getAttributes(), skill);
@@ -571,8 +585,8 @@ public class CarriersUtils {
 	 * @param attributes the {@link Attributes} container to check for the skill;
 	 * @param skill      the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
-	 *         <code>false</code> if the skill is not in the skill set, or there is
-	 *         no skill set available/set.
+	 * <code>false</code> if the skill is not in the skill set, or there is
+	 * no skill set available/set.
 	 */
 	private static boolean hasSkill(Attributes attributes, String skill) {
 		if (attributes.getAttribute(ATTR_SKILLS) == null) {
@@ -588,7 +602,7 @@ public class CarriersUtils {
 	 * @param attributes the {@link Attributes} container that is checked for the
 	 *                   skill(s) to be converted.
 	 * @return the {@link List} of skills, possibly empty, as parsed from the
-	 *         attribute.
+	 * attribute.
 	 */
 	private static List<String> convertSkillsAttributeToList(Attributes attributes) {
 		if (attributes.getAttribute(ATTR_SKILLS) == null) {
@@ -610,23 +624,23 @@ public class CarriersUtils {
 		}
 	}
 
-	public static Vehicle getVehicle(Plan plan ) {
-		return (Vehicle) plan.getAttributes().getAttribute( CARRIER_VEHICLE );
+	public static Vehicle getVehicle(Plan plan) {
+		return (Vehicle) plan.getAttributes().getAttribute(CARRIER_VEHICLE);
 	}
 
-	public static void putVehicle(Plan plan, Vehicle vehicle ){
-		plan.getAttributes().putAttribute( CARRIER_VEHICLE, vehicle );
+	public static void putVehicle(Plan plan, Vehicle vehicle) {
+		plan.getAttributes().putAttribute(CARRIER_VEHICLE, vehicle);
 	}
 
-	public static void setJspritScore(CarrierPlan plan, Double jspritScore){
+	public static void setJspritScore(CarrierPlan plan, Double jspritScore) {
 		plan.getAttributes().putAttribute(ATTR_JSPRIT_SCORE, jspritScore);
 	}
 
-	public static Double getJspritScore (CarrierPlan plan) {
+	public static Double getJspritScore(CarrierPlan plan) {
 		return (Double) plan.getAttributes().getAttribute(ATTR_JSPRIT_SCORE);
 	}
 
-	public static double getJspritComputationTime(Carrier carrier){
+	public static double getJspritComputationTime(Carrier carrier) {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
@@ -634,15 +648,16 @@ public class CarriersUtils {
 			return Integer.MIN_VALUE;
 		}
 	}
-	public static void setJspritComputationTime(Carrier carrier, double time){
+
+	public static void setJspritComputationTime(Carrier carrier, double time) {
 		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
 	}
 
-	public static void writeCarriers(Carriers carriers, String filename ) {
-		new CarrierPlanWriter( carriers ).write( filename );
+	public static void writeCarriers(Carriers carriers, String filename) {
+		new CarrierPlanWriter(carriers).write(filename);
 	}
 
-	static class JspritCarrierTask implements Runnable{
+	static class JspritCarrierTask implements Runnable {
 		private final int priority;
 		private final Carrier carrier;
 		private final Scenario scenario;
@@ -650,7 +665,8 @@ public class CarriersUtils {
 		private final AtomicInteger startedVRPCounter;
 		private final int taskCount;
 
-		public JspritCarrierTask(int priority, Carrier carrier, Scenario scenario, NetworkBasedTransportCosts netBasedCosts, AtomicInteger startedVRPCounter, int taskCount) {
+		public JspritCarrierTask(int priority, Carrier carrier, Scenario scenario, NetworkBasedTransportCosts netBasedCosts,
+								 AtomicInteger startedVRPCounter, int taskCount) {
 			this.priority = priority;
 			this.carrier = carrier;
 			this.scenario = scenario;
@@ -665,7 +681,8 @@ public class CarriersUtils {
 
 		@Override
 		public void run() {
-			FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightCarriersConfigGroup.class );
+			FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+				FreightCarriersConfigGroup.class);
 
 			double start = System.currentTimeMillis();
 			if (!carrier.getServices().isEmpty())
@@ -674,11 +691,13 @@ public class CarriersUtils {
 				log.info("Start tour planning for {} which has {} shipments", carrier.getId(), carrier.getShipments().size());
 
 			startedVRPCounter.incrementAndGet();
-			log.info("started VRP solving for carrier number {} out of {} carriers. Thread id: {}. Priority: {}", startedVRPCounter.get(), taskCount, Thread.currentThread().getId(), this.priority);
+			log.info("started VRP solving for carrier number {} out of {} carriers. Thread id: {}. Priority: {}", startedVRPCounter.get(), taskCount,
+				Thread.currentThread().getId(), this.priority);
 
 			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
-															   .setRoutingCost(netBasedCosts).build();
-			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup, netBasedCosts, problem);
+				.setRoutingCost(netBasedCosts).build();
+			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightCarriersConfigGroup,
+				netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = getJspritIterations(carrier);
@@ -714,7 +733,7 @@ public class CarriersUtils {
 
 	// we need this class because otherwise there is a runtime error in the PriorityBlockingQueue
 	// https://jvmaware.com/priority-queue-and-threadpool/
-	private static class JspritTreadPoolExecutor extends ThreadPoolExecutor{
+	private static class JspritTreadPoolExecutor extends ThreadPoolExecutor {
 		public JspritTreadPoolExecutor(BlockingQueue<Runnable> workQueue, int nThreads) {
 			super(nThreads, nThreads, 0, TimeUnit.SECONDS, workQueue);
 		}
@@ -725,7 +744,7 @@ public class CarriersUtils {
 		}
 	}
 
-	private static class CustomFutureTask<T> extends FutureTask<T> implements Comparable<CustomFutureTask<T>>{
+	private static class CustomFutureTask<T> extends FutureTask<T> implements Comparable<CustomFutureTask<T>> {
 		private final JspritCarrierTask task;
 
 		public CustomFutureTask(Runnable task) {
