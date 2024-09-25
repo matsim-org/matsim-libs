@@ -82,15 +82,27 @@ public final class CarrierImpl implements Carrier {
 	}
 
 	/**
-	 * Selects the selectedPlan.
-	 *
-	 * <p> If the plan-collection does not contain the selectedPlan, it is added to that collection.
-	 *
+	 * Adds a new CarrierPlan.
+	 * Makes it selected, if no other selectedPlan exists.
+	 * @param carrierPlan
+	 * @return
+	 */
+	@Override
+	public boolean addPlan(CarrierPlan carrierPlan) {
+		// Make sure there is a selected carrierPlan if there is at least one carrierPlan
+		if (this.selectedPlan == null) this.selectedPlan = carrierPlan;
+		return this.plans.add(carrierPlan);
+	}
+
+	/**
+	 * Set Plan as the selectedPlan.
 	 * @param selectedPlan to be selected
 	 */
 	@Override
-	public void setSelectedPlan(CarrierPlan selectedPlan) {
-		if(!plans.contains(selectedPlan)) plans.add(selectedPlan);
+	public void setSelectedPlan(final CarrierPlan selectedPlan) {
+		if (selectedPlan != null && !plans.contains( selectedPlan )) {
+			throw new IllegalStateException("The plan to be set as selected is neither not null nor stored in the carrier's plans");
+		}
 		this.selectedPlan = selectedPlan;
 	}
 
@@ -109,14 +121,12 @@ public final class CarrierImpl implements Carrier {
 		return services;
 	}
 
-	@Override
-	public boolean addPlan(CarrierPlan p) {
-		throw new RuntimeException("not implemented") ;
-	}
+
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
 		CarrierPlan newPlan = CarriersUtils.copyPlan(this.selectedPlan ) ;
+		this.addPlan( newPlan ) ;
 		this.setSelectedPlan( newPlan ) ;
 		return newPlan ;
 	}

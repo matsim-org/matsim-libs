@@ -140,7 +140,7 @@ public class CarrierControlerUtilsIT {
 				//Routing bestPlan to Network
 			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
-			carrier.setSelectedPlan(carrierPlanServicesAndShipments) ;
+			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}
 
 		/*
@@ -168,7 +168,7 @@ public class CarrierControlerUtilsIT {
 				//Routing bestPlan to Network
 			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
-			carrier.setSelectedPlan(carrierPlanServicesAndShipments) ;
+			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}
 
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
