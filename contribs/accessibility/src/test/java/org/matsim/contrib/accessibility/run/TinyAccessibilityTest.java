@@ -38,6 +38,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
@@ -73,6 +74,37 @@ public class TinyAccessibilityTest {
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
 		acg.setUseParallelization(false);
+
+		final Scenario scenario = createTestScenario(config);
+
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
+
+	@Test
+	public void runFromEventsDrt() {
+		final Config config = createTestConfig();
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+//		drtParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(drtParams);
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min);
+		acg.setBoundingBoxTop(max);
+		acg.setBoundingBoxLeft(min);
+		acg.setBoundingBoxRight(max);
+		acg.setUseParallelization(false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
 
 		final Scenario scenario = createTestScenario(config);
 

@@ -39,11 +39,11 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private static final Logger LOG = LogManager.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
-	private final TravelDisutilityFactory travelDisutilityFactory;
-	private final TravelTime travelTime;
+//	private final TravelDisutilityFactory travelDisutilityFactory;
+//	private final TravelTime travelTime;
 	private final Scenario scenario;
 
-	private final TravelDisutility travelDisutility;
+//	private final TravelDisutility travelDisutility;
 	private final ScoringConfigGroup scoringConfigGroup;
 	private final NetworkConfigGroup networkConfigGroup;
 
@@ -59,22 +59,22 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
-	private final LeastCostPathCalculator router;
+//	private final LeastCostPathCalculator router;
 	TripRouter tripRouter ;
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
-	public EstimatedDrtAccessibilityContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario, TripRouter tripRouter) {
+	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, TripRouter tripRouter) {
 		this.mode = mode;
-		this.travelTime = travelTime;
-		this.travelDisutilityFactory = travelDisutilityFactory;
+//		this.travelTime = travelTime;
+//		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.scenario = scenario;
 		this.scoringConfigGroup = scenario.getConfig().scoring();
 		this.networkConfigGroup = scenario.getConfig().network();
 		this.tripRouter = tripRouter;
 
-		Gbl.assertNotNull(travelDisutilityFactory);
-		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-		this.router = new SpeedyALTFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
+//		Gbl.assertNotNull(travelDisutilityFactory);
+//		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
+//		this.router = new SpeedyALTFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 
 		// drt params
 		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
@@ -240,7 +240,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	public EstimatedDrtAccessibilityContributionCalculator duplicate() {
 		LOG.info("Creating another EstimatedDrtAccessibilityContributionCalculator object.");
 		EstimatedDrtAccessibilityContributionCalculator estimatedDrtAccessibilityContributionCalculator =
-			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.travelTime, this.travelDisutilityFactory, this.scenario, tripRouter);
+			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, tripRouter);
 		estimatedDrtAccessibilityContributionCalculator.subNetwork = this.subNetwork;
 //		estimatedDrtAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		estimatedDrtAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;

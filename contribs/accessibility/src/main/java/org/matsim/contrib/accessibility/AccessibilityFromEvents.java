@@ -79,19 +79,19 @@ public final class AccessibilityFromEvents{
 				install( new ScenarioByInstanceModule( scenario ) ) ;
 				install( new TripRouterModule() ) ;
 				install( new TimeInterpretationModule() );
-				install(new EventsManagerModule());
-				install(new DvrpModule());
-				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
-				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-					install(new DrtModeModule(drtCfg));
-					installQSimModule(new DrtModeQSimModule(drtCfg));
-					install(new DrtModeAnalysisModule(drtCfg));
-				}
-
-
-//				install(new MultiModeDrtModule());
-//				install(new MultiModeDrtCompanionModule());
-
+//				install(new EventsManagerModule());
+//				install(new DvrpModule());
+//				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
+//				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+//					install(new DrtModeModule(drtCfg));
+//					installQSimModule(new DrtModeQSimModule(drtCfg));
+//					install(new DrtModeAnalysisModule(drtCfg));
+//				}
+//
+//
+////				install(new MultiModeDrtModule());
+////				install(new MultiModeDrtCompanionModule());
+//
 				for( String mode : getConfig().routing().getNetworkModes() ){
 					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
 				}
