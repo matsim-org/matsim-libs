@@ -1,6 +1,5 @@
 package org.matsim.contrib.accessibility;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -11,6 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
+import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.core.config.Config;
@@ -18,8 +18,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -155,8 +153,10 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 		// use walk router to calculate access walk time. Since it is a walk trip, there should only be a single leg.
 		List<? extends PlanElement> planElementsAccess = tripRouter.calcRoute(TransportMode.walk, origin, nearestStopAccess, departureTime, null, null);
-		double accessTime_h = ((Leg) planElementsAccess.get(0)).getTravelTime().seconds() / 3600;
-		double utility_access = accessTime_h * betaWalkTT_h;
+		Leg accessLeg = extractLeg(planElementsAccess, TransportMode.walk);
+		double accessTime_h = accessLeg.getTravelTime().seconds() / 3600;
+		double accessDist_m = accessLeg.getRoute().getDistance();
+		double utility_access = accessTime_h * betaWalkTT_h + accessDist_m * betaWalkDist_m;
 
 		// now we iterate through drt stops, each of which has a set of opportunities connected to it (those which are closest to that stop)
 		// we calculate sum of utilities to travel from the origin drt stop to all drt stops that have at least one opportunity close to it
@@ -166,41 +166,73 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
 
 			//TODO: replace actual person with a fake person, or find workaround.
-			List<? extends PlanElement> planElementsMain = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
+			Leg mainLeg = extractLeg(planElements, TransportMode.car);
+			double directRideDistance_m = mainLeg.getRoute().getDistance();
 
-			double directRideDistance_m = ((Leg) planElementsMain.get(2)).getRoute().getDistance();
-
+			// todo: insert CL's DRT Estimator here instead of hardcoding parameters here.
 			double waitTime_s = 103.34; //TODO
 			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
-			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m;
+			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours
 
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
 			double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
 
-			double drtUtility = utility_access + utilityDrtTime + utilityDrtDistance + Math.log(sumExpVjkWalk) + utilityDrtConstant;
+			double drtUtility =
+				utility_access +
+				utilityDrtTime +
+				utilityDrtDistance +
+				Math.log(sumExpVjkWalk) / scoringConfigGroup.getBrainExpBeta() + // todo should this be included in the comparison?
+				utilityDrtConstant;
 
 			// Calculate utility of direct walk
-			// Does this have to be euclidean distance? Couldn't the walk be routed on the network, so that physical boundaries such as rivers would be respected.
-			final Coord toCoord = destination.getNearestBasicLocation().getCoord();
-			double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
-			double directWalkUtility =
-				directDistance_m / walkSpeed_m_h * betaWalkTT_h + // utility based on travel time
-				directDistance_m * betaWalkDist_m + // utility based on travel distance
-				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup); // ASC
+			// todo: why is sumExpVjkWalk included in drtUtility but not in directWalkUtility...
+			// should we really be aggregating around drt stops. Should we not handle each opportuninity seperately, so we can actually compare direct walk times?
+			List<? extends PlanElement> planElementsDirectWalk = tripRouter.calcRoute(TransportMode.walk, origin, (DrtStopFacilityImpl) destination.getNearestBasicLocation(), departureTime, null, null);
+			Leg directWalkLeg = extractLeg(planElementsDirectWalk, TransportMode.walk);
+			double directWalkTime_h = directWalkLeg.getTravelTime().seconds() / 3600;
+			double directWalkDist_m = directWalkLeg.getRoute().getDistance();
+			double directWalkUtility = directWalkTime_h * betaWalkTT_h +
+				directWalkDist_m * betaWalkDist_m +
+				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup);
+
+//			final Coord toCoord = destination.getNearestBasicLocation().getCoord();
+//			double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
+////			double directWalkUtility =
+//				directDistance_m / walkSpeed_m_h * betaWalkTT_h + // utility based on travel time
+//				directDistance_m * betaWalkDist_m + // utility based on travel distance
+//				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup); // ASC
 
 			// Utilities for traveling are generally negative (unless there is a high ASC).
 			// We choose walk if it's utility is higher (less negative) than that of DRT
-			double travelUtility = Math.max(directWalkUtility, drtUtility);
+			// the access drt stop is same as the egress drt stop (which means they don't actually take drt)
+			double travelUtility;
+
+			if (nearestStopAccess.equals(nearestStopEgress) || directWalkUtility > drtUtility) {
+				travelUtility = directWalkUtility;
+			} else {
+				travelUtility = drtUtility;
+			}
 
 			// this is added to the sum of utilities from the measuring point
 			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * travelUtility);
 
 		}
 		return expSum;
+	}
+
+	private static Leg extractLeg(List<? extends PlanElement> planElementsMain, String mode) {
+		List<Leg> legList = planElementsMain.stream().filter(pe -> pe instanceof Leg && ((Leg) pe).getMode().equals(mode)).map(pe -> (Leg) pe).toList();
+
+		if (legList.size() != 1) {
+			throw new RuntimeException("for these accesibility calculations, there should be exactly one leg");
+		}
+
+		return legList.get(0);
 	}
 
 
@@ -242,7 +274,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			DrtStopFacility nearestStop = (DrtStopFacility) ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
 
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, nearestStop, opportunity, 10 * 3600., null, null);// departure time shouldn't matter for walk
-			double egressTime_s = ((Leg) planElements.get(0)).getTravelTime().seconds();
+			Leg leg = extractLeg(planElements, TransportMode.walk);
+			double egressTime_s = leg.getTravelTime().seconds();
 
 			double VjkWalkTravelTime = egressTime_s / 3600 * betaWalkTT_h; // a.k.a utility_egress
 
