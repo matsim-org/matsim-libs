@@ -85,6 +85,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
@@ -176,6 +177,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static Random rnd;
 	private RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
+	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
+
+	//TODO Remove these attributes from all method-signatures
+	private TripDistributionMatrix odMatrix;
+	private Map<String, Object2DoubleMap<String>> resultingDataPerZone;
+	private Map<String, Map<Id<Link>, Link>> linksPerZone;
 
 	private Index indexZones;
 
@@ -265,9 +272,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
-				Map<String, Object2DoubleMap<String>> resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
+				resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 				filterFacilitiesForZones(scenario, facilitiesPerZone);
-				Map<String, Map<Id<Link>, Link>> linksPerZone = filterLinksForZones(scenario, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
+				linksPerZone = filterLinksForZones(scenario, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic ->
@@ -343,6 +350,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private void solveSeparatedVRPs(Scenario originalScenario, Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
 
+		/*
+		TODO: Make a final fix for the unhandledServiceProblem using following procedure:
+			1. solveVRPs
+			2. check if carrierPlans are viable
+			3. if some are not then loop: delete non-viable carrierPlans and execute 1. but with CarrierUtils.solutions#... (will be pushed later)
+		 */
+
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
 		int maxServicesPerCarrier = 100;
@@ -350,6 +364,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			CarriersUtils.getCarriers(originalScenario).getCarriers());
 		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
 		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
+		Map<Id<Carrier>, List<Id<Carrier>>> carrierId2subCarrierIds = new HashMap<>();
 		CarriersUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
 			if (CarriersUtils.getJspritIterations(carrier) == 0) {
 				allCarriers.remove(carrier.getId());
@@ -409,6 +424,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							carrier.getAttributes().getAsMap().keySet().forEach(attribute -> newCarrier.getAttributes()
 								.putAttribute(attribute, carrier.getAttributes().getAttribute(attribute)));
 
+							carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
+							carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
+
 							List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
 								carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
 							List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
@@ -446,14 +464,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					subCarriers.remove(id);
 				}
 			}
-			//Now check if the sub-carrier-plans are viable
-//			makeSubCarrierPlansViable(subCarriers.values());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			CarriersUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
+
+			//Map the values to the new subcarriers
+			for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
+				for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
+					carrierId2carrierAttributes.put(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId));
+				}
+			}
+
 			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario);
-//			checkCarrierPlans(originalScenario);
+			makeAllCarrierPlansViable(originalScenario);
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			if (!splitVRPs)
@@ -475,123 +499,135 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 	}
 
-	private List<CarrierService> handleServiceBatch(VehicleAvailabilityAllocator allocator, List<CarrierService> lastServices, double serviceDuration, int serviceAmount){
-		//Make duration viable and allocate vehicle Time
-		double viableDuration = allocator.makeMultipleServiceDurationsBalancedViable(serviceAmount, serviceDuration+avgDrivingTime);
-		//double viableDuration = serviceDuration+avgDrivingTime;
-		for(int i = 0; i < serviceAmount; i++) assert allocator.allocateServiceDuration(viableDuration-avgDrivingTime);
+	/**
+	 * Checks and recalculates plans of carriers, which did not serve all services.
+	 * This step may take a few minutes.
+	 * @param scenario Scenario with carriers
+	 */
+	private void makeAllCarrierPlansViable(Scenario scenario) {
+		int maxIterations = 100;
 
-		List<CarrierService> newServices = new LinkedList<>();
+		log.info("Starting with carrier-replanning loop.");
+		for(int i = 0; i < maxIterations; i++){
+			log.info("carrier-replanning loop iteration: {}", i);
+			Collection<Carrier> allCarriers = CarriersUtils.getCarriers(scenario).getCarriers().values();
 
-		//Check if duration has changed and create new Services if it did
-		if(viableDuration != serviceDuration+avgDrivingTime){
-			for(CarrierService lastService : lastServices){
-				//the service duration is not viable, change its duration
-				if(viableDuration-avgDrivingTime < 0){
-					/* If this happens, the serviceDuration must be negative in order to ensure, that the carrier can serve it.
-					 * This however does not make sense, so we just leave the value as it is. It will result in unhandled services, but it leaves
-					 * the scenario somehow plausible.
-					 */
-					log.warn("The carrier has too many services to handle! It is impossible to ensure full serving. This may be cause by a to high avgDrivingTime or incorrect source-data.");
-					viableDuration = serviceDuration+avgDrivingTime;
+			if (allCarriersViable(scenario)) break;
+
+			for(Carrier carrier : allCarriers){
+				if (isCarrierViable(carrier)) continue;
+
+				// If we reach this point, the plan for this carrier is not viable. We will replan it
+				CarrierAttributes carrierAttributes = carrierId2carrierAttributes.get(carrier.getId());
+
+				// Generate new services. The new service batch should have a smaller sum of serviceDurations than before (or otherwise it will not change anything)
+				double oldSumOfServiceDurations = getSumOfServiceDurations(scenario, carrier.getId());
+				int j = 0;
+				do {
+					if (j >= maxIterations) break;
+
+					//TODO Remove old vehicles?
+
+					// Create the new services
+					EnumeratedDistribution<TourStartAndDuration> tourDistribution = getCommercialTourSpecifications.createTourDistribution(carrierAttributes.smallScaleCommercialTrafficType, rng);
+					Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> stopDurationTimeSelector = getCommercialTourSpecifications.createStopDurationDistributionPerCategory(carrierAttributes.smallScaleCommercialTrafficType, rng);
+					redrawAllServiceDurations(carrier, stopDurationTimeSelector, tourDistribution, carrierAttributes);
+					j++;
+				} while (getSumOfServiceDurations(scenario, carrier.getId()) > oldSumOfServiceDurations);
+				log.info("Carrer {}: Reduced summed serviceDuration from {} to {}", carrier.getId(), oldSumOfServiceDurations, getSumOfServiceDurations(scenario, carrier.getId()));
+
+				try {
+					CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+				} catch (ExecutionException e) {
+					throw new RuntimeException(e);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
 				}
-				CarrierService newService = CarrierService.Builder.newInstance(lastService.getId(), lastService.getLocationLinkId())
-					.setServiceDuration(viableDuration-avgDrivingTime).setServiceStartTimeWindow(lastService.getServiceStartTimeWindow()).build();
-
-				newServices.add(newService);
-
-				log.info("Reduced serviceDuration (with avg driving time) from {} to {} of service {}", lastService.getServiceDuration()+avgDrivingTime, viableDuration, newService.getId());
 			}
 		}
 
-		return newServices;
-	}
-
-	private void makeSubCarrierPlansViable(Collection<Carrier> subCarriers) {
-		for(Carrier carrier : subCarriers) {
-			List<CarrierService> newServices = new LinkedList<>();
-
-			List<Double> carrierVehicleTimes = new ArrayList<>(carrier.getCarrierCapabilities().getCarrierVehicles().size());
-			for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values())
-				carrierVehicleTimes.add(vehicle.getLatestEndTime() - vehicle.getEarliestStartTime());
-			VehicleAvailabilityAllocator allocator = new VehicleAvailabilityAllocator(carrierVehicleTimes);
-
-			double lastServiceDuration = 0;
-			int lastServiceBatchAmount = 0;
-			List<CarrierService> lastServices = new LinkedList<>();
-			for (CarrierService service : carrier.getServices().values()) {
-				if (service.getServiceDuration() != lastServiceDuration) {
-					log.info("Retiming services of {}", carrier.getId());
-					newServices.addAll(handleServiceBatch(allocator, lastServices, lastServiceDuration, lastServiceBatchAmount));
-					lastServiceDuration = service.getServiceDuration();
-					lastServiceBatchAmount = 0;
-					lastServices = new LinkedList<>();
-				}
-				lastServiceBatchAmount++;
-				lastServices.add(service);
-			}
-			newServices.addAll(handleServiceBatch(allocator, lastServices, lastServiceDuration, lastServiceBatchAmount));
-
-			for (CarrierService newService : newServices) {
-				carrier.getServices().put(newService.getId(), newService);
-			}
+		// Final check
+		if (!allCarriersViable(scenario)){
+			log.warn("Not all services were handled!");
 		}
 	}
 
-	private void checkCarrierPlans(Scenario scenario){
+	private double getSumOfServiceDurations(Scenario scenario, Id<Carrier> carrierId) {
+		double sum = 0;
+		for (CarrierService service : CarriersUtils.getCarriers(scenario).getCarriers().get(carrierId).getServices().values()){
+			sum += service.getServiceDuration();
+		}
+		return sum;
+	}
+
+	private boolean isCarrierViable(Carrier carrier){
+		CarrierPlan plan = carrier.getSelectedPlan();
+		// TODO: remove these debug values
+		double totalVehicleTime = 0;
+		double totalServiceDuration = 0;
+		double totalTravelDuration = 0;
+
+		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
+			totalVehicleTime += vehicle.getLatestEndTime() - vehicle.getEarliestStartTime();
+		}
+
+		List<CarrierService> handledServices = new LinkedList<>();
+		//Check if all services have been handled
+		for(ScheduledTour tour : plan.getScheduledTours()){
+			//DEBUG
+			double thisVehicleTime = tour.getVehicle().getLatestEndTime() - tour.getVehicle().getEarliestStartTime();
+			double thisTourTime = 0;
+
+			for(Tour.TourElement element : tour.getTour().getTourElements()){
+				if(element instanceof Tour.Leg){
+					totalTravelDuration += ((Tour.Leg) element).getExpectedTransportTime();
+					thisTourTime += ((Tour.Leg) element).getExpectedTransportTime();
+				}
+				if(element instanceof Tour.ServiceActivity){
+					handledServices.add(((Tour.ServiceActivity) element).getService());
+					totalServiceDuration += ((Tour.ServiceActivity) element).getDuration();
+					thisTourTime += ((Tour.ServiceActivity) element).getDuration();
+				}
+			}
+
+			//log.info("Tour {} used {} out of {} available vehicle time", tour.getTour().getId(), thisTourTime, thisVehicleTime);
+		}
+
+		List<CarrierService> unhandled = new LinkedList<>();
+		for(CarrierService service : carrier.getServices().values()){
+			if(!handledServices.contains(service)){
+				unhandled.add(service);
+			}
+		}
+
+		if(!unhandled.isEmpty()){
+			//TODO remove this message
+			log.warn("Carrier {}: {} of {} services were not handled! The total vehicle time is: {} ({}); The total serviceDuration is: {} ({}); The total travelDuration is : {}",
+				carrier.getId(),
+				unhandled.size(),
+				carrier.getServices().size(),
+				totalVehicleTime, carrier.getCarrierCapabilities().getCarrierVehicles().size(),
+				totalServiceDuration, carrier.getServices().size(),
+				totalTravelDuration
+			);
+			for(CarrierService s : unhandled){
+				log.warn("Service {} (duration={}) was not handled by carrier {}", s.getId(), s.getServiceDuration(), carrier.getId());
+			}
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
+	private boolean allCarriersViable(Scenario scenario){
 		int successful = 0;
 		for(Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()){
-			CarrierPlan plan = carrier.getSelectedPlan();
-			double totalVehicleTime = 0;
-			double totalServiceDuration = 0;
-			double totalTravelDuration = 0;
-
-			for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
-				totalVehicleTime += vehicle.getLatestEndTime() - vehicle.getEarliestStartTime();
-			}
-
-			List<CarrierService> handledServices = new LinkedList<>();
-			//Check if all services have been handled
-			for(ScheduledTour tour : plan.getScheduledTours()){
-				//DEBUG
-				double thisVehicleTime = tour.getVehicle().getLatestEndTime() - tour.getVehicle().getEarliestStartTime();
-				double thisTourTime = 0;
-
-				for(Tour.TourElement element : tour.getTour().getTourElements()){
-					if(element instanceof Tour.Leg){
-						totalTravelDuration += ((Tour.Leg) element).getExpectedTransportTime();
-						thisTourTime += ((Tour.Leg) element).getExpectedTransportTime();
-					}
-					if(element instanceof Tour.ServiceActivity){
-						handledServices.add(((Tour.ServiceActivity) element).getService());
-						totalServiceDuration += ((Tour.ServiceActivity) element).getDuration();
-						thisTourTime += ((Tour.ServiceActivity) element).getDuration();
-					}
-				}
-
-				log.info("Tour {} used {} out of {} available vehicle time", tour.getTour().getId(), thisTourTime, thisVehicleTime);
-			}
-
-			int i = 0;
-			for(CarrierService handled : handledServices){
-				if(carrier.getServices().containsValue(handled)) i++;
-			}
-
-			if(i != carrier.getServices().values().size()){
-				log.warn("Carrier {}: {} of {} services were not handled! The total vehicle time is: {} ({}); The total serviceDuration is: {} ({}); The total travelDuration is : {}",
-					carrier.getId(),
-					carrier.getServices().size() - i,
-					carrier.getServices().size(),
-					totalVehicleTime, carrier.getCarrierCapabilities().getCarrierVehicles().size(),
-					totalServiceDuration, carrier.getServices().size(),
-					totalTravelDuration
-				);
-			} else {
-				successful++;
-			}
+			if(isCarrierViable(carrier)) successful++;
 		}
 
 		log.info("{} of {} carriers were fully served!", successful, CarriersUtils.getCarriers(scenario).getCarriers().size());
+		return successful == CarriersUtils.getCarriers(scenario).getCarriers().size();
 	}
 
 	private void createCarriersAndDemand(Path output, Scenario scenario,
@@ -620,7 +656,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
-		final TripDistributionMatrix odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
+		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, linksPerZone);
 		createCarriers(
 			scenario,
@@ -784,6 +820,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							else
 								selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
 						}
+						// TODO #1
 
 						// Generate carrierName
 						String carrierName = null;
@@ -808,34 +845,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							tourDistribution);
 
 						// Now Create services for this carrier
-						log.info("Create services for carrier: {}", carrierName);
-						for (String stopZone : odMatrix.getListOfZones()) {
-							int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(startZone,
-								stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
-							int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / odMatrixEntry.occupancyRate);
-							if (numberOfJobs == 0)
-								continue;
-							// find a category for the tour stop with existing employees in this zone
-							String selectedStopCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
-							while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-								selectedStopCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
-							String[] serviceArea = new String[]{stopZone};
-							Carrier newCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class));
-							for (int i = 0; i < numberOfJobs; i++) {
-								int serviceTimePerStop;
-								if (selectedStartCategory.equals("Inhabitants"))
-									serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, odMatrixEntry.possibleStartCategories.getFirst(),
-										modeORvehType, smallScaleCommercialTrafficType);
-								else
-									serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, selectedStartCategory, modeORvehType,
-										smallScaleCommercialTrafficType);
+						Carrier newCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class));
+						CarrierAttributes carrierAttributes = new CarrierAttributes(
+							purpose,
+							startZone,
+							selectedStartCategory,
+							modeORvehType,
+							smallScaleCommercialTrafficType,
+							vehicleDepots,
+							odMatrixEntry);
 
-								TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
-									36 * 3600); // extended time window, so that late tours can handle it
-								createServices(newCarrier, vehicleDepots, selectedStopCategory, serviceArea, serviceTimePerStop, serviceTimeWindow,
-									linksPerZone);
-							}
-						}
+						carrierId2carrierAttributes.put(Id.create(carrierName, Carrier.class), carrierAttributes);
+
+						createServices(newCarrier,
+							resultingDataPerZone,
+							stopDurationTimeSelector,
+							tourDistribution,
+							odMatrix,
+							linksPerZone,
+							carrierAttributes);
 					}
 				}
 			}
@@ -845,13 +873,68 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
-	 * Creates the services for one carrier.
+	 * Generates and adds the services for the given carrier.
+	 * TODO In-source this method back into create carriers
 	 */
-	private void createServices(Carrier newCarrier, ArrayList<String> noPossibleLinks, String selectedStopCategory, String[] serviceArea,
-								Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
-								Map<String, Map<Id<Link>, Link>> linksPerZone) {
+	private void createServices(Carrier newCarrier,
+								Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+								Map<GenerateSmallScaleCommercialTrafficDemand. StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand. DurationsBounds>> stopDurationTimeSelector,
+								EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand. TourStartAndDuration> tourDistribution,
+								TripDistributionMatrix odMatrix,
+								Map<String, Map<Id<Link>, Link>> linksPerZone,
+								CarrierAttributes carrierAttributes) {
+		log.info("Create services for carrier: {}", newCarrier.getId());
+		for (String stopZone : odMatrix.getListOfZones()) {
+			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
+				stopZone, carrierAttributes.modeORvehType, carrierAttributes.purpose, carrierAttributes.smallScaleCommercialTrafficType));
+			int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / carrierAttributes.odMatrixEntry.occupancyRate);
+			if (numberOfJobs == 0)
+				continue;
+			// find a category for the tour stop with existing employees in this zone
+			String selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
+			while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+				selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
+			for (int i = 0; i < numberOfJobs; i++) {
+				int serviceTimePerStop;
+				if (carrierAttributes.selectedStartCategory.equals("Inhabitants")){
+					//TODO This is a bit ugly. Do we even need the selectedStartCategory of the carrierAttributes in this case? Or can we just set it right at the beginning? (move it to TODO #1)
+					CarrierAttributes inhabitantAttributes = new CarrierAttributes(
+						carrierAttributes.purpose,
+						carrierAttributes.startZone,
+						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(),
+						carrierAttributes.modeORvehType,
+						carrierAttributes.smallScaleCommercialTrafficType,
+						carrierAttributes.vehicleDepots,
+						carrierAttributes.odMatrixEntry);
+					serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, inhabitantAttributes);
 
-		String stopZone = serviceArea[0];
+				}
+				else {
+					serviceTimePerStop = getServiceTimePerStop(
+						newCarrier,
+						stopDurationTimeSelector, tourDistribution,
+						carrierAttributes);
+				}
+
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
+					36 * 3600); // extended time window, so that late tours can handle it
+				createService(newCarrier,
+					carrierAttributes.vehicleDepots,
+					selectedStopCategory,
+					stopZone,
+					serviceTimePerStop,
+					serviceTimeWindow,
+					linksPerZone);
+			}
+		}
+	}
+
+	/**
+	 * Adds a service with the given attributes to the carrier.
+	 */
+	private void createService(Carrier newCarrier, ArrayList<String> noPossibleLinks, String selectedStopCategory, String stopZone,
+							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow,
+							   Map<String, Map<Id<Link>, Link>> linksPerZone) {
 
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks, linksPerZone);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + rnd.nextInt(10000),
@@ -860,6 +943,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
 			.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
 		newCarrier.getServices().put(thisService.getId(), thisService);
+	}
+
+	/**
+	 * Redraws the service-durations of all {@link CarrierService}s of the given {@link Carrier}.
+	 */
+	private void redrawAllServiceDurations(Carrier carrier,
+										   Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> stopDurationTimeSelector,
+										   EnumeratedDistribution<TourStartAndDuration> tourDistribution,
+										   CarrierAttributes carrierAttributes) {
+		for (CarrierService service : carrier.getServices().values()) {
+			double newServiceDuration = getServiceTimePerStop(carrier, stopDurationTimeSelector, tourDistribution, carrierAttributes);
+			CarrierService redrawnService = CarrierService.Builder.newInstance(service.getId(), service.getLocationLinkId())
+				.setServiceDuration(newServiceDuration).setServiceStartTimeWindow(service.getServiceStartTimeWindow()).build();
+			carrier.getServices().put(redrawnService.getId(), redrawnService);
+		}
 	}
 
 	/**
@@ -946,24 +1044,24 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Give a service duration based on the purpose and the trafficType under a given probability
 	 *
-	 * @param serviceDurationTimeSelector the selector for the service duration
-	 * @param tourDistribution            the distribution for the tour start and duration
-	 * @param employeeCategory            the category of the employee
-	 * @param modeORvehType               the mode or vehicle type
+	 * @param newCarrier 					The carrier for which we generate the serviceTime
+	 * @param serviceDurationTimeSelector 	the selector for the service duration
+	 * @param tourDistribution            	the distribution for the tour start and duration
+	 * @param carrierAttributes           	attributes of the carrier to generate the service time for.
+	 *                                      	selectedStartCategory: the category of the employee
 	 * @return the service duration
 	 */
 	private Integer getServiceTimePerStop(Carrier newCarrier,
 										  Map<StopDurationGoodTrafficKey, EnumeratedDistribution<DurationsBounds>> serviceDurationTimeSelector,
-										  EnumeratedDistribution<TourStartAndDuration> tourDistribution, String employeeCategory,
-										  String modeORvehType, String smallScaleCommercialTrafficType) {
+										  EnumeratedDistribution<TourStartAndDuration> tourDistribution, CarrierAttributes carrierAttributes) {
 
 		GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey key = null;
-		if (smallScaleCommercialTrafficType.equals(
+		if (carrierAttributes.smallScaleCommercialTrafficType.equals(
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
-			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(employeeCategory, null);
-		else if (smallScaleCommercialTrafficType.equals(
+			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(carrierAttributes.selectedStartCategory, null);
+		else if (carrierAttributes.smallScaleCommercialTrafficType.equals(
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
-			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(employeeCategory, modeORvehType);
+			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(carrierAttributes.selectedStartCategory, carrierAttributes.modeORvehType);
 		}
 		// old Version
 //		GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
@@ -1006,8 +1104,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		}
 
-		throw new RuntimeException("No possible service duration found for employee category '" + employeeCategory + "' and mode '"
-			+ modeORvehType + "' in traffic type '" + smallScaleCommercialTrafficType + "'");
+		throw new RuntimeException("No possible service duration found for employee category '" + carrierAttributes.selectedStartCategory + "' and mode '"
+			+ carrierAttributes.modeORvehType + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType + "'");
 
 	}
 
@@ -1369,5 +1467,22 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public record TourStartAndDuration(int hourLower, int hourUpper, double minDuration, double maxDuration) {}
 
 	public record DurationsBounds(int minDuration, int maxDuration) {}
+
+	/**
+	 * The attributes of a carrier, used during the generation
+	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link VehicleSelection} to get more information about this carrier.
+	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
+	 * @param selectedStartCategory start category of this carrier, selected randomly from {@link VehicleSelection.OdMatrixEntryInformation#possibleStartCategories}
+	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
+	 * @param smallScaleCommercialTrafficType entry from {@link SmallScaleCommercialTrafficType}
+	 * @param vehicleDepots Containing the depots of this carrier with linkIds as strings
+	 */
+	private record CarrierAttributes(int purpose,
+									 String startZone,
+									 String selectedStartCategory,
+									 String modeORvehType,
+									 String smallScaleCommercialTrafficType,
+									 ArrayList<String> vehicleDepots,
+									 VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {}
 
 }
