@@ -85,7 +85,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
-		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();// todo
+		// todo: I added a getter to access the stop finder. Is this ok?
+		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();
 //		this.drtEstimator = new EuclideanDistanceBasedDrtEstimator(scenario.getNetwork(), 1.2, 0.0842928, 337.1288522,  5 * 60, 0, 0, 0);
 //		this.drtEstimator = DetourBasedDrtEstimator.normalDistributed(337.1288522, 0.0842928, 0., 0. * 60, 0);
 
@@ -105,6 +106,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		Gbl.assertNotNull(measuringPoints);
 		Gbl.assertNotNull(measuringPoints.getFacilities());
 
+		// todo: should I aggregate the measuring points to the nearest drt stop. Or do we in the near future want to compare the drt routes between multiple access/egress drt stops?
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> facilityId = measuringPoint.getId();
 			if(!aggregatedMeasurePoints.containsKey(facilityId)) {
@@ -127,6 +129,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
 
 
+		// todo: same question as above...
 		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, scenario.getConfig());
 
 
@@ -273,6 +276,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
 			DrtStopFacility nearestStop = (DrtStopFacility) ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
 
+			// todo: should I use the euclidean distance or the distance w/ beeline factor?
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, nearestStop, opportunity, 10 * 3600., null, null);// departure time shouldn't matter for walk
 			Leg leg = extractLeg(planElements, TransportMode.walk);
 			double egressTime_s = leg.getTravelTime().seconds();
