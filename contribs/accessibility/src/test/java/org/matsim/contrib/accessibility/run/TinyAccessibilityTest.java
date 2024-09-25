@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -75,10 +76,13 @@ public class TinyAccessibilityTest {
 		acg.setBoundingBoxRight(max);
 		acg.setUseParallelization(false);
 
+		// ---
+
 		final Scenario scenario = createTestScenario(config);
 
-		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+		// ---
 
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
 		builder.addDataListener( new ResultsComparator() );
@@ -106,10 +110,15 @@ public class TinyAccessibilityTest {
 		acg.setUseParallelization(false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
 
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		// ---
+
 		final Scenario scenario = createTestScenario(config);
 
-		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+		// ---
 
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
 		builder.addDataListener( new ResultsComparator() );
