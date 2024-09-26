@@ -611,15 +611,14 @@ public final class DemandReaderFromCSV {
 				possiblePersonsForService.putAll(population.getPersons());
 			int numberPossibleServices = (int) Math
 					.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			if (sampleSizeInputPopulation == sampleTo)
-				numberOfJobs = (int) Math.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			else if (samplingOption.equals("changeNumberOfLocationsWithDemand"))
-				numberOfJobs = (int) Math.round((sampleTo / sampleSizeInputPopulation)
-						* (shareOfPopulationWithThisService * possiblePersonsForService.size()));
-			else if (samplingOption.equals("changeDemandOnLocation")) {
-				demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-				numberOfJobs = (int) Math.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			} else
+			int sampledNumberPossibleServices = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleServices);
+			if (sampleSizeInputPopulation == sampleTo || samplingOption.equals("changeDemandOnLocation"))
+				numberOfJobs = numberPossibleServices;
+			else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
+				numberOfJobs = sampledNumberPossibleServices;
+				numberPossibleServices = numberOfJobs;
+			}
+			else
 				throw new RuntimeException(
 						"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			if (numberPossibleServices != 0)
@@ -823,37 +822,24 @@ public final class DemandReaderFromCSV {
 			int sampledNumberPossibleJobsPickup = (int)Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
 			int sampledNumberPossibleJobsDelivery = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup > numberPossibleJobsDelivery) {
-				if (sampleSizeInputPopulation == sampleTo) {
-					numberOfJobs = (int) Math.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
-					numberPossibleJobsPickup = numberOfJobs;
-					if (shareOfPopulationWithThisDelivery != null)
-						numberPossibleJobsDelivery = (int) Math
-								.round(shareOfPopulationWithThisDelivery * numberPossibleJobsDelivery);
+				if (sampleSizeInputPopulation == sampleTo ||samplingOption.equals("changeDemandOnLocation")) {
+					numberOfJobs = numberPossibleJobsPickup;
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
 					numberOfJobs = sampledNumberPossibleJobsPickup;
 					numberPossibleJobsPickup = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
 						numberPossibleJobsDelivery = sampledNumberPossibleJobsDelivery;
-				} else if (samplingOption.equals("changeDemandOnLocation")) {
-					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-					numberOfJobs = numberPossibleJobsPickup;
 				} else
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			} else {
-				if (sampleSizeInputPopulation == sampleTo) {
-					numberOfJobs = (int) Math.round(shareOfPopulationWithThisDelivery * numberPossibleJobsDelivery);
-					numberPossibleJobsDelivery = numberOfJobs;
-					numberPossibleJobsPickup = (int) Math
-							.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
+				if (sampleSizeInputPopulation == sampleTo ||samplingOption.equals("changeDemandOnLocation")) {
+					numberOfJobs = numberPossibleJobsDelivery;
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
 					numberOfJobs = sampledNumberPossibleJobsDelivery;
 					numberPossibleJobsDelivery = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
 						numberPossibleJobsPickup = sampledNumberPossibleJobsPickup;
-				} else if (samplingOption.equals("changeDemandOnLocation")) {
-					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-					numberOfJobs = numberPossibleJobsDelivery;
 				} else
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
