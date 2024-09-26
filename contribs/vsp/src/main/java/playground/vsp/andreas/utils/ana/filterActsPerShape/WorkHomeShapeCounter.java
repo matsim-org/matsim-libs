@@ -27,8 +27,9 @@ import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
@@ -40,7 +41,6 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 

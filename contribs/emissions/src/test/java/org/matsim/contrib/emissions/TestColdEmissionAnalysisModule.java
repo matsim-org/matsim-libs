@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -88,7 +87,7 @@ public class TestColdEmissionAnalysisModule {
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
 
-	// emission factors for tables - no dublicates!
+	// emission factors for tables - no duplicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
 	private static final Double averageAverageFactor = .1;

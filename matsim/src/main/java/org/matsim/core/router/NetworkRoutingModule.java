@@ -42,6 +42,7 @@ import org.matsim.facilities.Facility;
  *
  * @author thibautd
  */
+@Deprecated // use NetworkRoutingInclAccessEgressModule instead
 public final class NetworkRoutingModule implements RoutingModule {
 	// I think it makes sense to NOT add the bushwhacking mode directly into here ...
 	// ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId(). kai, dec'15
@@ -81,11 +82,13 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		if ( fromLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( fromFacility.getCoord() ) ;
 			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
 		}
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
 		if ( toLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( toFacility.getCoord() ) ;
 			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
 		}

@@ -37,7 +37,8 @@ class RunCreateDataDistributionOfStructureDataTest {
 		String investigationAreaData = Path.of(utils.getPackageInputDirectory()).getParent().resolve("investigationAreaData.csv").toString();
 
 		new CreateDataDistributionOfStructureData().execute(
-			"--pathOutput", utils.getOutputDirectory(),
+			"--outputFacilityFile", utils.getOutputDirectory() + "/commercialFacilities.xml.gz",
+			"--outputDataDistributionFile", utils.getOutputDirectory() + "/dataDistributionPerZone.csv",
 			"--landuseConfiguration", useOSMBuildingsAndLanduse,
 			"--regionsShapeFileName", regionsShapeFileName,
 			"--regionsShapeRegionColumn", regionsShapeRegionColumn,

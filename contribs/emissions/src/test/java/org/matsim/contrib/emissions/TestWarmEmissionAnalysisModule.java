@@ -20,11 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.geotools.metadata.iso.quality.TemporalAccuracyImpl;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +47,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
- *
+ * <p>
  * WarmEmissionAnalysisModule (weam)
  * public methods and corresponding tests:
  * weamParameter - testWarmEmissionAnalysisParameter
@@ -58,17 +55,17 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * get free flow occurences - testCounters*()
  * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get stop-go occurences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
  * get top go km couter - testCounters*()
  * get warm emission event counter - testCounters*()
- *
+ * <p>
  * private methods and corresponding tests:
  * rescale warm emissions - rescaleWarmEmissionsTest()
  * calculate warm emissions - implicitly tested
  * convert string 2 tuple - implicitly tested
- *
+ * <p>
  * in all cases the needed tables are created manually by the setUp() method
  * see test methods for details on the particular test cases
  **/
@@ -105,8 +102,8 @@ public class TestWarmEmissionAnalysisModule {
 
 	private final Double noeFreeSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
 
-	// case 6 - data in detailed table, stop go speed = free flow speed
-	private final String sgffRoadCatgory = "URB_case7";
+	// case 6 - data in detailed table, stop-go speed = free flow speed
+	private final String sgffRoadCategory = "URB_case7";
 	private final String sgffTechnology = "sg ff technology";
 	private final String sgffConcept = "sg ff concept";
 	private final String sgffSizeClass = "sg ff size class";
@@ -127,7 +124,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> sgffVehicleId = Id.create("vehicle sg equals ff", Vehicle.class);
 		double sgffLinklength = 4000.;
 		Link sgflink = createMockLink("link sgf", sgffLinklength, AVG_PASSENGER_CAR_SPEED_FF_KMH / 3.6);
-		EmissionUtils.setHbefaRoadType(sgflink, sgffRoadCatgory);
+		EmissionUtils.setHbefaRoadType(sgflink, sgffRoadCategory);
 
 		Id<VehicleType> sgffVehicleTypeId = Id.create( PASSENGER_CAR + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -185,8 +182,6 @@ public class TestWarmEmissionAnalysisModule {
 			excep = true;
 		}
 		Assertions.assertFalse(excep);
-
-		excep=false;
 	}
 
 	@ParameterizedTest
@@ -212,7 +207,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 	}
 
 	@ParameterizedTest
@@ -237,7 +232,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 	}
 
 	@ParameterizedTest
@@ -260,7 +255,7 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assertions.assertTrue(excep); excep=false;
+		Assertions.assertTrue(excep);
 
 	}
 
@@ -270,7 +265,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp(emissionsComputationMethod);
 		emissionsModule.reset();
 
-		// case 10 - data in detailed table, stop go speed > free flow speed
+		// case 10 - data in detailed table, stop-go speed > free flow speed
 		Id<Vehicle> tableVehicleId = Id.create("vehicle 8", Vehicle.class);
 		double tableLinkLength= 30.*1000;
 		Id<VehicleType> tableVehicleTypeId = Id.create(
@@ -349,7 +344,7 @@ public class TestWarmEmissionAnalysisModule {
 			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(sgffRoadCatgory);
+				detWarmKey.setRoadCategory(sgffRoadCategory);
 				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -367,7 +362,7 @@ public class TestWarmEmissionAnalysisModule {
 			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(sgffRoadCatgory);
+				detWarmKey.setRoadCategory(sgffRoadCategory);
 				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 				detWarmKey.setVehicleAttributes(vehAtt);
 				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -379,7 +374,7 @@ public class TestWarmEmissionAnalysisModule {
 	static void fillAverageTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable ) {
 
 		// entries for first case "petrol" should not be used since there are entries in the detailed table
-		// there should only average vehicle attributes in the avgHebfWarmTable jm oct'18
+		// there should only average vehicle attributes in the avgHbefaWarmTable jm oct'18
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 
 

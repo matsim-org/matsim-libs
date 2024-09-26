@@ -17,7 +17,7 @@ public class EmissionsByPollutantTest {
 
 	// The EmissionsByPollutant potentially adds up the same emissions coming from cold and warm.  Thus, this cannot be combined into the enum approach
 	// without some thinking.  kai, jan'20
-	// Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyways, the JM map of those emissions that are actually present in the
+	// Quite possibly, should just combine them into an enum "pollutant"?!  There is, anyway, the JM map of those emissions that are actually present in the
 	// input file.  kai, jan'20
 
 	@Test
@@ -25,8 +25,7 @@ public class EmissionsByPollutantTest {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
-        Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		Map<Pollutant, Double> map = new LinkedHashMap<>(emissions);
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant( map ) ;
 
@@ -46,8 +45,7 @@ public class EmissionsByPollutantTest {
         final Pollutant pollutant = CO;
         final double expectedValue = emissions.get(pollutant) + valueToAdd;
 
-        Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		Map<Pollutant, Double> map = new LinkedHashMap<>(emissions);
 
         EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(map);
 
@@ -79,13 +77,11 @@ public class EmissionsByPollutantTest {
 
         Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
-        Map<Pollutant,Double> map = new LinkedHashMap<>();
-        emissions.forEach( map::put ) ;
+		Map<Pollutant, Double> map = new LinkedHashMap<>(emissions);
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant(map);
 
-        Map<Pollutant,Double> map2 = new LinkedHashMap<>();
-        emissions.forEach( map2::put ) ;
+		Map<Pollutant, Double> map2 = new LinkedHashMap<>(emissions);
 
         linkEmissions.addEmissions(map2);
 

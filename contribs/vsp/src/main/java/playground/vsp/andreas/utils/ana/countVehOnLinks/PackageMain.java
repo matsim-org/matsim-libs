@@ -21,6 +21,7 @@ package playground.vsp.andreas.utils.ana.countVehOnLinks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -31,7 +32,6 @@ import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class PackageMain extends Links2ESRIShape{
 

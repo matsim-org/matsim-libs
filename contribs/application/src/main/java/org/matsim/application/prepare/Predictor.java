@@ -11,6 +11,7 @@ public interface Predictor {
 
 	/**
 	 * Predict value from given features.
+	 * @return predicted value, maybe NaN if no prediction is possible.
 	 */
 	double predict(Object2DoubleMap<String> features, Object2ObjectMap<String, String> categories);
 

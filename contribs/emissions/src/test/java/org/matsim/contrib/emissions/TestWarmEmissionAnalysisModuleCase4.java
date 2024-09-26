@@ -23,7 +23,6 @@ package org.matsim.contrib.emissions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Id;
@@ -57,12 +56,12 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
- * get free flow occurences - testCounters*()
- * get fraction occurences - testCounters*()
- * get stop go occurences - testCounters*()
+ * get free flow occurrences - testCounters*()
+ * get fraction occurrences - testCounters*()
+ * get stop-go occurrences - testCounters*()
  * get km counter - testCounters*()
  * get free flow km counter - testCounters*()
- * get top go km couter - testCounters*()
+ * get top go km counter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
  * private methods and corresponding tests:
@@ -105,7 +104,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	/*
 	 * this test method creates a vehicle (lpg properties) and a mock link
-	 * for two cases:  "avg speed = stop go speed" & "avg speed = free flow speed" the PM warm Emissions and the Emissions "sum" are tested
+	 * for two cases:  "avg speed = stop-go speed" & "avg speed = free flow speed" the PM warm Emissions and the Emissions "sum" are tested
 	 * average values are used
 	 */
 	@ParameterizedTest
@@ -123,7 +122,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle lpgVehicle = vehFac.createVehicle(lpgVehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 
-		// sub case avg speed = stop go speed
+		// subcase avg speed = stop-go speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/ SPEED_SG *3.6 );
 		Assertions.assertEquals( AVG_PC_FACTOR_SG *lpgLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON );
 		emissionEventManager.reset();
@@ -132,7 +131,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		emissionEventManager.reset();
 		warmEmissions.clear();
 
-		// sub case avg speed = free flow speed
+		// subcase avg speed = free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/ SPEED_FF *3.6 );
 		Assertions.assertEquals( AVG_PC_FACTOR_FF *lpgLinkLength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
 		emissionEventManager.reset();
@@ -144,7 +143,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	/*
 	 * this test method creates a vehicle and mock link
-	 * for two cases:  "avg speed = stop go speed" & "avg speed = free flow speed" the PM warm Emissions are tested
+	 * for two cases:  "avg speed = stop-go speed" & "avg speed = free flow speed" the PM warm Emissions are tested
 	 * average values are used
 	 */
 	@ParameterizedTest
@@ -161,7 +160,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 		Link lpgLink = TestWarmEmissionAnalysisModule.createMockLink("link zero", lpgLinkLength, SPEED_FF / 3.6 );
 
-		// sub case: current speed equals free flow speed
+		// subcase: current speed equals free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/ SPEED_FF *3.6 );
 		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assertions.assertEquals(lpgLinkLength/1000, emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
@@ -172,7 +171,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		Assertions.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 		emissionsModule.reset();
 
-		// sub case: current speed equals free flow speed
+		// subcase: current speed equals free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/ SPEED_SG *3.6 );
 		Assertions.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assertions.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );

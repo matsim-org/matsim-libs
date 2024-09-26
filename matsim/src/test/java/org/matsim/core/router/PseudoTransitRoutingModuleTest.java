@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
@@ -135,6 +136,7 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			s.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
 			walk.setBeelineDistanceFactor(1.3);
 			walk.setTeleportedModeSpeed(3.0 / 3.6);

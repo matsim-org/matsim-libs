@@ -66,10 +66,10 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 	}
 	public SquareGridZoneSystem(Network network, double cellSize, boolean filterByNetwork, Predicate<Zone> zoneFilter) {
 		this.zoneFilter = zoneFilter;
-		Preconditions.checkArgument(!network.getNodes().isEmpty(), "Cannot create SquareGrid if no nodes");
-
 		this.network = network;
 		this.cellSize = cellSize;
+
+		Preconditions.checkArgument(!network.getNodes().isEmpty(), "Cannot create SquareGrid if no nodes");
 
 		initBounds();
 

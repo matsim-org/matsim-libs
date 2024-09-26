@@ -89,7 +89,7 @@ public class MultiModalControlerListenerTest {
 	static void runSimpleScenario(int numberOfThreads) {
 
 		Config config = ConfigUtils.createConfig();
-
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.qsim().setEndTime(24 * 3600);
 
 		config.controller().setLastIteration(0);

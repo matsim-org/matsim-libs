@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.tuple.Pair;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygonal;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -28,8 +30,6 @@ import org.matsim.contrib.common.zones.util.ZoneFinderImpl;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,16 +55,16 @@ public final class ZoneSystemUtils {
 	private ZoneSystemUtils() {}
 
 	public static ZoneSystem createZoneSystem(Network network, ZoneSystemParams zoneSystemParams) {
-		return createZoneSystem(null, network, zoneSystemParams, null);
+		return createZoneSystem(null, network, zoneSystemParams, null, zone -> true);
 	}
 
 	public static ZoneSystem createZoneSystem(URL context, Network network, ZoneSystemParams zoneSystemParams) {
-		return createZoneSystem(context, network, zoneSystemParams, null);
+		return createZoneSystem(context, network, zoneSystemParams, null, zone -> true);
 	}
 
-
 	public static ZoneSystem createZoneSystem(@Nullable URL context, @Nonnull Network network,
-											  @Nonnull ZoneSystemParams zoneSystemParams, @Nullable String crs) {
+											  @Nonnull ZoneSystemParams zoneSystemParams, @Nullable String crs,
+											  Predicate<Zone> zoneFilter) {
 
 		final ZoneSystem zoneSystem = switch (zoneSystemParams.getName()) {
 			case GISFileZoneSystemParams.SET_NAME -> {
@@ -72,20 +72,15 @@ public final class ZoneSystemUtils {
 				Preconditions.checkNotNull(context);
 				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
 				Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
-				yield ZoneSystemUtils.createFromFeatures(network, features);
+				yield ZoneSystemUtils.createFromFeatures(network, features, zoneFilter);
 			}
 			case SquareGridZoneSystemParams.SET_NAME -> {
 				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).cellSize);
-
-				Predicate<Zone> zoneFilter = zone -> true;
-				SquareGridZoneSystem squareGridZoneSystem = new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).cellSize, zoneFilter);
-				yield squareGridZoneSystem;
+                yield new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).cellSize, zoneFilter);
 			}
 			case H3GridZoneSystemParams.SET_NAME -> {
 				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).h3Resolution);
 				Preconditions.checkNotNull(crs);
-
-				Predicate<Zone> zoneFilter = zone -> true;
 				yield  new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
 			}
 			default -> throw new IllegalStateException("Unexpected value: " + zoneSystemParams.getName());
@@ -93,7 +88,7 @@ public final class ZoneSystemUtils {
 		return zoneSystem;
 	}
 
-	public static ZoneSystem createFromFeatures(Network network, Collection<SimpleFeature> features) {
+	public static ZoneSystem createFromFeatures(Network network, Collection<SimpleFeature> features, Predicate<Zone> zoneFilter) {
 
 		Map<String, PreparedFeature> featureById = StreamEx.of(features.stream())
 			.mapToEntry(SimpleFeature::getID, sf -> new PreparedFeature(sf, new PreparedPolygon((Polygonal) sf.getDefaultGeometry())))
@@ -119,8 +114,8 @@ public final class ZoneSystemUtils {
 				}
 				return zone;
             })
+			.filter(zoneFilter)
 			.collect(IdCollectors.toIdMap(Zone.class, Identifiable::getId, zone -> zone));
-
 
 		return new ZoneSystemImpl(zones.values(), new ZoneFinderImpl(zones), network);
 	}

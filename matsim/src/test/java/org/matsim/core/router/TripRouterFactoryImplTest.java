@@ -66,6 +66,7 @@ public class TripRouterFactoryImplTest {
 	void testRestrictedNetworkNoPt() throws Exception {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit( false );
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		testRestrictedNetwork( config );
 	}
@@ -153,6 +154,7 @@ public class TripRouterFactoryImplTest {
 	@Test
 	void testMonomodalNetwork() throws Exception {
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 

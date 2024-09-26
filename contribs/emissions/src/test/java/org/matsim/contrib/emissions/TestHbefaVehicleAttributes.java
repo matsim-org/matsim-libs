@@ -53,7 +53,7 @@ public class TestHbefaVehicleAttributes {
 		compare.setHbefaEmConcept(concept);
 
 		String assertErrorMessage = "These hbefa vehicle attribute objects should have been the same: ";
-		assertErrorMessage += normal.toString() + " and " + compare.toString();
+		assertErrorMessage += normal.toString() + " and " + compare;
 		Assertions.assertEquals(normal, compare, assertErrorMessage);
 		Assertions.assertEquals(compare, normal, assertErrorMessage);
 
@@ -73,7 +73,7 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaSizeClass(sizeClass);
 		differentValues.setHbefaTechnology(technology);
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
-		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
+		assertErrorMessage += normal.toString() + " and " + differentValues;
 		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
 		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 	}
@@ -91,7 +91,7 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaSizeClass("small size");
 		differentValues.setHbefaTechnology(technology);
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
-		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
+		assertErrorMessage += normal.toString() + " and " + differentValues;
 		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
 		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 
@@ -110,7 +110,7 @@ public class TestHbefaVehicleAttributes {
 		differentValues.setHbefaSizeClass(sizeClass);
 		differentValues.setHbefaTechnology("other technology");
 		assertErrorMessage = "These hbefa vehicle attribute objects should not have been the same: ";
-		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
+		assertErrorMessage += normal.toString() + " and " + differentValues;
 		Assertions.assertNotEquals(normal, differentValues, assertErrorMessage);
 		Assertions.assertNotEquals(differentValues, normal, assertErrorMessage);
 
@@ -195,7 +195,7 @@ public class TestHbefaVehicleAttributes {
 	}
 
 }
-	
 
-	
+
+
 

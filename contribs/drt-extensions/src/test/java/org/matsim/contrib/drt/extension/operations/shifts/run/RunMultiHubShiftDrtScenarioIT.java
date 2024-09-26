@@ -4,16 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
-import org.matsim.contrib.drt.extension.operations.DrtWithOperationsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -34,7 +34,7 @@ public class RunMultiHubShiftDrtScenarioIT {
 	@Test
 	void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithOperationsConfigGroup::new);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
 		String fleetFile = "holzkirchenMultiHubFleet.xml";
 		String plansFile = "holzkirchenPlans.xml.gz";
@@ -42,21 +42,23 @@ public class RunMultiHubShiftDrtScenarioIT {
 		String opFacilitiesFile = "holzkirchenMultiHubOperationFacilities.xml";
 		String shiftsFile = "holzkirchenMultiHubShifts.xml";
 
-		DrtWithOperationsConfigGroup drtWithShiftsConfigGroup = (DrtWithOperationsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
 		drtConfigGroup.mode = TransportMode.drt;
-		DrtOptimizationConstraintsParams constraintsParam = drtConfigGroup.getDrtOptimizationConstraintsParam();
-		constraintsParam.maxTravelTimeAlpha = 1.5;
-        constraintsParam.maxTravelTimeBeta = 10. * 60.;
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 		drtConfigGroup.stopDuration = 30.;
-        constraintsParam.maxWaitTime = 600.;
-        constraintsParam.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
+        defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
+        defaultConstraintsSet.maxWaitTime = 600.;
+        defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        defaultConstraintsSet.maxWalkDistance = 1000.;
 		drtConfigGroup.useModeFilteredSubnetwork = false;
 		drtConfigGroup.vehiclesFile = fleetFile;
 		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
 		drtConfigGroup.plotDetailedCustomerStats = true;
-        constraintsParam.maxWalkDistance = 1000.;
 		drtConfigGroup.idleVehiclesReturnToDepots = false;
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

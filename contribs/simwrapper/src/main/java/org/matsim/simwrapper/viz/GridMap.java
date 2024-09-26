@@ -10,6 +10,12 @@ import java.util.Map;
 public class GridMap extends Viz {
 
 	/**
+	 * The unit of the values.
+	 */
+	@JsonProperty(required = false)
+	public String unit;
+
+	/**
 	 * The center of the map.
 	 */
 	@JsonProperty(required = false)

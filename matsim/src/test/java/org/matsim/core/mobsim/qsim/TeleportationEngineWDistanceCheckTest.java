@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -64,6 +65,7 @@ public class TeleportationEngineWDistanceCheckTest {
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controller().setLastIteration(0);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		ActivityParams params = new ActivityParams("dummy" ) ;
 		config.scoring().addActivityParams(params);

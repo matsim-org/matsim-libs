@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.common.zones.io;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.core.utils.gis.GeoFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.net.URL;
 import java.util.Collection;

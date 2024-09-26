@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,6 +78,7 @@ public class NoiseConfigGroupIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
