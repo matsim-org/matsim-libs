@@ -2,13 +2,11 @@ package org.matsim.freightDemandGeneration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,7 +39,7 @@ public class DemandReaderFromCSVTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testLinkForPerson() throws IOException {
+	void testLinkForPerson() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(
 				"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
@@ -61,9 +59,6 @@ public class DemandReaderFromCSVTest {
 		Assertions.assertEquals("j(8,8)R",nearestLinkPerPerson.get(Id.createPersonId("person6")).values().iterator().next());
 		Assertions.assertEquals("i(5,9)R",nearestLinkPerPerson.get(Id.createPersonId("person7")).values().iterator().next());
 		Assertions.assertEquals("i(9,5)R",nearestLinkPerPerson.get(Id.createPersonId("person8")).values().iterator().next());
-
-
-
 	}
 
 	@Test
@@ -82,7 +77,6 @@ public class DemandReaderFromCSVTest {
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		String shapeCategory = "Ortsteil";
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
-		Collection<SimpleFeature> polygonsInShape = shp.readFeatures();
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeNumberOfLocationsWithDemand");
@@ -295,7 +289,7 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertNull(demandInformationElement.getAreasSecondJobElement());
 				Assertions.assertEquals(1, (int) demandInformationElement.getNumberOfSecondJobElementLocations());
 				Assertions.assertEquals(1, demandInformationElement.getLocationsOfSecondJobElement().length);
-				Assertions.assertTrue(demandInformationElement.getLocationsOfSecondJobElement()[0].equals("i(2,0)"));
+				Assertions.assertEquals("i(2,0)", demandInformationElement.getLocationsOfSecondJobElement()[0]);
 				Assertions.assertEquals(350, (int) demandInformationElement.getSecondJobElementTimePerUnit());
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000),
 						demandInformationElement.getSecondJobElementTimeWindow());
