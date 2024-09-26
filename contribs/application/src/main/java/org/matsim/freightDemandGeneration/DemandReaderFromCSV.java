@@ -777,10 +777,10 @@ public final class DemandReaderFromCSV {
 		String[] areasForDeliveryLocations = newDemandInformationElement.getAreasSecondJobElement();
 		String[] setLocationsOfPickup = newDemandInformationElement.getLocationsOfFirstJobElement();
 		String[] setLocationsOfDelivery = newDemandInformationElement.getLocationsOfSecondJobElement();
-		ArrayList<String> usedPickupLocations = new ArrayList<String>();
-		ArrayList<String> usedDeliveryLocations = new ArrayList<String>();
-		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<Id<Person>, Person>();
-		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<Id<Person>, Person>();
+		ArrayList<String> usedPickupLocations = new ArrayList<>();
+		ArrayList<String> usedDeliveryLocations = new ArrayList<>();
+		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<>();
+		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonPickup = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonDelivery = new HashMap<>();
 
