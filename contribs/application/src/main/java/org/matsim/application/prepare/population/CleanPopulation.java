@@ -70,11 +70,7 @@ public class CleanPopulation implements MATSimAppCommand {
 		for (Person person : population.getPersons().values()) {
 
 			if (rmUnselected) {
-				Plan selected = person.getSelectedPlan();
-				for (Plan plan : Lists.newArrayList(person.getPlans())) {
-					if (plan != selected)
-						person.removePlan(plan);
-				}
+				removeUnselectedPlans(person);
 			}
 
 			for (Plan plan : person.getPlans()) {
@@ -83,16 +79,11 @@ public class CleanPopulation implements MATSimAppCommand {
 
 				for (PlanElement el : plan.getPlanElements()) {
 					if (rmRoutes) {
-						if (el instanceof Leg) {
-							((Leg) el).setRoute(null);
-						}
+						removeRouteFromLeg(el);
 					}
 
 					if (rmActivityLocations) {
-						if (el instanceof Activity) {
-							((Activity) el).setLinkId(null);
-							((Activity) el).setFacilityId(null);
-						}
+						removeActivityLocation(el);
 					}
 				}
 			}
@@ -101,5 +92,26 @@ public class CleanPopulation implements MATSimAppCommand {
 		PopulationUtils.writePopulation(population, output.toString());
 
 		return 0;
+	}
+
+	public static void removeActivityLocation(PlanElement el) {
+		if (el instanceof Activity act) {
+			act.setLinkId(null);
+			act.setFacilityId(null);
+		}
+	}
+
+	public static void removeRouteFromLeg(PlanElement el) {
+		if (el instanceof Leg leg) {
+			leg.setRoute(null);
+		}
+	}
+
+	public static void removeUnselectedPlans(Person person) {
+		Plan selected = person.getSelectedPlan();
+		for (Plan plan : Lists.newArrayList(person.getPlans())) {
+			if (plan != selected)
+				person.removePlan(plan);
+		}
 	}
 }
