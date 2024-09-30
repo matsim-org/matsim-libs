@@ -176,6 +176,7 @@ class TourPlanning {
 																									// plans
 			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took "
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			carrier.addPlan(carrierPlan);
 			carrier.setSelectedPlan(carrierPlan);
 		})).get();
 		;

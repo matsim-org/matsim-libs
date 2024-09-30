@@ -374,13 +374,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
 									upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
-					case increaseDemandOnLocation ->
+					case increaseDemandOnLocation -> {
 						/*
 						 * If the demand sample is higher than the population sample, the demand per
 						 * person will be increased.
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-									upSamplePopulationTo, "changeDemandOnLocation");
+						log.warn("You have selected the option to increase the demand on the location. "
+							+ "Because the simulation always uses the given demand the results are similar to the option with the same sample size.");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeDemandOnLocation");
+					}
 					case noPopulationSampling ->
 						/*
 						 * If the demand sample is equal to the population sample, the demand is created
