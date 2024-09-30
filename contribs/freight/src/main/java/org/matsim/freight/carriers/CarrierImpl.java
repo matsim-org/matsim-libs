@@ -83,9 +83,8 @@ public final class CarrierImpl implements Carrier {
 
 	/**
 	 * Adds a new CarrierPlan.
-	 * Makes it selected, if no other selectedPlan exists.
-	 * @param carrierPlan
-	 * @return
+	 * Makes it selected if no other selectedPlan exists.
+	 * @param carrierPlan carrierPlan to be added
 	 */
 	@Override
 	public boolean addPlan(CarrierPlan carrierPlan) {
@@ -137,7 +136,10 @@ public final class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public void clearPlans() { this.plans.clear(); }
+	public void clearPlans() {
+		this.plans.clear();
+		this.selectedPlan = null;
+	}
 
 	@Override
 	public Attributes getAttributes() {
