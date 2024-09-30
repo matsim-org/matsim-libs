@@ -266,6 +266,36 @@ public class CarriersUtils {
 		}
 	}
 
+	/**
+	 * Checks if the selected plan handles all jobs of a carrier.
+	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
+	 * @param carrier the carrier
+	 */
+	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
+		if (carrier.getSelectedPlan() == null) {
+			log.warn("Carrier {}: No selected plan available!", carrier.getId());
+			return false;
+		}
+		int planedJobs;
+		int handledJobs;
+		if (!carrier.getServices().isEmpty()) {
+			planedJobs = carrier.getServices().size();
+			handledJobs = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+				tour -> (int) tour.getTour().getTourElements().stream().filter(element -> element instanceof Tour.ServiceActivity).count()).sum();
+		} else {
+			planedJobs = carrier.getShipments().size();
+			handledJobs = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+				tour -> (int) tour.getTour().getTourElements().stream().filter(
+					element -> element instanceof Tour.ShipmentBasedActivity).count()).sum();
+			handledJobs = handledJobs / 2; // Shipment has two activities
+		}
+		if (planedJobs != handledJobs) {
+			log.warn("Carrier {}: {} of {} jobs were not handled!", carrier.getId(), planedJobs - handledJobs, planedJobs);
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s
@@ -686,7 +716,7 @@ public class CarriersUtils {
 
 			startedVRPCounter.incrementAndGet();
 			log.info("started VRP solving for carrier number {} out of {} carriers. Thread id: {}. Priority: {}", startedVRPCounter.get(), taskCount,
-				Thread.currentThread().getId(), this.priority);
+				Thread.currentThread().threadId(), this.priority);
 
 			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
 				.setRoutingCost(netBasedCosts).build();
@@ -718,10 +748,12 @@ public class CarriersUtils {
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			double timeForPlanningAndRouting = (System.currentTimeMillis() - start) / 1000;
 			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds. Thread id: {}", carrier.getId(),
-				timeForPlanningAndRouting, Thread.currentThread().getId());
+				timeForPlanningAndRouting, Thread.currentThread().threadId());
 
 			carrier.addPlan(newPlan);
 			setJspritComputationTime(carrier, timeForPlanningAndRouting);
+			if (!allJobsHandledBySelectedPlan(carrier))
+				log.warn("Not all jobs of carrier {} are handled by the selected plan.", carrier.getId());
 		}
 	}
 
