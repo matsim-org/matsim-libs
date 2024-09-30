@@ -6,25 +6,23 @@ import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommer
 
 import java.util.Map;
 
-public interface GetCommercialTourSpecifications {
+public interface CommercialTourSpecifications {
 
 	/**
 	 * Creates the probability distribution for the duration of the services.
 	 * The values are given in [min] and have an upperBound.
 	 *
-	 * @param smallScaleCommercialTrafficType the type of small scale commercial traffic
 	 * @return the probability distribution for the duration of the services
 	 */
-	Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> createStopDurationDistributionPerCategory(
-		String smallScaleCommercialTrafficType, RandomGenerator rng);
+	Map<GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> createStopDurationDistributionPerCategory(
+		RandomGenerator rng);
 
 	/**
 	 * Creates the distribution of the tour start and the related duration.
 	 *
-	 * @param smallScaleCommercialTrafficType the type of the small scale commercial traffic
 	 * @return the distribution of the tour start and the related duration
 	 */
-	EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration> createTourDistribution(String smallScaleCommercialTrafficType, RandomGenerator rng);
+	Map<String, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration>> createTourDistribution(RandomGenerator rng);
 
 	/**
 	 * Creates the probability distribution for the tour start times for the day.

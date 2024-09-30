@@ -71,8 +71,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
+import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
-import org.matsim.smallScaleCommercialTrafficGeneration.data.GetCommercialTourSpecifications;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -109,7 +109,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
-	private final GetCommercialTourSpecifications getCommercialTourSpecifications;
+	private final CommercialTourSpecifications commercialTourSpecifications;
 	private final VehicleSelection vehicleSelection;
 
 	private enum CreationOption {
@@ -178,7 +178,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
-
+	private Map<String, EnumeratedDistribution<TourStartAndDuration>> tourDistribution = null;
+	private Map<ServiceDurationPerCategoryKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector = null;
 	//TODO Remove these attributes from all method-signatures
 	private TripDistributionMatrix odMatrix;
 	private Map<String, Object2DoubleMap<String>> resultingDataPerZone;
@@ -189,12 +190,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public GenerateSmallScaleCommercialTrafficDemand() {
 		this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 		log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
-		this.getCommercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
+		this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 		log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		this.vehicleSelection = new DefaultVehicleSelection();
 		log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 	}
-	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial, GetCommercialTourSpecifications getCommercialTourSpecifications, VehicleSelection vehicleSelection) {
+	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial, CommercialTourSpecifications getCommercialTourSpecifications, VehicleSelection vehicleSelection) {
 		if (integrateExistingTrafficToSmallScaleCommercial == null){
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 			log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
@@ -203,10 +204,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			log.info("Using {} if existing models are integrated!", integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
 		}
 		if (getCommercialTourSpecifications == null){
-			this.getCommercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
+			this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 			log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		} else {
-			this.getCommercialTourSpecifications = getCommercialTourSpecifications;
+			this.commercialTourSpecifications = getCommercialTourSpecifications;
 			log.info("Using {} for tour specifications!", getCommercialTourSpecifications.getClass().getSimpleName());
 		}
 		if(vehicleSelection == null){
@@ -761,9 +762,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		int createdCarrier = 0;
 		int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
 
-		EnumeratedDistribution<TourStartAndDuration> tourDistribution = getCommercialTourSpecifications.createTourDistribution(smallScaleCommercialTrafficType, rng);
+		tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
 
-		Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> stopDurationTimeSelector = getCommercialTourSpecifications.createStopDurationDistributionPerCategory(smallScaleCommercialTrafficType, rng);
+		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
 
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
@@ -968,7 +969,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													CarrierCapabilities.FleetSize fleetSize, int fixedNumberOfVehiclePerTypeAndLocation,
 													List<String> vehicleDepots, Map<String, Map<Id<Link>, Link>> linksPerZone,
 													String smallScaleCommercialTrafficType,
-													EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration> tourStartTimeSelector) {
+													Map<String, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration>> tourStartTimeSelector) {
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
@@ -995,7 +996,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 
 		for (String singleDepot : vehicleDepots) {
-			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourStartTimeSelector.sample();
+			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourStartTimeSelector.get(smallScaleCommercialTrafficType).sample();
 
 			int vehicleStartTime = getVehicleStartTime(t);
 			int tourDuration = getVehicleTourDuration(t);
@@ -1090,7 +1091,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				int vehicleStartTime = 0;
 				int vehicleEndTime = 0;
 				while (tourDuration < maxVehicleAvailability) {
-					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.sample();
+					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
 					vehicleStartTime = getVehicleStartTime(t);
 					tourDuration = getVehicleTourDuration(t);
 					vehicleEndTime = vehicleStartTime + tourDuration;
