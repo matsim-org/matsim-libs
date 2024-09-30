@@ -30,6 +30,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -85,6 +86,13 @@ public class IntegrationIT {
 		CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveForAllCarriersAndAddPLans);
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
+			// Test method if all jobs are handled
+			Assertions.assertTrue(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "Not all jobs are handled");
+			CarrierService newService = CarrierService.Builder.newInstance(Id.create(
+				"service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"))
+				.setServiceDuration(10.).setServiceStartTimeWindow(TimeWindow.newInstance(0,86000)).build();
+			carrier.getServices().put(newService.getId(), newService);
+			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
 		}
 	}
 
