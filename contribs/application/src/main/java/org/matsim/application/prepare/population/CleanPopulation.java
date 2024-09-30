@@ -49,7 +49,7 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 
 	// Using the analysis main mode identifier instead of the routing mode based one on purpose
 	// to be able to process older population files without any routing modes!
-	TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
+	private final TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CleanPopulation()).execute(args));
