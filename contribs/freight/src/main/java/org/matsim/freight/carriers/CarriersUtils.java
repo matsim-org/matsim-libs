@@ -686,7 +686,7 @@ public class CarriersUtils {
 
 			startedVRPCounter.incrementAndGet();
 			log.info("started VRP solving for carrier number {} out of {} carriers. Thread id: {}. Priority: {}", startedVRPCounter.get(), taskCount,
-				Thread.currentThread().getId(), this.priority);
+				Thread.currentThread().threadId(), this.priority);
 
 			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
 				.setRoutingCost(netBasedCosts).build();
@@ -718,7 +718,7 @@ public class CarriersUtils {
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			double timeForPlanningAndRouting = (System.currentTimeMillis() - start) / 1000;
 			log.info("routing for carrier {} finished. Tour planning plus routing took {} seconds. Thread id: {}", carrier.getId(),
-				timeForPlanningAndRouting, Thread.currentThread().getId());
+				timeForPlanningAndRouting, Thread.currentThread().threadId());
 
 			carrier.addPlan(newPlan);
 			setJspritComputationTime(carrier, timeForPlanningAndRouting);
