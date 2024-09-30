@@ -659,12 +659,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output, linksPerZone);
-		createCarriers(
-			scenario,
-			odMatrix,
-			resultingDataPerZone,
-			smallScaleCommercialTrafficType,
-			linksPerZone);
+		createCarriers(scenario, odMatrix, resultingDataPerZone, smallScaleCommercialTrafficType, linksPerZone);
 	}
 
 	/**
@@ -749,11 +744,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param smallScaleCommercialTrafficType Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
 	 * @param linksPerZone
 	 */
-	public void createCarriers(Scenario scenario,
-							   TripDistributionMatrix odMatrix,
-							   Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-							   String smallScaleCommercialTrafficType,
-							   Map<String, Map<Id<Link>, Link>> linksPerZone){
+	public void createCarriers(Scenario scenario, TripDistributionMatrix odMatrix, Map<String, Object2DoubleMap<String>> resultingDataPerZone,
+							   String smallScaleCommercialTrafficType, Map<String, Map<Id<Link>, Link>> linksPerZone) {
 		//Save the given data
 		RandomGenerator rng = new MersenneTwister(scenario.getConfig().global().getRandomSeed());
 
@@ -847,23 +839,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 						// Now Create services for this carrier
 						Carrier newCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class));
-						CarrierAttributes carrierAttributes = new CarrierAttributes(
-							purpose,
-							startZone,
-							selectedStartCategory,
-							modeORvehType,
-							smallScaleCommercialTrafficType,
-							vehicleDepots,
-							odMatrixEntry);
+						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
+							smallScaleCommercialTrafficType, vehicleDepots, odMatrixEntry);
 
 						carrierId2carrierAttributes.put(Id.create(carrierName, Carrier.class), carrierAttributes);
 
-						createServices(newCarrier,
-							resultingDataPerZone,
-							stopDurationTimeSelector,
-							tourDistribution,
-							odMatrix,
-							linksPerZone,
+						createServices(newCarrier, resultingDataPerZone, odMatrix, linksPerZone,
 							carrierAttributes);
 					}
 				}
@@ -877,13 +858,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Generates and adds the services for the given carrier.
 	 * TODO In-source this method back into create carriers
 	 */
-	private void createServices(Carrier newCarrier,
-								Map<String, Object2DoubleMap<String>> resultingDataPerZone,
-								Map<GenerateSmallScaleCommercialTrafficDemand. StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand. DurationsBounds>> stopDurationTimeSelector,
-								EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand. TourStartAndDuration> tourDistribution,
-								TripDistributionMatrix odMatrix,
-								Map<String, Map<Id<Link>, Link>> linksPerZone,
-								CarrierAttributes carrierAttributes) {
+	private void createServices(Carrier newCarrier, Map<String, Object2DoubleMap<String>> resultingDataPerZone, TripDistributionMatrix odMatrix,
+								Map<String, Map<Id<Link>, Link>> linksPerZone, CarrierAttributes carrierAttributes) {
 		log.info("Create services for carrier: {}", newCarrier.getId());
 		for (String stopZone : odMatrix.getListOfZones()) {
 			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
@@ -899,15 +875,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				int serviceTimePerStop;
 				if (carrierAttributes.selectedStartCategory.equals("Inhabitants")){
 					//TODO This is a bit ugly. Do we even need the selectedStartCategory of the carrierAttributes in this case? Or can we just set it right at the beginning? (move it to TODO #1)
-					CarrierAttributes inhabitantAttributes = new CarrierAttributes(
-						carrierAttributes.purpose,
-						carrierAttributes.startZone,
-						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(),
-						carrierAttributes.modeORvehType,
-						carrierAttributes.smallScaleCommercialTrafficType,
-						carrierAttributes.vehicleDepots,
-						carrierAttributes.odMatrixEntry);
-					serviceTimePerStop = getServiceTimePerStop(newCarrier, stopDurationTimeSelector, tourDistribution, inhabitantAttributes);
+					CarrierAttributes inhabitantAttributes = new CarrierAttributes(carrierAttributes.purpose, carrierAttributes.startZone,
+						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(), carrierAttributes.modeORvehType,
+						carrierAttributes.smallScaleCommercialTrafficType, carrierAttributes.vehicleDepots, carrierAttributes.odMatrixEntry);
+					serviceTimePerStop = getServiceTimePerStop(newCarrier, inhabitantAttributes, 0);
 
 				}
 				else {
@@ -949,10 +920,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Redraws the service-durations of all {@link CarrierService}s of the given {@link Carrier}.
 	 */
-	private void redrawAllServiceDurations(Carrier carrier,
-										   Map<GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> stopDurationTimeSelector,
-										   EnumeratedDistribution<TourStartAndDuration> tourDistribution,
-										   CarrierAttributes carrierAttributes) {
+	private void redrawAllServiceDurations(Carrier carrier, CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
 		for (CarrierService service : carrier.getServices().values()) {
 			double newServiceDuration = getServiceTimePerStop(carrier, stopDurationTimeSelector, tourDistribution, carrierAttributes);
 			CarrierService redrawnService = CarrierService.Builder.newInstance(service.getId(), service.getLocationLinkId())
@@ -1107,7 +1075,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		throw new RuntimeException("No possible service duration found for employee category '" + carrierAttributes.selectedStartCategory + "' and mode '"
 			+ carrierAttributes.modeORvehType + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType + "'");
-
 	}
 
 	/**
@@ -1478,12 +1445,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param smallScaleCommercialTrafficType entry from {@link SmallScaleCommercialTrafficType}
 	 * @param vehicleDepots Containing the depots of this carrier with linkIds as strings
 	 */
-	private record CarrierAttributes(int purpose,
-									 String startZone,
-									 String selectedStartCategory,
-									 String modeORvehType,
-									 String smallScaleCommercialTrafficType,
-									 ArrayList<String> vehicleDepots,
+	private record CarrierAttributes(int purpose, String startZone, String selectedStartCategory, String modeORvehType,
+									 String smallScaleCommercialTrafficType, ArrayList<String> vehicleDepots,
 									 VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {}
-
 }
