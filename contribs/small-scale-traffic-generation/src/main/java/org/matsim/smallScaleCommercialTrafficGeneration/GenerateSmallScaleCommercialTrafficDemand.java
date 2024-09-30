@@ -1027,10 +1027,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		GenerateSmallScaleCommercialTrafficDemand.StopDurationGoodTrafficKey key = null;
 		if (carrierAttributes.smallScaleCommercialTrafficType.equals(
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
-			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(carrierAttributes.selectedStartCategory, null);
+			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory, null, carrierAttributes.smallScaleCommercialTrafficType);
 		else if (carrierAttributes.smallScaleCommercialTrafficType.equals(
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
-			key = GenerateSmallScaleCommercialTrafficDemand.makeStopDurationGoodTrafficKey(carrierAttributes.selectedStartCategory, carrierAttributes.modeORvehType);
+			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory, carrierAttributes.modeORvehType, carrierAttributes.smallScaleCommercialTrafficType);
 		}
 		// old Version
 //		GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
@@ -1407,29 +1407,34 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	}
 
-	public record StopDurationGoodTrafficKey(String employeeCategory, String vehicleType) {
+	public record ServiceDurationPerCategoryKey(String employeeCategory, String vehicleType, String smallScaleCommercialTrafficType) {
 
 		@Override
-			public boolean equals(Object obj) {
-				if (this == obj)
-					return true;
-				if (obj == null)
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ServiceDurationPerCategoryKey other = (ServiceDurationPerCategoryKey) obj;
+			if (employeeCategory == null) {
+				if (other.employeeCategory != null)
 					return false;
-				if (getClass() != obj.getClass())
+			} else if (!employeeCategory.equals(other.employeeCategory))
+				return false;
+			if (vehicleType == null) {
+				if (other.vehicleType != null)
 					return false;
-				StopDurationGoodTrafficKey other = (StopDurationGoodTrafficKey) obj;
-				if (employeeCategory == null) {
-					if (other.employeeCategory != null)
-						return false;
-				} else if (!employeeCategory.equals(other.employeeCategory))
-					return false;
-				if (vehicleType == null) {
-					return other.vehicleType == null;
-				} else return vehicleType.equals(other.vehicleType);
-			}
+			} else if (!vehicleType.equals(other.vehicleType))
+				return false;
+			if (smallScaleCommercialTrafficType == null) {
+				return other.smallScaleCommercialTrafficType == null;
+			} else return smallScaleCommercialTrafficType.equals(other.smallScaleCommercialTrafficType);
 		}
-	public static StopDurationGoodTrafficKey makeStopDurationGoodTrafficKey(String employeeCategory, String vehicleType) {
-		return new StopDurationGoodTrafficKey(employeeCategory, vehicleType);
+	}
+	public static ServiceDurationPerCategoryKey makeServiceDurationPerCategoryKey(String employeeCategory, String vehicleType, String smallScaleCommercialTrafficType) {
+		return new ServiceDurationPerCategoryKey(employeeCategory, vehicleType, smallScaleCommercialTrafficType);
 	}
 
 	public record TourStartAndDuration(int hourLower, int hourUpper, double minDuration, double maxDuration) {}
