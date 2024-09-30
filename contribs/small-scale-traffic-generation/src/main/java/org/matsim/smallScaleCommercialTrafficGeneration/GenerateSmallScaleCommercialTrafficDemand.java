@@ -573,7 +573,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //		return sum;
 //	}
 
-	private boolean allJobsHandledCheck(Carrier carrier){
+//	private boolean allJobsHandledCheck(Carrier carrier){
 //		CarrierPlan plan = carrier.getSelectedPlan();
 		// TODO: remove these debug values
 //		double totalVehicleTime = 0;
@@ -586,15 +586,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 //		List<CarrierService> handledServices = new LinkedList<>();
 		//Check if all services have been handled
-		int planedJobs = carrier.getServices().size();
-		int handledJobs = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
-			tour -> (int) tour.getTour().getTourElements().stream().filter(element -> element instanceof Tour.ServiceActivity).count()).sum();
-		if (planedJobs != handledJobs){
-			log.warn("Carrier {}: {} of {} services were not handled!", carrier.getId(), planedJobs - handledJobs, planedJobs);
-			return false;
-		} else {
-			return true;
-		}
+//		int planedJobs = carrier.getServices().size();
+//		int handledJobs = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+//			tour -> (int) tour.getTour().getTourElements().stream().filter(element -> element instanceof Tour.ServiceActivity).count()).sum();
+//		if (planedJobs != handledJobs){
+//			log.warn("Carrier {}: {} of {} services were not handled!", carrier.getId(), planedJobs - handledJobs, planedJobs);
+//			return false;
+//		} else {
+//			return true;
+//		}
 		//		for(ScheduledTour tour : plan.getScheduledTours()){
 //			//DEBUG
 //			double thisVehicleTime = tour.getVehicle().getLatestEndTime() - tour.getVehicle().getEarliestStartTime();
@@ -639,14 +639,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //		} else {
 //			return true;
 //		}
-
-	}
+//
+//	}
 
 	private List<Carrier> createListOfCarrierWithUnhandledJobs(Scenario scenario){
 		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
 //		int successful = 0;
 		for(Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()){
-			if(!allJobsHandledCheck(carrier))
+			if(!CarriersUtils.allJobsHandledBySelectedPlan(carrier))
 				carriersWithUnhandledJobs.add(carrier);
 		}
 
