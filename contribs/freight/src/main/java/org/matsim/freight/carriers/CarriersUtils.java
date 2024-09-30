@@ -287,6 +287,7 @@ public class CarriersUtils {
 			handledJobs = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 				tour -> (int) tour.getTour().getTourElements().stream().filter(
 					element -> element instanceof Tour.ShipmentBasedActivity).count()).sum();
+			handledJobs = handledJobs / 2; // Shipment has two activities
 		}
 		if (planedJobs != handledJobs) {
 			log.warn("Carrier {}: {} of {} jobs were not handled!", carrier.getId(), planedJobs - handledJobs, planedJobs);
