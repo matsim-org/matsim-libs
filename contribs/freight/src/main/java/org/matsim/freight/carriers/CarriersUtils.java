@@ -268,7 +268,7 @@ public class CarriersUtils {
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
-	 *
+	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
