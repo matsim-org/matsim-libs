@@ -48,7 +48,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
- *
  * How the network is cut out:
  * <ul>
  * 		<li>Keep all links in shape file</li>
@@ -56,14 +55,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * 		<li>if an agent has not route, a shortest-path route is calculated and used instead</li>
  * 		<li>This is done for all network modes</li>
  * </ul>
- *
+ * <p>
  * How the population is cut out:
  * <ul>
  * 		<li>All agents having any activity in the shape file are kept</li>
  * 		<li>Agents traveling through the shape file are kept, this is determined by the route</li>
  * 		<li>The buffer is not considered for the population cut out</li>
  * </ul>
- *
+ * <p>
  * How the network change events are generated:
  * <ul>
  *     <li>Travel time is computed using the given events</li>
@@ -75,7 +74,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Cutting out agents and fixing the speed is a challenging problem, because we lose sensitivity to policy cases
  * We can not use the speed limit and use the original capacity because this underestimates speed (because congestion can only decrease the speed)
  * Therefore the capacity is set to infinity, but these road don't react to changes<br>
- *
+ * <p>
  * The cut-out will create a buffer area around the shape in which the speed is simulated with the original network, so that it is sensitive to changes
  * Therefore, the buffer should not be too small
  * One should be careful creating too small cut-outs because of the mentioned limitations.
@@ -131,25 +130,57 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
-	// TODO: put comments as javadoc
-
-	//private variables for computing
+	// External classes
 	private final GeometryFactory geoFactory = new GeometryFactory();
+	private TravelTimeCalculator tt;
+
+	// Variables used for processing
+	/**
+	 * Map with mode-string as key and the mode-filtered Network as value
+	 */
 	private final Map<String, Network> mode2modeOnlyNetwork = new HashMap<>();
-	//Links inside the shapefile
+
+	/**
+	 * Links that are inside the shapefile.
+	 */
 	private final Set<Id<Link>> linksToKeep = ConcurrentHashMap.newKeySet();
-	//Links outside the shapefile
+
+	/**
+	 * Links that are outside the shapefile
+	 */
 	private final Set<Id<Link>> linksToDelete = ConcurrentHashMap.newKeySet();
-	// additional links to include (may be outside the shapefile)
+
+	/**
+	 * Additional links to include (may be outside the shapefile). Links are marked like this, if they are used in a plan of an agent, that
+	 * is relevant.
+	 */
 	private final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet();
-	// now delete irrelevant persons
+
+	/**
+	 * Agents, that are not relevant: Not in the shapefile or buffer, not route through the shapefile or buffer
+	 */
 	private final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet();
 
+	// Data inputs
+	/**
+	 * Full network
+	 */
 	private Network network;
+
+	/**
+	 * Shapefile as a {@link Geometry}
+	 */
 	private Geometry geom;
+
+	/**
+	 * Shapefile+buffer as a {@link Geometry}
+	 */
 	private Geometry geomBuffer;
+
+	/**
+	 * Facilities (is only set if used, otherwise not initialized)
+	 */
 	private ActivityFacilities facilities;
-	private TravelTimeCalculator tt;
 
 	private int emptyNetworkWarnings = 0;
 	private int noActCoordsWarnings = 0;
@@ -215,8 +246,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 		}
 
-		// TODO: consider facilities, (see FilterRelevantAgents in OpenBerlin) -> (done, untested)
-		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> Check why eventsfile does not generate a complete ChangeEventsFile
+		// TODO: consider facilities, (see FilterRelevantAgents in OpenBerlin) -> (done, partially tested)
+		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> It works and also generates an output, but speeds seem a bit off to me
 
 		// Cut out the population and mark needed network parts
 		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
@@ -425,7 +456,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				// Need to search for routes in all plans, but probably these plans are not really different
 				// Need to route modes that are not present, e.g if there is a car plan, route bike as well
 				// TODO currently only one mode is considered if a route is present
-
 
 				if (route instanceof NetworkRoute && !((NetworkRoute) route).getLinkIds().isEmpty()) {
 					// We have a NetworkRoute, thus we can just use it
