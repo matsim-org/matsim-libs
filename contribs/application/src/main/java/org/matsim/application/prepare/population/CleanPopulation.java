@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import picocli.CommandLine;
@@ -24,7 +25,7 @@ import java.nio.file.Path;
 		mixinStandardHelpOptions = true,
 		showDefaultValues = true
 )
-public class CleanPopulation implements MATSimAppCommand {
+public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 
 	private static final Logger log = LogManager.getLogger(CleanPopulation.class);
 
@@ -46,6 +47,10 @@ public class CleanPopulation implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "Output file name", required = true)
 	private Path output;
 
+	// Using the analysis main mode identifier instead of the routing mode based one on purpose
+	// to be able to process older population files without any routing modes!
+	private final TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CleanPopulation()).execute(args));
 	}
@@ -63,43 +68,64 @@ public class CleanPopulation implements MATSimAppCommand {
 		if (output.getParent() != null)
 			Files.createDirectories(output.getParent());
 
-		// Using the analysis main mode identifier instead of the routing mode based one on purpose
-		// to be able to process older population files without any routing modes!
-		TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
-
 		for (Person person : population.getPersons().values()) {
-
-			if (rmUnselected) {
-				Plan selected = person.getSelectedPlan();
-				for (Plan plan : Lists.newArrayList(person.getPlans())) {
-					if (plan != selected)
-						person.removePlan(plan);
-				}
-			}
-
-			for (Plan plan : person.getPlans()) {
-				if (tripsToLegs)
-					trips2Legs.run(plan);
-
-				for (PlanElement el : plan.getPlanElements()) {
-					if (rmRoutes) {
-						if (el instanceof Leg) {
-							((Leg) el).setRoute(null);
-						}
-					}
-
-					if (rmActivityLocations) {
-						if (el instanceof Activity) {
-							((Activity) el).setLinkId(null);
-							((Activity) el).setFacilityId(null);
-						}
-					}
-				}
-			}
+			run(person);
 		}
 
 		PopulationUtils.writePopulation(population, output.toString());
 
 		return 0;
+	}
+
+	@Override
+	public void run(Person person) {
+		if (rmUnselected) {
+			removeUnselectedPlans(person);
+		}
+
+		for (Plan plan : person.getPlans()) {
+			if (tripsToLegs)
+				trips2Legs.run(plan);
+
+			for (PlanElement el : plan.getPlanElements()) {
+				if (rmRoutes) {
+					removeRouteFromLeg(el);
+				}
+
+				if (rmActivityLocations) {
+					removeActivityLocation(el);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove link and facility information from activity.
+	 */
+	public static void removeActivityLocation(PlanElement el) {
+		if (el instanceof Activity act) {
+			act.setLinkId(null);
+			act.setFacilityId(null);
+		}
+	}
+
+	/**
+	 * Remove route information from leg.
+	 */
+	public static void removeRouteFromLeg(PlanElement el) {
+		if (el instanceof Leg leg) {
+			leg.setRoute(null);
+		}
+	}
+
+	/**
+	 * Remove all unselected plans for given person.
+	 */
+	public static void removeUnselectedPlans(Person person) {
+		Plan selected = person.getSelectedPlan();
+		for (Plan plan : Lists.newArrayList(person.getPlans())) {
+			if (plan != selected)
+				person.removePlan(plan);
+		}
 	}
 }
