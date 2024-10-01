@@ -181,7 +181,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
 		config.plans().setInputFile(ApplicationUtils.matchInput("plans", input.getRunDirectory()).toAbsolutePath().toString());
-		config.facilities().setInputFile(null);
+		config.facilities().setInputFile(ApplicationUtils.matchInput("facilities", input.getRunDirectory()).toAbsolutePath().toString());
 		config.eventsManager().setNumberOfThreads(null);
 		config.eventsManager().setEstimatedNumberOfEvents(null);
 		//ts, aug '24: not sure if and why we need to set 1 thread
