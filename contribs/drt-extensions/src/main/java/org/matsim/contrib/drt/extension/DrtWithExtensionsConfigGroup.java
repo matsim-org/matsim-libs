@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
+import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
@@ -32,7 +33,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author Steffen Axer
- *
+ * <p>
  * This class summarizes all optional drt parametersets and should be used while creating MultiModeDrtConfigGroup instances
  */
 public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
@@ -43,6 +44,9 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	@Nullable
 	private DrtOperationsParams drtOperationsParams;
 
+	@Nullable
+	private DrtServicesParams drtServicesParams;
+
 	public DrtWithExtensionsConfigGroup() {
 		this(DefaultDrtOptimizationConstraintsSet::new);
 	}
@@ -51,11 +55,15 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 		super(drtOptimizationConstraintsSetSupplier);
 		// Optional
 		addDefinition(DrtCompanionParams.SET_NAME, DrtCompanionParams::new, () -> drtCompanionParams,
-				params -> drtCompanionParams = (DrtCompanionParams) params);
+			params -> drtCompanionParams = (DrtCompanionParams) params);
 
 		// Optional
 		addDefinition(DrtOperationsParams.SET_NAME, DrtOperationsParams::new, () -> drtOperationsParams,
-				params -> drtOperationsParams = (DrtOperationsParams) params);
+			params -> drtOperationsParams = (DrtOperationsParams) params);
+
+		// Optional
+		addDefinition(DrtServicesParams.SET_TYPE, DrtServicesParams::new, () -> drtServicesParams,
+			params -> drtServicesParams = (DrtServicesParams) params);
 	}
 
 	public Optional<DrtCompanionParams> getDrtCompanionParams() {
@@ -65,5 +73,9 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	public Optional<DrtOperationsParams> getDrtOperationsParams() {
 		return Optional.ofNullable(drtOperationsParams);
 	}
-	
+
+	public Optional<DrtServicesParams> getServicesParams() {
+		return Optional.ofNullable(drtServicesParams);
+	}
+
 }
