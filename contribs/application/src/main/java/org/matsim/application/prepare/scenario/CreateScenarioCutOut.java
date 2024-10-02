@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,7 +18,8 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -34,15 +36,12 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,29 +90,29 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	 */
 	private final Map<String, ThreadLocal<LeastCostPathCalculator>> routerCache = new ConcurrentHashMap<>();
 
-	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
-	private Path input;
+	@CommandLine.Option(names = "--population", description = "Path to input population", required = true)
+	private String populationPath;
 
 	@CommandLine.Option(names = "--network", description = "Path to network", required = true)
-	private Path networkPath;
+	private String networkPath;
 
 	@CommandLine.Option(names = "--facilities", description = "Path to facilities file. Only needed if there are agents with no coordinates or links", required = false)
-	private Path facilityPath;
+	private String facilityPath;
 
 	@CommandLine.Option(names = "--events", description = "Input events used for travel time calculation. NOTE: Making a cutout without the events file will make the scenario inaccurate!", required = false)
-	private Path eventPath;
+	private String eventPath;
 
 	@CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "5000")
 	private double buffer;
 
 	@CommandLine.Option(names = "--output-network", description = "Path to output network", required = true)
-	private Path outputNetwork;
+	private String outputNetwork;
 
 	@CommandLine.Option(names = "--output-population", description = "Path to output population", required = true)
-	private Path outputPopulation;
+	private String outputPopulation;
 
 	@CommandLine.Option(names = "--output-network-change-events", description = "Path to network change event output", required = false)
-	private Path outputEvents;
+	private String outputEvents;
 
 	@CommandLine.Option(names = "--network-change-events-interval", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "900", required = false)
 	private double changeEventsInterval;
@@ -136,7 +135,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 	// Variables used for processing
 	/**
-	 * Map with mode-string as key and the mode-filtered Network as value
+	 * Map with mode-string as key and the mode-filtered Network as value.
 	 */
 	private final Map<String, Network> mode2modeOnlyNetwork = new HashMap<>();
 
@@ -146,7 +145,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private final Set<Id<Link>> linksToKeep = ConcurrentHashMap.newKeySet();
 
 	/**
-	 * Links that are outside the shapefile
+	 * Links that are outside the shapefile.
 	 */
 	private final Set<Id<Link>> linksToDelete = ConcurrentHashMap.newKeySet();
 
@@ -157,30 +156,25 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet();
 
 	/**
-	 * Agents, that are not relevant: Not in the shapefile or buffer, not route through the shapefile or buffer
+	 * Agents, that are not relevant: Not in the shapefile or buffer, not route through the shapefile or buffer.
 	 */
 	private final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet();
 
 	// Data inputs
 	/**
-	 * Full network
+	 * Scenario with network, population and facilities.
 	 */
-	private Network network;
+	private Scenario scenario;
 
 	/**
-	 * Shapefile as a {@link Geometry}
+	 * Shapefile as a {@link Geometry}.
 	 */
 	private Geometry geom;
 
 	/**
-	 * Shapefile+buffer as a {@link Geometry}
+	 * Shapefile+buffer as a {@link Geometry}.
 	 */
 	private Geometry geomBuffer;
-
-	/**
-	 * Facilities (is only set if used, otherwise not initialized)
-	 */
-	private ActivityFacilities facilities;
 
 	private int emptyNetworkWarnings = 0;
 	private int noActCoordsWarnings = 0;
@@ -197,28 +191,25 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			return 2;
 		}
 
-		//We need to make sure, that the network is a TimeVariantNetwork
-		NetworkConfigGroup ncg = new NetworkConfigGroup();
-		ncg.setTimeVariantNetwork(true);
-
 		// Prepare required input-data
-		Population population = PopulationUtils.readPopulation(input.toString());
-		network = NetworkUtils.readNetwork(networkPath.toString(), ncg);
+		Config config = ConfigUtils.createConfig();
+		config.global().setCoordinateSystem(crs.getInputCRS());
+		config.plans().setInputFile(populationPath);
+		config.network().setInputFile(networkPath);
+		config.network().setTimeVariantNetwork(true);
+		if (facilityPath != null){
+			config.facilities().setInputFile(facilityPath);
+		}
+		scenario = ScenarioUtils.loadScenario(config);
 
 		geom = shp.getGeometry();
 		geomBuffer = geom.buffer(buffer);
 
 		for (String mode : modes)
-			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(network, mode));
-
-		// Prepare optional input-data
-		if (facilityPath != null) {
-			facilities = FacilitiesUtils.createActivityFacilities();
-			new MatsimFacilitiesReader(crs.getInputCRS(), crs.getTargetCRS(), facilities).readFile(facilityPath.toString());
-		}
+			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(scenario.getNetwork(), mode));
 
 		if (eventPath != null) {
-			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
 			builder.setTimeslice(changeEventsInterval);
 
 			EventsManager manager = EventsUtils.createEventsManager();
@@ -234,7 +225,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		boolean useNetworkChangeEvents = outputEvents != null;
 
 		// Cut out the network: Filter for links inside the shapefile
-		for (Link link : network.getLinks().values()) {
+		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (geom.contains(MGC.coord2Point(link.getCoord()))
 				|| geom.contains(MGC.coord2Point(link.getFromNode().getCoord()))
 				|| geom.contains(MGC.coord2Point(link.getToNode().getCoord()))
@@ -246,39 +237,38 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 		}
 
-		// TODO: consider facilities, (see FilterRelevantAgents in OpenBerlin) -> (done, partially tested)
-		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> It works and also generates an output, but speeds seem a bit off to me
+		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> FIX TODO with startTimes != 0
 
 		// Cut out the population and mark needed network parts
-		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
+		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), this);
 
 		//Population
 		log.info("Persons to delete: {}", personsToDelete.size());
 		for (Id<Person> personId : personsToDelete) {
-			population.removePerson(personId);
+			scenario.getPopulation().removePerson(personId);
 		}
 
-		log.info("Persons in the scenario: {}", population.getPersons().size());
+		log.info("Persons in the scenario: {}", scenario.getPopulation().getPersons().size());
 
-		PopulationUtils.writePopulation(population, outputPopulation.toString());
+		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation.toString());
 
 		//Network
 		log.info("Links to add: {}", linksToKeep.size());
 
 		log.info("Additional links from routes to include: {}", linksToInclude.size());
 
-		log.info("number of links in original network: {}", network.getLinks().size());
+		log.info("number of links in original network: {}", scenario.getNetwork().getLinks().size());
 
 		for (Id<Link> linkId : linksToDelete) {
 			if (!linksToInclude.contains(linkId))
-				network.removeLink(linkId);
+				scenario.getNetwork().removeLink(linkId);
 		}
 
 		// clean the network
-		log.info("number of links before cleaning: {}", network.getLinks().size());
-		log.info("number of nodes before cleaning: {}", network.getNodes().size());
+		log.info("number of links before cleaning: {}", scenario.getNetwork().getLinks().size());
+		log.info("number of nodes before cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
+		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(scenario.getNetwork());
 		cleaner.removeNodesWithoutLinks();
 
 		for (String mode : modes) {
@@ -286,12 +276,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			cleaner.run(Set.of(mode));
 		}
 
-		log.info("number of links after cleaning: {}", network.getLinks().size());
-		log.info("number of nodes after cleaning: {}", network.getNodes().size());
+		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
+		log.info("number of nodes after cleaning: {}", scenario.getNetwork().getNodes().size());
 
 		List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
 
-		NetworkUtils.writeNetwork(network, outputNetwork.toString());
+		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork.toString());
 
 		if (useNetworkChangeEvents) {
 			new NetworkChangeEventsWriter().write(outputEvents.toString(), events);
@@ -371,8 +361,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	}
 
 	private Coord getActivityCoord(Activity activity) {
-		if (facilities != null && activity.getFacilityId() != null && facilities.getFacilities().containsKey(activity.getFacilityId()))
-			return facilities.getFacilities().get(activity.getFacilityId()).getCoord();
+		if (scenario.getActivityFacilities() != null && activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId()))
+			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
 
 		return activity.getCoord();
 	}
@@ -387,7 +377,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength) {
 		List<NetworkChangeEvent> events = new LinkedList<>();
 
-		for (Link link : network.getLinks().values()) {
+		for (Link link : scenario.getNetwork().getLinks().values()) {
 
 			// Don't generate events for links thar are in the shapefile + buffer
 			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
@@ -397,13 +387,14 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			link.setCapacity(Double.MAX_VALUE);
 
 			// Do this for the whole 24-hour simulation run
+			// TODO In simulations, that start at 8am, initalizing at 0 causes problem. Fix this
 			for (double time = 0; time < 86400; time += timeFrameLength) {
 
 				// Setting freespeed to the link average
-				double travelTime = tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
+				double travelTime = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, travelTime));
-				NetworkUtils.addNetworkChangeEvent(network, event);
+				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
 			}
