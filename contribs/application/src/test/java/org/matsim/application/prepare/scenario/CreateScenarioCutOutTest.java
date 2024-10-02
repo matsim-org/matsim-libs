@@ -63,7 +63,7 @@ class CreateScenarioCutOutTest {
 	 * Test the cutout with facilities but without events.
 	 */
 	@Test
-	void testFacilitiesCutout(){
+	void testFacilitiesCutout() {
 		new CreateScenarioCutOut().execute(
 			"--buffer", "100",
 			"--population", ExamplesUtils.getTestScenarioURL("chessboard") + "plans.xml",
@@ -119,7 +119,7 @@ class CreateScenarioCutOutTest {
 	}
 
 	/**
-	 * Test the cutout with both.
+	 * Test the cutout with facilities and events.
 	 */
 	@Test
 	void testFullCutOut() throws IOException {
@@ -147,8 +147,12 @@ class CreateScenarioCutOutTest {
 		Assertions.assertSame(PopulationComparison.Result.equal, PopulationComparison.compare(referenceScenario.getPopulation(), outputScenario.getPopulation()), "Population was not cut properly!");
 	}
 
-
-	private Scenario getReferenceScenario(boolean withEvents){
+	/**
+	 * Get the reference-output as a scenario
+	 *
+	 * @param withEvents If you executed the test with an input Events file, set this to true
+	 */
+	private Scenario getReferenceScenario(boolean withEvents) {
 		String folder = withEvents ? "withEvents/" : "withoutEvents/";
 
 		Config referenceConfig = ConfigUtils.createConfig();
@@ -160,7 +164,10 @@ class CreateScenarioCutOutTest {
 		return ScenarioUtils.loadScenario(referenceConfig);
 	}
 
-	private Scenario getOutputScenario(boolean withEvents){
+	/**
+	 * Get the output as a scenario
+	 */
+	private Scenario getOutputScenario(boolean withEvents) {
 		Config outputConfig = ConfigUtils.createConfig();
 		outputConfig.global().setCoordinateSystem("EPSG:25832");
 		outputConfig.network().setTimeVariantNetwork(true);
@@ -170,22 +177,28 @@ class CreateScenarioCutOutTest {
 		return ScenarioUtils.loadScenario(outputConfig);
 	}
 
+	/**
+	 * Checks if two Networks have the same NetworkChangeEvents by checking the ids.
+	 */
 	private boolean checkIfNetworkChangeEventsAreSame(Network firstNetwork, Network secondNetwork) throws IOException {
 		List<NetworkChangeEvent> firstList = new LinkedList<>();
 		List<NetworkChangeEvent> secondList = new LinkedList<>();
 		new NetworkChangeEventsParser(firstNetwork, firstList).parse(Files.newInputStream(Path.of(utils.getClassInputDirectory() + "withEvents/cut_change_events.xml")));
-		new NetworkChangeEventsParser(secondNetwork, secondList).parse(Files.newInputStream(Path.of(utils.getOutputDirectory() + "cut_change_events.xml")));;
+		new NetworkChangeEventsParser(secondNetwork, secondList).parse(Files.newInputStream(Path.of(utils.getOutputDirectory() + "cut_change_events.xml")));
+		;
 
-		if(firstList.size() != secondList.size()) return false;
+		if (firstList.size() != secondList.size()) return false;
 
 		// This loop is unefficient, but I did not found a better way, to compare the NetworkChangeEvents, as they have no deterministic order
 		int matches = 0;
-		for (NetworkChangeEvent firstEvent : firstList){
+		for (NetworkChangeEvent firstEvent : firstList) {
 			// Find an event in the secondList, that matches this event
-			for (NetworkChangeEvent secondEvent : secondList){
+			for (NetworkChangeEvent secondEvent : secondList) {
 				if (firstEvent.getStartTime() != secondEvent.getStartTime()) continue;
-				if (firstEvent.getFreespeedChange() != null && secondEvent.getFreespeedChange() != null && firstEvent.getFreespeedChange().getValue() != secondEvent.getFreespeedChange().getValue()) continue;
-				if (firstEvent.getFlowCapacityChange() != null && secondEvent.getFlowCapacityChange() != null && firstEvent.getFlowCapacityChange().getValue() != secondEvent.getFlowCapacityChange().getValue()) continue;
+				if (firstEvent.getFreespeedChange() != null && secondEvent.getFreespeedChange() != null && firstEvent.getFreespeedChange().getValue() != secondEvent.getFreespeedChange().getValue())
+					continue;
+				if (firstEvent.getFlowCapacityChange() != null && secondEvent.getFlowCapacityChange() != null && firstEvent.getFlowCapacityChange().getValue() != secondEvent.getFlowCapacityChange().getValue())
+					continue;
 				if (!equalsIds(firstEvent.getLinks(), secondEvent.getLinks())) continue;
 
 				matches++;
@@ -197,9 +210,9 @@ class CreateScenarioCutOutTest {
 	}
 
 	/**
-	 *	Checks if two List have the same elements by checking the ids.
+	 * Checks if two List have the same elements by checking the ids.
 	 */
-	private <T> boolean equalsIds(Collection<? extends Identifiable<T>> firstList, Collection<? extends Identifiable<T>> secondList){
+	private <T> boolean equalsIds(Collection<? extends Identifiable<T>> firstList, Collection<? extends Identifiable<T>> secondList) {
 		return new HashSet<>(firstList.stream().map(Identifiable::getId).toList()).equals(new HashSet<>(secondList.stream().map(Identifiable::getId).toList()));
 	}
 }

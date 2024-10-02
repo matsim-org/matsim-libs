@@ -86,9 +86,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private static final Logger log = LogManager.getLogger(CreateScenarioCutOut.class);
 
 	/**
-	 * Router cache for every mode. This is a thread-local cache, so that we can use the same router for every thread.
+	 * Maps mode to the {@link ThreadLocal} containing the router for the mode. This is a thread-local cache, so that we can use the same router for every thread.
 	 */
-	private final Map<String, ThreadLocal<LeastCostPathCalculator>> routerCache = new ConcurrentHashMap<>();
+	private final Map<String, ThreadLocal<LeastCostPathCalculator>> mode2routerCache = new ConcurrentHashMap<>();
 
 	@CommandLine.Option(names = "--population", description = "Path to input population", required = true)
 	private String populationPath;
@@ -156,7 +156,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private final Set<Id<Link>> linksToInclude = ConcurrentHashMap.newKeySet();
 
 	/**
-	 * Agents, that are not relevant: Not in the shapefile or buffer, not route through the shapefile or buffer.
+	 * Agents, that are not relevant: Not in the shapefile or buffer, no route through the shapefile or buffer.
 	 */
 	private final Set<Id<Person>> personsToDelete = ConcurrentHashMap.newKeySet();
 
@@ -197,7 +197,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		config.plans().setInputFile(populationPath);
 		config.network().setInputFile(networkPath);
 		config.network().setTimeVariantNetwork(true);
-		if (facilityPath != null){
+		if (facilityPath != null) {
 			config.facilities().setInputFile(facilityPath);
 		}
 		scenario = ScenarioUtils.loadScenario(config);
@@ -235,7 +235,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 		}
 
-		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> FIX TODO with startTimes != 0
+		// TODO: Use events for travel time calculation, (this is optional) -> (done, untested) -> FIX TODO with startTimes != 0, see generateNetworkChangeEvents()
 
 		// Cut out the population and mark needed network parts
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), this);
@@ -289,6 +289,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 	// Helper-Functions
 
+	/**
+	 * Filters the network to the given mode.
+	 */
 	private Network filterNetwork(Network network, String mode) {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 
@@ -297,9 +300,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		return carOnlyNetwork;
 	}
 
+	/**
+	 * Creates a {@link LeastCostPathCalculator} for the given network and saves it in {@code mode2routerCache}.
+	 * The network should be filtered to the expected mode using {@link CreateScenarioCutOut#filterNetwork}.
+	 */
 	private LeastCostPathCalculator createRouter(Network network, String mode) {
-		routerCache.putIfAbsent(mode, new ThreadLocal<>());
-		LeastCostPathCalculator c = routerCache.get(mode).get();
+		mode2routerCache.putIfAbsent(mode, new ThreadLocal<>());
+		LeastCostPathCalculator c = mode2routerCache.get(mode).get();
 		if (c == null) {
 			FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
 			LeastCostPathCalculatorFactory fastAStarLandmarksFactory = new SpeedyALTFactory();
@@ -307,8 +314,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			OnlyTimeDependentTravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 
 			c = fastAStarLandmarksFactory.createPathCalculator(network, travelDisutility, travelTime);
-			routerCache.putIfAbsent(mode, new ThreadLocal<>());
-			routerCache.get(mode).set(c);
+			mode2routerCache.putIfAbsent(mode, new ThreadLocal<>());
+			mode2routerCache.get(mode).set(c);
 		}
 
 		return c;
@@ -345,6 +352,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 	}
 
+	/**
+	 * Routes a Path in the given network and mode.
+	 */
 	private LeastCostPathCalculator.Path getModeNetworkPath(Network network, String mode, Trip trip) {
 		LeastCostPathCalculator router = createRouter(network, mode);
 
@@ -357,6 +367,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 	}
 
+	/**
+	 * Returns {@link Coord} of an activity, either from the activity itself or from the facility.
+	 */
 	private Coord getActivityCoord(Activity activity) {
 		if (scenario.getActivityFacilities() != null && activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId()))
 			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
@@ -402,6 +415,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 	// TODO Make that this method thread safe
 	// Parallelized Implementation of PersonAlgorithm for cutout
+
+	/**
+	 * Parallelized Implementation of PersonAlgorithm for cutout. It checks whether this {@link Person} is relevant and if it is, it adds the
+	 * {@link Link}s of the persons-route into {@code linksToInclude}.
+	 * If this {@link Person} is not relevant, it is added into {@code personsToDelete}.
+	 */
 	@Override
 	public void run(Person person) {
 		boolean keepPerson = false;
