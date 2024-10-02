@@ -32,6 +32,30 @@ class CreateScenarioCutOutTest {
 	 */
 	@Test
 	void testBasicCutout() {
+		// TODO Rueckfrage: Soll die cap auch auf inf gesetzt werden, wenn es keine Events gibt, die die freespeed anpassen?
+		new CreateScenarioCutOut().execute(
+			"--buffer", "100",
+			"--population", utils.getClassInputDirectory() + "plans_without_facilities.xml",
+			"--network", ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml",
+			"--output-network", utils.getOutputDirectory() + "cut_network.xml",
+			"--output-population", utils.getOutputDirectory() + "cut_population.xml",
+			"--output-network-change-events", utils.getOutputDirectory() + "cut_change_events.xml",
+			"--input-crs", "EPSG:25832",
+			"--target-crs", "EPSG:25832",
+			"--shp", utils.getClassInputDirectory() + "chessboard-cutout.shp",
+			"--network-change-events-interval", "3600"
+		);
+
+//		Scenario inputScenario = getInputScenario();
+		Scenario referenceScenario = getReferenceScenario(false);
+		Scenario outputScenario = getOutputScenario(false);
+
+		// Network-Change event should only be generated, if an events file is given
+		Assertions.assertFalse(new File(utils.getOutputDirectory() + "cut_change_events.xml").exists());
+
+
+		Assertions.assertTrue(NetworkUtils.compare(referenceScenario.getNetwork(), outputScenario.getNetwork()), "Network was not cut properly!");
+		Assertions.assertSame(PopulationComparison.Result.equal, PopulationComparison.compare(referenceScenario.getPopulation(), outputScenario.getPopulation()), "Population was not cut properly!");
 
 	}
 
@@ -39,7 +63,30 @@ class CreateScenarioCutOutTest {
 	 * Test the cutout with facilities but without events.
 	 */
 	@Test
-	void testFacilitiesCutout() {
+	void testFacilitiesCutout(){
+		new CreateScenarioCutOut().execute(
+			"--buffer", "100",
+			"--population", ExamplesUtils.getTestScenarioURL("chessboard") + "plans.xml",
+			"--network", ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml",
+			"--facilities", ExamplesUtils.getTestScenarioURL("chessboard") + "facilities.xml",
+			"--output-network", utils.getOutputDirectory() + "cut_network.xml",
+			"--output-population", utils.getOutputDirectory() + "cut_population.xml",
+			"--output-network-change-events", utils.getOutputDirectory() + "cut_change_events.xml",
+			"--input-crs", "EPSG:25832",
+			"--target-crs", "EPSG:25832",
+			"--shp", utils.getClassInputDirectory() + "chessboard-cutout.shp",
+			"--network-change-events-interval", "3600"
+		);
+
+//		Scenario inputScenario = getInputScenario();
+		Scenario referenceScenario = getReferenceScenario(false);
+		Scenario outputScenario = getOutputScenario(false);
+
+		// Network-Change event should only be generated, if an events file is given
+		Assertions.assertFalse(new File(utils.getOutputDirectory() + "cut_change_events.xml").exists());
+
+		Assertions.assertTrue(NetworkUtils.compare(referenceScenario.getNetwork(), outputScenario.getNetwork()), "Network was not cut properly!");
+		Assertions.assertSame(PopulationComparison.Result.equal, PopulationComparison.compare(referenceScenario.getPopulation(), outputScenario.getPopulation()), "Population was not cut properly!");
 
 	}
 
@@ -47,8 +94,28 @@ class CreateScenarioCutOutTest {
 	 * Test the cutout without facilities but with events.
 	 */
 	@Test
-	void testEventCutout() {
+	void testEventsCutout() throws IOException {
+		new CreateScenarioCutOut().execute(
+			"--buffer", "100",
+			"--population", utils.getClassInputDirectory() + "plans_without_facilities.xml",
+			"--network", ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml",
+			"--events", utils.getClassInputDirectory() + "events.xml.gz",
+			"--output-network", utils.getOutputDirectory() + "cut_network.xml",
+			"--output-population", utils.getOutputDirectory() + "cut_population.xml",
+			"--output-network-change-events", utils.getOutputDirectory() + "cut_change_events.xml",
+			"--input-crs", "EPSG:25832",
+			"--target-crs", "EPSG:25832",
+			"--shp", utils.getClassInputDirectory() + "chessboard-cutout.shp",
+			"--network-change-events-interval", "3600"
+		);
 
+//		Scenario inputScenario = getInputScenario();
+		Scenario referenceScenario = getReferenceScenario(true);
+		Scenario outputScenario = getOutputScenario(true);
+
+		Assertions.assertTrue(NetworkUtils.compare(referenceScenario.getNetwork(), outputScenario.getNetwork()), "Network was not cut properly!");
+		Assertions.assertTrue(checkIfNetworkChangeEventsAreSame(referenceScenario.getNetwork(), outputScenario.getNetwork()), "NetworkChangeEvents were not generated properly!");
+		Assertions.assertSame(PopulationComparison.Result.equal, PopulationComparison.compare(referenceScenario.getPopulation(), outputScenario.getPopulation()), "Population was not cut properly!");
 	}
 
 	/**
@@ -72,7 +139,7 @@ class CreateScenarioCutOutTest {
 		);
 
 //		Scenario inputScenario = getInputScenario();
-		Scenario referenceScenario = getReferenceScenario();
+		Scenario referenceScenario = getReferenceScenario(true);
 		Scenario outputScenario = getOutputScenario(true);
 
 		Assertions.assertTrue(NetworkUtils.compare(referenceScenario.getNetwork(), outputScenario.getNetwork()), "Network was not cut properly!");
@@ -81,22 +148,24 @@ class CreateScenarioCutOutTest {
 	}
 
 
-	private Scenario getReferenceScenario(){
+	private Scenario getReferenceScenario(boolean withEvents){
+		String folder = withEvents ? "withEvents/" : "withoutEvents/";
+
 		Config referenceConfig = ConfigUtils.createConfig();
 		referenceConfig.global().setCoordinateSystem("EPSG:25832");
 		referenceConfig.network().setTimeVariantNetwork(true);
-		referenceConfig.network().setInputFile(utils.getClassInputDirectory() + "cut_network.xml");
-		referenceConfig.network().setChangeEventsInputFile(utils.getClassInputDirectory() + "cut_change_events.xml");
-		referenceConfig.plans().setInputFile(utils.getOutputDirectory() + "cut_population.xml");
+		referenceConfig.network().setInputFile(utils.getClassInputDirectory() + folder + "cut_network.xml");
+		if (withEvents) referenceConfig.network().setChangeEventsInputFile(utils.getClassInputDirectory() + folder + "cut_change_events.xml");
+		referenceConfig.plans().setInputFile(utils.getClassInputDirectory() + folder + "cut_population.xml");
 		return ScenarioUtils.loadScenario(referenceConfig);
 	}
 
-	private Scenario getOutputScenario(boolean withChangeEvents){
+	private Scenario getOutputScenario(boolean withEvents){
 		Config outputConfig = ConfigUtils.createConfig();
 		outputConfig.global().setCoordinateSystem("EPSG:25832");
 		outputConfig.network().setTimeVariantNetwork(true);
 		outputConfig.network().setInputFile(utils.getOutputDirectory() + "cut_network.xml");
-		if (withChangeEvents) outputConfig.network().setChangeEventsInputFile(utils.getOutputDirectory() + "cut_change_events.xml");
+		if (withEvents) outputConfig.network().setChangeEventsInputFile(utils.getOutputDirectory() + "cut_change_events.xml");
 		outputConfig.plans().setInputFile(utils.getOutputDirectory() + "cut_population.xml");
 		return ScenarioUtils.loadScenario(outputConfig);
 	}
@@ -104,7 +173,7 @@ class CreateScenarioCutOutTest {
 	private boolean checkIfNetworkChangeEventsAreSame(Network firstNetwork, Network secondNetwork) throws IOException {
 		List<NetworkChangeEvent> firstList = new LinkedList<>();
 		List<NetworkChangeEvent> secondList = new LinkedList<>();
-		new NetworkChangeEventsParser(firstNetwork, firstList).parse(Files.newInputStream(Path.of(utils.getClassInputDirectory() + "cut_change_events.xml")));
+		new NetworkChangeEventsParser(firstNetwork, firstList).parse(Files.newInputStream(Path.of(utils.getClassInputDirectory() + "withEvents/cut_change_events.xml")));
 		new NetworkChangeEventsParser(secondNetwork, secondList).parse(Files.newInputStream(Path.of(utils.getOutputDirectory() + "cut_change_events.xml")));;
 
 		if(firstList.size() != secondList.size()) return false;
@@ -133,6 +202,4 @@ class CreateScenarioCutOutTest {
 	private <T> boolean equalsIds(Collection<? extends Identifiable<T>> firstList, Collection<? extends Identifiable<T>> secondList){
 		return new HashSet<>(firstList.stream().map(Identifiable::getId).toList()).equals(new HashSet<>(secondList.stream().map(Identifiable::getId).toList()));
 	}
-
-
 }
