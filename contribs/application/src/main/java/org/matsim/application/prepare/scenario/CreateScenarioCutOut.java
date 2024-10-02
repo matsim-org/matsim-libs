@@ -222,8 +222,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			manager.finishProcessing();
 		}
 
-		boolean useNetworkChangeEvents = outputEvents != null;
-
 		// Cut out the network: Filter for links inside the shapefile
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (geom.contains(MGC.coord2Point(link.getCoord()))
@@ -279,13 +277,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes after cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
-
-		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork.toString());
-
-		if (useNetworkChangeEvents) {
+		if (eventPath != null) {
+			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
 			new NetworkChangeEventsWriter().write(outputEvents.toString(), events);
 		}
+
+		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork.toString());
 
 		return 0;
 	}
