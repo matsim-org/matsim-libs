@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import com.google.inject.Inject;
@@ -182,7 +183,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private Map<String, EnumeratedDistribution<TourStartAndDuration>> tourDistribution = null;
 	private Map<ServiceDurationPerCategoryKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector = null;
-	//TODO Remove these attributes from all method-signatures
+
 	private TripDistributionMatrix odMatrix;
 	private Map<String, Object2DoubleMap<String>> resultingDataPerZone;
 	private Map<String, Map<Id<Link>, Link>> linksPerZone;
@@ -197,6 +198,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		this.vehicleSelection = new DefaultVehicleSelection();
 		log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 	}
+
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial, CommercialTourSpecifications getCommercialTourSpecifications, VehicleSelection vehicleSelection) {
 		if (integrateExistingTrafficToSmallScaleCommercial == null){
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
@@ -212,7 +214,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			this.commercialTourSpecifications = getCommercialTourSpecifications;
 			log.info("Using {} for tour specifications!", getCommercialTourSpecifications.getClass().getSimpleName());
 		}
-		if(vehicleSelection == null){
+		if (vehicleSelection == null){
 			this.vehicleSelection = new DefaultVehicleSelection();
 			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 		} else {
@@ -334,7 +336,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return 0;
 	}
 
-	/** Creates a map with the different facility types per building.
+	/**
+	 * Creates a map with the different facility types per building.
 	 * @param scenario 				complete Scenario
 	 * @param facilitiesPerZone 	Map with facilities per zone
 	 */
@@ -348,17 +351,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
+	 * Solves the generated carrier-plans and puts them into the Scenario.
+	 * If a carrier has unhandled services, a carrier-replanning loop delets the old plans and generates new plans.
+	 * The new plans will then be solved and checked again.
+	 * This is repeated until the carrier-plans are solved or the {@code maxReplanningIterations} are reached.
 	 * @param originalScenario complete Scenario
 	 */
 	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
-
-		/*
-		TODO: Make a final fix for the unhandledServiceProblem using following procedure:
-			1. solveVRPs
-			2. check if carrierPlans are viable
-			3. if some are not then loop: delete non-viable carrierPlans and execute 1. but with CarrierUtils.solutions#... (will be pushed later)
-		 */
-
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
 		int maxServicesPerCarrier = 100;
@@ -510,8 +509,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param scenario                  Scenario with carriers
 	 * @param nonCompleteSolvedCarriers List of carriers, which did not serve all services
 	 */
-	private void tryToSolveAllCarriersCompletely(Scenario scenario,
-												 List<Carrier> nonCompleteSolvedCarriers) {
+	private void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers) {
 		int startNumberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 		log.info("Starting with carrier-replanning loop.");
 		for (int i = 0; i < maxReplanningIterations; i++) {
@@ -735,7 +733,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							else
 								selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
 						}
-						// TODO #1
 
 						// Generate carrierName
 						String carrierName = null;
@@ -795,7 +792,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			for (int i = 0; i < numberOfJobs; i++) {
 				int serviceTimePerStop;
 				if (carrierAttributes.selectedStartCategory.equals("Inhabitants")){
-					//TODO This is a bit ugly. Do we even need the selectedStartCategory of the carrierAttributes in this case? Or can we just set it right at the beginning? (move it to TODO #1)
 					CarrierAttributes inhabitantAttributes = new CarrierAttributes(carrierAttributes.purpose, carrierAttributes.startZone,
 						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(), carrierAttributes.modeORvehType,
 						carrierAttributes.smallScaleCommercialTrafficType, carrierAttributes.vehicleDepots, carrierAttributes.odMatrixEntry);
