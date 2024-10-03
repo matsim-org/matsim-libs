@@ -46,11 +46,7 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
@@ -292,7 +288,7 @@ public class DrtSpeedUpTest {
 	DvrpVehicleSpecification vehicleSpecification(String id) {
 		return ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create(id, DvrpVehicle.class))
-				.capacity(1)
+				.capacity(new ScalarVehicleLoad(1))
 				.startLinkId(linkAB.getId())
 				.serviceBeginTime(0)
 				.serviceEndTime(3600)

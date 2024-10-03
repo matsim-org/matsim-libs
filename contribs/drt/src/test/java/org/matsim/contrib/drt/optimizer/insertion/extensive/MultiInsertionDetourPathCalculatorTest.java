@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.testcases.fakes.FakeLink;
@@ -84,7 +85,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -105,7 +106,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Waypoint.Dropoff.class));
 		var dropoff = insertionPoint(waypoint(pickupLink, Waypoint.Pickup.class),
 				waypoint(dropoffLink, Waypoint.End.class));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -128,7 +129,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);

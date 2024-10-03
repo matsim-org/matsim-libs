@@ -18,10 +18,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -412,7 +409,7 @@ public class PtAlongALineTest {
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
 					.id(Id.create(vehPrefix + i, DvrpVehicle.class))
 					.startLinkId(startLinkId)
-					.capacity(capacity)
+					.capacity(new ScalarVehicleLoad(capacity))
 					.serviceBeginTime(0)
 					.serviceEndTime(36 * 3600)
 					.build());

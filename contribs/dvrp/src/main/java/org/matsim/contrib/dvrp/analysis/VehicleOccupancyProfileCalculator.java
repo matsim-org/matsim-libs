@@ -35,9 +35,7 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
@@ -61,8 +59,18 @@ public class VehicleOccupancyProfileCalculator
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
-		private int occupancy;
+		private DvrpVehicleLoad occupancy;
 		private double beginTime;
+
+		public VehicleState(Task.TaskType taskType, DvrpVehicleLoad occupancy, double beginTime) {
+			this.taskType = taskType;
+			this.occupancy = occupancy;
+			this.beginTime = beginTime;
+		}
+
+		public VehicleState(DvrpVehicleLoad occupancy) {
+			this(null, occupancy, 0.0);
+		}
 	}
 
 	private final TimeDiscretizer timeDiscretizer;
@@ -74,7 +82,7 @@ public class VehicleOccupancyProfileCalculator
 	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
-	private final int maxCapacity;
+	private final DvrpVehicleLoad maxCapacity;
 
 	private final String dvrpMode;
 
@@ -98,9 +106,11 @@ public class VehicleOccupancyProfileCalculator
 		maxCapacity = fleet.getVehicleSpecifications()
 				.values()
 				.stream()
-				.mapToInt(DvrpVehicleSpecification::getCapacity)
-				.max()
-				.orElse(0);
+				.map(DvrpVehicleSpecification::getCapacity)
+				.reduce((left, right) -> left.fitsIn(right) ? right : left)
+				.orElse(null);
+
+		Verify.verify(maxCapacity instanceof ScalarVehicleLoad);
 	}
 
 	private void consolidate() {
@@ -163,13 +173,16 @@ public class VehicleOccupancyProfileCalculator
 
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
-		Verify.verify(state.occupancy >= 0);
-		Verify.verify(state.occupancy <= maxCapacity);
+		Verify.verify(state.occupancy instanceof ScalarVehicleLoad);
+		ScalarVehicleLoad currentVehicleOccupancy = (ScalarVehicleLoad) state.occupancy;
+		ScalarVehicleLoad vehicleCapacity = (ScalarVehicleLoad) maxCapacity;
+		Verify.verify(currentVehicleOccupancy.getLoad() >= 0);
+		Verify.verify(currentVehicleOccupancy.getLoad() <= vehicleCapacity.getLoad());
 
-		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
+		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || currentVehicleOccupancy.getLoad() > 0;
 
 		double[] profile = servingPassengers ?
-				vehicleOccupancyProfiles.get(state.occupancy) :
+				vehicleOccupancyProfiles.get(((ScalarVehicleLoad)state.occupancy).getLoad()) :
 				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
 						v -> new double[timeDiscretizer.getIntervalCount()]);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
@@ -203,10 +216,9 @@ public class VehicleOccupancyProfileCalculator
 		if (!event.getDvrpMode().equals(dvrpMode)) {
 			return;
 		}
-
 		final VehicleState state;
 		if (event.getTaskIndex() == 0) {
-			state = new VehicleState();
+			state = new VehicleState(new ScalarVehicleLoad(0));
 			vehicleStates.put(event.getDvrpVehicleId(), state);
 		} else {
 			state = vehicleStates.get(event.getDvrpVehicleId());
@@ -240,7 +252,7 @@ public class VehicleOccupancyProfileCalculator
 		VehicleState state = vehicleStates.get(Id.create(vehicleId, DvrpVehicle.class));
 		if (state != null && !isDriver(event.getPersonId(), vehicleId)) {
 			increment(state, event.getTime());
-			state.occupancy += change;
+			state.occupancy = state.occupancy.addTo(new ScalarVehicleLoad(change));
 			state.beginTime = event.getTime();
 		}
 	}
@@ -253,7 +265,7 @@ public class VehicleOccupancyProfileCalculator
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
-		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
+		vehicleOccupancyProfiles = IntStream.rangeClosed(0, ((ScalarVehicleLoad)maxCapacity).getLoad())
 				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
 				.collect(toImmutableList());
 

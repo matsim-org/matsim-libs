@@ -50,7 +50,7 @@ public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return vehicle capacity
 	 */
-	int getCapacity();
+	DvrpVehicleLoad getCapacity();
 
 	/**
 	 * @return vehicle operations start time

@@ -51,6 +51,7 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffT
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
@@ -216,7 +217,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null,
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null, new ScalarVehicleLoad(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :

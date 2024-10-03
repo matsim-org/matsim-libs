@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -72,8 +73,8 @@ public class ExtensiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
-		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
+		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), new ScalarVehicleLoad(1));
+		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), new ScalarVehicleLoad(1));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
 				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),

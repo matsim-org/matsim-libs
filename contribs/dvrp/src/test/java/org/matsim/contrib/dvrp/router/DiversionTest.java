@@ -16,12 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -171,7 +166,7 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(4) //
+					.capacity(new ScalarVehicleLoad(4)) //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(2000.0) //
@@ -499,7 +494,7 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(4) //
+					.capacity(new ScalarVehicleLoad(4)) //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(2000.0) //
