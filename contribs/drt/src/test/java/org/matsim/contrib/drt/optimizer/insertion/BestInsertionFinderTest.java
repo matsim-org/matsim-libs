@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -138,6 +140,6 @@ public class BestInsertionFinderTest {
 		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
 
 		return new InsertionWithDetourData(
-				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion), null, null);
+				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, new ScalarVehicleLoad(1)), null, null);
 	}
 }

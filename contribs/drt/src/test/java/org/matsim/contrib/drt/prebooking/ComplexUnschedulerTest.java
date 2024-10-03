@@ -26,11 +26,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -48,6 +44,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -608,7 +605,7 @@ public class ComplexUnschedulerTest {
 
 			DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder() //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
-					.capacity(4) //
+					.capacity(new ScalarVehicleLoad(4)) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(30.0 * 3600.0) //
 					.startLinkId(depotLink.getId()) //
@@ -636,6 +633,7 @@ public class ComplexUnschedulerTest {
 		AcceptedDrtRequest createRequest() {
 			AcceptedDrtRequest request = Mockito.mock(AcceptedDrtRequest.class);
 			Mockito.when(request.getId()).thenReturn(Id.create("req_" + requestIndex++, Request.class));
+			Mockito.when(request.getPassengerCount()).thenReturn(new ScalarVehicleLoad(0));
 			return request;
 		}
 

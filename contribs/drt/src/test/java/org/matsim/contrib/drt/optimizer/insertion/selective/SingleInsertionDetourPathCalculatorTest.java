@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -88,7 +89,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
@@ -107,7 +108,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 		//use specific class of waypoint to allow for detecting the special case
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Dropoff.class));
 		var dropoff = insertionPoint(waypoint(pickupLink, Pickup.class), waypoint(dropoffLink, End.class));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
@@ -123,7 +124,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	void calculatePaths_noDetours() {
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, new ScalarVehicleLoad(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 

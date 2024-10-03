@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -75,7 +76,7 @@ public class VrpAgentLogicTest {
 			.id(Id.create("veh_1", DvrpVehicle.class))
 			.serviceBeginTime(0)
 			.serviceEndTime(100)
-			.capacity(1)
+			.capacity(new ScalarVehicleLoad(1))
 			.startLinkId(startLink.getId())
 			.build();
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, startLink);

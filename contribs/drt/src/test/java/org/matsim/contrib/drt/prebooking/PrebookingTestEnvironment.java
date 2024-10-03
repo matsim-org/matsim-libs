@@ -22,10 +22,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -62,7 +59,7 @@ public class PrebookingTestEnvironment {
 	private final double edgeLength = 200.0;
 	private final double speed = 10.0;
 
-	private int vehicleCapacity = 4;
+	private DvrpVehicleLoad vehicleCapacity = new ScalarVehicleLoad(4);
 
 	private double maximumWaitTime = 3600.0;
 	private double detourRelative = 1.3;
@@ -141,7 +138,7 @@ public class PrebookingTestEnvironment {
 		return this;
 	}
 
-	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+	public PrebookingTestEnvironment setVehicleCapacity(DvrpVehicleLoad vehicleCapacity) {
 		this.vehicleCapacity = vehicleCapacity;
 		return this;
 	}

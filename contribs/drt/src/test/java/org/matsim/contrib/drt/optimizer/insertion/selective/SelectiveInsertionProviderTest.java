@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -74,7 +75,7 @@ public class SelectiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var insertionWithDetourData = new InsertionWithDetourData(new Insertion(vehicleEntry, null, null),
+		var insertionWithDetourData = new InsertionWithDetourData(new Insertion(vehicleEntry, null, null, new ScalarVehicleLoad(1)),
 				new InsertionDetourData(null, null, null, null), null);
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(

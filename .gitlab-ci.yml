@@ -7,5 +7,7 @@ cache:
 test:
   stage: test
   script:
-    - mvn install --batch-mode --also-make --projects contribs/drt -DskipTests -Dsource.skip
-    - cd contribs/drt && mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
+    - mvn install --batch-mode --also-make --projects contribs/drt,contribs/dvrp,contribs/drt-extensions -DskipTests -Dsource.skip
+    - cd contribs/dvrp && mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip && cd ../..
+    - cd contribs/drt && mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip && cd ../..
+    - cd contribs/drt-extensions && mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip && cd ../..

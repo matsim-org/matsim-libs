@@ -24,6 +24,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
@@ -91,8 +94,8 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public int getPassengerCount() {
-		return passengerIds.size();
+	public DvrpVehicleLoad getPassengerCount() {
+		return new ScalarVehicleLoad(passengerIds.size());
 	}
 
 	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {

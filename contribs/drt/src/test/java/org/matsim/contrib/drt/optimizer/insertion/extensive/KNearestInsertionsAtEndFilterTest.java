@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -108,16 +109,16 @@ public class KNearestInsertionsAtEndFilterTest {
 	private InsertionWithDetourData insertion(VehicleEntry vehicleEntry, int pickupIdx, double pickupDepartureTime) {
 		return new InsertionWithDetourData(new Insertion(vehicleEntry,
 				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
-						vehicleEntry.getWaypoint(pickupIdx + 1)), null), null,
+						vehicleEntry.getWaypoint(pickupIdx + 1)), null, new ScalarVehicleLoad(1)), null,
 				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, Double.NaN), null));
 	}
 
 	private Waypoint.Start start(double endTime) {
-		return new Waypoint.Start(null, null, endTime, 0);
+		return new Waypoint.Start(null, null, endTime, new ScalarVehicleLoad(0));
 	}
 
 	private Waypoint.Stop stop(double endTime) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), new ScalarVehicleLoad(0));
 	}
 
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {

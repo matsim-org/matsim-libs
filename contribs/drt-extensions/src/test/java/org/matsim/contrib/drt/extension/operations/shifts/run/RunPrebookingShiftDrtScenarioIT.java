@@ -32,10 +32,7 @@ import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
@@ -369,7 +366,7 @@ public class RunPrebookingShiftDrtScenarioIT {
         FleetSpecification fleetSpecification = new FleetSpecificationImpl();
         fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
                 .id(Id.create("v1", DvrpVehicle.class)) //
-                .capacity(1) //
+                .capacity(new ScalarVehicleLoad(1)) //
                 .serviceBeginTime(0.0) //
                 .serviceEndTime(24 * 3600) //
                 .startLinkId(Id.createLinkId(1)) //

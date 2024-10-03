@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.Insert
 import org.matsim.contrib.drt.optimizer.insertion.extensive.DetourPathDataCache;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.testcases.fakes.FakeLink;
 
@@ -130,11 +131,11 @@ public class DetourPathDataCacheTest {
 	}
 
 	private VehicleEntry entry(Link startLink, Link... stopLinks) {
-		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0),
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, new ScalarVehicleLoad(0)),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null, null, 0);
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), new ScalarVehicleLoad(0));
 	}
 }

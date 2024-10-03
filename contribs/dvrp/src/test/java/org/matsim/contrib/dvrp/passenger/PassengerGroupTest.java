@@ -10,10 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiActionCreator;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -48,7 +45,7 @@ public class PassengerGroupTest {
 			.serviceBeginTime(0)
 			.serviceEndTime(3600)
 			.startLinkId(fixture.linkAB.getId())
-			.capacity(1)
+			.capacity(new ScalarVehicleLoad(1))
 			.build(), fixture.linkAB);
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 

@@ -63,12 +63,12 @@ public class FleetReader extends MatsimXmlParser {
 				.build();
 	}
 
-	private static int getCapacity(String capacityAttribute) {
+	private static DvrpVehicleLoad getCapacity(String capacityAttribute) {
 		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
 		if ((int)capacity != capacity) {
 			//for backwards compatibility: use double when reading files (capacity used to be double)
 			throw new IllegalArgumentException("capacity must be an integer value");
 		}
-		return (int)capacity;
+		return new ScalarVehicleLoad((int)capacity);
 	}
 }

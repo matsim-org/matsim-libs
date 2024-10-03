@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -70,33 +71,33 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
-		
+
 		// find stop tasks and note down stay time before each task
 		double accumulatedStayTime = 0.0;
 		if (startTask != null && STAY.isBaseTypeOf(startTask)) {
 			accumulatedStayTime = Math.max(0.0, startTask.getEndTime() - currentTime);
 		}
-		
+
 		List<Double> precedingStayTimes = new ArrayList<>();
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (STAY.isBaseTypeOf(task)) {
 				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
 			} else if (STOP.isBaseTypeOf(task)) {
 				stopTasks.add((DrtStopTask)task);
-				precedingStayTimes.add(accumulatedStayTime); 
+				precedingStayTimes.add(accumulatedStayTime);
 				accumulatedStayTime = 0.0;
 			}
 		}
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
-		int outgoingOccupancy = 0;
+		DvrpVehicleLoad outgoingOccupancy = vehicle.getCapacity().getEmptyLoad();
 		for (int i = stops.length - 1; i >= 0; i--) {
 			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
-			outgoingOccupancy -= s.getOccupancyChange();
+			outgoingOccupancy = outgoingOccupancy.subtract(s.getOccupancyChange());
 		}
-		
+
 		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? new Waypoint.Stop((DrtStopTask) startTask, 0)
+				? new Waypoint.Stop((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
 				: null;
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);
@@ -120,11 +121,11 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
 			slackTimes[i + 1] = slackTime;
 		}
-		
+
 		// start
-		slackTimes[0] = start == null ? slackTime : 
+		slackTimes[0] = start == null ? slackTime :
 			Math.min(start.latestDepartureTime - start.task.getEndTime(), slackTime);
-		
+
 		return slackTimes;
 	}
 

@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -61,7 +62,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 
 	private static final int STOP_DURATION_INITIAL = 10;
 	private static final int STOP_DURATION_ADDED = 5;
-	
+
 	public static final PassengerStopDurationProvider STOP_DURATION_PROVIDER = new PassengerStopDurationProvider() {
 		@Override
 		public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
@@ -70,7 +71,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 			} else if (request.equals(drtRequestAdded)) {
 				return STOP_DURATION_ADDED;
 			}
-			
+
 			throw new IllegalStateException();
 		}
 
@@ -81,12 +82,12 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 			} else if (request.equals(drtRequestAdded)) {
 				return STOP_DURATION_ADDED;
 			}
-			
+
 			throw new IllegalStateException();
 		}
 	};
-	
-	public static final StopTimeCalculator STOP_TIME_CALCULATOR = 
+
+	public static final StopTimeCalculator STOP_TIME_CALCULATOR =
 			new CumulativeStopTimeCalculator(STOP_DURATION_PROVIDER);
 
 	@Test
@@ -265,13 +266,13 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Start start(Task task, double time, Link link) {
-		return new Waypoint.Start(task, link, time, 0);
+		return new Waypoint.Start(task, link, time, new ScalarVehicleLoad(0));
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
 		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
 		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
-		return new Waypoint.Stop(stopTask, 0);
+		return new Waypoint.Stop(stopTask, new ScalarVehicleLoad(0));
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

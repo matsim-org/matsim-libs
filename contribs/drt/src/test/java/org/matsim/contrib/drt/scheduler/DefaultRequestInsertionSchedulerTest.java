@@ -87,7 +87,7 @@ public class DefaultRequestInsertionSchedulerTest {
         fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
                 .id(V_1_ID)
                 .startLinkId(startLink.getId())
-                .capacity(6)
+                .capacity(new ScalarVehicleLoad(6))
                 .serviceBeginTime(0)
                 .serviceEndTime(1000)
                 .build()
@@ -132,10 +132,10 @@ public class DefaultRequestInsertionSchedulerTest {
 
 
         // vehicle entry
-        Waypoint.Start start = start(null, CURRENT_TIME, startLink, 1);//not a STOP -> pickup cannot be appended
-        Waypoint.Stop stop0 = stop(stopTask0, 2);
-        Waypoint.Stop stop1 = stop(stopTask1, 1);
-        Waypoint.Stop stop2 = stop(stopTask2, 0);
+        Waypoint.Start start = start(null, CURRENT_TIME, startLink, new ScalarVehicleLoad(1));//not a STOP -> pickup cannot be appended
+        Waypoint.Stop stop0 = stop(stopTask0, new ScalarVehicleLoad(2));
+        Waypoint.Stop stop1 = stop(stopTask1, new ScalarVehicleLoad(1));
+        Waypoint.Stop stop2 = stop(stopTask2, new ScalarVehicleLoad(0));
         var vehicleEntry = entry(vehicle, start, stop0, stop1, stop2);
 
         InsertionWithDetourData.InsertionDetourData detour = detourData(0, 10, 10, 10.);
@@ -213,11 +213,11 @@ public class DefaultRequestInsertionSchedulerTest {
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
 
-    private Waypoint.Start start(Task task, double time, Link link, int occupancy) {
+    private Waypoint.Start start(Task task, double time, Link link, DvrpVehicleLoad occupancy) {
         return new Waypoint.Start(task, link, time, occupancy);
     }
 
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, int outgoingOccupancy) {
+    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpVehicleLoad outgoingOccupancy) {
         return new Waypoint.Stop(stopTask, outgoingOccupancy);
     }
 

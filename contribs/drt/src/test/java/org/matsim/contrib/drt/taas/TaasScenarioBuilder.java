@@ -34,10 +34,7 @@ import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
@@ -147,12 +144,12 @@ public class TaasScenarioBuilder {
 
 	// SERVICE PART
 
-	record VehicleItem(String identifier, int depotX, int depotY, int capacity) {
+	record VehicleItem(String identifier, int depotX, int depotY, DvrpVehicleLoad capacity) {
 	}
 
 	private List<VehicleItem> vehicles = new LinkedList<>();
 
-	public TaasScenarioBuilder addVehicle(String identifier, int depotX, int depotY, int capacity) {
+	public TaasScenarioBuilder addVehicle(String identifier, int depotX, int depotY, DvrpVehicleLoad capacity) {
 		vehicles.add(new VehicleItem(identifier, depotX, depotY, capacity));
 		return this;
 	}

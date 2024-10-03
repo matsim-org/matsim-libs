@@ -28,10 +28,7 @@ import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -82,7 +79,7 @@ public class EqualVehicleDensityTargetCalculatorTest {
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
 					.id(Id.create(i + "", DvrpVehicle.class))
 					.startLinkId(Id.createLinkId("a"))
-					.capacity(1)
+					.capacity(new ScalarVehicleLoad(1))
 					.serviceBeginTime(0)
 					.serviceEndTime(100)
 					.build());

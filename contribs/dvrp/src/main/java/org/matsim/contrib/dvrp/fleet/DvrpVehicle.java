@@ -40,7 +40,7 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return the amount of people/goods that can be served/transported at the same time
 	 */
-	int getCapacity();
+	DvrpVehicleLoad getCapacity();
 
 	/**
 	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
