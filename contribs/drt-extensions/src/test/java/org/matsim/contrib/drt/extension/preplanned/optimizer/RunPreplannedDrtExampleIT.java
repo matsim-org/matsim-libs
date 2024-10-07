@@ -26,7 +26,6 @@ import static org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDr
 
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
