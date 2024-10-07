@@ -27,16 +27,20 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.Collections;
 import java.util.List;
+import org.matsim.pt.utils.TransitScheduleValidator.ValidationResult.ValidationIssue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,6 +52,16 @@ public class TransitScheduleValidatorTest {
 				ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(
 				scenario.getTransitSchedule(), scenario.getNetwork());
+		assertThat(validationResult.getIssues()).isEmpty();
+	}
+
+	@Test
+	void testPtTutorialPseudoNetwork() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(scenario).readFile("test/scenarios/pt-tutorial/transitSchedule.xml");
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "").createNetwork();
+		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(
+			scenario.getTransitSchedule(), scenario.getNetwork());
 		assertThat(validationResult.getIssues()).isEmpty();
 	}
 
