@@ -247,7 +247,7 @@ public class TripDashboard implements Dashboard {
 			.el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Mode usage";
-				viz.description = "Share of persons using a main mode at least once per day.";
+				viz.description = "Share of persons using a main mode at least once per day";
 				viz.width = 2d;
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_users.csv"));
@@ -267,6 +267,11 @@ public class TripDashboard implements Dashboard {
 					viz.mergeDatasets = true;
 				}
 
+			}).el(Sankey.class, (viz, data) -> {
+				viz.title = "Mode shift";
+				viz.width = 1.5d;
+				viz.description = "by main mode. Compares initial input with output after the last iteration";
+				viz.csv = data.compute(TripAnalysis.class, "mode_shift.csv", args);
 			});
 
 		createDistancePlot(layout, args, tab);
