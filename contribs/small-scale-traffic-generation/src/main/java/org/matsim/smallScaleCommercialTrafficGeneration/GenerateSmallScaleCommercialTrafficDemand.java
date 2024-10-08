@@ -198,7 +198,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		this.vehicleSelection = new DefaultVehicleSelection();
 		log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
-		this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this, maxReplanningIterations, additionalTravelBufferPerIterationInMinutes);
+		this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
 		log.info("Using default {} for tour unhandled-services-solution!", DefaultUnhandledServicesSolution.class.getSimpleName());
 	}
 
@@ -225,7 +225,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			log.info("Using {} for tour vehicle-selection!", vehicleSelection.getClass().getSimpleName());
 		}
 		if (unhandledServicesSolution == null){
-			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this, maxReplanningIterations, additionalTravelBufferPerIterationInMinutes);
+			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
 			log.info("Using default {} for unhandled-services-solution", DefaultUnhandledServicesSolution.class.getSimpleName());
 		} else {
 			this.unhandledServicesSolution = unhandledServicesSolution;
@@ -490,7 +490,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			CarriersUtils.runJsprit(originalScenario);
 			List<Carrier> nonCompleteSolvedCarriers = unhandledServicesSolution.createListOfCarrierWithUnhandledJobs(originalScenario);
 			if (!nonCompleteSolvedCarriers.isEmpty())
-				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers, carrierId2carrierAttributes);
+				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			if (!splitVRPs)
@@ -966,6 +966,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	public Map<ServiceDurationPerCategoryKey, EnumeratedDistribution<DurationsBounds>> getServiceDurationTimeSelector() {
 		return serviceDurationTimeSelector;
+	}
+
+	public Map<Id<Carrier>, CarrierAttributes> getCarrierId2carrierAttributes() {
+		return carrierId2carrierAttributes;
+	}
+
+	public int getMaxReplanningIterations(){
+		return maxReplanningIterations;
+	}
+
+	public int getAdditionalTravelBufferPerIterationInMinutes(){
+		return additionalTravelBufferPerIterationInMinutes;
 	}
 
 	private static class MyCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {

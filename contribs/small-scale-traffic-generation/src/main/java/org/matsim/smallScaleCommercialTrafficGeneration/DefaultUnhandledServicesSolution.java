@@ -2,7 +2,6 @@ package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.freight.carriers.Carrier;
@@ -15,18 +14,13 @@ import java.util.concurrent.ExecutionException;
 
 public class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	private static final Logger log = LogManager.getLogger(DefaultUnhandledServicesSolution.class);
-	// Replanning configuration
-	private final int maxReplanningIterations;
-	private final int additionalTravelBufferPerIterationInMinutes;
 
 	// Generation data
 	Random rnd;
 	private final GenerateSmallScaleCommercialTrafficDemand generator;
 
-	DefaultUnhandledServicesSolution(GenerateSmallScaleCommercialTrafficDemand generator, int maxReplanningIterations, int additionalTravelBufferPerIterationInMinutes){
+	DefaultUnhandledServicesSolution(GenerateSmallScaleCommercialTrafficDemand generator){
 		rnd = MatsimRandom.getRandom();
-		this.maxReplanningIterations = maxReplanningIterations;
-		this.additionalTravelBufferPerIterationInMinutes = additionalTravelBufferPerIterationInMinutes;
 		this.generator = generator;
 	}
 
@@ -102,20 +96,20 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	}
 
 	@Override
-	public void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers, Map<Id<Carrier>, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes> carrierId2carrierAttributes) {
+	public void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers) {
 		int startNumberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 		log.info("Starting with carrier-replanning loop.");
-		for (int i = 0; i < maxReplanningIterations; i++) {
+		for (int i = 0; i < generator.getMaxReplanningIterations(); i++) {
 			log.info("carrier-replanning loop iteration: {}", i);
 			int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 			for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
 				//Delete old plan of carrier
 				nonCompleteSolvedCarrier.clearPlans();
 				nonCompleteSolvedCarrier.setSelectedPlan(null);
-				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = carrierId2carrierAttributes.get(nonCompleteSolvedCarrier.getId());
+				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
 
 				// Generate new services. The new service batch should have a smaller sum of serviceDurations than before (or otherwise it will not change anything)
-				redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes, (i + 1) * additionalTravelBufferPerIterationInMinutes);
+				redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes, (i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
 				log.info("Carrier should be changed...");
 			}
 			try {
@@ -129,7 +123,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			log.info(
 				"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
 				i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
-				numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(), (i + 1) * additionalTravelBufferPerIterationInMinutes);
+				numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(), (i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
 			if (nonCompleteSolvedCarriers.isEmpty()) break;
 		}
 

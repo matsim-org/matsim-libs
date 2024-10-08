@@ -1,11 +1,9 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.Carrier;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * When generating service-durations for {@link Carrier}s it may happen service durations of their plans
@@ -37,5 +35,5 @@ public interface UnhandledServicesSolution {
 	 * @param scenario Scenario to handle the carriers for. Needed to execute {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)} and {@link UnhandledServicesSolution#createListOfCarrierWithUnhandledJobs(Scenario)}
 	 * @param nonCompleteSolvedCarriers List of carriers, that are not solved. Can be obtained by {@link UnhandledServicesSolution#createListOfCarrierWithUnhandledJobs(Scenario)}
 	 */
-	void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers, Map<Id<Carrier>, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes> carrierId2carrierAttributes);
+	void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers);
 }
