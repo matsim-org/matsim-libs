@@ -20,13 +20,18 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Key;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
+import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
+import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.drt.stops.*;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
@@ -38,10 +43,6 @@ import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrixModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Key;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -66,6 +67,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
 				drtCfg.changeStartLinkToLastLinkInSchedule));
+		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
 
@@ -83,12 +85,32 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 
+		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
+			return StaticPassengerStopDurationProvider.of(drtCfg.stopDuration, 0.0);
+		}));
+
 		bindModal(DefaultStopTimeCalculator.class).toProvider(modalProvider(getter -> {
 			return new DefaultStopTimeCalculator(drtCfg.stopDuration);
 		})).in(Singleton.class);
 
-		bindModal(StopTimeCalculator.class).to(modalKey(DefaultStopTimeCalculator.class));
+		if (drtCfg.getPrebookingParams().isEmpty()) {
+			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
+				return new DefaultStopTimeCalculator(drtCfg.stopDuration);
+			})).in(Singleton.class);
+		} else {
+			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
+				PassengerStopDurationProvider provider = getter.getModal(PassengerStopDurationProvider.class);
+				return new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(provider), drtCfg.stopDuration);
+			}));
+
+			install(new PrebookingModeAnalysisModule(getMode()));
+		}
 
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
+
+		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
+			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
+		}
+
 	}
 }

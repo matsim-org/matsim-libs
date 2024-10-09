@@ -63,6 +63,7 @@ public final class RaptorUtils {
 		staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
 		staticConfig.setIntermodalLegOnlyHandling(srrConfig.getIntermodalLegOnlyHandling());
 		staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
+		staticConfig.setTransferCalculation(srrConfig.getTransferCalculation());
 
         staticConfig.setUseModeMappingForPassengers(srrConfig.isUseModeMappingForPassengers());
         if (srrConfig.isUseModeMappingForPassengers()) {
@@ -70,6 +71,10 @@ public final class RaptorUtils {
                 staticConfig.addModeMappingForPassengers(mapping.getRouteMode(), mapping.getPassengerMode());
             }
         }
+
+		for (SwissRailRaptorConfigGroup.ModeToModeTransferPenalty penalty : srrConfig.getModeToModeTransferPenaltyParameterSets()){
+			staticConfig.addModeToModeTransferPenalty(penalty.fromMode,penalty.toMode,penalty.transferPenalty);
+		}
         staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
 
         return staticConfig;

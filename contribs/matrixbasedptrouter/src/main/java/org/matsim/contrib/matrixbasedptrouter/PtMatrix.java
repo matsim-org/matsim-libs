@@ -20,6 +20,7 @@
 package org.matsim.contrib.matrixbasedptrouter;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -84,16 +85,19 @@ public final class PtMatrix {
 			String ptTravelTimeInputFile = ippcm.getPtTravelTimesInputFile();
 			String ptTravelDistanceInputFile = ippcm.getPtTravelDistancesInputFile();
 
-			BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
-			log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
-			final Map<Id<PtStop>, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
-			FileUtils.fillODMatrix(originDestinationTravelTimeMatrix, ptStopsMap, brTravelTimes, true);
-			log.info("Done creating travel time OD matrix. " + originDestinationTravelTimeMatrix.toString());
-
-			log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
-			BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
-			FileUtils.fillODMatrix(originDestinationTravelDistanceMatrix, ptStopsMap, brTravelDistances, false);
-			log.info("Done creating travel distance OD matrix. " + originDestinationTravelDistanceMatrix.toString());
+			try (BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
+				BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
+			) {
+				log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
+				final Map<Id<PtStop>, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
+				FileUtils.fillODMatrix(originDestinationTravelTimeMatrix, ptStopsMap, brTravelTimes, true);
+				log.info("Done creating travel time OD matrix. " + originDestinationTravelTimeMatrix.toString());
+				log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
+				FileUtils.fillODMatrix(originDestinationTravelDistanceMatrix, ptStopsMap, brTravelDistances, false);
+				log.info("Done creating travel distance OD matrix. " + originDestinationTravelDistanceMatrix.toString());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 
 			log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");
 

@@ -22,8 +22,8 @@ package org.matsim.facilities;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class FacilitiesFromPopulationTest {
 
 	@Test
-	public void testRun_onePerLink_assignLinks() {
+	void testRun_onePerLink_assignLinks() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
@@ -55,11 +55,11 @@ public class FacilitiesFromPopulationTest {
 		generator.setAssignLinksToFacilitiesIfMissing( f.scenario.getNetwork() );
 		generator.run(f.scenario.getPopulation());
 
-		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
+		Assertions.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 
-		Assert.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(Id.create("bc", ActivityFacility.class)).getLinkId().toString());
-		Assert.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ca", ActivityFacility.class)).getLinkId().toString());
-		Assert.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ab", ActivityFacility.class)).getLinkId().toString());
+		Assertions.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(Id.create("bc", ActivityFacility.class)).getLinkId().toString());
+		Assertions.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ca", ActivityFacility.class)).getLinkId().toString());
+		Assertions.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ab", ActivityFacility.class)).getLinkId().toString());
 
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
@@ -74,7 +74,7 @@ public class FacilitiesFromPopulationTest {
 	}
 
 	@Test
-	public void testRun_onePerLink_assignLinks_openingTimes() {
+	void testRun_onePerLink_assignLinks_openingTimes() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
@@ -91,11 +91,11 @@ public class FacilitiesFromPopulationTest {
 		generator.assignOpeningTimes( config );
 		generator.run(f.scenario.getPopulation());
 
-		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
+		Assertions.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals(7*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getStartTime(), 1e-7);
-		Assert.assertEquals(19*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getEndTime(), 1e-7);
+		Assertions.assertEquals(7*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getStartTime(), 1e-7);
+		Assertions.assertEquals(19*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getEndTime(), 1e-7);
 
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
@@ -110,7 +110,7 @@ public class FacilitiesFromPopulationTest {
 	}
 
 	@Test
-	public void testRun_multiple_assignLinks() {
+	void testRun_multiple_assignLinks() {
 		Fixture f = new Fixture();
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
@@ -122,22 +122,22 @@ public class FacilitiesFromPopulationTest {
 //			System.out.println(af.getId() + "\t" + af.getLinkId() + "\t" + af.getCoord().getX() + "\t" + af.getCoord().getY());
 //		}
 
-		Assert.assertEquals(13, f.scenario.getActivityFacilities().getFacilities().size());
+		Assertions.assertEquals(13, f.scenario.getActivityFacilities().getFacilities().size());
 
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals("ab", ffs.get(Id.create("0", ActivityFacility.class)).getLinkId().toString()); // home of agent 1
-		Assert.assertEquals("bc", ffs.get(Id.create("1", ActivityFacility.class)).getLinkId().toString()); // work of agent 1-3
-		Assert.assertEquals("ab", ffs.get(Id.create("2", ActivityFacility.class)).getLinkId().toString()); // home of agent 2
-		Assert.assertEquals("ab", ffs.get(Id.create("3", ActivityFacility.class)).getLinkId().toString()); // home of agent 3
-		Assert.assertEquals("bc", ffs.get(Id.create("4", ActivityFacility.class)).getLinkId().toString()); // home of agent 4
-		Assert.assertEquals("ca", ffs.get(Id.create("5", ActivityFacility.class)).getLinkId().toString()); // work of agent 4-7
-		Assert.assertEquals("bc", ffs.get(Id.create("6", ActivityFacility.class)).getLinkId().toString()); // home of agent 5
-		Assert.assertEquals("bc", ffs.get(Id.create("7", ActivityFacility.class)).getLinkId().toString()); // home of agent 6
-		Assert.assertEquals("bc", ffs.get(Id.create("8", ActivityFacility.class)).getLinkId().toString()); // home of agent 7
-		Assert.assertEquals("ca", ffs.get(Id.create("9", ActivityFacility.class)).getLinkId().toString()); // home of agent 8
-		Assert.assertEquals("ab", ffs.get(Id.create("10", ActivityFacility.class)).getLinkId().toString()); // work of agent 8-10
-		Assert.assertEquals("ca", ffs.get(Id.create("11", ActivityFacility.class)).getLinkId().toString()); // home of agent 9
-		Assert.assertEquals("ca", ffs.get(Id.create("12", ActivityFacility.class)).getLinkId().toString()); // home of agent 10
+		Assertions.assertEquals("ab", ffs.get(Id.create("0", ActivityFacility.class)).getLinkId().toString()); // home of agent 1
+		Assertions.assertEquals("bc", ffs.get(Id.create("1", ActivityFacility.class)).getLinkId().toString()); // work of agent 1-3
+		Assertions.assertEquals("ab", ffs.get(Id.create("2", ActivityFacility.class)).getLinkId().toString()); // home of agent 2
+		Assertions.assertEquals("ab", ffs.get(Id.create("3", ActivityFacility.class)).getLinkId().toString()); // home of agent 3
+		Assertions.assertEquals("bc", ffs.get(Id.create("4", ActivityFacility.class)).getLinkId().toString()); // home of agent 4
+		Assertions.assertEquals("ca", ffs.get(Id.create("5", ActivityFacility.class)).getLinkId().toString()); // work of agent 4-7
+		Assertions.assertEquals("bc", ffs.get(Id.create("6", ActivityFacility.class)).getLinkId().toString()); // home of agent 5
+		Assertions.assertEquals("bc", ffs.get(Id.create("7", ActivityFacility.class)).getLinkId().toString()); // home of agent 6
+		Assertions.assertEquals("bc", ffs.get(Id.create("8", ActivityFacility.class)).getLinkId().toString()); // home of agent 7
+		Assertions.assertEquals("ca", ffs.get(Id.create("9", ActivityFacility.class)).getLinkId().toString()); // home of agent 8
+		Assertions.assertEquals("ab", ffs.get(Id.create("10", ActivityFacility.class)).getLinkId().toString()); // work of agent 8-10
+		Assertions.assertEquals("ca", ffs.get(Id.create("11", ActivityFacility.class)).getLinkId().toString()); // home of agent 9
+		Assertions.assertEquals("ca", ffs.get(Id.create("12", ActivityFacility.class)).getLinkId().toString()); // home of agent 10
 
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "0", "1", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "2", "1", true);
@@ -156,17 +156,17 @@ public class FacilitiesFromPopulationTest {
 		Activity work = (Activity) plan.getPlanElements().get(2);
 		Activity home2 = (Activity) plan.getPlanElements().get(4);
 
-		Assert.assertEquals(homeFacilityId, home1.getFacilityId().toString());
-		Assert.assertEquals(workFacilityId, work.getFacilityId().toString());
-		Assert.assertEquals(homeFacilityId, home2.getFacilityId().toString());
+		Assertions.assertEquals(homeFacilityId, home1.getFacilityId().toString());
+		Assertions.assertEquals(workFacilityId, work.getFacilityId().toString());
+		Assertions.assertEquals(homeFacilityId, home2.getFacilityId().toString());
 
 		if (linkCoordMustBeNull) {
-			Assert.assertNull(home1.getLinkId());
-			Assert.assertNull(home1.getCoord());
-			Assert.assertNull(work.getLinkId());
-			Assert.assertNull(work.getCoord());
-			Assert.assertNull(home2.getLinkId());
-			Assert.assertNull(home2.getCoord());
+			Assertions.assertNull(home1.getLinkId());
+			Assertions.assertNull(home1.getCoord());
+			Assertions.assertNull(work.getLinkId());
+			Assertions.assertNull(work.getCoord());
+			Assertions.assertNull(home2.getLinkId());
+			Assertions.assertNull(home2.getCoord());
 		}
 	}
 

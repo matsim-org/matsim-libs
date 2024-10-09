@@ -52,11 +52,11 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 	@Inject private OutputDirectoryHierarchy controlerIO;
 	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	@Inject private ExperiencedPlansService experiencedPlansService;
+	@Inject private NewScoreAssigner newScoreAssigner;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		NewScoreAssignerImpl newScoreAssigner = new NewScoreAssignerImpl(this.scoringConfigGroup, this.controllerConfigGroup);
 		newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
 	}
 

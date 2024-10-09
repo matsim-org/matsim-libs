@@ -19,9 +19,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -49,7 +48,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
@@ -57,12 +55,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData;
 
@@ -230,13 +224,35 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
-			var modeToVehicle = modeVehicleTypes.entrySet().stream()
-					// map mode type to vehicle id
-					.map(modeType -> Tuple.of(modeType, createVehicleId(person, modeType.getKey())))
-					// create a corresponding vehicle
-					.peek(tuple -> createAndAddVehicleIfNecessary(tuple.getSecond(), tuple.getFirst().getValue()))
-					// write mode-string to vehicle-id into a map
-					.collect(Collectors.toMap(tuple -> tuple.getFirst().getKey(), Tuple::getSecond));
+
+			Map<String, Id<Vehicle>> modeToVehicle = new HashMap<>();
+
+			// optional attribute, that can be null
+			Map<String, Id<VehicleType>> modeTypes = VehicleUtils.getVehicleTypes(person);
+
+			for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
+
+				String mode = modeType.getKey();
+
+				Id<Vehicle> vehicleId = createVehicleId(person, mode);
+
+				// get the type
+				VehicleType type = modeType.getValue();
+
+				// Use the person attribute to map to a more specific vehicle type
+				if (modeTypes != null && modeTypes.containsKey(mode)) {
+					Id<VehicleType> typeId = modeTypes.get(mode);
+					type = scenario.getVehicles().getVehicleTypes().get(typeId);
+					if (type == null) {
+						throw new IllegalStateException("Vehicle type " + typeId + " specified for person " + person.getId() + ", but not found in scenario.");
+					}
+				}
+
+				createAndAddVehicleIfNecessary(vehicleId, type);
+
+				// write mode-string to vehicle-id into a map
+				modeToVehicle.put(mode, vehicleId);
+			}
 
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
 		}
@@ -272,7 +288,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			VehicleType type;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
-					type = VehicleUtils.getDefaultVehicleType();
+					type = VehicleUtils.createDefaultVehicleType();
 					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId())){
 						scenario.getVehicles().addVehicleType( type );
 					}
@@ -312,6 +328,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
 
+	/**
+	 * Make sure that each leg has a routing mode.
+	 * Legs with outdated fallback modes will be treated in a special way.
+	 * Legs with no routing mode will have their network mode as routing mode.
+	 */
 	private void adaptOutdatedPlansForRoutingMode() {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -350,8 +371,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning
 								// module)
 
-								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0),
-										null);
+								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0), null);
 								if (oldMainMode != null) {
 									routingMode = oldMainMode;
 									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);

@@ -20,12 +20,12 @@
 
 package org.matsim.integration;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -82,12 +83,14 @@ import org.matsim.vehicles.Vehicles;
 
 public class SimulateAndScoreTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@Test public void testRealPtScore() {
+	@Test
+	void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 
 		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
@@ -237,8 +240,11 @@ public class SimulateAndScoreTest {
 
 	}
 
-	@Test public void testTeleportationScore() {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	@Test
+	void testTeleportationScore() {
+		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
@@ -298,7 +304,7 @@ public class SimulateAndScoreTest {
 		scorer.finish();
 
 		Double score = plan.getScore();
-		assertEquals("Expecting -1.0 from travel time, -1.0 from travel distance.", -2.0, score, MatsimTestUtils.EPSILON);
+		assertEquals(-2.0, score, MatsimTestUtils.EPSILON, "Expecting -1.0 from travel time, -1.0 from travel distance.");
 
 	}
 

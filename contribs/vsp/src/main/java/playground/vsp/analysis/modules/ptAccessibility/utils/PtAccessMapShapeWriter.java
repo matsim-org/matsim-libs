@@ -26,25 +26,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileWriter;
 
 import playground.vsp.analysis.modules.ptAccessibility.stops.PtStopMap;
 
 /**
  * Calculates and writes buffers to shapes
- * 
+ *
  * @author aneumann
  */
 public class PtAccessMapShapeWriter {
 
 	private PtAccessMapShapeWriter() {
-		
+
 	}
 
 	public static void writeAccessMap(Map<String, Map<String, MultiPolygon>> cluster2mode2area, int quadrantSegments, String outputFolder, String targetCoordinateSystem) {
@@ -56,11 +56,11 @@ public class PtAccessMapShapeWriter {
 		Collections.sort(distancesSmallestFirst);
 
 		HashMap<Integer, HashMap<String, Geometry>> distance2mode2buffer = new HashMap<Integer, HashMap<String, Geometry>>();
-		
+
 		// Calculate buffer for all Multipolygons
 		HashMap<String, Geometry> mode2buffer = null;
 		int lastDistance = 0;
-		
+
 		for (Integer distance : distancesSmallestFirst) {
 			if (mode2buffer == null) {
 				// it's the frist and smallest one
@@ -77,29 +77,29 @@ public class PtAccessMapShapeWriter {
 				mode2buffer = tempBuffers;
 				lastDistance = distance.intValue();
 			}
-			
+
 			distance2mode2buffer.put(distance, mode2buffer);
 		}
-		
+
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distance2mode2buffer, targetCoordinateSystem);
-		
-		
-		
+
+
+
 		// resort distances - largest first
 		ArrayList<Integer> distancesLargestFirst = new ArrayList<Integer>();
 		for (Integer distance : distancesSmallestFirst) {
 			distancesLargestFirst.add(0, distance);
 		}
-		
+
 
 		HashMap<Integer, HashMap<String, Geometry>> distance2mode2diffBuffer = new HashMap<Integer, HashMap<String, Geometry>>();
 		HashMap<String, Geometry> lastMode2Buffer = null;
 		Integer lastDist = null;
-		
+
 		// calculate Diff for all buffers
 		for (Integer distance : distancesLargestFirst) {
 			distance2mode2diffBuffer.put(distance, new HashMap<String, Geometry>());
-			
+
 			if (lastMode2Buffer == null) {
 				lastMode2Buffer = distance2mode2buffer.get(distance);
 				lastDist = distance;
@@ -113,12 +113,12 @@ public class PtAccessMapShapeWriter {
 				lastDist = distance;
 			}
 		}
-				
+
 		// add last (smallest) one as well
 		for (Entry<String, Geometry> mode2BufferEntry : lastMode2Buffer.entrySet()) {
 			distance2mode2diffBuffer.get(lastDist).put(mode2BufferEntry.getKey(), mode2BufferEntry.getValue());
 		}
-				
+
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distance2mode2diffBuffer, targetCoordinateSystem);
 	}
 
@@ -130,12 +130,12 @@ public class PtAccessMapShapeWriter {
 		b.add("location", MultiPolygon.class);
 		b.add("mode", String.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
+
 		Collection<SimpleFeature> bufferFeatures;
 		Object[] bufferFeatureAttribs;
-		
+
 		for (Entry<Integer, HashMap<String, Geometry>> distance2mode2bufferEntry : distance2mode2buffer.entrySet()) {
-			bufferFeatures = new ArrayList<SimpleFeature>();
+			bufferFeatures = new ArrayList<>();
 			HashMap<String, Geometry> mode2buffer = distance2mode2bufferEntry.getValue();
 			for (Entry<String, Geometry> mode2BufferEntry : mode2buffer.entrySet()) {
 				bufferFeatureAttribs = new Object[2];
@@ -148,13 +148,13 @@ public class PtAccessMapShapeWriter {
 					e1.printStackTrace();
 				}
 			}
-			
+
 			try{
-				ShapeFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance2mode2bufferEntry.getKey() + ".shp");
+				GeoFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance2mode2bufferEntry.getKey() + ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 }

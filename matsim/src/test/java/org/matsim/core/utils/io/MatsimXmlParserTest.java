@@ -19,10 +19,9 @@
 
 package org.matsim.core.utils.io;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
 
@@ -43,11 +42,11 @@ import java.util.Stack;
  */
 public class MatsimXmlParserTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+	@TempDir
+	public File tempFolder;
 
 	@Test
-	public void testParsingReservedEntities_AttributeValue() {
+	void testParsingReservedEntities_AttributeValue() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value&quot;&amp;&lt;&gt;value\">content</dummy>";
 
@@ -55,17 +54,17 @@ public class MatsimXmlParserTest {
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("dummy", parser.lastStartTag);
-		Assert.assertEquals("dummy", parser.lastEndTag);
-		Assert.assertEquals("content", parser.lastContent);
-		Assert.assertEquals(1, parser.lastAttributes.getLength());
-		Assert.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
-		Assert.assertEquals("value\"&<>value", parser.lastAttributes.getValue(0));
-		Assert.assertEquals("value\"&<>value", parser.lastAttributes.getValue("someAttribute"));
+		Assertions.assertEquals("dummy", parser.lastStartTag);
+		Assertions.assertEquals("dummy", parser.lastEndTag);
+		Assertions.assertEquals("content", parser.lastContent);
+		Assertions.assertEquals(1, parser.lastAttributes.getLength());
+		Assertions.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
+		Assertions.assertEquals("value\"&<>value", parser.lastAttributes.getValue(0));
+		Assertions.assertEquals("value\"&<>value", parser.lastAttributes.getValue("someAttribute"));
 	}
 
 	@Test
-	public void testParsingReservedEntities_Content() {
+	void testParsingReservedEntities_Content() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value\">content&quot;&amp;&lt;&gt;content</dummy>";
 
@@ -73,13 +72,13 @@ public class MatsimXmlParserTest {
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("dummy", parser.lastStartTag);
-		Assert.assertEquals("dummy", parser.lastEndTag);
-		Assert.assertEquals("content\"&<>content", parser.lastContent);
-		Assert.assertEquals(1, parser.lastAttributes.getLength());
-		Assert.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
-		Assert.assertEquals("value", parser.lastAttributes.getValue(0));
-		Assert.assertEquals("value", parser.lastAttributes.getValue("someAttribute"));
+		Assertions.assertEquals("dummy", parser.lastStartTag);
+		Assertions.assertEquals("dummy", parser.lastEndTag);
+		Assertions.assertEquals("content\"&<>content", parser.lastContent);
+		Assertions.assertEquals(1, parser.lastAttributes.getLength());
+		Assertions.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
+		Assertions.assertEquals("value", parser.lastAttributes.getValue(0));
+		Assertions.assertEquals("value", parser.lastAttributes.getValue("someAttribute"));
 	}
 
 	/**
@@ -87,7 +86,7 @@ public class MatsimXmlParserTest {
 	 * Based on a (non-reproducible) bug message on the users-mailing list 2012-04-26.
 	 */
 	@Test
-	public void testParsing_WindowsLinebreaks() {
+	void testParsing_WindowsLinebreaks() {
 		String str = """
 			<?xml version='1.0' encoding='UTF-8'?>\r
 			<root>\r
@@ -99,12 +98,12 @@ public class MatsimXmlParserTest {
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("dummy2", parser.lastStartTag);
-		Assert.assertEquals("root", parser.lastEndTag);
-		Assert.assertEquals(1, parser.lastAttributes.getLength());
-		Assert.assertEquals("someAttribute2", parser.lastAttributes.getLocalName(0));
-		Assert.assertEquals("value2", parser.lastAttributes.getValue(0));
-		Assert.assertEquals("value2", parser.lastAttributes.getValue("someAttribute2"));
+		Assertions.assertEquals("dummy2", parser.lastStartTag);
+		Assertions.assertEquals("root", parser.lastEndTag);
+		Assertions.assertEquals(1, parser.lastAttributes.getLength());
+		Assertions.assertEquals("someAttribute2", parser.lastAttributes.getLocalName(0));
+		Assertions.assertEquals("value2", parser.lastAttributes.getValue(0));
+		Assertions.assertEquals("value2", parser.lastAttributes.getValue("someAttribute2"));
 	}
 
 	private static class TestParser extends MatsimXmlParser {
@@ -133,7 +132,7 @@ public class MatsimXmlParserTest {
 	}
 
 	@Test
-	public void testParsingPlusSign() {
+	void testParsingPlusSign() {
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<dummy someAttribute=\"value+value\">content+content</dummy>";
 
@@ -141,17 +140,17 @@ public class MatsimXmlParserTest {
 		parser.setValidating(false);
 
 		parser.parse(new ByteArrayInputStream(str.getBytes()));
-		Assert.assertEquals("dummy", parser.lastStartTag);
-		Assert.assertEquals("dummy", parser.lastEndTag);
-		Assert.assertEquals("content+content", parser.lastContent);
-		Assert.assertEquals(1, parser.lastAttributes.getLength());
-		Assert.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
-		Assert.assertEquals("value+value", parser.lastAttributes.getValue(0));
-		Assert.assertEquals("value+value", parser.lastAttributes.getValue("someAttribute"));
+		Assertions.assertEquals("dummy", parser.lastStartTag);
+		Assertions.assertEquals("dummy", parser.lastEndTag);
+		Assertions.assertEquals("content+content", parser.lastContent);
+		Assertions.assertEquals(1, parser.lastAttributes.getLength());
+		Assertions.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
+		Assertions.assertEquals("value+value", parser.lastAttributes.getValue(0));
+		Assertions.assertEquals("value+value", parser.lastAttributes.getValue("someAttribute"));
 	}
 
 	@Test
-	public void testParse_parseEntities() {
+	void testParse_parseEntities() {
 		String xml = """
 			<?xml version='1.0' encoding='UTF-8'?>
 			<!DOCTYPE a SYSTEM "network_v1.dtd" [
@@ -177,12 +176,12 @@ public class MatsimXmlParserTest {
 			}
 		}.parse(stream);
 
-		Assert.assertEquals("b1", log.get(0));
-		Assert.assertEquals("b2", log.get(1));
+		Assertions.assertEquals("b1", log.get(0));
+		Assertions.assertEquals("b2", log.get(1));
 	}
 
 	@Test
-	public void testParse_dtdValidation() {
+	void testParse_dtdValidation() {
 		String xml = """
 			<?xml version='1.0' encoding='UTF-8'?>
 			<!DOCTYPE network SYSTEM "network_v2.dtd" ><network>
@@ -206,20 +205,20 @@ public class MatsimXmlParserTest {
 				public void endTag(String name, String content, Stack<String> context) {
 				}
 			}.parse(stream);
-			Assert.fail("expected exception.");
+			Assertions.fail("expected exception.");
 		} catch (UncheckedIOException e) {
-			Assert.assertTrue(e.getCause() instanceof IOException); // expected
-			Assert.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
+			Assertions.assertTrue(e.getCause() instanceof IOException); // expected
+			Assertions.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
 		}
 
-		Assert.assertEquals(3, log.size());
-		Assert.assertEquals("network", log.get(0));
-		Assert.assertEquals("nodes", log.get(1));
-		Assert.assertEquals("node", log.get(2));
+		Assertions.assertEquals(3, log.size());
+		Assertions.assertEquals("network", log.get(0));
+		Assertions.assertEquals("nodes", log.get(1));
+		Assertions.assertEquals("node", log.get(2));
 	}
 
 	@Test
-	public void testParse_xsdValidationSuccess() {
+	void testParse_xsdValidationSuccess() {
 		String xml = """
 			<?xml version="1.0" encoding="UTF-8"?>
 
@@ -245,16 +244,16 @@ public class MatsimXmlParserTest {
 			}
 		}.parse(stream);
 
-		Assert.assertEquals(5, log.size());
-		Assert.assertEquals("vehicleDefinitions", log.get(0));
-		Assert.assertEquals("vehicleType", log.get(1));
-		Assert.assertEquals("capacity", log.get(2));
-		Assert.assertEquals("length", log.get(3));
-		Assert.assertEquals("width", log.get(4));
+		Assertions.assertEquals(5, log.size());
+		Assertions.assertEquals("vehicleDefinitions", log.get(0));
+		Assertions.assertEquals("vehicleType", log.get(1));
+		Assertions.assertEquals("capacity", log.get(2));
+		Assertions.assertEquals("length", log.get(3));
+		Assertions.assertEquals("width", log.get(4));
 	}
 
 	@Test
-	public void testParse_xsdValidationFailure() {
+	void testParse_xsdValidationFailure() {
 		String xml = """
 			<?xml version="1.0" encoding="UTF-8"?>
 
@@ -282,27 +281,27 @@ public class MatsimXmlParserTest {
 				public void endTag(String name, String content, Stack<String> context) {
 				}
 			}.parse(stream);
-			Assert.fail("expected exception.");
+			Assertions.fail("expected exception.");
 		} catch (UncheckedIOException e) {
-			Assert.assertTrue(e.getCause() instanceof IOException); // expected
-			Assert.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
+			Assertions.assertTrue(e.getCause() instanceof IOException); // expected
+			Assertions.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
 		}
 
-		Assert.assertEquals(5, log.size());
-		Assert.assertEquals("vehicleDefinitions", log.get(0));
-		Assert.assertEquals("vehicleType", log.get(1));
-		Assert.assertEquals("capacity", log.get(2));
-		Assert.assertEquals("length", log.get(3));
-		Assert.assertEquals("width", log.get(4));
+		Assertions.assertEquals(5, log.size());
+		Assertions.assertEquals("vehicleDefinitions", log.get(0));
+		Assertions.assertEquals("vehicleType", log.get(1));
+		Assertions.assertEquals("capacity", log.get(2));
+		Assertions.assertEquals("length", log.get(3));
+		Assertions.assertEquals("width", log.get(4));
 	}
 
 	@Test
-	public void testParse_preventXEEattack_woodstox() throws IOException {
+	void testParse_preventXEEattack_woodstox() throws IOException {
 		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 		String secretValue = "S3CR3T";
 
-		File secretsFile = this.tempFolder.newFile("file-with-secrets.txt");
+		File secretsFile = new File(this.tempFolder,"file-with-secrets.txt");
 		try (OutputStream out = new FileOutputStream(secretsFile)) {
 			out.write(secretValue.getBytes(StandardCharsets.UTF_8));
 		}
@@ -335,21 +334,21 @@ public class MatsimXmlParserTest {
 					log.add(content);
 				}
 			}.parse(stream);
-			Assert.fail("Expected exception, got none.");
+			Assertions.fail("Expected exception, got none.");
 		} catch (UncheckedIOException expected) {}
 
-		Assert.assertEquals(2, log.size());
-		Assert.assertEquals("b1", log.get(0));
-		Assert.assertEquals(" - b2 - ", log.get(1));
+		Assertions.assertEquals(2, log.size());
+		Assertions.assertEquals("b1", log.get(0));
+		Assertions.assertEquals(" - b2 - ", log.get(1));
 	}
 
 	@Test
-	public void testParse_preventXEEattack_xerces() throws IOException {
+	void testParse_preventXEEattack_xerces() throws IOException {
 		// XEE: XML eXternal Entity attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 
 		String secretValue = "S3CR3T";
 
-		File secretsFile = this.tempFolder.newFile("file-with-secrets.txt");
+		File secretsFile = new File(this.tempFolder, "file-with-secrets.txt");
 		try (OutputStream out = new FileOutputStream(secretsFile)) {
 			out.write(secretValue.getBytes(StandardCharsets.UTF_8));
 		}
@@ -384,11 +383,11 @@ public class MatsimXmlParserTest {
 			}
 		}.parse(stream);
 
-		Assert.assertEquals(4, log.size());
-		Assert.assertEquals("attribute-a2", log.get(0));
-		Assert.assertEquals("attribute-", log.get(1));
-		Assert.assertEquals("object-", log.get(2));
-		Assert.assertEquals("objectattributes-", log.get(3));
+		Assertions.assertEquals(4, log.size());
+		Assertions.assertEquals("attribute-a2", log.get(0));
+		Assertions.assertEquals("attribute-", log.get(1));
+		Assertions.assertEquals("object-", log.get(2));
+		Assertions.assertEquals("objectattributes-", log.get(3));
 	}
 
 }

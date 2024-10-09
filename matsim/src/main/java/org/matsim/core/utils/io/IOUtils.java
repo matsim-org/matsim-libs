@@ -207,7 +207,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
 			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" )) {
+			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" ) || filename.startsWith( "http:" )) {
 				// looks like an URI
 				return new URL(filename);
 			}
@@ -341,7 +341,6 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 *
 	 * @throws UncheckedIOException
 	 */
-	@SuppressWarnings("resource")
 	public static OutputStream getOutputStream(URL url, boolean append) throws UncheckedIOException {
 		try {
 			if (!url.getProtocol().equals("file")) {

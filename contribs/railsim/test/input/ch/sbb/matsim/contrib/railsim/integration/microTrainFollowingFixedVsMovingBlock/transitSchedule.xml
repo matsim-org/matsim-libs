@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="t1_A" x="0" y="0" linkRefId="t1_1-t1_2">
+		</stopFacility>
+		<stopFacility id="t1_B" x="0" y="0" linkRefId="t1_7-t1_8">
+		</stopFacility>
+		<stopFacility id="t2_A" x="5500" y="-200" linkRefId="t2_1-t2_2">
+		</stopFacility>
+		<stopFacility id="t2_B" x="5500" y="-200" linkRefId="t2_7-t2_8">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="t1_line">
+		<transitRoute id="t1_line_route">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t1_A" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="t1_B" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="t1_1-t1_2"/>
+				<link refId="t1_2-t1_3"/>
+				<link refId="t1_3-t1_4"/>
+				<link refId="t1_4-t1_5"/>
+				<link refId="t1_5-t1_6"/>
+				<link refId="t1_6-t1_7"/>
+				<link refId="t1_7-t1_8"/>
+			</route>
+			<departures>
+				<departure id="t1_0" departureTime="08:00:00" vehicleRefId="t1_train1"/>
+				<departure id="t1_1" departureTime="08:00:05" vehicleRefId="t1_train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="t2_line">
+		<transitRoute id="t2_line_route">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t2_A" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="t2_B" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="t2_1-t2_2"/>
+				<link refId="t2_2-t2_3"/>
+				<link refId="t2_3-t2_4"/>
+				<link refId="t2_4-t2_5"/>
+				<link refId="t2_5-t2_6"/>
+				<link refId="t2_6-t2_7"/>
+				<link refId="t2_7-t2_8"/>
+			</route>
+			<departures>
+				<departure id="t2_0" departureTime="08:00:00" vehicleRefId="t2_train1"/>
+				<departure id="t2_1" departureTime="08:00:05" vehicleRefId="t2_train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Activity;
@@ -46,13 +47,13 @@ public class PHbyModeCalculatorTest {
 	Id<Person> person3 = Id.create("person3", Person.class);
 	Id<Person> person4 = Id.create("person4", Person.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 
 	@Test
-	public void testPKMbyModeCalculator() {
+	void testPKMbyModeCalculator() {
 
 		Plans plans = new Plans();
 
@@ -93,28 +94,28 @@ public class PHbyModeCalculatorTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
+		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controlerIO, new GlobalConfigGroup());
 
 		phbyModeCalculator.addIteration(1, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(1, map);
 
 		// removing person 2
 		map.remove(person2);
 		phbyModeCalculator.addIteration(2, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(2, map);
 
 		// removing person 3
 		map.remove(person3);
 		phbyModeCalculator.addIteration(3, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(3, map);
 
 		// removing person 4
 		map.remove(person4);
 		phbyModeCalculator.addIteration(4, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(4, map);
 	}
 
@@ -179,16 +180,16 @@ public class PHbyModeCalculatorTest {
 					double pt_wait_value = Double.parseDouble(column[pt_wait]);
 					double stageActivity_wait_value = Double.parseDouble(column[stageActivity_wait]);
 
-					Assert.assertEquals("car_travel hour does not match", Math.round(modeValues.get("car") / 3600.0),
-							car_travel_value, 0);
-					Assert.assertEquals("pt_travel hour score does not match", Math.round(modeValues.get("pt") / 3600.0),
-							pt_travel_value, 0);
-					Assert.assertEquals("walk_travel hour does not match", Math.round(modeValues.get("walk") / 3600.0),
-							walk_travel_value, 0);
-					Assert.assertEquals("pt_wait hour does not match", Math.round(modeValues.get("pt_wait") / 3600.0),
-							pt_wait_value, 0);
-					Assert.assertEquals("stageActivity_wait hour does not match", Math.round(modeValues.get("stageActivity_wait") / 3600.0),
-							stageActivity_wait_value, 0);
+					Assertions.assertEquals(Math.round(modeValues.get("car") / 3600.0),
+							car_travel_value, 0, "car_travel hour does not match");
+					Assertions.assertEquals(Math.round(modeValues.get("pt") / 3600.0),
+							pt_travel_value, 0, "pt_travel hour score does not match");
+					Assertions.assertEquals(Math.round(modeValues.get("walk") / 3600.0),
+							walk_travel_value, 0, "walk_travel hour does not match");
+					Assertions.assertEquals(Math.round(modeValues.get("pt_wait") / 3600.0),
+							pt_wait_value, 0, "pt_wait hour does not match");
+					Assertions.assertEquals(Math.round(modeValues.get("stageActivity_wait") / 3600.0),
+							stageActivity_wait_value, 0, "stageActivity_wait hour does not match");
 
 					break;
 				}

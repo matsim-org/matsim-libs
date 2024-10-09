@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.mobsim;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashSet;
 import java.util.Set;
 
-@Ignore
+@Disabled
 public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
@@ -61,7 +61,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<CarrierVehicle>();
+				employedVehicles = new HashSet<>();
 			}
 
 
@@ -93,8 +93,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 			@Override
 			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
+				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
@@ -136,7 +135,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		 double startTimeOfEnd;
 
-		 double amountPerHour = 20.0;
+		 final double amountPerHour = 20.0;
 
 		@Override
 		public void startActivity(double time, Activity act) {
@@ -174,7 +173,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();
@@ -199,7 +198,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 	}
 
-	 private Network network;
+	 private final Network network;
 
 	public ScoringFunctionFactoryForTests(Network network) {
 		super();

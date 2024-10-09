@@ -24,9 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -72,13 +73,13 @@ public class SpeedyMultiSourceALTForwardTest {
 
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	private final TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-	private final SpeedyGraph speedyGraph = new SpeedyGraph(network);
+	private final SpeedyGraph speedyGraph = SpeedyGraphBuilder.build(network);
 	private final SpeedyALTData landmarks = new SpeedyALTData(speedyGraph, 3, travelDisutility);
 	private final SpeedyMultiSourceALT multiSourceALT = new SpeedyMultiSourceALT(landmarks, travelTime,
 			travelDisutility);
 
 	@Test
-	public void testOneSource_forward() {
+	void testOneSource_forward() {
 		var startNode = new StartNode(nodeB, 9999, 7777);
 		var path = multiSourceALT.calcLeastCostPath(List.of(startNode), nodeA, null, null, false);
 		assertThat(path.nodes).containsExactly(nodeB, nodeD, nodeE, nodeA);
@@ -88,7 +89,7 @@ public class SpeedyMultiSourceALTForwardTest {
 	}
 
 	@Test
-	public void testManySources_forward_sameStartCost() {
+	void testManySources_forward_sameStartCost() {
 		var startNodeB = new StartNode(nodeB, 9999, 7777);
 		var startNodeC = new StartNode(nodeC, 9999, 7777);
 		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);
@@ -99,7 +100,7 @@ public class SpeedyMultiSourceALTForwardTest {
 	}
 
 	@Test
-	public void testManySources_forward_selectFartherNodeWithLowerCost() {
+	void testManySources_forward_selectFartherNodeWithLowerCost() {
 		var startNodeB = new StartNode(nodeB, 100, 7777);
 		var startNodeC = new StartNode(nodeC, 111, 1111);
 		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);
@@ -110,7 +111,7 @@ public class SpeedyMultiSourceALTForwardTest {
 	}
 
 	@Test
-	public void testManySources_forward_selectNearestNodeWithHigherCost() {
+	void testManySources_forward_selectNearestNodeWithHigherCost() {
 		var startNodeB = new StartNode(nodeB, 100, 7777);
 		var startNodeC = new StartNode(nodeC, 109, 1111);
 		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);

@@ -20,15 +20,15 @@
 
 package org.matsim.core.config.groups;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -46,7 +46,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ReplanningConfigGroupTest {
 
 	private static final Logger log = LogManager.getLogger(ReplanningConfigGroupTest.class);
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
@@ -55,7 +55,7 @@ public class ReplanningConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testParamNames() {
+	void testParamNames() {
 		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
 		configGroup.addParam("Module_1", "ReRoute");
@@ -68,8 +68,8 @@ public class ReplanningConfigGroupTest {
 			log.info("Catched IllegalArgumentException, as expected: "
 					+ e.getMessage());
 		}
-		assertEquals("unexpected number of strategy settings", 1, configGroup
-				.getStrategySettings().size());
+		assertEquals(1, configGroup
+				.getStrategySettings().size(), "unexpected number of strategy settings");
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class ReplanningConfigGroupTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testCheckConsistency() {
+	void testCheckConsistency() {
 		// start with a simple configuration with exactly one module defined
 		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
@@ -148,7 +148,7 @@ public class ReplanningConfigGroupTest {
 	}
 
 	@Test
-	public void testIOWithFormatChange() {
+	void testIOWithFormatChange() {
 		final ReplanningConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
@@ -177,40 +177,40 @@ public class ReplanningConfigGroupTest {
 			final ReplanningConfigGroup initialGroup,
 			final ReplanningConfigGroup inputConfigGroup) {
 		assertEquals(
-				"wrong config template for "+msg,
 				initialGroup.getExternalExeConfigTemplate(),
-				inputConfigGroup.getExternalExeConfigTemplate() );
+				inputConfigGroup.getExternalExeConfigTemplate(),
+				"wrong config template for "+msg );
 
 		assertEquals(
-				"wrong ExternalExeTimeOut for "+msg,
 				initialGroup.getExternalExeTimeOut(),
-				inputConfigGroup.getExternalExeTimeOut() );
+				inputConfigGroup.getExternalExeTimeOut(),
+				"wrong ExternalExeTimeOut for "+msg );
 
 		assertEquals(
-				"wrong ExternalExeTmpFileRootDir for "+msg,
 				initialGroup.getExternalExeTmpFileRootDir(),
-				inputConfigGroup.getExternalExeTmpFileRootDir() );
+				inputConfigGroup.getExternalExeTmpFileRootDir(),
+				"wrong ExternalExeTmpFileRootDir for "+msg );
 
 		assertEquals(
-				"wrong FractionOfIterationsToDisableInnovation for "+msg,
 				initialGroup.getFractionOfIterationsToDisableInnovation(),
 				inputConfigGroup.getFractionOfIterationsToDisableInnovation(),
-				MatsimTestUtils.EPSILON );
+				MatsimTestUtils.EPSILON,
+				"wrong FractionOfIterationsToDisableInnovation for "+msg );
 
 		assertEquals(
-				"wrong MaxAgentPlanMemorySize for "+msg,
 				initialGroup.getMaxAgentPlanMemorySize(),
-				inputConfigGroup.getMaxAgentPlanMemorySize() );
+				inputConfigGroup.getMaxAgentPlanMemorySize(),
+				"wrong MaxAgentPlanMemorySize for "+msg );
 
 		assertEquals(
-				"wrong PlanSelectorForRemoval for "+msg,
 				initialGroup.getPlanSelectorForRemoval(),
-				inputConfigGroup.getPlanSelectorForRemoval() );
+				inputConfigGroup.getPlanSelectorForRemoval(),
+				"wrong PlanSelectorForRemoval for "+msg );
 
 		assertEquals(
-				"wrong number of StrategySettings for "+msg,
 				initialGroup.getStrategySettings().size(),
-				inputConfigGroup.getStrategySettings().size() );
+				inputConfigGroup.getStrategySettings().size(),
+				"wrong number of StrategySettings for "+msg );
 	}
 
 	private ConfigGroup toUnderscoredModule(final ReplanningConfigGroup initialGroup) {

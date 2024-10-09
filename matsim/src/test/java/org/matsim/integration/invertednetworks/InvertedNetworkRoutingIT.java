@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import org.junit.Assert;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -30,11 +29,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class InvertedNetworkRoutingIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void testLanesInvertedNetworkRouting() {
+	final void testLanesInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(false, true, false);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
@@ -49,12 +48,12 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 
 	@Test
-	public final void testModesInvertedNetworkRouting() {
+	final void testModesInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
@@ -69,11 +68,11 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 
 	@Test
-	public final void testModesNotInvertedNetworkRouting() {
+	final void testModesNotInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
 		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().controller().setLinkToLinkRoutingEnabled(false);
@@ -90,6 +89,6 @@ public class InvertedNetworkRoutingIT {
 			}
 		});
 		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+		Assertions.assertTrue(testHandler.hadTrafficOnLink25, "No traffic on link");
 	}
 }

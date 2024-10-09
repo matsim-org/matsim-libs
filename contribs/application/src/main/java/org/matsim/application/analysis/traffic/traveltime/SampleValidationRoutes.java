@@ -19,10 +19,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CrsOptions;
-import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.ShpOptions;
+import org.matsim.application.options.*;
+import org.matsim.application.prepare.network.SampleNetwork;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -31,9 +29,11 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -85,23 +85,8 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--mode", description = "Mode to validate", defaultValue = TransportMode.car)
 	private String mode;
 
-	/**
-	 * Random coord in the same direction as a link.
-	 */
-	static Coord rndCoord(SplittableRandom rnd, double dist, Link link) {
-
-		Coord v = link.getFromNode().getCoord();
-		Coord u = link.getToNode().getCoord();
-
-		var angle = Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
-
-		var sample = angle + rnd.nextDouble(-0.2, 0.2) * Math.PI * 2;
-
-		var x = Math.cos(sample) * dist;
-		var y = Math.sin(sample) * dist;
-
-		return CoordUtils.round(new Coord(v.getX() + x, v.getY() + y));
-	}
+	@CommandLine.Option(names = "--input-od", description = "Use input fromNode,toNode instead of sampling", required = false)
+	private String inputOD;
 
 	public static void main(String[] args) {
 		new SampleValidationRoutes().execute(args);
@@ -158,9 +143,15 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		OnlyTimeDependentTravelDisutility util = new OnlyTimeDependentTravelDisutility(tt);
 		LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, util, tt);
 
-		List<Route> routes = sampleRoutes(network, router, rnd);
 
-		log.info("Sampled {} routes in range {}", routes.size(), distRange);
+		List<Route> routes;
+		if (inputOD != null) {
+			log.info("Using input OD file {}", inputOD);
+			routes = queryRoutes(network, router);
+		} else {
+			routes = sampleRoutes(network, router, rnd);
+			log.info("Sampled {} routes in range {}", routes.size(), distRange);
+		}
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output.getPath()), CSVFormat.DEFAULT)) {
 			csv.printRecord("from_node", "to_node", "beeline_dist", "dist", "travel_time", "geometry");
@@ -244,6 +235,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		ShpOptions.Index index = shp.isDefined() ? shp.createIndex(crs, "_") : null;
 		Predicate<Link> exclude = excludeRoads != null && !excludeRoads.isBlank() ? new Predicate<>() {
 			final Pattern p = Pattern.compile(excludeRoads, Pattern.CASE_INSENSITIVE);
+
 			@Override
 			public boolean test(Link link) {
 				return p.matcher(NetworkUtils.getHighwayType(link)).find();
@@ -268,7 +260,7 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 				continue;
 			}
 
-			Coord dest = rndCoord(rnd, rnd.nextDouble(distRange.get(0), distRange.get(1)), link);
+			Coord dest = SampleNetwork.rndCoord(rnd, rnd.nextDouble(distRange.get(0), distRange.get(1)), link);
 			Link to = NetworkUtils.getNearestLink(network, dest);
 
 			if (!to.getAllowedModes().contains(mode) || exclude.test(to)) {
@@ -295,6 +287,59 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 				path.links.stream().mapToDouble(Link::getLength).sum()
 			));
 		}
+		return result;
+	}
+
+	/**
+	 * Use given od pairs as input for validation.
+	 */
+	private List<Route> queryRoutes(Network network, LeastCostPathCalculator router) {
+
+		List<Route> result = new ArrayList<>();
+		String crs = ProjectionUtils.getCRS(network);
+
+		if (this.crs.getInputCRS() != null)
+			crs = this.crs.getInputCRS();
+
+		if (crs == null) {
+			throw new IllegalArgumentException("Input CRS could not be detected. Please specify with --input-crs [EPSG:xxx]");
+		}
+
+		GeotoolsTransformation ct = new GeotoolsTransformation(crs, "EPSG:4326");
+
+		try (CSVParser parser = CSVParser.parse(IOUtils.getBufferedReader(inputOD), CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).
+			setDelimiter(CsvOptions.detectDelimiter(inputOD)).build())) {
+
+			List<String> header = parser.getHeaderNames();
+			if (!header.contains("from_node"))
+				throw new IllegalArgumentException("Missing 'from_node' column in input file");
+			if (!header.contains("to_node"))
+				throw new IllegalArgumentException("Missing 'to_node' column in input file");
+
+			for (CSVRecord r : parser) {
+				Node fromNode = network.getNodes().get(Id.createNodeId(r.get("from_node")));
+				Node toNode = network.getNodes().get(Id.createNodeId(r.get("to_node")));
+
+				if (fromNode == null)
+					throw new IllegalArgumentException("Node " + r.get("from_node") + " not found");
+				if (toNode == null)
+					throw new IllegalArgumentException("Node " + r.get("to_node") + " not found");
+
+				LeastCostPathCalculator.Path path = router.calcLeastCostPath(fromNode, toNode, 0, null, null);
+				result.add(new Route(
+					fromNode.getId(),
+					toNode.getId(),
+					ct.transform(fromNode.getCoord()),
+					ct.transform(toNode.getCoord()),
+					path.travelTime,
+					path.links.stream().mapToDouble(Link::getLength).sum()
+				));
+			}
+
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 		return result;
 	}
 

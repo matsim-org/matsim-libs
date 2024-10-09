@@ -2,8 +2,8 @@ package org.matsim.contrib.osm.networkReader;
 
 import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.impl.Tag;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -19,15 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OsmBicycleReaderTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void test_singleLinkWithAttributes() {
+	void test_singleLinkWithAttributes() {
 
 		final String surface = "surface-value";
 		final String smoothness = "smoothness-value";
@@ -62,7 +62,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleLinkPrimaryWithSurfaceAsphalt() {
+	void test_singleLinkPrimaryWithSurfaceAsphalt() {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.PRIMARY));
@@ -85,7 +85,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleLinkWithBicycleNotAllowed() {
+	void test_singleLinkWithBicycleNotAllowed() {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.MOTORWAY));
@@ -109,7 +109,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleLinkWithOnlyBicycleAllowed() {
+	void test_singleLinkWithOnlyBicycleAllowed() {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.PEDESTRIAN));
@@ -133,7 +133,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleOnewayLinkOneWayBikeNo() {
+	void test_singleOnewayLinkOneWayBikeNo() {
 
 		final String surface = "surface-value";
 
@@ -166,7 +166,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleOnewayLinkOppositeBike() {
+	void test_singleOnewayLinkOppositeBike() {
 
 		final String surface = "surface-value";
 
@@ -199,7 +199,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_singleReverseOnewayLinkOneWayBikeNo() {
+	void test_singleReverseOnewayLinkOneWayBikeNo() {
 
 		final String surface = "surface-value";
 
@@ -233,7 +233,7 @@ public class OsmBicycleReaderTest {
 	}
 
 	@Test
-	public void test_builderDoesntOverrideLinkProperties() {
+	void test_builderDoesntOverrideLinkProperties() {
 
 		var osmFile = Paths.get(testUtils.getOutputDirectory()).resolve("osm-data.osm.pbf");
 

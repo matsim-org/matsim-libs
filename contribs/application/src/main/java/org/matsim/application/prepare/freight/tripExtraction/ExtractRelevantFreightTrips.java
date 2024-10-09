@@ -41,6 +41,18 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	// file from the German wide freight traffic.
 	private static final Logger log = LogManager.getLogger(ExtractRelevantFreightTrips.class);
 
+	/**
+	 * Enum for the type of trips to be extracted. The following types are available:
+	 * <ul> <li>ALL: Extract all trips driving in the shape are.</li>
+	 * <li>INCOMING: Extract only trips with the destination in the shape and the origin outside the shape</li>
+	 * <li>OUTGOING: Extract only trips with the origin in the shape and the destination outside the shape</li>
+	 * <li>INTERNAL: Extract only trips with origin and destination in the shape area</li>
+	 * <li>TRANSIT: Extract only trips driving through the shape area</li> </ul>
+	 */
+	private enum TripType {
+		ALL, INCOMING, INTERNAL, OUTGOING, TRANSIT
+	}
+
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to country wide freight traffic")
 	private Path freightDataDirectory;
 
@@ -53,11 +65,17 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions();
 
-	@CommandLine.Option(names = "--output", description = "Output path", required = true)
+	@CommandLine.Option(names = "--output", description = "Path of the output plans file", required = true)
 	private Path outputPath;
 
 	@CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
 	private boolean cutOnBoundary;
+
+	@CommandLine.Option(names = "--tripType", description = "Set the tripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
+	private TripType tripType;
+
+	@CommandLine.Option(names = "--LegMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
+	private String legMode;
 
 	private final SplittableRandom rnd = new SplittableRandom(4711);
 
@@ -103,6 +121,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		CoordinateTransformation sct = shp.createTransformation(crs.getInputCRS());
 
+		log.info("Filtering the links within the relevant area...");
 		// Identify links on the boundary
 		List<Id<Link>> linksOnTheBoundary = new ArrayList<>();
 		for (Link link : network.getLinks().values()) {
@@ -112,6 +131,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				linksOnTheBoundary.add(link.getId());
 			}
 		}
+		log.info("Finished filtering the links within the relevant area...");
 
 		CoordinateTransformation ct = crs.getTransformation();
 
@@ -125,7 +145,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 			processed += 1;
 			if (processed % 10000 == 0) {
-				log.info("Processing: {} persons have been processed", processed);
+				log.info("Processing: {} persons of {} persons have been processed", processed, originalPlans.getPersons().keySet().size());
 			}
 
 			Plan plan = person.getSelectedPlan();
@@ -144,126 +164,35 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(endCoord)));
 
 			Activity act0 = populationFactory.createActivityFromCoord("freight_start", null);
-			Leg leg = populationFactory.createLeg("freight");
+			Leg leg = populationFactory.createLeg(legMode);
 			Activity act1 = populationFactory.createActivityFromCoord("freight_end", null);
 
-			// Case 1: both origin and destination are within the relevant region
-			if (originIsInside && destinationIsInside) {
-				act0.setCoord(ct.transform(startCoord));
-				act0.setEndTime(departureTime);
-				act1.setCoord(ct.transform(endCoord));
+			switch (tripType) {
+				case ALL -> {
+					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord);
+					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink,
+						linksOnTheBoundary, act1, endCoord);
+					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink, linksOnTheBoundary, act1, endCoord);
+					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink, linksOnTheBoundary, act1, endCoord);
+				}
+				case INTERNAL ->
+					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord);
+				case OUTGOING ->
+					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+				case INCOMING ->
+					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+				case TRANSIT ->
+					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+				default -> throw new IllegalStateException("Unexpected value: " + tripType);
 			}
 
-			// Case 2: outgoing trips
-			if (originIsInside && !destinationIsInside) {
-				act0.setCoord(ct.transform(startCoord));
-				act0.setEndTime(departureTime);
-				if (cutOnBoundary) {
-					boolean isCoordSet = false;
-					LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-							network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
-							0, null, null);
-					if (route.links.size() == 0) {
-						continue;
-					}
-					for (Link link : route.links) {
-						if (linksOnTheBoundary.contains(link.getId())) {
-							act1.setCoord(ct.transform(link.getCoord()));
-							isCoordSet = true;
-							break;
-						}
-					}
-					if (!isCoordSet) {
-						int lastOne = route.links.size() - 1;
-						Coord originalCoord = route.links.get(lastOne).getCoord();
-						act1.setCoord(ct.transform(originalCoord));
-					}
-				} else {
-					act1.setCoord(ct.transform(endCoord));
-				}
-
-			}
-			// Case 3: incoming trips
-			if (!originIsInside && destinationIsInside) {
-				if (cutOnBoundary) {
-					boolean isCoordSet = false;
-					LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-							network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
-							0, null, null);
-					if (route.links.size() == 0) {
-						continue;
-					}
-					double timeSpent = 0;
-					for (Link link : route.links) {
-						if (linksOnTheBoundary.contains(link.getId())) {
-							act0.setCoord(ct.transform(link.getCoord()));
-							double newEndTime = departureTime + timeSpent;
-							if (newEndTime >= 86400)
-								newEndTime = rnd.nextInt(86400);
-							act0.setEndTime(newEndTime);
-							isCoordSet = true;
-							break;
-						}
-						timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
-					}
-					if (!isCoordSet) {
-						Coord originalCoord = route.links.get(0).getCoord();
-						act0.setCoord(ct.transform(originalCoord));
-						act0.setEndTime(departureTime);
-					}
-				} else {
-					act0.setCoord(ct.transform(startCoord));
-					act0.setEndTime(departureTime);
-				}
-				act1.setCoord(ct.transform(endCoord));
-			}
-
-			// case 4: through trips
-			if (!originIsInside && !destinationIsInside) {
-				boolean tripIsRelevant = false;
-				double timeSpent = 0;
-				boolean vehicleIsInside = false;
-				LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-						network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(), 0,
-						null, null);
-				if (route.links.size() == 0) {
-					continue;
-				}
-				if (cutOnBoundary) {
-					for (Link link : route.links) {
-						if (linksOnTheBoundary.contains(link.getId())) {
-							if (!vehicleIsInside) {
-								act0.setCoord(ct.transform(link.getCoord()));
-								double newEndTime = departureTime + timeSpent;
-								if (newEndTime >= 24 * 3600)
-									newEndTime = rnd.nextInt(86400);
-								act0.setEndTime(newEndTime);
-								vehicleIsInside = true;
-							} else {
-								act1.setCoord(ct.transform(link.getCoord()));
-								tripIsRelevant = true;
-								break;
-							}
-						}
-						timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
-					}
-				} else {
-					for (Link link : route.links) {
-						if (linksOnTheBoundary.contains(link.getId())) {
-							act0.setCoord(ct.transform(startCoord));
-							act0.setEndTime(departureTime);
-							act1.setCoord(ct.transform(endCoord));
-							tripIsRelevant = true;
-							break;
-						}
-					}
-				}
-				if (!tripIsRelevant) {
-					continue;
-				}
-			}
-
-			// Add new freight person to the output plans
+			// Add new freight person to the output plans if trips is relevant
 			if (act0.getEndTime().orElse(86400) < 86400) {
 				Person freightPerson = populationFactory.createPerson(Id.create("freight_" + generated, Person.class));
 				freightPerson.getAttributes().putAttribute("subpopulation", "freight");
@@ -281,7 +210,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		}
 
 		if (crs.getTargetCRS() != null)
-			ProjectionUtils.putCRS(originalPlans, crs.getTargetCRS());
+			ProjectionUtils.putCRS(outputPlans, crs.getTargetCRS());
 
 		// Write population
 		log.info("Writing population file...");
@@ -310,5 +239,139 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		tsvWriter.close();
 
 		return 0;
+	}
+
+	/**
+	 * Create activities if the trip is a transit trips
+	 */
+	private void createActivitiesForTransitTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+												double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
+												List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+		if (!originIsInside && !destinationIsInside) {
+			double timeSpent = 0;
+			boolean vehicleIsInside = false;
+			LeastCostPathCalculator.Path route = router.calcLeastCostPath(
+					network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(), 0,
+					null, null);
+			if (route.links.isEmpty()) {
+				return;
+			}
+			if (cutOnBoundary) {
+				for (Link link : route.links) {
+					if (linksOnTheBoundary.contains(link.getId())) {
+						if (!vehicleIsInside) {
+							act0.setCoord(ct.transform(link.getCoord()));
+							double newEndTime = departureTime + timeSpent;
+							if (newEndTime >= 24 * 3600)
+								newEndTime = rnd.nextInt(86400);
+							act0.setEndTime(newEndTime);
+							vehicleIsInside = true;
+						} else {
+							act1.setCoord(ct.transform(link.getCoord()));
+							break;
+						}
+					}
+					timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
+				}
+			} else {
+				for (Link link : route.links) {
+					if (linksOnTheBoundary.contains(link.getId())) {
+						act0.setCoord(ct.transform(startCoord));
+						act0.setEndTime(departureTime);
+						act1.setCoord(ct.transform(endCoord));
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Create activities if the trip is an incoming trip
+	 */
+	private void createActivitiesForIncomingTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+												  double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
+												  List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+		if (!originIsInside && destinationIsInside) {
+			if (cutOnBoundary) {
+				boolean isCoordSet = false;
+				LeastCostPathCalculator.Path route = router.calcLeastCostPath(
+						network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
+						0, null, null);
+				if (route.links.isEmpty()) {
+					return;
+				}
+				double timeSpent = 0;
+				for (Link link : route.links) {
+					if (linksOnTheBoundary.contains(link.getId())) {
+						act0.setCoord(ct.transform(link.getCoord()));
+						double newEndTime = departureTime + timeSpent;
+						if (newEndTime >= 86400)
+							newEndTime = rnd.nextInt(86400);
+						act0.setEndTime(newEndTime);
+						isCoordSet = true;
+						break;
+					}
+					timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
+				}
+				if (!isCoordSet) {
+					Coord originalCoord = route.links.getFirst().getCoord();
+					act0.setCoord(ct.transform(originalCoord));
+					act0.setEndTime(departureTime);
+				}
+			} else {
+				act0.setCoord(ct.transform(startCoord));
+				act0.setEndTime(departureTime);
+			}
+			act1.setCoord(ct.transform(endCoord));
+		}
+	}
+
+	/**
+	 * Create activities if the trip is an outgoing trip
+	 */
+	private void createActivitiesForOutgoingTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+												 double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
+												 List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+		if (originIsInside && !destinationIsInside) {
+			act0.setCoord(ct.transform(startCoord));
+			act0.setEndTime(departureTime);
+			if (cutOnBoundary) {
+				boolean isCoordSet = false;
+				LeastCostPathCalculator.Path route = router.calcLeastCostPath(
+					network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
+					0, null, null);
+				if (route.links.isEmpty()) {
+					return;
+				}
+				for (Link link : route.links) {
+					if (linksOnTheBoundary.contains(link.getId())) {
+						act1.setCoord(ct.transform(link.getCoord()));
+						isCoordSet = true;
+						break;
+					}
+				}
+				if (!isCoordSet) {
+					int lastOne = route.links.size() - 1;
+					Coord originalCoord = route.links.get(lastOne).getCoord();
+					act1.setCoord(ct.transform(originalCoord));
+				}
+			} else {
+				act1.setCoord(ct.transform(endCoord));
+			}
+
+		}
+	}
+
+	/**
+	 * Create activities if the trip is an internal trip
+	 */
+	private static void createActivitiesForInternalTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
+								  double departureTime, Activity act1, Coord endCoord) {
+		if (originIsInside && destinationIsInside) {
+			act0.setCoord(ct.transform(startCoord));
+			act0.setEndTime(departureTime);
+			act1.setCoord(ct.transform(endCoord));
+		}
 	}
 }

@@ -62,14 +62,13 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
 
-	public enum ScoreItem { worst, best, average, executed };
+	public enum ScoreItem { worst, best, average, executed }
 
 	private final Population population;
 	private final OutputDirectoryHierarchy controllerIO;
 	private final String delimiter;
 	private final BufferedWriter out;
 
-	private final boolean createPNG;
 	private final ControllerConfigGroup controllerConfigGroup;
 
 	private final Map<ScoreItem, Map< Integer, Double>> scoreHistory = new HashMap<>();
@@ -87,7 +86,6 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.population = population;
 		this.controllerIO = controllerIO;
 		this.delimiter = globalConfig.getDefaultDelimiter();
-		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats.csv"));
 
 		Set<String> subpopulations = population.getPersons().values().stream()
@@ -127,10 +125,19 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		collectScoreInfo(event);
+		if (isWriteGraph(event)) {
+			writePng();
+		}
+	}
+
+	private boolean isWriteGraph(IterationEndsEvent event) {
+		// create chart when data of more than one iteration is available.
+		return this.controllerConfigGroup.getCreateGraphsInterval() > 0 &&
+			event.getIteration() % this.controllerConfigGroup.getCreateGraphsInterval() == 0 &&
+			event.getIteration() > this.minIteration;
 	}
 
 	private void collectScoreInfo(final IterationEndsEvent event) {
-
 		ScoreInfo info = new ScoreInfo();
 
 		Map<String, ScoreInfo> perSubpop = new HashMap<>();
@@ -165,21 +172,16 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.scoreHistory.get( ScoreItem.best ).put( event.getIteration(), info.sumScoreBest / info.nofScoreBest ) ;
 		this.scoreHistory.get( ScoreItem.average ).put( event.getIteration(), info.sumAvgScores / info.nofAvgScores ) ;
 		this.scoreHistory.get( ScoreItem.executed ).put( event.getIteration(), info.sumExecutedScores / info.nofExecutedScores ) ;
+	}
 
-		if (this.createPNG && event.getIteration() > this.minIteration) {
-			// create chart when data of more than one iteration is available.
-			XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
-//			double[] iterations = new double[index + 1];
-//			for (int i = 0; i <= index; i++) {
-//				iterations[i] = i + this.minIteration;
-//			}
-			chart.addSeries("avg. worst score", this.scoreHistory.get( ScoreItem.worst ) ) ;
-			chart.addSeries("avg. best score", this.scoreHistory.get( ScoreItem.best) );
-			chart.addSeries("avg. of plans' average score", this.scoreHistory.get( ScoreItem.average) );
-			chart.addSeries("avg. executed score", this.scoreHistory.get( ScoreItem.executed ) );
-			chart.addMatsimLogo();
-			chart.saveAsPng(this.controllerIO.getOutputFilename("scorestats.png"), 800, 600);
-		}
+	private void writePng() {
+		XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
+		chart.addSeries("avg. worst score", this.scoreHistory.get( ScoreItem.worst ) ) ;
+		chart.addSeries("avg. best score", this.scoreHistory.get( ScoreItem.best) );
+		chart.addSeries("avg. of plans' average score", this.scoreHistory.get( ScoreItem.average) );
+		chart.addSeries("avg. executed score", this.scoreHistory.get( ScoreItem.executed ) );
+		chart.addMatsimLogo();
+		chart.saveAsPng(this.controllerIO.getOutputFilename("scorestats.png"), 800, 600);
 	}
 
 	@Override

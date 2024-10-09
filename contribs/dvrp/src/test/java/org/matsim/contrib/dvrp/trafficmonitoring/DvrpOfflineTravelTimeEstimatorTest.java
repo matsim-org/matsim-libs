@@ -22,8 +22,7 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -61,8 +60,8 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 	private final TimeDiscretizer timeDiscretizer = new TimeDiscretizer(200, 100);
 
 	@Test
-	public void getLinkTravelTime_timeAreCorrectlyBinned() {
-		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null);
+	void getLinkTravelTime_timeAreCorrectlyBinned() {
+		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null, ";");
 
 		//bin 0
 		assertThat(linkTravelTime(estimator, linkAB, -1)).isEqualTo(1);
@@ -79,7 +78,7 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 	}
 
 	@Test
-	public void getLinkTravelTime_exponentialAveragingOverIterations() {
+	void getLinkTravelTime_exponentialAveragingOverIterations() {
 		double alpha = 0.25;
 
 		//observed TTs for each time bin
@@ -99,7 +98,7 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 		};
 
 		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, observedTT, network, timeDiscretizer, alpha,
-				null);
+				null,";");
 
 		//expected TTs for each time bin
 		double expectedTT_0 = 1;
@@ -124,9 +123,10 @@ public class DvrpOfflineTravelTimeEstimatorTest {
 	}
 
 	@Test
-	public void getLinkTravelTime_linkOutsideNetwork_fail() {
+	void getLinkTravelTime_linkOutsideNetwork_fail() {
 		var linkOutsideNetwork = new FakeLink(Id.createLinkId("some-link"));
-		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer, 0.25, null);
+		var estimator = new DvrpOfflineTravelTimeEstimator(initialTT, null, network, timeDiscretizer,
+				0.25, null, ";");
 
 		assertThatThrownBy(() -> linkTravelTime(estimator, linkOutsideNetwork, 0)).isExactlyInstanceOf(
 				NullPointerException.class)

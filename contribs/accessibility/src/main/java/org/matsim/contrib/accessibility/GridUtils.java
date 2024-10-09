@@ -20,7 +20,6 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 public final class GridUtils {
 	// used from outside, e.g. in vsp playgrounds

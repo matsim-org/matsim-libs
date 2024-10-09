@@ -21,8 +21,8 @@
 
 package playground.vsp.pt.ptdisturbances;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ import jakarta.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -102,7 +102,7 @@ import com.google.inject.Inject;
 
 public class EditTripsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 	private static final Logger log = LogManager.getLogger(EditTripsTest.class);
 	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no
 	// constructor or similar to pass the replanning time
@@ -114,7 +114,7 @@ public class EditTripsTest {
 	 * Case 1.1.1
 	 */
 	@Test
-	public void testAgentStaysAtStop() {
+	void testAgentStaysAtStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -133,20 +133,19 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 1490.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 7 ,trip.size());
+		assertEquals(1490.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(7 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "tr_334", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("tr_334", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(4), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(5), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(6), "Trip element has changed");
 
 
 	}
-
 
 
 	/**
@@ -154,7 +153,7 @@ public class EditTripsTest {
 	 * are 2 testAgents at different places, but events are fine :-/
 	 */
 	@Test
-	public void testAgentLeavesStop() {
+	void testAgentLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -170,16 +169,16 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 1344.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 7 ,trip.size());
+		assertEquals(1344.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(7 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "tr_333", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("tr_333", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(4), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(5), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(6), "Trip element has changed");
 
 	}
 
@@ -187,7 +186,7 @@ public class EditTripsTest {
 	 * Case 1.2.1
 	 */
 	@Test
-	public void testAgentStaysInVehicle() {
+	void testAgentStaysInVehicle() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -206,16 +205,16 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 1044.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 7 ,trip.size());
+		assertEquals(1044.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(7 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "tr_332", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("tr_332", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(4), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(5), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(6), "Trip element has changed");
 
 
 	}
@@ -224,7 +223,7 @@ public class EditTripsTest {
 	 * Case 1.2.2
 	 */
 	@Test
-	public void testAgentLeavesVehicleAtNextStop() {
+	void testAgentLeavesVehicleAtNextStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -242,21 +241,21 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 1077.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 12 ,trip.size());
+		assertEquals(1077.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(12 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "tr_333", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt1", trip.get(6));
-		assertEquals("Trip element has changed", "pt interaction@pt1", trip.get(7));
-		assertEquals("Trip element has changed", "tr_45", trip.get(8));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(9));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(10));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(11));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("tr_333", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt7", trip.get(4), "Trip element has changed");
+		assertEquals("pt interaction@pt7", trip.get(5), "Trip element has changed");
+		assertEquals("pt interaction@pt1", trip.get(6), "Trip element has changed");
+		assertEquals("pt interaction@pt1", trip.get(7), "Trip element has changed");
+		assertEquals("tr_45", trip.get(8), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(9), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(10), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(11), "Trip element has changed");
 
 
 	}
@@ -268,7 +267,7 @@ public class EditTripsTest {
 	 * This is due to the utility params for walk, pt_wait and pt being equal/indifferent.
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndLeavesStop() {
+	void testAgentIsAtTeleportLegAndLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -284,18 +283,18 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 9 ,trip.size());
+		assertEquals(2570.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(9 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
-		assertEquals("Trip element has changed", "tr_334", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(4), "Trip element has changed");
+		assertEquals("tr_334", trip.get(5), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(6), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(7), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(8), "Trip element has changed");
 
 
 	}
@@ -306,7 +305,7 @@ public class EditTripsTest {
 	 * pt_wait and pt. Strangely only works with walk being significantly worse, does not work with small differences.
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
+	void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -326,18 +325,18 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 9 ,trip.size());
+		assertEquals(2570.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(9 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
-		assertEquals("Trip element has changed", "tr_334", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(4), "Trip element has changed");
+		assertEquals("tr_334", trip.get(5), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(6), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(7), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(8), "Trip element has changed");
 
 
 	}
@@ -346,7 +345,7 @@ public class EditTripsTest {
 	 * Case 2.2
 	 */
 	@Test
-	public void testAgentIsAtTeleportLegAndWaitsAtStop() {
+	void testAgentIsAtTeleportLegAndWaitsAtStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
@@ -362,18 +361,18 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 9 ,trip.size());
+		assertEquals(2570.0,  travelTime, MatsimTestUtils.EPSILON, "Travel time has changed");
+		assertEquals(9 ,trip.size(),"Number of trip elements has changed");
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
-		assertEquals("Trip element has changed", "tr_334", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
+		assertEquals("dummy@car_17bOut", trip.get(0), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(1), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(2), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(3), "Trip element has changed");
+		assertEquals("pt interaction@pt6c", trip.get(4), "Trip element has changed");
+		assertEquals("tr_334", trip.get(5), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(6), "Trip element has changed");
+		assertEquals("pt interaction@pt8", trip.get(7), "Trip element has changed");
+		assertEquals("dummy@work0", trip.get(8), "Trip element has changed");
 
 
 	}
@@ -383,7 +382,7 @@ public class EditTripsTest {
 	 * Simulates 900 agents so this case should include every possible state of an agent. Current and future trips are replanned.
 	 */
 	@Test
-	public void testOneAgentEveryFourSeconds() {
+	void testOneAgentEveryFourSeconds() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
@@ -412,7 +411,7 @@ public class EditTripsTest {
 					numberOfUsedLines++;
 				}
 			}
-			assertTrue("Number of used lines ist not plausible", numberOfUsedLines == 1 || numberOfUsedLines == 2);
+			assertTrue(numberOfUsedLines == 1 || numberOfUsedLines == 2, "Number of used lines ist not plausible");
 		}
 		System.out.println(config.controller().getOutputDirectory());
 	}

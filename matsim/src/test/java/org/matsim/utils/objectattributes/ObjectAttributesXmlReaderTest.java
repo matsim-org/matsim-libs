@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -35,10 +35,10 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlReaderTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testParse_customConverter() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_customConverter() throws SAXException, ParserConfigurationException, IOException {
 		String tupleClass = MyTuple.class.getCanonicalName();
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 		"<objectAttributes>\n" +
@@ -55,18 +55,18 @@ public class ObjectAttributesXmlReaderTest {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Object o = attributes.getAttribute("one", "a");
-		Assert.assertTrue(o instanceof MyTuple);
-		Assert.assertEquals(1, ((MyTuple) o).a);
-		Assert.assertEquals(2, ((MyTuple) o).b);
+		Assertions.assertTrue(o instanceof MyTuple);
+		Assertions.assertEquals(1, ((MyTuple) o).a);
+		Assertions.assertEquals(2, ((MyTuple) o).b);
 
 		o = attributes.getAttribute("two", "b");
-		Assert.assertTrue(o instanceof MyTuple);
-		Assert.assertEquals(3, ((MyTuple) o).a);
-		Assert.assertEquals(4, ((MyTuple) o).b);
+		Assertions.assertTrue(o instanceof MyTuple);
+		Assertions.assertEquals(3, ((MyTuple) o).a);
+		Assertions.assertEquals(4, ((MyTuple) o).b);
 	}
 
 	@Test
-	public void testParse_missingConverter() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_missingConverter() throws SAXException, ParserConfigurationException, IOException {
 		String tupleClass = MyTuple.class.getCanonicalName();
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 		"<objectAttributes>\n" +
@@ -84,54 +84,54 @@ public class ObjectAttributesXmlReaderTest {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
 		Object o = attributes.getAttribute("one", "a1");
-		Assert.assertNull(o);
+		Assertions.assertNull(o);
 		o = attributes.getAttribute("one", "a2");
-		Assert.assertTrue(o instanceof String);
-		Assert.assertEquals("foo", o);
+		Assertions.assertTrue(o instanceof String);
+		Assertions.assertEquals("foo", o);
 
 		o = attributes.getAttribute("two", "b1");
-		Assert.assertNull(o);
+		Assertions.assertNull(o);
 		o = attributes.getAttribute("two", "b2");
-		Assert.assertTrue(o instanceof Integer);
-		Assert.assertEquals(1980, ((Integer) o).intValue());
+		Assertions.assertTrue(o instanceof Integer);
+		Assertions.assertEquals(1980, ((Integer) o).intValue());
 	}
 
 	@Test
-	public void testParse_withDtd() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_withDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		new ObjectAttributesXmlReader(oa).readFile(filename);
 
 		Object o = oa.getAttribute("one", "a");
-		Assert.assertTrue(o instanceof String);
-		Assert.assertEquals("foobar", o);
+		Assertions.assertTrue(o instanceof String);
+		Assertions.assertEquals("foobar", o);
 
 		o = oa.getAttribute("two", "b");
-		Assert.assertTrue(o instanceof Boolean);
-		Assert.assertTrue(((Boolean) o).booleanValue());
+		Assertions.assertTrue(o instanceof Boolean);
+		Assertions.assertTrue(((Boolean) o).booleanValue());
 
 		o = oa.getAttribute("two", "ccc");
-		Assert.assertTrue(o instanceof Integer);
-		Assert.assertEquals(42, ((Integer) o).intValue());
+		Assertions.assertTrue(o instanceof Integer);
+		Assertions.assertEquals(42, ((Integer) o).intValue());
 	}
 
 	@Test
-	public void testParse_withoutDtd() throws SAXException, ParserConfigurationException, IOException {
+	void testParse_withoutDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withoutDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		new ObjectAttributesXmlReader(oa).readFile(filename);
 
 		Object o = oa.getAttribute("one", "a");
-		Assert.assertTrue(o instanceof String);
-		Assert.assertEquals("foobar", o);
+		Assertions.assertTrue(o instanceof String);
+		Assertions.assertEquals("foobar", o);
 
 		o = oa.getAttribute("two", "b");
-		Assert.assertTrue(o instanceof Boolean);
-		Assert.assertTrue(((Boolean) o).booleanValue());
+		Assertions.assertTrue(o instanceof Boolean);
+		Assertions.assertTrue(((Boolean) o).booleanValue());
 
 		o = oa.getAttribute("two", "ccc");
-		Assert.assertTrue(o instanceof Integer);
-		Assert.assertEquals(42, ((Integer) o).intValue());
+		Assertions.assertTrue(o instanceof Integer);
+		Assertions.assertEquals(42, ((Integer) o).intValue());
 	}
 
 }

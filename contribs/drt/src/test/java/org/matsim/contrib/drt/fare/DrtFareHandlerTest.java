@@ -21,8 +21,8 @@
 package org.matsim.contrib.drt.fare;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -30,6 +30,8 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.core.events.ParallelEventsManager;
+
+import java.util.List;
 
 /**
  * @author jbischoff
@@ -40,7 +42,7 @@ public class DrtFareHandlerTest {
 	 * Test method for {@link DrtFareHandler}.
 	 */
 	@Test
-	public void testDrtFareHandler() {
+	void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
 		fareParams.baseFare = 1;
@@ -69,19 +71,19 @@ public class DrtFareHandlerTest {
 		var personId = Id.createPersonId("p1");
 		{
 			var requestId = Id.create(0, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("12"),
-					Id.createLinkId("23"), 240, 1000, 0.0, 0.0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("12"),
+					Id.createLinkId("23"), 240, 1000, 0.0, 0.0, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.flush();
 
 			//fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
-			Assert.assertEquals(-4.0, fare.getValue(), 0);
+			Assertions.assertEquals(-4.0, fare.getValue(), 0);
 		}
 		{
 			// test minFarePerTrip
 			var requestId = Id.create(1, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("45"),
-					Id.createLinkId("56"), 24, 100, 0.0, 0.0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("45"),
+					Id.createLinkId("56"), 24, 100, 0.0, 0.0, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.finishProcessing();
 
@@ -89,7 +91,7 @@ public class DrtFareHandlerTest {
 			 * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
 			 * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
 			 */
-			Assert.assertEquals(-5.5, fare.getValue(), 0);
+			Assertions.assertEquals(-5.5, fare.getValue(), 0);
 		}
 	}
 

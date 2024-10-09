@@ -20,9 +20,9 @@
 
 package org.matsim.core.population.routes;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -43,14 +43,14 @@ import java.util.Collection;
  */
 public class RouteFactoryIntegrationTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Tests that the plans-reader and ReRoute-strategy module use the specified RouteFactory.
 	 */
 	@Test
-	public void testRouteFactoryIntegration() {
+	void testRouteFactoryIntegration() {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
 		Collection<StrategySettings> settings = config.replanning().getStrategySettings();
@@ -77,7 +77,7 @@ public class RouteFactoryIntegrationTest {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						Assert.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
+						Assertions.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
 						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}
@@ -105,8 +105,8 @@ public class RouteFactoryIntegrationTest {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						Assert.assertTrue("person: " + person.getId() + "; plan: " + planCounter,
-								route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl );
+						Assertions.assertTrue(route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl,
+								"person: " + person.getId() + "; plan: " + planCounter );
 						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
 						// test would be better. kai, feb'16
 					}

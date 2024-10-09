@@ -40,11 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -172,26 +169,25 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		RoutingModule module = routingModules.get( mainMode );
 
-		if (module != null) {
-			RoutingRequest request = DefaultRoutingRequest.of(
-					fromFacility,
-					toFacility,
-					departureTime,
-					person,
-					routingAttributes);
-
-			List<? extends PlanElement> trip = module.calcRoute(request);
-
-			if ( trip == null ) {
-				trip = fallbackRoutingModule.calcRoute(request) ;
-			}
-			for (Leg leg: TripStructureUtils.getLegs(trip)) {
-				TripStructureUtils.setRoutingMode(leg, mainMode);
-			}
-			return trip;
+		if (module == null) {
+			throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 		}
+		RoutingRequest request = DefaultRoutingRequest.of(
+				fromFacility,
+				toFacility,
+				departureTime,
+				person,
+				routingAttributes);
 
-		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
+		List<? extends PlanElement> trip = module.calcRoute(request);
+
+		if ( trip == null ) {
+			trip = fallbackRoutingModule.calcRoute(request) ;
+		}
+		for (Leg leg: TripStructureUtils.getLegs(trip)) {
+			TripStructureUtils.setRoutingMode(leg, mainMode);
+		}
+		return trip;
 	}
 
 	public static class UnknownModeException extends RuntimeException {

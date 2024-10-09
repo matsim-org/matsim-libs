@@ -110,7 +110,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
 			if ( comparisonModule != null ) {
 				comparisonSets = comparisonModule.getParameterSets(entry.getKey());
-			};
+			}
 			for ( ConfigGroup pSet : entry.getValue() ) {
 				ConfigGroup comparisonPSet = null ;
 				for ( ConfigGroup cg : comparisonSets ) {

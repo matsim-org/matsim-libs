@@ -17,17 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.core.replanning.strategies;
 
 import com.google.inject.*;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -55,14 +52,14 @@ import java.util.Collections;
 public class InnovationSwitchOffTest {
 	private static final Logger log = LogManager.getLogger(InnovationSwitchOffTest.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Integration test for testing if switching off of innovative strategies works.
 	 */
 	@Test
-	public void testInnovationSwitchOff() {
+	void testInnovationSwitchOff() {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("equil"));
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
@@ -139,18 +136,18 @@ public class InnovationSwitchOffTest {
 						for ( int ii = 0 ; ii < sm.getStrategies( null ).size(); ii++) {
 							log.warn("strategy " + sm.getStrategies( null ).get(ii ) + " has weight " + sm.getWeights( null ).get(ii ) );
 							if (event.getIteration() == 11 && sm.getStrategies( null ).get(ii ).toString().contains(ReRoute.class.getSimpleName() )) {
-								Assert.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
+								Assertions.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
 							if (event.getIteration() == 12 && sm.getStrategies( null ).get(ii ).toString().contains(ReRoute.class.getSimpleName() )) {
-								Assert.assertEquals(0., sm.getWeights( null ).get(ii ), 0.000001 );
+								Assertions.assertEquals(0., sm.getWeights( null ).get(ii ), 0.000001 );
 							}
 							if (event.getIteration() == 13 && sm.getStrategies( null ).get(ii ).toString().contains(
 								  TimeAllocationMutatorModule.class.getSimpleName() )) {
-								Assert.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
+								Assertions.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
 							if (event.getIteration() == 14 && sm.getStrategies( null ).get(ii ).toString().contains(
 								  TimeAllocationMutatorModule.class.getSimpleName() )) {
-								Assert.assertEquals(0.0, sm.getWeights( null ).get(ii ), 0.000001 );
+								Assertions.assertEquals(0.0, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
 						}
 						System.err.flush();

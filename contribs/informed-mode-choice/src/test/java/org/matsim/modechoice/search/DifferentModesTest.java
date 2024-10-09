@@ -1,6 +1,6 @@
 package org.matsim.modechoice.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.modechoice.PlanCandidate;
@@ -17,7 +17,7 @@ public class DifferentModesTest extends ScenarioTest {
 
 
 	@Test
-	public void topK() {
+	void topK() {
 
 		group.setTopK(1024);
 

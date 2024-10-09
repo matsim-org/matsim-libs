@@ -27,7 +27,7 @@ import org.matsim.vehicles.VehicleType;
 /**
  * Non-mutable static information for a single train.
  */
-record TrainInfo(
+public record TrainInfo(
 	Id<VehicleType> id,
 	double length,
 	double maxVelocity,
@@ -47,7 +47,7 @@ record TrainInfo(
 		);
 	}
 
-	public void checkConsistency() {
+	void checkConsistency() {
 		if (!Double.isFinite(maxVelocity) || maxVelocity <= 0)
 			throw new IllegalArgumentException("Train of type " + id + " does not have a finite maximumVelocity.");
 

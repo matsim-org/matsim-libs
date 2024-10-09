@@ -20,8 +20,8 @@
 
 package org.matsim.core.scoring;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -44,40 +44,43 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ScoringFunctionsForPopulationStressIT {
 
 	static final int MAX = 1000000;
 
-	@Test(expected = RuntimeException.class)
-	public void exceptionInScoringFunctionPropagates() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		Id<Person> personId = Id.createPersonId(1);
-		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
-		EventsManager events = EventsUtils.createEventsManager(config);
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
-		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
-		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
-		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
-		events.addHandler(e2legsActs);
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-				controlerListenerManager,
-				events,
-				e2acts,
-				e2legs,
-				scenario.getPopulation(),
-				throwingScoringFunctionFactory,
-				config
-		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
-		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
-		scoringFunctionsForPopulation.finishScoringFunctions();
+	@Test
+	void exceptionInScoringFunctionPropagates() {
+		assertThrows(RuntimeException.class, () -> {
+			Config config = ConfigUtils.createConfig();
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			Id<Person> personId = Id.createPersonId(1);
+			scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
+			EventsManager events = EventsUtils.createEventsManager(config);
+			ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+			ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
+			EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+			EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+			EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+			events.addHandler(e2legsActs);
+			ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+					controlerListenerManager,
+					events,
+					e2acts,
+					e2legs,
+					scenario.getPopulation(),
+					throwingScoringFunctionFactory,
+					config
+			);
+			controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
+			scoringFunctionsForPopulation.finishScoringFunctions();
+		});
 	}
 
-	private class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
+	private static class ThrowingScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(Person person) {
 			return new ScoringFunction() {
@@ -130,14 +133,14 @@ public class ScoringFunctionsForPopulationStressIT {
 	}
 
 	@Test
-	public void workWithNewEventsManager() {
+	void workWithNewEventsManager() {
 		Config config = ConfigUtils.createConfig();
 		config.eventsManager().setOneThreadPerHandler(true);
 		work(config);
 	}
 
 	@Test
-	public void workWithOldEventsManager() {
+	void workWithOldEventsManager() {
 		Config config = ConfigUtils.createConfig();
 		config.eventsManager().setNumberOfThreads(8);
 		work(config);
@@ -241,15 +244,16 @@ public class ScoringFunctionsForPopulationStressIT {
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
 
-	/* I (mrieser, 2019-01-09) disabled this test. By definition, events for one person should come in the right sequence,
-	   so this tests actually tests some additional (and potentially optional) behavior. But, more importantly, it poses
-	   inherent problems with the addition of trip scoring: to detect trips, it is important that activities and legs
-	   occur in the correct sequence, which means that also the corresponding events must be in the right sequence.
-	   If the sequence is disturbed, the trip detection already fails. So, with trip scoring, this test would always fail
-	   as it tests some non-required functionality.
+	/*I (mrieser, 2019-01-09) disabled this test. By definition, events for one person should come in the right sequence,
+		so this tests actually tests some additional (and potentially optional) behavior. But, more importantly, it poses
+		inherent problems with the addition of trip scoring: to detect trips, it is important that activities and legs
+		occur in the correct sequence, which means that also the corresponding events must be in the right sequence.
+		If the sequence is disturbed, the trip detection already fails. So, with trip scoring, this test would always fail
+		as it tests some non-required functionality.
 	 */
-	@Test @Ignore
-	public void unlikelyTimingOfScoringFunctionStillWorks() {
+	@Test
+	@Disabled
+	void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
 		config.eventsManager().setNumberOfThreads(8);
 		config.eventsManager().setOneThreadPerHandler(true);

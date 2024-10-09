@@ -19,9 +19,9 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -30,33 +30,33 @@ import org.locationtech.jts.geom.Polygon;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ConcaveHullTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	
+
 	/** Test whether duplicate input points are removed. **/
 	@Test
-	public void testConstructor(){
+	void testConstructor(){
 		GeometryCollection gcIncorrect = setupWithDuplicates();
 		ConcaveHull ch1 = new ConcaveHull(gcIncorrect, 2);
-		Assert.assertEquals("Duplicates not removed.", 8, ch1.getInputPoints());
-		
+		Assertions.assertEquals(8, ch1.getInputPoints(), "Duplicates not removed.");
+
 		GeometryCollection gcCorrect = setup();
 		ConcaveHull ch2 = new ConcaveHull(gcCorrect, 2);
-		Assert.assertEquals("Wrong number of input points.", 8, ch2.getInputPoints());
+		Assertions.assertEquals(8, ch2.getInputPoints(), "Wrong number of input points.");
 	}
-	
-	
+
+
 	public void testGetConcaveHull(){
 		GeometryCollection gc = setup();
 		ConcaveHull ch = new ConcaveHull(gc, 1.0);
 		Geometry g = ch.getConcaveHull();
-		Assert.assertTrue("Wrong geometry created.", g instanceof Polygon);
+		Assertions.assertTrue(g instanceof Polygon, "Wrong geometry created.");
 	}
-	
+
 
 	/**
 	 * Set up a small test case:
-	 * 
+	 *
 	 *   ^
 	 *   |
 	 *   3         4
@@ -64,7 +64,7 @@ public class ConcaveHullTest {
      *   | 8     6
 	 *   |    5
 	 *   1_________2___>
-	 *   
+	 *
 	 */
 	private GeometryCollection setup(){
 		GeometryFactory gf = new GeometryFactory();
@@ -79,7 +79,7 @@ public class ConcaveHullTest {
 		ga[7] = gf.createPoint(new Coordinate(1, 2));
 		return new GeometryCollection(ga, gf);
 	}
-	
+
 	/**
 	 * Creates a similar {@link GeometryCollection} as in setup() but have
 	 * triplicates of points 7 & 8.
@@ -96,10 +96,10 @@ public class ConcaveHullTest {
 		ga[5] = gf.createPoint(new Coordinate(3, 2)); // 6
 		ga[6] = gf.createPoint(new Coordinate(2, 3)); // 7
 		ga[7] = gf.createPoint(new Coordinate(1, 2)); // 8
-		
+
 		ga[8] = gf.createPoint(new Coordinate(2, 3)); // 7
 		ga[9] = gf.createPoint(new Coordinate(2, 3)); // 7
-		
+
 		ga[10] = gf.createPoint(new Coordinate(1, 2)); // 8
 		ga[11] = gf.createPoint(new Coordinate(1, 2)); // 8
 		return new GeometryCollection(ga, gf);

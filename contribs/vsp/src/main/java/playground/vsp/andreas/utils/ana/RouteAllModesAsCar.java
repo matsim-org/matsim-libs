@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -54,19 +55,18 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.pt.PtConstants;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Routes all modes of transport (except for transit_walk) as car modes and counts the number of trips per link.
  * Output as Shape
- * 
+ *
  * @author aneumann
  *
  */
 public class RouteAllModesAsCar extends AbstractPersonFilter {
-	
+
 	private final static Logger log = LogManager.getLogger(RouteAllModesAsCar.class);
 
 	private final Scenario sc;
@@ -74,16 +74,16 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 
 	private HashMap<Link, Integer> link2totals = new HashMap<Link, Integer>();
 	private HashMap<String, HashMap<Link, Integer>> mode2link2totals = new HashMap<String, HashMap<Link,Integer>>();
-	
+
 	public RouteAllModesAsCar(String networkFilename) {
 		Gbl.startMeasurement();
 		Gbl.printMemoryUsage();
-		
+
 		// read input data
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.sc.getConfig().network().setInputFile(networkFilename);
 		ScenarioUtils.loadScenario(this.sc);
-		
+
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		this.routingAlgo = new DijkstraFactory().createPathCalculator(this.sc.getNetwork(), tC, tC);
 		@SuppressWarnings("serial")
@@ -99,7 +99,7 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 		String networkFilename = args[1];
 		String popFilename = args[2];
 		String targetCoordinateSystem = args[3];
-		
+
 		RouteAllModesAsCar routeAllModesAsCar = new RouteAllModesAsCar(networkFilename);
 		routeAllModesAsCar.run(popFilename);
 		routeAllModesAsCar.writeAsShape(outputDir, targetCoordinateSystem);
@@ -115,15 +115,15 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 		for (String mode : this.mode2link2totals.keySet()) {
 			typeBuilder.add("count " + mode, Double.class);
 		}
-		
+
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-		
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
+		Collection<SimpleFeature> features = new ArrayList<>();
+
 		Object[] featureAttribs;
-		
+
 		for(Link link: this.sc.getNetwork().getLinks().values()){
-			
+
 			featureAttribs = createLinkFeatureAttribs(link, new Object[3 + this.mode2link2totals.keySet().size()]);
 
 			// skip links without count
@@ -137,25 +137,25 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 				e1.printStackTrace();
 			}
 		}
-		
-		ShapeFileWriter.writeGeometries(features, outputDir + "routeAllModesAsCar.shp");
+
+		GeoFileWriter.writeGeometries(features, outputDir + "routeAllModesAsCar.shp");
 	}
 
 	private Object[] createLinkFeatureAttribs(Link link, Object[] objects) {
 		if(this.link2totals.get(link) == null) {
 			return null;
 		}
-		
+
 		int total = this.link2totals.get(link).intValue();
-		
+
 		Coordinate[] coord =  new Coordinate[2];
 		coord[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY(), 0.);
 		coord[1] = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY(), 0.);
-		
+
 		objects[0] = new GeometryFactory().createLineString(coord);
 		objects[1] = link.getId().toString();
 		objects[2] = total;
-		
+
 		int index = 3;
 		for(String mode : this.mode2link2totals.keySet()){
 			if (this.mode2link2totals.get(mode).get(link) == null) {
@@ -195,27 +195,27 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 		count();
 		Activity lastAct = null;
 		String currentMode = null;
-		
+
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity act = (Activity) planElement;
-				
+
 				if (act.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 					continue;
 				}
-				
+
 				if (lastAct == null) {
 					lastAct = act;
 				} else {
 					Link lastLink = this.sc.getNetwork().getLinks().get(lastAct.getLinkId());
 					Link currentLink = this.sc.getNetwork().getLinks().get(act.getLinkId());
-					
+
 					Path path = this.routingAlgo.calcLeastCostPath(lastLink.getToNode(), currentLink.getFromNode(), 0.0, null, null);
 					this.storeLinks(currentMode, path.links);
 					lastAct = act;
 				}
 			}
-			
+
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (!leg.getMode().equalsIgnoreCase(TransportMode.transit_walk)) {
@@ -228,11 +228,11 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 	private void storeLinks(String currentMode, List<Link> links) {
 		for (Link link : links) {
 			this.addOne(this.link2totals, link);
-		
+
 			if (this.mode2link2totals.get(currentMode) == null) {
 				this.mode2link2totals.put(currentMode, new HashMap<Link, Integer>());
 			}
-		
+
 			this.addOne(this.mode2link2totals.get(currentMode), link);
 		}
 	}

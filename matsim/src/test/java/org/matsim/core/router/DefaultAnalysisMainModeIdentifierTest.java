@@ -1,6 +1,6 @@
 package org.matsim.core.router;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
@@ -21,7 +21,7 @@ public class DefaultAnalysisMainModeIdentifierTest {
 	}
 
 	@Test
-	public void correctModes() {
+	void correctModes() {
 
 		assertThat(mmi.identifyMainMode(legs(TransportMode.walk, TransportMode.car, TransportMode.walk)))
 			.isEqualTo(TransportMode.car);
@@ -44,7 +44,7 @@ public class DefaultAnalysisMainModeIdentifierTest {
 	}
 
 	@Test
-	public void failingModes() {
+	void failingModes() {
 
 		assertThatThrownBy(() -> mmi.identifyMainMode(legs("new_mode", TransportMode.walk, "other_new_mode"))).
 			isInstanceOf(IllegalStateException.class);
@@ -61,7 +61,7 @@ public class DefaultAnalysisMainModeIdentifierTest {
 	}
 
 	@Test
-	public final void testIntermodalPtDrtTrip() {
+	final void testIntermodalPtDrtTrip() {
 
 		assertThat(mmi.identifyMainMode(legs(TransportMode.non_network_walk, TransportMode.walk, TransportMode.non_network_walk,
 			TransportMode.drt, TransportMode.walk, TransportMode.pt, TransportMode.walk, TransportMode.pt, TransportMode.walk)))

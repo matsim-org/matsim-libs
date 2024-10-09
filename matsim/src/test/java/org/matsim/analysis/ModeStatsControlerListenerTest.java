@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -52,11 +52,11 @@ public class ModeStatsControlerListenerTest {
 	HashMap<String, Integer> person1modes = new HashMap<>();
 	HashMap<String, Integer> person2modes = new HashMap<>();
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testModeStatsControlerListener() {
+	void testModeStatsControlerListener() {
 
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		final List<PlanElement> planElem = new ArrayList<PlanElement>();
@@ -436,30 +436,25 @@ public class ModeStatsControlerListenerTest {
 							: 0;
 					double othervalue = (other > 0) ? Double.parseDouble(column[other]) : 0;
 					double ridevalue = (ride > 0) ? Double.parseDouble(column[ride]) : 0;
-					Assert.assertEquals("car mode has an unexpected score",
-							(modes.get(TransportMode.car).doubleValue() / totalTrips), carvalue, 0);
-					Assert.assertEquals("walk mode has an unexpected score",
-							(modes.get(TransportMode.walk).doubleValue() / totalTrips), walkvalue, 0);
-					Assert.assertEquals("pt mode has an unexpected score",
-							(modes.get(TransportMode.pt).doubleValue() / totalTrips), ptvalue, 0);
-					Assert.assertEquals("bike mode has an unexpected score",
-							(modes.get(TransportMode.bike).doubleValue() / totalTrips), bikevalue, 0);
-					Assert.assertEquals("non_network_walk mode has an unexpected score",
-							(modes.get(TransportMode.non_network_walk).doubleValue() / totalTrips),
-							non_network_walkvalue, 0);
-					Assert.assertEquals("other mode has an unexpected score",
-							(modes.get(TransportMode.other).doubleValue() / totalTrips), othervalue, 0);
-					Assert.assertEquals("ride mode has an unexpected score",
-							(modes.get(TransportMode.ride).doubleValue() / totalTrips), ridevalue, 0);
+					Assertions.assertEquals((modes.get(TransportMode.car).doubleValue() / totalTrips), carvalue, 0, "car mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.walk).doubleValue() / totalTrips), walkvalue, 0, "walk mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.pt).doubleValue() / totalTrips), ptvalue, 0, "pt mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.bike).doubleValue() / totalTrips), bikevalue, 0, "bike mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.non_network_walk).doubleValue() / totalTrips),
+							non_network_walkvalue, 0, "non_network_walk mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.other).doubleValue() / totalTrips), othervalue, 0, "other mode has an unexpected score");
+					Assertions.assertEquals((modes.get(TransportMode.ride).doubleValue() / totalTrips), ridevalue, 0, "ride mode has an unexpected score");
 
-					Assert.assertEquals("sum of the scores of all  modes in not equal to 1", 1.0,
+					Assertions.assertEquals(1.0,
 							carvalue + walkvalue + ptvalue + bikevalue + non_network_walkvalue + othervalue + ridevalue,
-							0.01);
+							0.01,
+							"sum of the scores of all  modes in not equal to 1");
 
 					break;
 				}
 				iteration++;
 			}
+			Assertions.assertEquals(itr, iteration);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

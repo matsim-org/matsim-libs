@@ -97,6 +97,13 @@ import org.matsim.core.utils.io.IOUtils;
 		public void run()  {
 			var processBuilder = new ProcessBuilder();
 			processBuilder.environment().put("MATSIM_GUI", "true"); // add "MATSIM_GUI" to the inherited vars
+
+			// Copy the MATSIM_GUI_ARGS environment variable to the process environment
+			// these arguments may be used internally by the matsim scenario
+			if (System.getProperty("MATSIM_GUI_ARGS") != null) {
+				processBuilder.environment().put("MATSIM_GUI_ARGS", System.getProperty("MATSIM_GUI_ARGS"));
+			}
+
 			if (workingDirectory != null) {
 				processBuilder.directory(new File(workingDirectory));
 			}
@@ -138,7 +145,7 @@ import org.matsim.core.utils.io.IOUtils;
 					log.info("got interrupted while waiting for errorHandler to die.", e);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("problem running executable.", e);
 				this.erg = -2;
 			}
 		}
@@ -170,8 +177,7 @@ import org.matsim.core.utils.io.IOUtils;
 					}
 				}
 			} catch (IOException e) {
-				log.info("StreamHandler got interrupted");
-				e.printStackTrace();
+				log.info("StreamHandler got interrupted", e);
 			}
 		}
 	}

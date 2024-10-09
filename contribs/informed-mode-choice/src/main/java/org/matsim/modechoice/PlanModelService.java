@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 public final class PlanModelService implements StartupListener {
 
 	@Inject
-	private Map<String, LegEstimator<?>> legEstimators;
+	private Map<String, LegEstimator> legEstimators;
 
 	@Inject
-	private Map<String, TripEstimator<?>> tripEstimator;
+	private Map<String, TripEstimator> tripEstimator;
 
 	@Inject
 	private Set<TripConstraint<?>> constraints;
@@ -49,10 +49,10 @@ public final class PlanModelService implements StartupListener {
 	private ControlerListenerManager controlerListenerManager;
 
 	private final InformedModeChoiceConfigGroup config;
-	private final Map<String, ModeOptions<?>> options;
+	private final Map<String, ModeOptions> options;
 
 	@Inject
-	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
+	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions> options) {
 		this.config = config;
 		this.options = options;
 
@@ -92,14 +92,14 @@ public final class PlanModelService implements StartupListener {
 
 		for (String mode : config.getModes()) {
 
-			ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode);
+			ModeOptions t = this.options.get(mode);
 
-			List<Enum<?>> modeOptions = t.get(planModel.getPerson());
+			List<ModeAvailability> modeOptions = t.get(planModel.getPerson());
 
 			List<ModeEstimate> c = new ArrayList<>();
 
-			for (Enum<?> modeOption : modeOptions) {
-				TripEstimator<Enum<?>> te = (TripEstimator<Enum<?>>) tripEstimator.get(mode);
+			for (ModeAvailability modeOption : modeOptions) {
+				TripEstimator te = tripEstimator.get(mode);
 
 				boolean usable = t.allowUsage(modeOption);
 
@@ -123,7 +123,7 @@ public final class PlanModelService implements StartupListener {
 	/**
 	 * Return the modes an estimator was registered for.
 	 */
-	public List<String> modesForEstimator(LegEstimator<?> est) {
+	public List<String> modesForEstimator(LegEstimator est) {
 		return legEstimators.entrySet().stream().filter(e -> e.getValue().equals(est))
 				.map(Map.Entry::getKey)
 				.distinct()
@@ -139,10 +139,10 @@ public final class PlanModelService implements StartupListener {
 
 		for (String mode : config.getModes()) {
 
-			ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode);
-			List<Enum<?>> modeOptions = t.get(planModel.getPerson());
+			ModeOptions t = this.options.get(mode);
+			List<ModeAvailability> modeOptions = t.get(planModel.getPerson());
 
-			for (Enum<?> modeOption : modeOptions) {
+			for (ModeAvailability modeOption : modeOptions) {
 				boolean usable = t.allowUsage(modeOption);
 
 				if (usable) {
@@ -157,6 +157,7 @@ public final class PlanModelService implements StartupListener {
 	/**
 	 * Calculate the estimates for all options. Note that plan model has to be routed before computing estimates.
 	 */
+	@SuppressWarnings("rawtypes")
 	public void calculateEstimates(EstimatorContext context, PlanModel planModel) {
 
 		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
@@ -180,7 +181,7 @@ public final class PlanModelService implements StartupListener {
 						continue;
 					}
 
-					TripEstimator<Enum<?>> tripEst = (TripEstimator<Enum<?>>) tripEstimator.get(c.getMode());
+					TripEstimator tripEst =  tripEstimator.get(c.getMode());
 
 					// some options may produce equivalent results, but are re-estimated
 					// however, the more expensive computation is routing and only done once
@@ -208,7 +209,7 @@ public final class PlanModelService implements StartupListener {
 						if (tripEst != null && legMode.equals(c.getMode()))
 							continue;
 
-						LegEstimator<Enum<?>> legEst = (LegEstimator<Enum<?>>) legEstimators.get(legMode);
+						LegEstimator legEst = legEstimators.get(legMode);
 
 						if (legEst == null)
 							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);
@@ -264,7 +265,7 @@ public final class PlanModelService implements StartupListener {
 	/**
 	 * Return the trip estimator for one specific mode.
 	 */
-	public TripEstimator<?> getTripEstimator(String mode) {
+	public TripEstimator getTripEstimator(String mode) {
 		return tripEstimator.get(mode);
 	}
 

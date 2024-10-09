@@ -1,13 +1,13 @@
 package org.matsim.application.options;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.assertj.core.data.Offset;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,73 +19,113 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShpOptionsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void readZip() {
+	void readZip() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
 				.replace("ShpOptionsTest", "CreateLandUseShpTest")
 				.replace("options", "prepare"))
-				.resolve("andorra-latest-free.shp.zip");
+			.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
 		List<SimpleFeature> ft = shp.readFeatures();
 
 		assertThat(ft)
-				.isNotEmpty();
+			.isNotEmpty();
 
 	}
 
 	@Test
-	public void all() {
+	void get() {
+
+		Path input = Path.of(utils.getClassInputDirectory()
+				.replace("ShpOptionsTest", "CreateLandUseShpTest")
+				.replace("options", "prepare"))
+			.resolve("andorra-latest-free.shp.zip");
+
+		Assumptions.assumeTrue(Files.exists(input));
+
+		ShpOptions shp = new ShpOptions(input, null, null);
+
+		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "name");
+
+		SimpleFeature result = index.queryFeature(new Coord(1.5333461, 42.555388));
+
+		assertThat(result)
+			.isNotNull();
+
+		String name = index.query(new Coord(1.5333461, 42.555388));
+		assertThat(name)
+			.isEqualTo("Museu de la Miniatura");
+	}
+
+	@Test
+	void all() {
 
 		// use same shape file as for land-use
 		Path input = Path.of(utils.getClassInputDirectory()
 				.replace("ShpOptionsTest", "CreateLandUseShpTest")
 				.replace("options", "prepare"))
-				.resolve("andorra-latest-free.shp.zip");
+			.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 
 		ShpOptions.Index index = shp.createIndex(shp.getShapeCrs(), "_");
 
-		List<SimpleFeature> ft = index.getAll();
+		List<SimpleFeature> ft = index.getAllFeatures();
 
 		assertThat(ft)
-				.hasSize(578)
-				.hasSize(Set.copyOf(ft).size());
+			.hasSize(4906)
+			.hasSize(Set.copyOf(ft).size());
+
+		assertThat(shp.readFeatures())
+			.hasSameElementsAs(ft);
 
 	}
 
 	@Test
-	public void testGetGeometry() {
+	void testGetGeometry() {
 
 		Path input = Path.of(utils.getClassInputDirectory()
-						.replace("ShpOptionsTest", "CreateLandUseShpTest")
-						.replace("options", "prepare"))
-				.resolve("andorra-latest-free.shp.zip");
+				.replace("ShpOptionsTest", "CreateLandUseShpTest")
+				.replace("options", "prepare"))
+			.resolve("andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+		Assumptions.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
-		Geometry geometry = shp.getGeometry() ;
-		Geometry expectedGeometry = new GeometryFactory().createEmpty(2);
+		Geometry geometry = shp.getGeometry();
+
+		assertThat(geometry.getArea())
+			.isCloseTo(1.9847543618489646E-4, Offset.offset(1e-8));
+
+	}
+
+	@Test
+	void gpkg() {
+
+		Path path = Path.of(utils.getPackageInputDirectory(), "example.gpkg");
+
+		ShpOptions shp = ShpOptions.ofLayer(path.toString(), null);
 
 		List<SimpleFeature> features = shp.readFeatures();
 
-		for(SimpleFeature feature : features) {
-			Geometry geometryToJoin = (Geometry) feature.getDefaultGeometry();
-			expectedGeometry = expectedGeometry.union(geometryToJoin);
-		}
+		assertThat(features)
+			.hasSize(3);
 
-		Assert.assertTrue(geometry.equals(expectedGeometry));
+		ShpOptions.Index index = shp.createIndex("_");
+
+		assertThat(index.size())
+			.isEqualTo(3);
+
 	}
 }

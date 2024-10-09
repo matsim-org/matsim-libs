@@ -10,9 +10,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.simwrapper.ComponentMixin;
 import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.plotly.components.Line;
@@ -28,8 +28,8 @@ import java.io.IOException;
 
 public class PlotlyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private ObjectWriter writer;
 
@@ -48,13 +48,13 @@ public class PlotlyTest {
 		return mapper.writerFor(Plotly.class);
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = createWriter();
 	}
 
 	@Test
-	public void inline() throws IOException {
+	void inline() throws IOException {
 
 		Object[] x = {"sheep", "cows", "fish", "tree sloths"};
 		double[] y = {1, 4, 9, 16};
@@ -73,7 +73,7 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void data() throws IOException {
+	void data() throws IOException {
 
 		ScatterTrace.ScatterBuilder trace = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 				.text(Plotly.TEXT_INPUT)
@@ -98,7 +98,7 @@ public class PlotlyTest {
 	}
 
 	@Test
-	public void multiple() throws IOException {
+	void multiple() throws IOException {
 
 
 		ScatterTrace scatter = ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)

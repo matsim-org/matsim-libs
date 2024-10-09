@@ -29,8 +29,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * 
- * After creating a config file with 
+ *
+ * After creating a config file with
  * {@link CreateEmissionConfig CreateEmissionConfig}
  * this class runs a simulation and calculates emissions online.
  * Results are written into events file (including emission events) for some iterations (as specified by the config).
@@ -55,23 +55,6 @@ public final class RunDetailedEmissionToolOnlineExample {
 		return config;
 	}
 
-	public static Scenario prepareScenario( Config config ) {
-		Scenario scenario = ScenarioUtils.loadScenario( config );
-
-		//load emissions config
-//		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
-//		URL context = scenario.getConfig().getContext();
-//		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
-
-		//add Hbefa mappings to the network
-//		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
-//		vhtm.addHbefaMappings(scenario.getNetwork());
-		
-		// no need for the mapping file; hbefa mappings were directly written into the link attributes. ihab nov '18
-
-		return scenario ;
-	}
-
 	public static void run( Scenario scenario, AbstractModule... modules ) {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -87,7 +70,8 @@ public final class RunDetailedEmissionToolOnlineExample {
 	}
 	public static void main(String[] args) {
 		Config config = prepareConfig( args ) ;
-		Scenario scenario = prepareScenario( config ) ;
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		run( scenario ) ;
 	}
 

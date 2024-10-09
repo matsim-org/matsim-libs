@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -53,7 +53,7 @@ public class CourtesyEventsTest {
 	public static final String TYPE = "type";
 
 	@Test
-	public void testFullOverlap() {
+	void testFullOverlap() {
 
 		testEvents( 4,
 				// 1:|------------------|
@@ -85,7 +85,7 @@ public class CourtesyEventsTest {
 	}
 
 	@Test
-	public void testPartialOverlap() {
+	void testPartialOverlap() {
 		testEvents( 4,
 				// 1:|------------------|
 				// 2:      |-------------------|
@@ -116,7 +116,7 @@ public class CourtesyEventsTest {
 	}
 
 	@Test
-	public void testNoOverlap() {
+	void testNoOverlap() {
 		testEvents( 0,
 				// 1:|-----|
 				// 2:            |------------|
@@ -147,7 +147,7 @@ public class CourtesyEventsTest {
 	}
 
 	@Test
-	public void testStartTogether() {
+	void testStartTogether() {
 		testEvents( 4,
 				// 1:|-----|
 				// 2:|------------------------|
@@ -178,7 +178,7 @@ public class CourtesyEventsTest {
 	}
 
 	@Test
-	public void testEndTogether() {
+	void testEndTogether() {
 		testEvents( 4,
 				// 1:|------------------------|
 				// 2:            |------------|
@@ -241,10 +241,10 @@ public class CourtesyEventsTest {
 
 		eventManager.finishProcessing();
 
-		Assert.assertEquals(
-				"wrong number of events in "+collected,
+		Assertions.assertEquals(
 				expectedCourtesy,
-				collected.size() );
+				collected.size(),
+				"wrong number of events in "+collected );
 	}
 }
 

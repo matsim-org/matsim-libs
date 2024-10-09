@@ -20,9 +20,9 @@
 
 package org.matsim.integration.replanning;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -46,8 +46,8 @@ import java.net.MalformedURLException;
  */
 public class ResumableRunsIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Runs a first simulation for 11 iteration, then restarts at iteration 10.
@@ -56,7 +56,7 @@ public class ResumableRunsIT {
 	 * re-planning, which both could depend on random numbers.
 	 */
 	@Test
-	public void testResumableRuns() throws MalformedURLException {
+	void testResumableRuns() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(11);
 		config.controller().setWriteEventsInterval(1);
@@ -89,15 +89,15 @@ public class ResumableRunsIT {
 		// comparison
 		long cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
 		long cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
-		Assert.assertEquals("Plans must not be altered just be reading in and writing out again.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "Plans must not be altered just be reading in and writing out again.");
 
 		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.events.xml.gz");
 		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.events.xml.gz");
-		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same when resuming runs.");
 
 		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.11/11.events.xml.gz");
 		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.11/11.events.xml.gz");
-		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		Assertions.assertEquals(cksum1, cksum2, "The checksums of events must be the same when resuming runs.");
 	}
 
 }

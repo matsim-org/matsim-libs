@@ -21,12 +21,10 @@ package org.matsim.examples.simple;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -41,7 +39,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -50,25 +47,17 @@ import org.matsim.testcases.utils.EventsCollector;
  *
  */
 
-@RunWith(Parameterized.class)
 public class PtScoringTest {
 
-	@Parameter
-	public TypicalDurationScoreComputation typicalDurationScoreComputation;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	 @Parameterized.Parameters
-	 public static Object[] testParameters() {
-	      return new Object[] {TypicalDurationScoreComputation.relative, TypicalDurationScoreComputation.uniform};
-	  }
-
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Test
-	public void test_PtScoringLineswitch() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void test_PtScoringLineswitch(TypicalDurationScoreComputation typicalDurationScoreComputation) {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams params : pcs.getActivityParams()){
 				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
 			}
@@ -205,22 +194,24 @@ public class PtScoringTest {
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
 
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(-21.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+			if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+				Assertions.assertEquals(-21.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(27.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(27.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 		}
 
 	}
-	@Test
-	public void test_PtScoringLineswitchAndPtConstant() {
+
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void test_PtScoringLineswitchAndPtConstant(TypicalDurationScoreComputation typicalDurationScoreComputation) {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
+		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
 			for(ActivityParams params : pcs.getActivityParams()){
 				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
 		}
@@ -359,23 +350,25 @@ public class PtScoringTest {
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
 
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+			if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 //				Assert.assertEquals(89.14608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-				Assert.assertEquals(-19.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(-19.280962467387187, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(29.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(29.468448990195423, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 		}
 
 	}
-	@Test
-	public void test_PtScoring_Wait() {
+
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void test_PtScoring_Wait(TypicalDurationScoreComputation typicalDurationScoreComputation) {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring();
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams params : pcs.getActivityParams()){
 				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
 			}
@@ -446,22 +439,23 @@ public class PtScoringTest {
 
 			System.out.println("agent score: " + pp.getSelectedPlan().getScore() ) ;
 
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.13108279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+			if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+				Assertions.assertEquals(89.13108279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(137.1310827971504, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(137.1310827971504, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 		}
 
 	}
 
-	@Test
-	public void test_PtScoring() {
+	@ParameterizedTest
+	@EnumSource(TypicalDurationScoreComputation.class)
+	void test_PtScoring(TypicalDurationScoreComputation typicalDurationScoreComputation) {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		ScoringConfigGroup pcs = config.scoring() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
+		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
 		for(ActivityParams params : pcs.getActivityParams()){
 			params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
 		}
@@ -528,11 +522,11 @@ public class PtScoringTest {
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
 
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.87441613048377, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+			if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
+				Assertions.assertEquals(89.87441613048377, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 			else{
-				Assert.assertEquals(137.87441613048375, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				Assertions.assertEquals(137.87441613048375, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 

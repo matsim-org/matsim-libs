@@ -7,6 +7,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -48,6 +49,10 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		this.builder = builder;
 	}
 
+	public static Builder newBuilder() {
+		return new Builder();
+	}
+
 	@Override
 	public void install() {
 
@@ -80,7 +85,12 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		MapBinder<String, CandidatePruner> pBinder = MapBinder.newMapBinder(binder(), String.class, CandidatePruner.class);
 		for (Map.Entry<String, CandidatePruner> e : builder.pruner.entrySet()) {
-			pBinder.addBinding(e.getKey()).toInstance(e.getValue());
+			CandidatePruner instance = e.getValue();
+
+			pBinder.addBinding(e.getKey()).toInstance(instance);
+
+			if (instance instanceof ControlerListener cl)
+				addControlerListenerBinding().toInstance(cl);
 		}
 
 		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
@@ -131,20 +141,16 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		}
 	}
 
-	public static Builder newBuilder() {
-		return new Builder();
-	}
-
 	/**
 	 * Builder to configure the module.
 	 */
 	public static final class Builder {
 
-		private final Map<String, Class<? extends FixedCostsEstimator<?>>> fixedCosts = new HashMap<>();
-		private final Map<String, Class<? extends LegEstimator<?>>> legEstimators = new HashMap<>();
-		private final Map<String, Class<? extends TripEstimator<?>>> tripEstimators = new HashMap<>();
+		private final Map<String, Class<? extends FixedCostsEstimator>> fixedCosts = new HashMap<>();
+		private final Map<String, Class<? extends LegEstimator>> legEstimators = new HashMap<>();
+		private final Map<String, Class<? extends TripEstimator>> tripEstimators = new HashMap<>();
 
-		private final Map<String, Class<? extends ModeOptions<?>>> options = new HashMap<>();
+		private final Map<String, Class<? extends ModeOptions>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
 
@@ -155,7 +161,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a fixed cost to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withFixedCosts(Class<? extends FixedCostsEstimator<T>> estimator, String... modes) {
+		public Builder withFixedCosts(Class<? extends FixedCostsEstimator> estimator, String... modes) {
 
 			for (String mode : modes) {
 				fixedCosts.put(mode, estimator);
@@ -167,8 +173,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link LegEstimator} to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
-		                                                    String... modes) {
+		public Builder withLegEstimator(Class<? extends LegEstimator> estimator, Class<? extends ModeOptions> option,
+															String... modes) {
 
 			for (String mode : modes) {
 
@@ -187,8 +193,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link TripEstimator} to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withTripEstimator(Class<? extends TripEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
-		                                                     String... modes) {
+		public Builder withTripEstimator(Class<? extends TripEstimator> estimator, Class<? extends ModeOptions> option,
+															 String... modes) {
 
 			for (String mode : modes) {
 

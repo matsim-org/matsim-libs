@@ -1,7 +1,7 @@
 package org.matsim.core.config;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 public class ConfigReaderMatsimV2Test {
 
 	@Test
-	public void testModuleNameAlias() {
+	void testModuleNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -33,11 +33,11 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theController", ControllerConfigGroup.GROUP_NAME);
 		r2.readStream(bais);
 
-		Assert.assertEquals(27, config.controller().getLastIteration());
+		Assertions.assertEquals(27, config.controller().getLastIteration());
 	}
 
 	@Test
-	public void testModuleNameAlias_noOldModules() {
+	void testModuleNameAlias_noOldModules() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -54,12 +54,12 @@ public class ConfigReaderMatsimV2Test {
 
 		r2.readStream(bais);
 
-		Assert.assertEquals(27, config.controller().getLastIteration());
-		Assert.assertNull(config.getModules().get("controler"));
+		Assertions.assertEquals(27, config.controller().getLastIteration());
+		Assertions.assertNull(config.getModules().get("controler"));
 	}
 
 	@Test
-	public void testParamNameAlias() {
+	void testParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -77,11 +77,11 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controller().getLastIteration());
+		Assertions.assertEquals(23, config.controller().getLastIteration());
 	}
 
 	@Test
-	public void testModuleAndParamNameAlias() {
+	void testModuleAndParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -100,14 +100,14 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controller().getLastIteration());
+		Assertions.assertEquals(23, config.controller().getLastIteration());
 	}
 
 	/**
 	 * Test that a parameter can be renamed inside a renamed module.
 	 */
 	@Test
-	public void testConditionalParamNameAliasWithModuleRenaming() {
+	void testConditionalParamNameAliasWithModuleRenaming() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -132,8 +132,8 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("input", "inputPlansFile", "plans");
 		r2.readStream(bais);
 
-		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
-		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+		Assertions.assertEquals("my_network.xml.gz", config.network().getInputFile());
+		Assertions.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class ConfigReaderMatsimV2Test {
 	 * different parameter names depending on in which module they are in.
 	 */
 	@Test
-	public void testConditionalParamNameAlias() {
+	void testConditionalParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -163,15 +163,15 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("input", "inputPlansFile", "plans");
 		r2.readStream(bais);
 
-		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
-		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+		Assertions.assertEquals("my_network.xml.gz", config.network().getInputFile());
+		Assertions.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 	}
 
 	/**
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias2() {
+	void testConditionalParamNameAlias2() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -192,15 +192,15 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("inputNetworkFile", "inputPlansFile", "plans");
 		r2.readStream(bais);
 
-		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
-		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+		Assertions.assertEquals("my_network.xml.gz", config.network().getInputFile());
+		Assertions.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 	}
 
 	/**
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias3() {
+	void testConditionalParamNameAlias3() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -218,14 +218,14 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("inputPlansFile", "input", "inexistant");
 		r2.readStream(bais); // if the alias were matched, it should produce an exception, as "input" is not known
 
-		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+		Assertions.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 	}
 
 	/**
 	 * Test that an alias only matches if its path also matches.
 	 */
 	@Test
-	public void testConditionalParamNameAlias4() {
+	void testConditionalParamNameAlias4() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -243,7 +243,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("inputPlansFile", "input", "plans", "inexistant");
 		r2.readStream(bais); // if the alias were matched, it should produce an exception, as "input" is not known
 
-		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
+		Assertions.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 
 	}
 
@@ -251,7 +251,7 @@ public class ConfigReaderMatsimV2Test {
 	 * Test that an alias also matches in nested parameter sets.
 	 */
 	@Test
-	public void testAliasWithParamSets() {
+	void testAliasWithParamSets() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
 
@@ -289,7 +289,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theMode", "mode", "scoring", "scoringParameters", "modeParams");
 		r2.readStream(bais);
 
-		Assert.assertEquals(-5.6, config.scoring().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
-		Assert.assertEquals(-8.7, config.scoring().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
+		Assertions.assertEquals(-5.6, config.scoring().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
+		Assertions.assertEquals(-8.7, config.scoring().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
 	}
 }

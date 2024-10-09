@@ -47,7 +47,7 @@ import java.util.Random;
 final class FreightScenarioCreator {
 
     static int agentCounter = 1;
-    static Random random = new Random(Long.MAX_VALUE);
+    static final Random random = new Random(Long.MAX_VALUE);
 
     public static void main(String[] args) {
 

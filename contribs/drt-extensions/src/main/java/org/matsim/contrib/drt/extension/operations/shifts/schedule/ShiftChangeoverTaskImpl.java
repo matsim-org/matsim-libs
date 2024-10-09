@@ -1,5 +1,9 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
@@ -10,10 +14,6 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
-
-import java.util.Map;
-
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 /**
  * A task representing stopping and waiting for a new shift.
@@ -63,6 +63,16 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	@Override
 	public void addPickupRequest(AcceptedDrtRequest request) {
 		delegate.addPickupRequest(request);
+	}
+
+	@Override
+	public void removePickupRequest(Id<Request> requestId) {
+		delegate.removePickupRequest(requestId);
+	}
+
+	@Override
+	public void removeDropoffRequest(Id<Request> requestId) {
+		delegate.removeDropoffRequest(requestId);
 	}
 }
 

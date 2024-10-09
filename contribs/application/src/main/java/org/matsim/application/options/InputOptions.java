@@ -113,6 +113,10 @@ public final class InputOptions {
 		return NetworkUtils.readNetwork(networkPath);
 	}
 
+	public String getNetworkPath() {
+		return networkPath;
+	}
+
 	public Population getPopulation() {
 		if (!spec.requirePopulation())
 			throw new IllegalArgumentException("Population can not be accessed unless, requirePopulation=true.");

@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -50,11 +50,11 @@ public class IterationTravelStatsControlerListenerTest {
 	private int first_act_y;
 	private int first_act_type;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControlerListener() {
 
 		Plans plans = new Plans();
 
@@ -81,13 +81,13 @@ public class IterationTravelStatsControlerListenerTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));;
+		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		person1.addPlan(plan1);
-		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));;
+		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
 		person2.addPlan(plan2);
-		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));;
+		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
 		person3.addPlan(plan3);
-		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));;
+		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));
 		person4.addPlan(plan4);
 
 		scenario.getPopulation().addPerson(person1);
@@ -149,12 +149,14 @@ public class IterationTravelStatsControlerListenerTest {
 					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
 					Activity firstActivity = identifyFirstActivity(personInScenario);
 
-					Assert.assertEquals("wrong score", personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("x coordinate does not match", firstActivity.getCoord().getX(), x,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("y coordinate does not match", firstActivity.getCoord().getY(), y,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("type of first activity does not match", firstActivity.getType(), column[first_act_type]);
+					Assertions.assertEquals(personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON, "wrong score");
+					Assertions.assertEquals(firstActivity.getCoord().getX(), x,
+							MatsimTestUtils.EPSILON,
+							"x coordinate does not match");
+					Assertions.assertEquals(firstActivity.getCoord().getY(), y,
+							MatsimTestUtils.EPSILON,
+							"y coordinate does not match");
+					Assertions.assertEquals(firstActivity.getType(), column[first_act_type], "type of first activity does not match");
 
 					break;
 			}

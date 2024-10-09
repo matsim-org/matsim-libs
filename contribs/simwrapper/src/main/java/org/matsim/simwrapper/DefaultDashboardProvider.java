@@ -1,6 +1,7 @@
 package org.matsim.simwrapper;
 
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.dashboard.*;
@@ -18,17 +19,26 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		List<Dashboard> result = new ArrayList<>(List.of(
 			new OverviewDashboard(),
 			new TripDashboard(),
-			new TrafficDashboard(),
-			new StuckAgentDashboard()
+			new TrafficDashboard()
 		));
+
+		if (config.transit().isUseTransit()) {
+			result.add(new PublicTransitDashboard());
+		}
 
 		if (config.counts().getCountsFileName() != null) {
 			result.add(new TrafficCountsDashboard());
 		}
 
 		if (ConfigUtils.hasModule(config, EmissionsConfigGroup.class)) {
-			result.add(new EmissionsDashboard());
+			result.add(new EmissionsDashboard(config.global().getCoordinateSystem()));
 		}
+
+		if (ConfigUtils.hasModule(config, NoiseConfigGroup.class)) {
+			result.add(new NoiseDashboard(config.global().getCoordinateSystem()));
+		}
+
+		result.add(new StuckAgentDashboard());
 
 		return result;
 	}

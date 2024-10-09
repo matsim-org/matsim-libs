@@ -20,17 +20,15 @@
  * *********************************************************************** */
 
  package org.matsim.core.mobsim.qsim.components.guice;
-
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-/**
+	/**
  * This test shows that Guice creates Singletons solely based on the *class
  * name*. So as shown in the example one can bind the same class to different
  * interfaces, even with different names. If the class is declared in the
@@ -47,8 +45,8 @@ public class MultipleBindingsTest {
 
 	}
 
-	@Test
-	public void testGuiceComponentNaming() {
+	 @Test
+	 void testGuiceComponentNaming() {
 		Injector injector = Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -61,6 +59,6 @@ public class MultipleBindingsTest {
 		InterfaceA implA = injector.getInstance(Key.get(InterfaceA.class, Names.named("abc1")));
 		InterfaceB implB = injector.getInstance(Key.get(InterfaceB.class, Names.named("abc2")));
 
-		Assert.assertSame(implA, implB);
+		Assertions.assertSame(implA, implB);
 	}
 }

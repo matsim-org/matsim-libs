@@ -1,8 +1,8 @@
 package org.matsim.application;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.analysis.TestDependentAnalysis;
 import org.matsim.application.analysis.TestOtherAnalysis;
 import org.matsim.application.analysis.TestOtherDependentAnalysis;
@@ -12,11 +12,11 @@ import java.nio.file.Path;
 
 public class CommandRunnerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void runner() {
+	void runner() {
 
 		Path path = Path.of(utils.getOutputDirectory());
 

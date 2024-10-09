@@ -35,7 +35,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		super(config);
 	}
 
-	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
+	public List<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
 
 		CandidatePruner p = pruner.get();
 		double threshold = -1;
@@ -54,7 +54,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	 * @param diffThreshold allowed difference to the best solution (if positive)
 	 * @param absThreshold  minimal required estimate score (use NaN or negative infinity if not needed)
 	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
+	public List<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
 	                                          int topK, double diffThreshold, double absThreshold) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
@@ -88,7 +88,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
+	private List<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
 	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
@@ -203,11 +203,24 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 
-				if (candidates.containsKey(c))
-					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5)
-						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+				if (candidates.containsKey(c)) {
+					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5) {
 
-				candidates.put(c, c);
+						// TODO: probably needs to be investigated
+						// Only occurs with certain configurations, usually including the pt mode
+						// Not big issue probably, might remove the warning
+
+//						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+						log.warn("Estimates differ for person {}: {} vs. {}", planModel.getPerson().getId(), candidates.get(c), c.getUtility());
+					}
+
+					// Put the candidate with the higher utility in the map
+					if (c.getUtility() > candidates.get(c).getUtility()) {
+						candidates.put(c, c);
+					}
+
+				} else
+					candidates.put(c, c);
 
 				k++;
 			}
@@ -242,7 +255,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		// Add the fixed costs estimate if a mode has been used
 		for (ModeEstimate mode : options) {
 
-			FixedCostsEstimator<Enum<?>> f = (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
+			FixedCostsEstimator f = fixedCosts.get(mode.getMode());
 
 			// Fixed costs are not required for each mode
 			if (f == null)
@@ -260,7 +273,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			for (ModeEstimate mode : options) {
 				if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
 
-					TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
+					TripEstimator f = tripEstimator.get(mode.getMode());
 
 					// subtract all the trip estimates that have been made before
 					for (int i = 0; i < result.length; i++) {

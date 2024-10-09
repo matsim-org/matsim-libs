@@ -21,15 +21,16 @@
 
 package org.matsim.freight.carriers.controler;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -43,7 +44,7 @@ public class EquilWithCarrierWithPersonsIT {
 
 	private Controler controler;
 
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	static Config commonConfig( MatsimTestUtils testUtils ) {
 		Config config = ConfigUtils.createConfig();
@@ -57,10 +58,12 @@ public class EquilWithCarrierWithPersonsIT {
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
 
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 		return config;
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp(){
 		Config config = commonConfig( testUtils );
 
@@ -86,7 +89,7 @@ public class EquilWithCarrierWithPersonsIT {
 	}
 
 	@Test
-	public void testScoringInMeters(){
+	void testScoringInMeters(){
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -98,10 +101,10 @@ public class EquilWithCarrierWithPersonsIT {
 		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
-		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
 
 		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 	}
 
 }

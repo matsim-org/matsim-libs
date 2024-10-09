@@ -21,19 +21,17 @@
 
  package org.matsim.utils.objectattributes.attributable;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * @author thibautd
  */
 public class AttributesTest {
-	@Test
-	public void testInsertion() {
+	 @Test
+	 void testInsertion() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -41,28 +39,27 @@ public class AttributesTest {
 		attributes.putAttribute( "the answer" , 42 );
 		attributes.putAttribute( "1 the begin" , 1L );
 
-		Assert.assertEquals( "unexpected number of elements in "+attributes ,
-				4 , attributes.size() );
+		Assertions.assertEquals( 4 , attributes.size(), "unexpected number of elements in "+attributes );
 
-		Assert.assertEquals( "unexpected value " ,
-				"nice" ,
-				attributes.getAttribute( "sun" ) );
+		Assertions.assertEquals( "nice" ,
+				attributes.getAttribute( "sun" ),
+				"unexpected value " );
 
-		Assert.assertEquals( "unexpected value " ,
-				false ,
-				attributes.getAttribute( "rain is nice" ) );
+		Assertions.assertEquals( false ,
+				attributes.getAttribute( "rain is nice" ),
+				"unexpected value " );
 
-		Assert.assertEquals( "unexpected value " ,
-				42 ,
-				attributes.getAttribute( "the answer" ) );
+		Assertions.assertEquals( 42 ,
+				attributes.getAttribute( "the answer" ),
+				"unexpected value " );
 
-		Assert.assertEquals( "unexpected value " ,
-				1L ,
-				attributes.getAttribute( "1 the begin" ) );
+		Assertions.assertEquals( 1L ,
+				attributes.getAttribute( "1 the begin" ),
+				"unexpected value " );
 	}
 
-	@Test
-	public void testReplacement() {
+	 @Test
+	 void testReplacement() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -73,19 +70,17 @@ public class AttributesTest {
 		// that was wrong!
 		final Object wrong = attributes.putAttribute( "the answer" , 42 );
 
-		Assert.assertEquals( "unexpected number of elements in "+attributes ,
-				4 , attributes.size() );
+		Assertions.assertEquals( 4 , attributes.size(), "unexpected number of elements in "+attributes );
 
-		Assert.assertEquals( "unexpected replaced value " ,
-				7 , wrong );
+		Assertions.assertEquals( 7 , wrong, "unexpected replaced value " );
 
-		Assert.assertEquals( "unexpected value " ,
-				42 ,
-				attributes.getAttribute( "the answer" ) );
+		Assertions.assertEquals( 42 ,
+				attributes.getAttribute( "the answer" ),
+				"unexpected value " );
 	}
 
-	@Test
-	public void testRemoval() {
+	 @Test
+	 void testRemoval() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
@@ -96,33 +91,31 @@ public class AttributesTest {
 		// no need to store such a stupid statement
 		final Object wrong = attributes.removeAttribute( "rain is nice" );
 
-		Assert.assertEquals( "unexpected number of elements in "+attributes ,
-				3 , attributes.size() );
+		Assertions.assertEquals( 3 , attributes.size(), "unexpected number of elements in "+attributes );
 
-		Assert.assertEquals( "unexpected removed value " ,
-				false , wrong );
+		Assertions.assertEquals( false , wrong, "unexpected removed value " );
 
-		Assert.assertNull( "unexpected mapping " ,
-				attributes.getAttribute( "rain is nice" ) );
+		Assertions.assertNull( attributes.getAttribute( "rain is nice" ),
+				"unexpected mapping " );
 	}
 
-	@Test
-	public void testGetAsMap() {
+	 @Test
+	 void testGetAsMap() {
 		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
 
 		Map<String, Object> map = attributes.getAsMap();
-		Assert.assertEquals(2, map.size());
+		Assertions.assertEquals(2, map.size());
 
-		Assert.assertEquals("nice", map.get("sun"));
-		Assert.assertEquals(false, map.get("rain is nice"));
+		Assertions.assertEquals("nice", map.get("sun"));
+		Assertions.assertEquals(false, map.get("rain is nice"));
 
 		Iterator<Map.Entry<String, Object>> iter = map.entrySet().iterator();
 		boolean foundSun = false;
 		boolean foundRain = false;
-		Assert.assertTrue(iter.hasNext());
+		Assertions.assertTrue(iter.hasNext());
 		Map.Entry<String, Object> e = iter.next();
 		if (e.getKey().equals("sun") && e.getValue().equals("nice")) {
 			foundSun = true;
@@ -130,7 +123,7 @@ public class AttributesTest {
 		if (e.getKey().equals("rain is nice") && e.getValue().equals(false)) {
 			foundRain = true;
 		}
-		Assert.assertTrue(iter.hasNext());
+		Assertions.assertTrue(iter.hasNext());
 		e = iter.next();
 		if (e.getKey().equals("sun") && e.getValue().equals("nice")) {
 			foundSun = true;
@@ -138,19 +131,119 @@ public class AttributesTest {
 		if (e.getKey().equals("rain is nice") && e.getValue().equals(false)) {
 			foundRain = true;
 		}
-		Assert.assertFalse(iter.hasNext());
+		Assertions.assertFalse(iter.hasNext());
 
-		Assert.assertTrue(foundSun);
-		Assert.assertTrue(foundRain);
+		Assertions.assertTrue(foundSun);
+		Assertions.assertTrue(foundRain);
 
 		try {
 			iter.next();
-			Assert.fail("Expected NoSuchElementException, but got none.");
+			Assertions.fail("Expected NoSuchElementException, but got none.");
 		} catch (NoSuchElementException ignore) {
 			// expected
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			Assert.fail("Expected NoSuchElementException, but caught a different one.");
+			Assertions.fail("Expected NoSuchElementException, but caught a different one.");
 		}
 	}
+
+		@Test
+		void testComparison() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a1.putAttribute("att1", "1");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "1");
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			a2.putAttribute("att1", "one");
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+		}
+
+		@Test
+		void testComplexComparisonMap() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+
+			Map<Object, Object> map = new HashMap<>();
+			a1.putAttribute("map", map);
+			a2.putAttribute("map", map);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Map<Object, Object> map2 = new HashMap<>();
+			a2.putAttribute("map", map2);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Object o = new Object();
+			map.put(o, o);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			map2.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+
+			Map<Object, Object> recursiveMap = new HashMap<>();
+			map.put("recursiveMap", recursiveMap);
+			map2.put("recursiveMap", recursiveMap);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			recursiveMap.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Map<Object, Object> recursiveMap2 = new HashMap<>();
+			map2.put("recursiveMap", recursiveMap2);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			recursiveMap2.put(o, o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+		}
+
+		@Test
+		void testComplexComparisonList() {
+
+			AttributesImpl a1 = new AttributesImpl();
+			AttributesImpl a2 = new AttributesImpl();
+
+			List<Object> list= new ArrayList<>();
+			a1.putAttribute("list", list);
+			a2.putAttribute("list", list);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> list2 = new ArrayList<>();
+			a2.putAttribute("list", list2);
+
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			Object o = new Object();
+			list.add(o);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+
+			list2.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> recursiveList = new ArrayList<>();
+			list.add(recursiveList);
+			list2.add(recursiveList);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			recursiveList.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+
+			List<Object> recursiveList2 = new ArrayList<>();
+			list2.add(recursiveList2);
+			Assertions.assertFalse(AttributesComparison.equals(a1, a2));
+			list2.remove(recursiveList);
+
+			recursiveList2.add(o);
+			Assertions.assertTrue(AttributesComparison.equals(a1, a2));
+		}
 }

@@ -22,9 +22,7 @@ package org.matsim.contrib.drt.extension.preplanned.optimizer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -79,7 +77,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			TravelTime travelTime, TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory,
 			EventsManager eventsManager, Fleet fleet, ScheduleTimingUpdater scheduleTimingUpdater) {
 		Preconditions.checkArgument(
-				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
+				fleet.getVehicles().keySet().containsAll(preplannedSchedules.vehicleToPreplannedStops.keySet()),
 				"Some schedules are preplanned for vehicles outside the fleet");
 
 		this.mode = drtCfg.getMode();
@@ -118,7 +116,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 					"Pre-planned request (%s) not assigned to any vehicle and not marked as unassigned.",
 					preplannedRequest);
 			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
-					drtRequest.getPassengerId(), "Marked as unassigned"));
+					drtRequest.getPassengerIds(), "Marked as unassigned"));
 			return;
 		}
 
@@ -130,7 +128,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		//TODO in the current implementation we do not know the scheduled pickup and dropoff times
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), drtRequest.getMode(), drtRequest.getId(),
-						drtRequest.getPassengerId(), vehicleId, Double.NaN, Double.NaN));
+						drtRequest.getPassengerIds(), vehicleId, Double.NaN, Double.NaN));
 	}
 
 	@Override
@@ -176,17 +174,22 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
 
-			var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
-			if (nextStop.pickup) {
-				var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
-						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+			if(nextStop.preplannedRequest.key.passengerIds.isEmpty() && nonVisitedPreplannedStops.isEmpty()) {
+				var stayTask = taskFactory.createStayTask(vehicle, currentTime, vehicle.getServiceEndTime(), currentLink);
+				schedule.addTask(stayTask);
 			} else {
-				var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
-						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
+				if (nextStop.pickup) {
+					var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
+							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
+					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				} else {
+					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
+							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
+					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+				}
+				schedule.addTask(stopTask);
 			}
-			schedule.addTask(stopTask);
 		}
 
 		// switch to the next task and update currentTasks
@@ -203,7 +206,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 									  Map<PreplannedRequestKey, PreplannedRequest> unassignedRequests) {
 	}
 
-	public record PreplannedRequestKey(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
+	public record PreplannedRequestKey(Set<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId) {
 	}
 
 	// also input to the external optimiser
@@ -212,7 +215,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	}
 
 	static PreplannedRequest createFromRequest(DrtRequest request) {
-		return new PreplannedRequest(new PreplannedRequestKey(request.getPassengerId(), request.getFromLink().getId(),
+		return new PreplannedRequest(new PreplannedRequestKey(Set.copyOf(request.getPassengerIds()), request.getFromLink().getId(),
 				request.getToLink().getId()), request.getEarliestStartTime(), request.getLatestStartTime(),
 				request.getLatestArrivalTime());
 	}

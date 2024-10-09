@@ -1,7 +1,7 @@
 package org.matsim.contrib.sumo;
 
 import com.google.common.io.Resources;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URL;
@@ -9,8 +9,8 @@ import java.net.URL;
 public class SumoNetworkHandlerTest {
 
 
-    @Test
-    public void read() throws Exception {
+	@Test
+	void read() throws Exception {
 
         URL resource = Resources.getResource("osm.net.xml");
 

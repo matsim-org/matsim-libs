@@ -21,6 +21,9 @@
 package org.matsim.core.network;
 
 import java.util.*;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +39,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.algorithms.NetworkModeRestriction;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -51,6 +54,10 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = LogManager.getLogger(NetworkUtils.class);
+
+	private NetworkUtils() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	/**
 	 * This will create a time invariant network.
@@ -987,5 +994,56 @@ public final class NetworkUtils {
 
 		result.add(link.getToNode());
 		return result;
+	}
+
+	private static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
+
+	@Nullable
+	public static DisallowedNextLinks getDisallowedNextLinks(Link link) {
+		return (DisallowedNextLinks) link.getAttributes().getAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static DisallowedNextLinks getOrCreateDisallowedNextLinks(Link link) {
+		DisallowedNextLinks disallowedNextLinks = getDisallowedNextLinks(link);
+		if (disallowedNextLinks == null) {
+			disallowedNextLinks = new DisallowedNextLinks();
+			setDisallowedNextLinks(link, disallowedNextLinks);
+		}
+		return disallowedNextLinks;
+	}
+
+	public static void setDisallowedNextLinks(Link link, DisallowedNextLinks disallowedNextLinks) {
+		link.getAttributes().putAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE, disallowedNextLinks);
+	}
+
+	public static boolean addDisallowedNextLinks(Link link, String mode, List<Id<Link>> linkIds) {
+		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
+		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
+	}
+
+	public static void removeDisallowedNextLinks(Link link) {
+		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static void addAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.add(mode);
+		link.setAllowedModes(modes);
+	}
+
+	public static void removeAllowedMode(Link link, String mode) {
+		Set<String> modes = new HashSet<>(link.getAllowedModes());
+		modes.remove(mode);
+		link.setAllowedModes(modes);
+	}
+
+	/**
+	 * Removes the given modes from the links and runs the network cleaner afterwards. Thus, some more links may be restricted to keep the network consistent.
+	 * That means, each link can be reached from each other link.
+	 * @param network the network
+	 * @param modesToRemoveByLinkId map of modes that should be removed from the links
+	 */
+	public static void restrictModesAndCleanNetwork(Network network, Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
+		new NetworkModeRestriction(modesToRemoveByLinkId).run(network);
 	}
 }

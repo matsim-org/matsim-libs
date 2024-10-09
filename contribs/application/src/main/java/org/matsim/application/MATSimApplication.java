@@ -1,17 +1,10 @@
 package org.matsim.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.application.commands.RunScenario;
-import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigAliases;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -23,15 +16,12 @@ import picocli.AutoComplete;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -77,6 +67,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
 	private static final Logger log = LogManager.getLogger(MATSimApplication.class);
+
+	private static final String ARGS_DELIMITER = "§$";
 
 	public static final String COLOR = "@|bold,fg(81) ";
 	static final String DEFAULT_NAME = "MATSimApplication";
@@ -161,7 +153,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			config = loadConfig(Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString() );
+			String path = Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString();
+			List<ConfigGroup> customModules = getCustomModules();
+
+			final Config config1 = ConfigUtils.loadConfig(path, customModules.toArray(new ConfigGroup[0] ) );
+			Config prepared = prepareConfig( config1 );
+
+			config = prepared != null ? prepared : config1;
+			// (The above lines of code come from inlining so maybe it happened there: I cannot see how prepared could be null but config1 not except if user code returns null which I would consider a bug.  kai, aug'24)
 		} else {
 			Config tmp = prepareConfig(config);
 			config = tmp != null ? tmp : config;
@@ -170,7 +169,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Objects.requireNonNull(config);
 
 		if (specs != null)
-			applySpecs(config, specs);
+			ApplicationUtils.applyConfigUpdate(config, specs);
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -210,98 +209,21 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 				} catch (Exception e) {
 					log.error("Error running post-processing", e);
 				}
-
 			}
-
 		}
 
 
 		return 0;
 	}
 
-	/**
-	 * Apply given specs to config.
-	 */
-	private static void applySpecs(Config config, Path specs) {
-
-		if (!Files.exists(specs)) {
-			throw new IllegalArgumentException("Desired run config does not exist:" + specs);
-		}
-
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
-				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
-
-		ConfigAliases aliases = new ConfigAliases();
-		Deque<String> emptyStack = new ArrayDeque<>();
-
-		try (BufferedReader reader = Files.newBufferedReader(specs)) {
-
-			JsonNode node = mapper.readTree(reader);
-
-			Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-			while (fields.hasNext()) {
-				Map.Entry<String, JsonNode> field = fields.next();
-				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
-				ConfigGroup group = config.getModules().get(configGroupName);
-				if (group == null) {
-					log.warn("Config group not found: {}", configGroupName);
-					continue;
-				}
-
-				applyNodeToConfigGroup(field.getValue(), group);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	File getConfigPath() {
+		return configPath;
 	}
 
-	/**
-	 * Sets the json config into
-	 */
-	private static void applyNodeToConfigGroup(JsonNode node, ConfigGroup group) {
-
-		Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
-		while (fields.hasNext()) {
-			Map.Entry<String, JsonNode> field = fields.next();
-
-			if (field.getValue().isArray()) {
-
-				Collection<? extends ConfigGroup> params = group.getParameterSets(field.getKey());
-
-				// single node and entry merged directly
-				if (field.getValue().size() == 1 && params.size() == 1) {
-					applyNodeToConfigGroup(field.getValue().get(0), params.iterator().next());
-				} else {
-
-					for (JsonNode item : field.getValue()) {
-
-						Map.Entry<String, JsonNode> first = item.fields().next();
-						Optional<? extends ConfigGroup> m = params.stream().filter(p -> p.getParams().get(first.getKey()).equals(first.getValue().textValue())).findFirst();
-						if (m.isEmpty())
-							throw new IllegalArgumentException("Could not find matching param by key" + first);
-
-						applyNodeToConfigGroup(item, m.get());
-					}
-				}
-
-			} else {
-
-				if (!field.getValue().isValueNode())
-					throw new IllegalArgumentException("Received complex value type instead of primitive: " + field.getValue());
-
-
-				if (field.getValue().isTextual())
-					group.addParam(field.getKey(), field.getValue().textValue());
-				else
-					group.addParam(field.getKey(), field.getValue().toString());
-			}
-		}
+	@Nullable
+	String getDefaultScenario() {
+		return defaultScenario;
 	}
-
 
 	/**
 	 * Custom module configs that will be added to the {@link Config} object.
@@ -391,15 +313,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		addRunOption(config, option, "");
 	}
 
-	private Config loadConfig(String path) {
-		List<ConfigGroup> customModules = getCustomModules();
-
-		final Config config = ConfigUtils.loadConfig(path, customModules.toArray(new ConfigGroup[0]));
-		Config prepared = prepareConfig(config);
-
-		return prepared != null ? prepared : config;
-	}
-
 	@Override
 	public String defaultValue(CommandLine.Model.ArgSpec argSpec) throws Exception {
 		Object obj = argSpec.userObject();
@@ -429,6 +342,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			l.addAll(Arrays.asList(args));
 
 			args = l.toArray(new String[0]);
+
+			// Pass stored args to the instance as well
+			if (System.getenv().containsKey("MATSIM_GUI_ARGS")) {
+				String[] guiArgs = System.getenv("MATSIM_GUI_ARGS").split(ARGS_DELIMITER);
+				if (guiArgs.length > 0)
+					args = ApplicationUtils.mergeArgs(args, guiArgs);
+			}
 		}
 
 		prepareArgs(args);
@@ -449,6 +369,83 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		int code = cli.execute(args);
 		System.exit(code);
+	}
+
+	/**
+	 * <p>Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
+	 * This method may also be used to predefine some default arguments.</p>
+	 *
+	 * <p>With respect to args it looks like arguments are treated in the following sequence (programmed in the run method):
+	 * <ul>
+	 *         <li>ConfigUtils.loadConfig without args</li>
+	 *         <li>prepareConfig which is usually overwritten</li>
+	 *         <li>config options from some yaml file which can be provided as a command line option</li>
+	 *         <li>config options on command line </li>
+	 * </ul></p>
+	 *
+	 * <p>defaultArgs could be used to provide defaults when calling this method here; they would go in addition to what is coming in from "upstream" which is typically the command line.</p>
+	 *
+	 * <p>There are many execution paths that can be reached from this class, but a typical one for matsim-scenarios seems to be:<ul>
+	 * <li> This method runs MATSimApplication.run( TheScenarioClass.class , args ).</li>
+	 * <li> That run class will instantiate an instance of TheScenarioClass (*), then do some args consistenty checking, then call the piccoli execute method. </li>
+	 * <li> The piccoli execute method will essentially call the "call" method of MATSimApplication. </li>
+	 * <li> I think that in the described execution path, this.config in that call method will initially be null.  (The ctor of MATSimApplication was called via reflection at (*); I think that it was called there without a config argument.) </li>
+	 * <li> This call method then will do: <ul>
+	 * 		<li> getCustomModules() (which is empty by default but can be overriden) </li>
+	 * 		<li>ConfigUtils.loadConfig(...) _without_ passing on the args</li>
+	 * 		<li>prepareConfig(...) (which is empty by default but is typically overridden, in this case in OpenBerlinScenario).  In our case, this sets the typical scoring params and the typical replanning strategies.
+	 * 		<li>next one can override the config from some yaml file provided as a commandline option
+	 * 		<li> next args is parsed and set
+	 * 		<li>then some standard CL options are detected and set
+	 * 		<li>then createScenario(config) is called (which can be overwritten but is not)
+	 * 		<li>then prepareScenario(scenario) is called (which can be overwritten but is not)
+	 * 		<li>then a standard controler is created from scenario
+	 * 		<li>then prepareControler is called which can be overwritten
+	 * 	</ul>
+	 * 	</ul>
+	 * 	</p>
+	 *
+	 * @param clazz class of the scenario to run
+	 * @param args pass arguments from the main method
+	 * @param defaultArgs predefined default arguments that will always be present
+	 */
+	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+
+		if (ApplicationUtils.isRunFromDesktop() && args.length == 0) {
+
+			System.setProperty("MATSIM_GUI_DESKTOP", "true");
+
+			if (defaultArgs.length > 0) {
+				String value = String.join(ARGS_DELIMITER, defaultArgs);
+				System.setProperty("MATSIM_GUI_ARGS", value);
+			}
+
+			// args are empty when run from desktop and is not used
+			run(clazz, "gui");
+
+		} else {
+			// run if no other command is present
+			if (args.length > 0) {
+				// valid command is present
+				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
+					// If this is a run command, the default args can be applied
+					if (args[0].equals("run"))
+						args = ApplicationUtils.mergeArgs(args, defaultArgs);
+
+				} else {
+					// Automatically add run command
+					String[] runArgs = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+					args = ApplicationUtils.mergeArgs(runArgs, args);
+				}
+
+			} else
+				// Automatically add run command
+				args = ApplicationUtils.mergeArgs(new String[]{"run"}, defaultArgs);
+
+			log.info("Running {} with: {}", clazz.getSimpleName(), String.join(" ", args));
+
+			run(clazz, args);
+		}
 	}
 
 	/**
@@ -512,7 +509,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		config = tmp != null ? tmp : config;
 
 		if (app.specs != null) {
-			applySpecs(config, app.specs);
+			ApplicationUtils.applyConfigUpdate(config, app.specs);
 		}
 
 		if (app.remainingArgs != null) {
@@ -744,7 +741,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
-	 * Option to switch post processing behavour
+	 * Option to switch post-processing behaviour
 	 */
 	public enum PostProcessOption {
 

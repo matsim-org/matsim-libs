@@ -22,10 +22,9 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,6 +43,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -57,11 +57,11 @@ import com.google.inject.Provides;
 
 public class VehicleHandlerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testVehicleHandler() {
+	void testVehicleHandler() {
 		// This is a test where there is a link with a certain parking capacity. As soon
 		// as
 		// it is reached the link is blocking, until a vehicle is leaving the link
@@ -76,20 +76,20 @@ public class VehicleHandlerTest {
 		Result result;
 
 		result = runTestScenario(4);
-		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+		Assertions.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+		Assertions.assertEquals(3, result.initialCount);
 
 		result = runTestScenario(3);
-		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+		Assertions.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+		Assertions.assertEquals(3, result.initialCount);
 
 		result = runTestScenario(2);
-		Assert.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+		Assertions.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
+		Assertions.assertEquals(3, result.initialCount);
 
 		result = runTestScenario(1);
-		Assert.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+		Assertions.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
+		Assertions.assertEquals(3, result.initialCount);
 	}
 
 	public Result runTestScenario(long capacity) {
@@ -127,12 +127,12 @@ public class VehicleHandlerTest {
 		return result;
 	}
 
-	private class Result {
+	private static class Result {
 		double latestArrivalTime;
 		long initialCount;
 	}
 
-	private class BlockingVehicleHandler implements VehicleHandler {
+	private static class BlockingVehicleHandler implements VehicleHandler {
 		private final long capacity;
 
 		long initialCount = 0;
@@ -172,7 +172,7 @@ public class VehicleHandlerTest {
 		}
 	}
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
+	private static class LatestArrivalHandler implements PersonArrivalEventHandler {
 		Double latestArrivalTime = null;
 
 		@Override
@@ -185,6 +185,7 @@ public class VehicleHandlerTest {
 
 	private Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

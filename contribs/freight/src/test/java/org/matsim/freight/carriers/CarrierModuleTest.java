@@ -21,12 +21,13 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -47,12 +48,13 @@ public class CarrierModuleTest {
 
     FreightCarriersConfigGroup freightCarriersConfigGroup;
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Before
+    @BeforeEach
     public void setUp(){
         Config config = ConfigUtils.createConfig() ;
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
         ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");
         workParams.setTypicalDuration(60 * 60 * 8);
         config.scoring().addActivityParams(workParams);
@@ -80,10 +82,10 @@ public class CarrierModuleTest {
     }
 
 
+	//using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
+	// to me, it is currently not clear how to do that, tschlenther oct 10 '19
 	@Test
-    //using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
-    // to me, it is currently not clear how to do that, tschlenther oct 10 '19
-    public void test_ConstructorWOParameters(){
+	void test_ConstructorWOParameters(){
 		// note setUp method!
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {
@@ -96,8 +98,8 @@ public class CarrierModuleTest {
         controler.run();
     }
 
-    @Test
-    public void test_ConstructorWithOneParameter(){
+	@Test
+	void test_ConstructorWithOneParameter(){
 	    // note setUp method!
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {

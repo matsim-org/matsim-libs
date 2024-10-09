@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.extension.companions;
 
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import java.util.Arrays;
 import java.util.List;
@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**
- *
- * @author Steffen Axer
- *
+ * @author steffenaxer
  */
 public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final char DEFAULT_COLLECTION_DELIMITER = ',';

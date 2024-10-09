@@ -21,8 +21,8 @@
 package org.matsim.contrib.multimodal;
 
 import com.google.inject.name.Names;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +39,7 @@ import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -65,7 +66,7 @@ import java.util.Set;
 public class MultiModalTripRouterTest {
 
 	@Test
-	public void testRouteLeg() {
+	void testRouteLeg() {
 
 		final Config config = ConfigUtils.createConfig();
 		config.routing().addParam("teleportedModeSpeed_bike", "6.01");
@@ -73,6 +74,7 @@ public class MultiModalTripRouterTest {
 		config.routing().addParam("teleportedModeSpeed_ride", "15.0");
 		config.routing().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
 		config.routing().addParam("teleportedModeSpeed_walk", "1.34");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -200,7 +202,7 @@ public class MultiModalTripRouterTest {
 					break;
 				}
 			}
-			Assert.assertTrue(validMode);
+			Assertions.assertTrue(validMode);
 
 		}
 	}

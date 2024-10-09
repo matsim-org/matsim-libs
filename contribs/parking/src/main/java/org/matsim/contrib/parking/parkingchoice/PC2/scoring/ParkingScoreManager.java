@@ -108,7 +108,7 @@ public final class ParkingScoreManager implements ParkingScore {
 	}
 
 	@Override
-	public synchronized void prepareForNewIteration() {
+	public synchronized void notifyBeforeMobsim() {
 		scores = new DoubleValueHashMap<>();
 	}
 

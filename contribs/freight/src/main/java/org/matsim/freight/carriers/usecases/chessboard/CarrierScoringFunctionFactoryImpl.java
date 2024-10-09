@@ -237,7 +237,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				CarrierVehicle carrierVehicle = CarriersUtils.getCarrierVehicle(carrier, ((LinkEnterEvent) event).getVehicleId());
 				if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
 				double toll = roadPricing.getTollAmount(carrierVehicle.getType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId() ),event.getTime() );
-				if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll + "" );
+				if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll );
 				score += (-1) * toll;
 			}
 		}

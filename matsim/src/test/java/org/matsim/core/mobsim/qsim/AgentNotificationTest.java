@@ -22,8 +22,7 @@
  package org.matsim.core.mobsim.qsim;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Map;
 
@@ -31,7 +30,8 @@ import jakarta.inject.Inject;
 
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -76,7 +76,7 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 
 
-public class AgentNotificationTest {
+ public class AgentNotificationTest {
 
 	private static class MyAgentFactory implements AgentFactory {
 
@@ -261,9 +261,9 @@ public class AgentNotificationTest {
 	}
 
 
-	@SuppressWarnings("static-method")
-	@Test
-	public void testAgentNotification() {
+	 @SuppressWarnings("static-method")
+	 @Test
+	 void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -288,8 +288,7 @@ public class AgentNotificationTest {
 			.build(scenario, eventsManager) //
 			.run();
 
-		assumeThat(handler.getEvents(), hasItem(
-				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
+		Assumptions.assumeTrue(handler.getEvents().stream().anyMatch(e -> e.getTime() == 25200.0 && e instanceof PersonDepartureEvent));
 		assertThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25800.0)).and(instanceOf(MyAgentFactory.MyAgent.HomesicknessEvent.class)))));
 	}

@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -29,8 +29,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class SwissRailRaptorDataTest {
 
-    @Test
-    public void testTransfersFromSchedule() {
+	@Test
+	void testTransfersFromSchedule() {
         Fixture f = new Fixture();
         f.init();
 
@@ -47,7 +47,7 @@ public class SwissRailRaptorDataTest {
             TransitStopFacility fromStop = data.routeStops[t.fromRouteStop].routeStop.getStopFacility();
             TransitStopFacility toStop = data.routeStops[t.toRouteStop].routeStop.getStopFacility();
             if (fromStop.getId().equals(stopId19) && toStop.getId().equals(stopId9)) {
-                Assert.fail("There should not be any transfer between stop facilities 19 and 9.");
+                Assertions.fail("There should not be any transfer between stop facilities 19 and 9.");
             }
         }
 
@@ -63,8 +63,8 @@ public class SwissRailRaptorDataTest {
                 foundTransferCount++;
             }
         }
-        Assert.assertEquals("wrong number of transfers between stop facilities 19 and 9.", 1, foundTransferCount);
-        Assert.assertEquals("number of transfers should have incrased.", data.transfers.length + 1, data2.transfers.length);
+        Assertions.assertEquals(1, foundTransferCount, "wrong number of transfers between stop facilities 19 and 9.");
+        Assertions.assertEquals(data.transfers.length + 1, data2.transfers.length, "number of transfers should have incrased.");
 
         // assign a high transfer time to a "default" transfer
         f.schedule.getMinimalTransferTimes().set(stopId5, stopId18, 456);
@@ -74,12 +74,12 @@ public class SwissRailRaptorDataTest {
             TransitStopFacility fromStop = data3.routeStops[t.fromRouteStop].routeStop.getStopFacility();
             TransitStopFacility toStop = data3.routeStops[t.toRouteStop].routeStop.getStopFacility();
             if (fromStop.getId().equals(stopId5) && toStop.getId().equals(stopId18)) {
-                Assert.assertEquals("transfer has wrong transfer time.", 456, t.transferTime);
+                Assertions.assertEquals(456, t.transferTime, "transfer has wrong transfer time.");
                 foundCorrectTransfer = true;
             }
         }
-        Assert.assertTrue("did not find overwritten transfer", foundCorrectTransfer);
-        Assert.assertEquals("number of transfers should have stayed the same.", data2.transfers.length, data3.transfers.length);
+        Assertions.assertTrue(foundCorrectTransfer, "did not find overwritten transfer");
+        Assertions.assertEquals(data2.transfers.length, data3.transfers.length, "number of transfers should have stayed the same.");
 
         // assign a low transfer time to a "default" transfer
         f.schedule.getMinimalTransferTimes().set(stopId5, stopId18, 0.2);
@@ -89,12 +89,12 @@ public class SwissRailRaptorDataTest {
             TransitStopFacility fromStop = data4.routeStops[t.fromRouteStop].routeStop.getStopFacility();
             TransitStopFacility toStop = data4.routeStops[t.toRouteStop].routeStop.getStopFacility();
             if (fromStop.getId().equals(stopId5) && toStop.getId().equals(stopId18)) {
-                Assert.assertEquals("transfer has wrong transfer time.", 1, t.transferTime); // transferTime gets rounded up to int vlues
+                Assertions.assertEquals(1, t.transferTime, "transfer has wrong transfer time."); // transferTime gets rounded up to int vlues
                 foundCorrectTransfer = true;
             }
         }
-        Assert.assertTrue("did not find overwritten transfer", foundCorrectTransfer);
-        Assert.assertEquals("number of transfers should have stayed the same.", data2.transfers.length, data4.transfers.length);
+        Assertions.assertTrue(foundCorrectTransfer, "did not find overwritten transfer");
+        Assertions.assertEquals(data2.transfers.length, data4.transfers.length, "number of transfers should have stayed the same.");
     }
 
 }

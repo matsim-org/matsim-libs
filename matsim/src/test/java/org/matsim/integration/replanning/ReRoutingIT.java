@@ -26,9 +26,9 @@ import java.util.EnumSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -44,8 +45,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ReRoutingIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
@@ -77,7 +78,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingDijkstra() throws MalformedURLException {
+	void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
@@ -88,7 +89,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingAStarLandmarks() throws MalformedURLException {
+	void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
@@ -99,7 +100,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingSpeedyALT() throws MalformedURLException {
+	void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
 		Controler controler = new Controler(scenario);
@@ -113,7 +114,6 @@ public class ReRoutingIT {
 		this.evaluate("plans.xml.gz");
 	}
 
-	private final static Logger LOG = LogManager.getLogger(ReRoutingIT.class);
 	private void evaluate(String plansFilename) throws MalformedURLException {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
@@ -124,13 +124,12 @@ public class ReRoutingIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Gbl.startMeasurement();
-		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
+		PopulationComparison.Result result = PopulationComparison.compare(referenceScenario.getPopulation(), scenario.getPopulation());
 		Gbl.printElapsedTime();
-		if ( !isEqual ) {
+		if (result == PopulationComparison.Result.notEqual) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
-		Assert.assertTrue("different plans files.", isEqual);
+		Assertions.assertEquals(PopulationComparison.Result.equal, result, "different plans file");
 	}
-
 }
