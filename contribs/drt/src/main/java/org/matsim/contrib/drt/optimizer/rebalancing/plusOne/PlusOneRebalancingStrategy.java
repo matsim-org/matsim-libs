@@ -99,7 +99,9 @@ public class PlusOneRebalancingStrategy
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (event.getMode().equals(mode)) {
 			Id<Link> linkId = potentialTargetLinks.remove(event.getRequestId());
-			targets.add(new Target(linkId, event.getTime()));
+			if(linkId != null) {
+				targets.add(new Target(linkId, event.getTime()));
+			}
 		}
 	}
 
