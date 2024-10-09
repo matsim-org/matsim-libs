@@ -132,9 +132,13 @@ public class FreightDemandGenerationUtils {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
 						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
-					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" + coord.getX()
-						+ "	" + coord.getY() + "	" + "Service" + "	"
-						+ thisService.getLocationLinkId().toString() + "		" +"	"+ "\n");
+					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" +
+							coord.getX()+ "	" + coord.getY() + "	" +
+							"Service" + "	" +
+							thisService.getLocationLinkId().toString() + "	"+
+							" "+ "	"+
+							" "+ "	"+
+							" "+"\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
@@ -144,14 +148,16 @@ public class FreightDemandGenerationUtils {
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
 						+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
-						"Pickup" + "		"+
+						"Pickup" + "	"+
+							" "+"	"+
 						thisShipment.getFrom().toString() + "	" +
 						thisShipment.getTo().toString() + "	"+
 						0 + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 						+ coordTo.getX() + "	" + coordTo.getY() + "	"
-						+ "Delivery" + "		"
-						+ thisShipment.getFrom() + "	" +
+						+ "Delivery" + "	"+
+							" "+"	"+
+						thisShipment.getFrom() + "	" +
 						thisShipment.getTo() + "	"+
 						thisShipment.getSize() + "\n");
 				}
@@ -171,7 +177,7 @@ public class FreightDemandGenerationUtils {
 	 */
 	static void createDemandDistributionFile(Controler controler) {
 
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandDistributionFile.tsv");
+		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("personId	age	demand\n");
 

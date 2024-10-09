@@ -22,6 +22,8 @@ package org.matsim.freightDemandGeneration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.math3.distribution.PoissonDistribution;
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -85,7 +87,7 @@ public final class DemandReaderFromCSV {
 	private static final String totalDemandGenerationOption = "DemandPerPerson";
 	//private static final String totalDemandGenerationOption = "DemandForShape";
 	//private static final String totalDemandGenerationOption = "";
-	private static final double PACKAGES_PER_PERSON = 0.16;
+	private static final double PACKAGES_PER_PERSON = 0.14;
 	public static final double PACKAGES_PER_STOP = 1.5;
 
 	/**
@@ -962,9 +964,9 @@ public final class DemandReaderFromCSV {
 			log.info("Possible persons for delivery are matched with link...");
 			for (Id<Person> personId:possiblePersonsDelivery.keySet()) {
 				Person person = possiblePersonsDelivery.get(personId);
-				findLinksForPerson(scenario, nearestLinkPerPersonDelivery, person);
+				//findLinksForPerson(scenario, nearestLinkPerPersonDelivery, person);
 			}
-			log.info("Possible persons for delivery ("+nearestLinkPerPersonDelivery.size()+") were matched with link.");
+			//log.info("Possible persons for delivery ("+nearestLinkPerPersonDelivery.size()+") were matched with link.");
 
 			if (possibleLinksPickup.isEmpty())
 				throw new RuntimeException(
@@ -1042,8 +1044,8 @@ public final class DemandReaderFromCSV {
 						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
 							demandForThisLink);
 					} else {
-						createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
+						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink);
 					}
 				}
 			} else
@@ -1114,23 +1116,32 @@ public final class DemandReaderFromCSV {
 						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
 							demandForThisLink);
 					} else if (demandForThisLink > 0) {
-						createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
+						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
 			}
 		} else { // if a certain number of shipments is selected
-			log.info("Number of jobs: "+numberOfJobs);
+			log.info("Number of jobs/ possible persons: "+numberOfJobs);
 
 			//ERROR: Verschoben vor die for-Schleife
-			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs && demandDistributionOption != "byPopulationAndAge") {
+			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs &&	demandDistributionOption == "toRandomLinks") {
 				numberOfJobs = demandToDistribute;
 				log.warn(
 					"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
 				log.info("New number of jobs: "+numberOfJobs);
 			}
 			//TODO: Could be more organized
+
+			//new: Poisson
+			org.apache.commons.math3.distribution.PoissonDistribution poisson = new PoissonDistribution(0.6);
+			Frequency frequency = new Frequency();
+			for (int i=0; i<11; i++){
+				frequency.incrementValue(i+1,Math.round(poisson.probability(i)*numberOfJobs));
+			}
+			RouletteWheel rouletteWheel = RouletteWheel.Builder.newInstance(frequency).setRandom(rand).build();
+
 			for (int i = 0; i < numberOfJobs; i++) {
 
 				Link linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
@@ -1141,12 +1152,13 @@ public final class DemandReaderFromCSV {
 				Link linkDelivery = null;
 				Id<Person> person;
 				if (demandDistributionOption == "byPopulationAndAge"||demandDistributionOption == "byPopulation") {
-					person = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
-					possiblePersonsDelivery.remove(person);
-					linkDelivery = findLinkForSelectedPerson(scenario, indexShape,
-						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-						usedDeliveryLocations, possiblePersonsDelivery, person, nearestLinkPerPersonDelivery,
-						crsTransformationNetworkAndShape, i);
+					//person = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
+					//possiblePersonsDelivery.remove(person);
+					//findLinksForPerson(scenario, nearestLinkPerPersonDelivery, population.getPersons().get(person));
+					//linkDelivery = findLinkForSelectedPerson(scenario, indexShape,
+					//	numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
+					//	usedDeliveryLocations, possiblePersonsDelivery, person, nearestLinkPerPersonDelivery,
+					//	crsTransformationNetworkAndShape, i);
 				}else{
 					linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
 						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
@@ -1156,32 +1168,44 @@ public final class DemandReaderFromCSV {
 
 				//NEW: demand not random but by age group
 				int demandForThisLink = 0;
-				if (demandDistributionOption == "byPopulationAndAge") {
+				if (demandDistributionOption == "byPopulationAndAge" || demandDistributionOption == "byPopulation") {
 					if (distributedDemand != demandToDistribute) {
-						demandForThisLink = calculateDemandBasedOnAge(person, population);
-					}
-					//add demand for the person
-					int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-					demandForEachPerson.put(person, new HashMap<>());
-					demandForEachPerson.get(person).put(age, demandForThisLink);
+						person = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
+						possiblePersonsDelivery.remove(person);
+						//find demand for person/link
+						demandForThisLink = calculateDemandBasedOnRouletteWheel(person, population,rouletteWheel, demandToDistribute, distributedDemand);
+						//find link for person
+						if(demandForThisLink != 0) {
+							findLinksForPerson(scenario, nearestLinkPerPersonDelivery, population.getPersons().get(person));
+							linkDelivery = findLinkForSelectedPerson(scenario, indexShape,
+									numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
+									usedDeliveryLocations, possiblePersonsDelivery, person, nearestLinkPerPersonDelivery,
+									crsTransformationNetworkAndShape, i);
+						}
+						}
 				} else {
-					demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+					if (distributedDemand != demandToDistribute) {
+						demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+					}
 				}
 
 				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
 					usedPickupLocations.add(linkPickup.getId().toString());
-				if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
-					usedDeliveryLocations.add(linkDelivery.getId().toString());
+
+				if(demandForThisLink != 0) {
+					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
+						usedDeliveryLocations.add(linkDelivery.getId().toString());
+				}
 
 				//NEW: create Package
-				if(demandDistributionOption !="") {
+				if(demandForThisLink != 0) {
 					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
 						demandForThisLink);
 					distributedDemand = distributedDemand + demandForThisLink;
 				}else {
 					if(demandForThisLink != 0) {
-						createSinglePackageShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, (Double) population.getAttributes().getAttribute("sampleSize"));
+						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
+							demandForThisLink);
 						distributedDemand = distributedDemand + demandForThisLink;
 					}
 				}
@@ -1408,49 +1432,56 @@ public final class DemandReaderFromCSV {
 	/** Calculates the demand for selected person based on the age //NEW METHOD
 	 * @param person				selected person
 	 * @param population 		    population
+	 * @param demandToDistribute
+	 * @param distributedDemand
 	 * @return						Demand for this link
 	 */
-	private static int calculateDemandBasedOnAge(Id<Person> person, Population population){
+	private static int calculateDemandBasedOnRouletteWheel(Id<Person> person, Population population,
+														   RouletteWheel rouletteWheel, int demandToDistribute, int distributedDemand){
 
-		int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
 		int demandForThisLink = 0;
+		int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
 
-		for (Object ageGroup: demandDistributionPerAgeGroup.keySet()) {
-			HashMap temp = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
-			int lower = (int) temp.get("lower");
-			int upper = (int) temp.get("upper");
-			double error = (double) temp.get("error");
-			if (age <= upper && age >= lower) {
-				int restOfDemandForThisAge = (int) temp.get("demand");
-				int restOfPersonsInThisAge = (int) temp.get("personsWithDemandInThisAgeGroup_counter");
+		if (demandDistributionOption == "byPopulationAndAge"){ //based on age
 
-				if (restOfDemandForThisAge != 0){
+			for (Object ageGroup: demandDistributionPerAgeGroup.keySet()) {
+				HashMap temp = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
+				int lower = (int) temp.get("lower");
+				int upper = (int) temp.get("upper");
+				double error = (double) temp.get("error");
+				if (age <= upper && age >= lower) {
+					int restOfDemandForThisAge = (int) temp.get("demand");
+					int restOfPersonsInThisAge = (int) temp.get("personsWithDemandInThisAgeGroup_counter");
 
-					double demandForThisPersonDouble = (double) restOfDemandForThisAge / restOfPersonsInThisAge;
-					demandForThisLink = (int) Math.round(demandForThisPersonDouble);
+					if (restOfDemandForThisAge != 0){
 
-					if (demandForThisLink == 0) {
-						//randomize demand
-						if (restOfDemandForThisAge <= 4)
-							demandForThisLink = 1;
-						else {
-							//demandForThisLink = 1;
-							demandForThisLink = (rand.nextInt(3)+1);
-						}
+						//poisson demand
+						demandForThisLink = rouletteWheel.nextLong().intValue();
+						if(demandForThisLink > restOfDemandForThisAge)
+							demandForThisLink = restOfDemandForThisAge;
 
+						temp.put("demand", restOfDemandForThisAge - demandForThisLink);
+						temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
+						temp.put("error", error);
 					}
-
-					temp.put("demand", restOfDemandForThisAge - demandForThisLink);
-					temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
-					temp.put("error", error);
-				}
-				else {
-					temp.put("demand", restOfDemandForThisAge);
-					temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
-					temp.put("error", error);
+					else {
+						temp.put("demand", restOfDemandForThisAge);
+						temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
+						temp.put("error", error);
+					}
 				}
 			}
+		} else if (demandDistributionOption == "byPopulation") {
+
+			demandForThisLink = rouletteWheel.nextLong().intValue();
+			if(demandForThisLink > (demandToDistribute-distributedDemand))
+				demandForThisLink = (demandToDistribute-distributedDemand);
+
 		}
+
+		//add demand to list
+		demandForEachPerson.put(person, new HashMap<>());
+		demandForEachPerson.get(person).put(age, demandForThisLink);
 
 		return demandForThisLink;
 	}
@@ -1726,6 +1757,7 @@ public final class DemandReaderFromCSV {
 					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
 				}
 			}
+		log.info(nearestLinkPerPerson.size());
 
 	}
 
@@ -2019,4 +2051,22 @@ public final class DemandReaderFromCSV {
 		return link;
 	}
 
+	//new method
+	public static HashMap getDemandDistribution() {
+		HashMap list = new HashMap();
+		double totalDemand = 100;
+
+		org.apache.commons.math3.distribution.PoissonDistribution poisson =
+				new org.apache.commons.math3.distribution.PoissonDistribution(1.6);
+
+		for (int x = 0; x <= 10; x++) {
+			double probability = poisson.probability(x);
+			list.put(x,probability*totalDemand);
+
+		}
+
+		log.info(list);
+
+		return list;
+	}
 }
