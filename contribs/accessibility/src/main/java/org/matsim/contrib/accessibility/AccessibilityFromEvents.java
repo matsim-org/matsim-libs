@@ -101,7 +101,7 @@ public final class AccessibilityFromEvents{
 				// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
 
 				//				install(new EventsManagerModule());
-				install(new DvrpModule());
+//				install(new DvrpModule());
 //				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
 //				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 //					install(new DrtModeModule(drtCfg));

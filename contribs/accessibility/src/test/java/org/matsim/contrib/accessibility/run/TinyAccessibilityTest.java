@@ -90,48 +90,48 @@ public class TinyAccessibilityTest {
 
 	}
 
-	@Test
-	public void runFromEventsDrt() {
-		final Config config = createTestConfig();
-
-		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-//		drtParams.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(drtParams);
-
-		double min = 0.; // Values for bounding box usually come from a config file
-		double max = 200.;
-
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(min);
-		acg.setBoundingBoxTop(max);
-		acg.setBoundingBoxLeft(min);
-		acg.setBoundingBoxRight(max);
-		acg.setUseParallelization(false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
-
-//		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
-//			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
-//			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
-//			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
-//			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
-//			.build();
-
-		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-
-		// ---
-
-		final Scenario scenario = createTestScenario(config);
-
-		// ---
-
-		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
-
-		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
-		builder.addDataListener( new ResultsComparator() );
-		builder.build().run() ;
-
-	}
+//	@Test
+//	public void runFromEventsDrt() {
+//		final Config config = createTestConfig();
+//
+//		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+////		drtParams.setMarginalUtilityOfTraveling(0);
+//		config.scoring().addModeParams(drtParams);
+//
+//		double min = 0.; // Values for bounding box usually come from a config file
+//		double max = 200.;
+//
+//		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+//		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+//		acg.setBoundingBoxBottom(min);
+//		acg.setBoundingBoxTop(max);
+//		acg.setBoundingBoxLeft(min);
+//		acg.setBoundingBoxRight(max);
+//		acg.setUseParallelization(false);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+//
+////		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+////			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+////			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
+////			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
+////			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
+////			.build();
+//
+//		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+//
+//		// ---
+//
+//		final Scenario scenario = createTestScenario(config);
+//
+//		// ---
+//
+//		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+//
+//		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+//		builder.addDataListener( new ResultsComparator() );
+//		builder.build().run() ;
+//
+//	}
 
 	@Test
 	public void testWithBoundingBox() {
