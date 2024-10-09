@@ -81,6 +81,9 @@ public final class AccessibilityModule extends AbstractModule {
 
 			@Inject TripRouter tripRouter ;
 
+			// TODO: consider injecting estimator here
+//			@Inject DrtEstimator drtEstimator ;
+
 			@Override
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
@@ -162,6 +165,7 @@ public final class AccessibilityModule extends AbstractModule {
 //						final TravelTime travelTime = travelTimes.get("dvrp_estimated");
 //						final TravelTime travelTime = travelTimes.get(TransportMode.car);
 //						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+						// TODO: add drtEstimator here
 						calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, tripRouter);
 					} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;

@@ -63,6 +63,11 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	TripRouter tripRouter ;
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
+//	private final DrtEstimator drtEstimator
+//
+//	@Inject
+//	private DrtEstimator drtEstimator;
+
 	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, TripRouter tripRouter) {
 		this.mode = mode;
 //		this.travelTime = travelTime;
@@ -71,6 +76,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.scoringConfigGroup = scenario.getConfig().scoring();
 		this.networkConfigGroup = scenario.getConfig().network();
 		this.tripRouter = tripRouter;
+//		this.drtEstimator = drtEstimator;
 
 //		Gbl.assertNotNull(travelDisutilityFactory);
 //		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
@@ -173,6 +179,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Leg mainLeg = extractLeg(planElements, TransportMode.car);
 			double directRideDistance_m = mainLeg.getRoute().getDistance();
 
+//			drtEstimator.estimate(DrtRoute)
 			// todo: insert CL's DRT Estimator here instead of hardcoding parameters here.
 			double waitTime_s = 103.34; //TODO
 			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;

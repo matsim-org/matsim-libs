@@ -110,6 +110,13 @@ public class TinyAccessibilityTest {
 		acg.setUseParallelization(false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
 
+//		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+//			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+//			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
+//			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
+//			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
+//			.build();
+
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 
 		// ---

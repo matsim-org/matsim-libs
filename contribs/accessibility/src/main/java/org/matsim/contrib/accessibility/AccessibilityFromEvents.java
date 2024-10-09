@@ -85,6 +85,9 @@ public final class AccessibilityFromEvents{
 
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 
+				//TODO: Needed to bind DRT Estimator
+//				bind(DrtEstimator).toInstance()
+
 				install( new TripRouterModule() ) ;
 				// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed
 				// for: teleportation routers, network routers, pt routers.)
