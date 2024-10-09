@@ -19,8 +19,9 @@
 
 package org.matsim.contrib.accessibility.run;
 
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,7 +57,7 @@ import static org.ejml.UtilEjml.assertTrue;
  */
 public class RunDrtAccessibilityExampleIT {
 
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
@@ -100,7 +101,7 @@ public class RunDrtAccessibilityExampleIT {
 
 		// Added following so that agent can always walk to drt stop
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-			drtCfg.maxWalkDistance = Double.MAX_VALUE;
+//			drtCfg.maxWalkDistance = Double.MAX_VALUE;
 		}
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
