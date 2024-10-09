@@ -155,7 +155,7 @@ public final class PopulationAgentSource implements AgentSource {
 			}
 
 			// find the link ID of where to place the vehicle:
-			Id<Link> vehicleLinkId = findVehicleLink(person);
+			Id<Link> vehicleLinkId = findVehicleLink(person, vehicle);
 
 			// Checking if the vehicle has been seen before:
 			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
@@ -190,7 +190,15 @@ public final class PopulationAgentSource implements AgentSource {
 	 *  than to ask agent.getCurrentLinkId() after creation.
 	 * @param person TODO
 	 */
-	private Id<Link> findVehicleLink(Person person ) {
+	private Id<Link> findVehicleLink(Person person, Vehicle vehicle) {
+		/*
+		 * Manual case: the initial link id of the vehicle is saved as an attribute
+		 */
+		Id<Link> initialLinkId = VehicleUtils.getInitialLinkId(vehicle);
+		if (initialLinkId != null) {
+			return initialLinkId;
+		}
+		
 		/* Cases that come to mind:
 		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.
 		 *      This is treated by the following algo.

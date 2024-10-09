@@ -115,7 +115,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             NetworkRouter.routePlan(newPlan, netBasedCosts);
 
             //assign this plan now to the carrier and make it the selected carrier plan
-            carrier.setSelectedPlan(newPlan);
+            carrier.addPlan(newPlan);
 
         }
         String outputdirectory = sc.getConfig().controller().getOutputDirectory();

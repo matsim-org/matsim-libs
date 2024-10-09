@@ -550,6 +550,7 @@ public final class DemandReaderFromCSV {
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
 		for (DemandInformationElement newDemandInformationElement : demandInformation) {
+			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
 				createServices(scenario, newDemandInformationElement, indexShape, population, combineSimilarJobs,
 						crsTransformationNetworkAndShape);
@@ -585,12 +586,16 @@ public final class DemandReaderFromCSV {
 		Integer numberOfServiceLocations = newDemandInformationElement.getNumberOfFirstJobElementLocations();
 		ArrayList<String> usedServiceLocations = new ArrayList<String>();
 		int numberOfLinksInNetwork = scenario.getNetwork().getLinks().size();
-		HashMap<Id<Person>, Person> possiblePersonsForService = new HashMap<Id<Person>, Person>();
+		HashMap<Id<Person>, Person> possiblePersonsForService = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 
 		// set number of jobs
-		if (shareOfPopulationWithThisService == null)
+		if (shareOfPopulationWithThisService == null) {
 			numberOfJobs = newDemandInformationElement.getNumberOfJobs();
+			if (population != null)
+				log.warn(
+					"You have a population but no share of the population for the demand. The number of jobs will be set to the number of jobs you set in the csv file. The population will not be used for the demand generation.");
+		}
 		else if (population == null)
 			throw new RuntimeException(
 					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
@@ -606,15 +611,14 @@ public final class DemandReaderFromCSV {
 				possiblePersonsForService.putAll(population.getPersons());
 			int numberPossibleServices = (int) Math
 					.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			if (sampleSizeInputPopulation == sampleTo)
-				numberOfJobs = (int) Math.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			else if (samplingOption.equals("changeNumberOfLocationsWithDemand"))
-				numberOfJobs = (int) Math.round((sampleTo / sampleSizeInputPopulation)
-						* (shareOfPopulationWithThisService * possiblePersonsForService.size()));
-			else if (samplingOption.equals("changeDemandOnLocation")) {
-				demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-				numberOfJobs = (int) Math.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
-			} else
+			int sampledNumberPossibleServices = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleServices);
+			if (sampleSizeInputPopulation == sampleTo || samplingOption.equals("changeDemandOnLocation"))
+				numberOfJobs = numberPossibleServices;
+			else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
+				numberOfJobs = sampledNumberPossibleServices;
+				numberPossibleServices = numberOfJobs;
+			}
+			else
 				throw new RuntimeException(
 						"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			if (numberPossibleServices != 0)
@@ -773,16 +777,20 @@ public final class DemandReaderFromCSV {
 		String[] areasForDeliveryLocations = newDemandInformationElement.getAreasSecondJobElement();
 		String[] setLocationsOfPickup = newDemandInformationElement.getLocationsOfFirstJobElement();
 		String[] setLocationsOfDelivery = newDemandInformationElement.getLocationsOfSecondJobElement();
-		ArrayList<String> usedPickupLocations = new ArrayList<String>();
-		ArrayList<String> usedDeliveryLocations = new ArrayList<String>();
-		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<Id<Person>, Person>();
-		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<Id<Person>, Person>();
+		ArrayList<String> usedPickupLocations = new ArrayList<>();
+		ArrayList<String> usedDeliveryLocations = new ArrayList<>();
+		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<>();
+		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonPickup = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonDelivery = new HashMap<>();
 
 		// set number of jobs
-		if (shareOfPopulationWithThisPickup == null && shareOfPopulationWithThisDelivery == null)
+		if (shareOfPopulationWithThisPickup == null && shareOfPopulationWithThisDelivery == null){
+			if (population != null)
+				log.warn(
+					"You have a population but no share of the population for the demand. The number of jobs will be set to the number of jobs you set in the csv file. The population will not be used for the demand generation.");
 			numberOfJobs = newDemandInformationElement.getNumberOfJobs();
+		}
 		else if (population == null)
 			throw new RuntimeException(
 					"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
@@ -814,37 +822,24 @@ public final class DemandReaderFromCSV {
 			int sampledNumberPossibleJobsPickup = (int)Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
 			int sampledNumberPossibleJobsDelivery = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup > numberPossibleJobsDelivery) {
-				if (sampleSizeInputPopulation == sampleTo) {
-					numberOfJobs = (int) Math.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
-					numberPossibleJobsPickup = numberOfJobs;
-					if (shareOfPopulationWithThisDelivery != null)
-						numberPossibleJobsDelivery = (int) Math
-								.round(shareOfPopulationWithThisDelivery * numberPossibleJobsDelivery);
+				if (sampleSizeInputPopulation == sampleTo ||samplingOption.equals("changeDemandOnLocation")) {
+					numberOfJobs = numberPossibleJobsPickup;
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
 					numberOfJobs = sampledNumberPossibleJobsPickup;
 					numberPossibleJobsPickup = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
 						numberPossibleJobsDelivery = sampledNumberPossibleJobsDelivery;
-				} else if (samplingOption.equals("changeDemandOnLocation")) {
-					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-					numberOfJobs = numberPossibleJobsPickup;
 				} else
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			} else {
-				if (sampleSizeInputPopulation == sampleTo) {
-					numberOfJobs = (int) Math.round(shareOfPopulationWithThisDelivery * numberPossibleJobsDelivery);
-					numberPossibleJobsDelivery = numberOfJobs;
-					numberPossibleJobsPickup = (int) Math
-							.round(shareOfPopulationWithThisPickup * numberPossibleJobsPickup);
+				if (sampleSizeInputPopulation == sampleTo ||samplingOption.equals("changeDemandOnLocation")) {
+					numberOfJobs = numberPossibleJobsDelivery;
 				} else if (samplingOption.equals("changeNumberOfLocationsWithDemand")) {
 					numberOfJobs = sampledNumberPossibleJobsDelivery;
 					numberPossibleJobsDelivery = numberOfJobs;
 					if (shareOfPopulationWithThisDelivery != null)
 						numberPossibleJobsPickup = sampledNumberPossibleJobsPickup;
-				} else if (samplingOption.equals("changeDemandOnLocation")) {
-					demandToDistribute = (int) Math.round((sampleTo / sampleSizeInputPopulation) * demandToDistribute);
-					numberOfJobs = numberPossibleJobsDelivery;
 				} else
 					throw new RuntimeException(
 							"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
@@ -1289,6 +1284,7 @@ public final class DemandReaderFromCSV {
 																Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
 																HashMap<Id<Person>, Person> possiblePersons,
 																HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
+		log.info("Finding possible links for the demand in the selected areas {}", Arrays.toString(areasForLocations));
 		HashMap<Id<Link>, Link> possibleLinks = new HashMap<>();
 		if (numberOfLocations == null) {
 			for (Link link : scenario.getNetwork().getLinks().values())
@@ -1364,7 +1360,7 @@ public final class DemandReaderFromCSV {
 	private static HashMap<Id<Person>, Person> findPossiblePersons(Population population,
 			String[] areasForJobElementLocations, ShpOptions.Index indexShape,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
-
+		log.info("Finding possible persons for the demand in the selected areas {}", Arrays.toString(areasForJobElementLocations));
 		HashMap<Id<Person>, Person> possiblePersons = new HashMap<>();
 
 		for (Person person : population.getPersons().values()) {
