@@ -23,6 +23,8 @@ package org.matsim.contrib.drt.run;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,12 +35,9 @@ import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.routing.*;
-import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule.DefaultMainLegRouterProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -93,7 +92,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 				new DrtRouteCreatorProvider(drtCfg));// not singleton
 		// this is used in DvrpModeRoutingModule (recruited by the DvrpRoutingModuleProvider above)
 
-		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
+		bindModal(DrtStopNetwork.class ).toProvider( new DrtStopNetworkProvider(getConfig(), drtCfg) ).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
 

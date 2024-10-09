@@ -1,10 +1,28 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
+import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
+import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -20,6 +38,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 import java.util.*;
@@ -72,59 +91,152 @@ public final class AccessibilityFromEvents{
 		}
 		new MatsimEventsReader(events).readFile( eventsFile );
 
-		AbstractModule module = new AbstractModule(){
-			@Override public void install(){
-				install( new TimeInterpretationModule() );
-				// has to do with config
+		List<AbstractModule> modules = new ArrayList<>();
 
-				install( new ScenarioByInstanceModule( scenario ) ) ;
-				// (= scenario)
+
+		{
+			AbstractModule module = new AbstractModule(){
+				@Override public void install(){
+
+					bind( DrtEstimator.class ).toInstance(new DirectTripDistanceBasedDrtEstimator.Builder()
+											      .setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(103.34) )
+											      .setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.0) )
+											      .setRideDurationEstimator(new ConstantRideDurationEstimator(0.1087, 47.84) ) // TODO: I'm abusing this method a bit. It's supposed to calculate drt ride duration based on car ride duration; in my case it is based on car ride **distance**
+											      .setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.0))
+											      .build() );
+
+
+					install( new TimeInterpretationModule() );
+					// has to do with config
+
+					install( new ScenarioByInstanceModule( scenario ) );
+					// (= scenario)
 
 //				install( new NewControlerModule() );
-				// (= some controler infrastructure because in particular dvrp wants it)
+					// (= some controler infrastructure because in particular dvrp wants it)
 
-				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
+					bind( OutputDirectoryHierarchy.class ).asEagerSingleton();
 
-				//TODO: Needed to bind DRT Estimator
+					//TODO: Needed to bind DRT Estimator
 //				bind(DrtEstimator).toInstance()
 
-				install( new TripRouterModule() ) ;
-				// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed
-				// for: teleportation routers, network routers, pt routers.)
+					install( new TripRouterModule() );
+					// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed
+					// for: teleportation routers, network routers, pt routers.)
 
-				for( String mode : getConfig().routing().getNetworkModes() ){
-					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
-				}
-				// (= sets the network travel times which are needed for the TripRouterModule)
+					for( String mode : getConfig().routing().getNetworkModes() ){
+						addTravelTimeBinding( mode ).toInstance( map.get( mode ) );
+					}
+					// (= sets the network travel times which are needed for the TripRouterModule)
 
-				install( new TravelDisutilityModule() ) ;
-				// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
+					install( new TravelDisutilityModule() );
+					// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
 
-				//				install(new EventsManagerModule());
+					//				install(new EventsManagerModule());
 //				install(new DvrpModule());
-//				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
-//				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-//					install(new DrtModeModule(drtCfg));
-//					installQSimModule(new DrtModeQSimModule(drtCfg));
-//					install(new DrtModeAnalysisModule(drtCfg));
-//				}
 //
 //
 ////				install(new MultiModeDrtModule());
 ////				install(new MultiModeDrtCompanionModule());
-//
-				// install the accessiblity module:
-				{
-					final AccessibilityModule module = new AccessibilityModule();
-					for( FacilityDataExchangeInterface dataListener : dataListeners ){
-						module.addFacilityDataExchangeListener( dataListener );
-					}
-					install( module );
-				}
-			}
-		};
 
-		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , module );
+
+//
+					// install the accessiblity module:
+					{
+						final AccessibilityModule module = new AccessibilityModule();
+						for( FacilityDataExchangeInterface dataListener : dataListeners ){
+							module.addFacilityDataExchangeListener( dataListener );
+						}
+						install( module );
+					}
+				}
+			};
+			modules.add( module );
+
+			DrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+
+
+			MapBinder<String, DvrpRoutingModule.AccessEgressFacilityFinder> facilityFinders;
+			facilityFinders.addBinding( "drt" ).toInstance( new ClosestAccessEgressFacilityFinder(
+					optimizationConstraintsSet.maxWalkDistance,
+//					getter.get( Network.class ),
+					scenario.getNetwork(),
+					QuadTrees.createQuadTree(
+							getter.getModal( DrtStopNetwork.class ).getDrtStops().values()
+								)
+			) );
+		}
+
+		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
+		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+			DrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+
+			AbstractModule newModule = new AbstractModule(){
+				@Override public void install(){
+
+					abc = createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+
+
+					bind(DrtStopNetwork.class).toProvider(new DrtModeRoutingModule.DrtStopNetworkProvider(getConfig(), drtCfg) ).asEagerSingleton();
+
+
+
+
+					TypeLiteral<String> keyType = TypeLiteral.get( String.class );
+					TypeLiteral<DvrpRoutingModule.AccessEgressFacilityFinder> valueType = new TypeLiteral<DvrpRoutingModule.AccessEgressFacilityFinder>(){};
+
+					MapBinder<String, DvrpRoutingModule.AccessEgressFacilityFinder> facilityFinders = MapBinder.newMapBinder( this.binder(), keyType, valueType );
+
+					facilityFinders.addBinding( "drt" ).toInstance( new ClosestAccessEgressFacilityFinder(
+							optimizationConstraintsSet.maxWalkDistance,
+							scenario.getNetwork(),
+
+							QuadTrees.createQuadTree(
+									getter.getModal( DrtStopNetwork.class ).getDrtStops().values()
+										)
+
+					) );
+				}
+			};
+			modules.add( newModule );
+
+			AbstractDvrpModeModule modeModule = new AbstractDvrpModeModule( drtCfg.getMode() ){
+				@Override public void install(){
+
+					bindModal( DrtRouteConstraintsCalculator.class ).toProvider(modalProvider( getter -> new DefaultDrtRouteConstraintsCalculator(
+							drtCfg, getter.getModal( ConstraintSetChooser.class )) ) ).in( Singleton.class );
+					DrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+					bindModal(ConstraintSetChooser.class).toProvider(
+							() -> (departureTime, accessActLink, egressActLink, person, tripAttributes)
+									      -> Optional.of(optimizationConstraintsSet)
+											).in(Singleton.class);
+
+					switch( drtCfg.operationalScheme ){
+						case door2door -> bindModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ).toProvider(
+																		 modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
+																 .asEagerSingleton();
+						case stopbased, serviceAreaBased -> {
+							bindModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ).toProvider( modalProvider(
+																       getter -> new ClosestAccessEgressFacilityFinder(
+																		       optimizationConstraintsSet.maxWalkDistance,
+																		       getter.get( Network.class ),
+																		       QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
+														       .asEagerSingleton();
+						}
+						default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.operationalScheme );
+					}
+				}
+
+//				bindModal( DvrpRoutingModule.class).toProvider( DvrpRoutingModuleProvider.class );
+
+
+			};
+
+			modules.add( modeModule );
+
+		}
+
+		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , modules.toArray( new AbstractModule[0] ) ) ;
 
 		// The following is more awkward than it should be because of Java type erasure; essentially, it says ...getInstance( Set<ControlerListener>.class ):
 		Set<ControlerListener> result = injector.getInstance( Key.get( new TypeLiteral<Set<ControlerListener>>(){} ) );
@@ -140,4 +252,17 @@ public final class AccessibilityFromEvents{
 			}
 		}
 	}
+
+	//	static class StopFinderProvider extends ModalProviders.AbstractProvider<DvrpMode, DvrpRoutingModule.AccessEgressFacilityFinder > {
+//
+//		StopFinderProvider( String mode ){
+//			super( mode, DvrpModes::mode );
+//		}
+//
+//		@Override public DvrpRoutingModule.AccessEgressFacilityFinder get(){
+//			return getModalInstance( DvrpRoutingModule.AccessEgressFacilityFinder.class );
+//		}
+//
+//	}
+
 }

@@ -32,6 +32,8 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -66,6 +68,8 @@ public final class AccessibilityModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		String mode = null;
+
 		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 			// yy not sure if this truly needs to be a provider.  kai, dec'16
 
