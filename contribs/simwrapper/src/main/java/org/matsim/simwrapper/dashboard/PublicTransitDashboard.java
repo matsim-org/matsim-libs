@@ -13,6 +13,16 @@ import java.util.List;
  */
 public class PublicTransitDashboard implements Dashboard {
 
+	private List<TransitViewer.CustomRouteType> customRouteTypes = new ArrayList<>();
+
+	/**
+	 * Add custom route types to the transit viewer.
+	 */
+	public PublicTransitDashboard withCustomRouteTypes(TransitViewer.CustomRouteType... custom) {
+		customRouteTypes.addAll(List.of(custom));
+		return this;
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 
@@ -27,20 +37,8 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.network = "*output_network.xml.gz";
 			viz.transitSchedule = data.output("*output_transitSchedule.xml.gz");
 
-			viz.customRouteTypes = new ArrayList<>();
-			// bus
-			TransitViewer.CustomRouteType crt = new TransitViewer.CustomRouteType();
-			crt.label = "Bus";
-			crt.color = "#109192";
-			crt.addMatchTransportMode("bus");
-			viz.customRouteTypes.add(crt);
-
-			// rail
-			TransitViewer.CustomRouteType crtRail = new TransitViewer.CustomRouteType();
-			crtRail.label = "Rail";
-			crtRail.color = "#EC0016";
-			crtRail.addMatchTransportMode("rail");
-			viz.customRouteTypes.add(crtRail);
+			if (!customRouteTypes.isEmpty())
+				viz.customRouteTypes = customRouteTypes;
 		});
 	}
 }
