@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CsvOptions;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -45,14 +47,12 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	produces = {
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
 		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
-		"mode_share_distance_distribution.csv",
+		"mode_share_distance_distribution.csv", "mode_shift.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
 )
 public class TripAnalysis implements MATSimAppCommand {
-
-	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 
 	/**
 	 * Attributes which relates this person to a reference person.
@@ -66,31 +66,24 @@ public class TripAnalysis implements MATSimAppCommand {
 	 * Person attribute containing its weight for analysis purposes.
 	 */
 	public static final String ATTR_REF_WEIGHT = "ref_weight";
-
+	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
+	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
+		"The attribute needs to be contained by output_persons.csv. Persons who do not match all filters are filtered out.", split = ",")
+	private final Map<String, String> personFilters = new HashMap<>();
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
 	private OutputOptions output = OutputOptions.ofCommand(TripAnalysis.class);
-
 	@CommandLine.Option(names = "--input-ref-data", description = "Optional path to reference data", required = false)
 	private String refData;
-
 	@CommandLine.Option(names = "--match-id", description = "Pattern to filter agents by id")
 	private String matchId;
-
 	@CommandLine.Option(names = "--dist-groups", split = ",", description = "List of distances for binning", defaultValue = "0,1000,2000,5000,10000,20000")
 	private List<Long> distGroups;
-
 	@CommandLine.Option(names = "--modes", split = ",", description = "List of considered modes, if not set all will be used")
 	private List<String> modeOrder;
-
 	@CommandLine.Option(names = "--shp-filter", description = "Define how the shp file filtering should work", defaultValue = "home")
 	private LocationFilter filter;
-
-	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
-		"The attribute needs to be contained by output_persons.csv. Persons who do not match all filters are filtered out.", split = ",")
-	private final Map<String, String> personFilters = new HashMap<>();
-
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
@@ -135,6 +128,20 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 
 		return hist;
+	}
+
+	private static Map<String, ColumnType> getColumnTypes() {
+		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.TEXT,
+			"trav_time", ColumnType.STRING, "wait_time", ColumnType.STRING, "dep_time", ColumnType.STRING,
+			"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING,
+			"start_activity_type", ColumnType.TEXT, "end_activity_type", ColumnType.TEXT,
+			"first_pt_boarding_stop", ColumnType.TEXT, "last_pt_egress_stop", ColumnType.TEXT));
+
+		// Map.of only has 10 argument max
+		columnTypes.put("traveled_distance", ColumnType.LONG);
+		columnTypes.put("euclidean_distance", ColumnType.LONG);
+
+		return columnTypes;
 	}
 
 	@Override
@@ -209,18 +216,8 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		log.info("Filtered {} out of {} persons", persons.rowCount(), total);
 
-		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.TEXT,
-			"trav_time", ColumnType.STRING, "wait_time", ColumnType.STRING, "dep_time", ColumnType.STRING,
-			"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING,
-			"start_activity_type", ColumnType.TEXT, "end_activity_type", ColumnType.TEXT,
-			"first_pt_boarding_stop", ColumnType.TEXT, "last_pt_egress_stop", ColumnType.TEXT));
-
-		// Map.of only has 10 argument max
-		columnTypes.put("traveled_distance", ColumnType.LONG);
-		columnTypes.put("euclidean_distance", ColumnType.LONG);
-
 		Table trips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("trips.csv")))
-			.columnTypesPartial(columnTypes)
+			.columnTypesPartial(getColumnTypes())
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("trips.csv"))).build());
 
@@ -313,6 +310,8 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeTripPurposes(joined);
 
 		writeTripDistribution(joined);
+
+		writeModeShift(joined);
 
 		return 0;
 	}
@@ -581,6 +580,34 @@ public class TripAnalysis implements MATSimAppCommand {
 				printer.println();
 			}
 		}
+	}
+
+	private void writeModeShift(Table trips) throws IOException {
+		Path path;
+		try {
+			Path dir = Path.of(input.getPath("trips.csv")).getParent().resolve("ITERS").resolve("it.0");
+			path = ApplicationUtils.matchInput("trips.csv", dir);
+		} catch (Exception e) {
+			log.error("Could not find trips from 0th iteration.", e);
+			return;
+		}
+
+		Table originalTrips = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path.toString()))
+			.columnTypesPartial(getColumnTypes())
+			.sample(false)
+			.separator(CsvOptions.detectDelimiter(path.toString())).build());
+
+		// Use longest_distance_mode where main_mode is not present
+		originalTrips.stringColumn("main_mode")
+			.set(originalTrips.stringColumn("main_mode").isMissing(),
+				originalTrips.stringColumn("longest_distance_mode"));
+
+		originalTrips.column("main_mode").setName("original_mode");
+
+		Table joined = new DataFrameJoiner(trips, "trip_id").inner(true, originalTrips);
+		Table aggr = joined.summarize("trip_id", count).by("original_mode", "main_mode");
+
+		aggr.write().csv(output.getPath("mode_shift.csv").toFile());
 	}
 
 	/**
