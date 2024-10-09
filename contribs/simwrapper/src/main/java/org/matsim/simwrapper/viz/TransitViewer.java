@@ -21,29 +21,49 @@ public class TransitViewer extends Viz {
 		super("transit");
 	}
 
-	public void addCustomRouteType(String name, String color, List<Integer> routeTypes) {
+	public CustomRouteType addCustomRouteType(String label, String color, boolean hide) {
 		CustomRouteType crt = new CustomRouteType();
-		crt.label = name;
+		crt.label = label;
 		crt.color = color;
+		crt.hide = hide;
 		customRouteTypes.add(crt);
+		return crt;
 	}
 
-	private class CustomRouteType {
-		String label;
-		String color;
+	public static class CustomRouteType {
+		public String label;
+		public String color;
+		public Boolean hide;
 		Match match;
+
+		public CustomRouteType addMatchTransportMode(String... transportMode) {
+			if (match == null)
+				match = new Match();
+
+			match.transportMode = transportMode;
+			return this;
+		}
+
+		public CustomRouteType addMatchId(String... id) {
+			if (match == null)
+				match = new Match();
+
+			match.id = id;
+			return this;
+		}
+
+		public CustomRouteType addMatchGtfsRouteType(Integer... gtfsRouteType) {
+			if (match == null)
+				match = new Match();
+
+			match.gtfsRouteType = gtfsRouteType;
+			return this;
+		}
 	}
 
-	public void addMatch(String transportMode, String id, List<Integer> gtfsRouteType) {
-		Match m = new Match();
-		m.transportMode = transportMode;
-		m.id = id;
-		m.gtfsRouteType = gtfsRouteType;
-	}
-
-	private class Match {
-		String transportMode;
-		String id;
-		List<Integer> gtfsRouteType;
+	private static class Match {
+		Object transportMode;
+		Object id;
+		Object gtfsRouteType;
 	}
 }
