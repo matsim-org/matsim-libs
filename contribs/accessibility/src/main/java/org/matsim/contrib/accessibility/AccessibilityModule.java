@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -82,7 +83,8 @@ public final class AccessibilityModule extends AbstractModule {
 			@Inject TripRouter tripRouter ;
 
 			// TODO: consider injecting estimator here
-//			@Inject DrtEstimator drtEstimator ;
+			@Inject
+			DrtEstimator drtEstimator;
 
 			@Override
 			public ControlerListener get() {
@@ -162,11 +164,7 @@ public final class AccessibilityModule extends AbstractModule {
 					} else if ( TransportMode.pt.equals( mode ) ){
 						calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.scoring(), scenario );
 					} else if ( Modes4Accessibility.estimatedDrt.name().equals( mode )) {
-//						final TravelTime travelTime = travelTimes.get("dvrp_estimated");
-//						final TravelTime travelTime = travelTimes.get(TransportMode.car);
-//						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
-						// TODO: add drtEstimator here
-						calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, tripRouter);
+						calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, tripRouter, drtEstimator);
 					} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(

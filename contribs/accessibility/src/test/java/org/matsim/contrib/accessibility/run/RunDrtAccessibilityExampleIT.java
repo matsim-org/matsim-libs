@@ -28,12 +28,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
+import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -96,39 +103,59 @@ public class RunDrtAccessibilityExampleIT {
 
 		// -----------
 		// Following is inlined from RunDrtExample.run(config, false);
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
-
-		// Added following so that agent can always walk to drt stop
-		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-//			drtCfg.maxWalkDistance = Double.MAX_VALUE;
-		}
-
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-
-		// add supermarket facility
 		{
-			// Node 16 (link 222) is in the west of Mielec
-			ActivityFacility s1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("s1", ActivityFacility.class), new Coord(299.5735,-3886.1963));//Id.createLinkId("222"));
-			s1.addActivityOption(scenario.getActivityFacilities().getFactory().createActivityOption("supermarket"));
-			scenario.getActivityFacilities().addActivityFacility(s1);
+			MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+			DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+
+			// Added following so that agent can always walk to drt stop
+			for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+					(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
+				defaultConstraintsSet.maxWalkDistance = Double.MAX_VALUE;
+			}
+
+			Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+
+			// add supermarket facility
+			{
+				// Node 16 (link 222) is in the west of Mielec
+				ActivityFacility s1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("s1", ActivityFacility.class), new Coord(299.5735,-3886.1963));//Id.createLinkId("222"));
+				s1.addActivityOption(scenario.getActivityFacilities().getFactory().createActivityOption("supermarket"));
+				scenario.getActivityFacilities().addActivityFacility(s1);
+			}
+
+			ScenarioUtils.loadScenario(scenario);
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new DvrpModule());
+			controler.addOverridingModule(new MultiModeDrtModule());
+			controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+
+			//add accessibility module
+			{
+				final AccessibilityModule accModule = new AccessibilityModule();
+				accModule.setConsideredActivityType("supermarket");
+				controler.addOverridingModule(accModule);
+			}
+
+
+			//opt 2
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(DrtEstimator.class).toInstance(new DirectTripDistanceBasedDrtEstimator.Builder()
+						.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(103.34))
+						.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.0))
+						.setRideDurationEstimator(new ConstantRideDurationEstimator(0.1087, 47.84)) // TODO: I'm abusing this method a bit. It's supposed to calculate drt ride duration based on car ride duration; in my case it is based on car ride **distance**
+						.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.0))
+						.build());
+				}
+			});
+
+
+			controler.run();
 		}
-
-		ScenarioUtils.loadScenario(scenario);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
-
-		//add accessibility module
-		{
-			final AccessibilityModule accModule = new AccessibilityModule();
-			accModule.setConsideredActivityType("supermarket");
-			controler.addOverridingModule(accModule);
-		}
-
-		controler.run();
 		// -----------
 
 		// compare results:

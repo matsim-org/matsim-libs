@@ -1,5 +1,6 @@
 package org.matsim.contrib.accessibility;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -9,6 +10,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.*;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
@@ -19,12 +22,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -39,13 +37,10 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private static final Logger LOG = LogManager.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
-//	private final TravelDisutilityFactory travelDisutilityFactory;
-//	private final TravelTime travelTime;
 	private final Scenario scenario;
 
-//	private final TravelDisutility travelDisutility;
+
 	private final ScoringConfigGroup scoringConfigGroup;
-	private final NetworkConfigGroup networkConfigGroup;
 
 	private Network subNetwork;
 
@@ -63,24 +58,17 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	TripRouter tripRouter ;
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
-//	private final DrtEstimator drtEstimator
-//
-//	@Inject
-//	private DrtEstimator drtEstimator;
+	private final DrtEstimator drtEstimator;
 
-	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, TripRouter tripRouter) {
+
+	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, TripRouter tripRouter, DrtEstimator drtEstimator) {
+
 		this.mode = mode;
-//		this.travelTime = travelTime;
-//		this.travelDisutilityFactory = travelDisutilityFactory;
+
 		this.scenario = scenario;
 		this.scoringConfigGroup = scenario.getConfig().scoring();
-		this.networkConfigGroup = scenario.getConfig().network();
 		this.tripRouter = tripRouter;
-//		this.drtEstimator = drtEstimator;
-
-//		Gbl.assertNotNull(travelDisutilityFactory);
-//		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-//		this.router = new SpeedyALTFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
+		this.drtEstimator = drtEstimator;
 
 		// drt params
 		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
@@ -93,10 +81,6 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 		// todo: I added a getter to access the stop finder. Is this ok?
 		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();
-//		this.drtEstimator = new EuclideanDistanceBasedDrtEstimator(scenario.getNetwork(), 1.2, 0.0842928, 337.1288522,  5 * 60, 0, 0, 0);
-//		this.drtEstimator = DetourBasedDrtEstimator.normalDistributed(337.1288522, 0.0842928, 0., 0. * 60, 0);
-
-
 
 	}
 
@@ -179,13 +163,24 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Leg mainLeg = extractLeg(planElements, TransportMode.car);
 			double directRideDistance_m = mainLeg.getRoute().getDistance();
 
-//			drtEstimator.estimate(DrtRoute)
-			// todo: insert CL's DRT Estimator here instead of hardcoding parameters here.
-			double waitTime_s = 103.34; //TODO
-			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
+
+			// attempt to replace hard coded calculation w/ DRT Estimator
+			DrtRoute drtRoute = new DrtRoute(Id.createLinkId("dummyFrom"), Id.createLinkId("dummyTo"));
+			drtRoute.setDistance(directRideDistance_m);
+			drtRoute.setDirectRideTime(mainLeg.getRoute().getTravelTime().seconds());
+
+			DrtEstimator.Estimate estimate = drtEstimator.estimate(drtRoute, OptionalTime.defined(departureTime));
+			double waitTime_s = estimate.waitingTime();
+			double rideTime_s = estimate.rideTime();
+			// old version, hardcoded
+//			{
+//				double waitTime_s = 103.34;
+//				double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
+//			}
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours
+
 
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
@@ -250,7 +245,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	public EstimatedDrtAccessibilityContributionCalculator duplicate() {
 		LOG.info("Creating another EstimatedDrtAccessibilityContributionCalculator object.");
 		EstimatedDrtAccessibilityContributionCalculator estimatedDrtAccessibilityContributionCalculator =
-			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, tripRouter);
+			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, this.tripRouter, this.drtEstimator);
 		estimatedDrtAccessibilityContributionCalculator.subNetwork = this.subNetwork;
 //		estimatedDrtAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		estimatedDrtAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
