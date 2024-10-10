@@ -85,6 +85,7 @@ public class CarrierSchedulerUtils {
 
     CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
     NetworkRouter.routePlan(plan, netbasedTransportCosts);
+    carrier.addPlan(plan);
     carrier.setSelectedPlan(plan);
     return carrier;
   }
