@@ -295,7 +295,8 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentTransportElement(
-          LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
+//          LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
+    LspShipment lspShipment, Tour tour, Tour.ServiceActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
             LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
@@ -415,7 +416,23 @@ import org.matsim.vehicles.VehicleType;
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         DistributionServiceStartEventHandler handler =
-                new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource);
+                new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource, null);
+        lspShipment.addSimulationTracker(handler);
+        break;
+      }
+    }
+  }
+
+  //TODO: Kann man das wieder zusammenfassen mitt der Methode fpr die Services?
+  private void addDistributionServiceEventHandler(
+          CarrierShipment carrierShipment,
+          LspShipment lspShipment,
+          LSPCarrierResource resource) {
+
+    for (LogisticChainElement element : this.resource.getClientElements()) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+        DistributionServiceStartEventHandler handler =
+                new DistributionServiceStartEventHandler(null, lspShipment, element, resource, carrierShipment);
         lspShipment.addSimulationTracker(handler);
         break;
       }
@@ -432,6 +449,22 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LSPTourStartEventHandler handler =
                 new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
+        lspShipment.addSimulationTracker(handler);
+        break;
+      }
+    }
+  }
+
+  private void addDistributionTourStartEventHandler(
+          CarrierShipment carrierShipment,
+          LspShipment lspShipment,
+          LSPCarrierResource resource,
+          Tour tour) {
+
+    for (LogisticChainElement element : this.resource.getClientElements()) {
+      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+        LSPTourStartEventHandler handler =
+                new LSPTourStartEventHandler(lspShipment, null, element, resource, tour); //FIXME: Hier müsste eigentlich das CarrierShipment übergeben werden in anaolger Logic zu Services... arghhh.
         lspShipment.addSimulationTracker(handler);
         break;
       }

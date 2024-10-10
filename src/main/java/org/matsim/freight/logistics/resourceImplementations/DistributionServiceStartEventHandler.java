@@ -54,7 +54,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
           CarrierService carrierService,
           LspShipment lspShipment,
           LogisticChainElement element,
-          LSPCarrierResource resource) {
+          LSPCarrierResource resource, CarrierShipment carrierShipment) {
     this.carrierShipment = carrierShipment;
     this.carrierService = carrierService;
     this.lspShipment = lspShipment;
@@ -96,6 +96,17 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
   }
 
+  //TODO: Inahltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
+  private void logTransport(CarrierShipmentDeliveryStartEvent event) {
+    String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
+    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+    LspShipmentPlanElement abstractPlanElement =
+            lspShipment.getShipmentLog().getPlanElements().get(id);
+    if (abstractPlanElement instanceof LspShipmentLeg transport) {
+      transport.setEndTime(event.getTime());
+    }
+  }
+
   private void logUnload(CarrierServiceStartEvent event) {
     LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
             LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
@@ -105,6 +116,26 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     builder.setResourceId(resource.getId());
     builder.setStartTime(event.getTime());
     builder.setEndTime(event.getTime() + event.getServiceDuration());
+    LspShipmentPlanElement unload = builder.build();
+    String idString =
+            unload.getResourceId()
+                    + ""
+                    + unload.getLogisticChainElement().getId()
+                    + unload.getElementType();
+    Id<LspShipmentPlanElement> unloadId = Id.create(idString, LspShipmentPlanElement.class);
+    lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
+  }
+
+  //TODO: Inahltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
+  private void logUnload(CarrierShipmentDeliveryStartEvent event) {
+    LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
+            LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+    builder.setCarrierId(event.getCarrierId());
+    builder.setLinkId(event.getLinkId());
+    builder.setLogisticChainElement(logisticChainElement);
+    builder.setResourceId(resource.getId());
+    builder.setStartTime(event.getTime());
+    builder.setEndTime(event.getTime() + event.getDeliveryDuration());
     LspShipmentPlanElement unload = builder.build();
     String idString =
             unload.getResourceId()
