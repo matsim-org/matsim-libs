@@ -2,9 +2,12 @@ package org.matsim.contrib.accessibility;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -74,6 +77,9 @@ public final class AccessibilityFromEvents{
 
 		AbstractModule module = new AbstractModule(){
 			@Override public void install(){
+				AccessibilityConfigGroup accessibilityConfig = ConfigUtils.addOrGetModule( this.getConfig(), AccessibilityConfigGroup.class );
+
+
 				install( new TimeInterpretationModule() );
 				// has to do with config
 
@@ -100,18 +106,44 @@ public final class AccessibilityFromEvents{
 				install( new TravelDisutilityModule() ) ;
 				// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
 
-				//				install(new EventsManagerModule());
-//				install(new DvrpModule());
-//				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
-//				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-//					install(new DrtModeModule(drtCfg));
-//					installQSimModule(new DrtModeQSimModule(drtCfg));
-//					install(new DrtModeAnalysisModule(drtCfg));
-//				}
-//
-//
-////				install(new MultiModeDrtModule());
-////				install(new MultiModeDrtCompanionModule());
+				if ( accessibilityConfig.getIsComputingMode().contains( Modes4Accessibility.estimatedDrt ) ){
+
+					//				install(new EventsManagerModule());
+					install( new DvrpModule() );
+					MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), MultiModeDrtConfigGroup.class );
+					for( DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements() ){
+						install( new DrtModeModule( drtCfg ) );
+						installQSimModule( new DrtModeQSimModule( drtCfg ) );
+						install( new DrtModeAnalysisModule( drtCfg ) );
+
+						install( new AbstractDvrpModeModule( drtCfg.getMode() ){
+							// (= we need to install a ModeModule so we get access to the modal material)
+
+							@Override public void install(){
+								MapBinder<String, DvrpRoutingModule.AccessEgressFacilityFinder> mapBinder = MapBinder.newMapBinder( binder(), String.class,
+										DvrpRoutingModule.AccessEgressFacilityFinder.class );
+								// (this is just the "normal" map binder)
+
+								// There is ModalProviders.InstanceGetter#getModal to get modal instances.  However, if one
+								// looks in the internals, one finds that it is taken out of the injector, which means that it
+								// can only be called _after_ the injector was constructed.  Which means that one needs to
+								// program the material as (modal)provider which is lazily called only when needed.
+
+								mapBinder.addBinding( getMode() ).toProvider(
+										this.modalProvider( getter -> getter.getModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ) ) );
+								// (I think that this works as follows:
+								// * getter.getModal(...) takes whatever modal material is needed out of the injector.
+								// * however, the provider that is bound to the mapBinder is not activated until this is really needed.
+								// I think.  kai, oct'24)
+							}
+						} );
+					}
+
+
+//				install(new MultiModeDrtModule());
+//				install(new MultiModeDrtCompanionModule());
+				}
+
 //
 				// install the accessiblity module:
 				{
@@ -140,4 +172,6 @@ public final class AccessibilityFromEvents{
 			}
 		}
 	}
+
+
 }

@@ -22,9 +22,12 @@ package org.matsim.contrib.accessibility.run;
 import java.util.*;
 import java.util.function.Function;
 
+import com.google.inject.multibindings.MapBinder;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -75,10 +78,7 @@ public class TinyAccessibilityTest {
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(min);
-		acg.setBoundingBoxTop(max);
-		acg.setBoundingBoxLeft(min);
-		acg.setBoundingBoxRight(max);
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
 		acg.setUseParallelization(false);
 
 		// ---
@@ -95,48 +95,45 @@ public class TinyAccessibilityTest {
 
 	}
 
-//	@Test
-//	public void runFromEventsDrt() {
-//		final Config config = createTestConfig();
-//
-//		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-////		drtParams.setMarginalUtilityOfTraveling(0);
-//		config.scoring().addModeParams(drtParams);
-//
-//		double min = 0.; // Values for bounding box usually come from a config file
-//		double max = 200.;
-//
-//		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-//		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-//		acg.setBoundingBoxBottom(min);
-//		acg.setBoundingBoxTop(max);
-//		acg.setBoundingBoxLeft(min);
-//		acg.setBoundingBoxRight(max);
-//		acg.setUseParallelization(false);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
-//
-////		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
-////			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
-////			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
-////			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
-////			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
-////			.build();
-//
-//		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-//
-//		// ---
-//
-//		final Scenario scenario = createTestScenario(config);
-//
-//		// ---
-//
-//		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
-//
-//		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
-//		builder.addDataListener( new ResultsComparator() );
-//		builder.build().run() ;
-//
-//	}
+	@Test @Disabled
+	public void runFromEventsDrt() {
+		final Config config = createTestConfig();
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+//		drtParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(drtParams);
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min ).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
+		acg.setUseParallelization(false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+
+//		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+//			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+//			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
+//			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
+//			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
+//			.build();
+
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		// ---
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
 
 	@Test
 	void testWithBoundingBox() {
@@ -334,15 +331,6 @@ public class TinyAccessibilityTest {
 			}
 		}
 	}
-	static class FinderRegistry {
-		Map<String, DvrpRoutingModule.AccessEgressFacilityFinder> map = new LinkedHashMap<>();
-		void setFinder( String mode, DvrpRoutingModule.AccessEgressFacilityFinder finder ) {
-			map.put( mode, finder );
-		}
-		DvrpRoutingModule.AccessEgressFacilityFinder getFinder( String mode ) {
-			return map.get( mode );
-		}
-	}
 	static class FinderBridge extends AbstractDvrpModeModule {
 		FinderBridge( String mode ){
 			super( mode );
@@ -351,9 +339,15 @@ public class TinyAccessibilityTest {
 			// we bind modal material using the modal binders.  but how do we get it back?  The ModalProviders have methods getModalInstance(...), which return what we need ...
 			// ... however, they take it out of the injector, which means that we really need to use providers, since their getters are called _after_ the injector is created.
 
-			bind( Abc.class).to(this.modalProvider( getter -> {
+			MapBinder<String, DvrpRoutingModule.AccessEgressFacilityFinder> mapBinder = MapBinder.newMapBinder( binder(), String.class,
+					DvrpRoutingModule.AccessEgressFacilityFinder.class );
 
-			});
+			mapBinder.addBinding( getMode() ).toProvider( this.modalProvider( getter -> getter.getModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ) ) );
+			// (I think that this works as follows:
+			// * getter.getModal(...) takes whatever is needed out of the injector.
+			// * however, the provider that is bound to the mapBinder is not activated until this is really needed.
+			// I think.  kai, oct'24)
+
 		}
 	}
 }

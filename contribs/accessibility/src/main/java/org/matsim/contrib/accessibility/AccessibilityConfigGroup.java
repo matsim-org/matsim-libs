@@ -144,12 +144,13 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return map ;
 	}
 	
-	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
+	public AccessibilityConfigGroup setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		if (val) {
 			this.isComputingMode.add(mode);
 		} else {
 			this.isComputingMode.remove(mode);
 		}
+		return this;
 	}
 
 	public Set<Modes4Accessibility> getIsComputingMode() {
@@ -201,8 +202,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return this.timeOfDay ;
 	}
 	@StringSetter(TIME_OF_DAY)
-	public void setTimeOfDay(Double timeOfDay) {
+	public AccessibilityConfigGroup setTimeOfDay(Double timeOfDay) {
 		this.timeOfDay = timeOfDay;
+		return this;
 	}
 	
     @StringGetter(MEASURE_POINT_GEOMETRY_PROVISION)
@@ -210,82 +212,96 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
         return this.measurePointGeometryProvision;
     }
     @StringSetter(MEASURE_POINT_GEOMETRY_PROVISION)
-    public void setMeasurePointGeometryProvision(MeasurePointGeometryProvision measurePointGeometryProvision) {
+    public AccessibilityConfigGroup setMeasurePointGeometryProvision(MeasurePointGeometryProvision measurePointGeometryProvision) {
         this.measurePointGeometryProvision = measurePointGeometryProvision;
+	    return this;
     }
     @StringGetter(ACCESSIBILITY_MEASURE_TYPE)
     public AccessibilityMeasureType getAccessibilityMeasureType() {
         return this.accessibilityMeasureType;
     }
     @StringSetter(ACCESSIBILITY_MEASURE_TYPE)
-    public void setAccessibilityMeasureType(AccessibilityMeasureType accessibilityMeasureType) {
+    public AccessibilityConfigGroup setAccessibilityMeasureType(AccessibilityMeasureType accessibilityMeasureType) {
         this.accessibilityMeasureType = accessibilityMeasureType;
+	    return this;
     }
+
+	// yyyy change the following Boolean to an enum
     @StringGetter(USE_OPPORTUNITY_WEIGHTS)
     public boolean isUseOpportunityWeights() {
     	return useOpportunityWeights;
     }
     @StringSetter(USE_OPPORTUNITY_WEIGHTS)
-    public void setUseOpportunityWeights(Boolean useOpportunityWeights) {
+    public AccessibilityConfigGroup setUseOpportunityWeights(Boolean useOpportunityWeights) {
     	this.useOpportunityWeights = useOpportunityWeights;
+	    return this;
     }
+
+	// yyyy change the following Boolean to an enum
 	@StringGetter(USE_PARALLELIZATION)
 	public boolean isUseParallelization() {
 		return useParallelization;
 	}
 	@StringSetter(USE_PARALLELIZATION)
-	public void setUseParallelization(Boolean useParallelization) {
+	public AccessibilityConfigGroup setUseParallelization(Boolean useParallelization) {
 		this.useParallelization = useParallelization;
+		return this;
 	}
     @StringGetter(WEIGHT_EXPONENT)
     public double getWeightExponent() {
     	return weightExponent;
     }
     @StringSetter(WEIGHT_EXPONENT)
-    public void setWeightExponent(double weightExponent) {
+    public AccessibilityConfigGroup setWeightExponent(double weightExponent) {
     	this.weightExponent = weightExponent;
+	    return this;
     }
     @StringGetter(BOUNDING_BOX_TOP)
     public double getBoundingBoxTop() {
         return this.boundingBoxTop;
     }
     @StringSetter(BOUNDING_BOX_TOP)
-    public void setBoundingBoxTop(double value) {
+    public AccessibilityConfigGroup setBoundingBoxTop(double value) {
         this.boundingBoxTop = value;
+	    return this;
     }
     @StringGetter(BOUNDING_BOX_LEFT)
     public double getBoundingBoxLeft() {
         return this.boundingBoxLeft;
     }
     @StringSetter(BOUNDING_BOX_LEFT)
-    public void setBoundingBoxLeft(double value) {
+    public AccessibilityConfigGroup setBoundingBoxLeft(double value) {
         this.boundingBoxLeft = value;
+	    return this;
     }
     @StringGetter(BOUNDING_BOX_RIGHT)
     public double getBoundingBoxRight() {
         return this.boundingBoxRight;
     }
     @StringSetter(BOUNDING_BOX_RIGHT)
-    public void setBoundingBoxRight(double value) {
+    public AccessibilityConfigGroup setBoundingBoxRight(double value) {
         this.boundingBoxRight = value;
+	    return this;
     }
     @StringGetter(BOUNDING_BOX_BOTTOM)
     public double getBoundingBoxBottom() {
         return this.boundingBoxBottom;
     }
     @StringSetter(BOUNDING_BOX_BOTTOM)
-    public void setBoundingBoxBottom(double value) {
+    public AccessibilityConfigGroup setBoundingBoxBottom(double value) {
         this.boundingBoxBottom = value;
+	    return this;
     }
     
     /**
 	 * helper method to set bounding box in code
 	 */
-    public void setEnvelope( Envelope envelope ) {
+    public AccessibilityConfigGroup setEnvelope( Envelope envelope ) {
 	    this.boundingBoxBottom = envelope.getMinY() ;
 	    this.boundingBoxLeft = envelope.getMinX() ;
 	    this.boundingBoxRight = envelope.getMaxX() ;
 	    this.boundingBoxTop = envelope.getMaxY() ;
+	    return this;
     }
 
     @StringGetter(AREA_OF_ACC_COMP)
@@ -294,8 +310,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
+	public AccessibilityConfigGroup setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
 	    this.areaOfAccessibilityComputation = areaOfAccessibilityComputation ;
+	    return this;
 	}
     
     /**
