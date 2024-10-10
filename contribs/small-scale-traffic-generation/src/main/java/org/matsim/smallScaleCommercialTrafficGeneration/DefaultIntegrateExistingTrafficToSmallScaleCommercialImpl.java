@@ -311,6 +311,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 				else if (!carrier.getShipments().isEmpty())
 					newCarrier.getShipments().putAll(carrier.getShipments());
 				if (carrier.getSelectedPlan() != null) {
+					newCarrier.addPlan(carrier.getSelectedPlan());
 					newCarrier.setSelectedPlan(carrier.getSelectedPlan());
 
 					List<String> startAreas = new ArrayList<>();

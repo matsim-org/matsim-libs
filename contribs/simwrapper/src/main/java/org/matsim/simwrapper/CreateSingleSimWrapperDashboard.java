@@ -97,10 +97,10 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 			//add dashboard
 			switch (dashboardType) {
 				case noise -> {
-					sw.addDashboard(new NoiseDashboard());
+					sw.addDashboard(new NoiseDashboard(config.global().getCoordinateSystem()));
 				}
 				case emissions -> {
-					sw.addDashboard(new EmissionsDashboard());
+					sw.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()));
 				}
 				case traffic -> {
 					sw.addDashboard(new TrafficDashboard());
