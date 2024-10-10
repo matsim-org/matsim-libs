@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
-import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -230,7 +229,7 @@ import org.matsim.vehicles.VehicleType;
         switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
           case serviceBased -> {
             for (TourElement element : tour.getTourElements()) {
-              if (element instanceof ServiceActivity serviceActivity) {
+              if (element instanceof Tour.ServiceActivity serviceActivity) {
                 if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
                   addShipmentLoadElement(lspShipment, tour);
                   addShipmentTransportElement(lspShipment, tour, serviceActivity);
@@ -296,7 +295,8 @@ import org.matsim.vehicles.VehicleType;
 
   private void addShipmentTransportElement(
 //          LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
-    LspShipment lspShipment, Tour tour, Tour.ServiceActivity tourActivity) {
+//                  LspShipment lspShipment, Tour tour, Tour.ServiceActivity tourActivity) {
+    LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
             LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
@@ -327,7 +327,15 @@ import org.matsim.vehicles.VehicleType;
     builder.setCarrierId(carrier.getId());
     builder.setFromLinkId(tour.getStartLinkId());
     builder.setToLinkId(tourActivity.getLocation());
-    builder.setCarrierService(tourActivity.getService());
+	  switch( tourActivity ){
+		  case Tour.ServiceActivity serviceActivity -> builder.setCarrierService( serviceActivity.getService() );
+		  case Tour.ShipmentBasedActivity shipment -> builder.setCarrierShipment( shipment.getShipment() );
+		  case null, default -> {
+		  }
+                  // yyyy: At the jsprit level, it makes sense to have these different since services run about 10x faster than shipments.  However,
+                  // at the matsim level we could consider to either only have shipments (from depot to xx for what used to be services), or only have
+                  // services.  kai/kai, oct'24
+	  }
     LspShipmentPlanElement transport = builder.build();
     String idString =
             transport.getResourceId()
