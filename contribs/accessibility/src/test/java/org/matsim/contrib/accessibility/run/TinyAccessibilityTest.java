@@ -20,6 +20,7 @@
 package org.matsim.contrib.accessibility.run;
 
 import java.util.*;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,13 +36,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -327,6 +332,28 @@ public class TinyAccessibilityTest {
 					}
 				}
 			}
+		}
+	}
+	static class FinderRegistry {
+		Map<String, DvrpRoutingModule.AccessEgressFacilityFinder> map = new LinkedHashMap<>();
+		void setFinder( String mode, DvrpRoutingModule.AccessEgressFacilityFinder finder ) {
+			map.put( mode, finder );
+		}
+		DvrpRoutingModule.AccessEgressFacilityFinder getFinder( String mode ) {
+			return map.get( mode );
+		}
+	}
+	static class FinderBridge extends AbstractDvrpModeModule {
+		FinderBridge( String mode ){
+			super( mode );
+		}
+		@Override public void install(){
+			// we bind modal material using the modal binders.  but how do we get it back?  The ModalProviders have methods getModalInstance(...), which return what we need ...
+			// ... however, they take it out of the injector, which means that we really need to use providers, since their getters are called _after_ the injector is created.
+
+			bind( Abc.class).to(this.modalProvider( getter -> {
+
+			});
 		}
 	}
 }
