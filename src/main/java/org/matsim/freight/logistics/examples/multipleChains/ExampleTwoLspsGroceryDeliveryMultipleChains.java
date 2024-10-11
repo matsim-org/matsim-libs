@@ -128,17 +128,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
-
     Controler controler = prepareControler(scenario);
 
     log.info("Run MATSim");
 
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
-    controler
-            .getConfig()
-            .vspExperimental()
-            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controler.run();
 
     runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
@@ -162,6 +155,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     config.global().setCoordinateSystem("EPSG:31468");
     config.global().setRandomSeed(4177);
     config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
     FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
