@@ -278,7 +278,7 @@ import org.matsim.vehicles.VehicleType;
     double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     double cumulatedLoadingTime = 0;
     for (TourElement element : tour.getTourElements()) {
-      if (element instanceof ServiceActivity activity) {
+      if (element instanceof Tour.ServiceActivity activity) {
         cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
       }
     }
@@ -294,8 +294,6 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentTransportElement(
-//          LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
-//                  LspShipment lspShipment, Tour tour, Tour.ServiceActivity tourActivity) {
     LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
@@ -330,11 +328,10 @@ import org.matsim.vehicles.VehicleType;
 	  switch( tourActivity ){
 		  case Tour.ServiceActivity serviceActivity -> builder.setCarrierService( serviceActivity.getService() );
 		  case Tour.ShipmentBasedActivity shipment -> builder.setCarrierShipment( shipment.getShipment() );
-		  case null, default -> {
-		  }
-                  // yyyy: At the jsprit level, it makes sense to have these different since services run about 10x faster than shipments.  However,
+          default ->  throw new IllegalStateException("Unexpected value: " + tourActivity);
+          // yyyy: At the jsprit level, it makes sense to have these different since services run about 10x faster than shipments.  However,
                   // at the matsim level we could consider to either only have shipments (from depot to xx for what used to be services), or only have
-                  // services.  kai/kai, oct'24
+                  // services. See also MATSim issue #3510  kai/kai, oct'24
 	  }
     LspShipmentPlanElement transport = builder.build();
     String idString =
@@ -348,7 +345,7 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentUnloadElement(
-          LspShipment tuple, Tour tour, ServiceActivity serviceActivity) {
+          LspShipment tuple, Tour tour, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
             LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
@@ -360,11 +357,27 @@ import org.matsim.vehicles.VehicleType;
       }
     }
 
-    int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-    ServiceActivity serviceAct = (ServiceActivity) tour.getTourElements().get(serviceIndex);
+    final double startTime = tourActivity.getExpectedArrival();
+    final double endTime = startTime + tourActivity.getDuration();
+    //Todo: Check if it also works with shipmentBased activity, or if we in that case need the way with the switch-case and the data from the shipmentBasedActivity. KMT Oct'24
 
-    final double startTime = serviceAct.getExpectedArrival();
-    final double endTime = startTime + serviceAct.getDuration();
+//    switch( tourActivity ){
+//      case Tour.ServiceActivity serviceActivity -> {
+//        startTime = tourActivity.getExpectedArrival();
+//        endTime = startTime + tourActivity.getDuration();
+//
+////        startTime = serviceActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
+////        endTime = startTime + serviceActivity.getDuration();
+//      }
+//      case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
+//        //Todo: Not tested ; maybe we need to take the data from the shipment itself (as is was originally done with the service: serviceActivity.getService() ,..... KMT Oct'24
+//        startTime = shipmentBasedActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
+//        endTime = startTime + shipmentBasedActivity.getDuration();
+//
+//      }
+//      default -> {}
+//    }
+
     Assert.isTrue(
             endTime >= startTime,
             "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
