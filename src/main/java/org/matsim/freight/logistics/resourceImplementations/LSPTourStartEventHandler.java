@@ -75,33 +75,30 @@ import java.util.Objects;
 
   @Override
   public void handleEvent(CarrierTourStartEvent event) {
-    //Todo: Ablauf für CarrierShipment einbauen. Das fehlt aktuell noch.
-    if (event.getTourId().equals(tour.getId())) {
+    if (event.getTourId().equals(tour.getId())  && event.getCarrierId() == resource.getCarrier().getId()) {
       for (TourElement tourElement : tour.getTourElements()) {
         switch (tourElement) {
+          //This could even be short, if the Id would be available already on the level of Tour.TourActivity. KMT Oct'24
           case ServiceActivity serviceActivity -> {
-            if (serviceActivity.getService().getId() == carrierService.getId()
-                    && event.getCarrierId() == resource.getCarrier().getId()) {
-              if (resource instanceof DistributionCarrierResource || resource instanceof MainRunCarrierResource) {
-                logLoad(event.getCarrierId(),event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour),  event.getTime());
-                logTransport(event.getCarrierId(),  event.getLinkId(), tour.getEndLinkId(), event.getTime());
-              }
+            if (serviceActivity.getService().getId() == carrierService.getId()) {
+              logLoadAndTransport(event);
             }
           }
           case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierService.getId().toString())
-                    && event.getCarrierId() == resource.getCarrier().getId()) {
-
-              //Todo: This should be possibly even shorter, because it does the same es in the ServiceBased case...
-              if (resource instanceof DistributionCarrierResource || resource instanceof MainRunCarrierResource) {
-                logLoad(event.getCarrierId(),event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour),  event.getTime());
-                logTransport(event.getCarrierId(),  event.getLinkId(), tour.getEndLinkId(), event.getTime());
-              }
+            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierService.getId().toString())) {
+              logLoadAndTransport(event);
             }
           }
           case null, default -> {}
         }
       }
+    }
+  }
+
+  private void logLoadAndTransport(CarrierTourStartEvent event) {
+    if (resource instanceof DistributionCarrierResource || resource instanceof MainRunCarrierResource) {
+      logLoad(event.getCarrierId(), event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour),  event.getTime());
+      logTransport(event.getCarrierId(),  event.getLinkId(), tour.getEndLinkId(), event.getTime());
     }
   }
 
