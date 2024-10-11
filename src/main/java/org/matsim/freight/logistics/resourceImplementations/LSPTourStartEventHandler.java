@@ -76,31 +76,43 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     //Todo: Ablauf für CarrierShipment einbauen. Das fehlt aktuell noch.
     if (event.getTourId().equals(tour.getId())) {
       for (TourElement tourElement : tour.getTourElements()) {
-        if (tourElement instanceof ServiceActivity serviceActivity) {
-          if (serviceActivity.getService().getId() == carrierService.getId()
-              && event.getCarrierId() == resource.getCarrier().getId()) {
-            if (resource instanceof DistributionCarrierResource) { //DistributionTourStarts
-              logLoad(
-                  event.getCarrierId(),
-                  event.getLinkId(),
-                  event.getTime() - getCumulatedLoadingTime(tour),
-                  event.getTime());
-              logTransport(
-                  event.getCarrierId(),
-                  event.getLinkId(), tour.getEndLinkId(),
-                  event.getTime());
-            } else if (resource instanceof MainRunCarrierResource) { //MainRunTourStarts
-              logLoad(event.getCarrierId(),
-                  event.getLinkId(),
-                event.getTime() - getCumulatedLoadingTime(tour),
-                  event.getTime());
-              logTransport(event.getCarrierId(),
-                  event.getLinkId(),
-                  tour.getEndLinkId(),
-                  event.getTime());
-            }
+          switch (tourElement) {
+              case ServiceActivity serviceActivity -> {
+                  if (serviceActivity.getService().getId() == carrierService.getId()
+                          && event.getCarrierId() == resource.getCarrier().getId()) {
+                    switch (resource) {
+                      case DistributionCarrierResource ignored -> { //DistributionTourStarts
+                          logLoad(
+                                  event.getCarrierId(),
+                                  event.getLinkId(),
+                                  event.getTime() - getCumulatedLoadingTime(tour),
+                                  event.getTime());
+                          logTransport(
+                                  event.getCarrierId(),
+                                  event.getLinkId(), 
+                                  tour.getEndLinkId(),
+                                  event.getTime());
+                      }
+                      case MainRunCarrierResource ignored -> { //MainRunTourStarts
+                          logLoad(event.getCarrierId(),
+                                  event.getLinkId(),
+                                  event.getTime() - getCumulatedLoadingTime(tour),
+                                  event.getTime());
+                          logTransport(event.getCarrierId(),
+                                  event.getLinkId(),
+                                  tour.getEndLinkId(),
+                                  event.getTime());
+                      }
+                        default -> {}
+                    }
+              }
+                  }
+              case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
+                  //Todo: Implement ShipmentBasedActivity
+              }
+              case null, default -> {
+              }
           }
-        }
       }
     }
   }
