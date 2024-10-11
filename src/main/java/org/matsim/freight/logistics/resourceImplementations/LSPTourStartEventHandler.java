@@ -1,22 +1,22 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2022 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2022 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.resourceImplementations;
@@ -40,8 +40,10 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
+import java.util.Objects;
+
 /*package-private*/ class LSPTourStartEventHandler
-    implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
+        implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final Tour tour;
   private final CarrierService carrierService;
@@ -51,12 +53,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private LspShipment lspShipment;
 
   public LSPTourStartEventHandler(
-      LspShipment lspShipment,
-      CarrierService carrierService,
-      LogisticChainElement logisticChainElement,
-      LSPCarrierResource resource,
-      Tour tour,
-      CarrierShipment carrierShipment)
+          LspShipment lspShipment,
+          CarrierService carrierService,
+          LogisticChainElement logisticChainElement,
+          LSPCarrierResource resource,
+          Tour tour,
+          CarrierShipment carrierShipment)
   {
     this.lspShipment = lspShipment;
     this.carrierService = carrierService;
@@ -76,50 +78,36 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     //Todo: Ablauf für CarrierShipment einbauen. Das fehlt aktuell noch.
     if (event.getTourId().equals(tour.getId())) {
       for (TourElement tourElement : tour.getTourElements()) {
-          switch (tourElement) {
-              case ServiceActivity serviceActivity -> {
-                  if (serviceActivity.getService().getId() == carrierService.getId()
-                          && event.getCarrierId() == resource.getCarrier().getId()) {
-                    switch (resource) {
-                      case DistributionCarrierResource ignored -> { //DistributionTourStarts
-                          logLoad(
-                                  event.getCarrierId(),
-                                  event.getLinkId(),
-                                  event.getTime() - getCumulatedLoadingTime(tour),
-                                  event.getTime());
-                          logTransport(
-                                  event.getCarrierId(),
-                                  event.getLinkId(), 
-                                  tour.getEndLinkId(),
-                                  event.getTime());
-                      }
-                      case MainRunCarrierResource ignored -> { //MainRunTourStarts
-                          logLoad(event.getCarrierId(),
-                                  event.getLinkId(),
-                                  event.getTime() - getCumulatedLoadingTime(tour),
-                                  event.getTime());
-                          logTransport(event.getCarrierId(),
-                                  event.getLinkId(),
-                                  tour.getEndLinkId(),
-                                  event.getTime());
-                      }
-                        default -> {}
-                    }
+        switch (tourElement) {
+          case ServiceActivity serviceActivity -> {
+            if (serviceActivity.getService().getId() == carrierService.getId()
+                    && event.getCarrierId() == resource.getCarrier().getId()) {
+              if (resource instanceof DistributionCarrierResource || resource instanceof MainRunCarrierResource) {
+                logLoad(event.getCarrierId(),event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour),  event.getTime());
+                logTransport(event.getCarrierId(),  event.getLinkId(), tour.getEndLinkId(), event.getTime());
               }
-                  }
-              case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-                  //Todo: Implement ShipmentBasedActivity
-              }
-              case null, default -> {
-              }
+            }
           }
+          case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
+            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierService.getId().toString())
+                    && event.getCarrierId() == resource.getCarrier().getId()) {
+
+              //Todo: This should be possibly even shorter, because it does the same es in the ServiceBased case...
+              if (resource instanceof DistributionCarrierResource || resource instanceof MainRunCarrierResource) {
+                logLoad(event.getCarrierId(),event.getLinkId(), event.getTime() - getCumulatedLoadingTime(tour),  event.getTime());
+                logTransport(event.getCarrierId(),  event.getLinkId(), tour.getEndLinkId(), event.getTime());
+              }
+            }
+          }
+          case null, default -> {}
+        }
       }
     }
   }
 
   private void logLoad(Id<Carrier> carrierId, Id<Link> linkId, double startTime, double endTime) {
     LspShipmentUtils.LoggedShipmentLoadBuilder builder =
-        LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+            LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
@@ -128,18 +116,18 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     builder.setEndTime(endTime);
     LspShipmentPlanElement loggedShipmentLoad = builder.build();
     String idString =
-        loggedShipmentLoad.getResourceId()
-            + ""
-            + loggedShipmentLoad.getLogisticChainElement().getId()
-            + loggedShipmentLoad.getElementType();
+            loggedShipmentLoad.getResourceId()
+                    + ""
+                    + loggedShipmentLoad.getLogisticChainElement().getId()
+                    + loggedShipmentLoad.getElementType();
     Id<LspShipmentPlanElement> loadId = Id.create(idString, LspShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
   }
 
   private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId,
-      Id<Link> toLinkId, double startTime) {
+                            Id<Link> toLinkId, double startTime) {
     LspShipmentUtils.LoggedShipmentTransportBuilder builder =
-        LspShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+            LspShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setFromLinkId(fromLinkId);
     builder.setToLinkId(toLinkId);
@@ -148,10 +136,10 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     builder.setStartTime(startTime);
     LspShipmentLeg transport = builder.build();
     String idString =
-        transport.getResourceId()
-            + ""
-            + transport.getLogisticChainElement().getId()
-            + transport.getElementType();
+            transport.getResourceId()
+                    + ""
+                    + transport.getLogisticChainElement().getId()
+                    + transport.getElementType();
     Id<LspShipmentPlanElement> transportId = Id.create(idString, LspShipmentPlanElement.class);
     lspShipment.getShipmentLog().addPlanElement(transportId, transport);
   }
