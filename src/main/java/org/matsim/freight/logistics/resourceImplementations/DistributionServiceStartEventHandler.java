@@ -54,7 +54,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
           CarrierService carrierService,
           LspShipment lspShipment,
           LogisticChainElement element,
-          LSPCarrierResource resource, CarrierShipment carrierShipment) {
+          LSPCarrierResource resource,
+          CarrierShipment carrierShipment) {
     this.carrierShipment = carrierShipment;
     this.carrierService = carrierService;
     this.lspShipment = lspShipment;
@@ -96,7 +97,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
   }
 
-  //TODO: Inahltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
+  //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
   private void logTransport(CarrierShipmentDeliveryStartEvent event) {
     String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
@@ -126,7 +127,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
   }
 
-  //TODO: Inahltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
+  //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
   private void logUnload(CarrierShipmentDeliveryStartEvent event) {
     LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
             LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
@@ -146,6 +147,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
   }
 
+  //Todo: Wird das auch inhaltlich irgendwo genutzt,oder ist das nur für die Tests da?
+  //todo ctd. Brauchen wir den CarrierService hier eigentlich wirklich oder kann das zurück gebaut werden? KMT Okt'24
   public CarrierService getCarrierService() {
     return carrierService;
   }

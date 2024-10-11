@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
@@ -44,6 +45,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   private final Tour tour;
   private final CarrierService carrierService;
+  private final CarrierShipment carrierShipment;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
@@ -53,9 +55,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
       CarrierService carrierService,
       LogisticChainElement logisticChainElement,
       LSPCarrierResource resource,
-      Tour tour) {
+      Tour tour,
+      CarrierShipment carrierShipment)
+  {
     this.lspShipment = lspShipment;
     this.carrierService = carrierService;
+    this.carrierShipment = carrierShipment;
     this.logisticChainElement = logisticChainElement;
     this.resource = resource;
     this.tour = tour;
@@ -68,6 +73,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   public void handleEvent(CarrierTourStartEvent event) {
+    //Todo: Ablauf für CarrierShipment einbauen. Das fehlt aktuell noch.
     if (event.getTourId().equals(tour.getId())) {
       for (TourElement tourElement : tour.getTourElements()) {
         if (tourElement instanceof ServiceActivity serviceActivity) {
@@ -99,8 +105,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
   }
 
-  private void logLoad(Id<Carrier> carrierId, Id<Link> linkId,
-      double startTime, double endTime) {
+  private void logLoad(Id<Carrier> carrierId, Id<Link> linkId, double startTime, double endTime) {
     LspShipmentUtils.LoggedShipmentLoadBuilder builder =
         LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(carrierId);

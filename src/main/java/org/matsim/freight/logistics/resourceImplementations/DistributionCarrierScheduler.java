@@ -233,23 +233,23 @@ import org.matsim.vehicles.VehicleType;
                 if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
                   addShipmentLoadElement(lspShipment, tour);
                   addShipmentTransportElement(lspShipment, tour, serviceActivity);
-                  addShipmentUnloadElement(lspShipment, tour, serviceActivity);
-                  addDistributionTourStartEventHandler(serviceActivity.getService(), lspShipment, resource, tour);
-                  addDistributionServiceEventHandler(serviceActivity.getService(), lspShipment, resource);
+                  addShipmentUnloadElement(lspShipment, serviceActivity);
+                  addDistributionTourStartEventHandler(serviceActivity, lspShipment, resource, tour);
+                  addDistributionServiceEventHandler(serviceActivity, lspShipment, resource);
                 }
               }
             }
           }
           case shipmentBased -> {
-            //TODO needs fixture
+            //TODO needs to get fixed. KMT'Aug'24
             for (TourElement element : tour.getTourElements()) {
               if (element instanceof Tour.Delivery deliveryActivity) {
                 if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
                   addShipmentLoadElement(lspShipment, tour);
                   addShipmentTransportElement(lspShipment, tour, deliveryActivity);
-                  addShipmentUnloadElement(lspShipment, tour, deliveryActivity);
-                  addDistributionTourStartEventHandler(deliveryActivity.getShipment(), lspShipment, resource, tour);
-                  addDistributionServiceEventHandler(deliveryActivity.getShipment(), lspShipment, resource);
+                  addShipmentUnloadElement(lspShipment, deliveryActivity);
+                  addDistributionTourStartEventHandler(deliveryActivity, lspShipment, resource, tour);
+                  addDistributionServiceEventHandler(deliveryActivity, lspShipment, resource);
                 }
               }
             }
@@ -344,8 +344,7 @@ import org.matsim.vehicles.VehicleType;
             .addPlanElement(id, transport);
   }
 
-  private void addShipmentUnloadElement(
-          LspShipment tuple, Tour tour, Tour.TourActivity tourActivity) {
+  private void addShipmentUnloadElement(LspShipment tuple, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
             LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
@@ -430,30 +429,23 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addDistributionServiceEventHandler(
-          CarrierService carrierService,
+          Tour.TourActivity tourActivity,
           LspShipment lspShipment,
           LSPCarrierResource resource) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        DistributionServiceStartEventHandler handler =
-                new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource, null);
-        lspShipment.addSimulationTracker(handler);
-        break;
-      }
-    }
-  }
+        DistributionServiceStartEventHandler handler;
+        switch (tourActivity) {
+          case Tour.ServiceActivity serviceActivity-> {
+            handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
+          }
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
+            handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
+          }
+          default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
+        }
 
-  //TODO: Kann man das wieder zusammenfassen mitt der Methode fpr die Services?
-  private void addDistributionServiceEventHandler(
-          CarrierShipment carrierShipment,
-          LspShipment lspShipment,
-          LSPCarrierResource resource) {
-
-    for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        DistributionServiceStartEventHandler handler =
-                new DistributionServiceStartEventHandler(null, lspShipment, element, resource, carrierShipment);
         lspShipment.addSimulationTracker(handler);
         break;
       }
@@ -461,35 +453,29 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addDistributionTourStartEventHandler(
-          CarrierService carrierService,
+          Tour.TourActivity tourActivity,
           LspShipment lspShipment,
           LSPCarrierResource resource,
           Tour tour) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        LSPTourStartEventHandler handler =
-                new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
+        LSPTourStartEventHandler handler;
+        switch (tourActivity) {
+          case Tour.ServiceActivity serviceActivity-> {
+            handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
+          }
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
+            handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
+          }
+          default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
+        }
+
         lspShipment.addSimulationTracker(handler);
         break;
       }
     }
   }
 
-  private void addDistributionTourStartEventHandler(
-          CarrierShipment carrierShipment,
-          LspShipment lspShipment,
-          LSPCarrierResource resource,
-          Tour tour) {
-
-    for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        LSPTourStartEventHandler handler =
-                new LSPTourStartEventHandler(lspShipment, null, element, resource, tour); //FIXME: Hier müsste eigentlich das CarrierShipment übergeben werden in anaolger Logic zu Services... arghhh.
-        lspShipment.addSimulationTracker(handler);
-        break;
-      }
-    }
-  }
 
 }
