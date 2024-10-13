@@ -53,7 +53,7 @@ import java.util.Collection;
  * @author kturner
  *
  */
-public class CarrierControlerUtilsIT {
+public class CarrierControllerUtilsIT{
 
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
