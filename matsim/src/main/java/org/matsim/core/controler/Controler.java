@@ -65,7 +65,7 @@ import java.util.*;
  *
  * @author mrieser
  */
-public final class Controler implements ControlerI, MatsimServices, AllowsConfiguration{
+public final class Controler implements Controller, ControlerI, MatsimServices, AllowsConfiguration{
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13

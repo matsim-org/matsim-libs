@@ -59,12 +59,12 @@ import org.matsim.vehicles.*;
 import java.net.URL;
 import java.util.Collection;
 
-public class CarrierControlerUtilsTest {
+public class CarrierControllerUtilsTest{
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static final Logger log = LogManager.getLogger(CarrierControlerUtilsTest.class);
+	private static final Logger log = LogManager.getLogger( CarrierControllerUtilsTest.class );
 
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);

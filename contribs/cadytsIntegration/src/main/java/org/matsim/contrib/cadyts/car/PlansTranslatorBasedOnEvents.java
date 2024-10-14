@@ -59,8 +59,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private int iteration = -1;
 
-	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<>();
 
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
@@ -167,9 +165,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			// construct a new PlanBulder and attach it to the plan:
 			planStepFactory = new PlanBuilder<Link>();
 			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
-
-			// memorize the plan as being seen:
-			this.plansEverSeen.add(selectedPlan);
 		}
 
 		return planStepFactory;
