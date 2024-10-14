@@ -48,6 +48,11 @@ public class SumoNetworkHandler extends DefaultHandler {
 	final Map<String, Type> types = new HashMap<>();
 
 	/**
+	 * Attribute names that have been observed during parsing.
+	 */
+	Set<String> attributes = new LinkedHashSet<>();
+
+	/**
 	 * Stores current parsed edge.
 	 */
 	private Edge tmpEdge = null;
@@ -257,6 +262,14 @@ public class SumoNetworkHandler extends DefaultHandler {
 					case "origTo":
 						tmpEdge.origTo = value;
 						break;
+					// Redundant attribute, that does not need to be stored
+					case "highway":
+						break;
+					default:
+						String attribute = attributes.getValue("key").intern();
+						this.attributes.add(attribute);
+						tmpEdge.attributes.put(attribute, value);
+						break;
 				}
 
 				break;
@@ -344,6 +357,8 @@ public class SumoNetworkHandler extends DefaultHandler {
 
 		@Nullable
 		String origTo;
+
+		final Map<String, String> attributes = new HashMap<>();
 
 		public Edge(String id, String from, String to, String type, int priority, String name, String[] shape) {
 			this.id = id;

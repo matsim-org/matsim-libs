@@ -495,6 +495,19 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			case SpeedyALT:
 				break;
 		}
+
+		if ( config.controller().getWritePlansInterval() <= 0 ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "found writePlansInterval==0.  vsp default is to write plans at least once (for simwrapper).") ;
+		}
+
+		if ( config.controller().getWriteTripsInterval() <= 0 ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "found writeTripsInterval==0.  vsp default is to write trips at least once (for simwrapper).") ;
+		}
+
 		return problem;
 	}
 
