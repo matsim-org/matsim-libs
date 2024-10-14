@@ -110,6 +110,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	@Inject
 	private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();
+	// (yyyy Feels plausible to have them but how can they be set?  And isn't there a more global way to set the attribute converters?  kai, feb'24)
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
@@ -214,22 +215,26 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpCounts() {
 		try {
 			if (this.counts != null ) {
-				final String inputCRS = this.config.counts().getInputCRS();
-				final String internalCRS = this.config.global().getCoordinateSystem();
+//				final String inputCRS = this.config.counts().getInputCRS();
+//				final String internalCRS = this.config.global().getCoordinateSystem();
 
-				if ( inputCRS == null ) {
+//				if ( inputCRS == null ) {
 					new CountsWriter(this.counts).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.counts));
-				}
-				else {
-					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
-
-					final CoordinateTransformation transformation =
-							TransformationFactory.getCoordinateTransformation(
-									internalCRS,
-									inputCRS );
-
-					new CountsWriter( transformation , this.counts).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.counts));
-				}
+//				}
+//				else {
+//					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
+//
+//					final CoordinateTransformation transformation =
+//							TransformationFactory.getCoordinateTransformation(
+//									internalCRS,
+//									inputCRS );
+//
+//					new CountsWriter( transformation , this.counts).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.counts));
+//				}
+				// we said at some point that we are no longer projecting back for the final output.  For Counts, this was so far not
+				// adapted in this direction.  I assume that the reason was that the CountsWriter took a transformation, not the
+				// coordinate string itself, and so it was not possible to automatically at the CRS string as attribute into the file.
+				//  I adapted that now (I hope).  kai, feb'24
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing counts.", ee);

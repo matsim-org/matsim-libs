@@ -24,10 +24,12 @@ import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -42,11 +44,10 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	private final static Logger log = LogManager.getLogger(MatsimCountsReader.class);
 	private final static String COUNTS_V1 = "counts_v1.xsd";
 	private final static String COUNTS_V2 = "counts_v2.xsd";
-
 	private final Counts counts;
+	private final String inputCRS;
+	private final String targetCRS;
 	private MatsimXmlParser delegate = null;
-
-	private final CoordinateTransformation coordinateTransformation;
 	private final Class<? extends Identifiable<?>> idClass;
 
 
@@ -56,34 +57,35 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	 * @param counts The Counts-object to store the configuration settings in.
 	 */
 	public MatsimCountsReader(final Counts counts) {
-		this( new IdentityTransformation() , counts, Link.class);
+		this( null, null, counts, Link.class );
 	}
 
 	/**
 	 * Creates a new reader for MATSim counts files.
 	 *
-	 * @param coordinateTransformation transformation from the CRS of the file to the internal CRS for MATSim
-	 * @param counts The Counts-object to store the configuration settings in.
+	 * @param inputCRS
+	 * @param targetCRS
+	 * @param counts    The Counts-object to store the configuration settings in.
 	 */
 	public MatsimCountsReader(
-			final CoordinateTransformation coordinateTransformation,
-			final Counts counts) {
-		this(coordinateTransformation, counts, Link.class);
+			String inputCRS, String targetCRS, final Counts counts ) {
+		this( inputCRS, targetCRS, counts, Link.class );
 	}
 
 	/**
 	 * Creates a new reader for MATSim counts files.
 	 *
-	 * @param coordinateTransformation transformation from the CRS of the file to the internal CRS for MATSim
-	 * @param counts the counts object to store the configuration settings in
-	 * @param idClass id class of locations
+	 * @param inputCRS
+	 * @param targetCRS
+	 * @param counts    the counts object to store the configuration settings in
+	 * @param idClass   id class of locations
 	 */
 	public MatsimCountsReader(
-		final CoordinateTransformation coordinateTransformation,
-		final Counts counts,
-		Class<? extends Identifiable<?>> idClass) {
+			String inputCRS, String targetCRS, final Counts counts,
+			Class<? extends Identifiable<?>> idClass) {
 		super(ValidationType.XSD_ONLY);
-		this.coordinateTransformation = coordinateTransformation;
+		this.inputCRS = inputCRS;
+		this.targetCRS = targetCRS;
 		this.counts = counts;
 		this.idClass = idClass;
 	}
@@ -103,10 +105,14 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
+			CoordinateTransformation coordinateTransformation = new IdentityTransformation();
+			if (inputCRS != null && targetCRS != null) {
+				coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS );
+			}
 			this.delegate = new CountsReaderMatsimV1( coordinateTransformation, this.counts);
 			log.info("using counts_v1-reader.");
 		} else if (COUNTS_V2.equals(doctype)) {
-			this.delegate = new CountsReaderMatsimV2(coordinateTransformation, this.counts, idClass);
+			this.delegate = new CountsReaderMatsimV2( inputCRS, targetCRS, this.counts, idClass);
 			log.info("using counts_v2-reader.");
 
 		} else {
