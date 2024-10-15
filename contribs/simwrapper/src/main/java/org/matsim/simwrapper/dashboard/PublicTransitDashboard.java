@@ -28,14 +28,14 @@ public class PublicTransitDashboard implements Dashboard {
 
 		header.title = "Public Transit";
 		header.tab = "PT";
-		header.triggerPattern = "*output_transitSchedule*xml*";
+		header.triggerPattern = "(*.)?output_transitSchedule*xml*";
 
 		layout.row("viewer").el(TransitViewer.class, (viz, data) -> {
 			viz.title = "Transit Viewer";
 			viz.height = 12d;
 			viz.description = "Visualize the transit schedule.";
-			viz.network = "*output_network.xml.gz";
-			viz.transitSchedule = data.output("*output_transitSchedule.xml.gz");
+			viz.network = "(*.)?output_network.xml.gz";
+			viz.transitSchedule = data.output("(*.)?output_transitSchedule.xml.gz");
 
 			if (!customRouteTypes.isEmpty())
 				viz.customRouteTypes = customRouteTypes;
