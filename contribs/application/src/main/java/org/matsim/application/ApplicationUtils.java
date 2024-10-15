@@ -450,7 +450,7 @@ public class ApplicationUtils {
 		if (path.isPresent())
 			return path.get();
 
-		throw new IllegalArgumentException("Could not match input file: " + name);
+		throw new IllegalArgumentException("Could not match input file: %s (in %s)".formatted(name, dir));
 	}
 
 	private static Optional<Path> matchSuffix(String suffix, Path dir) {
