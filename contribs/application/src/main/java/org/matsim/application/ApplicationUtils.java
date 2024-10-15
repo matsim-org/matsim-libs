@@ -446,7 +446,7 @@ public class ApplicationUtils {
 			return path.get();
 
 		// Even more permissive pattern
-		path = matchPattern(".+\\.[a-zA-Z0-9_.\\-]*(_|\\.)" + name + "\\..+", dir);
+		path = matchPattern(".+[a-zA-Z0-9_.\\-]*(_|\\.)" + name + ".+", dir);
 		if (path.isPresent())
 			return path.get();
 
