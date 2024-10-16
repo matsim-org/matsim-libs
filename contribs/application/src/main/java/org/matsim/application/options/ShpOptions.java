@@ -8,9 +8,12 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.data.*;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.*;
@@ -219,10 +222,28 @@ public final class ShpOptions {
 		);
 
 		if (geometryCollection.isEmpty()) {
-			throw new IllegalStateException("There are noe geometries in the shape file.");
+			throw new IllegalStateException("There are no geometries in the shape file.");
 		}
 
 		return geometryCollection.union();
+	}
+
+	/**
+	 * Return the union of all geometries in the shape file and project it to the target crs.
+	 * @param toCRS target coordinate system
+	 */
+	public Geometry getGeometry(String toCRS) {
+		try {
+			CoordinateReferenceSystem sourceCRS = CRS.decode(detectCRS());
+			CoordinateReferenceSystem targetCRS = CRS.decode(toCRS);
+
+			MathTransform ct = CRS.findMathTransform(sourceCRS, targetCRS);
+
+			return JTS.transform(getGeometry(), ct);
+
+		} catch (TransformException | FactoryException e) {
+			throw new IllegalStateException("Could not transform coordinates of the provided shape", e);
+		}
 	}
 
 	/**
