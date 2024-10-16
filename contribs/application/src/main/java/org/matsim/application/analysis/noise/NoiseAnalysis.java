@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
@@ -20,6 +21,7 @@ import org.matsim.contrib.noise.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
@@ -28,10 +30,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @CommandLine.Command(
 	name = "noise-analysis",
@@ -88,10 +87,18 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
 		if(overrideParameters){
-			log.warn("no NoiseConfigGroup was configured before. Will set some standards. You should check the next lines in the log file!");
+			log.warn("no NoiseConfigGroup was configured before. Will set some standards. You should check the next lines in the log file and the output_config.xml!");
 			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(considerActivities.toArray(String[]::new));
 			noiseParameters.setConsideredActivitiesForDamageCalculationArray(considerActivities.toArray(String[]::new));
 
+			{
+				Set<String> set = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
+				noiseParameters.setNetworkModesToIgnoreSet( set );
+			}
+			{
+				String[] set = new String[]{"freight"};
+				noiseParameters.setHgvIdPrefixesArray( set );
+			}
 			//use actual speed and not freespeed
 			noiseParameters.setUseActualSpeedLevel(true);
 			//use the valid speed range (recommended by IK)
