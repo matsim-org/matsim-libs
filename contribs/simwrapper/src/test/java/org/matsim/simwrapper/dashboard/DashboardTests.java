@@ -13,6 +13,7 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
+import org.matsim.simwrapper.viz.TransitViewer;
 import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
@@ -74,7 +75,8 @@ public class DashboardTests {
 		run(new TripDashboard());
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv");
+			.isDirectoryContaining("glob:**mode_share.csv")
+			.isDirectoryContaining("glob:**mode_shift.csv");
 	}
 
 	@Test
@@ -156,4 +158,24 @@ public class DashboardTests {
 
 	}
 
+	@Test
+	void ptCustom() {
+		PublicTransitDashboard pt = new PublicTransitDashboard();
+
+		// bus
+		TransitViewer.CustomRouteType crt = new TransitViewer.CustomRouteType();
+		crt.label = "Bus";
+		crt.color = "#109192";
+		crt.addMatchGtfsRouteType(3);
+
+		// rail
+		TransitViewer.CustomRouteType crtRail = new TransitViewer.CustomRouteType();
+		crtRail.label = "Rail";
+		crtRail.color = "#EC0016";
+		crtRail.addMatchGtfsRouteType(2);
+
+		pt.withCustomRouteTypes(crt, crtRail);
+
+		run(pt);
+	}
 }
