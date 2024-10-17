@@ -87,10 +87,10 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	void writeLoadPerVehicle(Path analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory.resolve("Load_perVehicle.tsv").toString();
+		String fileName = Path.of(analysisOutputDirectory).resolve("Load_perVehicle.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 

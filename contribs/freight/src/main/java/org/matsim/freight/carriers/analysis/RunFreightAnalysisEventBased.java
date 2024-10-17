@@ -38,7 +38,6 @@ import org.matsim.freight.carriers.events.CarrierEventsReaders;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 //import static org.matsim.application.ApplicationUtils.globFile;
 
@@ -58,8 +57,8 @@ public class RunFreightAnalysisEventBased {
 	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventBased.class);
 
 	//Where is your simulation output, that should be analysed?
-	private Path EVENTS_PATH = null;
-	private final Path ANALYSIS_OUTPUT_PATH;
+	private String EVENTS_PATH = null;
+	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
 	private final String delimiter = "\t";
@@ -72,7 +71,7 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(Path simOutputPath, Path analysisOutputPath, String globalCrs) {
+	public RunFreightAnalysisEventBased(String simOutputPath, String analysisOutputPath, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 //		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
@@ -81,13 +80,13 @@ public class RunFreightAnalysisEventBased {
 //		Path carriersPath = globFile(simOutputPath, "*output_carriers.*");
 //		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
 
-		this.EVENTS_PATH = simOutputPath.resolve("*output_events.xml.gz");
-		Path vehiclesPath = simOutputPath.resolve("*output_allVehicles.xml.gz");
-		Path networkPath = simOutputPath.resolve("*output_network.xml.gz");
-		Path carriersPath = simOutputPath.resolve("*output_carriers.xml.gz");
-		Path carriersVehicleTypesPath = simOutputPath.resolve("*output_carriersVehicleTypes.xml.gz");
-
-		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
+//		this.EVENTS_PATH = simOutputPath.resolve("*output_events.xml.gz");
+//		Path vehiclesPath = simOutputPath.resolve("*output_allVehicles.xml.gz");
+//		Path networkPath = simOutputPath.resolve("*output_network.xml.gz");
+//		Path carriersPath = simOutputPath.resolve("*output_carriers.xml.gz");
+//		Path carriersVehicleTypesPath = simOutputPath.resolve("*output_carriersVehicleTypes.xml.gz");
+//
+//		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**
@@ -101,8 +100,8 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath       Path to the output directory
 	 * @param globalCrs                The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(Path networkPath, Path vehiclesPath, Path carriersPath, Path carriersVehicleTypesPath, Path eventsPath,
-										Path analysisOutputPath, String globalCrs) {
+	public RunFreightAnalysisEventBased(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
+										String analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
@@ -115,16 +114,16 @@ public class RunFreightAnalysisEventBased {
 	 * @param carriers           The carriers to be analysed
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 */
-	public RunFreightAnalysisEventBased(Carriers carriers, Path analysisOutputPath) {
+	public RunFreightAnalysisEventBased(Carriers carriers, String analysisOutputPath) {
 		this.carriers = carriers;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
 
-	private void createScenarioForFreightAnalysis(Path vehiclesPath, Path networkPath, Path carriersPath, Path carriersVehicleTypesPath,
+	private void createScenarioForFreightAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath,
 												  String globalCrs) {
 		Config config = ConfigUtils.createConfig();
-		config.vehicles().setVehiclesFile(vehiclesPath.toString());
-		config.network().setInputFile(networkPath.toString());
+		config.vehicles().setVehiclesFile(vehiclesPath);
+		config.network().setInputFile(networkPath);
 		config.plans().setInputFile(null);
 		config.eventsManager().setNumberOfThreads(null);
 		config.eventsManager().setEstimatedNumberOfEvents(null);
@@ -133,7 +132,7 @@ public class RunFreightAnalysisEventBased {
 
 		//freight settings
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersFile(carriersPath.toString());
+		freightCarriersConfigGroup.setCarriersFile(carriersPath);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(carriersVehicleTypesPath.toString());
 
 		scenario = ScenarioUtils.loadScenario(config);
@@ -171,7 +170,7 @@ public class RunFreightAnalysisEventBased {
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = CarrierEventsReaders.createEventsReader(eventsManager);
 
-		matsimEventsReader.readFile(EVENTS_PATH.toString());
+		matsimEventsReader.readFile(EVENTS_PATH);
 		eventsManager.finishProcessing();
 
 		log.info("Analysis completed.");

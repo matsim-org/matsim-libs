@@ -62,10 +62,10 @@ public class CarrierPlanAnalysis {
 		this.carriers = carriers;
 	}
 
-	public void runAnalysisAndWriteStats(Path analysisOutputDirectory) throws IOException {
+	public void runAnalysisAndWriteStats(String analysisOutputDirectory) throws IOException {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory.resolve("Carrier_stats.tsv").toString();
+		String fileName = Path.of(analysisOutputDirectory).resolve("Carrier_stats.tsv").toString();
 
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 

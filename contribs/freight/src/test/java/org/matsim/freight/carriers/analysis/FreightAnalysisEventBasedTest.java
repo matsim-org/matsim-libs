@@ -28,9 +28,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 
 public class FreightAnalysisEventBasedTest {
 
@@ -39,18 +37,17 @@ public class FreightAnalysisEventBasedTest {
 	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
 	@Test
-	void runServiceEventTest() throws IOException, URISyntaxException {
+	void runServiceEventTest() throws IOException {
 		// Note: I had to manually change the files for this test to run, as I did not have access to the original input file of the events-file
 		// This results in the carrier-plans not being related to the actual events. This is however no problem for testing the core functionality,
 		// as those are two disjunct analysis outputs, which do not depend on each other. (aleks Sep'24)
-
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toURI()).toAbsolutePath(),
-			Path.of(testUtils.getInputDirectory() + "in/output_allVehicles.xml"),
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities.xml" ).toURI()),
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toURI()),
-			Path.of(testUtils.getInputDirectory() + "in/serviceBasedEvents.xml"),
-			Path.of(testUtils.getOutputDirectory()),
+			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/output_allVehicles.xml",
+			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities.xml" ).toString(),
+			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/serviceBasedEvents.xml",
+			testUtils.getOutputDirectory(),
 			null);
 		analysisEventBased.runCompleteAnalysis();
 
@@ -61,14 +58,14 @@ public class FreightAnalysisEventBasedTest {
 	}
 
 	@Test
-	void runShipmentEventTest() throws IOException, URISyntaxException {
+	void runShipmentEventTest() throws IOException {
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toURI()),
-			Path.of(testUtils.getInputDirectory() + "in/carrierVehicles.xml"),
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities_Shipments.xml" ).toURI()),
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toURI()),
-			Path.of(testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml"),
-			Path.of(testUtils.getOutputDirectory()),
+			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/carrierVehicles.xml",
+			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities_Shipments.xml" ).toString(),
+			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
+			testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml",
+			testUtils.getOutputDirectory(),
 			null);
 		analysisEventBased.runCompleteAnalysis();
 

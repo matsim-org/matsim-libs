@@ -153,10 +153,10 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		}
 	}
 
-	void writeTravelTimeAndDistancePerVehicle(Path analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
-		String fileName = analysisOutputDirectory.resolve("TimeDistance_perVehicle.tsv").toString();
+		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicle.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
@@ -224,7 +224,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		log.info("Output written to {}", fileName);
 	}
 
-	void writeTravelTimeAndDistancePerVehicleType(Path analysisOutputDirectory, Scenario scenario) throws IOException {
+	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
@@ -234,7 +234,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
 		}
 
-		String fileName = analysisOutputDirectory.resolve("TimeDistance_perVehicleType.tsv").toString();
+		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicleType.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 		//Write headline:
