@@ -55,13 +55,7 @@ import java.util.TreeMap;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class FreightTimeAndDistanceAnalysisEventsHandler implements
-	CarrierTourStartEventHandler,
-	CarrierTourEndEventHandler,
-	LinkEnterEventHandler,
-	LinkLeaveEventHandler,
-	VehicleEntersTrafficEventHandler,
-	VehicleLeavesTrafficEventHandler {
+public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
 	private final String delimiter;
