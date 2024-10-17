@@ -25,17 +25,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -43,6 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,9 +55,10 @@ import java.util.TreeMap;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHandler {
+public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
+	private final String delimiter;
 
 	private final Scenario scenario;
 	private final Map<Id<Vehicle>, Double> vehicleId2TourDuration = new LinkedHashMap<>();
@@ -74,21 +80,24 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	private final Map<Id<Vehicle>, Double> vehicleEnteredLinkTime = new LinkedHashMap<>();
 
 
-	public FreightTimeAndDistanceAnalysisEventsHandler(Scenario scenario) {
+	public FreightTimeAndDistanceAnalysisEventsHandler(String delimiter, Scenario scenario) {
+		this.delimiter = delimiter;
 		this.scenario = scenario;
 	}
 
-	private void handleEvent(CarrierTourStartEvent event) {
+	@Override
+	public void handleEvent(CarrierTourStartEvent event) {
 		// Save time of freight tour start
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		tourStartTime.put(key, event.getTime());
 	}
 
 	//Fix costs for vehicle usage
-	private void handleEvent(CarrierTourEndEvent event) {
+	@Override
+	public void handleEvent(CarrierTourEndEvent event) {
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		double tourDuration = event.getTime() - tourStartTime.get(key);
-		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration);
+		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration); //TODO, check if this may overwrite old data and if this is intended to do so
 		VehicleType vehType = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType();
 		vehicleTypeId2SumOfTourDuration.merge(vehType.getId(), tourDuration, Double::sum);
 
@@ -99,7 +108,13 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		vehicleId2VehicleType.putIfAbsent(event.getVehicleId(), vehType);
 	}
 
-	private void handleEvent(LinkEnterEvent event) {
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event){
+		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime());
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
 		final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		vehicleId2TourLength.merge(event.getVehicleId(), distance, Double::sum);
 		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime()); //Safe time when entering the link.
@@ -109,7 +124,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 	//If the vehicle leaves a link at the end, the travelTime is calculated and stored.
-	private void handleEvent(LinkLeaveEvent event){
+	@Override
+	public void handleEvent(LinkLeaveEvent event){
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -123,7 +139,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 	}
 
 	//If the vehicle leaves a link because it reached its destination, the travelTime is calculated and stored.
-	private void handleEvent(VehicleLeavesTrafficEvent event){
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event){
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -136,39 +153,31 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 		}
 	}
 
-	private void handleEvent(VehicleEntersTrafficEvent event){
-		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime());
-	}
-
-	@Override public void handleEvent(Event event) {
-		if (event instanceof CarrierTourStartEvent carrierTourStartEvent) {
-			handleEvent(carrierTourStartEvent);
-		} else if (event instanceof CarrierTourEndEvent carrierTourEndEvent) {
-			handleEvent(carrierTourEndEvent);
-		} else if (event instanceof LinkEnterEvent linkEnterEvent) {
-			handleEvent(linkEnterEvent);
-		} else if (event instanceof LinkLeaveEvent linkLeaveEvent) {
-			handleEvent(linkLeaveEvent);
-		} else if (event instanceof VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent) {
-			handleEvent(vehicleLeavesTrafficEvent);
-		} else if (event instanceof VehicleEntersTrafficEvent vehicleEntersTrafficEvent) {
-			handleEvent(vehicleEntersTrafficEvent);
-		}
-	}
-
 	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
-		String fileName = analysisOutputDirectory + "TimeDistance_perVehicle.tsv";
+		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicle.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write("vehicleId \t carrierId \t vehicleTypeId \t tourId \t "
-			+ "tourDuration[s] \t tourDuration[h] \t"
-			+ "travelDistance[m] \t travelDistance[km] \t " +
-				"travelTime[s] \t travelTime[h] \t" +
-			"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR] \t varCostsTime[EUR] \t varCostsDist[EUR] \t totalCosts[EUR]");
+		bw1.write(String.join(delimiter,
+			"vehicleId",
+			"carrierId",
+			"vehicleTypeId",
+			"tourId",
+			"tourDuration[s]",
+			"tourDuration[h]",
+			"travelDistance[m]",
+			"travelDistance[km]",
+			"travelTime[s]",
+			"travelTime[h]",
+			"costPerSecond[EUR/s]",
+			"costPerMeter[EUR/m]",
+			"fixedCosts[EUR]",
+			"varCostsTime[EUR]",
+			"varCostsDist[EUR]",
+			"totalCosts[EUR]"));
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
@@ -188,33 +197,32 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			final double totalVehCosts = fixedCost + varCostsTime + varCostsDist;
 
 			bw1.write(vehicleId.toString());
-			bw1.write("\t" + vehicleId2CarrierId.get(vehicleId));
-			bw1.write("\t" + vehicleType.getId().toString());
-			bw1.write("\t" + vehicleId2TourId.get(vehicleId));
+			bw1.write(delimiter + vehicleId2CarrierId.get(vehicleId));
+			bw1.write(delimiter + vehicleType.getId().toString());
+			bw1.write(delimiter + vehicleId2TourId.get(vehicleId));
 
-			bw1.write("\t" + durationInSeconds);
-			bw1.write("\t" + durationInSeconds /3600);
+			bw1.write(delimiter + durationInSeconds);
+			bw1.write(delimiter + durationInSeconds /3600);
 
-			bw1.write("\t" + distanceInMeters);
-			bw1.write("\t" + distanceInMeters/1000);
+			bw1.write(delimiter + distanceInMeters);
+			bw1.write(delimiter + distanceInMeters/1000);
 
-			bw1.write("\t" + travelTimeInSeconds);
-			bw1.write("\t" + travelTimeInSeconds /3600);
+			bw1.write(delimiter + travelTimeInSeconds);
+			bw1.write(delimiter + travelTimeInSeconds /3600);
 
-			bw1.write("\t" + costsPerSecond);
-			bw1.write("\t" + costsPerMeter);
-			bw1.write("\t" + fixedCost);
-			bw1.write("\t" + varCostsTime);
-			bw1.write("\t" + varCostsDist);
-			bw1.write("\t" + totalVehCosts);
+			bw1.write(delimiter + costsPerSecond);
+			bw1.write(delimiter + costsPerMeter);
+			bw1.write(delimiter + fixedCost);
+			bw1.write(delimiter + varCostsTime);
+			bw1.write(delimiter + varCostsDist);
+			bw1.write(delimiter + totalVehCosts);
 
 			bw1.newLine();
 		}
 
 		bw1.close();
-		log.info("Output written to " + fileName);
+		log.info("Output written to {}", fileName);
 	}
-
 
 	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
@@ -226,16 +234,26 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
 		}
 
-		String fileName = analysisOutputDirectory + "TimeDistance_perVehicleType.tsv";
+		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicleType.tsv").toString();
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 		//Write headline:
-		bw1.write("vehicleTypeId \t nuOfVehicles \t " +
-			 "SumOfTourDuration[s] \t SumOfTourDuration[h] \t" +
-			 "SumOfTravelDistances[m] \t SumOfTravelDistances[km] \t " +
-			"SumOfTravelTime[s] \t SumOfTravelTime[h] \t" +
-				"costPerSecond[EUR/s] \t costPerMeter[EUR/m] \t fixedCosts[EUR/veh] \t" +
-				"varCostsTime[EUR] \t varCostsDist[EUR] \t fixedCosts[EUR] \t totalCosts[EUR]");
+		bw1.write(String.join(delimiter,
+			"vehicleTypeId",
+			"nuOfVehicles",
+			"SumOfTourDuration[s]",
+			"SumOfTourDuration[h]",
+			"SumOfTravelDistances[m]",
+			"SumOfTravelDistances[km]",
+			"SumOfTravelTime[s]",
+			"SumOfTravelTime[h]",
+			"costPerSecond[EUR/s]",
+			"costPerMeter[EUR/m]",
+			"fixedCosts[EUR/veh]",
+			"varCostsTime[EUR]",
+			"varCostsDist[EUR]",
+			"fixedCosts[EUR]",
+			"totalCosts[EUR]"));
 		bw1.newLine();
 
 		for (VehicleType vehicleType : vehicleTypesMap.values()) {
@@ -255,25 +273,25 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 
 			bw1.write(vehicleType.getId().toString());
 
-			bw1.write("\t" + nuOfVehicles);
-			bw1.write("\t" + sumOfTourDurationInSeconds);
-			bw1.write("\t" + sumOfTourDurationInSeconds / 3600);
-			bw1.write("\t" + sumOfDistanceInMeters);
-			bw1.write("\t" + sumOfDistanceInMeters / 1000);
-			bw1.write("\t" + sumOfTravelTimeInSeconds);
-			bw1.write("\t" + sumOfTravelTimeInSeconds / 3600);
-			bw1.write("\t" + costRatePerSecond);
-			bw1.write("\t" + costRatePerMeter);
-			bw1.write("\t" + fixedCostPerVeh);
-			bw1.write("\t" + sumOfVarCostsTime);
-			bw1.write("\t" + sumOfVarCostsDistance);
-			bw1.write("\t" + sumOfFixCosts);
-			bw1.write("\t" + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
+			bw1.write(delimiter + nuOfVehicles);
+			bw1.write(delimiter + sumOfTourDurationInSeconds);
+			bw1.write(delimiter + sumOfTourDurationInSeconds / 3600);
+			bw1.write(delimiter + sumOfDistanceInMeters);
+			bw1.write(delimiter + sumOfDistanceInMeters / 1000);
+			bw1.write(delimiter + sumOfTravelTimeInSeconds);
+			bw1.write(delimiter + sumOfTravelTimeInSeconds / 3600);
+			bw1.write(delimiter + costRatePerSecond);
+			bw1.write(delimiter + costRatePerMeter);
+			bw1.write(delimiter + fixedCostPerVeh);
+			bw1.write(delimiter + sumOfVarCostsTime);
+			bw1.write(delimiter + sumOfVarCostsDistance);
+			bw1.write(delimiter + sumOfFixCosts);
+			bw1.write(delimiter + (sumOfFixCosts + sumOfVarCostsTime + sumOfVarCostsDistance));
 
 			bw1.newLine();
 		}
 
 		bw1.close();
-		log.info("Output written to " + fileName);
+		log.info("Output written to {}", fileName);
 	}
 }
