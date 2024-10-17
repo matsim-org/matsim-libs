@@ -45,7 +45,7 @@ public class FreightAnalysisEventBasedTest {
 		// as those are two disjunct analysis outputs, which do not depend on each other. (aleks Sep'24)
 
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
-			Path.of(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toURI()),
+			Path.of(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toURI()).toAbsolutePath(),
 			Path.of(testUtils.getInputDirectory() + "in/output_allVehicles.xml"),
 			Path.of(IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities.xml" ).toURI()),
 			Path.of(IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toURI()),
