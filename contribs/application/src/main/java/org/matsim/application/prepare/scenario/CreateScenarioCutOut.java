@@ -212,6 +212,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			return 2;
 		}
 
+		if (eventPath != null && outputEvents == null) {
+			log.error("Events were given as input, that means --output-network-change-events must be set.");
+			return 2;
+		}
+
 		// Prepare required input-data
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem(crs.getInputCRS());
@@ -223,7 +228,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 
-		geom = shp.getGeometry();
+		geom = shp.getGeometry(crs.getInputCRS());
 		geomBuffer = geom.buffer(buffer);
 
 		for (String mode : modes)
@@ -240,7 +245,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			manager.addHandler(tt);
 
 			manager.initProcessing();
-			EventsUtils.readEvents(manager, eventPath.toString());
+			EventsUtils.readEvents(manager, eventPath);
 			manager.finishProcessing();
 		}
 
@@ -257,18 +262,32 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 		}
 
+		log.info("Links in shape: {} out of {}", linksToKeep.size(), scenario.getNetwork().getLinks().size());
+
+		if (linksToKeep.isEmpty()) {
+			log.error("No links are in the resulting network. Check your input shape file and coordinate system");
+			log.error("If using EPSG:4326 (WGS84), -Dorg.geotools.referencing.forceXY=true might help");
+			return 1;
+		}
+
 		// Cut out the population and mark needed network parts
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), this);
 
 		//Population
+		log.info("Persons in the original population: {}", scenario.getPopulation().getPersons().size());
 		log.info("Persons to delete: {}", personsToDelete.size());
 		for (Id<Person> personId : personsToDelete) {
 			scenario.getPopulation().removePerson(personId);
 		}
 
-		//Network
-		log.info("Links to add: {}", linksToKeep.size());
+		log.info("Persons in the resulting scenario: {}", scenario.getPopulation().getPersons().size());
 
+		if (scenario.getPopulation().getPersons().isEmpty()) {
+			log.error("No persons are in the resulting population. Check if your input shape file and coordinate system is correct. Exiting ...");
+			return 1;
+		}
+
+		// Network
 		log.info("Additional links from routes to include: {}", linksToInclude.size());
 
 		log.info("number of links in original network: {}", scenario.getNetwork().getLinks().size());
@@ -295,8 +314,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new CleanPersonLinkIds());
 
-		log.info("Persons in the scenario: {}", scenario.getPopulation().getPersons().size());
-		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation.toString());
+		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
 		if (facilityPath != null) {
 
@@ -310,10 +328,10 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		if (eventPath != null) {
 			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
-			new NetworkChangeEventsWriter().write(outputEvents.toString(), events);
+			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
 
-		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork.toString());
+		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork);
 
 		return 0;
 	}
@@ -346,7 +364,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 
 			// Expensive check last
-			if (f.getCoord() != null &&  geom.contains(MGC.coord2Point(f.getCoord())))
+			if (f.getCoord() != null && geom.contains(MGC.coord2Point(f.getCoord())))
 				facilitiesToInclude.add(f.getId());
 		}
 
