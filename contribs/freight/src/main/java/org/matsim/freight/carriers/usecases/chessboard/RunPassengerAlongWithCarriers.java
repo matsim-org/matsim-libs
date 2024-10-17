@@ -100,6 +100,7 @@ final class RunPassengerAlongWithCarriers {
 	public Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		config.controller().setLastIteration(5);
 		config.global().setRandomSeed(4177);
 		config.controller().setOutputDirectory("./output/");
 		return config;
