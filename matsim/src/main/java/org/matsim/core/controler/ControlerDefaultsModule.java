@@ -51,6 +51,9 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 public final class ControlerDefaultsModule extends AbstractModule {
+
+	public static final String MATSIM_TEMP_DIR_PROPERTY = "matsim.tempDir";
+
     @Override
     public void install() {
         install(new EventsManagerModule());
@@ -85,9 +88,16 @@ public final class ControlerDefaultsModule extends AbstractModule {
 		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
 		//  the cache needs to be always set correctly.
 		addControlerListenerBinding().toInstance(new StartupListener() {
-			@Inject private OutputDirectoryHierarchy outputDirectoryHierarchy;
-			@Override   public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(outputDirectoryHierarchy.getTempPath()));
+			@Inject
+			private OutputDirectoryHierarchy outputDirectoryHierarchy;
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				String matsimTempDir = System.getProperty(MATSIM_TEMP_DIR_PROPERTY);
+				if (matsimTempDir == null) {
+					matsimTempDir = outputDirectoryHierarchy.getTempPath();
+				}
+				ImageIO.setCacheDirectory(new File(matsimTempDir));
 			}
 		});
 
