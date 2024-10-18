@@ -164,6 +164,8 @@ public class OutputDirectoryHierarchyTest {
 
 		String javaTempDir = System.getProperty("java.io.tmpdir");
 		System.setProperty(OutputDirectoryHierarchy.MATSIM_TEMP_DIR_PROPERTY, javaTempDir);
+		Assertions.assertNotNull(javaTempDir);
+
 		System.setProperty("matsim.preferLocalDtds", "true");
 
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
