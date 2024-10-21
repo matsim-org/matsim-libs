@@ -53,7 +53,7 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
 		// For car, we assume default network mode, otherwise not
-		if (typeId.toString().equals(TransportMode.car)) {
+		if (typeId != null && typeId.toString().equals(TransportMode.car)) {
 			networkMode = TransportMode.car;
 		}
 	}
