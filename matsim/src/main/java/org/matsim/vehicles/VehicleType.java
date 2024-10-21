@@ -26,6 +26,8 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import java.util.Objects;
+
 /**
  * @author dgrether
  */
@@ -118,7 +120,7 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 		return costInformation;
 	}
 	public final String getNetworkMode() {
-		return networkMode;
+		return Objects.requireNonNull(networkMode, () -> "Network mode not set for vehicle type %s. Network mode needs to be set explicitly for non car modes.".formatted(id));
 	}
 	public final VehicleType setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;
