@@ -46,12 +46,16 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	private final CostInformation costInformation = new CostInformation() ;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
-	private String networkMode = TransportMode.car ;
+	private String networkMode;
 	private Id<VehicleType> id;
 	private final Attributes attributes = new AttributesImpl();
 
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
+		// For car, we assume default network mode, otherwise not
+		if (typeId.toString().equals(TransportMode.car)) {
+			networkMode = TransportMode.car;
+		}
 	}
 	public final String getDescription() {
 		return description;
