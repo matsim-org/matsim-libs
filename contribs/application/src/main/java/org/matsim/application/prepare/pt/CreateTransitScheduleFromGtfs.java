@@ -1,5 +1,6 @@
 package org.matsim.application.prepare.pt;
 
+import com.conveyal.gtfs.model.Route;
 import com.conveyal.gtfs.model.Stop;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 
@@ -76,6 +78,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--include-stops", description = "Fully qualified class name to a Predicate<Stop> for filtering certain stops")
 	private Class<?> includeStops;
+
+	@CommandLine.Option(names = "--transform-stops", description = "Fully qualified class name to a Consumer<Stop> for transforming stops before usage")
+	private Class<?> transformStops;
+
+	@CommandLine.Option(names = "--transform-routes", description = "Fully qualified class name to a Consumer<Route> for transforming routes before usage")
+	private Class<?> transformRoutes;
+
+	@CommandLine.Option(names = "--transform-routes", description = "Fully qualified class name to a Consumer<TransitSchedule> to be executed after the schedule was created", arity = "0..*", split = ",")
+	private List<Class<?>> transformSchedule;
 
 	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate")
 	private boolean mergeStops;
@@ -134,6 +145,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				log.info("Using prefix: {}", prefix);
 			}
 
+			if (transformStops != null) {
+				converter.setTransformStop(createConsumer(transformStops, Stop.class));
+			}
+
+			if (transformRoutes != null) {
+				converter.setTransformRoute(createConsumer(transformRoutes, Route.class));
+			}
+
+
 			converter.build().convert();
 			i++;
 		}
@@ -144,6 +164,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			TransitSchedulePostProcessTools.copyEarlyDeparturesToFollowingNight(scenario.getTransitSchedule(), 6 * 3600, "copied");
 		}
 
+		if (transformSchedule != null && !transformSchedule.isEmpty()) {
+			for (Class<?> c : transformSchedule) {
+				Consumer<TransitSchedule> f = createConsumer(c, TransitSchedule.class);
+				log.info("Applying {} to created schedule", c.getName());
+				f.accept(scenario.getTransitSchedule());
+			}
+		}
+
 		Network network = NetworkUtils.readNetwork(networkFile);
 
 		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
@@ -151,11 +179,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		if (validate) {
 			//Check schedule and network
 			TransitScheduleValidator.ValidationResult checkResult = TransitScheduleValidator.validateAll(ptScenario.getTransitSchedule(), ptScenario.getNetwork());
+			List<String> warnings = checkResult.getWarnings();
+			if (!warnings.isEmpty())
+				log.warn("TransitScheduleValidator warnings: {}", String.join("\n", warnings));
+
 			if (checkResult.isValid()) {
 				log.info("TransitSchedule and Network valid according to TransitScheduleValidator");
-				log.warn("TransitScheduleValidator warnings: {}", checkResult.getWarnings());
 			} else {
-				log.error(checkResult.getErrors());
+				log.error("TransitScheduleValidator errors: {}", String.join("\n", checkResult.getErrors()));
 				throw new RuntimeException("TransitSchedule and/or Network invalid");
 			}
 		}
@@ -170,6 +201,12 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		return 0;
 	}
 
+	@SuppressWarnings({"unchecked", "unused"})
+	private <T> Consumer<T> createConsumer(Class<?> consumer, Class<T> type) throws ReflectiveOperationException {
+		return (Consumer<T>) consumer.getDeclaredConstructor().newInstance();
+	}
+
+	@SuppressWarnings("unchecked")
 	private Predicate<Stop> createFilter(int i) throws Exception {
 
 		Predicate<Stop> filter = (stop) -> true;

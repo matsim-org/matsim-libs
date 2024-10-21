@@ -20,17 +20,12 @@
 package org.matsim.pt.utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,13 +34,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
+import org.matsim.pt.transitSchedule.api.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -248,6 +239,132 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	/**
+	 * Validate if coordinates of stops and given travel times are plausible.
+	 */
+	public static ValidationResult validateStopCoordinates(final TransitSchedule schedule) {
+
+		ValidationResult result = new ValidationResult();
+
+		// List of stops to the collected suspicious stops
+		Map<TransitStopFacility, DoubleList> suspiciousStops = new TreeMap<>(Comparator.comparing(TransitStopFacility::getName));
+
+		for (TransitLine line : schedule.getTransitLines().values()) {
+
+			for (TransitRoute route : line.getRoutes().values()) {
+
+				List<TransitRouteStop> routeStops = route.getStops();
+
+				// For too short routes, we can not detect outliers
+				if (routeStops.size() <= 4)
+					continue;
+
+				double lastDepartureOffset = route.getStops().get(0).getDepartureOffset().seconds();
+				// min. time spend at a stop, useful especially for stops whose arrival and departure offset is identical,
+				// so we need to add time for passengers to board and alight
+				double minStopTime = 30.0;
+
+				DoubleList speeds = new DoubleArrayList();
+				DoubleList dists = new DoubleArrayList();
+
+				for (int i = 1; i < routeStops.size(); i++) {
+					TransitRouteStop routeStop = routeStops.get(i);
+
+					if (routeStop.getStopFacility().getCoord() == null)
+						break;
+
+					// if there is no departure offset set (or infinity), it is the last stop of the line,
+					// so we don't need to care about the stop duration
+					double stopDuration = routeStop.getDepartureOffset().isDefined() ? routeStop.getDepartureOffset().seconds() - routeStop.getArrivalOffset().seconds() : minStopTime;
+					// ensure arrival at next stop early enough to allow for 30s stop duration -> time for passengers to board / alight
+					// if link freespeed had been set such that the pt veh arrives exactly on time, but departure time is identical
+					// with arrival time the pt vehicle would have been always delayed
+					// Math.max to avoid negative values of travelTime
+					double travelTime = Math.max(1, routeStop.getArrivalOffset().seconds() - lastDepartureOffset - 1.0 -
+						(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration)));
+
+					if (travelTime == 0) {
+						speeds.add(-1);
+						dists.add(-1);
+						continue;
+					}
+
+					double length = CoordUtils.calcEuclideanDistance(routeStop.getStopFacility().getCoord(),
+						routeStops.get(i - 1).getStopFacility().getCoord());
+
+					dists.add(length);
+
+					// Short distances are not checked, because here high speeds are not so problematic and arise from few seconds difference
+					if (length <= 20) {
+						speeds.add(-1);
+						continue;
+					}
+
+					double speed = length / travelTime;
+					speeds.add(speed);
+					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
+				}
+
+				// If all speeds are valid, the stops and speeds can be checked
+				if (speeds.size() == routeStops.size() - 1) {
+
+					// First check for suspicious stops
+					// These are stops with very high speed, and also high distance between stops
+					for (int i = 0; i < speeds.size() - 1; i++) {
+						TransitRouteStop stop = routeStops.get(i + 1);
+						double toStop = speeds.getDouble(i);
+						double fromStop = speeds.getDouble(i + 1);
+
+						double dist = (dists.getDouble(i) + dists.getDouble(i + 1)) / 2;
+
+						// Only if the distance is large, we assume a mapping error might have occurred
+						if (dist < 5_000)
+							continue;
+
+						// Remove the considered speeds from the calculation
+						DoubleList copy = new DoubleArrayList(speeds);
+						copy.removeDouble(i);
+						copy.removeDouble(i);
+						copy.removeIf(s -> s == -1);
+
+						double mean = copy.doubleStream().average().orElse(-1);
+
+						// If no mean is known, use a high value to avoid false positives
+						if (mean == -1) {
+							mean = 100;
+						}
+
+						// Some hard coded rules to detect suspicious stops, these are speed m/s, so quite high values
+						if ( ( (toStop > 3 * mean && toStop > 120) || toStop > 230) && ( (fromStop > 3 * mean && fromStop > 120) || fromStop > 230)) {
+							DoubleList suspiciousSpeeds = suspiciousStops.computeIfAbsent(stop.getStopFacility(), (k) -> new DoubleArrayList());
+							suspiciousSpeeds.add(toStop);
+							suspiciousSpeeds.add(fromStop);
+						}
+					}
+
+					// Then check for implausible travel times
+					for (int i = 0; i < speeds.size(); i++) {
+						double speed = speeds.getDouble(i);
+						TransitStopFacility from = routeStops.get(i).getStopFacility();
+						TransitStopFacility to = routeStops.get(i + 1).getStopFacility();
+						if (speed > 230) {
+							result.addWarning("Suspicious high speed from stop %s (%s) to %s (%s) on line %s, route %s, index: %d: %.2f m/s"
+								.formatted(from.getName(), from.getId(), to.getName(), to.getId(), line.getId(), route.getId(), i, speed));
+						}
+					}
+				}
+			}
+		}
+
+		for (Map.Entry<TransitStopFacility, DoubleList> e : suspiciousStops.entrySet()) {
+			TransitStopFacility stop = e.getKey();
+			double speed = e.getValue().doubleStream().average().orElse(-1);
+			result.addWarning("Suspicious location for stop %s (%s) at stop area %s: %s, avg. speed: %.2f m/s".formatted(stop.getName(), stop.getId(), stop.getStopAreaId(), stop.getCoord(), speed));
+		}
+
+		return result;
+	}
+
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
 		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
 		v.add(validateNetworkRoutes(schedule, network));
@@ -259,6 +376,7 @@ public abstract class TransitScheduleValidator {
 		v.add(validateAllStopsExist(schedule));
 		v.add(validateOffsets(schedule));
 		v.add(validateTransfers(schedule));
+		v.add(validateStopCoordinates(schedule));
 		return v;
 	}
 
