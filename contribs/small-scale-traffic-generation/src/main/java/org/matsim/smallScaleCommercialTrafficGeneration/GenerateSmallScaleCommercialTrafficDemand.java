@@ -750,17 +750,51 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarrierAttributes inhabitantAttributes = new CarrierAttributes(carrierAttributes.purpose, carrierAttributes.startZone,
 						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(), carrierAttributes.modeORvehType,
 						carrierAttributes.smallScaleCommercialTrafficType, carrierAttributes.vehicleDepots, carrierAttributes.odMatrixEntry);
-					serviceTimePerStop = unhandledServicesSolution.getServiceTimePerStop(newCarrier, inhabitantAttributes, 0);
+					serviceTimePerStop = getServiceTimePerStop(newCarrier, inhabitantAttributes, 0);
 
 				}
 				else {
-					serviceTimePerStop = unhandledServicesSolution.getServiceTimePerStop(newCarrier, carrierAttributes, 0);
+					serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
 				}
 
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
 					36 * 3600); // extended time window, so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow);
 			}
+		}
+	}
+
+	/**
+	 * Give a service duration based on the purpose and the trafficType under a given probability
+	 *
+	 * @param carrier                                     The carrier for which the service time should be calculated
+	 * @param carrierAttributes                           The attributes of the carrier
+	 * @param additionalTravelBufferPerIterationInMinutes Additional travel buffer per recalculation iteration for a carrier in minutes
+	 * @return The service time in seconds
+	 */
+	public Integer getServiceTimePerStop(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes,
+										 int additionalTravelBufferPerIterationInMinutes) {
+		GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey key;
+		if (carrierAttributes.smallScaleCommercialTrafficType().equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
+			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(), null,
+				carrierAttributes.smallScaleCommercialTrafficType());
+		else if (carrierAttributes.smallScaleCommercialTrafficType().equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(),
+				carrierAttributes.modeORvehType(), carrierAttributes.smallScaleCommercialTrafficType());
+		} else {
+			throw new RuntimeException("Unknown traffic type: " + carrierAttributes.smallScaleCommercialTrafficType());
+		}
+		// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+		if (additionalTravelBufferPerIterationInMinutes == 0) {
+			GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
+
+			int serviceDurationLowerBound = serviceDurationBounds.minDuration();
+			int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
+			return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
+		} else {
+			return unhandledServicesSolution.changeServiceTimePerStop(carrier, carrierAttributes, key, additionalTravelBufferPerIterationInMinutes);
 		}
 	}
 
