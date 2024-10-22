@@ -55,12 +55,13 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
 		// For common types a default network mode is assumed, for others it needs to be set explicitly.
-		networkMode = switch (typeId.toString()) {
-			case TransportMode.car, TransportMode.ride -> TransportMode.car;
-			case TransportMode.bike -> TransportMode.bike;
-			case TransportMode.walk, TransportMode.transit_walk -> TransportMode.walk;
-			default -> null;
-		};
+		if (typeId != null)
+			networkMode = switch (typeId.toString()) {
+				case TransportMode.car, TransportMode.ride -> TransportMode.car;
+				case TransportMode.bike -> TransportMode.bike;
+				case TransportMode.walk, TransportMode.transit_walk -> TransportMode.walk;
+				default -> null;
+			};
 	}
 
 	VehicleType(Id<VehicleType> typeId, String networkMode) {
