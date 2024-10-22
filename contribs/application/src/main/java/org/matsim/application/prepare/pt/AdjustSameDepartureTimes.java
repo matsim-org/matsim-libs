@@ -2,6 +2,7 @@ package org.matsim.application.prepare.pt;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.api.*;
 
@@ -61,10 +62,41 @@ public class AdjustSameDepartureTimes implements Consumer<TransitSchedule> {
 		List<TransitRouteStop> stops = new ArrayList<>(route.getStops());
 
 		boolean adjusted = false;
+
+		// Check if the times at the end of the schedule are the same
+		// These need to be calculated and can not be interpolated
+		// The arrival at the last stop is shifted by small travel time
+		if (stops.size() > 1) {
+			TransitRouteStop last = stops.getLast();
+			TransitRouteStop secondLast = stops.get(stops.size() - 2);
+
+			OptionalTime lastDep = last.getDepartureOffset().or(last.getArrivalOffset());
+			OptionalTime secondLastDep = secondLast.getDepartureOffset().or(secondLast.getArrivalOffset());
+
+			if (lastDep.isDefined() && secondLastDep.isDefined() && lastDep.equals(secondLastDep)) {
+				// Calculate the time between the last two stops
+				double dist = Math.max(20, CoordUtils.calcEuclideanDistance(last.getStopFacility().getCoord(), secondLast.getStopFacility().getCoord()));
+				double time = dist / 10; // 10 m/s
+
+				// Calculate the time for the last stop
+				TransitRouteStop newStop = f.createTransitRouteStop(
+					last.getStopFacility(),
+					add(last.getArrivalOffset(), time),
+					add(last.getDepartureOffset(), time)
+				);
+
+				newStop.setAwaitDepartureTime(last.isAwaitDepartureTime());
+				newStop.setAllowAlighting(last.isAllowAlighting());
+				newStop.setAllowBoarding(last.isAllowBoarding());
+
+				stops.set(stops.size() - 1, newStop);
+				adjusted = true;
+			}
+		}
+
 		for (int i = 0; i < stops.size() - 1; ) {
 
 			TransitRouteStop stop = stops.get(i);
-
 			OptionalTime dep = stop.getDepartureOffset().or(stop.getArrivalOffset());
 
 			if (!dep.isDefined()) {

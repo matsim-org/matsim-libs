@@ -325,7 +325,7 @@ public abstract class TransitScheduleValidator {
 						}
 
 						// Some hard coded rules to detect suspicious stops, these are speed m/s, so quite high values
-						if (((toStop > 3 * mean && both > 30) || toStop > 120) && (((fromStop > 3 * mean && both > 30) || fromStop > 120))) {
+						if (((toStop > 3 * mean && both > 50) || toStop > 120) && (((fromStop > 3 * mean && both > 50) || fromStop > 120))) {
 							DoubleList suspiciousSpeeds = suspiciousStops.computeIfAbsent(stop.getStopFacility(), (k) -> new DoubleArrayList());
 							suspiciousSpeeds.add(toStop);
 							suspiciousSpeeds.add(fromStop);
