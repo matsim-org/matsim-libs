@@ -32,10 +32,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -169,6 +166,16 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				Consumer<TransitSchedule> f = createConsumer(c, TransitSchedule.class);
 				log.info("Applying {} to created schedule", c.getName());
 				f.accept(scenario.getTransitSchedule());
+			}
+		}
+
+		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+			List<TransitRoute> routes = new ArrayList<>(line.getRoutes().values());
+			for (TransitRoute route : routes) {
+				if (route.getDepartures().isEmpty()) {
+					log.warn("Route {} in line {} with no departures removed.", route.getId(), line.getId());
+					line.removeRoute(route);
+				}
 			}
 		}
 

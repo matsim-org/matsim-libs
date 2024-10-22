@@ -47,10 +47,11 @@ public class AdjustSameDepartureTimes implements Consumer<TransitSchedule> {
 
 				TransitRoute newRoute = schedule.getFactory().createTransitRoute(route.getId(), route.getRoute(), newStops, route.getTransportMode());
 				newRoute.setDescription(route.getDescription());
-
 				for (Map.Entry<String, Object> e : route.getAttributes().getAsMap().entrySet()) {
 					newRoute.getAttributes().putAttribute(e.getKey(), e.getValue());
 				}
+				route.getDepartures().values().forEach(newRoute::addDeparture);
+
 				line.addRoute(newRoute);
 			}
 		}

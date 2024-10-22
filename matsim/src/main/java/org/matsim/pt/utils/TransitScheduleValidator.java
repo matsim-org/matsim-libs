@@ -239,6 +239,19 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	public static ValidationResult validateDepartures(TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				if (route.getDepartures().isEmpty())
+					result.addError("No departures defined for line %s, route %s".formatted(line.getId(), route.getId()));
+
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * Validate if coordinates of stops and given travel times are plausible.
 	 */
@@ -367,6 +380,7 @@ public abstract class TransitScheduleValidator {
 		v.add(validateOffsets(schedule));
 		v.add(validateTransfers(schedule));
 		v.add(validateStopCoordinates(schedule));
+		v.add(validateDepartures(schedule));
 		return v;
 	}
 
