@@ -201,7 +201,7 @@ public class TestPositionEmissionModule {
     }
 
     private VehicleType createVehicleType() {
-        VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
+        VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class), TransportMode.car);
         EngineInformation engineInformation = vehicleType.getEngineInformation();
         VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
         VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
