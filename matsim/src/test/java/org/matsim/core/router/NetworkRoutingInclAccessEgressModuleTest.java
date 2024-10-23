@@ -189,6 +189,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
         config.qsim().setMainModes(modes);
         config.routing().setNetworkModes(modes);
+		config.travelTimeCalculator().setAnalyzedModes(new HashSet<>(modes));
         ScoringConfigGroup scoring = config.scoring();
 
         ScoringConfigGroup.ModeParams slowParams = new ScoringConfigGroup.ModeParams(SLOW_MODE);
