@@ -479,10 +479,34 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	}
 
 	private void arrangeAgentActivity(final MobsimAgent agent) {
+		ActivityHandler responsible = null;
+		ActivityEngine activityEngine = null;
 		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				return;
+			if ( activityHandler instanceof ActivityEngine ) {
+				// seems that only exactly one activity engine is allowed.  We use that as a fallback.
+				activityEngine = (ActivityEngine) activityHandler;
+			} else if ( activityHandler.handleActivity(agent) ) {
+				// if we are here, then the activity was already handled.
+				if ( responsible==null ){
+					responsible = activityHandler;
+				} else {
+					// in this case, the activity was handled twice.
+					StringBuilder strb = new StringBuilder();
+					strb.append( "more than one activity handler feels reponsible for agent=" ).append( agent );
+					strb.append( ".  activityHandler1=" ).append( responsible ).append( "; activityHandler2=" ).append( activityHandler );
+					log.fatal( strb.toString() );
+					throw new RuntimeException( strb.toString() );
+				}
 			}
+		}
+		if ( responsible==null && activityEngine!=null ) {
+			// only if the activity has not been handled yet we call the activity engine.
+			activityEngine.handleActivity( agent );
+		} else {
+			StringBuilder strb = new StringBuilder();
+			strb.append( "There is no ActivityHandler that wants to handle the agent, and also no ActivityEngine." );
+			log.fatal( strb.toString() );
+			throw new RuntimeException( strb.toString() );
 		}
 	}
 
@@ -506,13 +530,24 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
+		DepartureHandler responsible = null;
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, agent, linkId)) {
-				return;
+			if (departureHandler.handleDeparture(now, agent, linkId) ) {
+				if ( responsible==null ){
+					responsible = departureHandler;
+				} else {
+					StringBuilder strb = new StringBuilder();
+					strb.append( "More than one departure handler feels responsible for agent=" ).append( agent ).append( "; dpHandler1=" )
+					    .append( responsible ).append( "; dpHandler2=" ).append( departureHandler );
+					log.fatal( strb.toString() );
+					throw new RuntimeException( strb.toString() );
+				}
 			}
 		}
-		log.warn("no departure handler wanted to handle the departure of agent " + agent.getId());
-		// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
+		if ( responsible==null ){
+			log.warn( "no departure handler wanted to handle the departure of agent " + agent.getId() );
+			// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
+		}
 
 	}
 
