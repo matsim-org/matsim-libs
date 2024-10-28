@@ -1,12 +1,11 @@
 package org.matsim.codeexamples.guicewithoutmatsim;
 
-import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ConstructorInjection{
+class ConventionalInjectionByConstructor{
 
-	private static final Logger log = LogManager.getLogger( org.matsim.codeexamples.guicewithoutmatsim.PartOne.class ) ;
+	private static final Logger log = LogManager.getLogger( BasicInjection.class ) ;
 
 	public static void main(String[] args){
 		Helper helper = new MyHelper1();
