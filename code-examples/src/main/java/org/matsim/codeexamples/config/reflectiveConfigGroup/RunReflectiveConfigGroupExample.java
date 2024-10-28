@@ -45,7 +45,7 @@ public class RunReflectiveConfigGroupExample {
 		
 		config.checkConsistency(); 
 		
-		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "test");
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "test" );
 		
 	}
 
