@@ -56,7 +56,6 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
 				//Delete old plan of carrier
 				nonCompleteSolvedCarrier.clearPlans();
-				nonCompleteSolvedCarrier.setSelectedPlan(null);
 				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
 
 				// Generate new services. The new service batch should have a smaller sum of serviceDurations than before (or otherwise it will not change anything)

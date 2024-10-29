@@ -731,8 +731,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Generates and adds the services for the given carrier.
 	 */
-	private void createServices(Carrier newCarrier,
-								CarrierAttributes carrierAttributes) {
+	private void createServices(Carrier newCarrier, CarrierAttributes carrierAttributes) {
 		log.info("Create services for carrier: {}", newCarrier.getId());
 		for (String stopZone : odMatrix.getListOfZones()) {
 			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
@@ -848,7 +847,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (String singleDepot : carrierAttributes.vehicleDepots) {
 			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
-
 			int vehicleStartTime = t.getVehicleStartTime();
 			int tourDuration = t.getVehicleTourDuration();
 			int vehicleEndTime = vehicleStartTime + tourDuration;
