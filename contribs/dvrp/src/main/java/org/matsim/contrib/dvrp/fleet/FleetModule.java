@@ -31,8 +31,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 /**
@@ -70,23 +68,20 @@ public class FleetModule extends AbstractDvrpModeModule {
 		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
 		//     i.e. VehiclesSource.fromVehiclesData)
 		// - vehicle specifications provided via a custom binding for FleetSpecification
+		bindModal(DvrpFleetReaderLoadFromScalarCreator.class).toInstance((capacity, id) -> new ScalarVehicleLoad(capacity));
 		if (fleetSpecificationUrl != null) {
-			bindModal(FleetSpecification.class).toProvider(() -> {
+			bindModal(FleetSpecification.class).toProvider(modalProvider((getter) -> {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-				new FleetReader(fleetSpecification).parse(fleetSpecificationUrl);
+				DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator = getter.getModal(DvrpFleetReaderLoadFromScalarCreator.class);
+				new FleetReader(fleetSpecification, dvrpFleetReaderLoadFromScalarCreator).parse(fleetSpecificationUrl);
 				return fleetSpecification;
-			}).asEagerSingleton();
+			})).asEagerSingleton();
 		} else {
-			bindModal(FleetSpecification.class).toProvider(new Provider<>() {
-				@Inject
-				private Vehicles vehicles;
-
-				@Override
-				public FleetSpecification get() {
-					return DvrpVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(
-							getMode(), vehicles);
-				}
-			}).asEagerSingleton();
+			bindModal(FleetSpecification.class).toProvider(modalProvider(getter -> {
+				Vehicles vehicles = getter.get(Vehicles.class);
+				DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator = getter.getModal(DvrpFleetReaderLoadFromScalarCreator.class);
+				return DvrpVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(getMode(), vehicles, dvrpFleetReaderLoadFromScalarCreator);
+			})).asEagerSingleton();
 		}
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {

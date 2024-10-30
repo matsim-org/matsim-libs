@@ -118,7 +118,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	private Waypoint.Stop stop(double endTime) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(endTime - 10, endTime, null), new ScalarVehicleLoad(0));
 	}
 
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {

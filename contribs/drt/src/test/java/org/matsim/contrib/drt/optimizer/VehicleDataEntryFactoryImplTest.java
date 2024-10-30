@@ -125,7 +125,7 @@ public class VehicleDataEntryFactoryImplTest {
 	}
 
 	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
-		return new Stop(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, new ScalarVehicleLoad(0));
 	}
 
 	private DvrpVehicle vehicle(double vehicleEndTime, double lastStayTaskBeginTime) {

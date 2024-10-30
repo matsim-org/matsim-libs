@@ -24,12 +24,12 @@ public class ScalarVehicleLoad implements DvrpVehicleLoad {
 		if(other == null) {
 			return this;
 		}
-		Class<? extends DvrpVehicleLoad> currentClass = other.getClass();
-		if(!(currentClass.isInstance(other))) {
+		Class<? extends DvrpVehicleLoad> currentClass = this.getClass();
+		if(!other.getClass().equals(currentClass)) {
 			throw new UnsupportedVehicleLoadException(other, currentClass);
 		}
 		ScalarVehicleLoad scalarVehicleLoad = (ScalarVehicleLoad) other;
-		return new ScalarVehicleLoad(scalarVehicleLoad.capacity + this.capacity);
+		return fromInt(scalarVehicleLoad.capacity + this.capacity);
 	}
 
 	@Override
@@ -42,18 +42,17 @@ public class ScalarVehicleLoad implements DvrpVehicleLoad {
 			throw new UnsupportedVehicleLoadException(other, currentClass);
 		}
 		ScalarVehicleLoad scalarVehicleLoad = (ScalarVehicleLoad) other;
-		return new ScalarVehicleLoad(this.capacity - scalarVehicleLoad.capacity);
+		return fromInt(this.capacity - scalarVehicleLoad.capacity);
 	}
 
 	@Override
 	public DvrpVehicleLoad getEmptyLoad() {
-		return new ScalarVehicleLoad(0);
+		return fromInt(0);
 	}
 
 	@Override
 	public boolean fitsIn(DvrpVehicleLoad other) {
-		Class<? extends DvrpVehicleLoad> currentClass = other.getClass();
-		if(!(currentClass.isInstance(other))) {
+		if(!this.getClass().equals(other.getClass())) {
 			return false;
 		}
 		ScalarVehicleLoad scalarVehicleLoad = (ScalarVehicleLoad) other;
@@ -63,5 +62,9 @@ public class ScalarVehicleLoad implements DvrpVehicleLoad {
 	@Override
 	public boolean isEmpty() {
 		return this.capacity == 0;
+	}
+
+	protected ScalarVehicleLoad fromInt(int load) {
+		return new ScalarVehicleLoad(load);
 	}
 }

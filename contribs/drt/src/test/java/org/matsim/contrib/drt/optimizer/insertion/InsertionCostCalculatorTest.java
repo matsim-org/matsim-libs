@@ -90,7 +90,7 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[1];
-		stops[0] = new Waypoint.Stop(existingDropoffTask, new ScalarVehicleLoad(1));
+		stops[0] = new Waypoint.StopWithPickupAndDropoff(existingDropoffTask, new ScalarVehicleLoad(1));
 
 		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
 		var insertion = insertion(entry, 0, 1);
@@ -145,8 +145,8 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[2];
-		stops[0] = new Waypoint.Stop(existingPickupTask, new ScalarVehicleLoad(2));
-		stops[1] = new Waypoint.Stop(existingDropoffTask, new ScalarVehicleLoad(1));
+		stops[0] = new Waypoint.StopWithPickupAndDropoff(existingPickupTask, new ScalarVehicleLoad(2));
+		stops[1] = new Waypoint.StopWithPickupAndDropoff(existingDropoffTask, new ScalarVehicleLoad(1));
 
 		VehicleEntry entry = entry(new double[] {60, 60, 60, 300}, ImmutableList.copyOf(stops), start);
 

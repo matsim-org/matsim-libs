@@ -30,11 +30,7 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -319,6 +315,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 		double nextBeginTime = pickupIdx == dropoffIdx ? //
 				pickupStopTask.getEndTime() : // asap
+				stops.get(pickupIdx).task instanceof DefaultDrtStopTaskWithVehicleCapacityChange taskWithCapacityChange ?
+					taskWithCapacityChange.getBeginTime() :
 				stops.get(pickupIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
@@ -438,7 +436,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 						afterDropoffTask.getTaskIdx() + 1, afterDropoffTask.getEndTime());
 			} else {
 				// may want to wait here or after driving before starting next stop
-				double earliestArrivalTime = stops.get(dropoffIdx).task.getPickupRequests().values()
+				double earliestArrivalTime = stops.get(dropoffIdx) instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange ?
+					stopWithCapacityChange.getArrivalTime()
+						: stops.get(dropoffIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
 						.min()

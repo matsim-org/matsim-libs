@@ -1,0 +1,168 @@
+package org.matsim.contrib.drt.optimizer.insertion;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.testcases.fakes.FakeLink;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class InsertionGeneratorWithChangingCapacitiesTest {
+
+	private static final int STOP_DURATION = 10;
+
+	private final Link depotLink = link("depot");
+
+	private final Link fromLink = link("from");
+
+	private final Link toLink = link("to");
+
+	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
+		.id(Id.create("v1", DvrpVehicle.class))
+		.capacity(STARTING_VEHICLE_CAPACITY)
+		.startLinkId(depotLink.getId())
+		.serviceBeginTime(0)
+		.serviceEndTime(24 * 3600)
+		.build();
+	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, depotLink);
+
+	private Link link(String id) {
+		return new FakeLink(Id.createLinkId(id));
+	}
+
+	private Waypoint.Stop stop(double beginTime, Link link, DvrpVehicleLoad outgoingOccupancy) {
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
+	}
+
+	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpVehicleLoad previousCapacity, DvrpVehicleLoad newCapacity) {
+		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, previousCapacity, newCapacity));
+	}
+
+	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return entry(start, precedingStayTimes, stops);
+	}
+
+	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, Waypoint.Stop... stops) {
+		var slackTimes = new double[stops.length + 2];
+		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
+	}
+
+	private static class TestScalarVehicleLoadA extends ScalarVehicleLoad {
+		public TestScalarVehicleLoadA(int capacity) {
+			super(capacity);
+		}
+
+		public static TestScalarVehicleLoadA fromPersonIds(Collection<Id<Person>> personIds) {
+			return new TestScalarVehicleLoadA(personIds.size());
+		}
+
+		protected ScalarVehicleLoad fromInt(int load) {
+			return new TestScalarVehicleLoadA(load);
+		}
+	}
+	private static class TestScalarVehicleLoadB extends ScalarVehicleLoad {
+		public TestScalarVehicleLoadB(int capacity) {
+			super(capacity);
+		}
+
+		public static TestScalarVehicleLoadB fromPersonIds(Collection<Id<Person>> personIds) {
+			return new TestScalarVehicleLoadB(personIds.size());
+		}
+
+		protected ScalarVehicleLoad fromInt(int load) {
+			return new TestScalarVehicleLoadB(load);
+		}
+	}
+	private static final DvrpVehicleLoad STARTING_VEHICLE_CAPACITY = new TestScalarVehicleLoadA(4);
+	private static final DvrpVehicleLoad CHANGED_VEHICLE_CAPACITY = new TestScalarVehicleLoadB(4);
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).scalarDvrpVehicleLoadGetter(TestScalarVehicleLoadA::fromPersonIds).build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).scalarDvrpVehicleLoadGetter(TestScalarVehicleLoadB::fromPersonIds).build();
+
+	@Test
+	void startEmpty_capacityChange_oneRequestPerCapacityType() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
+		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
+		VehicleEntry entry = entry(start, stop0);
+		assertInsertionsOnly(drtRequestA, entry,
+			//pickup after start
+			new InsertionGenerator.Insertion(drtRequestA, entry, 0, 0));
+
+		assertInsertionsOnly(drtRequestB, entry,
+			//pickup after stop 1
+			new InsertionGenerator.Insertion(drtRequestB, entry, 1, 1));
+	}
+
+	@Test
+	void startOccupied_capacityChange_oneRequestPerCapacityType() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
+		Waypoint.Stop stop0 = stop(0, link("stop0"), new TestScalarVehicleLoadA(1)); //pickup
+		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadA(0)); // dropoff
+		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);
+
+		VehicleEntry entry = entry(start, stop0, stop1, stop2);
+
+		assertInsertionsOnly(drtRequestA, entry,
+			new InsertionGenerator.Insertion(drtRequestA, entry, 0, 0),
+			new InsertionGenerator.Insertion(drtRequestA, entry, 0, 1),
+			new InsertionGenerator.Insertion(drtRequestA, entry, 0, 2),
+			new InsertionGenerator.Insertion(drtRequestA, entry, 1, 1),
+			new InsertionGenerator.Insertion(drtRequestA, entry, 1, 2),
+			new InsertionGenerator.Insertion(drtRequestA, entry, 2, 2));
+
+		assertInsertionsOnly(drtRequestB, entry,
+			new InsertionGenerator.Insertion(drtRequestB, entry, 3, 3));
+	}
+
+	@Test
+	void startEmpty_capacityChangeThenRequest_oneRequestPerCapacityType() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
+		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);
+		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadB(1)); //pickup
+		Waypoint.Stop stop2 = stop(0, link("stop2"), new TestScalarVehicleLoadB(0)); // dropoff
+
+		VehicleEntry entry = entry(start, stop0, stop1, stop2);
+
+		assertInsertionsOnly(drtRequestA, entry,
+			new InsertionGenerator.Insertion(drtRequestA, entry, 0, 0));
+
+		assertInsertionsOnly(drtRequestB, entry,
+			new InsertionGenerator.Insertion(drtRequestB, entry, 1, 1),
+			new InsertionGenerator.Insertion(drtRequestB, entry, 1, 2),
+			new InsertionGenerator.Insertion(drtRequestB, entry, 1, 3),
+			new InsertionGenerator.Insertion(drtRequestB, entry, 2, 2),
+			new InsertionGenerator.Insertion(drtRequestB, entry, 2, 3),
+			new InsertionGenerator.Insertion(drtRequestB, entry, 3, 3));
+	}
+
+	private void assertInsertionsOnly(DrtRequest drtRequest, VehicleEntry entry, InsertionGenerator.Insertion... expectedInsertions) {
+		int stopCount = entry.stops.size();
+		DvrpVehicleLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
+		Preconditions.checkArgument(endOccupancy.isEmpty());//make sure the input is valid
+
+		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;
+
+		var actualInsertions = new InsertionGenerator(new DefaultStopTimeCalculator(STOP_DURATION), timeEstimator).generateInsertions(drtRequest,
+			entry);
+		assertThat(actualInsertions.stream().map(i -> i.insertion)).usingRecursiveFieldByFieldElementComparator()
+			.containsExactly(expectedInsertions);
+	}
+
+
+}

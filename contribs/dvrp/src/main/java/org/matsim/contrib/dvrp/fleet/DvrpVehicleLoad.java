@@ -11,7 +11,7 @@ package org.matsim.contrib.dvrp.fleet;
 public interface DvrpVehicleLoad {
 	class UnsupportedVehicleLoadException extends IllegalStateException {
 		public UnsupportedVehicleLoadException(DvrpVehicleLoad left, Class<? extends DvrpVehicleLoad> dvrpVehicleLoadClass) {
-			super(String.format("%s is not instances of the %s class", left.toString(), dvrpVehicleLoadClass.toString()));
+			super(String.format("%s is not a direct instance (might be a subclass instance) of the %s class", left.toString(), dvrpVehicleLoadClass.toString()));
 		}
 	}
 

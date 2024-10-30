@@ -31,7 +31,6 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
-import org.matsim.contrib.drt.optimizer.insertion.extensive.DetourPathDataCache;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
@@ -136,6 +135,6 @@ public class DetourPathDataCacheTest {
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(0, 60, link), new ScalarVehicleLoad(0));
 	}
 }
