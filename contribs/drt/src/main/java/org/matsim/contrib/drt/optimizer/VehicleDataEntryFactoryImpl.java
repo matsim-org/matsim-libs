@@ -25,6 +25,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
@@ -79,6 +80,10 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		}
 
 		List<Double> precedingStayTimes = new ArrayList<>();
+
+		// With changing capacities, we need to start the loop for (int i = stops.length - 1; i >= 0; i--) with the last vehicle capacity
+		DvrpVehicleLoad outgoingOccupancy = vehicle.getCapacity().getEmptyLoad();
+
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (STAY.isBaseTypeOf(task)) {
 				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
@@ -87,17 +92,25 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				precedingStayTimes.add(accumulatedStayTime);
 				accumulatedStayTime = 0.0;
 			}
+			if(task instanceof DefaultDrtStopTaskWithVehicleCapacityChange defaultDrtStopTaskWithVehicleCapacityChange) {
+				outgoingOccupancy = defaultDrtStopTaskWithVehicleCapacityChange.getNewVehicleCapacity().getEmptyLoad();
+			}
 		}
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
-		DvrpVehicleLoad outgoingOccupancy = vehicle.getCapacity().getEmptyLoad();
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
-			outgoingOccupancy = outgoingOccupancy.subtract(s.getOccupancyChange());
+			if(stopTasks.get(i) instanceof DefaultDrtStopTaskWithVehicleCapacityChange stopTaskWithVehicleCapacityChange) {
+				assert outgoingOccupancy.isEmpty();
+				outgoingOccupancy = stopTaskWithVehicleCapacityChange.getPreviousVehicleCapacity().getEmptyLoad();
+				stops[i] = new Waypoint.StopWithCapacityChange(stopTaskWithVehicleCapacityChange);
+			} else {
+				Waypoint.Stop s = stops[i] = new Waypoint.StopWithPickupAndDropoff(stopTasks.get(i), outgoingOccupancy);
+				outgoingOccupancy = outgoingOccupancy.subtract(s.getOccupancyChange());
+			}
 		}
 
 		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? new Waypoint.Stop((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
+				? startTask instanceof DefaultDrtStopTaskWithVehicleCapacityChange stopTaskWithVehicleCapacityChange ? new Waypoint.StopWithCapacityChange(stopTaskWithVehicleCapacityChange) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
 				: null;
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);

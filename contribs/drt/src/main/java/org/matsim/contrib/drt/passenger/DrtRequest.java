@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +49,7 @@ public class DrtRequest implements PassengerRequest {
 
 	private final Link fromLink;
 	private final Link toLink;
+	private final Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter;
 
 	private DrtRequest(Builder builder) {
 		id = builder.id;
@@ -60,6 +62,7 @@ public class DrtRequest implements PassengerRequest {
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
+		scalarVehicleLoadGetter = builder.scalarVehicleLoadGetter;
 	}
 
 	public static Builder newBuilder() {
@@ -78,6 +81,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
+		builder.scalarVehicleLoadGetter = copy.scalarVehicleLoadGetter;
 		return builder;
 	}
 
@@ -131,7 +135,7 @@ public class DrtRequest implements PassengerRequest {
 
 	@Override
 	public DvrpVehicleLoad getPassengerCount() {
-		return new ScalarVehicleLoad(passengerIds.size());
+		return this.scalarVehicleLoadGetter.apply(passengerIds);
 	}
 
 	@Override
@@ -161,6 +165,7 @@ public class DrtRequest implements PassengerRequest {
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
+		private Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter = passengerIds -> new ScalarVehicleLoad(passengerIds.size());
 
 		private Builder() {
 		}
@@ -212,6 +217,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder toLink(Link val) {
 			toLink = val;
+			return this;
+		}
+
+		public Builder scalarDvrpVehicleLoadGetter(Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter) {
+			this.scalarVehicleLoadGetter = scalarVehicleLoadGetter;
 			return this;
 		}
 

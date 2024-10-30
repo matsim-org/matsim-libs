@@ -42,6 +42,10 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 */
 	DvrpVehicleLoad getCapacity();
 
+	default void setCapacity(DvrpVehicleLoad capacity) {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
 	 * {@link Schedule#getBeginTime()}

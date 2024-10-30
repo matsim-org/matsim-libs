@@ -230,7 +230,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), new ScalarVehicleLoad(0));
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

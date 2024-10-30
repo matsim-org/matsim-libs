@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -138,7 +139,7 @@ public interface Waypoint {
 		}
 	}
 
-	class Stop implements Waypoint {
+	abstract class Stop implements Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
 		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
@@ -196,17 +197,9 @@ public interface Waypoint {
 			}
 		}
 
-		private double calcLatestArrivalTime() {
-			return getMaxTimeConstraint(
-					task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
-					task.getBeginTime());
-		}
+		abstract protected double calcLatestArrivalTime();
 
-		private double calcLatestDepartureTime() {
-			return getMaxTimeConstraint(
-					task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
-					task.getEndTime());
-		}
+		abstract protected double calcLatestDepartureTime();
 
 		private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
 			//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
@@ -218,6 +211,59 @@ public interface Waypoint {
 		@Override
 		public String toString() {
 			return "VehicleData.Stop for: " + task.toString();
+		}
+	}
+
+	class StopWithPickupAndDropoff extends Stop {
+
+		public StopWithPickupAndDropoff(DrtStopTask task, DvrpVehicleLoad outgoingOccupancy) {
+			super(task, outgoingOccupancy);
+		}
+
+		public StopWithPickupAndDropoff(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpVehicleLoad outgoingOccupancy) {
+			super(task, latestArrivalTime, latestDepartureTime, outgoingOccupancy);
+		}
+
+
+		@Override
+		public double calcLatestArrivalTime() {
+			return getMaxTimeConstraint(
+				task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
+				task.getBeginTime());
+		}
+
+		@Override
+		public double calcLatestDepartureTime() {
+			return getMaxTimeConstraint(
+				task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
+				task.getEndTime());
+		}
+
+		private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
+			//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
+			//thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
+			//but we cannot add a new stop before the delayed task
+			return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
+		}
+	}
+
+	class StopWithCapacityChange extends Stop {
+		public StopWithCapacityChange(DefaultDrtStopTaskWithVehicleCapacityChange task) {
+			super(task, task.getNewVehicleCapacity().getEmptyLoad());
+		}
+
+		public DvrpVehicleLoad getNewVehicleCapacity() {
+			return ((DefaultDrtStopTaskWithVehicleCapacityChange) this.task).getNewVehicleCapacity();
+		}
+
+		@Override
+		protected double calcLatestArrivalTime() {
+			return task.getBeginTime();
+		}
+
+		@Override
+		protected double calcLatestDepartureTime() {
+			return task.getEndTime();
 		}
 	}
 

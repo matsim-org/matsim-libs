@@ -22,10 +22,12 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
@@ -39,8 +41,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 /**
@@ -92,15 +92,13 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
-			@Inject
-			private EventsManager events;
+		bindModal(DvrpLoadFromPassengers.class).toInstance(passengerIds -> new ScalarVehicleLoad(passengerIds.size()));
 
-			@Override
-			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events);
-			}
-		}).asEagerSingleton();
+		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
+			EventsManager eventsManager = getter.get(EventsManager.class);
+			DvrpLoadFromPassengers dvrpLoadFromPassengers = getter.getModal(DvrpLoadFromPassengers.class);
+			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadFromPassengers);
+		})).asEagerSingleton();
 
 		// this is not the actual selection which DynActionCreator is used, see
 		// DrtModeOptimizerQSimModule

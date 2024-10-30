@@ -38,14 +38,14 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	public static final String SERVICE_BEGIN_TIME = "serviceBeginTime";
 	public static final String SERVICE_END_TIME = "serviceEndTime";
 
-	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles) {
+	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles, DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator) {
 		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
 		vehicles.getVehicles()
 				.values()
 				.stream()
 				.filter(vehicle -> mode.equals(
 						vehicle.getAttributes().getAttribute(DVRP_MODE)))
-				.map(DvrpVehicleSpecificationWithMatsimVehicle::new)
+				.map(vehicle -> new DvrpVehicleSpecificationWithMatsimVehicle(vehicle, dvrpFleetReaderLoadFromScalarCreator))
 				.forEach(fleetSpecification::addVehicleSpecification);
 		return fleetSpecification;
 	}
@@ -59,11 +59,11 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	private final double serviceBeginTime;
 	private final double serviceEndTime;
 
-	public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle) {
+	public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle, DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator) {
 		id = Objects.requireNonNull(Id.create(matsimVehicle.getId(), DvrpVehicle.class));
 		this.matsimVehicle = matsimVehicle;
 
-		this.capacity = new ScalarVehicleLoad(matsimVehicle.getType().getCapacity().getSeats());
+		this.capacity = dvrpFleetReaderLoadFromScalarCreator.getDvrpVehicleLoad(matsimVehicle.getType().getCapacity().getSeats(), id);
 
 		var attributes = matsimVehicle.getAttributes();
 		this.startLinkId = Objects.requireNonNull(Id.createLinkId((String)attributes.getAttribute(START_LINK)));

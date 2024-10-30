@@ -86,4 +86,8 @@ public interface Task {
 	 * (TaskStatus == STARTED) can be tracked.
 	 */
 	void initTaskTracker(TaskTracker taskTracker);
+
+	default boolean isMovable() {
+		return true;
+	}
 }

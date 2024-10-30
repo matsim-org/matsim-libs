@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.scheduler;
 
-import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -13,7 +12,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.examples.RunDrtExampleIT;
 import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
@@ -218,7 +216,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
     private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpVehicleLoad outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy);
+        return new Waypoint.StopWithPickupAndDropoff(stopTask, outgoingOccupancy);
     }
 
 

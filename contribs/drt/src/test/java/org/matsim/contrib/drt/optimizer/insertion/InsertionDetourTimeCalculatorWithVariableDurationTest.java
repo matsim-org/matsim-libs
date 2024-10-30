@@ -272,7 +272,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	private Waypoint.Stop stop(double beginTime, Link link) {
 		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
 		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
-		return new Waypoint.Stop(stopTask, new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(stopTask, new ScalarVehicleLoad(0));
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

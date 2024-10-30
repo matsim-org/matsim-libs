@@ -36,10 +36,12 @@ public class FleetReader extends MatsimXmlParser {
 	private static final int DEFAULT_CAPACITY = 1;
 
 	private final FleetSpecification fleet;
+	private final DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator;
 
-	public FleetReader(FleetSpecification fleet) {
+	public FleetReader(FleetSpecification fleet, DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator) {
 		super(ValidationType.DTD_ONLY);
 		this.fleet = fleet;
+		this.dvrpVehicleLoadCreator = dvrpVehicleLoadCreator;
 	}
 
 	@Override
@@ -54,21 +56,22 @@ public class FleetReader extends MatsimXmlParser {
 	}
 
 	private DvrpVehicleSpecification createSpecification(Attributes atts) {
+		Id<DvrpVehicle> vehicleId = Id.create(atts.getValue("id"), DvrpVehicle.class);
 		return ImmutableDvrpVehicleSpecification.newBuilder()
-				.id(Id.create(atts.getValue("id"), DvrpVehicle.class))
+				.id(vehicleId)
 				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(getCapacity(atts.getValue("capacity")))
+				.capacity(getCapacity(atts.getValue("capacity"), vehicleId, this.dvrpVehicleLoadCreator))
 				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
 				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
 				.build();
 	}
 
-	private static DvrpVehicleLoad getCapacity(String capacityAttribute) {
+	private static DvrpVehicleLoad getCapacity(String capacityAttribute, Id<DvrpVehicle> vehicleId, DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator) {
 		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
 		if ((int)capacity != capacity) {
 			//for backwards compatibility: use double when reading files (capacity used to be double)
 			throw new IllegalArgumentException("capacity must be an integer value");
 		}
-		return new ScalarVehicleLoad((int)capacity);
+		return dvrpVehicleLoadCreator.getDvrpVehicleLoad((int)capacity, vehicleId);
 	}
 }
