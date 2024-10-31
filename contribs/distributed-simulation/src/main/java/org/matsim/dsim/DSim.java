@@ -132,6 +132,8 @@ public final class DSim implements Mobsim {
             time += 1.0;
         }
 
+		manager.finishProcessing();
+
         double mu = histogram.getMean() / 1000;
 
         // simulated / real

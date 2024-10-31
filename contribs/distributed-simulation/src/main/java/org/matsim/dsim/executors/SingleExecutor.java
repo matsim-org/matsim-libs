@@ -3,7 +3,6 @@ package org.matsim.dsim.executors;
 import com.google.inject.Inject;
 import org.matsim.api.LP;
 import org.matsim.api.core.v01.messages.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
@@ -21,14 +20,12 @@ import java.util.function.Consumer;
  */
 public final class SingleExecutor implements LPExecutor {
 
-    private final DistributedEventsManager manager;
     private final SerializationProvider serializer;
 
     private final List<SimTask> tasks = new ArrayList<>();
 
     @Inject
-    public SingleExecutor(DistributedEventsManager manager, SerializationProvider serializer, Node node) {
-        this.manager = manager;
+    public SingleExecutor(SerializationProvider serializer, Node node) {
         this.serializer = serializer;
     }
 
@@ -72,4 +69,14 @@ public final class SingleExecutor implements LPExecutor {
             }
         }
     }
+
+	@Override
+	public void runEventHandler() {
+		for (SimTask task : tasks) {
+			if (task instanceof EventHandlerTask) {
+				task.beforeExecution();
+				task.run();
+			}
+		}
+	}
 }

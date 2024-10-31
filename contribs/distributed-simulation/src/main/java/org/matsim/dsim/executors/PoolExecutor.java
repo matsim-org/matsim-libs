@@ -101,4 +101,32 @@ public final class PoolExecutor implements LPExecutor {
 
         executions.clear();
     }
+
+	@Override
+	public void runEventHandler() {
+		for (SimTask task : tasks) {
+			if (task instanceof EventHandlerTask) {
+				task.beforeExecution();
+			}
+		}
+
+		// These need to be two loops because of concurrency
+
+		for (SimTask task : tasks) {
+			if (task instanceof EventHandlerTask) {
+				executions.add(executor.submit(task));
+			}
+		}
+
+		for (Future<?> execution : executions) {
+			try {
+				execution.get();
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Error while executing task", e);
+				executor.shutdown();
+			}
+		}
+
+		executions.clear();
+	}
 }

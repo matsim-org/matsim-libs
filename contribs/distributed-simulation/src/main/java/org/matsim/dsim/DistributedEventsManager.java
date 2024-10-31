@@ -384,5 +384,16 @@ public final class DistributedEventsManager implements EventsManager {
     @Override
     public void finishProcessing() {
 
+		// Force last sync
+		double time = lastSync + remoteSyncStep;
+
+		afterSimStep(time);
+		broker.syncTimestep(time);
+
+		beforeSimStep(time + 1);
+
+		executor.runEventHandler();
+
+
     }
 }

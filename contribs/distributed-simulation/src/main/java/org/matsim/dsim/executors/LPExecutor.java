@@ -27,6 +27,12 @@ public interface LPExecutor extends Steppable {
                               int part, int totalParts,
                               @Nullable AtomicInteger counter);
 
+
+	/**
+	 * Runs all event handlers tasks.
+	 */
+	void runEventHandler();
+
     /**
      * Remove a task from the execution loop.
      */
