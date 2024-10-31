@@ -1,5 +1,9 @@
 image: maven:3.9-eclipse-temurin-21-jammy
 
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
 stages:
   - build
 
@@ -81,3 +85,5 @@ build-job:
     - mvn install --also-make --projects $module -DskipTests -Dsource.skip
     - cd $module
     - mvn verify -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true -Dsource.skip
+
+  interruptible: true
