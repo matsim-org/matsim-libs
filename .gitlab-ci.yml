@@ -55,6 +55,7 @@ build-job:
           - contribs/sbb-extensions
           - contribs/simulatedannealing
           - contribs/small-scale-traffic-generation
+          - contribs/distributed-simulation
           - benchmark
 
   cache:

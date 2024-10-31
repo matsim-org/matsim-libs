@@ -24,8 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Message;
 
-public abstract class Event {
+public abstract class Event implements Message {
 
 	public final static String ATTRIBUTE_TIME = "time";
 	public final static String ATTRIBUTE_TYPE = "type";

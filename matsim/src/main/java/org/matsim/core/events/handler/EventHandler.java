@@ -44,4 +44,20 @@ public interface EventHandler extends MatsimExtensionPoint {
 	 */
 	default void reset(int iteration) {}
 
+	/**
+	 * The interval in simulation seconds at which events should be processed. This is the minimum guaranteed interval.
+	 * Events may be processed more frequently depending on the event handler.
+	 */
+	default double getProcessInterval() {
+		return 15 * 60;
+	}
+
+	/**
+	 * Display name of the event handler.
+	 */
+	default String getName() {
+		String simpleName = getClass().getSimpleName();
+		return simpleName.isBlank() ? getClass().getName() : simpleName;
+	}
+
 }
