@@ -1,0 +1,81 @@
+image: maven:3.9-eclipse-temurin-21-jammy
+
+stages:
+  - build
+
+build-job:
+  stage: build
+  parallel:
+    matrix:
+      - module:
+          - matsim
+          # sorted from longest to shortest (to minimise the overall test stage duration)
+          # (used in travis; not respected in GitHub Action workflows)
+          - contribs/vsp
+          - contribs/common
+          - contribs/taxi
+          - contribs/minibus
+          - contribs/signals
+          - contribs/bicycle
+          - contribs/cadytsIntegration
+          - contribs/drt
+          - contribs/drt-extensions
+          - contribs/discrete_mode_choice
+          - contribs/carsharing
+          - contribs/commercialTrafficApplications
+          - contribs/av
+          - contribs/locationchoice
+          - contribs/ev
+          - contribs/dvrp
+          - contribs/emissions
+          - contribs/decongestion
+          - contribs/noise
+          - contribs/accidents
+          - contribs/freight
+          - contribs/freightreceiver
+          - contribs/parking
+          - contribs/matrixbasedptrouter
+          - contribs/accessibility
+          - contribs/integration
+          - contribs/multimodal
+          - contribs/protobuf
+          - contribs/shared_mobility
+          - contribs/socnetsim
+          - contribs/sumo
+          - contribs/pseudosimulation
+          - contribs/railsim
+          - contribs/roadpricing
+          - contribs/analysis
+          - contribs/hybridsim
+          - contribs/informed-mode-choice
+          - contribs/otfvis
+          - contribs/osm
+          - contribs/application
+          - contribs/simwrapper
+          - contribs/sbb-extensions
+          - contribs/simulatedannealing
+          - contribs/small-scale-traffic-generation
+          - benchmark
+
+  cache:
+    paths:
+      - .m2/repository
+
+  variables:
+    MAVEN_OPTS: >-
+      -Xmx2G
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+
+    MAVEN_CLI_OPTS: >-
+      --batch-mode
+      --errors
+      --fail-at-end
+      --show-version
+      --no-transfer-progress
+
+  script:
+    - cd $module
+    - mvn verify -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true -Dsource.skip
