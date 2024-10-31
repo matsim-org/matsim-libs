@@ -23,6 +23,10 @@
 
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Topology;
+import org.matsim.api.core.v01.messages.Node;
+
+import java.util.List;
 
 public final class NewControlerModule extends AbstractModule {
 	@Override
@@ -35,6 +39,11 @@ public final class NewControlerModule extends AbstractModule {
 		bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 		bind(TerminationCriterion.class).to(TerminateAtFixedIterationNumber.class);
 		bind(MatsimServices.class).to(MatsimServicesImpl.class);
+
+		// Always bind topology, which will be single machine by default
+		Node node = Node.builder().rank(0).build();
+		bind(Node.class).toInstance(node);
+		bind(Topology.class).toInstance(Topology.builder().nodes(List.of(node)).build());
 
 		bind(IterationCounter.class).to(MatsimServicesImpl.class);
 		// (I don't want to always inject the whole MatsimServices just to get the iteration number.  If

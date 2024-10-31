@@ -4,8 +4,10 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.core.serialization.SerializationProvider;
 
 import java.lang.foreign.MemorySegment;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class NullCommunicator implements Communicator {
 
@@ -27,9 +29,8 @@ public class NullCommunicator implements Communicator {
     public void recv(MessageReceiver expectsNext, MessageConsumer handleMsg) {
     }
 
-    @Override
-    public <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {
-        return new ArrayList<>(List.of(msg));
-    }
-
+	@Override
+	public <T extends Message> List<T> allGather(T msg, int tag, Queue<ByteBuffer> queue, SerializationProvider provider) {
+		return new ArrayList<>(List.of(msg));
+	}
 }

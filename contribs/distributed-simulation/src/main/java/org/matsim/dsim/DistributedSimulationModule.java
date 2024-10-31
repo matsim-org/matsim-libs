@@ -25,6 +25,7 @@ import org.matsim.dsim.simulation.TimeInterpretation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -56,7 +57,7 @@ public class DistributedSimulationModule extends AbstractModule {
         topology = createTopology(serializer);
 
         log.info("Topology has {} partitions on {} nodes. Node {} is has parts: {}",
-                topology.getTotalPartitions(), topology.getNodes().size(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
+                topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
     }
 
     /**
@@ -113,7 +114,7 @@ public class DistributedSimulationModule extends AbstractModule {
                 .build();
 
         // Receive node information from all ranks
-        List<Node> nodes = comm.allGather(node, 0, serializer);
+        List<Node> nodes = comm.allGather(node, 0, new LinkedList<>(), serializer);
         nodes.sort(Comparator.comparingInt(Node::getRank));
 
         Topology.TopologyBuilder topology = Topology.builder();

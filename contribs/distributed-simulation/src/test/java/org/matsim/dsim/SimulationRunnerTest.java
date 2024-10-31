@@ -1,6 +1,5 @@
 package org.matsim.dsim;
 
-import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -64,7 +63,6 @@ class SimulationRunnerTest {
                 //bind(SerializationProvider.class).in(Singleton.class);
                 bind(Node.class).toInstance(node);
                 bind(Communicator.class).to(NullCommunicator.class);
-                bind(IOHandler.class).in(Singleton.class);
                 bind(Topology.class).toInstance(topology);
 
                 //Multibinder<LPProvider> lpBinder = Multibinder.newSetBinder(binder(), LPProvider.class);

@@ -204,7 +204,7 @@ public final class DistributedEventsManager implements EventsManager {
         registry.syncStep(remoteSyncStep);
 
         EventRegistry self = registry.build();
-        List<EventRegistry> all = comm.allGather(self, 1, serializer);
+        List<EventRegistry> all = comm.allGather(self, 1, broker.getMessageQueue(), serializer);
 
         if (!globalListener.isEmpty()) {
 
@@ -388,7 +388,7 @@ public final class DistributedEventsManager implements EventsManager {
 		double time = lastSync + remoteSyncStep;
 
 		afterSimStep(time);
-		broker.syncTimestep(time);
+		broker.syncTimestep(time, true);
 
 		beforeSimStep(time + 1);
 

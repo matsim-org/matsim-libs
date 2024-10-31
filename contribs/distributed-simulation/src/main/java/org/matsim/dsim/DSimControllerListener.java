@@ -44,6 +44,9 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
     @Inject
     private Communicator comm;
 
+	@Inject
+	private MessageBroker broker;
+
     @Inject
     private SerializationProvider serializer;
 
@@ -70,7 +73,7 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
                 .build();
 
         // Check if Ids are consistent
-        List<StartUpMessage> all = comm.allGather(msg, 10, serializer);
+        List<StartUpMessage> all = comm.allGather(msg, 10, broker.getMessageQueue(), serializer);
         for (StartUpMessage m : all) {
             Id.check(Link.class, m.getLinkIds());
             Id.check(Node.class, m.getNodeIds());
@@ -93,11 +96,12 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
     @Override
     public void notifyShutdown(ShutdownEvent event) {
 
-        log.info("Simulation finished");
-
         injector.getInstance(LPExecutor.class).shutdown();
 
         // Wait for all nodes to finish
-        comm.allGather(new ShutDownMessage(), Integer.MAX_VALUE, serializer);
-    }
+		comm.allGather(new ShutDownMessage(), Integer.MAX_VALUE, broker.getMessageQueue(), serializer);
+
+		log.info("Simulation finished");
+
+	}
 }

@@ -132,8 +132,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
         this.topology = topology;
 
         this.addresses = new int[topology.getTotalPartitions()];
-        for (int i = 0; i < topology.getNodes().size(); i++) {
-            Node n = topology.getNodes().get(i);
+        for (int i = 0; i < topology.getNodesCount(); i++) {
+            Node n = topology.getNode(i);
             for (int p : n.getParts()) {
                 addresses[p] = n.getRank();
             }
@@ -181,6 +181,13 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
     List<Event> getEvents() {
         return events;
     }
+
+	/**
+	 * Returns the message queue for unprompted messages.
+	 */
+	Queue<ByteBuffer> getMessageQueue() {
+		return aheadMsgs;
+	}
 
     void register(SimTask task, int part) {
 
@@ -248,7 +255,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
      */
     public void addNullMessage(int partition) {
         // This is inefficient, but should be a small loop
-        for (Node node : topology.getNodes()) {
+        for (Node node : topology) {
             if (node.getParts().contains(partition)) {
                 sendNullMsgs.add(node.getRank());
             }
@@ -279,7 +286,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
         seq = 1000 + (int) (time * 100);
     }
 
-    void syncTimestep(double time) {
+    void syncTimestep(double time, boolean last) {
         if (comm.getSize() == 1) {
             return;
         }
@@ -288,6 +295,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
         for (SimTask task : tasks) {
             IntSet others = task.waitForOtherRanks(time);
+
+			// On last iteration the lps are not executed
+			if (last && task instanceof LPTask)
+				continue;
 
             if (others == LP.ALL_NODES_BROADCAST) {
                 waitFor.addAll(otherParts);

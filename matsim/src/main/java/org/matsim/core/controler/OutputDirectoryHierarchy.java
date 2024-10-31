@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Topology;
+import org.matsim.api.core.v01.messages.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
@@ -45,11 +47,11 @@ public final class OutputDirectoryHierarchy {
 
 	public enum OverwriteFileSetting {failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists}
 
-	private static final String DIRECTORY_ITERS = "ITERS";
 
 	private static final  Logger log = LogManager.getLogger(OutputDirectoryHierarchy.class);
 
 	private String runId = null;
+	private String directoryIters = "ITERS";
 
 	private final String outputPath;
 
@@ -58,12 +60,21 @@ public final class OutputDirectoryHierarchy {
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(ControllerConfigGroup config) {
-
+	OutputDirectoryHierarchy(ControllerConfigGroup config, Topology topology, Node node) {
 		this(config.getOutputDirectory(),
 				config.getRunId(),
 				config.getOverwriteFileSetting(),
 				config.getCompressionType());
+
+		if (topology.isDistributed())
+			directoryIters += "-" + node.getRank();
+	}
+
+	OutputDirectoryHierarchy(ControllerConfigGroup config) {
+		this(config.getOutputDirectory(),
+			config.getRunId(),
+			config.getOverwriteFileSetting(),
+			config.getCompressionType());
 	}
 
 	/**
@@ -120,7 +131,7 @@ public final class OutputDirectoryHierarchy {
 	 * @return path to the specified iteration directory
 	 */
 	public final String getIterationPath(final int iteration) {
-		return outputPath + "/" + DIRECTORY_ITERS + "/it." + iteration;
+		return outputPath + "/" + directoryIters + "/it." + iteration;
 	}
 
 	/**
@@ -212,15 +223,14 @@ public final class OutputDirectoryHierarchy {
 	 */
 	public final void createIterationDirectory(final int iteration) {
 		File dir = new File(getIterationPath(iteration));
-		if (!dir.mkdir()) {
-			if (this.overwriteFiles == OverwriteFileSetting.overwriteExistingFiles && dir.exists()) {
-				log.info("Iteration directory "
-						+ getIterationPath(iteration)
-						+ " exists already.");
-			} else {
-				log.warn("Could not create iteration directory "
-						+ getIterationPath(iteration) + ".");
-			}
+
+		if (this.overwriteFiles == OverwriteFileSetting.overwriteExistingFiles && dir.exists())
+			log.info("Iteration directory {} exists already.", getIterationPath(iteration));
+
+		try {
+			Files.createDirectories(dir.toPath());
+		} catch (IOException e) {
+			log.warn("Could not create iteration directory {}.", getIterationPath(iteration), e);
 		}
 	}
 
@@ -229,7 +239,7 @@ public final class OutputDirectoryHierarchy {
 	 */
 	public void deleteIterationDirectory() {
 
-		Path path = Path.of(outputPath + "/" + DIRECTORY_ITERS);
+		Path path = Path.of(outputPath + "/" + directoryIters);
 		try (Stream<Path> stream = Files.walk(path)) {
 			stream
 					.sorted(Comparator.reverseOrder())

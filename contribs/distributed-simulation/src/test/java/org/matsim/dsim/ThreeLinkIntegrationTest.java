@@ -8,8 +8,10 @@ import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -52,8 +56,10 @@ public class ThreeLinkIntegrationTest {
         controller.run();
 
         var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-        var actualEventsPath = utils.getOutputDirectory() + "output/three-links.output_events.xml";
-        compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
+        var actualEventsPath = utils.getOutputDirectory() + "output/three-links.output_events.xml.gz";
+
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
     }
 
     /**
@@ -70,8 +76,10 @@ public class ThreeLinkIntegrationTest {
         controller.run();
 
         var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
-        compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
+        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
     }
 
     /**
@@ -91,12 +99,14 @@ public class ThreeLinkIntegrationTest {
         controller.run();
 
         var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-2-plans.xml";
-        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
-        compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
+        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
     }
 
     @Test
-    void oneAgentThreeNodes() throws InterruptedException, ExecutionException {
+    void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
         var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
         var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
 
@@ -120,11 +130,14 @@ public class ThreeLinkIntegrationTest {
                 .toList();
 
         for (var f : futures) {
-            f.get();
+            f.get(2, TimeUnit.MINUTES);
         }
+
         var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
-        compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
+        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
     }
 
     @Test
@@ -193,26 +206,5 @@ public class ThreeLinkIntegrationTest {
 
 
         //compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
-    }
-
-    private static void compareXmlFilesByLine(String expectedEventsPath, String actualEventsPath) {
-        try (var expected = Files.newBufferedReader(Paths.get(expectedEventsPath)); var actual = Files.newBufferedReader(Paths.get(actualEventsPath))) {
-            int lineNumber = 0;
-            String expectedLine;
-            while ((expectedLine = expected.readLine()) != null) {
-
-                var actualLine = actual.readLine();
-                assertNotNull(actualLine);
-                //log.info(actualLine);
-
-                //do this stupid replacement as the auto formatting removes white space in the expected file...
-                assertThat(actualLine.trim()).as("Line %d", lineNumber)
-                        .isEqualToIgnoringWhitespace(expectedLine.trim());
-
-                lineNumber++;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

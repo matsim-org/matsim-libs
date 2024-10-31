@@ -5,6 +5,7 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -93,6 +94,7 @@ public class DistributedController implements ControlerI {
         PrepareForSim prepareForSim = injector.getInstance(PrepareForSim.class);
         prepareForSim.run();
 
+		injector.getInstance(IterationStopWatch.class).beginIteration(0);
 		io.createIterationDirectory(0);
 
 		listenerManager.fireControlerIterationStartsEvent(0, false);

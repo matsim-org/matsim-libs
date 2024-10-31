@@ -127,7 +127,7 @@ public final class DSim implements Mobsim {
             }
 
             manager.afterSimStep(time);
-            broker.syncTimestep(time);
+            broker.syncTimestep(time, false);
 
             time += 1.0;
         }
