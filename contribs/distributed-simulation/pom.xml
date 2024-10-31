@@ -21,9 +21,22 @@
 
 	<dependencies>
 
+		<!-- TODO: should be removed later, the run class needs to be somewhere else-->
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.7.6</version>
 		</dependency>
 
 		<dependency>
@@ -75,6 +88,19 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Tests will cover drt -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>drt</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 

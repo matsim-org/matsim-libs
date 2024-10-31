@@ -25,6 +25,7 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -38,7 +39,7 @@ public class MobsimScopeEventHandlingTest {
 	void test_addMobsimScopeHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
 
-		verify(eventsManager, times(1)).addHandler(argThat(arg -> arg == handler));
+		verify(eventsManager, times(1)).addHandler((EventHandler) argThat(arg -> arg == handler));
 	}
 
 	@Test
