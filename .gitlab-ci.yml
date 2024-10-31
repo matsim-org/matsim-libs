@@ -77,5 +77,6 @@ build-job:
       --no-transfer-progress
 
   script:
+    - mvn install --also-make --projects $module -DskipTests -Dsource.skip
     - cd $module
     - mvn verify -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true -Dsource.skip
