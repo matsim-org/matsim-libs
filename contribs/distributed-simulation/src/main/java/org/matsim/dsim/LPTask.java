@@ -164,8 +164,6 @@ public final class LPTask implements SimTask {
             steppable.doSimStep(time);
         }
 
-        manager.flushEvents();
-
         long rt = System.nanoTime() - t;
         avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
 

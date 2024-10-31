@@ -30,6 +30,8 @@ import java.util.List;
 @Log4j2
 public class DSimControllerListener implements StartupListener, ShutdownListener, BeforeMobsimListener {
 
+	public static double PRIORITY = -100;
+
     @Inject
     private Scenario scenario;
 
@@ -48,7 +50,12 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
     @Inject
     private Injector injector;
 
-    @Override
+	@Override
+	public double priority() {
+		return PRIORITY;
+	}
+
+	@Override
     public void notifyStartup(StartupEvent event) {
 
         // Right now every node is required to perform the same partitioning to that results are consistent
@@ -89,7 +96,6 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
         log.info("Simulation finished");
 
         injector.getInstance(LPExecutor.class).shutdown();
-        injector.getInstance(IOHandler.class).close();
 
         // Wait for all nodes to finish
         comm.allGather(new ShutDownMessage(), Integer.MAX_VALUE, serializer);

@@ -1,6 +1,8 @@
 package org.matsim.dsim;
 
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
@@ -12,9 +14,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.*;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,20 +82,20 @@ public class DistributedController implements ControlerI {
         Injector injector = defaultController.getInjector();
 
         Node node = injector.getInstance(Node.class);
+		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
-        ControlerListenerManagerImpl listenerManager = (ControlerListenerManagerImpl) injector.getInstance(ControlerListenerManager.class);
+		ControlerListenerManagerImpl listenerManager = (ControlerListenerManagerImpl) injector.getInstance(ControlerListenerManager.class);
 
-        // Added manually, somehow not picked up by the injector
-        DSimControllerListener listener = new DSimControllerListener();
-        injector.injectMembers(listener);
-        listenerManager.addControlerListener(listener);
+		addCoreControllers(listenerManager, injector);
 
         listenerManager.fireControlerStartupEvent();
 
         PrepareForSim prepareForSim = injector.getInstance(PrepareForSim.class);
         prepareForSim.run();
 
-        listenerManager.fireControlerIterationStartsEvent(0, false);
+		io.createIterationDirectory(0);
+
+		listenerManager.fireControlerIterationStartsEvent(0, false);
 
         listenerManager.fireControlerBeforeMobsimEvent(0, false);
 
@@ -101,15 +109,28 @@ public class DistributedController implements ControlerI {
 
         listenerManager.fireControlerShutdownEvent(false, 0);
 
-        OutputDirectoryHierarchy out = injector.getInstance(OutputDirectoryHierarchy.class);
-
-        if (node.getRank() == 0) {
+		if (node.getRank() == 0) {
             // TODO: hard-coded to write network output for easier testing
-            NetworkUtils.writeNetwork(scenario.getNetwork(), out.getOutputFilename(Controler.DefaultFiles.network));
+            NetworkUtils.writeNetwork(scenario.getNetwork(), io.getOutputFilename(Controler.DefaultFiles.network));
 
-            String prefix = out.getOutputFilename("events_node");
-            IOHandler.mergeEvents(prefix, out.getOutputFilename("output_events.xml"));
-
+//            String prefix = out.getOutputFilename("events_node");
+//            IOHandler.mergeEvents(prefix, out.getOutputFilename("output_events.xml"));
         }
     }
+
+	/**
+	 * Add some default controllers to replicate behaviour of {@link NewControler}.
+	 */
+	private void addCoreControllers(ControlerListenerManager listenerManager, Injector injector) {
+
+		listenerManager.addControlerListener(injector.getInstance(DumpDataAtEnd.class));
+		listenerManager.addControlerListener(injector.getInstance(PlansScoring.class));
+		listenerManager.addControlerListener(injector.getInstance(PlansDumping.class));
+		listenerManager.addControlerListener(injector.getInstance(EventsHandling.class));
+
+		Set<ControlerListener> listeners = injector.getInstance(Key.get(new TypeLiteral<>() {}));
+		for (ControlerListener l : listeners) {
+			listenerManager.addControlerListener(l);
+		}
+	}
 }

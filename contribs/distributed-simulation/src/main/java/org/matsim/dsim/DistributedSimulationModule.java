@@ -78,7 +78,6 @@ public class DistributedSimulationModule extends AbstractModule {
         bind(MessageBroker.class).in(Singleton.class);
         bind(DSim.class).in(Singleton.class);
         bind(SerializationProvider.class).toInstance(serializer);
-        bind(IOHandler.class).in(Singleton.class);
         bind(TimeInterpretation.class).in(Singleton.class);
 
 		// Binds mobsim related things

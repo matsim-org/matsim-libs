@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.LP;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.AggregateFromAll;
@@ -288,8 +287,6 @@ public final class EventHandlerTask implements SimTask {
                 pattern.communicate(broker, handler);
             }
         }
-
-        manager.flushEvents();
 
         int s = (int) time;
         // Fill with zeros

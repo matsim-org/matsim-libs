@@ -22,4 +22,11 @@ public class Topology implements Message {
         return nodes.get(index);
     }
 
+	/**
+	 * Return whether the simulation runs in distributed setup.
+	 */
+	public boolean isDistributed() {
+		return nodes.size() > 1;
+	}
+
 }

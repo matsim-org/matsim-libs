@@ -3,6 +3,7 @@ package org.matsim.dsim;
 import org.matsim.core.communication.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -91,7 +92,9 @@ public class RunDistributedSim implements Callable<Integer> {
 
         // Compatibility with many scenarios
         Activities.addScoringParams(config);
-        config.controller().setMobsim("dsim");
+        config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+		config.controller().setWriteEventsInterval(1);
+
         config.qsim().setUsePersonIdForMissingVehicleId(false);
 
         // Randomness might cause differences on different nodes

@@ -29,7 +29,6 @@ public final class DistributedEventsManager implements EventsManager {
 
     private final MessageBroker broker;
     private final Node node;
-    private final IOHandler io;
     private final LPExecutor executor;
     private final SerializationProvider serializer;
 
@@ -68,16 +67,10 @@ public final class DistributedEventsManager implements EventsManager {
     private final ThreadLocal<AtomicInteger> ctxPartition = ThreadLocal.withInitial(() -> new AtomicInteger(-1));
 
     /**
-     * Stores the events each thread produces. These
-     */
-    private final ThreadLocal<List<Event>> eventIOBuffer = ThreadLocal.withInitial(ArrayList::new);
-
-    /**
      * Set of other nodes that are waited for during event exchange.
      */
     private final IntSet waitFor = new IntOpenHashSet();
 
-    private final boolean ioDisabled;
     private final boolean eventsDisabled;
     /**
      * The remote sync step for events, which is the minimum of all handlers.
@@ -89,14 +82,11 @@ public final class DistributedEventsManager implements EventsManager {
     private double lastSync = -1;
 
     @Inject
-    DistributedEventsManager(MessageBroker broker, Node node, IOHandler io, LPExecutor executor, SerializationProvider serializer) {
+    DistributedEventsManager(MessageBroker broker, Node node, LPExecutor executor, SerializationProvider serializer) {
         this.broker = broker;
         this.node = node;
-        this.io = io;
         this.executor = executor;
         this.serializer = serializer;
-
-        this.ioDisabled = Objects.equals(System.getenv("DISABLE_IO"), "1");
         this.eventsDisabled = Objects.equals(System.getenv("DISABLE_EVENTS"), "1");
     }
 
@@ -280,25 +270,22 @@ public final class DistributedEventsManager implements EventsManager {
 
     @Override
     public void removeHandler(EventHandler handler) {
-        throw new UnsupportedOperationException("Not implemented yet");
+
+		log.warn("##############################");
+		log.warn("Removing event handler is not supported yet. This need to be implemented or handlers will be duplicated every iteration.");
+		log.warn("##############################");
     }
 
     @Override
     public void processEvent(Event e) {
 
         if (eventsDisabled) {
-            if (!ioDisabled)
-                eventIOBuffer.get().add(e);
-
             return;
         }
 
         // Need to process two times, for handlers that registered for ANY_TYPE
         boolean sent = processInternal(e, e.getType(), false);
         processInternal(e, Event.ANY_TYPE, sent);
-
-        if (!ioDisabled)
-            eventIOBuffer.get().add(e);
     }
 
     /**
@@ -323,17 +310,6 @@ public final class DistributedEventsManager implements EventsManager {
         }
 
         return false;
-    }
-
-    /**
-     * Flush events to be written.
-     */
-    public void flushEvents() {
-        List<Event> buffer = eventIOBuffer.get();
-        if (!buffer.isEmpty()) {
-            io.write(buffer);
-            buffer.clear();
-        }
     }
 
     @Override
