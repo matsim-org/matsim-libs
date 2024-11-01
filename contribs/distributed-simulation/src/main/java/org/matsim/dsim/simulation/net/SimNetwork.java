@@ -35,7 +35,7 @@ public class SimNetwork {
         links = linkIds.stream()
                 .map(id -> network.getLinks().get(id))
                 .map(link ->
-                        SimLink.create(link, vehicleEndsRouteHandler, config.qsim().getLinkDynamics(), network.getEffectiveCellSize(), part))
+					SimLink.create(link, vehicleEndsRouteHandler, config.qsim(), network.getEffectiveCellSize(), part))
                 .collect(Collectors.toMap(SimLink::getId, simLink -> simLink));
         nodes = localNodes.values().stream()
                 .map(node -> Tuple.of(node.getId(), SimNode.create(node, links)))

@@ -14,7 +14,7 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.Objects;
 
-public class SimVehicleProvider {
+class SimVehicleProvider {
 
     private final double stuckThreshold;
     private final QSimConfigGroup.VehiclesSource vehiclesSource;

@@ -3,7 +3,7 @@ package org.matsim.dsim.simulation.net;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class FIFOSimQueue implements SimQueue {
+class FIFOQueue implements SimDequeue {
 
     private final Deque<SimVehicle> internalQ = new ArrayDeque<>();
 

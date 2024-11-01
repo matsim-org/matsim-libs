@@ -15,7 +15,7 @@ import java.util.Queue;
 
 @Log4j2
 @RequiredArgsConstructor
-public class Wait2Link implements Steppable {
+class Wait2Link implements Steppable {
 
     private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
     private final EventsManager em;
@@ -40,7 +40,7 @@ public class Wait2Link implements Steppable {
                 var vehicle = waitingQ.peek().vehicle();
                 var position = vehicle.getNextRouteElement() == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
 
-                if (link.isAccepting(position)) {
+				if (link.isAccepting(position, now)) {
                     waitingQ.poll();
                     pushVehicleOntoLink(vehicle, link, position, now);
                 } else {
