@@ -146,6 +146,7 @@ public class SimProvider implements LPProvider {
 
 		QSimCompatibility qsim = injector.getInstance(QSimCompatibility.class);
 
+		// TODO: use in the LPs
 		List<AgentSource> agentSources = qsim.getAgentSources();
 
 		// wire up all the qsim parts. This can probably also be done with injection
