@@ -19,11 +19,10 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTransitDriverAgent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -37,27 +36,16 @@ public interface TrainDisposition {
 	void onDeparture(double time, MobsimDriverAgent driver, List<RailLink> route);
 
 	/**
-	 * Called by the driver when an entry link is within stop distance.
-	 *
-	 * @param segment the original link segment between entry and exit
-	 * @return the route change, or null if nothing should be changed
+	 * Request the next segment to be reserved.
+	 * @param time current time
+	 * @param position position information
+	 * @param dist distance in meter the train is requesting
 	 */
-	@Nullable
-	default List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, List<RailLink> segment,
-										RailLink entry, RailLink exit) {
-		return null;
-	}
+	DispositionResponse requestNextSegment(double time, TrainPosition position, double dist);
 
-	/**
-	 * Train is reaching the given links and is trying to block them.
-	 *
-	 * @return links of the request that are exclusively blocked for the train.
-	 */
-	List<RailLink> blockRailSegment(double time, MobsimDriverAgent driver, List<RailLink> segment);
 
 	/**
 	 * Inform the resource manager that the train has passed a link that can now be unblocked.
-	 * This needs to be called after track states have been updated already.
 	 */
 	void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link);
 

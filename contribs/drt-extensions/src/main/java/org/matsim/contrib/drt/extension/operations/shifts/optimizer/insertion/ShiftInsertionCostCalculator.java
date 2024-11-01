@@ -1,7 +1,9 @@
 package org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion;
 
+import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -32,18 +34,23 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
 	@Override
 	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
-		if (!checkShiftTimeConstraintsForScheduledRequests(insertion,
-				detourTimeInfo.pickupDetourInfo.pickupTimeLoss, detourTimeInfo.getTotalTimeLoss())) {
+		if (!checkShiftTimeConstraintsForScheduledRequests(insertion, detourTimeInfo)) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 		return delegate.calculate(drtRequest, insertion, detourTimeInfo);
 	}
 
-	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, double pickupDetourTimeLoss,
-			double totalTimeLoss) {
+	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, DetourTimeInfo detourTimeInfo) {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		final int pickupIdx = insertion.pickup.index;
 		final int dropoffIdx = insertion.dropoff.index;
+
+		DrtShift currentShift = ((ShiftDvrpVehicle) vEntry.vehicle).getShifts().peek();
+		double shiftEndTime = currentShift.getEndTime();
+		if(shiftEndTime < detourTimeInfo.dropoffDetourInfo.arrivalTime) {
+			// fast fail which also captures requests that are prebooked for times outside of the shift.
+			return false;
+		}
 
 		for (int s = 0; s < pickupIdx; s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
@@ -52,6 +59,8 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				return false;
 			}
 		}
+
+		double pickupDetourTimeLoss = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
 
 		// each existing stop has 2 time constraints: latestArrivalTime and latestDepartureTime (see: Waypoint.Stop)
 		// we are looking only at the time constraints of the scheduled requests (the new request is checked separately)
@@ -72,6 +81,8 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				return false;
 			}
 		}
+
+		double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 
 		// all stops after the new (potential) dropoff are delayed by totalTimeLoss
 		// check if this delay satisfies the time constraints at these stops
@@ -109,6 +120,31 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				return false;
 			}
 		}
+
+
+		// avoid shrinking break corridor too much (rather coarse for now)
+		if(currentShift.getBreak().isPresent()) {
+			DrtShiftBreak drtShiftBreak = currentShift.getBreak().get();
+			if(!drtShiftBreak.isScheduled()) {
+
+
+				if(detourTimeInfo.dropoffDetourInfo.arrivalTime < drtShiftBreak.getEarliestBreakStartTime()) {
+					// insertion finished before break corridor
+					//ok
+				} else if(detourTimeInfo.pickupDetourInfo.departureTime > drtShiftBreak.getLatestBreakEndTime()) {
+					// insertion start after break corridor
+					//ok
+				} else {
+					double remainingTime = drtShiftBreak.getLatestBreakEndTime() - detourTimeInfo.dropoffDetourInfo.arrivalTime;
+					if (remainingTime < drtShiftBreak.getDuration()) {
+						// no meaningful break possible after insertion
+						// (there could still be enough time before a prebooking though)
+						return false;
+					}
+				}
+			}
+		}
+
 		return true; //all time constraints of all stops are satisfied
 	}
 }

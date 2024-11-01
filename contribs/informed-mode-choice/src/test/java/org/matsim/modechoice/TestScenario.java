@@ -59,7 +59,7 @@ public class TestScenario extends MATSimApplication {
 
 	/**
 	 * Load scenario config.
-	 * @param utils needed to set correct output directory {@code @Rule public MatsimTestUtils utils = new MatsimTestUtils();}
+	 * @param utils needed to set correct output directory {@code @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();}
 	 */
 	public static Config loadConfig(MatsimTestUtils utils) {
 

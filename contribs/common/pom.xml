@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>contrib</artifactId>
-        <version>16.0-SNAPSHOT</version>
+        <version>2025.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
@@ -18,5 +18,15 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>one.util</groupId>
+			<artifactId>streamex</artifactId>
+			<version>0.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.uber</groupId>
+			<artifactId>h3</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+	</dependencies>
 </project>

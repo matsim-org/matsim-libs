@@ -1,9 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.operations.shifts.events.*;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -12,32 +9,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
-import java.util.Set;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
-		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
+        DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
-	public static final int DEFAULT_END_TIME = 30 * 3600;
-	public static final int DEFAULT_BIN_SIZE = 300;
+    private final String mode;
 
-    private Set<Id<DrtShift>> shiftIds;
+    public static final int DEFAULT_END_TIME = 30 * 3600;
+    public static final int DEFAULT_BIN_SIZE = 300;
+
     private int iteration = 0;
     private final int binSize;
     private final int nofBins;
     private DataFrame data = null;
 
 
-    public ShiftHistogram(Population population, Config config) {
-		super();
-		this.binSize = DEFAULT_BIN_SIZE;
-		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
-		reset(0);
-        if (population == null) {
-            this.shiftIds = null;
-        }
+    public ShiftHistogram(String mode, Config config) {
+        super();
+        this.mode = mode;
+        this.binSize = DEFAULT_BIN_SIZE;
+        this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME)) / this.binSize + 1;
+        reset(0);
     }
 
     /**
@@ -46,8 +41,9 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
      * @param binSize The size of a time bin in seconds.
      * @param nofBins The number of time bins for this analysis.
      */
-    public ShiftHistogram(final int binSize, final int nofBins) {
+    public ShiftHistogram(String mode, final int binSize, final int nofBins) {
         super();
+        this.mode = mode;
         this.binSize = binSize;
         this.nofBins = nofBins;
         reset(0);
@@ -57,34 +53,40 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
 
     @Override
     public void handleEvent(final DrtShiftStartedEvent event) {
-        int index = getBinIndex(event.getTime());
-        if ((this.shiftIds == null || this.shiftIds.contains(event.getShiftId()))) {
+        if (event.getMode().equals(mode)) {
+            int index = getBinIndex(event.getTime());
             DataFrame dataFrame = getData();
             dataFrame.countsStart[index]++;
+
         }
     }
 
     @Override
     public void handleEvent(final DrtShiftEndedEvent event) {
-        int index = getBinIndex(event.getTime());
-        if ((this.shiftIds == null || this.shiftIds.contains(event.getShiftId()))) {
+        if (event.getMode().equals(mode)) {
+            int index = getBinIndex(event.getTime());
             DataFrame dataFrame = getData();
             dataFrame.countsEnd[index]++;
+
         }
     }
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        int index = getBinIndex(event.getTime());
-        DataFrame dataFrame = getData();
-        dataFrame.countsBreaksStart[index]++;
+        if (event.getMode().equals(mode)) {
+            int index = getBinIndex(event.getTime());
+            DataFrame dataFrame = getData();
+            dataFrame.countsBreaksStart[index]++;
+        }
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        int index = getBinIndex(event.getTime());
-        DataFrame dataFrame = getData();
-        dataFrame.countsBreaksEnd[index]++;
+        if (event.getMode().equals(mode)) {
+            int index = getBinIndex(event.getTime());
+            DataFrame dataFrame = getData();
+            dataFrame.countsBreaksEnd[index]++;
+        }
     }
 
 

@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
 
 import java.util.List;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
@@ -44,7 +43,7 @@ public class SparseMatrixTest {
 	private final List<Node> allNodes = List.of(nodeA, nodeB, nodeC);
 
 	@Test
-	public void emptyMatrix() {
+	void emptyMatrix() {
 		var matrix = new SparseMatrix();
 		for (Node from : allNodes) {
 			for (Node to : allNodes) {
@@ -54,7 +53,7 @@ public class SparseMatrixTest {
 	}
 
 	@Test
-	public void triangularMatrix() {
+	void triangularMatrix() {
 		var matrix = new SparseMatrix();
 		//A -> A, B, C
 		matrix.setRow(nodeA,
@@ -76,7 +75,7 @@ public class SparseMatrixTest {
 	}
 
 	@Test
-	public void nodeAndTimeOrderNotImportant() {
+	void nodeAndTimeOrderNotImportant() {
 		//A -> A, B, C
 		var nodeAndTimes = List.of(nodeAndTime(nodeA, 0), nodeAndTime(nodeB, 1), nodeAndTime(nodeC, 2));
 

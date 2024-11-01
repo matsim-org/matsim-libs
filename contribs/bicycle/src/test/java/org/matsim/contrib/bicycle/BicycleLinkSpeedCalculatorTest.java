@@ -1,8 +1,8 @@
 package org.matsim.contrib.bicycle;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,18 +30,19 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BicycleLinkSpeedCalculatorTest {
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
     private static final double MAX_BICYCLE_SPEED = 15;
 
     private final Config config = ConfigUtils.createConfig();
     private BicycleConfigGroup configGroup;
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
-    @Before
+    @BeforeEach
     public void before() {
         configGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
         configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);
@@ -58,8 +59,8 @@ public class BicycleLinkSpeedCalculatorTest {
         return VehicleUtils.createVehicle(Id.createVehicleId(id), type);
     }
 
-    @Test
-    public void getMaximumVelocity_bike() {
+	@Test
+	void getMaximumVelocity_bike() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         QVehicle vehicle = new QVehicleImpl(createVehicle(link.getFreespeed() * 0.5, 1)); // higher speed than the default
@@ -70,8 +71,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertEquals(vehicle.getMaximumVelocity(), speed, 0.0);
     }
 
-    @Test
-    public void getMaximumVelocity_bike_fasterThanFreespeed() {
+	@Test
+	void getMaximumVelocity_bike_fasterThanFreespeed() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         QVehicle vehicle = new QVehicleImpl(createVehicle(link.getFreespeed() * 2, 1));
@@ -82,8 +83,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertEquals(link.getFreespeed(), speed, 0.0);
     }
 
-    @Test
-    public void getMaximumVelocityForLink_bikeIsNull() {
+	@Test
+	void getMaximumVelocityForLink_bikeIsNull() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(config);
@@ -93,8 +94,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertEquals(configGroup.getMaxBicycleSpeedForRouting(), speed, 0.001);
     }
 
-    @Test
-    public void getMaximumVelocityForLink_withGradient() {
+	@Test
+	void getMaximumVelocityForLink_withGradient() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithGradient = createLink(100, "paved", "not-a-cycle-way", 1.0);
@@ -108,8 +109,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertTrue(comparisonSpeed > gradientSpeed);
     }
 
-    @Test
-    public void getMaximumVelocityForLink_withReducedSpeedFactor() {
+	@Test
+	void getMaximumVelocityForLink_withReducedSpeedFactor() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithReducedSpeed = createLink(0, "paved", "not-a-cycle-way", 0.5);
@@ -123,8 +124,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertTrue(comparisonSpeed > gradientSpeed);
     }
 
-    @Test
-    public void getMaximumVelocityForLink_noSpeedFactor() {
+	@Test
+	void getMaximumVelocityForLink_noSpeedFactor() {
 
         var link = createLinkWithNoGradientAndNoSpecialSurface();
         var vehicle = createVehicle(link.getFreespeed() + 1, 1);
@@ -135,8 +136,8 @@ public class BicycleLinkSpeedCalculatorTest {
         assertEquals(link.getFreespeed(), speed, 0.001);
     }
 
-    @Test
-    public void getMaximumVelocityForLink_withRoughSurface() {
+	@Test
+	void getMaximumVelocityForLink_withRoughSurface() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithCobbleStone = createLink(0, "cobblestone", "not-a-cycle-way", 1.0);
@@ -177,8 +178,8 @@ public class BicycleLinkSpeedCalculatorTest {
         return link;
     }
 
-    @Test
-    public void getMaximumVelocityForLink_withCycleWay() {
+	@Test
+	void getMaximumVelocityForLink_withCycleWay() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithCobbleStone = createLink(0, "some-surface", BicycleUtils.CYCLEWAY, 1.0);

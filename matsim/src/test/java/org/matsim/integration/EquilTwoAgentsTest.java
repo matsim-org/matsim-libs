@@ -21,8 +21,8 @@ package org.matsim.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -51,7 +51,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import jakarta.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
 /**
@@ -69,8 +69,8 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  */
 public class EquilTwoAgentsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/*package*/ final static Logger log = LogManager.getLogger(EquilTwoAgentsTest.class);
 
@@ -88,7 +88,7 @@ public class EquilTwoAgentsTest {
 	private TestSingleIterationEventHandler handler;
 
 	@Test
-	public void testSingleIterationPlansV4() {
+	void testSingleIterationPlansV4() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());

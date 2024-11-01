@@ -32,10 +32,10 @@ import java.util.Set;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -99,8 +99,8 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 
 public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private EventsManager events;
 
@@ -131,11 +131,12 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V3
 	 *
 	 */
-    @Ignore("Temporarily ignoring")//TODO for Amit
-    @Test
-	public final void testFlowAndStorageCongestion_3agents(){
+	@Disabled("Temporarily ignoring")//TODO for Amit
+	@Test
+	final void testFlowAndStorageCongestion_3agents(){
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -162,11 +163,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 
 			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
-				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(9.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			}
 
 		}
@@ -178,9 +179,10 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 *
 	 */
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V9() {
+	final void testFlowAndStorageCongestion_3agents_V9() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -210,7 +212,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 50.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -219,9 +221,10 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 *
 	 */
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V8() {
+	final void testFlowAndStorageCongestion_3agents_V8() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -251,7 +254,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 30.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -259,11 +262,12 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	 * V10
 	 *
 	 */
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testFlowAndStorageCongestion_3agents_V10() {
+	final void testFlowAndStorageCongestion_3agents_V10() {
 
 		Scenario sc = loadScenario1();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation1(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -292,7 +296,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 			totalDelay += event.getDelay();
 		}
-		Assert.assertEquals("wrong total delay.", 32.0, totalDelay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(32.0, totalDelay, MatsimTestUtils.EPSILON, "wrong total delay.");
 
 	}
 
@@ -309,15 +313,16 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// in both iterations the "toll" and the "tollOldValue" should be the same
 	//
 	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testRouting(){
+	final void testRouting(){
 
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -424,10 +429,10 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		controler.run();
 
 		{ // controlling and showing the conditions of the test:
-			Assert.assertEquals("entering agents in timeBin1.", 3.0, enterCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("entering agents in timeBin2.", 3.0, enterCounter.get(timeBin2), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 1.0, leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 5.0, leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(3.0, enterCounter.get(timeBin1), MatsimTestUtils.EPSILON, "entering agents in timeBin1.");
+			Assertions.assertEquals(3.0, enterCounter.get(timeBin2), MatsimTestUtils.EPSILON, "entering agents in timeBin2.");
+			Assertions.assertEquals(1.0, leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON, "leaving agents in timeBin1.");
+			Assertions.assertEquals(5.0, leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON, "leaving agents in timeBin1.");
 		}
 
 		// for both time-bins ("28800-29700" and "29700-30600")
@@ -436,24 +441,25 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		// the congestion effects of each 3 cars are the same,
 		// the fact that 2 of the first 3 cars leave the link in the next time-bin should be irrelevant
 
-		Assert.assertEquals("avgValue1 == avgValue2", avgValue1, avgValue2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgValue3 == avgValue3", avgValue3, avgValue4, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgValue1 == avgValue3", avgValue1, avgValue3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgValue1, avgValue2, MatsimTestUtils.EPSILON, "avgValue1 == avgValue2");
+		Assertions.assertEquals(avgValue3, avgValue4, MatsimTestUtils.EPSILON, "avgValue3 == avgValue3");
+		Assertions.assertEquals(avgValue1, avgValue3, MatsimTestUtils.EPSILON, "avgValue1 == avgValue3");
 
-		Assert.assertEquals("avgOldValue1 == avgOldValue2", avgOldValue1, avgOldValue2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgOldValue3 == avgOldValue3", avgOldValue3, avgOldValue4, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avgOldValue1 == avgOldValue3", avgOldValue1, avgOldValue3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgOldValue1, avgOldValue2, MatsimTestUtils.EPSILON, "avgOldValue1 == avgOldValue2");
+		Assertions.assertEquals(avgOldValue3, avgOldValue4, MatsimTestUtils.EPSILON, "avgOldValue3 == avgOldValue3");
+		Assertions.assertEquals(avgOldValue1, avgOldValue3, MatsimTestUtils.EPSILON, "avgOldValue1 == avgOldValue3");
 
-		Assert.assertEquals("avgValue1 == avgOldValue1", avgValue1, avgOldValue1, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(avgValue1, avgOldValue1, MatsimTestUtils.EPSILON, "avgValue1 == avgOldValue1");
 
 	 }
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_01(){
+	final void testInsertingWaitingVehicles_01(){
 
 		Scenario sc = loadScenario4();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation4(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -493,26 +499,27 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 4., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 	}
 
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = true
 	// to compare
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_02(){
+	final void testInsertingWaitingVehicles_02(){
 
 		Scenario sc = loadScenario5();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation5(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -552,15 +559,15 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 4., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(4., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent3))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 
@@ -569,11 +576,12 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
 	// agent 2 is already on link 2 when agent 3 ends his activity,
 	// therefore agent 3 has to wait until agent 2 has left the link
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testInsertingWaitingVehicles_03(){
+	final void testInsertingWaitingVehicles_03(){
 
 		Scenario sc = loadScenario4();
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		setPopulation6(sc);
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -613,23 +621,23 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		}
 
-		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(congestionEvents.size(), 3, MatsimTestUtils.EPSILON, "numberOfCongestionEvents");
 
 		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
-				Assert.assertEquals("delay", 5., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(5., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
-				Assert.assertEquals("delay", 8., mce.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(8., mce.getDelay(), MatsimTestUtils.EPSILON, "delay");
 			}
 		}
 
 	}
 
-    @Ignore("Temporarily ignoring")//TODO for Amit
+	@Disabled("Temporarily ignoring")//TODO for Amit
 	@Test
-	public final void testStuckTimePeriod(){
+	final void testStuckTimePeriod(){
 
 		Scenario sc = loadScenario1b();
 		setPopulation1(sc);
@@ -682,11 +690,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			System.out.println(event.toString());
 
 			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
-				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(10.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
-				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(9.0, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay.");
 			}
 		}
 

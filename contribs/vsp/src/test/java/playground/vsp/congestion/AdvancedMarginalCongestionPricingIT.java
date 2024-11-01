@@ -27,10 +27,9 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -71,12 +70,12 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
  */
 public class AdvancedMarginalCongestionPricingIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	// test normal activities
 	@Test
-	public final void test0a(){
+	final void test0a(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("work");
@@ -104,7 +103,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		activity1.setEndTime(16 * 3600.);
 		double delay1 = 0 * 3600.;
 		double activityDelayDisutility1 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity1, delay1);
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0., activityDelayDisutility1, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to late at the activity location anyway
 		Activity activity2 = PopulationUtils.createActivityFromLinkId("work", linkId);
@@ -112,7 +111,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		activity2.setEndTime(20 * 3600.);
 		double delay2 = 0.5 * 3600.;
 		double activityDelayDisutility2 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity2, delay2);
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0., activityDelayDisutility2, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to early at the activity location anyway
 		Activity activity3 = PopulationUtils.createActivityFromLinkId("work", linkId);
@@ -120,7 +119,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		activity3.setEndTime(5 * 3600.);
 		double delay3 = 0.5 * 3600.;
 		double activityDelayDisutility3 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity3, delay3);
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility3, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0., activityDelayDisutility3, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// test if a delay results in the right activity delay disutility if the agent would have had more time to perform the activity
 		Activity activity4 = PopulationUtils.createActivityFromLinkId("work", linkId);
@@ -130,18 +129,18 @@ public class AdvancedMarginalCongestionPricingIT {
 		double activityDelayDisutility4 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity4, delay4);
 		// 6 hours --> 65.549424473781 utils
 		// 5 hours --> 60 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.549424473781310, activityDelayDisutility4, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5.549424473781310, activityDelayDisutility4, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// repeat the previous test: test if a delay results in the right activity delay disutility if the agent would have had more time to perform the activity
 		double activityDelayDisutility4b = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity4, delay4);
 		// 6 hours --> 65.549424473781 utils
 		// 5 hours --> 60 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.549424473781310, activityDelayDisutility4b, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5.549424473781310, activityDelayDisutility4b, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 	}
 
 	// test overnight activities with first and last activity of the same type
 	@Test
-	public final void test0b(){
+	final void test0b(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
@@ -171,25 +170,25 @@ public class AdvancedMarginalCongestionPricingIT {
 		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay1);
 		// 6 + 7 hours --> 65.763074952494600 utils
 		// 6 + 7 hours --> 65.763074952494600 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0., activityDelayDisutility1, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// test if a delay results in the right activity delay disutility
 		double delay2 = 1 * 3600.;
 		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
 		// 6 + 7 hours --> 65.763074952494600 utils
 		// 7 + 7 hours --> 71.098848947562600 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.335773995067980, activityDelayDisutility2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5.335773995067980, activityDelayDisutility2, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// repeat the previous test: test if a delay results in the right activity delay disutility
 		double activityDelayDisutility2b = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
 		// 6 + 7 hours --> 65.763074952494600 utils
 		// 7 + 7 hours --> 71.098848947562600 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.335773995067980, activityDelayDisutility2b, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(5.335773995067980, activityDelayDisutility2b, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 	}
 
 	// test overnight activities with first and last activity of different types
 	@Test
-	public final void test0c(){
+	final void test0c(){
 
 		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 
@@ -224,19 +223,19 @@ public class AdvancedMarginalCongestionPricingIT {
 		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay1);
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0., activityDelayDisutility1, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 
 		// test if a delay results in the right activity delay disutility
 		double delay2 = 1 * 3600.;
 		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
 		// 7 --> 21.1922519472465 utils + 7 --> 21.1922519472465 utils = 42.3845038944931 utils
-		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 11.0988489475631, activityDelayDisutility2, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(11.0988489475631, activityDelayDisutility2, MatsimTestUtils.EPSILON, "Wrong disutility from starting an activity with a delay (arriving later at the activity location).");
 	}
 
 	// test if the delayed arrival at a normal activity (not the first or last activity) results in the right monetary amount
 	@Test
-	public final void test1(){
+	final void test1(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 
@@ -300,12 +299,12 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.run();
 
 		// test if there is only one congestion event and only one money event
-		Assert.assertEquals("Wrong number of congestion events.", 1, congestionEvents.size());
-		Assert.assertEquals("Wrong number of money events.", 1, moneyEvents.size());
+		Assertions.assertEquals(1, congestionEvents.size(), "Wrong number of congestion events.");
+		Assertions.assertEquals(1, moneyEvents.size(), "Wrong number of money events.");
 
 		// test if the delay is 2 seconds
 		double delay = congestionEvents.get(0).getDelay();
-		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
 		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
@@ -313,12 +312,12 @@ public class AdvancedMarginalCongestionPricingIT {
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
 		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
-		Assert.assertEquals("Wrong amount.", amount, amountFromEvent, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(amount, amountFromEvent, MatsimTestUtils.EPSILON, "Wrong amount.");
 	 }
 
 	// test if a delayed arrival at the last activity results in the right monetary amount
 	@Test
-	public final void test2(){
+	final void test2(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
@@ -380,12 +379,12 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.run();
 
 		// test if there is only one congestion event and only one money event
-		Assert.assertEquals("Wrong number of congestion events.", 1, congestionEvents.size());
-		Assert.assertEquals("Wrong number of money events.", 1, moneyEvents.size());
+		Assertions.assertEquals(1, congestionEvents.size(), "Wrong number of congestion events.");
+		Assertions.assertEquals(1, moneyEvents.size(), "Wrong number of money events.");
 
 		// test if the delay is 2 seconds
 		double delay = congestionEvents.get(0).getDelay();
-		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2.0, delay, MatsimTestUtils.EPSILON, "Wrong delay.");
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
 		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
@@ -399,12 +398,12 @@ public class AdvancedMarginalCongestionPricingIT {
 
 		double activityDelayDisutility = 80.584243964094500 - 80.581739442040600;
 		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
-		Assert.assertEquals("Wrong amount.", amount, amountFromEvent, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(amount, amountFromEvent, MatsimTestUtils.EPSILON, "Wrong amount.");
 	 }
 
 	// test if the right number of money events are thrown
 	@Test
-	public final void test3(){
+	final void test3(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
@@ -466,13 +465,13 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.run();
 
 		// test if there are three congestion events and three money events
-		Assert.assertEquals("Wrong number of congestion events.", 3, congestionEvents.size());
-		Assert.assertEquals("Wrong number of money events.", 3, moneyEvents.size());
+		Assertions.assertEquals(3, congestionEvents.size(), "Wrong number of congestion events.");
+		Assertions.assertEquals(3, moneyEvents.size(), "Wrong number of money events.");
 	 }
 
 	// test if the right number of money events are thrown
 	@Test
-	public final void test4(){
+	final void test4(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
@@ -534,7 +533,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.run();
 
 		// test if there are three congestion events and three money events
-		Assert.assertEquals("Wrong number of congestion events.", 3, congestionEvents.size());
-		Assert.assertEquals("Wrong number of money events.", 3, moneyEvents.size());
+		Assertions.assertEquals(3, congestionEvents.size(), "Wrong number of congestion events.");
+		Assertions.assertEquals(3, moneyEvents.size(), "Wrong number of money events.");
 	 }
 }

@@ -1,20 +1,21 @@
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.parkingsearch.events.RemoveParkingActivityEvent;
-import org.matsim.contrib.parking.parkingsearch.events.ReserveParkingLocationEvent;
-import org.matsim.contrib.parking.parkingsearch.events.SelectNewParkingLocationEvent;
-import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.events.*;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.search.NearestParkingSpotSearchLogic;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 public class NearestParkingDynLeg extends ParkingDynLeg {
 	private boolean parkingAtEndOfLeg = true;
+	private boolean passangerInteractionAtParkingFacilityAtEndOfLeg = false;
 	private boolean reachedDestinationWithoutParking = false;
 	private boolean alreadyReservedParking = false;
 	private boolean driveToBaseWithoutParking = false;
@@ -34,18 +36,19 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	private final int planIndexNextActivity;
 	private Plan plan;
 	private Id<Link> nextSelectedParkingLink = null;
+	protected static final Logger log = LogManager.getLogger(NearestParkingDynLeg.class);
 
 	public NearestParkingDynLeg(Leg currentPlannedLeg, NetworkRoute route, Plan plan, int planIndexNextActivity, ParkingSearchLogic logic,
 								ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		super(currentPlannedLeg.getMode(), route, logic, parkingManager, vehicleId, timer, events);
 		this.followingActivity = (Activity) plan.getPlanElements().get(planIndexNextActivity);
-		followingActivity.setStartTime(timer.getTimeOfDay());
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (followingActivity.getAttributes().getAsMap().containsKey("parking") && followingActivity.getAttributes().getAttribute("parking").equals(
-			"noParking"))
+		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity))
 			parkingAtEndOfLeg = false;
+		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity))
+			passangerInteractionAtParkingFacilityAtEndOfLeg = true;
 	}
 
 	@Override
@@ -85,7 +88,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 	@Override
 	public Id<Link> getNextLinkId() {
 
-		if (!parkingMode && parkingAtEndOfLeg) {
+		if (!passangerInteractionAtParkingFacilityAtEndOfLeg && (!parkingMode && parkingAtEndOfLeg)) {
 			parkingMode = true;
 			this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 		}
@@ -98,12 +101,18 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 			return linkIds.get(currentLinkIdx + 1);
 
 		} else {
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg && !hasFoundParking && followingActivity.getLinkId().equals(currentLinkId)) {
+				createWaitingActivityUntilPassengerInteractionIsPossible(currentLinkId, vehicleId, timer.getTimeOfDay());
+				this.events
+					.processEvent(new StartWaitingForParkingEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
+			}
 			if (hasFoundParking || reachedDestinationWithoutParking) {
 				// easy, we can just park where at our destination link
-				if (hasFoundParking) {
+				if (hasFoundParking && !passangerInteractionAtParkingFacilityAtEndOfLeg) {
+					//calculate parkingTime for parking_activity
 					double parkingDuration;
 					double expectedDrivingDurationToPickup;
-					double drivingDurationFromDropOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
+					double drivingDurationFromGetOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
 
 					if (nextSelectedParkingLink.equals(currentLinkId)) {
 						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
@@ -112,7 +121,9 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 						expectedDrivingDurationToPickup = ((NearestParkingSpotSearchLogic) this.logic).getExpectedTravelTime(
 							currentPlannedLeg.getRoute().getStartLinkId(), timer.getTimeOfDay(), currentLinkId);
 					}
-					parkingDuration = followingActivity.getMaximumDuration().seconds() - drivingDurationFromDropOff - expectedDrivingDurationToPickup;
+					parkingDuration = followingActivity.getMaximumDuration().seconds()
+						- drivingDurationFromGetOff - expectedDrivingDurationToPickup
+						- ((FacilityBasedParkingManager) parkingManager).getParkStageActivityDuration();
 					followingActivity.setMaximumDuration(parkingDuration);
 				}
 				this.logic.reset();
@@ -125,10 +136,19 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					}
 				}
 				// need to find the next link
-				double nextPickupTime = followingActivity.getStartTime().seconds() + followingActivity.getMaximumDuration().seconds();
-				double maxParkingDuration = followingActivity.getMaximumDuration().seconds() - (followingActivity.getStartTime().seconds() - timer.getTimeOfDay());
+				double nextPickupTime;
+				double maxParkingDuration;
+				if (passangerInteractionAtParkingFacilityAtEndOfLeg){
+					nextPickupTime = 0.;
+					maxParkingDuration = followingActivity.getMaximumDuration().seconds();
+				}
+				else {
+					nextPickupTime = currentPlannedLeg.getDepartureTime().seconds() + followingActivity.getMaximumDuration().seconds();
+					maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
+				}
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
-					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime);
+					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtParkingFacilityAtEndOfLeg,
+					followingActivity.getCoord());
 				if (((NearestParkingSpotSearchLogic) this.logic).isNextParkingActivitySkipped() && parkingAtEndOfLeg) {
 					removeNextActivityAndFollowingLeg();
 					parkingAtEndOfLeg = false;
@@ -163,9 +183,19 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		}
 	}
 
+	private void createWaitingActivityUntilPassengerInteractionIsPossible(Id<Link> newLinkId, Id<Vehicle> vehicleId, double now) {
+		Activity waitingActivity = PopulationUtils.createActivityFromLinkId(ParkingUtils.WaitingForParkingActivityType, newLinkId);
+		ParkingUtils.setNoParkingForActivity(waitingActivity);
+		plan.getPlanElements().add(planIndexNextActivity, waitingActivity);
+		hasFoundParking = true;
+		((FacilityBasedParkingManager) parkingManager).addVehicleForWaitingForParking(newLinkId, vehicleId, now);
+	}
+
 	private void removeNextActivityAndFollowingLeg() {
 		plan.getPlanElements().remove(planIndexNextActivity);
 		plan.getPlanElements().remove(planIndexNextActivity);
+//		log.info(
+//			plan.getPerson().getId().toString() + ": Parking activity after getOff point '" + ((Activity)plan.getPlanElements().get(planIndexNextActivity - 2)).getType() + "' is removed, because no parking facility was found.");
 	}
 
 	public boolean driveToBaseWithoutParking() {

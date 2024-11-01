@@ -50,16 +50,14 @@ import java.io.UncheckedIOException;
 public class CourtesyHistogramListener  implements IterationEndsListener, IterationStartsListener {
 
 	private final CourtesyHistogram histogram;
-	private final boolean outputGraph;
 
 	private static final Logger log = LogManager.getLogger(CourtesyHistogramListener.class);
 	private final OutputDirectoryHierarchy controlerIO;
 
     @Inject
-    CourtesyHistogramListener(Config config, CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
+    CourtesyHistogramListener(CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
 		this.histogram = histogram;
-		this.outputGraph = config.controller().isCreateGraphs();
 	}
 
 	@Override
@@ -70,7 +68,10 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "courtesyHistogram.txt"));
-		if (this.outputGraph) {
+
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
+		if (createGraphs) {
 			for ( String type : histogram.getDataFrames().keySet() ) {
 				writeGraphic(
 						this.histogram,

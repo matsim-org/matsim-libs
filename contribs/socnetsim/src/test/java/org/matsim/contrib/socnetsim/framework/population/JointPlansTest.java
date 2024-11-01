@@ -22,8 +22,8 @@ package org.matsim.contrib.socnetsim.framework.population;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,12 +34,12 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class JointPlansTest {
 	@Test
-	public void testExceptionAddWithCache( ) throws Exception {
+	void testExceptionAddWithCache() throws Exception {
 		testExceptionAdd( true );
 	}
 
 	@Test
-	public void testExceptionAddWithoutCache( ) throws Exception {
+	void testExceptionAddWithoutCache() throws Exception {
 		testExceptionAdd( false );
 	}
 
@@ -68,18 +68,18 @@ public class JointPlansTest {
 			gotException = true;
 		}
 
-		Assert.assertTrue(
-				"got no exception when associating two joint plans to one individual plan",
-				gotException);
+		Assertions.assertTrue(
+				gotException,
+				"got no exception when associating two joint plans to one individual plan");
 	}
 
 	@Test
-	public void testExceptionRemoveWithCache( ) throws Exception {
+	void testExceptionRemoveWithCache() throws Exception {
 		testExceptionRemove( true );
 	}
 
 	@Test
-	public void testExceptionRemoveWithoutCache( ) throws Exception {
+	void testExceptionRemoveWithoutCache() throws Exception {
 		testExceptionRemove( false );
 	}
 
@@ -109,18 +109,18 @@ public class JointPlansTest {
 			gotException = true;
 		}
 
-		Assert.assertTrue(
-				"got no exception when associating two joint plans to one individual plan",
-				gotException);
+		Assertions.assertTrue(
+				gotException,
+				"got no exception when associating two joint plans to one individual plan");
 	}
 
 	@Test
-	public void testAddAndGetSeveralInstancesWithCache( ) {
+	void testAddAndGetSeveralInstancesWithCache() {
 		testAddAndGetSeveralInstances( true );
 	}
 
 	@Test
-	public void testAddAndGetSeveralInstancesWithoutCache( ) {
+	void testAddAndGetSeveralInstancesWithoutCache() {
 		testAddAndGetSeveralInstances( false );
 	}
 
@@ -152,60 +152,60 @@ public class JointPlansTest {
 		final JointPlan jointPlan5 = jointPlans5.getFactory().createJointPlan( jp );
 		jointPlans5.addJointPlan( jointPlan5 );
 
-		Assert.assertSame(
-				"wrong joint plan 1 for person 1",
+		Assertions.assertSame(
 				jointPlan1,
-				jointPlans1.getJointPlan( p1 ) );
-		Assert.assertSame(
-				"wrong joint plan 1 for person 2",
+				jointPlans1.getJointPlan( p1 ),
+				"wrong joint plan 1 for person 1" );
+		Assertions.assertSame(
 				jointPlan1,
-				jointPlans1.getJointPlan( p2 ) );
+				jointPlans1.getJointPlan( p2 ),
+				"wrong joint plan 1 for person 2" );
 
-		Assert.assertSame(
-				"wrong joint plan 2 for person 1",
+		Assertions.assertSame(
 				jointPlan2,
-				jointPlans2.getJointPlan( p1 ) );
-		Assert.assertSame(
-				"wrong joint plan 2 for person 2",
+				jointPlans2.getJointPlan( p1 ),
+				"wrong joint plan 2 for person 1" );
+		Assertions.assertSame(
 				jointPlan2,
-				jointPlans2.getJointPlan( p2 ) );
+				jointPlans2.getJointPlan( p2 ),
+				"wrong joint plan 2 for person 2" );
 
-		Assert.assertSame(
-				"wrong joint plan 3 for person 1",
+		Assertions.assertSame(
 				jointPlan3,
-				jointPlans3.getJointPlan( p1 ) );
-		Assert.assertSame(
-				"wrong joint plan 3 for person 2",
+				jointPlans3.getJointPlan( p1 ),
+				"wrong joint plan 3 for person 1" );
+		Assertions.assertSame(
 				jointPlan3,
-				jointPlans3.getJointPlan( p2 ) );
+				jointPlans3.getJointPlan( p2 ),
+				"wrong joint plan 3 for person 2" );
 
-		Assert.assertSame(
-				"wrong joint plan 4 for person 1",
+		Assertions.assertSame(
 				jointPlan4,
-				jointPlans4.getJointPlan( p1 ) );
-		Assert.assertSame(
-				"wrong joint plan 4 for person 2",
+				jointPlans4.getJointPlan( p1 ),
+				"wrong joint plan 4 for person 1" );
+		Assertions.assertSame(
 				jointPlan4,
-				jointPlans4.getJointPlan( p2 ) );
+				jointPlans4.getJointPlan( p2 ),
+				"wrong joint plan 4 for person 2" );
 
-		Assert.assertSame(
-				"wrong joint plan 5 for person 1",
+		Assertions.assertSame(
 				jointPlan5,
-				jointPlans5.getJointPlan( p1 ) );
-		Assert.assertSame(
-				"wrong joint plan 5 for person 2",
+				jointPlans5.getJointPlan( p1 ),
+				"wrong joint plan 5 for person 1" );
+		Assertions.assertSame(
 				jointPlan5,
-				jointPlans5.getJointPlan( p2 ) );
+				jointPlans5.getJointPlan( p2 ),
+				"wrong joint plan 5 for person 2" );
 	}
 
 
 	@Test
-	public void testClearWithoutCache( ) {
+	void testClearWithoutCache() {
 		testClear( false );
 	}
 
 	@Test
-	public void testClearWithCache( ) {
+	void testClearWithCache() {
 		testClear( true );
 	}
 
@@ -221,14 +221,14 @@ public class JointPlansTest {
 		jointPlans.addJointPlan(
 			jointPlans.getFactory().createJointPlan( jp1 ) );
 
-		Assert.assertNotNull(
-				"joint plan was not added???",
-				jointPlans.getJointPlan( p1 ) );
+		Assertions.assertNotNull(
+				jointPlans.getJointPlan( p1 ),
+				"joint plan was not added???" );
 		jointPlans.clear();
 
-		Assert.assertNull(
-				"still a joint plan after clear...",
-				jointPlans.getJointPlan( p1 ) );
+		Assertions.assertNull(
+				jointPlans.getJointPlan( p1 ),
+				"still a joint plan after clear..." );
 	}
 
 	private static Plan createPlan( final Person person , final boolean withCache ) {

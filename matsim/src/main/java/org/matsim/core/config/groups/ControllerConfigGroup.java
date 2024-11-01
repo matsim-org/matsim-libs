@@ -73,16 +73,18 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
+	private static final String CREATE_GRAPHS_INTERVAL = "createGraphsInterval";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 	private static final String CLEAN_ITERS_AT_END = "cleanItersAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
 	private static final String EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS = "createScoringFunctionType";
 
+	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
+
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
-
 
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -101,13 +103,15 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private int writeTripsInterval = 50;
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
-	private boolean createGraphs = true;
+	private int createGraphsInterval = 1;
 	private boolean dumpDataAtEnd = true;
 
 	private CompressionType compressionType = CompressionType.gzip;
 	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
 
 	private CleanIterations cleanItersAtEnd = CleanIterations.keep;
+
+	private int memoryObserverInterval = 60;
 
 	public ControllerConfigGroup() {
 		super(GROUP_NAME);
@@ -134,6 +138,11 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
+
+		map.put(CREATE_GRAPHS_INTERVAL, "Sets the interval in which graphs are generated. Default is 1. If set to 0, no graphs are generated." +
+			" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
+			" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
+
 		map.put(COMPRESSION_TYPE, "Compression algorithm to use when writing out data to files. Possible values: " + Arrays.toString(CompressionType.values()));
 		map.put(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS, "Defines when the scoring functions for the population are created. Default=IterationStarts. Possible values: " + Arrays.toString(EventTypeToCreateScoringFunctions.values()));
 
@@ -146,6 +155,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 				"to a file. `0' disables snapshots writing completely");
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
 		map.put(CLEAN_ITERS_AT_END, "Defines what should be done with the ITERS directory when a simulation finished successfully");
+		map.put(MEMORY_OBSERVER_INTERVAL, "Defines the interval for printing memory usage to the log in [seconds]. Must be positive. Defaults to 60.");
 		return map;
 	}
 
@@ -353,24 +363,34 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
-	@StringGetter( CREATE_GRAPHS )
-	public boolean isCreateGraphs() {
-		return createGraphs;
+	@StringGetter( CREATE_GRAPHS_INTERVAL )
+	public int getCreateGraphsInterval() {
+		return createGraphsInterval;
 	}
 
-    /**
-     * Sets whether graphs showing some analyses should automatically be
-     * generated during the simulation. The generation of graphs usually takes a
-     * small amount of time that does not have any weight in big simulations,
-     * but add a significant overhead in smaller runs or in test cases where the
-     * graphical output is not even requested.
-     *
-     * @param createGraphs
-     *            true if graphs showing analyses' output should be generated.
-     */
+	/**
+	 * Sets whether graphs showing some analyses should automatically be
+	 * generated during the simulation. The generation of graphs usually takes a
+	 * small amount of time that does not have any weight in big simulations,
+	 * but add a significant overhead in smaller runs or in test cases where the
+	 * graphical output is not even requested.
+	 *
+	 * @param createGraphsInterval iteration interval in which graphs are generated
+	 */
+	@StringSetter( CREATE_GRAPHS_INTERVAL )
+	public void setCreateGraphsInterval(int createGraphsInterval) {
+		this.createGraphsInterval = createGraphsInterval;
+	}
+
 	@StringSetter( CREATE_GRAPHS )
+	@Deprecated
 	public void setCreateGraphs(boolean createGraphs) {
-		this.createGraphs = createGraphs;
+		log.warn("Parameter 'createGraphs' is deprecated. Using 'createGraphsInterval' instead. The output_config.xml will contain the new parameter.");
+		if (createGraphs) {
+			this.setCreateGraphsInterval(1);
+		} else {
+			this.setCreateGraphsInterval(0);
+		}
 	}
 
 	@StringGetter( OVERWRITE_FILE )
@@ -412,6 +432,17 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	public void setEventTypeToCreateScoringFunctions(EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions) {
 		this.eventTypeToCreateScoringFunctions = eventTypeToCreateScoringFunctions;
 	}
+
+	@StringGetter(MEMORY_OBSERVER_INTERVAL)
+	public int getMemoryObserverInterval() {
+		return memoryObserverInterval;
+	}
+
+	@StringSetter(MEMORY_OBSERVER_INTERVAL)
+	public void setMemoryObserverInterval(int memoryObserverInterval) {
+		this.memoryObserverInterval = memoryObserverInterval;
+	}
+
 	// ---
 	int writePlansUntilIteration = 1 ;
 	public int getWritePlansUntilIteration() {
@@ -434,6 +465,9 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
 			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
 			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );
+		}
+		if(config.controller().getMemoryObserverInterval() < 0) {
+			log.warn("Memory observer interval is negative. Simulation will most likely crash.");
 		}
 	}
 }

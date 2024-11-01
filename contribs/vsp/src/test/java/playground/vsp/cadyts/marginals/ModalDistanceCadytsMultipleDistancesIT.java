@@ -1,7 +1,6 @@
 package playground.vsp.cadyts.marginals;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,11 +14,8 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
-import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -35,16 +31,16 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-
 public class ModalDistanceCadytsMultipleDistancesIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
@@ -52,7 +48,7 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
 	@Test
-	public void test() {
+	void test() {
 
 		Config config = createConfig();
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
@@ -135,6 +131,8 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 	private Config createConfig() {
 
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 		String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());

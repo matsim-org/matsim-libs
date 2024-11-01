@@ -26,6 +26,7 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import org.apache.logging.log4j.LogManager;
@@ -162,7 +163,8 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
         hopper.setGraphHopperLocation("target/routing-graph-cache");
 
         // see docs/core/profiles.md to learn more about profiles
-        hopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
+		//fixme: "Graphhopper profiles have changed"
+        //hopper.setProfiles(new Profile("car").setCustomModel(new CustomModel()).setWeighting("fastest").setTurnCosts(false));
 
         // this enables speed mode for the profile we called car
         hopper.getCHPreparationHandler().setCHProfiles(new CHProfile("car"));

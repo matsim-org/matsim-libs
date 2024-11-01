@@ -20,14 +20,15 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
+
+import static org.matsim.api.core.v01.events.HasPersonId.ATTRIBUTE_PERSON;
 
 /**
  * @author michalm
@@ -41,9 +42,9 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 
-	public PassengerRequestSubmittedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+	public PassengerRequestSubmittedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
 			Id<Link> fromLinkId, Id<Link> toLinkId) {
-		super(time, mode, requestId, personId);
+		super(time, mode, requestId, personIds);
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
 	}
@@ -80,9 +81,14 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
-		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
+		String[] personIdsAttribute = attributes.get(ATTRIBUTE_PERSON).split(",");
+		List<Id<Person>> personIds = new ArrayList<>();
+		for (String person : personIdsAttribute) {
+			personIds.add(Id.create(person, Person.class));
+		}
+
 		Id<Link> fromLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_FROM_LINK));
 		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
-		return new PassengerRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId);
+		return new PassengerRequestSubmittedEvent(time, mode, requestId, personIds, fromLinkId, toLinkId);
 	}
 }

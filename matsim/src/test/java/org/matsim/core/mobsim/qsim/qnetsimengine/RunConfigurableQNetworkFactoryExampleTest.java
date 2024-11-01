@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -34,7 +34,7 @@ public class RunConfigurableQNetworkFactoryExampleTest {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	final void testMain() {
 		try {
 			Config config = ConfigUtils.createConfig() ;
 			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );

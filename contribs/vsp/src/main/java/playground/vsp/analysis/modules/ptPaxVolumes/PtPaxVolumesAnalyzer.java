@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -37,9 +38,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -80,7 +80,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		}
 		this.lineId2features.put(Id.create("all", TransitLine.class), getAll(this.targetCoordinateSystem));
 	}
-	
+
 	private Collection<SimpleFeature> getAll(String targetCoordinateSystem) {
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
@@ -93,9 +93,9 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 			b.add("pax_" + String.valueOf(i), Double.class);
 		}
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
+
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		Object[] featureAttribs;
 		for(Link link: this.sc.getNetwork().getLinks().values()){
 			featureAttribs = getFeatureAll(link,new Object[4 + this.handler.getMaxInterval()]);
@@ -116,7 +116,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		Coordinate[] coord =  new Coordinate[2];
 		coord[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY(), 0.);
 		coord[1] = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY(), 0.);
-		
+
 		objects[0] = new GeometryFactory().createLineString(coord);
 		objects[1] = "all";
 		objects[2] = link.getId().toString();
@@ -138,11 +138,11 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		for (int i = 0; i < this.handler.getMaxInterval(); i++){
 			b.add("pax_" + String.valueOf(i), Double.class);
 		}
-		
+
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
+
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		Object[] featureAttribs;
 		for(Link link: this.sc.getNetwork().getLinks().values()){
 			featureAttribs = getLinkFeatureAttribs(link,l.getId(),  new Object[4 + this.handler.getMaxInterval()]);
@@ -169,7 +169,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		Coordinate[] coord =  new Coordinate[2];
 		coord[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY(), 0.);
 		coord[1] = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY(), 0.);
-		
+
 		objects[0] = new GeometryFactory().createLineString(coord);
 		objects[1] = lineId.toString();
 		objects[2] = link.getId().toString();
@@ -185,7 +185,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		for(Entry<Id<TransitLine>, Collection<SimpleFeature>> ee: this.lineId2features.entrySet()){
 			try{
 				if(ee.getValue().size() <= 0) continue;
-				ShapeFileWriter.writeGeometries(ee.getValue(), outputFolder + ee.getKey().toString()+ ".shp");
+				GeoFileWriter.writeGeometries(ee.getValue(), outputFolder + ee.getKey().toString()+ ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}

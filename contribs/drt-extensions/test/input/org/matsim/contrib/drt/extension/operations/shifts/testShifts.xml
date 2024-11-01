@@ -1,8 +1,8 @@
 <shifts>
-    <shift id="11" start="14400" end="45000" operationFacilityId="op1">
+    <shift id="11" start="14400" end="45000" operationFacilityId="op1" designatedVehicleId="drt1">
         <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
     </shift>
-    <shift id="22" start="18400" end="49000" operationFacilityId="op2">
+    <shift id="22" start="18400" end="49000" operationFacilityId="op2" designatedVehicleId="drt2">
         <break earliestStart="29200.0" latestEnd="32800.0" duration="3600.0"/>
     </shift>
     <shift id="33" start="22400" end="53000">

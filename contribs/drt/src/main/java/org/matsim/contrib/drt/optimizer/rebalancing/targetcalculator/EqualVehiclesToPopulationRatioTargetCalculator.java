@@ -23,25 +23,24 @@
  */
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.counting;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Collectors;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.common.zones.Zone;
+import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.counting;
 
 /**
  * Calculates population size per zone by counting first activites per zone in the selected plans.
@@ -55,11 +54,11 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 	private static final Logger log = LogManager.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
 	private final int fleetSize;
-	private final Map<DrtZone, Integer> activitiesPerZone;
+	private final Map<Zone, Integer> activitiesPerZone;
 	private final int totalNrActivities;
 
-	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
-			@NotNull FleetSpecification fleetSpecification) {
+	public EqualVehiclesToPopulationRatioTargetCalculator(ZoneSystem zonalSystem, Population population,
+														  @NotNull FleetSpecification fleetSpecification) {
 		log.debug("nr of zones: " + zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
 				.size());
 		fleetSize = fleetSpecification.getVehicleSpecifications().size();
@@ -68,19 +67,20 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 		log.debug("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	private Map<DrtZone, Integer> countFirstActsPerZone(DrtZonalSystem zonalSystem, Population population) {
+	private Map<Zone, Integer> countFirstActsPerZone(ZoneSystem zonalSystem, Population population) {
 		return population.getPersons()
 				.values()
 				.stream()
 				.map(person -> (Activity)person.getSelectedPlan().getPlanElements().get(0))
 				.map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
-				.filter(Objects::nonNull)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.collect(Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
 	}
 
 	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+	public ToDoubleFunction<Zone> calculate(double time,
+			Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		if (totalNrActivities == 0) {
 			return zoneId -> 0;
 		}

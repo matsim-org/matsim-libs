@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -65,100 +66,100 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 public class CorridorNetworkTest {
 
 	@Test
-	public void v3Test(){
+	void v3Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
-		
+
 		List<CongestionEvent> v3_events = getCongestionEvents("v3", sc);
 
-		Assert.assertEquals("wrong number of congestion events", 6, v3_events.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, v3_events.size(), MatsimTestUtils.EPSILON, "wrong number of congestion events");
 
 		for ( CongestionEvent event : v3_events ){
 
 			if(event.getAffectedAgentId().equals(Id.createPersonId(2))){ // agent 2 is delayed on link 2 (bottleneck link) due to agent 1
 
-				Assert.assertEquals("wrong causing agent", "1", event.getCausingAgentId().toString());
-				Assert.assertEquals("wrong delay", 3, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals("1", event.getCausingAgentId().toString(), "wrong causing agent");
+				Assertions.assertEquals(3, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 
 			} else if ( event.getAffectedAgentId().equals(Id.createPersonId(3)) ) { // agent 3 is delayed on link 2 due to agent 2, 1
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(2))) {
-					
-					Assert.assertEquals("wrong delay", 4, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				} else {
-				
-					Assert.assertEquals("wrong delay", 2, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				}
 
-			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec) 
+			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec)
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(3))){
-				
-					Assert.assertEquals("wrong delay", 4, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				} else if (event.getCausingAgentId().equals(Id.createPersonId(2))){
-					
-					Assert.assertEquals("wrong delay", 4, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				} else {
-					
-					Assert.assertEquals("wrong causing agent", "1", event.getCausingAgentId().toString());
-					Assert.assertEquals("wrong delay", 1, event.getDelay(), MatsimTestUtils.EPSILON);
+
+					Assertions.assertEquals("1", event.getCausingAgentId().toString(), "wrong causing agent");
+					Assertions.assertEquals(1, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 				}
 			}
 		}
 	}
 
 	@Test
-	public void v4Test(){
+	void v4Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
 
 		List<CongestionEvent> v4_events = getCongestionEvents("v4", sc);
 
-		Assert.assertEquals("wrong number of congestion events", 6, v4_events.size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(6, v4_events.size(), MatsimTestUtils.EPSILON, "wrong number of congestion events");
 
 		for ( CongestionEvent event : v4_events ){
 
 			if(event.getAffectedAgentId().equals(Id.createPersonId(2))){ // agent 2 is delayed on link 2 (bottleneck link) due to agent 1
 
-				Assert.assertEquals("wrong causing agent", "1", event.getCausingAgentId().toString());
-				Assert.assertEquals("wrong delay", 3, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals("1", event.getCausingAgentId().toString(), "wrong causing agent");
+				Assertions.assertEquals(3, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
 
 			} else if ( event.getAffectedAgentId().equals(Id.createPersonId(3)) ) { // agent 3 is delayed on link 2 due to agent 2, 1
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(2))) {
-					
-					Assert.assertEquals("wrong delay", 4, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				} else {
-				
-					Assert.assertEquals("wrong delay", 2, event.getDelay(), MatsimTestUtils.EPSILON);
-				
+
+					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 				}
 
-			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec) 
+			} else if(event.getAffectedAgentId().equals(Id.createPersonId(4))){ // agent 4 is first delayed due to spill back on link 1 (3 sec) and then on link 2 (6sec)
 
 				if(event.getCausingAgentId().equals(Id.createPersonId(3)) ){
 					if ( event.getTime() == 10.0 ) {
-						
-						Assert.assertEquals("wrong delay", 3, event.getDelay(), MatsimTestUtils.EPSILON);
-					
+
+						Assertions.assertEquals(3, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 					} else {
-					
-						Assert.assertEquals("wrong congestion event time", 18.0, event.getTime(), MatsimTestUtils.EPSILON);
-						Assert.assertEquals("wrong delay", 4, event.getDelay(), MatsimTestUtils.EPSILON);
-					
+
+						Assertions.assertEquals(18.0, event.getTime(), MatsimTestUtils.EPSILON, "wrong congestion event time");
+						Assertions.assertEquals(4, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
 					}
-					
+
 				} else {
-					
-					Assert.assertEquals("wrong causing agent", "2", event.getCausingAgentId().toString());
-					Assert.assertEquals("wrong delay", 2, event.getDelay(), MatsimTestUtils.EPSILON);
-				
-				} 
+
+					Assertions.assertEquals("2", event.getCausingAgentId().toString(), "wrong causing agent");
+					Assertions.assertEquals(2, event.getDelay(), MatsimTestUtils.EPSILON, "wrong delay");
+
+				}
 			}
 		}
 	}
@@ -173,7 +174,7 @@ public class CorridorNetworkTest {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -188,7 +189,7 @@ public class CorridorNetworkTest {
 				LogManager.getLogger( CorridorNetworkTest.class ).warn( event );
 			}
 		});
-		
+
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
 			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
 		}
@@ -204,10 +205,10 @@ public class CorridorNetworkTest {
 	private class CorridorNetworkAndPlans {
 
 		/**
-		 * generates network with 3 links. 
-		 *<p>			
+		 * generates network with 3 links.
+		 *<p>
 		 *<p>  o--0---o---1---o---2---o---3---o
-		 *<p>				  
+		 *<p>
 		 */
 		Scenario scenario;
 		Config config;
@@ -221,6 +222,7 @@ public class CorridorNetworkTest {
 
 		CorridorNetworkAndPlans(){
 			config=ConfigUtils.createConfig();
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();

@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -53,6 +54,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter {
 	private static final Logger log = LogManager.getLogger(DefaultUnplannedRequestInserter.class);
 	public static final String NO_INSERTION_FOUND_CAUSE = "no_insertion_found";
+	public static final String OFFER_REJECTED_CAUSE = "offer_rejected";
 
 	private final String mode;
 	private final Fleet fleet;
@@ -64,21 +66,22 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 	private final DrtOfferAcceptor drtOfferAcceptor;
 	private final ForkJoinPool forkJoinPool;
+	private final PassengerStopDurationProvider stopDurationProvider;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
-			ForkJoinPool forkJoinPool) {
+			ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool);
+				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool, stopDurationProvider);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
 			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
-			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool) {
+			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -89,6 +92,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionSearch = insertionSearch;
 		this.drtOfferAcceptor = drtOfferAcceptor;
 		this.forkJoinPool = forkJoinPool;
+		this.stopDurationProvider = stopDurationProvider;
 	}
 
 	@Override
@@ -122,17 +126,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Optional<InsertionWithDetourData> best = insertionSearch.findBestInsertion(req,
 				Collections.unmodifiableCollection(vehicleEntries.values()));
 		if (best.isEmpty()) {
-			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
-				eventsManager.processEvent(
-						new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerId(),
-								NO_INSERTION_FOUND_CAUSE));
-				log.debug("No insertion found for drt request "
-						+ req
-						+ " from passenger id="
-						+ req.getPassengerId()
-						+ " fromLinkId="
-						+ req.getFromLink().getId());
-			}
+			retryOrReject(req, now, NO_INSERTION_FOUND_CAUSE);
 		} else {
 			InsertionWithDetourData insertion = best.get();
 
@@ -141,20 +135,44 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 					insertion.detourTimeInfo.pickupDetourInfo.departureTime,
 					insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime);
 
-			var vehicle = insertion.insertion.vehicleEntry.vehicle;
-			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
+			if(acceptedRequest.isPresent()) {
+				var vehicle = insertion.insertion.vehicleEntry.vehicle;
+				var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
-			VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
-			if (newVehicleEntry != null) {
-				vehicleEntries.put(vehicle.getId(), newVehicleEntry);
+				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
+				if (newVehicleEntry != null) {
+					vehicleEntries.put(vehicle.getId(), newVehicleEntry);
+				} else {
+					vehicleEntries.remove(vehicle.getId());
+				}
+
+				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
+				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
+				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+
+				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
+				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
+
+				eventsManager.processEvent(
+						new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
+								expectedPickupTime, expectedDropoffTime));
 			} else {
-				vehicleEntries.remove(vehicle.getId());
+				retryOrReject(req, now, OFFER_REJECTED_CAUSE);
 			}
+		}
+	}
 
+	private void retryOrReject(DrtRequest req, double now, String cause) {
+		if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
 			eventsManager.processEvent(
-					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(), vehicle.getId(),
-							pickupDropoffTaskPair.pickupTask.getEndTime(),
-							pickupDropoffTaskPair.dropoffTask.getBeginTime()));
+					new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerIds(),
+							cause));
+			log.debug("No insertion found for drt request "
+					+ req
+					+ " with passenger ids="
+					+ req.getPassengerIds().stream().map(Object::toString).collect(Collectors.joining(","))
+					+ " fromLinkId="
+					+ req.getFromLink().getId());
 		}
 	}
 }

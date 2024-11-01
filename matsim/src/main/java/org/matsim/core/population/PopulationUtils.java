@@ -57,6 +57,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PersonRouteCheck;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -77,6 +78,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author nagel, ikaddoura
@@ -381,7 +385,7 @@ public final class PopulationUtils {
 		public void setType(String type) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public Id<Plan> getId() {
 			return this.delegate.getId();
@@ -391,7 +395,7 @@ public final class PopulationUtils {
 		public void setPlanId(Id<Plan> planId) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		@Override
 		public int getIterationCreated() {
 			return this.delegate.getIterationCreated();
@@ -662,7 +666,10 @@ public final class PopulationUtils {
 	 * this will go unnoticed (this method will just return true or false,
 	 * probably false, except if both Writers have written the exact same text
 	 * until the Exception happens).
+	 *
+	 * @deprecated -- please use {@link org.matsim.core.population.routes.PopulationComparison} instead.  nkuehnel, apr'24
 	 */
+	@Deprecated
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
 			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
@@ -679,7 +686,6 @@ public final class PopulationUtils {
 	 *
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
-	@SuppressWarnings("resource")
 	private static InputStream openPopulationInputStream(final Population s1) {
 		try {
 			final PipedInputStream in = new PipedInputStream();
@@ -816,6 +822,14 @@ public final class PopulationUtils {
 		Activity act = getFactory().createInteractionActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
+	}
+
+	public static Activity convertInteractionToStandardActivity(Activity activity) {
+		if (activity instanceof InteractionActivity) {
+			return createActivity(activity);
+		} else {
+			return activity;
+		}
 	}
 
 	public static Leg createLeg(String transportMode) {
@@ -1176,6 +1190,10 @@ public final class PopulationUtils {
 		readPopulation( population, filename );
 		return population ;
 	}
+	/**
+	 * @deprecated -- please use {@link org.matsim.core.population.routes.PopulationComparison} instead.  nkuehnel, apr'24
+	 */
+	@Deprecated
 	public static boolean comparePopulations( Population population1, Population population2 ) {
 		return PopulationUtils.equalPopulation( population1, population2 );
 	}
@@ -1259,5 +1277,35 @@ public final class PopulationUtils {
 		return person ;
 	}
 
+	/**
+	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 */
+	public static void insertVehicleTypesIntoPersonAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType ) {
+		VehicleUtils.insertVehicleTypesIntoPersonAttributes( person, modeToVehicleType );
+	}
+	/**
+	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+	 *
+	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+	 *                      and provided values are merged into one map
+	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
+	 */
+	public static void insertVehicleIdsIntoPersonAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle ) {
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, modeToVehicle );
+	}
 
+	/**
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
+	 * @param population
+	 * @param network
+	 */
+	public static void checkRouteModeAndReset(Population population, Network network) {
+		PersonRouteCheck personRouteChecker = new PersonRouteCheck(network);
+		population.getPersons().values().forEach(
+			personRouteChecker::run
+		);
+	}
 }

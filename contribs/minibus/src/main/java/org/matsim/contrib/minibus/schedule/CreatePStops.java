@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -44,23 +45,22 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
- * 
+ *
  * @author aneumann, droeder
  *
  */
 public final class CreatePStops{
-	
+
 	private final static Logger log = LogManager.getLogger(CreatePStops.class);
-	
+
 	private final Network net;
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
@@ -74,7 +74,7 @@ public final class CreatePStops{
 	private List<Integer> topoTypesForStops = null;
 
 	private NetworkCalcTopoType networkCalcTopoType;
-	
+
 	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup){
 		return createPStops(network, pConfigGroup, null);
 	}
@@ -84,14 +84,14 @@ public final class CreatePStops{
 		cS.run();
 		return cS.getTransitSchedule();
 	}
-	
+
 	/**
 	 * Creates PStops in two ways. First, if a serviceAreaFile is defined in the config and this file exists, the file is used.
 	 * Second, the (default) min/max-x/y-values are used.
-	 * 
+	 *
 	 * Following FileTypes are supported:
 	 * <ul>
-	 * 	<li>Shapefiles with polygons. If one ore more attributes are defined, the last one is parsed 
+	 * 	<li>Shapefiles with polygons. If one ore more attributes are defined, the last one is parsed
 	 *	 	to Boolean and used to get include- and exclude-areas.</li>
 	 * 	<li>Textfile, containing a List of x/y-pairs per row, divided by semicolon. The first and the last coordinate should be equal
 	 * 		to get a closed and well defined Geometry.</li>
@@ -104,13 +104,13 @@ public final class CreatePStops{
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		this.factory = new GeometryFactory();
-		
+
 		this.linkId2StopFacilityMap = new LinkedHashMap<>();
-		
+
 		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
 
 		int warnCounter = 10;
-		
+
 		if (realTransitSchedule != null) {
 			for (TransitStopFacility stopFacility : realTransitSchedule.getFacilities().values()) {
 				if (stopFacility.getLinkId() != null) {
@@ -131,7 +131,7 @@ public final class CreatePStops{
 				}
 			}
 		}
-		
+
 		this.exclude = this.factory.buildGeometry(new ArrayList<Geometry>());
 		if(!new File(pConfigGroup.getServiceAreaFile()).exists()){
 			log.warn("file " + this.pConfigGroup.getServiceAreaFile() + " not found. Falling back to min/max serviceArea parameters.");
@@ -140,7 +140,7 @@ public final class CreatePStops{
 			log.warn("using " + this.pConfigGroup.getServiceAreaFile() + " for servicearea. x/y-values defined in the config are not used.");
 			createServiceArea(pConfigGroup.getServiceAreaFile());
 		}
-		
+
 		if (stopsWithoutLinkIds.size() > 0) {
 			log.warn("There are " + stopsWithoutLinkIds.size() + " stop facilities without a link id, namely: " + stopsWithoutLinkIds.toString());
 		}
@@ -184,7 +184,7 @@ public final class CreatePStops{
 	 * @param serviceAreaFile
 	 */
 	private void createServiceAreaTxt(String serviceAreaFile) {
-		
+
 		List<String> lines = new ArrayList<>();
 		String line;
 		try {
@@ -202,15 +202,15 @@ public final class CreatePStops{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		if(lines.size() < 3){
 			log.warn("an area needs at least 3 points, to be defined. Falling back to simple (default) x/y-values...");
 			this.createServiceArea(pConfigGroup.getMinX(), pConfigGroup.getMaxX(), pConfigGroup.getMinY(), pConfigGroup.getMaxY());
-			return;	
+			return;
 		}
-		
+
 		Coordinate[] c = new Coordinate[lines.size() + 1];
-			
+
 		double x,y;
 		for(int i = 0; i < lines.size(); i++){
 			x = Double.parseDouble(lines.get(i).split(";")[0]);
@@ -226,10 +226,10 @@ public final class CreatePStops{
 	 * @param serviceAreaFile
 	 */
 	private void createServiceAreaShp(String serviceAreaFile) {
-		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(serviceAreaFile);
+		Collection<SimpleFeature> features = new GeoFileReader().readFileAndInitialize(serviceAreaFile);
 		Collection<Geometry> include = new ArrayList<>();
 		Collection<Geometry> exclude = new ArrayList<>();
-		
+
 		for(SimpleFeature f: features){
 			boolean incl = true;
 			Geometry g = null;
@@ -240,7 +240,7 @@ public final class CreatePStops{
 					g = (Geometry) o;
 				}
 				// TODO use a better way to get the attributes, maybe directly per index.
-				// Now the last attribute is used per default... 
+				// Now the last attribute is used per default...
 				else if (o instanceof String){
 					incl = Boolean.parseBoolean((String) o);
 				}
@@ -253,46 +253,46 @@ public final class CreatePStops{
 				}
 			}
 		}
-		this.include = this.factory.createGeometryCollection( 
+		this.include = this.factory.createGeometryCollection(
 				include.toArray(new Geometry[include.size()])).buffer(0);
-		this.exclude = this.factory.createGeometryCollection( 
+		this.exclude = this.factory.createGeometryCollection(
 				exclude.toArray(new Geometry[exclude.size()])).buffer(0);
 	}
 
 	private void run(){
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		int stopsAdded = 0;
-		
+
 		for (Link link : this.net.getLinks().values()) {
 			if(link.getAllowedModes().contains(TransportMode.car)){
 				stopsAdded += addStopOnLink(link);
 			}
 		}
-		
+
 		log.info("Added " + stopsAdded + " additional stops for paratransit services");
 	}
-	
+
 	private int addStopOnLink(Link link) {
 		if(link == null){
 			return 0;
 		}
-		
+
 		if(!linkToNodeInServiceArea(link)){
 			return 0;
 		}
-		
+
 		if (linkHasAlreadyAFormalPTStopFromTheGivenSchedule(link)) {
 			return 0;
 		}
-		
+
 		if(!topoTypeAllowed(link)){
 			return 0;
 		}
-		
+
 		if (link.getFreespeed() >= this.pConfigGroup.getSpeedLimitForStops()) {
 			return 0;
 		}
-		
+
 		if (link.getCapacity() < this.pConfigGroup.getMinCapacityForStops()) {
 			return 0;
 		}
@@ -301,12 +301,12 @@ public final class CreatePStops{
 			log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
 			return 0;
 		}
-		
+
 		Id<TransitStopFacility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), TransitStopFacility.class);
 		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(stopId, link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
-		return 1;		
+		return 1;
 	}
 
 	private boolean topoTypeAllowed(Link link) {
@@ -316,7 +316,7 @@ public final class CreatePStops{
 		}
 		Integer topoType = this.networkCalcTopoType.getTopoType(link.getToNode());
 		return this.topoTypesForStops.contains(topoType);
-	}	
+	}
 
 	private boolean linkToNodeInServiceArea(Link link) {
 		Point p = factory.createPoint(MGC.coord2Coordinate(link.getToNode().getCoord()));

@@ -21,17 +21,17 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AssignmentTaxiOptimizerIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAssignment_arrivalTime() {
+	void testAssignment_arrivalTime() {
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 		params.mode = Mode.ARRIVAL_TIME;
 		params.vehPlanningHorizonOversupply = 99999;
@@ -42,7 +42,7 @@ public class AssignmentTaxiOptimizerIT {
 	}
 
 	@Test
-	public void testAssignment_pickupTime() {
+	void testAssignment_pickupTime() {
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 		params.mode = Mode.PICKUP_TIME;
 		params.vehPlanningHorizonOversupply = 120;
@@ -54,7 +54,7 @@ public class AssignmentTaxiOptimizerIT {
 	}
 
 	@Test
-	public void testAssignment_dse() {
+	void testAssignment_dse() {
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 		params.mode = Mode.DSE;
 		params.vehPlanningHorizonOversupply = 120;
@@ -66,7 +66,7 @@ public class AssignmentTaxiOptimizerIT {
 	}
 
 	@Test
-	public void testAssignment_totalWaitTime() {
+	void testAssignment_totalWaitTime() {
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 		params.mode = Mode.TOTAL_WAIT_TIME;
 		params.vehPlanningHorizonOversupply = 120;

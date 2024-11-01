@@ -32,7 +32,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.SingleHandlerEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -145,6 +144,7 @@ class Worker extends Thread implements BasicEventHandler{
 				switch( key ){
 					case Event.ATTRIBUTE_X:
 					case Event.ATTRIBUTE_Y:
+					case Event.ATTRIBUTE_TIME:
 						continue;
 				}
 			}
@@ -160,6 +160,7 @@ class Worker extends Thread implements BasicEventHandler{
 			eventStr.append(" | ");
 			eventStr.append(str);
 		}
+
 		eventStr.append(" | ") ;
 		return eventStr.toString();
 	}

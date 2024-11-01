@@ -25,6 +25,7 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,12 +39,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -51,9 +51,9 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  * @author aneumann, droeder
  */
 public class TransitSchedule2Shp extends AbstractAnalysisModule{
-	
+
 	private static final Logger log = LogManager.getLogger(TransitSchedule2Shp.class);
-	
+
 	private Network network;
 	private TransitSchedule schedule;
 	private final String targetCoordinateSystem;
@@ -72,17 +72,17 @@ public class TransitSchedule2Shp extends AbstractAnalysisModule{
 
 	@Override
 	public void preProcessData() {
-		
+
 	}
 
 	@Override
 	public void postProcessData() {
-		
+
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<>();
 		// write a shape per line
 		for(TransitLine transitLine: this.schedule.getTransitLines().values()){
 			if(transitLine.getRoutes().isEmpty()){
@@ -92,23 +92,23 @@ public class TransitSchedule2Shp extends AbstractAnalysisModule{
 			Collection<SimpleFeature> temp = getTransitLineFeatures(transitLine, this.targetCoordinateSystem);
 			features.addAll(temp);
 			try{
-				ShapeFileWriter.writeGeometries(temp, outputFolder + transitLine.getId().toString() + ".shp");
+				GeoFileWriter.writeGeometries(temp, outputFolder + transitLine.getId().toString() + ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}
 		}
-		// write a complete shape 
+		// write a complete shape
 		if(features.isEmpty()){
 			log.error("the transitschedule seems to be empty. No features are created, thus no shapefile will be written...");
 			return;
 		}
 		try{
-			ShapeFileWriter.writeGeometries(features, outputFolder + "allLines.shp");
+			GeoFileWriter.writeGeometries(features, outputFolder + "allLines.shp");
 		}catch(ServiceConfigurationError e){
 			e.printStackTrace();
 		}
 	}
-	
+
 	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine transitLine, String targetCoordinateSystem) {
 		SimpleFeatureTypeBuilder simpleFeatureBuilder = new SimpleFeatureTypeBuilder();
 		simpleFeatureBuilder.setCRS(MGC.getCRS(targetCoordinateSystem));
@@ -131,9 +131,9 @@ public class TransitSchedule2Shp extends AbstractAnalysisModule{
 		simpleFeatureBuilder.add("lastDep", String.class);
 		simpleFeatureBuilder.add("timeOper", String.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(simpleFeatureBuilder.buildFeatureType());
-		
+
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		Object[] routeFeatureAttributes;
 		for(TransitRoute transitRoute: transitLine.getRoutes().values()){
 			routeFeatureAttributes = getRouteFeatureAttribs(transitRoute, transitLine.getId(), new Object[17]);
@@ -147,25 +147,25 @@ public class TransitSchedule2Shp extends AbstractAnalysisModule{
 	}
 
 	private Object[] getRouteFeatureAttribs(TransitRoute transitRoute, Id<TransitLine> lineId, Object[] routeFeatureAttributes ) {
-		
+
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 
 		// Create the polyline (lineString)
-		
+
 		// add the startLink
 		Coord toNode = this.network.getLinks().get(transitRoute.getRoute().getStartLinkId()).getToNode().getCoord();
 		coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
-		
+
 		// add the routeLinks
 		for(Id<Link> linkId : transitRoute.getRoute().getLinkIds()){
 			toNode = this.network.getLinks().get(linkId).getToNode().getCoord();
 			coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
 		}
-		
+
 		//add the endlink
 		toNode = this.network.getLinks().get(transitRoute.getRoute().getEndLinkId()).getToNode().getCoord();
 		coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
-		
+
 		// create an array
 		Coordinate[] coord = new Coordinate[coords.size()];
 		coord = coords.toArray(coord);
@@ -173,7 +173,7 @@ public class TransitSchedule2Shp extends AbstractAnalysisModule{
 
 		// get the content
 		TransitRouteData transitRouteData = new TransitRouteData(this.network, transitRoute);
-		
+
 		routeFeatureAttributes[0] = lineString;
 		routeFeatureAttributes[1] = lineId.toString();
 		routeFeatureAttributes[2] = transitRoute.getId();

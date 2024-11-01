@@ -24,8 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 public class TransitScheduleIOTest {
 
 	@Test
-	public void testWriteRead_V2() {
+	void testWriteRead_V2() {
 		TransitScheduleFactory f = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = new TransitScheduleImpl(f);
 		{ // prepare data
@@ -68,7 +68,6 @@ public class TransitScheduleIOTest {
 
 			schedule.getMinimalTransferTimes().set(stop1.getId(), stop2.getId(), 300.0);
 			schedule.getMinimalTransferTimes().set(stop2.getId(), stop1.getId(), 360.0);
-;
 			TransitLine line1 = f.createTransitLine(Id.create("blue", TransitLine.class));
 			line1.getAttributes().putAttribute("color", "like the sky");
 			line1.getAttributes().putAttribute("operator", "higher being");
@@ -112,45 +111,45 @@ public class TransitScheduleIOTest {
 
 		TransitSchedule schedule2 = scenario.getTransitSchedule();
 		// assert schedule
-		Assert.assertEquals("myImagination", schedule2.getAttributes().getAttribute("source"));
+		Assertions.assertEquals("myImagination", schedule2.getAttributes().getAttribute("source"));
 
 		// assert stop facilities
 		TransitStopFacility stop1 = schedule2.getFacilities().get(Id.create(1, TransitStopFacility.class));
-		Assert.assertTrue(AttributesUtils.isEmpty(stop1.getAttributes()));
+		Assertions.assertTrue(AttributesUtils.isEmpty(stop1.getAttributes()));
 		TransitStopFacility stop2 = schedule2.getFacilities().get(Id.create(2, TransitStopFacility.class));
-		Assert.assertFalse(AttributesUtils.isEmpty(stop2.getAttributes()));
-		Assert.assertEquals("thin", stop2.getAttributes().getAttribute("air"));
-		Assert.assertTrue(stop2.getCoord().hasZ());
-		Assert.assertEquals(98765.0, stop2.getCoord().getZ(), 0.0);
-		Assert.assertEquals("GZ", stop2.getStopAreaId().toString());
+		Assertions.assertFalse(AttributesUtils.isEmpty(stop2.getAttributes()));
+		Assertions.assertEquals("thin", stop2.getAttributes().getAttribute("air"));
+		Assertions.assertTrue(stop2.getCoord().hasZ());
+		Assertions.assertEquals(98765.0, stop2.getCoord().getZ(), 0.0);
+		Assertions.assertEquals("GZ", stop2.getStopAreaId().toString());
 
 		// assert minmal transfer times
-		Assert.assertEquals(300, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop2.getId()), 0.0);
-		Assert.assertEquals(360, schedule2.getMinimalTransferTimes().get(stop2.getId(), stop1.getId()), 0.0);
-		Assert.assertEquals(Double.NaN, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop1.getId()), 0.0);
+		Assertions.assertEquals(300, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop2.getId()), 0.0);
+		Assertions.assertEquals(360, schedule2.getMinimalTransferTimes().get(stop2.getId(), stop1.getId()), 0.0);
+		Assertions.assertEquals(Double.NaN, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop1.getId()), 0.0);
 
 		// assert transit lines
 		TransitLine line1 = schedule2.getTransitLines().get(Id.create("blue", TransitLine.class));
-		Assert.assertNotNull(line1);
-		Assert.assertFalse(AttributesUtils.isEmpty(line1.getAttributes()));
-		Assert.assertEquals("like the sky", line1.getAttributes().getAttribute("color"));
-		Assert.assertEquals("higher being", line1.getAttributes().getAttribute("operator"));
+		Assertions.assertNotNull(line1);
+		Assertions.assertFalse(AttributesUtils.isEmpty(line1.getAttributes()));
+		Assertions.assertEquals("like the sky", line1.getAttributes().getAttribute("color"));
+		Assertions.assertEquals("higher being", line1.getAttributes().getAttribute("operator"));
 
 		// assert transit routes
 		TransitRoute route1 = line1.getRoutes().get(Id.create("upwards", TransitRoute.class));
-		Assert.assertNotNull(route1);
-		Assert.assertFalse(AttributesUtils.isEmpty(route1.getAttributes()));
-		Assert.assertTrue(route1.getAttributes().getAttribute("bidirectional") instanceof Boolean);
-		Assert.assertFalse((Boolean) route1.getAttributes().getAttribute("bidirectional"));
+		Assertions.assertNotNull(route1);
+		Assertions.assertFalse(AttributesUtils.isEmpty(route1.getAttributes()));
+		Assertions.assertTrue(route1.getAttributes().getAttribute("bidirectional") instanceof Boolean);
+		Assertions.assertFalse((Boolean) route1.getAttributes().getAttribute("bidirectional"));
 
 		// assert departures
 		Departure dep1 = route1.getDepartures().get(Id.create("first", Departure.class));
-		Assert.assertNotNull(dep1);
-		Assert.assertFalse(AttributesUtils.isEmpty(dep1.getAttributes()));
-		Assert.assertEquals("yes", dep1.getAttributes().getAttribute("early"));
+		Assertions.assertNotNull(dep1);
+		Assertions.assertFalse(AttributesUtils.isEmpty(dep1.getAttributes()));
+		Assertions.assertEquals("yes", dep1.getAttributes().getAttribute("early"));
 		Departure dep2 = route1.getDepartures().get(Id.create("last", Departure.class));
-		Assert.assertNotNull(dep2);
-		Assert.assertTrue(AttributesUtils.isEmpty(dep2.getAttributes()));
+		Assertions.assertNotNull(dep2);
+		Assertions.assertTrue(AttributesUtils.isEmpty(dep2.getAttributes()));
 
 	}
 }

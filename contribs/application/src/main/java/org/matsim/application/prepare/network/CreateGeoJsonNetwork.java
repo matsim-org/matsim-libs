@@ -29,6 +29,9 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 
+/**
+ * Note that {@link CreateAvroNetwork} offers a more efficient way to store network data, which also loads much faster in the browser.
+ */
 @CommandLine.Command(name = "network-geojson", description = "Create geojson representation of a network.")
 @CommandSpec(requireNetwork = true, produces = "network.geojson")
 public class CreateGeoJsonNetwork implements MATSimAppCommand {
@@ -55,6 +58,9 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
 	private boolean withProperties;
 
+	@CommandLine.Option(names = "--filter-properties", description = "Only include listed properties in the output.")
+	private Set<String> filterProperties;
+
 	public static void main(String[] args) {
 		new CreateGeoJsonNetwork().execute(args);
 	}
@@ -79,7 +85,7 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 		json.put("type", "FeatureCollection");
 
 		// Default CRS assumed to be 4326
-		if (!networkCrs.equalsIgnoreCase("epsg:4326")) {
+		if (!crs.getTargetCRS().equalsIgnoreCase("epsg:4326")) {
 			ObjectNode crs = json.putObject("crs");
 			putCrs(crs, networkCrs);
 		}
@@ -152,6 +158,11 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 
 				for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
 					Object value = e.getValue();
+
+					// Skip properties that are not defined
+					if (filterProperties != null && !filterProperties.isEmpty() && !filterProperties.contains(e.getKey()))
+						continue;
+
 					if (value instanceof String || value instanceof Number || value instanceof Boolean)
 						prop.putPOJO(e.getKey(), value);
 				}

@@ -9,4 +9,5 @@
 	<event time="21660" person="6" link="7" type="arrival"  />
 	<event time="21670" person="7" link="8" actType="" type="actstart"  />
 	<event time="21680" person="8" link="9" type="stuckAndAbort"  />
+	<event time="21690" person="9" type="personMoney" amount="-1.0" purpose="drtFare" transactionPartner="drt" reference="drt_0"  />
 </events>

@@ -73,13 +73,13 @@ import java.io.UncheckedIOException;
     }
 
     protected final void run(final Config config) {
-        MemoryObserver.start(60);
+        MemoryObserver.start(config.controller().getMemoryObserverInterval());
         MatsimRuntimeModifications.MyRunnable runnable = new MatsimRuntimeModifications.MyRunnable() {
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
                 loadCoreListeners();
                 controlerListenerManagerImpl.fireControlerStartupEvent();
-                ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
+                ControllerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" );
                 prepareForSim();
                 doIterations(config);
             }
@@ -178,7 +178,7 @@ import java.io.UncheckedIOException;
         } catch (UncheckedIOException e) {
             log.error("Could not write stopwatch file.", e);
         }
-        if (config.controller().isCreateGraphs()) {
+        if (config.controller().getCreateGraphsInterval() > 0 && iteration % config.controller().getCreateGraphsInterval() == 0) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch.png", ControllerConfigGroup.CompressionType.none));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");

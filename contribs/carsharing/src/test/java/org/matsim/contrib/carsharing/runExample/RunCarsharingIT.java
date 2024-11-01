@@ -25,9 +25,9 @@ import static org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModePar
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,10 +55,10 @@ public class RunCarsharingIT {
 
 	private final static Logger log = LogManager.getLogger(RunCarsharingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public final void test() {
+	final void test() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new FreeFloatingConfigGroup(),
 				new OneWayCarsharingConfigGroup(),
@@ -162,63 +162,63 @@ public class RunCarsharingIT {
 					if (TransportMode.walk.equals(legMode)) {
 						// walk is used for access+egress to car
 						// -> number of walk legs for access+egress equals twice the number of car legs = 44
-						Assert.assertEquals(44, nOfModeLegs);
+						Assertions.assertEquals(44, nOfModeLegs);
 					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(22, nOfModeLegs);
+						Assertions.assertEquals(22, nOfModeLegs);
 					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					}
 				} else if (iteration == 10) {
 
 					if (TransportMode.walk.equals(legMode)) {
 
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("twoway_vehicle".equals(legMode)) {
 
-						Assert.assertEquals(6, nOfModeLegs);
+						Assertions.assertEquals(6, nOfModeLegs);
 
 					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
+						Assertions.assertEquals(2, nOfModeLegs);
 					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					}
 				} else if (iteration == 20) {
 					if (TransportMode.walk.equals(legMode)) {
-						Assert.assertEquals(5, nOfModeLegs);
+						Assertions.assertEquals(5, nOfModeLegs);
 					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("twoway_vehicle".equals(legMode)) {
-						Assert.assertEquals(6, nOfModeLegs);
+						Assertions.assertEquals(6, nOfModeLegs);
 					} else if ("freefloating_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
+						Assertions.assertEquals(3, nOfModeLegs);
 					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+						Assertions.assertEquals(0, nOfModeLegs);
 
 					}
 				}

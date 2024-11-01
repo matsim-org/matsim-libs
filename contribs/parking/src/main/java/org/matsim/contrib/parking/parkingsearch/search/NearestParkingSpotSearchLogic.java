@@ -49,6 +49,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	private NetworkRoute actualRoute = null;
 	private final boolean canReserveParkingSlot;
 	private final boolean canCheckParkingCapacitiesInAdvanced;
+	private double distanceFromBaseToAttraction = Double.NaN;
 	private boolean useRandomLinkChoice;
 	private int currentLinkIdx;
 	private final HashSet<Id<ActivityFacility>> triedParking;
@@ -79,22 +80,32 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	 * @param baseLinkId linkId of the origin destination where the parkingSearch starts
 	 */
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> baseLinkId, Id<Vehicle> vehicleId, String mode, double now,
-								double maxParkingDuration, double nextPickupTime) {
-
+								double maxParkingDuration, double nextPickupTime, boolean passangerInteractionAtParkingFacilityAtEndOfLeg,
+								Coord coordOfAttraction) {
+		double maxAdditionalDistanceToAttraction = Double.MAX_VALUE;
+		// if a passenger interaction take place at a facility the walking distance to the attraction should be not extended by the value of maxAdditionalDistanceToAttraction
+		if (passangerInteractionAtParkingFacilityAtEndOfLeg) {
+			if (Double.isNaN(distanceFromBaseToAttraction))
+				findDistanceBetweenBaseLinkAndAttraction(baseLinkId, coordOfAttraction);
+			maxAdditionalDistanceToAttraction = 200.;
+		}
 		if (actualRoute == null) {
-			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now, maxParkingDuration);
-			checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
-			if (actualRoute != null) {
-				actualRoute.setVehicleId(vehicleId);
-			}
+			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now,
+				maxParkingDuration,
+				passangerInteractionAtParkingFacilityAtEndOfLeg, maxAdditionalDistanceToAttraction, coordOfAttraction);
+			if (!passangerInteractionAtParkingFacilityAtEndOfLeg)
+				checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
 			triedParking.clear();
 		} else if (currentLinkId.equals(actualRoute.getEndLinkId()) && !skipParkingActivity) {
 			currentLinkIdx = 0;
-			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now, maxParkingDuration);
-			checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
-			if (actualRoute != null) {
-				actualRoute.setVehicleId(vehicleId);
-			}
+			actualRoute = findRouteToNearestParkingFacility(baseLinkId, currentLinkId, canCheckParkingCapacitiesInAdvanced, now,
+				maxParkingDuration,
+				passangerInteractionAtParkingFacilityAtEndOfLeg, maxAdditionalDistanceToAttraction, coordOfAttraction);
+			if (!passangerInteractionAtParkingFacilityAtEndOfLeg)
+				checkIfDrivingToNextParkingLocationIsPossible(currentLinkId, baseLinkId, now, nextPickupTime);
+		}
+		if (actualRoute != null) {
+			actualRoute.setVehicleId(vehicleId);
 		}
 		//if no possible parking was found. The vehicle takes a random next link. Background assumption: parking only at given parking slots
 		if (actualRoute == null) {
@@ -109,6 +120,20 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 		return nextLink;
 
+	}
+
+	/**
+	 * Calculates the EuclideanDistance between the planed parkingLocation to the related attraction.
+	 *
+	 * @param baseLinkId
+	 * @param coordOfAttraction
+	 */
+	private void findDistanceBetweenBaseLinkAndAttraction(Id<Link> baseLinkId, Coord coordOfAttraction) {
+		for (ActivityFacility activityFacility : activityFacilities.values()) {
+			if (activityFacility.getLinkId().equals(baseLinkId))
+				distanceFromBaseToAttraction = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(),
+					coordOfAttraction);
+		}
 	}
 
 	/**
@@ -175,7 +200,9 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 	}
 
 	private NetworkRoute findRouteToNearestParkingFacility(Id<Link> baseLinkId, Id<Link> currentLinkId, boolean canCheckParkingCapacitiesInAdvanced,
-														   double now, double maxParkingDuration) {
+														   double now, double maxParkingDuration,
+														   boolean passangerInteractionAtParkingFacilityAtEndOfLeg, double maxDistanceFromBase,
+														   Coord coordOfAttraction) {
 		TreeMap<Double, ActivityFacility> euclideanDistanceToParkingFacilities = new TreeMap<>();
 		ActivityFacility nearstActivityFacility = null;
 		NetworkRoute selectedRoute = null;
@@ -183,29 +210,31 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		for (ActivityFacility activityFacility : activityFacilities.values()) {
 			if (triedParking.size() == activityFacilities.size())
 				triedParking.clear();
-			if (triedParking.contains(activityFacility.getId()))
+			if (!passangerInteractionAtParkingFacilityAtEndOfLeg && triedParking.contains(activityFacility.getId()))
 				continue;
 			if (canCheckParkingCapacitiesInAdvanced) {
 				if (((FacilityBasedParkingManager) parkingManager).getNrOfFreeParkingSpacesOnLink(activityFacility.getLinkId()) < 1)
 					continue;
 			}
 			double latestEndOfParking = now + maxParkingDuration;
-			ActivityOption parkingOptions = activityFacility.getActivityOptions().get("parking");
 			// checks if parking slot is now open and still open when the parking will finish; if no openingTime is set, we assume that it is open the hole day
+			ActivityOption parkingOptions = activityFacility.getActivityOptions().get("parking");
 			if (!parkingOptions.getOpeningTimes().isEmpty()) {
-				if (!(parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first().getEndTime() == 24 * 3600))
-					if (parkingOptions.getOpeningTimes().first().getStartTime() > now || parkingOptions.getOpeningTimes().first().getEndTime() < latestEndOfParking)
-						continue;
+				if (parkingOptions.getOpeningTimes().first().getStartTime() > now && parkingOptions.getOpeningTimes().first().getEndTime() < latestEndOfParking)
+					continue;
 			}
-			//check if approx. the max parking time at facility will not exceed
+			//check if approx. the max parking time at facility will not exceed, assumption: "parking duration - 30 minutes" is parking Time.
 			if (activityFacility.getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) { //TODO vielleicht etwas sparsamer machen
 				double maxParkingDurationAtFacility = 3600 * (double) activityFacility.getAttributes().getAsMap().get("maxParkingDurationInHours");
-				if (maxParkingDuration > maxParkingDurationAtFacility)
+				if (maxParkingDuration - 30*60 > maxParkingDurationAtFacility)
 					continue;
-				double expectedTravelTimeFromParkingToBase = getExpectedTravelTime(baseLinkId, now, activityFacility.getLinkId());
-				double expectedTravelTimeFromCurrentToParking = getExpectedTravelTime(activityFacility.getLinkId(), now, currentLinkId);
-				double expectedParkingTime = maxParkingDuration - expectedTravelTimeFromCurrentToParking - expectedTravelTimeFromParkingToBase;
-				if (expectedParkingTime > maxParkingDurationAtFacility)
+			}
+
+			//TODO beschreiben was passiert
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg) {
+				double distanceBetweenThisParkingFacilityAndTheAttraction = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(),
+					coordOfAttraction);
+				if (distanceBetweenThisParkingFacilityAndTheAttraction - distanceFromBaseToAttraction > maxDistanceFromBase)
 					continue;
 			}
 			// create Euclidean distances to the parking activities to find routes only to the nearest facilities in the next step
@@ -213,7 +242,11 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 			Coord coordCurrentLink = network.getLinks().get(currentLinkId).getCoord();
 
 			double distanceBaseAndFacility = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(), coordBaseLink);
-			double distanceCurrentAndFacility = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(), coordCurrentLink);
+			double distanceCurrentAndFacility;
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg)
+				distanceCurrentAndFacility = 0.;
+			else
+				distanceCurrentAndFacility = NetworkUtils.getEuclideanDistance(activityFacility.getCoord(), coordCurrentLink);
 
 			double distanceForParking = distanceBaseAndFacility + distanceCurrentAndFacility;
 			euclideanDistanceToParkingFacilities.put(distanceForParking, activityFacility);
@@ -223,9 +256,28 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 
 		// selects the parking facility with the minimum travel time; only investigates the nearest facilities
 		for (ActivityFacility activityFacility : euclideanDistanceToParkingFacilities.values()) {
+			if (activityFacility.getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) {
+				double maxParkingDurationAtFacility = 3600 * (double) activityFacility.getAttributes().getAsMap().get("maxParkingDurationInHours");
+				double expectedTravelTimeFromParkingToBase = getExpectedTravelTime(baseLinkId, now, activityFacility.getLinkId());
+				double expectedTravelTimeFromCurrentToParking = getExpectedTravelTime(activityFacility.getLinkId(), now, currentLinkId);
+				double expectedParkingTime = maxParkingDuration - expectedTravelTimeFromCurrentToParking - expectedTravelTimeFromParkingToBase;
+				if (expectedParkingTime > maxParkingDurationAtFacility)
+					continue;
+			}
 			counter++;
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg && euclideanDistanceToParkingFacilities.size() > triedParking.size())
+				if (triedParking.contains(activityFacility.getId()))
+					continue;
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg && euclideanDistanceToParkingFacilities.size() == triedParking.size())
+				triedParking.clear();
 			NetworkRoute possibleRoute = this.parkingRouter.getRouteFromParkingToDestination(activityFacility.getLinkId(), now,
 				currentLinkId);
+			// reason is that we expect that the driver will always take the nearest possible getOff point to reduce the walk distance for the guests
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg){
+				selectedRoute = possibleRoute;
+				nearstActivityFacility = activityFacility;
+				break;
+			}
 			double travelTimeToParking = possibleRoute.getTravelTime().seconds();
 			double travelTimeFromParking = travelTimeToParking;
 			if (!baseLinkId.equals(currentLinkId)) {
@@ -276,6 +328,7 @@ public class NearestParkingSpotSearchLogic implements ParkingSearchLogic {
 		actualRoute = null;
 		currentLinkIdx = 0;
 		skipParkingActivity = false;
+		distanceFromBaseToAttraction = Double.NaN;
 	}
 
 }

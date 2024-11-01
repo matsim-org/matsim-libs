@@ -3,7 +3,9 @@
 <config>
 	<module name="dvrp">
 		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="100"/>
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="100"/>
+			</parameterset>
 		</parameterset>
 	</module>
 
@@ -11,10 +13,11 @@
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="600"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="400"/>
-
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+			</parameterset>
 			<param name="operationalScheme" value="serviceAreaBased"/>
 			<param name="drtServiceAreaShapeFile" value="mielec/mielec.shp"/>
 
@@ -22,8 +25,9 @@
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
 			<parameterset type="zonalSystem">
-				<param name="zonesGeneration" value="GridFromNetwork"/>
-				<param name="cellSize" value="500"/>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
 			</parameterset>
 
 			<parameterset type="rebalancing">

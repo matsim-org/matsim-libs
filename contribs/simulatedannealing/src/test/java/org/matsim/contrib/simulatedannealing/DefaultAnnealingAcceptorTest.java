@@ -9,8 +9,8 @@
 package org.matsim.contrib.simulatedannealing;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
@@ -23,7 +23,7 @@ public class DefaultAnnealingAcceptorTest {
 	private final SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
 
 	@Test
-	public void testAcceptor() {
+	void testAcceptor() {
 
 		MutableInt iteration = new MutableInt(0);
 		IterationCounter iterationCounter = iteration::getValue;
@@ -37,27 +37,27 @@ public class DefaultAnnealingAcceptorTest {
 		TemperatureFunction.DefaultFunctions temperatureFunction = TemperatureFunction.DefaultFunctions.exponentialMultiplicative;
 
 		boolean accept = acceptor.accept(currentSolution, acceptedSolution, temperature(iteration));
-		Assert.assertTrue(accept);
+		Assertions.assertTrue(accept);
 
 		currentSolution = new SimulatedAnnealing.Solution<>("current", 15);
-		Assert.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
+		Assertions.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
 
 		currentSolution = new SimulatedAnnealing.Solution<>("current", 20);
-		Assert.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
+		Assertions.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
 
 		iteration.setValue(10);
-		Assert.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
+		Assertions.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
 
 		iteration.setValue(1000);
-		Assert.assertFalse(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
+		Assertions.assertFalse(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
 
 		currentSolution = new SimulatedAnnealing.Solution<>("current", 10);
-		Assert.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
+		Assertions.assertTrue(acceptor.accept(currentSolution, acceptedSolution, temperature(iteration)));
 
 
-		Assert.assertThrows(RuntimeException.class, () -> acceptor.accept(null, null, temperature(iteration)));
-		Assert.assertThrows(RuntimeException.class, () -> acceptor.accept(new SimulatedAnnealing.Solution<>("notnull"), null, temperature(iteration)));
-		Assert.assertThrows(RuntimeException.class, () -> acceptor.accept(new SimulatedAnnealing.Solution<>("notnull"), new SimulatedAnnealing.Solution<>("notnull"), temperature(iteration)));
+		Assertions.assertThrows(RuntimeException.class, () -> acceptor.accept(null, null, temperature(iteration)));
+		Assertions.assertThrows(RuntimeException.class, () -> acceptor.accept(new SimulatedAnnealing.Solution<>("notnull"), null, temperature(iteration)));
+		Assertions.assertThrows(RuntimeException.class, () -> acceptor.accept(new SimulatedAnnealing.Solution<>("notnull"), new SimulatedAnnealing.Solution<>("notnull"), temperature(iteration)));
 	}
 
 	private double temperature(MutableInt iteration) {

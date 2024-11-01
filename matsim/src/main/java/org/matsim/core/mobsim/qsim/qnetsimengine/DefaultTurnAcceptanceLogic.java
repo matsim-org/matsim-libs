@@ -19,9 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,15 +28,15 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * this class checks whether turning is physically possible, i.e. if the next link exists and if it is connected to the current link
- * 
+ *
  * @author kainagel
  *
  */
 public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	private static final Logger log = LogManager.getLogger( DefaultTurnAcceptanceLogic.class) ;
-	
-	@Override
+
 	/** We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise */
+	@Override
 	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now){
 		if (nextLinkId == null) {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
@@ -48,9 +45,9 @@ public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 			return AcceptTurn.ABORT;
 		}
 		QLinkI nextQLink = qNetwork.getNetsimLinks().get(nextLinkId);
-		
+
 		if (nextQLink == null){
-			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + 
+			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() +
 					" plans to travel on that link from link " + veh.getCurrentLink().getId());
 			return AcceptTurn.ABORT ;
 		}
@@ -63,15 +60,15 @@ public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 //			throw new RuntimeException( message ) ;
 ////			log.warn(message );
 ////			return acceptTurn.ABORT ;
-//			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be 
+//			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be
 //			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
 //		}
-		// currently does not work, see MATSIM-533 
-		
-		/* note: it cannot happen, that currentLane does not lead to nextLink (e.g. due to turn restrictions) because this is checked before: 
+		// currently does not work, see MATSIM-533
+
+		/* note: it cannot happen, that currentLane does not lead to nextLink (e.g. due to turn restrictions) because this is checked before:
 		 * a vehicle only enters a lane when that lane leads to the next link. see QLinkLanesImpl.moveBufferToNextLane() and .chooseNextLane()
 		 * tthunig, oct'17 */
-		
+
 		return AcceptTurn.GO ;
 	}
 

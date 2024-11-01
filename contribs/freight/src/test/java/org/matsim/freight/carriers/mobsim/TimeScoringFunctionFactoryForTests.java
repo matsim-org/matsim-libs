@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.mobsim;
 
 import jakarta.inject.Inject;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashSet;
 import java.util.Set;
 
-@Ignore
+@Disabled
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
@@ -94,8 +94,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 			@Override
 			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
+				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
@@ -200,7 +199,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 	static class NumberOfToursAward implements BasicScoring{
 
-		private Carrier carrier;
+		private final Carrier carrier;
 
 		public NumberOfToursAward(Carrier carrier) {
 			super();

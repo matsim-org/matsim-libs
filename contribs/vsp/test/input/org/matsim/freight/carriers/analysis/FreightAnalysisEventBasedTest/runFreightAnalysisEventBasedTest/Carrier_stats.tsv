@@ -1,2 +1,2 @@
-carrierId 	 MATSimScoreSelectedPlan 	 jSpritScoreSelectedPlan 	 nuOfTours 	 nuOfShipments(input) 	 nuOfServices(input) 
-carrier1	-263.4	null	2	0	7
+carrierId 	 MATSimScoreSelectedPlan 	 jSpritScoreSelectedPlan 	 nuOfTours 	 nuOfShipments(input) 	 nuOfShipments(handled) 	 nuOfServices(input) 	 nuOfServices(handled) 	 nuOfPlanedDemandSize 	 nuOfHandledDemandSize 	 jspritComputationTime[HH:mm:ss]
+carrier1	-263.4	null	2	0	0	7	7	7	7	null

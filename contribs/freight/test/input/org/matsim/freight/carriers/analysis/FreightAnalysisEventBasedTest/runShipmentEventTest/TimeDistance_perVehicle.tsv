@@ -1,0 +1,2 @@
+vehicleId	carrierId	vehicleTypeId	tourId	tourDuration[s]	tourDuration[h]	travelDistance[m]	travelDistance[km]	travelTime[s]	travelTime[h]	costPerSecond[EUR/s]	costPerMeter[EUR/m]	fixedCosts[EUR]	varCostsTime[EUR]	varCostsDist[EUR]	totalCosts[EUR]
+freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1	carrier1	heavy	1	6870.0	1.9083333333333334	40000.0	40.0	5360.0	1.488888888888889	0.008	7.7E-4	130.0	54.96	30.799999999999997	215.76

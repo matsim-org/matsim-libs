@@ -1,0 +1,20 @@
+header:
+  title: Simwrapper Test Dashboard
+  fullScreen: true
+subtabs:
+- title: "Tab #1"
+  rows:
+  - first
+- title: "Tab #2"
+  title_de: Zweiter Tab
+  rows:
+  - second
+layout:
+  first:
+  - type: text
+    title: TextBlock
+    file: example.csv
+  second:
+  - type: text
+    title: TextBlock
+    file: example.csv

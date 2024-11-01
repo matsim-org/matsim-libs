@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.signals.builder;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -30,6 +30,7 @@ import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
@@ -38,8 +39,7 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.*;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 /**
  * @author aneumann
@@ -49,11 +49,11 @@ public class TravelTimeFourWaysTest {
 
 	private static final String EVENTSFILE = "events.xml.gz";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testTrafficLightIntersection4arms() {
+	void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
@@ -62,7 +62,7 @@ public class TravelTimeFourWaysTest {
 	}
 
 	@Test
-	public void testTrafficLightIntersection4armsWithUTurn() {
+	void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans_uturn.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
@@ -78,6 +78,8 @@ public class TravelTimeFourWaysTest {
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
+		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
 		signalsConfig.setUseSignalSystems(true);
@@ -125,7 +127,7 @@ public class TravelTimeFourWaysTest {
 
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
+		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
 	}
 
 }

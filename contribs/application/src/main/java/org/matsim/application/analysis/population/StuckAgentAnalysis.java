@@ -35,6 +35,10 @@ import java.util.*;
 public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHandler, ActivityStartEventHandler {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 	private final Object2IntMap<String> stuckAgentsPerMode = new Object2IntOpenHashMap<>();
+
+	/**
+	 * Per mode, per hour -> number of stuck agents
+	 */
 	private final Map<String, Int2DoubleMap> stuckAgentsPerHour = new HashMap<>();
 	private final Map<String, Object2DoubleOpenHashMap<String>> stuckAgentsPerLink = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> allStuckLinks = new Object2DoubleOpenHashMap<>();
@@ -96,12 +100,13 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 			// Sort Map
 			List<String> sorted = new ArrayList<>(allStuckLinks.keySet());
 			sorted.sort((o1, o2) -> -Double.compare(allStuckLinks.getDouble(o1), allStuckLinks.getDouble(o2)));
+
 			List<String> header = new ArrayList<>(stuckAgentsPerLink.keySet());
 			header.add(0, "link");
 			header.add(1, "Agents");
 			// Write to .csv
 			printer.printRecord(header);
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 20 && i < sorted.size(); i++) {
 				String[] result = new String[header.size()];
 				result[0] = sorted.get(i);
 				result[1] = String.valueOf(this.summarizeStuckAgentsPerLink(sorted.get(i)));
@@ -146,8 +151,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		// Pie chart
-		if (!stuckAgentsPerMode.containsKey(event.getLegMode())) stuckAgentsPerMode.put(event.getLegMode(), 1);
-		else stuckAgentsPerMode.put(event.getLegMode(), stuckAgentsPerMode.getInt(event.getLegMode()) + 1);
+		stuckAgentsPerMode.mergeInt(event.getLegMode(), 1, Integer::sum);
 
 		// Stuck Agents per Hour
 		Int2DoubleMap perHour = stuckAgentsPerHour.computeIfAbsent(event.getLegMode(), (k) -> new Int2DoubleOpenHashMap());
@@ -159,7 +163,7 @@ public class StuckAgentAnalysis implements MATSimAppCommand, PersonStuckEventHan
 		Object2DoubleMap<String> perLink = stuckAgentsPerLink.computeIfAbsent(event.getLegMode(), (k) -> new Object2DoubleOpenHashMap<>());
 
 		Id<Link> link = Objects.requireNonNullElseGet(event.getLinkId(), () -> Id.createLinkId("unknown"));
-		allStuckLinks.merge(link.toString(), 1., Double::sum);
+		allStuckLinks.mergeDouble(link.toString(), 1., Double::sum);
 		perLink.mergeDouble(link.toString(), 1, Double::sum);
 	}
 

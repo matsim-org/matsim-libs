@@ -36,6 +36,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import com.google.common.collect.ImmutableSortedSet;
+
 /*deliberately package*/ class LinkImpl implements Link {
 
 	private final static Logger log = LogManager.getLogger(Link.class);
@@ -131,7 +133,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		}
 	}
 
-	
+
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -184,7 +186,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
 
 	// ---
-	
+
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
@@ -281,7 +283,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 			if (set == null) {
 				return null;
 			}
-			return cache.computeIfAbsent(set.hashCode(), key -> Set.copyOf(set));
+			return cache.computeIfAbsent(set.hashCode(), key -> ImmutableSortedSet.copyOf(set));
 		}
 	}
 }

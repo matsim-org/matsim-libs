@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -36,6 +38,7 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
@@ -132,13 +135,19 @@ class RunJointDemandDRTExample {
     }
 
     private static void loadConfigGroups(Config config) {
-        ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-        MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		DvrpConfigGroup dvrpConfigGroup = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+		ConfigGroup zoneParams = dvrpConfigGroup.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		dvrpConfigGroup.getTravelTimeMatrixParams().addParameterSet(zoneParams);
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 
         DrtConfigGroup drtCfg = new DrtConfigGroup();
-        drtCfg.maxWaitTime = 2 * 3600;
-        drtCfg.maxTravelTimeAlpha = 5;
-        drtCfg.maxTravelTimeBeta = 15 * 60;
+        DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+                (DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
+        defaultConstraintsSet.maxWaitTime = 2 * 3600;
+		defaultConstraintsSet.maxTravelTimeAlpha = 5;
+		defaultConstraintsSet.maxTravelTimeBeta = 15 * 60;
         drtCfg.stopDuration = 60;
         drtCfg.vehiclesFile = "jointDemand_vehicles.xml";
         multiModeDrtConfigGroup.addParameterSet(drtCfg);

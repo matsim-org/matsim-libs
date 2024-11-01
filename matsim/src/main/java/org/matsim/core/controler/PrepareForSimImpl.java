@@ -34,11 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -291,7 +288,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			VehicleType type;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
-					type = VehicleUtils.getDefaultVehicleType();
+					type = VehicleUtils.createDefaultVehicleType();
 					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId())){
 						scenario.getVehicles().addVehicleType( type );
 					}
@@ -331,6 +328,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
 
+	/**
+	 * Make sure that each leg has a routing mode.
+	 * Legs with outdated fallback modes will be treated in a special way.
+	 * Legs with no routing mode will have their network mode as routing mode.
+	 */
 	private void adaptOutdatedPlansForRoutingMode() {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -369,8 +371,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning
 								// module)
 
-								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0),
-										null);
+								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0), null);
 								if (oldMainMode != null) {
 									routingMode = oldMainMode;
 									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);

@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-public class VehicleAbortsEvent extends Event {
+public class VehicleAbortsEvent extends Event implements  HasLinkId, HasVehicleId {
 
 	public static final String EVENT_TYPE = "vehicle aborts";
-	
+
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
@@ -41,11 +41,11 @@ public class VehicleAbortsEvent extends Event {
 		this.vehicleId = vehicleId;
 		this.linkId = linkId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
-	
+
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
@@ -54,12 +54,11 @@ public class VehicleAbortsEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		return attr;
+		Map<String, String> atts = super.getAttributes();
+		// linkId, vehicleId handled by superclass
+		return atts;
 	}
 }

@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -24,18 +25,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 
-
 public class PlanInheritanceTest {
 	/**
 	 * @author alex94263
 	 */
 
-		
-		@Rule
+		@RegisterExtension
 		public MatsimTestUtils util = new MatsimTestUtils();
 
-		@Test
-		public void testPlanInheritanceEnabled() throws IOException {
+	@Test
+	void testPlanInheritanceEnabled() throws IOException {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -48,7 +47,7 @@ public class PlanInheritanceTest {
 			File csv = new File(outputDirectory, "planInheritanceRecords.csv.gz");
 
 			assertThat(csv).exists();
-			
+
 
 			List<Person> personList = new ArrayList<Person>();
 			final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -66,9 +65,9 @@ public class PlanInheritanceTest {
 					assert(p.getAttributes().getAsMap().keySet().contains(PlanInheritanceModule.ITERATION_CREATED));
 					assert(p.getAttributes().getAsMap().keySet().contains(PlanInheritanceModule.PLAN_ID));
 				}
-				
+
 			}
-			
+
 			PlanInheritanceRecordReader reader = new PlanInheritanceRecordReader(outputDirectory+"planInheritanceRecords.csv.gz");
 			List<PlanInheritanceRecord> records = reader.read();
 			assert(records.size()==2);
@@ -79,7 +78,7 @@ public class PlanInheritanceTest {
 			assert( ((PlanInheritanceRecord) records.get(0)).getIterationRemoved() == -1);
 			assert( ((PlanInheritanceRecord) records.get(0)).getPlanId().equals(Id.create("1",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(0)).getIterationsSelected().equals(Arrays.asList(0, 1, 2, 3, 4, 6, 7, 8, 9, 10)));
-			
+
 			assert( ((PlanInheritanceRecord) records.get(1)).getAgentId().equals(Id.createPersonId("1")));
 			assert( ((PlanInheritanceRecord) records.get(1)).getAncestorId().equals(Id.create("1",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(1)).getMutatedBy().equals("RandomPlanSelector_ReRoute"));
@@ -87,13 +86,13 @@ public class PlanInheritanceTest {
 			assert( ((PlanInheritanceRecord) records.get(1)).getIterationRemoved() == -1);
 			assert( ((PlanInheritanceRecord) records.get(1)).getPlanId().equals(Id.create("2",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(1)).getIterationsSelected().equals(Arrays.asList(5)));
-			
-			
+
+
 
 		}
-				
-		@Test
-		public void testPlanInheritanceDisabled() throws IOException {
+
+	@Test
+	void testPlanInheritanceDisabled() throws IOException {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -106,7 +105,7 @@ public class PlanInheritanceTest {
 			File csv = new File(outputDirectory, "planInheritanceRecords.csv.gz");
 
 			assertThat(csv).doesNotExist();
-			
+
 			List<Person> personList = new ArrayList<Person>();
 			final Scenario scenario = ScenarioUtils.createScenario(config);
 			StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
@@ -123,7 +122,7 @@ public class PlanInheritanceTest {
 					assert(!p.getAttributes().getAsMap().keySet().contains(PlanInheritanceModule.ITERATION_CREATED));
 					assert(!p.getAttributes().getAsMap().keySet().contains(PlanInheritanceModule.PLAN_ID));
 				}
-				
+
 			}
 		}
 }

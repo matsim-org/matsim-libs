@@ -32,6 +32,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author nagel
@@ -258,7 +259,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(MAIN_MODE)
 	private void setMainModes(String value) {
-		setMainModes(Arrays.asList(value.split(",")));
+		Set<String> modes = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
+		setMainModes(modes);
 	}
 
 	@StringSetter(SNAPSHOT_PERIOD)
@@ -600,7 +602,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(SEEP_MODE)
 	private void setSeepModes(String value) {
-		setSeepModes(Arrays.asList(value.split(",")));
+		Set<String> modes = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
+		setSeepModes(modes);
 	}
 
 	public Collection<String> getSeepModes() {

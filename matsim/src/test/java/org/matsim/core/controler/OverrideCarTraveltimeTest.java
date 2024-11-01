@@ -20,9 +20,7 @@
  * *********************************************************************** */
 
  package org.matsim.core.controler;
-
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +37,7 @@ import org.matsim.vehicles.Vehicle;
 import jakarta.inject.Inject;
 import java.util.Map;
 
-public class OverrideCarTraveltimeTest {
+ public class OverrideCarTraveltimeTest {
 
     public static void main(String[] args) {
         final Config config = ConfigUtils.createConfig();
@@ -94,8 +92,8 @@ public class OverrideCarTraveltimeTest {
 
         @Override
         public void notifyReplanning(ReplanningEvent event) {
-            Assert.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
-            Assert.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
+            Assertions.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
+            Assertions.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
         }
     }
 }

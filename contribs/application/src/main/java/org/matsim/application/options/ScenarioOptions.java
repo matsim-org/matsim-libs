@@ -23,7 +23,7 @@ public class ScenarioOptions {
 	private String scenarioArgs;
 
 	@CommandLine.Option(names = "--population", description = "Path to input population")
-	private Path populationPath;
+	private String populationPath;
 
 	private Config config;
 
@@ -35,7 +35,7 @@ public class ScenarioOptions {
 			config = ConfigUtils.loadConfig(configPath);
 
 			if (populationPath != null)
-				config.plans().setInputFile(populationPath.toString());
+				config.plans().setInputFile(populationPath);
 		}
 
 		return config;

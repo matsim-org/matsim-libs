@@ -36,7 +36,6 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	public ParkingCostConfigGroup() {
 		super(GROUP_NAME);
 	}
-
 	private String mode = "car";
 	private String dailyParkingCostLinkAttributeName = "dailyPCost";
 	private String firstHourParkingCostLinkAttributeName = "oneHourPCost";

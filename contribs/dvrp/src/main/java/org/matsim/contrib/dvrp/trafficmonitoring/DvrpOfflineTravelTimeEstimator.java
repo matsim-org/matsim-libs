@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -63,18 +64,21 @@ public class DvrpOfflineTravelTimeEstimator
 	private final double[][] linkTravelTimes;
 	private final double alpha;
 
+	private final String delimiter;
+
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
-			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
-			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
-			OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.travelTimeEstimationAlpha, outputDirectoryHierarchy);
+										  @Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
+										  @Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
+										  TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
+										  OutputDirectoryHierarchy outputDirectoryHierarchy, GlobalConfigGroup globalConfig) {
+		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.travelTimeEstimationAlpha,
+				outputDirectoryHierarchy, globalConfig.getDefaultDelimiter());
 	}
 
 	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
 			TimeDiscretizer timeDiscretizer, double travelTimeEstimationAlpha,
-			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+			OutputDirectoryHierarchy outputDirectoryHierarchy, String delimiter) {
 		this.observedTT = observedTT;
 		this.network = network;
 
@@ -83,9 +87,10 @@ public class DvrpOfflineTravelTimeEstimator
 		this.timeInterval = timeDiscretizer.getTimeInterval();
 
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
+		this.delimiter = delimiter;
 
 		alpha = travelTimeEstimationAlpha;
-		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
+		checkArgument(alpha >= 0 && alpha <= 1, "travelTimeEstimationAlpha must be in [0,1]");
 
 		linkTravelTimes = DvrpOfflineTravelTimes.convertToLinkTravelTimeMatrix(initialTT, network.getLinks().values(),
 				timeDiscretizer);
@@ -109,13 +114,16 @@ public class DvrpOfflineTravelTimeEstimator
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		updateTTs(observedTT, alpha);
+		if(alpha > 0) {
+			updateTTs(observedTT, alpha);
+		}
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		DvrpOfflineTravelTimes.saveLinkTravelTimes(timeDiscretizer, linkTravelTimes,
-				outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "dvrp_travel_times.csv.gz"));
+				outputDirectoryHierarchy.getIterationFilename(event.getIteration(),
+						"dvrp_travel_times.csv.gz"), delimiter);
 	}
 
 	private void updateTTs(TravelTime travelTime, double alpha) {

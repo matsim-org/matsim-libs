@@ -20,6 +20,9 @@
 package ch.sbb.matsim.config;
 
 import com.google.common.base.Verify;
+
+import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig.RaptorTransferCalculation;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +43,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
-	private static final Logger log = LogManager.getLogger(SwissRailRaptorConfigGroup.class);
     public static final String GROUP = "swissRailRaptor";
 
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";
@@ -62,6 +64,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING = "intermodalLegOnlyHandling";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING_DESC = "Define how routes containing only intermodal legs are handled: Useful options: alllow, avoid, forbid";
+    private static final String PARAM_TRANSFER_CALCULATION = "transferCalculation";
+    private static final String PARAM_TRANFER_CALCULATION_DESC = "Defines whether all potential transfers are precomputed at the beginning of the simulation (Initial) or whether they are constructed on-demand when needed (Adaptive). The former incurs potentially long up-front caclulations, but quicker routing. The latter avoids any initial computation, but may require longer routing time.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
@@ -75,12 +79,14 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private double transferPenaltyHourlyCost = 0;
     private double transferWalkMargin = 5;
 	private IntermodalLegOnlyHandling intermodalLegOnlyHandling = IntermodalLegOnlyHandling.forbid;
+	private RaptorTransferCalculation transferCalculation = RaptorTransferCalculation.Initial;
 
     private ScoringParameters scoringParameters = ScoringParameters.Default;
 
     private final Map<String, RangeQuerySettingsParameterSet> rangeQuerySettingsPerSubpop = new HashMap<>();
     private final Map<String, RouteSelectorParameterSet> routeSelectorPerSubpop = new HashMap<>();
     private final List<IntermodalAccessEgressParameterSet> intermodalAccessEgressSettings = new ArrayList<>();
+    private final List<ModeToModeTransferPenalty> modeToModeTransferPenaltyParameterSets = new ArrayList<>();
     private final Map<String, ModeMappingForPassengersParameterSet> modeMappingForPassengersByRouteMode = new HashMap<>();
 
 
@@ -128,9 +134,19 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	public String getIntermodalLegOnlyHandlingString() {
 		return intermodalLegOnlyHandling.toString();
 	}
-
+	
 	public IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
 		return intermodalLegOnlyHandling;
+	}	
+	
+	@StringSetter(PARAM_TRANSFER_CALCULATION)
+	public void setTransferCalculation(RaptorTransferCalculation transferCalculation) {
+		this.transferCalculation = transferCalculation;
+	}
+
+	@StringGetter(PARAM_TRANSFER_CALCULATION)
+	public RaptorTransferCalculation getTransferCalculation() {
+		return transferCalculation;
 	}
 
 	@StringGetter(PARAM_USE_RANGE_QUERY)
@@ -243,19 +259,19 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         this.transferPenaltyHourlyCost = hourlyCost;
     }
 
-    @Override
+
+	@Override
     public ConfigGroup createParameterSet(String type) {
-        if (RangeQuerySettingsParameterSet.TYPE.equals(type)) {
-            return new RangeQuerySettingsParameterSet();
-        } else if (RouteSelectorParameterSet.TYPE.equals(type)) {
-            return new RouteSelectorParameterSet();
-        } else if (IntermodalAccessEgressParameterSet.TYPE.equals(type)) {
-            return new IntermodalAccessEgressParameterSet();
-        } else if (ModeMappingForPassengersParameterSet.TYPE.equals(type)) {
-            return new ModeMappingForPassengersParameterSet();
-        } else {
-            throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
-        }
+        return switch (type){
+			case RangeQuerySettingsParameterSet.TYPE -> new RangeQuerySettingsParameterSet();
+			case RouteSelectorParameterSet.TYPE -> new RouteSelectorParameterSet();
+			case IntermodalAccessEgressParameterSet.TYPE -> new IntermodalAccessEgressParameterSet();
+			case ModeMappingForPassengersParameterSet.TYPE -> new ModeMappingForPassengersParameterSet();
+			case ModeToModeTransferPenalty.TYPE -> new ModeToModeTransferPenalty();
+			default -> throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
+
+		};
+
     }
 
     @Override
@@ -267,13 +283,25 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         } else if (set instanceof IntermodalAccessEgressParameterSet) {
             addIntermodalAccessEgress((IntermodalAccessEgressParameterSet) set);
         } else if (set instanceof ModeMappingForPassengersParameterSet) {
-            addModeMappingForPassengers((ModeMappingForPassengersParameterSet) set);
+            addModeMappingForPassengers((ModeMappingForPassengersParameterSet) set);}
+		else if (set instanceof ModeToModeTransferPenalty) {
+			addModeToModeTransferPenalty((ModeToModeTransferPenalty) set);
         } else {
             throw new IllegalArgumentException("Unsupported parameterset: " + set.getClass().getName());
         }
     }
 
-    public void addRangeQuerySettings(RangeQuerySettingsParameterSet settings) {
+	public void addModeToModeTransferPenalty(ModeToModeTransferPenalty set) {
+		this.modeToModeTransferPenaltyParameterSets.add(set);
+		super.addParameterSet(set);
+
+	}
+
+	public List<ModeToModeTransferPenalty> getModeToModeTransferPenaltyParameterSets() {
+		return modeToModeTransferPenaltyParameterSets;
+	}
+
+	public void addRangeQuerySettings(RangeQuerySettingsParameterSet settings) {
         Set<String> subpops = settings.getSubpopulations();
         if (subpops.isEmpty()) {
             this.rangeQuerySettingsPerSubpop.put(null, settings);
@@ -662,12 +690,40 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
     }
 
-    @Override
+	public static class ModeToModeTransferPenalty extends ReflectiveConfigGroup{
+		private static final String TYPE = "modeToModeTransferPenalty";
+		@Parameter
+		@Comment("from Transfer PT Sub-Mode")
+		public String fromMode;
+		@Parameter
+		@Comment("to Transfer PT Sub-Mode")
+		public String toMode;
+		@Parameter
+		@Comment("Transfer Penalty per Transfer between modes")
+		public double transferPenalty = 0.0;
+
+		public ModeToModeTransferPenalty() {
+			super(TYPE);
+		}
+
+		public ModeToModeTransferPenalty(String fromMode, String toMode, double transferPenalty) {
+			super(TYPE);
+			this.fromMode = fromMode;
+			this.toMode = toMode;
+			this.transferPenalty = transferPenalty;
+		}
+	}
+
+
+
+	@Override
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
         comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
+		comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION,PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
+		comments.put(PARAM_TRANSFER_CALCULATION, PARAM_TRANFER_CALCULATION_DESC);
         return comments;
     }
 
@@ -679,7 +735,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
             Verify.verify(config.plans().getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.reject), "Using intermodal access and egress in "
                     + "combination with plans without a routing mode is not supported.");
-            Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress "
+            Verify.verify(!intermodalAccessEgressSettings.isEmpty(), "Using intermodal routing, but there are no access/egress "
                     + "modes defined. Add at least one parameterset with an access/egress mode and ensure "
                     + "SwissRailRaptorConfigGroup is loaded correctly.");
 

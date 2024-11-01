@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,6 +48,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
@@ -77,7 +78,7 @@ public class JointTripRouterFactoryTest {
 	private Provider<TripRouter> factory;
 	private Scenario scenario;
 
-	@Before
+	@BeforeEach
 	public void initFixtures() {
 		this.scenario = createScenario();
 		this.factory = createFactory( scenario );
@@ -95,6 +96,8 @@ public class JointTripRouterFactoryTest {
 
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
+		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
 		Network net = (Network) sc.getNetwork();
 		final Id<Node> id5 = node1;
 		Node node1inst = NetworkUtils.createAndAddNode(net, id5, new Coord((double) 0, (double) 1));
@@ -202,7 +205,7 @@ public class JointTripRouterFactoryTest {
 	}
 
 	@Test
-	public void testPassengerRoute() throws Exception {
+	void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
@@ -227,10 +230,10 @@ public class JointTripRouterFactoryTest {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.PASSENGER ) ) {
 						final Id actualDriver = ((PassengerRoute) ((Leg) pe).getRoute()).getDriverId();
 
-						Assert.assertEquals(
-								"wrong driver Id",
+						Assertions.assertEquals(
 								driver,
-								actualDriver);
+								actualDriver,
+								"wrong driver Id");
 					}
 				}
 
@@ -239,7 +242,7 @@ public class JointTripRouterFactoryTest {
 	}
 
 	@Test
-	public void testDriverRoute() throws Exception {
+	void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
@@ -264,14 +267,14 @@ public class JointTripRouterFactoryTest {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.DRIVER ) ) {
 						final Collection<Id<Person>> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
 
-						Assert.assertEquals(
-								"wrong number of passengers",
+						Assertions.assertEquals(
 								passengerIds.size(),
-								actualPassengers.size());
+								actualPassengers.size(),
+								"wrong number of passengers");
 
-						Assert.assertTrue(
-								"wrong passengers ids: "+actualPassengers+" is not "+passengerIds,
-								passengerIds.containsAll( actualPassengers ));
+						Assertions.assertTrue(
+								passengerIds.containsAll( actualPassengers ),
+								"wrong passengers ids: "+actualPassengers+" is not "+passengerIds);
 					}
 				}
 

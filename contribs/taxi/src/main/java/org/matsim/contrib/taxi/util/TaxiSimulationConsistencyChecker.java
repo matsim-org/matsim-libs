@@ -49,7 +49,7 @@ public class TaxiSimulationConsistencyChecker implements MobsimBeforeCleanupList
 					LogManager.getLogger(getClass())
 							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
 									seq.getSubmitted().getTime()) + "\tPassenger:\t" + seq.getSubmitted()
-									.getPersonId());
+									.getPersonIds());
 				}
 			}
 		}

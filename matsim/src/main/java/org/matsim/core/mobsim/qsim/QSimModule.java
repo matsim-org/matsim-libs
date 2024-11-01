@@ -28,22 +28,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.inject.Inject;
-
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueModule;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;

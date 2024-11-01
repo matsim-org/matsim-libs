@@ -2,7 +2,7 @@ package org.matsim.modechoice.replanning;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
@@ -20,7 +20,7 @@ import org.matsim.modechoice.TestScenario;
 public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 
 	@Test
-	public void selectSingleTrip() {
+	void selectSingleTrip() {
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -42,7 +42,7 @@ public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 	}
 
 	@Test
-	public void person() {
+	void person() {
 
 		PlanStrategy strategy = injector.getInstance(Key.get(PlanStrategy.class, Names.named(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)));
 

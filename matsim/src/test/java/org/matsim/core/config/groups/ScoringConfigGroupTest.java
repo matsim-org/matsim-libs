@@ -28,9 +28,9 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -41,11 +41,11 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ScoringConfigGroupTest {
+	public class ScoringConfigGroupTest {
 	private static final Logger log =
 		LogManager.getLogger(ScoringConfigGroupTest.class);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
@@ -53,16 +53,16 @@ public class ScoringConfigGroupTest {
 
 		if ( ! fullyHierarchical ){
 			// mode params are there for default modes:
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
-			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
+			Assertions.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
 
 			// default stage/interaction params are there for pt and drt (as a service):
-			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
-			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
+			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
+			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
 		}
 		// default stage/interaction params for modes routed on the network are not yet there:
 //		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
@@ -74,12 +74,12 @@ public class ScoringConfigGroupTest {
 
 		// default stage/interaction params for modes routed on the network are now there:
 		for( String networkMode : config.routing().getNetworkModes() ){
-			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+			Assertions.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
 		}
 	}
 
-	@Test
-	public void testFullyHierarchicalVersion() {
+	 @Test
+	 void testFullyHierarchicalVersion() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, true ) ;
@@ -106,8 +106,9 @@ public class ScoringConfigGroupTest {
 		}
 		log.warn( "" );
 	}
-	@Test
-	public void testVersionWoScoringparams() {
+
+	 @Test
+	 void testVersionWoScoringparams() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
 		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, false ) ;
@@ -135,21 +136,21 @@ public class ScoringConfigGroupTest {
 		log.warn( "" );
 	}
 
-	@Test
-	public void testAddActivityParams() {
+	 @Test
+	 void testAddActivityParams() {
 		ScoringConfigGroup c = new ScoringConfigGroup();
         int originalSize = c.getActivityParams().size();
-		Assert.assertNull(c.getActivityParams("type1"));
-        Assert.assertEquals(originalSize, c.getActivityParams().size());
+		Assertions.assertNull(c.getActivityParams("type1"));
+        Assertions.assertEquals(originalSize, c.getActivityParams().size());
 
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
-		Assert.assertEquals(ap, c.getActivityParams("type1"));
-        Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
+		Assertions.assertEquals(ap, c.getActivityParams("type1"));
+        Assertions.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
-	@Test
-	public void testIODifferentVersions() {
+	 @Test
+	 void testIODifferentVersions() {
 		final ScoringConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
@@ -177,183 +178,189 @@ public class ScoringConfigGroupTest {
 			final String msg,
 			final ScoringConfigGroup initialGroup,
 			final ScoringConfigGroup inputConfigGroup) {
-		Assert.assertEquals(
-				"wrong brainExpBeta "+msg,
+		Assertions.assertEquals(
 				initialGroup.getBrainExpBeta(),
 				inputConfigGroup.getBrainExpBeta(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong constantBike "+msg,
+				1e-7,
+				"wrong brainExpBeta "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.bike).getConstant(),
 				inputConfigGroup.getModes().get(TransportMode.bike).getConstant(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong constantCar "+msg,
+				1e-7,
+				"wrong constantBike "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.car).getConstant(),
 				inputConfigGroup.getModes().get(TransportMode.car).getConstant(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong constantOther "+msg,
+				1e-7,
+				"wrong constantCar "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.other).getConstant(),
 				inputConfigGroup.getModes().get(TransportMode.other).getConstant(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong constantPt "+msg,
+				1e-7,
+				"wrong constantOther "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.pt).getConstant(),
 				inputConfigGroup.getModes().get(TransportMode.pt).getConstant(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong constantWalk "+msg,
+				1e-7,
+				"wrong constantPt "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.walk).getConstant(),
 				inputConfigGroup.getModes().get(TransportMode.walk).getConstant(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong lateArrival_utils_hr "+msg,
+				1e-7,
+				"wrong constantWalk "+msg);
+		Assertions.assertEquals(
 				initialGroup.getLateArrival_utils_hr(),
 				inputConfigGroup.getLateArrival_utils_hr(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong earlyDeparture_utils_hr "+msg,
+				1e-7,
+				"wrong lateArrival_utils_hr "+msg );
+		Assertions.assertEquals(
 				initialGroup.getEarlyDeparture_utils_hr(),
 				inputConfigGroup.getEarlyDeparture_utils_hr(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong learningRate "+msg,
+				1e-7,
+				"wrong earlyDeparture_utils_hr "+msg );
+		Assertions.assertEquals(
 				initialGroup.getLearningRate(),
 				inputConfigGroup.getLearningRate(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong marginalUtilityOfMoney "+msg,
+				1e-7,
+				"wrong learningRate "+msg );
+		Assertions.assertEquals(
 				initialGroup.getMarginalUtilityOfMoney(),
 				inputConfigGroup.getMarginalUtilityOfMoney() ,
-				1e-7);
-		Assert.assertEquals(
-				"wrong marginalUtlOfDistanceOther "+msg,
+				1e-7,
+				"wrong marginalUtilityOfMoney "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
 				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong marginalUtlOfDistanceWalk "+msg,
+				1e-7,
+				"wrong marginalUtlOfDistanceOther "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
 				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong marginalUtlOfWaiting_utils_hr "+msg,
+				1e-7,
+				"wrong marginalUtlOfDistanceWalk "+msg);
+		Assertions.assertEquals(
 				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
 				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong marginalUtlOfWaitingPt_utils_hr "+msg,
+				1e-7,
+				"wrong marginalUtlOfWaiting_utils_hr "+msg );
+		Assertions.assertEquals(
 				initialGroup.getMarginalUtlOfWaitingPt_utils_hr(),
 				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong monetaryDistanceCostRateCar "+msg,
+				1e-7,
+				"wrong marginalUtlOfWaitingPt_utils_hr "+msg );
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
 				inputConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong monetaryDistanceCostRatePt "+msg,
+				1e-7,
+				"wrong monetaryDistanceCostRateCar "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
 				inputConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong pathSizeLogitBeta "+msg,
+				1e-7,
+				"wrong monetaryDistanceCostRatePt "+msg);
+		Assertions.assertEquals(
 				initialGroup.getPathSizeLogitBeta(),
 				inputConfigGroup.getPathSizeLogitBeta(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong performing_utils_hr "+msg,
+				1e-7,
+				"wrong pathSizeLogitBeta "+msg );
+		Assertions.assertEquals(
 				initialGroup.getPerforming_utils_hr(),
 				inputConfigGroup.getPerforming_utils_hr(),
-				1e-7 );
-		Assert.assertEquals(
-				"wrong traveling_utils_hr "+msg,
+				1e-7,
+				"wrong performing_utils_hr "+msg );
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
 				inputConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong travelingBike_utils_hr "+msg,
+				1e-7,
+				"wrong traveling_utils_hr "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
 				inputConfigGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong travelingOther_utils_hr "+msg,
+				1e-7,
+				"wrong travelingBike_utils_hr "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
 				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong travelingPt_utils_hr "+msg,
+				1e-7,
+				"wrong travelingOther_utils_hr "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
 				inputConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong travelingWalk_utils_hr "+msg,
+				1e-7,
+				"wrong travelingPt_utils_hr "+msg);
+		Assertions.assertEquals(
 				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
 				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
-				1e-7);
-		Assert.assertEquals(
-				"wrong utilityOfLineSwitch "+msg,
+				1e-7,
+				"wrong travelingWalk_utils_hr "+msg);
+		Assertions.assertEquals(
 				initialGroup.getUtilityOfLineSwitch(),
 				inputConfigGroup.getUtilityOfLineSwitch(),
-				1e-7 );
+				1e-7,
+				"wrong utilityOfLineSwitch "+msg );
 
 		for ( ActivityParams initialSettings : initialGroup.getActivityParams() ) {
 			final ActivityParams inputSettings =
 				inputConfigGroup.getActivityParams(
 						initialSettings.getActivityType() );
-			Assert.assertEquals(
-					"wrong type "+msg,
+			Assertions.assertEquals(
 					initialSettings.getActivityType(),
-					inputSettings.getActivityType() );
-			Assert.assertEquals(
-					"wrong closingTime "+msg, initialSettings.getClosingTime(),
-					inputSettings.getClosingTime());
-			Assert.assertEquals(
-					"wrong earliestEndTime "+msg, initialSettings.getEarliestEndTime(),
-					inputSettings.getEarliestEndTime());
-			Assert.assertEquals(
-					"wrong latestStartTime "+msg, initialSettings.getLatestStartTime(),
-					inputSettings.getLatestStartTime());
-			Assert.assertEquals(
-					"wrong minimalDuration "+msg, initialSettings.getMinimalDuration(),
-					inputSettings.getMinimalDuration());
-			Assert.assertEquals(
-					"wrong openingTime "+msg, initialSettings.getOpeningTime(),
-					inputSettings.getOpeningTime());
-			Assert.assertEquals(
-					"wrong priority "+msg,
+					inputSettings.getActivityType(),
+					"wrong type "+msg );
+			Assertions.assertEquals(
+					initialSettings.getClosingTime(),
+					inputSettings.getClosingTime(),
+					"wrong closingTime "+msg);
+			Assertions.assertEquals(
+					initialSettings.getEarliestEndTime(),
+					inputSettings.getEarliestEndTime(),
+					"wrong earliestEndTime "+msg);
+			Assertions.assertEquals(
+					initialSettings.getLatestStartTime(),
+					inputSettings.getLatestStartTime(),
+					"wrong latestStartTime "+msg);
+			Assertions.assertEquals(
+					initialSettings.getMinimalDuration(),
+					inputSettings.getMinimalDuration(),
+					"wrong minimalDuration "+msg);
+			Assertions.assertEquals(
+					initialSettings.getOpeningTime(),
+					inputSettings.getOpeningTime(),
+					"wrong openingTime "+msg);
+			Assertions.assertEquals(
 					initialSettings.getPriority(),
 					inputSettings.getPriority(),
-					1e-7 );
-			Assert.assertEquals(
-					"wrong typicalDuration "+msg, initialSettings.getTypicalDuration(),
-					inputSettings.getTypicalDuration());
+					1e-7,
+					"wrong priority "+msg );
+			Assertions.assertEquals(
+					initialSettings.getTypicalDuration(),
+					inputSettings.getTypicalDuration(),
+					"wrong typicalDuration "+msg);
 		}
 
 		for ( ModeParams initialSettings : initialGroup.getModes().values() ) {
 			final String mode = initialSettings.getMode();
 			final ModeParams inputSettings = inputConfigGroup.getModes().get( mode );
-			Assert.assertEquals(
-					"wrong constant "+msg,
+			Assertions.assertEquals(
 					initialSettings.getConstant(),
 					inputSettings.getConstant(),
-					1e-7 );
-			Assert.assertEquals(
-					"wrong marginalUtilityOfDistance "+msg,
+					1e-7,
+					"wrong constant "+msg );
+			Assertions.assertEquals(
 					initialSettings.getMarginalUtilityOfDistance(),
 					inputSettings.getMarginalUtilityOfDistance(),
-					1e-7 );
-			Assert.assertEquals(
-					"wrong marginalUtilityOfTraveling "+msg,
+					1e-7,
+					"wrong marginalUtilityOfDistance "+msg );
+			Assertions.assertEquals(
 					initialSettings.getMarginalUtilityOfTraveling(),
 					inputSettings.getMarginalUtilityOfTraveling(),
-					1e-7 );
-			Assert.assertEquals(
-					"wrong monetaryDistanceRate "+msg,
+					1e-7,
+					"wrong marginalUtilityOfTraveling "+msg );
+			Assertions.assertEquals(
 					initialSettings.getMonetaryDistanceRate(),
 					inputSettings.getMonetaryDistanceRate(),
-					1e-7 );
+					1e-7,
+					"wrong monetaryDistanceRate "+msg );
 		}
 
 

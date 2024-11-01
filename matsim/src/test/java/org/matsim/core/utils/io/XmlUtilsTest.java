@@ -19,8 +19,8 @@
 
 package org.matsim.core.utils.io;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -28,25 +28,25 @@ import org.junit.Test;
 public class XmlUtilsTest {
 
 	@Test
-	public void testEncodeAttributeValue() {
-		Assert.assertEquals("hello world!", XmlUtils.encodeAttributeValue("hello world!"));
-		Assert.assertEquals("you &amp; me", XmlUtils.encodeAttributeValue("you & me"));
-		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeAttributeValue("you & me & her"));
-		Assert.assertEquals("tick &quot; tack", XmlUtils.encodeAttributeValue("tick \" tack"));
-		Assert.assertEquals("tick &quot; tack &quot; tock", XmlUtils.encodeAttributeValue("tick \" tack \" tock"));
-		Assert.assertEquals("this &amp; that &quot; these &amp; those", XmlUtils.encodeAttributeValue("this & that \" these & those"));
-		Assert.assertEquals("tick &lt; tack &gt; tock", XmlUtils.encodeAttributeValue("tick < tack > tock"));
+	void testEncodeAttributeValue() {
+		Assertions.assertEquals("hello world!", XmlUtils.encodeAttributeValue("hello world!"));
+		Assertions.assertEquals("you &amp; me", XmlUtils.encodeAttributeValue("you & me"));
+		Assertions.assertEquals("you &amp; me &amp; her", XmlUtils.encodeAttributeValue("you & me & her"));
+		Assertions.assertEquals("tick &quot; tack", XmlUtils.encodeAttributeValue("tick \" tack"));
+		Assertions.assertEquals("tick &quot; tack &quot; tock", XmlUtils.encodeAttributeValue("tick \" tack \" tock"));
+		Assertions.assertEquals("this &amp; that &quot; these &amp; those", XmlUtils.encodeAttributeValue("this & that \" these & those"));
+		Assertions.assertEquals("tick &lt; tack &gt; tock", XmlUtils.encodeAttributeValue("tick < tack > tock"));
 	}
 
 	@Test
-	public void testEncodedContent() {
-		Assert.assertEquals("hello world!", XmlUtils.encodeContent("hello world!"));
-		Assert.assertEquals("you &amp; me", XmlUtils.encodeContent("you & me"));
-		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeContent("you & me & her"));
-		Assert.assertEquals("tick \" tack", XmlUtils.encodeContent("tick \" tack"));
-		Assert.assertEquals("tick \" tack \" tock", XmlUtils.encodeContent("tick \" tack \" tock"));
-		Assert.assertEquals("this &amp; that \" these &amp; those", XmlUtils.encodeContent("this & that \" these & those"));
-		Assert.assertEquals("tick &lt; tack &gt; tock", XmlUtils.encodeContent("tick < tack > tock"));
+	void testEncodedContent() {
+		Assertions.assertEquals("hello world!", XmlUtils.encodeContent("hello world!"));
+		Assertions.assertEquals("you &amp; me", XmlUtils.encodeContent("you & me"));
+		Assertions.assertEquals("you &amp; me &amp; her", XmlUtils.encodeContent("you & me & her"));
+		Assertions.assertEquals("tick \" tack", XmlUtils.encodeContent("tick \" tack"));
+		Assertions.assertEquals("tick \" tack \" tock", XmlUtils.encodeContent("tick \" tack \" tock"));
+		Assertions.assertEquals("this &amp; that \" these &amp; those", XmlUtils.encodeContent("this & that \" these & those"));
+		Assertions.assertEquals("tick &lt; tack &gt; tock", XmlUtils.encodeContent("tick < tack > tock"));
 	}
 	
 }

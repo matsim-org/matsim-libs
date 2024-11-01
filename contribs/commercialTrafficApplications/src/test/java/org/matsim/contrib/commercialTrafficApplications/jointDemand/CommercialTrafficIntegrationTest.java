@@ -1,6 +1,6 @@
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -12,8 +12,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class CommercialTrafficIntegrationTest {
 
-    @Test
-    public void runCommercialTrafficIT() {
+	@Test
+	void runCommercialTrafficIT() {
         Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
         config.controller().setLastIteration(5);
         ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);

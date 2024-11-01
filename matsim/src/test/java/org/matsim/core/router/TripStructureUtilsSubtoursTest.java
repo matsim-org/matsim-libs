@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,10 +29,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -49,20 +47,8 @@ import org.matsim.facilities.ActivityFacility;
 /**
  * @author thibautd
  */
-@RunWith( Parameterized.class )
 public class TripStructureUtilsSubtoursTest {
 	private static final String STAGE = "stage_activity interaction";
-	private final boolean useFacilitiesAsAnchorPoint;
-
-	@Parameters
-	public static Collection<Object[]> contructorParameters() {
-		return Arrays.<Object[]>asList( new Boolean[]{true} , new Boolean[]{false} );
-	}
-
-	public TripStructureUtilsSubtoursTest(final boolean useFacilitiesAsAnchorPoint) {
-		this.useFacilitiesAsAnchorPoint = useFacilitiesAsAnchorPoint;
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// fixtures
 	// /////////////////////////////////////////////////////////////////////////
@@ -97,7 +83,7 @@ public class TripStructureUtilsSubtoursTest {
 
 		return act;
 	}
-	
+
 	private static Id<?> createId(long no, boolean anchorAtFacilities){
 		Id<?> id;
 		if (anchorAtFacilities){
@@ -107,7 +93,7 @@ public class TripStructureUtilsSubtoursTest {
 			id = Id.create(no, Link.class);
 
 		}
-		
+
 		return id;
 	}
 
@@ -267,7 +253,7 @@ public class TripStructureUtilsSubtoursTest {
 
 		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "aa" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act5 );
-	
+
 		final List<PlanElement> trip5 = new ArrayList<PlanElement>();
 		final Leg leg7 = fact.createLeg( "skateboard" );
 		plan.addLeg( leg7 );
@@ -748,68 +734,76 @@ public class TripStructureUtilsSubtoursTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
-	@Test
-	public void testOneSubtour() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testOneSubtour(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createMonoSubtourFixture( useFacilitiesAsAnchorPoint ) );
 	}
 
-	@Test
-	public void testTwoNestedSubtours() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTwoNestedSubtours(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createTwoNestedSubtours(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testTwoChildren() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTwoChildren(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createTwoChildren(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testComplexSubtours() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testComplexSubtours(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createComplexSubtours(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testOpenPlan() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testOpenPlan(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createOpenPlan(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testLoops() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testLoops(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createPlanWithLoops(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testTwoIndependentTours() {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTwoIndependentTours(boolean useFacilitiesAsAnchorPoint) {
 		performTest( createTwoIndependentTours(useFacilitiesAsAnchorPoint) );
 	}
 
-	@Test
-	public void testTripFromSomewhereElse() { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTripFromSomewhereElse(boolean useFacilitiesAsAnchorPoint) { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
 
-	@Test
-	public void testTripToSomewhereElse() { performTest( createSingleTourGoingToSomewhereElse(useFacilitiesAsAnchorPoint));}
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testTripToSomewhereElse(boolean useFacilitiesAsAnchorPoint) { performTest( createSingleTourGoingToSomewhereElse(useFacilitiesAsAnchorPoint));}
 
 	private static void performTest(final Fixture fixture) {
 		final Collection<Subtour> subtours =
 			TripStructureUtils.getSubtours( fixture.plan );
 
 		assertEquals(
-				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"unexpected number of subtours in "+subtours,
 				fixture.expectedSubtours.size(),
-				subtours.size() );
+				subtours.size(),
+				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
+				"unexpected number of subtours in "+subtours );
 
 		assertEquals(
-				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"uncompatible subtours",
-				// do not bother about iteration order,
-				// but ensure you get some information on failure
 				new HashSet<Subtour>( fixture.expectedSubtours ),
-				new HashSet<Subtour>( subtours ) );
+				new HashSet<Subtour>( subtours ),
+				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
+				"uncompatible subtours" );
 	}
 
-	@Test
-	public void testInconsistentPlan() throws Exception {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testInconsistentPlan(boolean useFacilitiesAsAnchorPoint) throws Exception {
 		final Fixture fixture = createInconsistentTrips( useFacilitiesAsAnchorPoint );
 		boolean hadException = false;
 		try {
@@ -820,13 +814,14 @@ public class TripStructureUtilsSubtoursTest {
 		}
 
 		assertTrue(
+				hadException,
 				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
-				"no exception was thrown!",
-				hadException);
+				"no exception was thrown!");
 	}
 
-	@Test
-	public void testGetTripsWithoutSubSubtours() throws Exception {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testGetTripsWithoutSubSubtours(boolean useFacilitiesAsAnchorPoint) throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
 			final int nTrips = TripStructureUtils.getTrips( f.plan ).size();
 			final Collection<Subtour> subtours =
@@ -838,32 +833,33 @@ public class TripStructureUtilsSubtoursTest {
 			}
 
 			assertEquals(
-					"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-					"unexpected total number of trips in subtours without subsubtours",
 					countTrips,
-					nTrips);
+					nTrips,
+					"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
+					"unexpected total number of trips in subtours without subsubtours");
 		}
 	}
 
-	@Test
-	public void testFatherhood() throws Exception {
+	@ParameterizedTest
+	@ValueSource(booleans = {true, false})
+	void testFatherhood(boolean useFacilitiesAsAnchorPoint) throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
 			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan );
 
 			for (Subtour s : subtours) {
 				for ( Subtour child : s.getChildren() ) {
 					assertEquals(
-							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-							"wrong father!",
 							child.getParent(),
-							s);
+							s,
+							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
+							"wrong father!");
 				}
 
 				if ( s.getParent() != null ) {
 					assertTrue(
+							s.getParent().getChildren().contains( s ),
 							"[anchorAtFacilities="+f.useFacilitiesAsAnchorPoint+"] "+
-							"father does not have subtour has a child",
-							s.getParent().getChildren().contains( s ));
+							"father does not have subtour has a child");
 				}
 			}
 		}

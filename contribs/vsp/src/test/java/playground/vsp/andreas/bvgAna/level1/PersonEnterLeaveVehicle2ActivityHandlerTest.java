@@ -3,7 +3,7 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -56,7 +56,7 @@ public class PersonEnterLeaveVehicle2ActivityHandlerTest {
 	    test.handleEvent(event6);
 	    test.handleEvent(event7);
 
-	    Assert.assertEquals(event0, test.getPersonEntersVehicleEvent2ActivityEndEvent().get(event1));
+	    Assertions.assertEquals(event0, test.getPersonEntersVehicleEvent2ActivityEndEvent().get(event1));
 
 	    System.out.println(test.getPersonEntersVehicleEvent2ActivityEndEvent().toString());
 

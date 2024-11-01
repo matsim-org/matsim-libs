@@ -44,6 +44,7 @@ import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
  */
 public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModule {
 	
+	private final static int GRIDSIZE = 500;
 	private final Scenario scenario;
 	
 	public ParkingProxyModule(Scenario scenario) {
@@ -60,57 +61,40 @@ public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModul
 				initialLoad, 
 				parkingConfig.getTimeBinSize(), 
 				qsimEndTime,
-				parkingConfig.getGridSize()
+				GRIDSIZE
 				);
-		PenaltyFunction penaltyFunction = new LinearPenaltyFunctionWithCap(parkingConfig.getGridSize(), parkingConfig.getDelayPerCar(), parkingConfig.getMaxDelay());
+		PenaltyFunction penaltyFunction = new LinearPenaltyFunctionWithCap(parkingConfig.getDelayPerCar(), parkingConfig.getMaxDelay());
 		//PenaltyFunction penaltyFunction = new ExponentialPenaltyFunctionWithCap(10, parkingConfig.getGridSize(), parkingConfig.getMaxDelay(), 360);
 		
-		switch(parkingConfig.getCalculationMethod()) {
-		case none:
+		ParkingVehiclesCountEventHandler parkingHandler = new ParkingVehiclesCountEventHandler(carCounter, scenario.getNetwork(), parkingConfig.getScenarioScaleFactor());
+		super.addEventHandlerBinding().toInstance(parkingHandler);
+		
+		CarEgressWalkObserver walkObserver;
+		switch (parkingConfig.getIter0Method()) {
+		case hourPenalty:
+			walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyHourCalculator());
 			break;
-		case events:
-			ParkingVehiclesCountEventHandler parkingHandler = new ParkingVehiclesCountEventHandler(carCounter, scenario.getNetwork(), parkingConfig.getScenarioScaleFactor());
-			super.addEventHandlerBinding().toInstance(parkingHandler);
-			
-			CarEgressWalkObserver walkObserver;
-			switch (parkingConfig.getIter0Method()) {
-			case hourPenalty:
-				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyHourCalculator());
-				break;
-			case noPenalty:
-				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
-				break;
-			case takeFromAttributes:
-				// CarEgressWalkChanger will handle this, we don't want to also change egress walks. Note that if it is observeOnly, the first iteration will put out zeros.
-				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
-				break;
-			case estimateFromPlans:
-				ParkingCounterByPlans plansCounter = new ParkingCounterByPlans(carCounter, parkingConfig.getScenarioScaleFactor());
-				plansCounter.calculateByPopulation(scenario.getPopulation(), scenario.getNetwork());
-				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, plansCounter.generatePenaltyCalculator());
-				break;
-			default:
-				throw new RuntimeException("Unknown iter0 mode");
-			}
-			if (parkingConfig.getObserveOnly()) {
-				super.addControlerListenerBinding().toInstance(walkObserver);
-			} else {
-				super.addControlerListenerBinding().toInstance(new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method()));
-			}
+		case noPenalty:
+			walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
 			break;
-		case plans:
-			throw new RuntimeException("Mode \"plans\" is not working yet. Use \"events\" instead.");
-			/*
-			ParkingCounterByPlans planCounter = new ParkingCounterByPlans(carCounter, parkingConfig.getScenarioScaleFactor());
-			super.addControlerListenerBinding().toInstance(planCounter);
-			if (parkingConfig.getObserveOnly()) {
-				super.addControlerListenerBinding().toInstance(new CarEgressWalkObserver(planCounter, penaltyFunction));
-			} else {
-				super.addControlerListenerBinding().toInstance(new CarEgressWalkChanger(planCounter, penaltyFunction));
-			}
-			break;*/
+		case takeFromAttributes:
+			// CarEgressWalkChanger will handle this, we don't want to also change egress walks. Note that if it is observeOnly, the first iteration will put out zeros.
+			walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
+			break;
+		case estimateFromPlans:
+			ParkingCounterByPlans plansCounter = new ParkingCounterByPlans(carCounter, parkingConfig.getScenarioScaleFactor());
+			plansCounter.calculateByPopulation(scenario.getPopulation(), scenario.getNetwork());
+			walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, plansCounter.generatePenaltyCalculator());
+			break;
 		default:
-			throw new RuntimeException("Unsupported calculation method " + parkingConfig.getCalculationMethod());	
+			throw new RuntimeException("Unknown iter0 mode");
+		}
+		if (parkingConfig.getObserveOnly()) {
+			super.addControlerListenerBinding().toInstance(walkObserver);
+		} else {
+			CarEgressWalkChanger walkChanger = new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method());
+			super.addControlerListenerBinding().toInstance(walkChanger);
+			super.addControlerListenerBinding().toInstance(walkChanger.getBackChanger());
 		}
 	}
 	

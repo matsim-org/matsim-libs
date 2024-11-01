@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +43,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public class TripRouterTest {
 	@Test
-	public void testTripInsertion() {
+	void testTripInsertion() {
 		Plan plan = PopulationUtils.createPlan();
 		PopulationUtils.createAndAddActivity(plan, "-4");
 		PopulationUtils.createAndAddLeg( plan, "-3" );
@@ -64,9 +64,9 @@ public class TripRouterTest {
 		TripRouter.insertTrip( plan , o , trip , d );
 
 		assertEquals(
-				"insertion did not produce the expected plan length!",
 				13,
-				plan.getPlanElements().size());
+				plan.getPlanElements().size(),
+				"insertion did not produce the expected plan length!");
 
 		int oldIndex = Integer.MIN_VALUE;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -80,14 +80,14 @@ public class TripRouterTest {
 			}
 
 			assertTrue(
-					"wrong inserted sequence: "+plan.getPlanElements(),
-					newIndex > oldIndex);
+					newIndex > oldIndex,
+					"wrong inserted sequence: "+plan.getPlanElements());
 			oldIndex = newIndex;
 		}
 	}
 
 	@Test
-	public void testTripInsertionIfActivitiesImplementEquals() {
+	void testTripInsertionIfActivitiesImplementEquals() {
 		Plan plan = PopulationUtils.createPlan();
 		plan.addActivity( new EqualsActivity( "-4" , Id.create( 1, Link.class ) ) );
 		PopulationUtils.createAndAddLeg( plan, "-3" );
@@ -110,9 +110,9 @@ public class TripRouterTest {
 		TripRouter.insertTrip( plan , o , trip , d );
 
 		assertEquals(
-				"insertion did not produce the expected plan length!",
 				13,
-				plan.getPlanElements().size());
+				plan.getPlanElements().size(),
+				"insertion did not produce the expected plan length!");
 
 		int oldIndex = Integer.MIN_VALUE;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -126,14 +126,14 @@ public class TripRouterTest {
 			}
 
 			assertTrue(
-					"wrong inserted sequence: "+plan.getPlanElements(),
-					newIndex > oldIndex);
+					newIndex > oldIndex,
+					"wrong inserted sequence: "+plan.getPlanElements());
 			oldIndex = newIndex;
 		}
 	}
 
 	@Test
-	public void testReturnedOldTrip() throws Exception {
+	void testReturnedOldTrip() throws Exception {
 		List<PlanElement> expected = new ArrayList<PlanElement>();
 
 		Plan plan = PopulationUtils.createPlan();
@@ -159,9 +159,9 @@ public class TripRouterTest {
 		trip.add( PopulationUtils.createLeg("4") );
 
 		assertEquals(
-				"wrong old trip",
 				expected,
-				TripRouter.insertTrip( plan , o , trip , d ) );
+				TripRouter.insertTrip( plan , o , trip , d ),
+				"wrong old trip" );
 	}
 
 	private static class EqualsActivity implements Activity {

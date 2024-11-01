@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
@@ -49,12 +49,12 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubsidyTestIT implements TabularFileHandler {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 
 	@Test
-	public final void testSubsidyPControler() {
+	final void testSubsidyPControler() {
 
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 
@@ -91,7 +91,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 
 		for (String filename : filesToCheckFor) {
 			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+			Assertions.assertEquals(true, f.exists() && !f.isDirectory(), filename + " does not exist");
 		}
 
 		// Check pStats
@@ -105,8 +105,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		// Check final iteration
 		String actual = this.pStatsResults.get(2)[9];
 		// flaky (non-deterministic) test... allow multiple results
-		Assert.assertTrue("Number of budget (final iteration)",
-			List.of("174413625.6239444000", "174413625.7708889500", "174413625.7022777500").contains(actual));
+		Assertions.assertEquals(174413625.6, Double.parseDouble(actual), 1, "Number of budget (final iteration)");
 	}
 
 	@Override

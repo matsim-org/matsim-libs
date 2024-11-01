@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,7 +38,6 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
@@ -49,14 +49,12 @@ import org.matsim.core.utils.charts.StackedBarChart;
 public class PKMbyModeCalculator {
 
     private final Map<Integer,Map<String,Double>> pmtPerIteration = new TreeMap<>();
-    private final boolean writePng;
     private final OutputDirectoryHierarchy controllerIO;
 		private final String delimiter;
     private final static String FILENAME = "pkm_modestats";
 
     @Inject
-    PKMbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
-        writePng = controllerConfigGroup.isCreateGraphs();
+    PKMbyModeCalculator(OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
         this.controllerIO = controllerIO;
         this.delimiter = globalConfig.getDefaultDelimiter();
     }
@@ -72,61 +70,75 @@ public class PKMbyModeCalculator {
                     if (Double.isNaN(dist)) {dist = 0.0; }
                     return new AbstractMap.SimpleEntry<>(leg.getMode(),dist);
                 })
-                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue(),(a,b)->a+b));
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue, Double::sum));
         pmtPerIteration.put(iteration,pmtbyMode);
     }
 
-
-    void writeOutput() {
-        writeVKTText();
-
+    void writeOutput(boolean writePng) {
+        writeCsv();
+		if (writePng){
+			new Thread(this::writePng).start();
+		}
     }
 
-    private void writeVKTText() {
-        TreeSet<String> allModes = new TreeSet<>();
-        allModes.addAll(this.pmtPerIteration.values()
-                .stream()
-                .flatMap(i->i.keySet().stream())
-                .collect(Collectors.toSet()));
+    private void writeCsv() {
+		TreeSet<String> allModes = getAllModes();
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename( FILENAME+ ".csv"))), CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)))) {
-            csvPrinter.print("Iteration");
-            csvPrinter.printRecord(allModes);
-
-            for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
-                csvPrinter.print(e.getKey());
-                for (String mode : allModes){
-                    csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
-                }
-                csvPrinter.println();
-            }
-
-
+		try {
+			BufferedWriter writer = Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename(FILENAME + ".csv")));
+			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.Builder.create().setDelimiter((this.delimiter.charAt(0))).build());
+            writeHeader(csvPrinter, allModes);
+			writeValues(csvPrinter, allModes);
+			csvPrinter.close();
         } catch (IOException e) {
             LogManager.getLogger(getClass()).error("Could not write PKM Modestats.");
         }
-        if (writePng){
-            String[] categories = new String[pmtPerIteration.size()];
-            int i = 0;
-            for (Integer it : pmtPerIteration.keySet()){
-                categories[i++] = it.toString();
-            }
-
-            StackedBarChart chart = new StackedBarChart("Passenger kilometers traveled per Mode","Iteration","pkm",categories);
-            //rotate x-axis by 90degrees
-            chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-
-            for (String mode : allModes){
-                double[] value =  pmtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,0.0)/1000.0)
-                        .toArray();
-                chart.addSeries(mode, value);
-            }
-            chart.addMatsimLogo();
-            chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
-
-        }
-
     }
+
+	private void writeHeader(CSVPrinter csvPrinter, TreeSet<String> allModes) throws IOException {
+		csvPrinter.print("Iteration");
+		csvPrinter.printRecord(allModes);
+	}
+
+	private void writeValues(CSVPrinter csvPrinter, TreeSet<String> allModes) throws IOException {
+		for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
+			csvPrinter.print(e.getKey());
+			for (String mode : allModes){
+				csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
+			}
+			csvPrinter.println();
+		}
+	}
+
+	private void writePng() {
+		String[] categories = new String[pmtPerIteration.size()];
+		int i = 0;
+		for (Integer it : pmtPerIteration.keySet()){
+			categories[i++] = it.toString();
+		}
+
+		StackedBarChart chart = new StackedBarChart("Passenger kilometers traveled per Mode","Iteration","pkm",categories);
+		//rotate x-axis by 90degrees
+		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
+		for (String mode : getAllModes()){
+			double[] value =  pmtPerIteration.values().stream()
+					.mapToDouble(k->k.getOrDefault(mode,0.0)/1000.0)
+					.toArray();
+			chart.addSeries(mode, value);
+		}
+		chart.addMatsimLogo();
+
+		synchronized (controllerIO) {
+			chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
+		}
+	}
+
+	private TreeSet<String> getAllModes() {
+		return this.pmtPerIteration.values()
+                                   .stream()
+                                   .flatMap(i -> i.keySet().stream())
+                                   .collect(Collectors.toCollection(TreeSet::new));
+	}
 }
 

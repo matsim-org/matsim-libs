@@ -27,10 +27,10 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -74,11 +74,11 @@ public class AccessibilityIntegrationTest {
 
 	private static final Logger LOG = LogManager.getLogger(AccessibilityIntegrationTest.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testRunAccessibilityExample() {
+	void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
 
 		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -101,15 +101,15 @@ public class AccessibilityIntegrationTest {
 
 	            	if (x == 50) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
+	            			Assertions.assertEquals(2.1486094237531126, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1766435716006005, value, utils.EPSILON);
+	            			Assertions.assertEquals(2.1766435716006005, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
 	            		}
 	            	} else if (x == 150) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
+	            			Assertions.assertEquals(2.1486094237531126, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.2055702759681273, value, utils.EPSILON);
+	            			Assertions.assertEquals(2.2055702759681273, value, utils.EPSILON, "Wrong work accessibility value at x=" + x + ", y=" + y + ":");
 	            		}
 	            	}
             	}
@@ -119,7 +119,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBoxConfigFile() {
+	void testWithBoundingBoxConfigFile() {
 		Config config = ConfigUtils.loadConfig(utils.getInputDirectory() + "config.xml");
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
@@ -159,7 +159,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBox() {
+	void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
@@ -197,7 +197,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithBoundingBoxUsingOpportunityWeights() {
+	void testWithBoundingBoxUsingOpportunityWeights() {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
@@ -237,7 +237,7 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithExtentDeterminedByNetwork() {
+	void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
 
 		config.routing().setRoutingRandomness(0.);
@@ -264,14 +264,14 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithExtentDeterminedShapeFile() {
+	void testWithExtentDeterminedShapeFile() {
 		Config config = createTestConfig() ;
 
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
 			LOG.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
-			Assert.assertTrue(f.exists());
+			Assertions.assertTrue(f.exists());
 		}
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -304,14 +304,14 @@ public class AccessibilityIntegrationTest {
 
 
 	@Test
-	public void testWithPredefinedMeasuringPoints() {
+	void testWithPredefinedMeasuringPoints() {
 		Config config = createTestConfig() ;
 
 		File f = new File(this.utils.getInputDirectory() + "measuringPoints.xml");
 
 		if(!f.exists()){
 			LOG.error("Facilities file with measuring points not found! testWithMeasuringPointsInFacilitiesFile could not be performed...");
-			Assert.assertTrue(f.exists());
+			Assertions.assertTrue(f.exists());
 		}
 
 		Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -350,16 +350,16 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testWithFile(){
+	void testWithFile(){
 		/*TODO Complete - JWJ, Dec'16 */
 		Config config = createTestConfig();
 
 		File f = new File(this.utils.getInputDirectory() + "pointFile.csv");
 		if(!f.exists()){
 			LOG.error("Point file not found! testWithFile could not be tested...");
-			Assert.assertTrue(f.exists());
+			Assertions.assertTrue(f.exists());
 		}
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -598,12 +598,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) { // commented values are before (a) Marcel's change of the QuadTree in Oct'18, (b) change in TravelTimeCalculator in Apr'21
-									case "freespeed": Assert.assertEquals(2.207441799716032, value, MatsimTestUtils.EPSILON); break; // (a) 2.1486094237531126
-									case TransportMode.car: Assert.assertEquals(2.2058369602991204, value, MatsimTestUtils.EPSILON); break; // (a) 2.1482840466191093  (b) 2.205836861444427
-									case TransportMode.bike: Assert.assertEquals(2.2645288908389554, value, MatsimTestUtils.EPSILON); break; // (a) 2.2257398663221
-									case TransportMode.walk: Assert.assertEquals(1.8697283849051263, value, MatsimTestUtils.EPSILON); break; // (a) 1.70054725728361
-									case TransportMode.pt: Assert.assertEquals(2.1581641260040683, value, MatsimTestUtils.EPSILON); break;
-									case "matrixBasedPt": Assert.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
+									case "freespeed": Assertions.assertEquals(2.207441799716032, value, MatsimTestUtils.EPSILON); break; // (a) 2.1486094237531126
+									case TransportMode.car: Assertions.assertEquals(2.2058369602991204, value, MatsimTestUtils.EPSILON); break; // (a) 2.1482840466191093  (b) 2.205836861444427
+									case TransportMode.bike: Assertions.assertEquals(2.2645288908389554, value, MatsimTestUtils.EPSILON); break; // (a) 2.2257398663221
+									case TransportMode.walk: Assertions.assertEquals(1.8697283849051263, value, MatsimTestUtils.EPSILON); break; // (a) 1.70054725728361
+									case TransportMode.pt: Assertions.assertEquals(2.1581641260040683, value, MatsimTestUtils.EPSILON); break;
+									case "matrixBasedPt": Assertions.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
 								}
 							}
 						}
@@ -611,12 +611,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(2.207441799716032, value, MatsimTestUtils.EPSILON); break; // (a) 2.1766435716006005
-									case TransportMode.car: Assert.assertEquals(2.207441960299121, value, MatsimTestUtils.EPSILON); break; // (a) 2.176238564675181  (b) 2.207441799716032
-									case TransportMode.bike: Assert.assertEquals(2.2645288908389554, value, MatsimTestUtils.EPSILON); break; // (a) 2.2445468698643367
-									case TransportMode.walk: Assert.assertEquals(1.8697283849051263, value, MatsimTestUtils.EPSILON); break; // (a) 1.7719146868026079
-									case TransportMode.pt: Assert.assertEquals(2.1581641260040683, value, MatsimTestUtils.EPSILON); break; // (a) 2.057596373646452
-									case "matrixBasedPt": Assert.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
+									case "freespeed": Assertions.assertEquals(2.207441799716032, value, MatsimTestUtils.EPSILON); break; // (a) 2.1766435716006005
+									case TransportMode.car: Assertions.assertEquals(2.207441960299121, value, MatsimTestUtils.EPSILON); break; // (a) 2.176238564675181  (b) 2.207441799716032
+									case TransportMode.bike: Assertions.assertEquals(2.2645288908389554, value, MatsimTestUtils.EPSILON); break; // (a) 2.2445468698643367
+									case TransportMode.walk: Assertions.assertEquals(1.8697283849051263, value, MatsimTestUtils.EPSILON); break; // (a) 1.7719146868026079
+									case TransportMode.pt: Assertions.assertEquals(2.1581641260040683, value, MatsimTestUtils.EPSILON); break; // (a) 2.057596373646452
+									case "matrixBasedPt": Assertions.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
 								}
 							}
 						}
@@ -626,12 +626,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(2.235503385314382, value, MatsimTestUtils.EPSILON); break; // (a) 2.1486094237531126
-									case TransportMode.car: Assert.assertEquals(2.23550352057971, value, MatsimTestUtils.EPSILON); break; // (a) 2.1482840466191093  (b) 2.235503385314382
-									case TransportMode.bike: Assert.assertEquals(2.2833435568892395, value, MatsimTestUtils.EPSILON); break; // (a) 2.2257398663221
-									case TransportMode.walk: Assert.assertEquals(1.9418539664691532, value, MatsimTestUtils.EPSILON); break; // (a) 1.70054725728361
-									case TransportMode.pt: Assert.assertEquals(2.0032465393091434, value, MatsimTestUtils.EPSILON); break;
-									case "matrixBasedPt": Assert.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
+									case "freespeed": Assertions.assertEquals(2.235503385314382, value, MatsimTestUtils.EPSILON); break; // (a) 2.1486094237531126
+									case TransportMode.car: Assertions.assertEquals(2.23550352057971, value, MatsimTestUtils.EPSILON); break; // (a) 2.1482840466191093  (b) 2.235503385314382
+									case TransportMode.bike: Assertions.assertEquals(2.2833435568892395, value, MatsimTestUtils.EPSILON); break; // (a) 2.2257398663221
+									case TransportMode.walk: Assertions.assertEquals(1.9418539664691532, value, MatsimTestUtils.EPSILON); break; // (a) 1.70054725728361
+									case TransportMode.pt: Assertions.assertEquals(2.0032465393091434, value, MatsimTestUtils.EPSILON); break;
+									case "matrixBasedPt": Assertions.assertEquals(1.6542905235735796, value, MatsimTestUtils.EPSILON); break; // (a) 0.461863556339195
 								}
 							}
 						}
@@ -639,12 +639,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(2.235503385314382, value, MatsimTestUtils.EPSILON); break; // (a) 2.2055702759681273
-									case TransportMode.car: Assert.assertEquals(2.23550352057971, value, MatsimTestUtils.EPSILON); break; // (a) 2.2052225231109226  (b) 2.235503385314382
-									case TransportMode.bike: Assert.assertEquals(2.2833435568892395, value, MatsimTestUtils.EPSILON); break; // (a) 2.2637376515333636
-									case TransportMode.walk: Assert.assertEquals(1.9418539664691532, value, MatsimTestUtils.EPSILON); break; // (a) 1.851165291193725
-									case TransportMode.pt: Assert.assertEquals(2.0032465393091434, value, MatsimTestUtils.EPSILON); break; // (a) 1.9202710265495115
-									case "matrixBasedPt": Assert.assertEquals(1.5073890466447624, value, MatsimTestUtils.EPSILON); break; // (a) 0.624928280738513
+									case "freespeed": Assertions.assertEquals(2.235503385314382, value, MatsimTestUtils.EPSILON); break; // (a) 2.2055702759681273
+									case TransportMode.car: Assertions.assertEquals(2.23550352057971, value, MatsimTestUtils.EPSILON); break; // (a) 2.2052225231109226  (b) 2.235503385314382
+									case TransportMode.bike: Assertions.assertEquals(2.2833435568892395, value, MatsimTestUtils.EPSILON); break; // (a) 2.2637376515333636
+									case TransportMode.walk: Assertions.assertEquals(1.9418539664691532, value, MatsimTestUtils.EPSILON); break; // (a) 1.851165291193725
+									case TransportMode.pt: Assertions.assertEquals(2.0032465393091434, value, MatsimTestUtils.EPSILON); break; // (a) 1.9202710265495115
+									case "matrixBasedPt": Assertions.assertEquals(1.5073890466447624, value, MatsimTestUtils.EPSILON); break; // (a) 0.624928280738513
 								}
 							}
 						}
@@ -656,12 +656,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(3.5937361608359226, value, MatsimTestUtils.EPSILON); break; // (a) 3.534903784873003
-									case TransportMode.car: Assert.assertEquals(3.592131321419011, value, MatsimTestUtils.EPSILON); break; // (a) 3.534578407739  (b) 3.592131222564318
-									case TransportMode.bike: Assert.assertEquals(3.650823251958846, value, MatsimTestUtils.EPSILON); break; // (a) 3.6120342274419914
-									case TransportMode.walk: Assert.assertEquals(3.256022746025017, value, MatsimTestUtils.EPSILON); break; // (a) 3.086841618403501
-									case TransportMode.pt: Assert.assertEquals(3.5444584871239586, value, MatsimTestUtils.EPSILON); break;
-									case "matrixBasedPt": Assert.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
+									case "freespeed": Assertions.assertEquals(3.5937361608359226, value, MatsimTestUtils.EPSILON); break; // (a) 3.534903784873003
+									case TransportMode.car: Assertions.assertEquals(3.592131321419011, value, MatsimTestUtils.EPSILON); break; // (a) 3.534578407739  (b) 3.592131222564318
+									case TransportMode.bike: Assertions.assertEquals(3.650823251958846, value, MatsimTestUtils.EPSILON); break; // (a) 3.6120342274419914
+									case TransportMode.walk: Assertions.assertEquals(3.256022746025017, value, MatsimTestUtils.EPSILON); break; // (a) 3.086841618403501
+									case TransportMode.pt: Assertions.assertEquals(3.5444584871239586, value, MatsimTestUtils.EPSILON); break;
+									case "matrixBasedPt": Assertions.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
 								}
 							}
 						}
@@ -669,12 +669,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(3.5937361608359226, value, MatsimTestUtils.EPSILON); break; // (a) 3.562937932720491
-									case TransportMode.car: Assert.assertEquals(3.5937363214190112, value, MatsimTestUtils.EPSILON); break; // (a) 3.5625329257950717  (b) 3.5937361608359226
-									case TransportMode.bike: Assert.assertEquals(3.650823251958846, value, MatsimTestUtils.EPSILON); break; // (a) 3.6308412309842275
-									case TransportMode.walk: Assert.assertEquals(3.256022746025017, value, MatsimTestUtils.EPSILON); break; // (a) 3.1582090479224982
-									case TransportMode.pt: Assert.assertEquals(3.5444584871239586, value, MatsimTestUtils.EPSILON); break; // (a) 3.443890734766343
-									case "matrixBasedPt": Assert.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
+									case "freespeed": Assertions.assertEquals(3.5937361608359226, value, MatsimTestUtils.EPSILON); break; // (a) 3.562937932720491
+									case TransportMode.car: Assertions.assertEquals(3.5937363214190112, value, MatsimTestUtils.EPSILON); break; // (a) 3.5625329257950717  (b) 3.5937361608359226
+									case TransportMode.bike: Assertions.assertEquals(3.650823251958846, value, MatsimTestUtils.EPSILON); break; // (a) 3.6308412309842275
+									case TransportMode.walk: Assertions.assertEquals(3.256022746025017, value, MatsimTestUtils.EPSILON); break; // (a) 3.1582090479224982
+									case TransportMode.pt: Assertions.assertEquals(3.5444584871239586, value, MatsimTestUtils.EPSILON); break; // (a) 3.443890734766343
+									case "matrixBasedPt": Assertions.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
 								}
 							}
 						}
@@ -684,12 +684,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(3.621797746434273, value, MatsimTestUtils.EPSILON); break; // (a) 3.534903784873003
-									case TransportMode.car: Assert.assertEquals(3.621797881699601, value, MatsimTestUtils.EPSILON); break; // (a) 3.534578407739  (b) 3.621797746434273
-									case TransportMode.bike: Assert.assertEquals(3.66963791800913, value, MatsimTestUtils.EPSILON); break; // (a) 3.6120342274419914
-									case TransportMode.walk: Assert.assertEquals(3.328148327589044, value, MatsimTestUtils.EPSILON); break; // (a) 3.086841618403501
-									case TransportMode.pt: Assert.assertEquals(3.389540900429034, value, MatsimTestUtils.EPSILON); break;
-									case "matrixBasedPt": Assert.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
+									case "freespeed": Assertions.assertEquals(3.621797746434273, value, MatsimTestUtils.EPSILON); break; // (a) 3.534903784873003
+									case TransportMode.car: Assertions.assertEquals(3.621797881699601, value, MatsimTestUtils.EPSILON); break; // (a) 3.534578407739  (b) 3.621797746434273
+									case TransportMode.bike: Assertions.assertEquals(3.66963791800913, value, MatsimTestUtils.EPSILON); break; // (a) 3.6120342274419914
+									case TransportMode.walk: Assertions.assertEquals(3.328148327589044, value, MatsimTestUtils.EPSILON); break; // (a) 3.086841618403501
+									case TransportMode.pt: Assertions.assertEquals(3.389540900429034, value, MatsimTestUtils.EPSILON); break;
+									case "matrixBasedPt": Assertions.assertEquals(3.0405848846934704, value, MatsimTestUtils.EPSILON); break; // (a) 1.8481579174590859
 								}
 							}
 						}
@@ -697,12 +697,12 @@ public class AccessibilityIntegrationTest {
 							for (String mode : accessibilitiesMap.get(tuple).keySet()) {
 								double value = accessibilitiesMap.get(tuple).get(mode);
 								switch (mode) {
-									case "freespeed": Assert.assertEquals(3.621797746434273, value, MatsimTestUtils.EPSILON); break; // (a) 3.5918646370880176
-									case TransportMode.car: Assert.assertEquals(3.621797881699601, value, MatsimTestUtils.EPSILON); break; // (a) 3.591516884230813  (b) 3.621797746434273
-									case TransportMode.bike: Assert.assertEquals(3.66963791800913, value, MatsimTestUtils.EPSILON); break; // (a) 3.6500320126532544
-									case TransportMode.walk: Assert.assertEquals(3.328148327589044, value, MatsimTestUtils.EPSILON); break; // (a) 3.2374596523136154
-									case TransportMode.pt: Assert.assertEquals(3.389540900429034, value, MatsimTestUtils.EPSILON); break; // (a) 3.3065653876694023
-									case "matrixBasedPt": Assert.assertEquals(2.893683407764653, value, MatsimTestUtils.EPSILON); break; // (a) 2.0112226418584043
+									case "freespeed": Assertions.assertEquals(3.621797746434273, value, MatsimTestUtils.EPSILON); break; // (a) 3.5918646370880176
+									case TransportMode.car: Assertions.assertEquals(3.621797881699601, value, MatsimTestUtils.EPSILON); break; // (a) 3.591516884230813  (b) 3.621797746434273
+									case TransportMode.bike: Assertions.assertEquals(3.66963791800913, value, MatsimTestUtils.EPSILON); break; // (a) 3.6500320126532544
+									case TransportMode.walk: Assertions.assertEquals(3.328148327589044, value, MatsimTestUtils.EPSILON); break; // (a) 3.2374596523136154
+									case TransportMode.pt: Assertions.assertEquals(3.389540900429034, value, MatsimTestUtils.EPSILON); break; // (a) 3.3065653876694023
+									case "matrixBasedPt": Assertions.assertEquals(2.893683407764653, value, MatsimTestUtils.EPSILON); break; // (a) 2.0112226418584043
 								}
 							}
 						}

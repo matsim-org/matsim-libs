@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -29,7 +29,7 @@ import java.util.LinkedList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mrieser
@@ -38,7 +38,8 @@ public class PseudoRemovePriorityQueueTest {
 
 	private static final Logger log = LogManager.getLogger(PseudoRemovePriorityQueueTest.class);
 
-	@Test public void testAdd() {
+	@Test
+	void testAdd() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		assertEquals(0, pq.size());
 		pq.add(Integer.valueOf(1), 1.0);
@@ -52,7 +53,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertEquals(3, iteratorElementCount(pq.iterator()));
 	}
 
-	@Test public void testAdd_Null() {
+	@Test
+	void testAdd_Null() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		try {
 			pq.add(null, 1.0);
@@ -65,7 +67,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertEquals(0, iteratorElementCount(pq.iterator()));
 	}
 
-	@Test public void testPoll() {
+	@Test
+	void testPoll() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -86,7 +89,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNull(pq.poll());
 	}
 
-	@Test public void testIterator() {
+	@Test
+	void testIterator() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -99,7 +103,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertFalse(coll.contains(Integer.valueOf(4)));
 	}
 
-	@Test public void testIterator_ConcurrentModification_add() {
+	@Test
+	void testIterator_ConcurrentModification_add() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -122,7 +127,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNotNull(iter.next());
 	}
 
-	@Test public void testIterator_ConcurrentModification_poll() {
+	@Test
+	void testIterator_ConcurrentModification_poll() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -145,7 +151,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNotNull(iter.next());
 	}
 
-	@Test public void testIterator_ConcurrentModification_remove() {
+	@Test
+	void testIterator_ConcurrentModification_remove() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -171,7 +178,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNotNull(iter.next());
 	}
 
-	@Test public void testIterator_RemoveUnsupported() {
+	@Test
+	void testIterator_RemoveUnsupported() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -188,7 +196,8 @@ public class PseudoRemovePriorityQueueTest {
 		}
 	}
 
-	@Test public void testRemove() {
+	@Test
+	void testRemove() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -230,7 +239,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNull(pq.poll());
 	}
 
-	@Test public void testRemoveAndAdd_LowerPriority() {
+	@Test
+	void testRemoveAndAdd_LowerPriority() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -249,7 +259,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNull(pq.poll());
 	}
 
-	@Test public void testRemoveAndAdd_HigherPriority() {
+	@Test
+	void testRemoveAndAdd_HigherPriority() {
 		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 		pq.add(Integer.valueOf(5), 5.0);
 		pq.add(Integer.valueOf(3), 3.0);
@@ -268,7 +279,8 @@ public class PseudoRemovePriorityQueueTest {
 		assertNull(pq.poll());
 	}
 
-	@Test public void testDecreaseKey() {
+	@Test
+	void testDecreaseKey() {
 //		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
 //		pq.add(Integer.valueOf(5), 5.0);
 //		pq.add(Integer.valueOf(3), 3.0);
