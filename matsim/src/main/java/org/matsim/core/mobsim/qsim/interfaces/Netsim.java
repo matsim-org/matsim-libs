@@ -19,8 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
@@ -29,9 +32,16 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 
 import java.util.Collection;
 
+/**
+ * Interface that combines the most important interfaces of the QSim.
+ */
 public interface Netsim extends ObservableMobsim, ActivityEndRescheduler, VisMobsim {
 
 	NetsimNetwork getNetsimNetwork();
+
+	void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId);
+
+	void insertAgentIntoMobsim(MobsimAgent agent);
 
 	EventsManager getEventsManager();
 

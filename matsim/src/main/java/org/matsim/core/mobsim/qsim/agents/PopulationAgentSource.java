@@ -29,7 +29,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -49,13 +49,13 @@ public final class PopulationAgentSource implements AgentSource {
 	private final Population population;
 	private final AgentFactory agentFactory;
 	private final QVehicleFactory qVehicleFactory;
-	private final QSim qsim;
+	private final Netsim qsim;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
     private int warnCnt = 0;
 
 	@Inject
-	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, QSim qsim ) {
+	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim ) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qVehicleFactory = qVehicleFactory;
@@ -198,7 +198,7 @@ public final class PopulationAgentSource implements AgentSource {
 		if (initialLinkId != null) {
 			return initialLinkId;
 		}
-		
+
 		/* Cases that come to mind:
 		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.
 		 *      This is treated by the following algo.

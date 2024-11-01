@@ -91,7 +91,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim implements VisMobsim, Netsim {
+public final class QSim implements Netsim {
 
 	final private static Logger log = LogManager.getLogger(QSim.class);
 
@@ -312,6 +312,7 @@ public final class QSim implements VisMobsim, Netsim {
 //	}
 
 	private static int wrnCnt2 = 0;
+	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (this.netEngine != null) {
 			this.netEngine.addParkedVehicle(veh, startLinkId);
@@ -437,6 +438,7 @@ public final class QSim implements VisMobsim, Netsim {
 		return doContinue;
 	}
 
+	@Override
 	public void insertAgentIntoMobsim(final MobsimAgent agent) {
 		if (this.agents.containsKey(agent.getId())) {
 			throw new RuntimeException("Agent with same Id (" + agent.getId().toString() + ") already in mobsim; aborting ... ") ;
