@@ -41,9 +41,8 @@ public final class NewControlerModule extends AbstractModule {
 		bind(MatsimServices.class).to(MatsimServicesImpl.class);
 
 		// Always bind topology, which will be single machine by default
-		Node node = Node.builder().rank(0).build();
-		bind(Node.class).toInstance(node);
-		bind(Topology.class).toInstance(Topology.builder().nodes(List.of(node)).build());
+		bind(Node.class).toInstance(Node.SINGLE_INSTANCE);
+		bind(Topology.class).toInstance(Topology.builder().nodes(List.of(Node.SINGLE_INSTANCE)).build());
 
 		bind(IterationCounter.class).to(MatsimServicesImpl.class);
 		// (I don't want to always inject the whole MatsimServices just to get the iteration number.  If

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.messages.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -112,6 +113,7 @@ public class IterationTravelStatsControlerListenerTest {
 				install(new TripRouterModule());
 				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
+				bind(Node.class).toInstance(Node.SINGLE_INSTANCE);
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
 				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
 				bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);

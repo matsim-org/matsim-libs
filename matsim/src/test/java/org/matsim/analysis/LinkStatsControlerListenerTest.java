@@ -95,6 +95,7 @@ public class LinkStatsControlerListenerTest {
 				install(new EventsManagerModule());
 				install(new ScenarioByInstanceModule(scenario));
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
+				bind(org.matsim.api.core.v01.messages.Node.class).toInstance(org.matsim.api.core.v01.messages.Node.SINGLE_INSTANCE);
 				bind(IterationStopWatch.class).asEagerSingleton();
 			}
 		});

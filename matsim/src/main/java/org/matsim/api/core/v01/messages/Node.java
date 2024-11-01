@@ -9,6 +9,11 @@ import org.matsim.api.core.v01.Topology;
  */
 public class Node implements Message {
 
+	/**
+	 * A instance of a node that is used for single instance simulations.
+	 */
+	public static final Node SINGLE_INSTANCE = Node.builder().parts(IntList.of()).rank(0).cores(1).hostname("localhost").build();
+
 	private final int rank;
 	private final int cores;
 	private final boolean distributed;
