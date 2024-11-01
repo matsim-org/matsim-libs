@@ -20,6 +20,8 @@ public class SimNetwork {
 
     private final Map<Id<Link>, SimLink> links;
     private final Map<Id<Node>, SimNode> nodes;
+	@Getter
+	private final int part;
 
     SimNetwork(Network network, Config config, SimLink.OnLeaveQueue vehicleEndsRouteHandler, int part) {
 
@@ -40,6 +42,7 @@ public class SimNetwork {
         nodes = localNodes.values().stream()
                 .map(node -> Tuple.of(node.getId(), SimNode.create(node, links)))
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+		this.part = part;
     }
 
     private static boolean isOnPartition(Attributable element, int part) {
