@@ -20,7 +20,7 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.messages.Empty;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
@@ -133,7 +133,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
         this.addresses = new int[topology.getTotalPartitions()];
         for (int i = 0; i < topology.getNodesCount(); i++) {
-            Node n = topology.getNode(i);
+            SimulationNode n = topology.getNode(i);
             for (int p : n.getParts()) {
                 addresses[p] = n.getRank();
             }
@@ -255,7 +255,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
      */
     public void addNullMessage(int partition) {
         // This is inefficient, but should be a small loop
-        for (Node node : topology) {
+        for (SimulationNode node : topology) {
             if (node.getParts().contains(partition)) {
                 sendNullMsgs.add(node.getRank());
             }

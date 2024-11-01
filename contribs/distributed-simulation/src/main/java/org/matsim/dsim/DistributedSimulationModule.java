@@ -7,7 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LPProvider;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
@@ -25,7 +25,6 @@ import org.matsim.dsim.simulation.TimeInterpretation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -71,10 +70,10 @@ public class DistributedSimulationModule extends AbstractModule {
     @Override
     public void install() {
 
-        Node node = topology.getNode(comm.getRank());
+        SimulationNode node = topology.getNode(comm.getRank());
 
         bind(Communicator.class).toInstance(comm);
-        bind(Node.class).toInstance(node);
+        bind(SimulationNode.class).toInstance(node);
         bind(Topology.class).toInstance(topology);
         bind(MessageBroker.class).in(Singleton.class);
         bind(DSim.class).in(Singleton.class);
@@ -108,23 +107,23 @@ public class DistributedSimulationModule extends AbstractModule {
 
     private Topology createTopology(SerializationProvider serializer) {
 
-        Node node = Node.builder()
+        SimulationNode node = SimulationNode.builder()
                 .cores(threads)
                 .rank(comm.getRank())
                 .build();
 
         // Receive node information from all ranks
-        List<Node> nodes = comm.allGather(node, 0, serializer);
-        nodes.sort(Comparator.comparingInt(Node::getRank));
+        List<SimulationNode> nodes = comm.allGather(node, 0, serializer);
+        nodes.sort(Comparator.comparingInt(SimulationNode::getRank));
 
         Topology.TopologyBuilder topology = Topology.builder();
-        List<Node> topoNodes = new ArrayList<>();
+        List<SimulationNode> topoNodes = new ArrayList<>();
 
 
         int total = 0;
-        for (Node value : nodes) {
+        for (SimulationNode value : nodes) {
 
-            Node.NodeBuilder n = value.toBuilder();
+            SimulationNode.NodeBuilder n = value.toBuilder();
             int parts = (int) (value.getCores() * oversubscribe);
 
             n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));

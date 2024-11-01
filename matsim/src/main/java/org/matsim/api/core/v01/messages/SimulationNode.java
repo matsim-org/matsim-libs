@@ -7,12 +7,12 @@ import org.matsim.api.core.v01.Topology;
 /**
  * Information about one computing node within a {@link Topology}.
  */
-public class Node implements Message {
+public class SimulationNode implements Message {
 
 	/**
 	 * A instance of a node that is used for single instance simulations.
 	 */
-	public static final Node SINGLE_INSTANCE = Node.builder().parts(IntList.of()).rank(0).cores(1).hostname("localhost").build();
+	public static final SimulationNode SINGLE_INSTANCE = SimulationNode.builder().parts(IntList.of()).rank(0).cores(1).hostname("localhost").build();
 
 	private final int rank;
 	private final int cores;
@@ -20,7 +20,7 @@ public class Node implements Message {
 	private final IntList parts;
 	private final String hostname;
 
-	Node(NodeBuilder builder) {
+	SimulationNode(NodeBuilder builder) {
 		this.rank = builder.rank;
 		this.cores = builder.cores;
 		this.parts = builder.parts;
@@ -73,8 +73,8 @@ public class Node implements Message {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof Node)) return false;
-		final Node other = (Node) o;
+		if (!(o instanceof SimulationNode)) return false;
+		final SimulationNode other = (SimulationNode) o;
 		if (!other.canEqual((Object) this)) return false;
 		if (this.getRank() != other.getRank()) return false;
 		if (this.getCores() != other.getCores()) return false;
@@ -88,7 +88,7 @@ public class Node implements Message {
 	}
 
 	protected boolean canEqual(final Object other) {
-		return other instanceof Node;
+		return other instanceof SimulationNode;
 	}
 
 	public int hashCode() {
@@ -146,8 +146,8 @@ public class Node implements Message {
 			return this;
 		}
 
-		public Node build() {
-			return new Node(this);
+		public SimulationNode build() {
+			return new SimulationNode(this);
 		}
 
 		public String toString() {

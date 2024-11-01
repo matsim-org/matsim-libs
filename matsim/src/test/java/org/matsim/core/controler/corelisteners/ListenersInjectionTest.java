@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -90,7 +90,7 @@ public class ListenersInjectionTest {
 								config.controller().getCompressionType()));
 						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
 						bind(IterationCounter.class).toInstance(() -> 0);
-						bind(Node.class).toInstance(Node.SINGLE_INSTANCE);
+						bind(SimulationNode.class).toInstance(SimulationNode.SINGLE_INSTANCE);
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
 					}
                 },

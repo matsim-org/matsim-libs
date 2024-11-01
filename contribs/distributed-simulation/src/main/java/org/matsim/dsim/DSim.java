@@ -10,7 +10,7 @@ import org.HdrHistogram.Histogram;
 import org.matsim.api.LP;
 import org.matsim.api.LPProvider;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.config.Config;
@@ -62,7 +62,7 @@ public final class DSim implements Mobsim {
     @Override
     public void run() {
 
-        Node node = injector.getInstance(Node.class);
+        SimulationNode node = injector.getInstance(SimulationNode.class);
         Topology topology = injector.getInstance(Topology.class);
         Config config = injector.getInstance(Config.class);
 
@@ -167,7 +167,7 @@ public final class DSim implements Mobsim {
     }
 
     @SneakyThrows
-    private void writeRuntimes(Node node, Histogram simulation, Histogram broker, LPExecutor executor, long overallRuntime) {
+    private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, LPExecutor executor, long overallRuntime) {
 
         OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 

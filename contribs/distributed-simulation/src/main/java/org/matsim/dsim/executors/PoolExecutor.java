@@ -3,7 +3,7 @@ package org.matsim.dsim.executors;
 import com.google.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LP;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
@@ -28,7 +28,7 @@ public final class PoolExecutor implements LPExecutor {
     private int step;
 
     @Inject
-    public PoolExecutor(SerializationProvider serializer, Node node) {
+    public PoolExecutor(SerializationProvider serializer, SimulationNode node) {
         this.serializer = serializer;
         this.executor = Executors.newWorkStealingPool(node.getCores());
     }

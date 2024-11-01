@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.ConfigUtils;
@@ -41,7 +41,7 @@ class SimulationRunnerTest {
 
         //var broker = mock(MessageBroker.class);
         //var eventsManager = TestUtils.mockExpectingEventsManager(ThreeLinkTestFixture.expectedEvents());
-        var node = Node.builder()
+        var node = SimulationNode.builder()
                 .parts(IntList.of(0, 1))
                 .cores(2)
                 .rank(0)
@@ -61,7 +61,7 @@ class SimulationRunnerTest {
                 //bind(SimulationRunner.class).in(Singleton.class);
                 //bind(LPExecutor.class).to(PoolExecutor.class);
                 //bind(SerializationProvider.class).in(Singleton.class);
-                bind(Node.class).toInstance(node);
+                bind(SimulationNode.class).toInstance(node);
                 bind(Communicator.class).to(NullCommunicator.class);
                 bind(Topology.class).toInstance(topology);
 

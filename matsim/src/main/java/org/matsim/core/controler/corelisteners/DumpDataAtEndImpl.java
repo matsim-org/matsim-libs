@@ -24,7 +24,7 @@ import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -111,7 +111,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	private Node node;
+	private SimulationNode node;
 
 	@Inject
 	private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();

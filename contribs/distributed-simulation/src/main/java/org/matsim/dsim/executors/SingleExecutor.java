@@ -2,7 +2,7 @@ package org.matsim.dsim.executors;
 
 import com.google.inject.Inject;
 import org.matsim.api.LP;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.DistributedEventsManager;
@@ -25,7 +25,7 @@ public final class SingleExecutor implements LPExecutor {
     private final List<SimTask> tasks = new ArrayList<>();
 
     @Inject
-    public SingleExecutor(SerializationProvider serializer, Node node) {
+    public SingleExecutor(SerializationProvider serializer, SimulationNode node) {
         this.serializer = serializer;
     }
 

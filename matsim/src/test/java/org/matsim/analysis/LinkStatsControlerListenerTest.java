@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -95,7 +96,7 @@ public class LinkStatsControlerListenerTest {
 				install(new EventsManagerModule());
 				install(new ScenarioByInstanceModule(scenario));
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
-				bind(org.matsim.api.core.v01.messages.Node.class).toInstance(org.matsim.api.core.v01.messages.Node.SINGLE_INSTANCE);
+				bind(SimulationNode.class).toInstance(SimulationNode.SINGLE_INSTANCE);
 				bind(IterationStopWatch.class).asEagerSingleton();
 			}
 		});

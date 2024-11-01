@@ -9,7 +9,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.communication.Communicator;
@@ -82,7 +82,7 @@ public class DistributedController implements ControlerI {
 
         Injector injector = defaultController.getInjector();
 
-        Node node = injector.getInstance(Node.class);
+        SimulationNode node = injector.getInstance(SimulationNode.class);
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
 		ControlerListenerManagerImpl listenerManager = (ControlerListenerManagerImpl) injector.getInstance(ControlerListenerManager.class);

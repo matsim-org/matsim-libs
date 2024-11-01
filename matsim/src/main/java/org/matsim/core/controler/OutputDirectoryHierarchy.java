@@ -29,8 +29,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,7 +60,7 @@ public final class OutputDirectoryHierarchy {
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(ControllerConfigGroup config, Node node) {
+	OutputDirectoryHierarchy(ControllerConfigGroup config, SimulationNode node) {
 		this(config.getOutputDirectory(),
 				config.getRunId(),
 				config.getOverwriteFileSetting(),

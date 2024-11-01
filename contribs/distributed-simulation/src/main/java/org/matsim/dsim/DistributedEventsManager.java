@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.messages.EventRegistry;
-import org.matsim.api.core.v01.messages.Node;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.events.handler.EventHandler;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 public final class DistributedEventsManager implements EventsManager {
 
     private final MessageBroker broker;
-    private final Node node;
+    private final SimulationNode node;
     private final LPExecutor executor;
     private final SerializationProvider serializer;
 
@@ -82,7 +82,7 @@ public final class DistributedEventsManager implements EventsManager {
     private double lastSync = -1;
 
     @Inject
-    DistributedEventsManager(MessageBroker broker, Node node, LPExecutor executor, SerializationProvider serializer) {
+    DistributedEventsManager(MessageBroker broker, SimulationNode node, LPExecutor executor, SerializationProvider serializer) {
         this.broker = broker;
         this.node = node;
         this.executor = executor;
