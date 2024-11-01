@@ -1,6 +1,8 @@
 package org.matsim.dsim;
 
+import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.SneakyThrows;
@@ -12,8 +14,10 @@ import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -23,9 +27,7 @@ import org.matsim.dsim.executors.SingleExecutor;
 import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.dsim.simulation.TimeInterpretation;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Log4j2
@@ -77,6 +79,7 @@ public class DistributedSimulationModule extends AbstractModule {
         bind(Topology.class).toInstance(topology);
         bind(MessageBroker.class).in(Singleton.class);
         bind(DSim.class).in(Singleton.class);
+		bind(Netsim.class).to(Key.get(DSim.class));
         bind(SerializationProvider.class).toInstance(serializer);
         bind(TimeInterpretation.class).in(Singleton.class);
 
@@ -85,6 +88,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		installQSimModule(new TransitEngineModule());
 		installQSimModule(new PopulationModule());
 		bindMobsim().toProvider(DSimProvider.class);
+		bind(QSimCompatibility.class).in(Singleton.class);
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
@@ -98,12 +102,13 @@ public class DistributedSimulationModule extends AbstractModule {
         }
 
         Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder(), LPProvider.class);
+		lps.addBinding().to(SimProvider.class);
 
-        lps.addBinding().to(SimProvider.class);
 
-        Multibinder<EventHandler> handler = Multibinder.newSetBinder(binder(), EventHandler.class);
-        handler.addBinding().to(TravelTimeCalculator.class);
-    }
+		// From the qsim module
+		bind( new TypeLiteral<Collection<AbstractQSimModule>>() {} ).to(new TypeLiteral<Set<AbstractQSimModule>>() {});
+
+	}
 
     private Topology createTopology(SerializationProvider serializer) {
 

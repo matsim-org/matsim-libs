@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.List;
 
@@ -37,7 +38,8 @@ import java.util.List;
  *
  */
 public interface InternalInterface {
-	QSim getMobsim();
+
+	Netsim getMobsim();
 	void arrangeNextAgentState( MobsimAgent agent );
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);

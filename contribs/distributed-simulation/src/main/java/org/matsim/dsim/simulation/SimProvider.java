@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation;
 
-import com.google.inject.Inject;
+import com.google.inject.*;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
@@ -15,14 +15,27 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.MessageBroker;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +65,10 @@ public class SimProvider implements LPProvider {
     @Inject
     private EventsManager eventsManager;
 
-    private static boolean isOnPartition(Attributable element, int part) {
+	@Inject
+	private Injector injector;
+
+	private static boolean isOnPartition(Attributable element, int part) {
         return (int) element.getAttributes().getAttribute(PARTITION_ATTR_KEY) == part;
     }
 
@@ -128,7 +144,12 @@ public class SimProvider implements LPProvider {
     @Override
     public LP create(int part) {
 
-        // wire up all the qsim parts. This can probably also be done with injection
+		QSimCompatibility qsim = injector.getInstance(QSimCompatibility.class);
+
+		// TODO: use in the LPs
+		List<AgentSource> agentSources = qsim.getAgentSources();
+
+		// wire up all the qsim parts. This can probably also be done with injection
         // but keep things simple for now.
         IntSet neighbors = network.getLinks().values().stream()
                 .filter(l -> hasNodeOnPart(l, part))

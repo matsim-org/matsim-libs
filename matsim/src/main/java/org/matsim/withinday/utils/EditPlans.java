@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -44,22 +44,22 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 public final class EditPlans {
 	private static final Logger log = LogManager.getLogger( EditPlans.class ) ;
 
-	private final QSim mobsim;
+	private final Netsim mobsim;
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
 	@Deprecated // population factory argument not needed.  kai, apr'18
-	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
+	public EditPlans(Netsim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
 		this( mobsim, editTrips ) ;
 	}
 	@Deprecated // scenario argument not needed.  kai, apr'18
-	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, Scenario sc) {
+	public EditPlans( Netsim mobsim, TripRouter tripRouter, EditTrips editTrips, Scenario sc) {
 		this( mobsim, editTrips ) ;
 	}
 	@Deprecated // tripRouter argument not needed. gleich-oct'19
-	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips ) {
+	public EditPlans( Netsim mobsim, TripRouter tripRouter, EditTrips editTrips ) {
 		this( mobsim, editTrips ) ;
 	}
-	public EditPlans( QSim mobsim, EditTrips editTrips ) {
+	public EditPlans( Netsim mobsim, EditTrips editTrips ) {
 		Gbl.assertNotNull( this.mobsim = mobsim );
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
 		Gbl.assertNotNull( this.pf = mobsim.getScenario().getPopulation().getFactory() ) ;
