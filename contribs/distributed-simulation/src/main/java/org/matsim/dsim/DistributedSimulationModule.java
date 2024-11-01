@@ -128,6 +128,7 @@ public class DistributedSimulationModule extends AbstractModule {
             int parts = (int) (value.getCores() * oversubscribe);
 
             n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
+			n.distributed(nodes.size() > 1);
 
             total += parts;
             topoNodes.add(n.build());

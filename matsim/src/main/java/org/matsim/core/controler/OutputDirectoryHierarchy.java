@@ -60,13 +60,13 @@ public final class OutputDirectoryHierarchy {
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(ControllerConfigGroup config, Topology topology, Node node) {
+	OutputDirectoryHierarchy(ControllerConfigGroup config, Node node) {
 		this(config.getOutputDirectory(),
 				config.getRunId(),
 				config.getOverwriteFileSetting(),
 				config.getCompressionType());
 
-		if (topology.isDistributed())
+		if (!node.isHeadNode())
 			directoryIters += "-" + node.getRank();
 	}
 

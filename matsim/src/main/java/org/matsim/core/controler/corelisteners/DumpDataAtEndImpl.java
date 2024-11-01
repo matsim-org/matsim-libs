@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.messages.Node;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -36,6 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.events.algorithms.EventsMergerXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
@@ -109,6 +111,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
+	private Node node;
+
+	@Inject
 	private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();
 
 	@Override
@@ -143,25 +148,29 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	}
 
 	private void dumpOutputEvents(int iteration) {
+
 		for (ControllerConfigGroup.EventsFileFormat format : this.controllerConfigGroup.getEventsFileFormats()) {
 			try{
 				Controler.DefaultFiles file;
 				switch (format) {
-					case xml:
-						file = Controler.DefaultFiles.events;
-						break;
-					case pb:
-						file = Controler.DefaultFiles.eventsPb;
-						break;
-					case json:
-						file = Controler.DefaultFiles.eventsJson;
-						break;
-					default:
+					case xml -> file = Controler.DefaultFiles.events;
+					case pb -> file = Controler.DefaultFiles.eventsPb;
+					case json -> file = Controler.DefaultFiles.eventsJson;
+					default -> {
 						continue;
+					}
 				}
 
-				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, file),
-						this.controlerIO.getOutputFilename(file));
+				if (node.isDistributed() && node.isHeadNode() && format == ControllerConfigGroup.EventsFileFormat.xml) {
+
+					EventsMergerXML.mergeEvents(
+						this.controlerIO.getIterationPath(iteration),
+						this.controlerIO.getIterationFilename(iteration, file),
+						this.controlerIO.getOutputFilename(file)
+					);
+
+				} else
+					IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, file), this.controlerIO.getOutputFilename(file));
 			} catch (Exception ee) {
 				LogManager.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 						+ "generated in the final iteration");

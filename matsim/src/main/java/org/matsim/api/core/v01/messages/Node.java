@@ -11,28 +11,53 @@ public class Node implements Message {
 
 	private final int rank;
 	private final int cores;
+	private final boolean distributed;
 	private final IntList parts;
 	private final String hostname;
 
-	Node(int rank, int cores, IntList parts, String hostname) {
-		this.rank = rank;
-		this.cores = cores;
-		this.parts = parts;
-		this.hostname = hostname;
+	Node(NodeBuilder builder) {
+		this.rank = builder.rank;
+		this.cores = builder.cores;
+		this.parts = builder.parts;
+		this.hostname = builder.hostname;
+		this.distributed = builder.distributed;
 	}
 
 	public static NodeBuilder builder() {
 		return new NodeBuilder();
 	}
 
+	/**
+	 * Check if this node is the head node of the topology.
+	 */
+	public boolean isHeadNode() {
+		return this.rank == 0;
+	}
+
+	/**
+	 * Whether there is a distributed simulation running.
+	 */
+	public boolean isDistributed() {
+		return this.distributed;
+	}
+
+	/**
+	 * The rank of this node. The terminology is borrowed from MPI. The rank starts at 0.
+	 */
 	public int getRank() {
 		return this.rank;
 	}
 
+	/**
+	 * Number of cores this node should use.
+	 */
 	public int getCores() {
 		return this.cores;
 	}
 
+	/**
+	 * The partitions this node is responsible for.
+	 */
 	public IntList getParts() {
 		return this.parts;
 	}
@@ -84,6 +109,7 @@ public class Node implements Message {
 	public static class NodeBuilder {
 		private int rank;
 		private int cores;
+		private boolean distributed;
 		private IntList parts;
 		private String hostname;
 
@@ -110,8 +136,13 @@ public class Node implements Message {
 			return this;
 		}
 
+		public NodeBuilder distributed(boolean distributed) {
+			this.distributed = distributed;
+			return this;
+		}
+
 		public Node build() {
-			return new Node(this.rank, this.cores, this.parts, this.hostname);
+			return new Node(this);
 		}
 
 		public String toString() {
