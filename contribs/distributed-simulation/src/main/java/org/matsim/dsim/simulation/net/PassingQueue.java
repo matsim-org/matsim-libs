@@ -3,7 +3,7 @@ package org.matsim.dsim.simulation.net;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PassingSimQueue implements SimQueue {
+class PassingQueue implements SimDequeue {
 
     private final PriorityQueue<SimVehicle> internalQ = new PriorityQueue<>(
             Comparator.comparingDouble(SimVehicle::getEarliestExitTime)
@@ -27,7 +27,7 @@ public class PassingSimQueue implements SimQueue {
     @Override
     public void addFirst(SimVehicle vehicle) {
 
-        if (!isEmpty() && poll().getEarliestExitTime() < vehicle.getEarliestExitTime()) {
+		if (!isEmpty() && peek().getEarliestExitTime() < vehicle.getEarliestExitTime()) {
             throw new IllegalArgumentException("A vehicle's exit time must be set to the next time step if it should be added to the end of a link, when a passingQ is used.");
         }
 

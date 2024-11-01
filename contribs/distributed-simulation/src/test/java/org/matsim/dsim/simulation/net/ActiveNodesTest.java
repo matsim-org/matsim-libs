@@ -45,14 +45,12 @@ class ActiveNodesTest {
         SimLink emptyInLink = mock(SimLink.class);
         when(emptyInLink.isOffering()).thenReturn(false);
         SimLink nextLink = mock(SimLink.class);
-        when(nextLink.isAccepting(any())).thenReturn(true);
-        var bla = Id.createLinkId("next-link");
-        when(nextLink.getId()).thenReturn(bla);
-        var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(bla, nextLink));
+		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
+		var nextLinkId = Id.createLinkId("next-link");
+		when(nextLink.getId()).thenReturn(nextLinkId);
+		var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(nextLinkId, nextLink));
         var activeNodes = new ActiveNodes(mock(EventsManager.class));
-        activeNodes.setActivateLink(a -> {
-            assertEquals(bla, a.getId());
-        });
+		activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a.getId()));
         activeNodes.activate(node);
 
         activeNodes.doSimStep(0);
@@ -74,7 +72,7 @@ class ActiveNodesTest {
         var inLink = SimLink.create(TestUtils.createSingleLink(0, 0), 0);
         inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
         var nextLink = mock(SimLink.class);
-        when(nextLink.isAccepting(any())).thenReturn(false);
+		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
 
         var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
         var activeNodes = new ActiveNodes(mock(EventsManager.class));
@@ -89,7 +87,7 @@ class ActiveNodesTest {
         assertTrue(inLink.isOffering());
 
         // do it again, but this time the next link has space
-        when(nextLink.isAccepting(any())).thenReturn(true);
+		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
         activeNodes.doSimStep(100);
         // in link should be inactive as no vehicle is on the link anymore
         assertFalse(inLink.isOffering());
@@ -111,7 +109,7 @@ class ActiveNodesTest {
         // call dostimstep here, so that the first vehicle is moved to the buffer
         inLink.doSimStep(null, 99);
         var nextLink = mock(SimLink.class);
-        when(nextLink.isAccepting(any())).thenReturn(true);
+		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
         var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
         var activeNodes = new ActiveNodes(mock(EventsManager.class));
         activeNodes.setActivateLink(l -> assertEquals(nextLink, l));
@@ -140,7 +138,7 @@ class ActiveNodesTest {
         inLink.doSimStep(null, 100); // move vehicle into the buffer, which starts the stuck timer
 
         var nextLink = mock(SimLink.class);
-        when(nextLink.isAccepting(any())).thenReturn(false);
+		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
 
         var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
         var activeNodes = new ActiveNodes(mock(EventsManager.class));

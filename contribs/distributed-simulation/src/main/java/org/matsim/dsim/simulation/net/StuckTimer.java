@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
-public class StuckTimer {
+class StuckTimer {
 
     private final double stuckThreshold;
 

@@ -8,19 +8,19 @@ import java.util.Queue;
 class SimBuffer {
 
     private final Queue<SimVehicle> internalBuffer;
-    private final FlowCap flowCap;
+	private final FlowCapacity flowCap;
 
     @Getter
     private double pceInBuffer = 0;
 
     double getMaxFlowCapacity() {
-        return flowCap.max;
+		return flowCap.getMax();
     }
 
-    SimBuffer(double flowCapacityPerSecond) {
-        var minCapacity = Math.max(1, flowCapacityPerSecond);
+	SimBuffer(FlowCapacity outflowCapacity) {
+		var minCapacity = Math.max(1, outflowCapacity.getMax());
         this.internalBuffer = new ArrayDeque<>((int) minCapacity);
-        this.flowCap = new FlowCap(flowCapacityPerSecond);
+		this.flowCap = outflowCapacity;
     }
 
     void add(SimVehicle vehicle, double now) {
@@ -42,38 +42,8 @@ class SimBuffer {
         return this.internalBuffer.peek();
     }
 
-    boolean isAvailable() {
-        return pceInBuffer < flowCap.max && flowCap.accumulatedCapacity > 0;
-    }
-
-    void updateFlowCapacity(double now) {
+	boolean isAvailable(double now) {
         flowCap.update(now);
-    }
-
-    private static class FlowCap {
-
-        private final double max;
-
-        private double lastUpdateTime;
-        private double accumulatedCapacity;
-
-        FlowCap(double flowCapacityPerSecond) {
-            this.max = flowCapacityPerSecond;
-            this.accumulatedCapacity = flowCapacityPerSecond;
-            this.lastUpdateTime = 0;
-        }
-
-        void consume(double pce) {
-            accumulatedCapacity -= pce;
-        }
-
-        void update(double now) {
-            if (lastUpdateTime < now) {
-                var timeSteps = now - lastUpdateTime;
-                var accFlow = timeSteps * max + accumulatedCapacity;
-                accumulatedCapacity = Math.min(accFlow, max);
-                lastUpdateTime = now;
-            }
-        }
+		return pceInBuffer < flowCap.getMax() && flowCap.isAvailable();
     }
 }
