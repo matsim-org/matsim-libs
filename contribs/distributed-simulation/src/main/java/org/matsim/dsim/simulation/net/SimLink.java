@@ -4,10 +4,11 @@ import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
@@ -23,7 +24,7 @@ public interface SimLink {
 
     double getMaxFlowCapacity();
 
-    boolean isAccepting(LinkPosition position);
+	boolean isAccepting(LinkPosition position, double now);
 
     boolean isOffering();
 
@@ -60,19 +61,25 @@ public interface SimLink {
 
 
     static SimLink create(Link link, int part) {
-        return create(link, (_, _, _) -> OnLeaveQueueInstruction.MoveToBuffer, QSimConfigGroup.LinkDynamics.FIFO, 7.5, part);
+		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
+		return create(link, (_, _, _) -> OnLeaveQueueInstruction.MoveToBuffer, defaultQsimConfig, 7.5, part);
     }
 
-    static SimLink create(Link link, OnLeaveQueue onLeaveQueue, QSimConfigGroup.LinkDynamics linkDynamics, double effectiveCellSize, int part) {
+	static SimLink create(Link link, OnLeaveQueue onLeaveQueue, QSimConfigGroup config, double effectiveCellSize, int part) {
         var fromPart = getPartition(link.getFromNode());
         var toPart = getPartition(link.getToNode());
+		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
         if (fromPart == toPart) {
-            return new LocalLink(link, createQ(linkDynamics), effectiveCellSize, onLeaveQueue);
+			var q = SimQueue.create(link, config, effectiveCellSize);
+			return new LocalLink(link, q, outflowCapacity, onLeaveQueue);
         } else if (toPart == part) {
-            var localLink = new LocalLink(link, createQ(linkDynamics), effectiveCellSize, onLeaveQueue);
+			var q = SimQueue.create(link, config, effectiveCellSize);
+			var localLink = new LocalLink(link, q, outflowCapacity, onLeaveQueue);
             return new SplitInLink(localLink, fromPart);
         } else {
-            return new SplitOutLink(link, effectiveCellSize);
+			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
+			var storageCapacity = new SimpleStorageCapacity(link, effectiveCellSize);
+			return new SplitOutLink(link, storageCapacity, inflowCapacity);
         }
     }
 
@@ -83,15 +90,6 @@ public interface SimLink {
         }
 
         return (int) attr;
-    }
-
-    private static SimQueue createQ(QSimConfigGroup.LinkDynamics linkDynamics) {
-        return switch (linkDynamics) {
-            case FIFO -> new FIFOSimQueue();
-            case PassingQ -> new PassingSimQueue();
-            case SeepageQ ->
-                    throw new RuntimeException("Config:qsim.linkDynamics = 'SeepageQ' is not supported. Supported options are: 'FIFO' and 'PassingQ'");
-        };
     }
 
     /// Implementations of SimLink
@@ -112,27 +110,23 @@ public interface SimLink {
         private final SimBuffer buffer;
         private final double length;
         private final double freespeed;
-        private final double maxStorageCap;
-
-        private double occupiedStorageCap = 0;
 
 
-        LocalLink(Link link, SimQueue q, double effectiveCellSize, OnLeaveQueue defaultOnLeaveQueue) {
+		LocalLink(Link link, SimQueue q, FlowCapacity outflowCapacity, OnLeaveQueue defaultOnLeaveQueue) {
             id = link.getId();
             this.q = q;
             length = link.getLength();
             freespeed = link.getFreespeed();
-            maxStorageCap = link.getLength() * link.getNumberOfLanes() / effectiveCellSize;
-            buffer = new SimBuffer(link.getFlowCapacityPerSec());
+			buffer = new SimBuffer(outflowCapacity);
             toNode = link.getToNode().getId();
             this.onLeaveQueue = defaultOnLeaveQueue;
         }
 
         @Override
-        public boolean isAccepting(LinkPosition position) {
+		public boolean isAccepting(LinkPosition position, double now) {
             return switch (position) {
-                case QStart, QEnd -> maxStorageCap - occupiedStorageCap > 0.;
-                case Buffer -> buffer.isAvailable();
+				case QStart, QEnd -> q.isAccepting(position, now);
+				case Buffer -> buffer.isAvailable(now);
             };
         }
 
@@ -179,32 +173,14 @@ public interface SimLink {
             var earliestExitTime = now + duration;
             vehicle.setEarliestExitTime(earliestExitTime);
 
-            double pceToConsume = addVehicle(vehicle, position, now);
-            consumeStorage(pceToConsume);
-        }
-
-        private double addVehicle(SimVehicle vehicle, LinkPosition position, double now) {
-            return switch (position) {
-                case QStart -> {
-                    q.addLast(vehicle);
-                    yield vehicle.getPce();
-                }
-                case QEnd -> {
-                    q.addFirst(vehicle);
-                    yield vehicle.getPce();
-                }
-                case Buffer -> {
-                    buffer.add(vehicle, now);
-                    yield 0.;
-                }
-            };
+			switch (position) {
+				case QStart, QEnd -> q.add(vehicle, position);
+				case Buffer -> buffer.add(vehicle, now);
+			}
         }
 
         @Override
         public boolean doSimStep(SimStepMessaging messaging, double now) {
-
-            // adjust flow capacities, to the current time step
-            buffer.updateFlowCapacity(now);
 
             while (!q.isEmpty()) {
 
@@ -217,18 +193,17 @@ public interface SimLink {
                 // the vehicle should keep moving through the network. Move it to the
                 // buffer, so that it can be processed in the next intersection update
                 if (leaveResult.equals(OnLeaveQueueInstruction.MoveToBuffer)) {
-                    if (!buffer.isAvailable()) break;
+					if (!buffer.isAvailable(now)) break;
                     moveVehicle(now);
                 }
                 // the vehicle was removed by some handler. For example, the vehicle has arrived.
                 // remove the vehicle from the queue
                 else if (leaveResult.equals(OnLeaveQueueInstruction.RemoveVehicle)) {
-                    var vehicle = q.poll();
-                    releaseStorage(vehicle.getPce());
+					q.poll(now);
                 }
                 // if the result is block, don't do anything. We assume that the handler has set a new exit time
             }
-            return occupiedStorageCap > 0.;
+			return !q.isEmpty();
         }
 
         @Override
@@ -237,17 +212,8 @@ public interface SimLink {
         }
 
         private void moveVehicle(double now) {
-            var vehicle = q.poll();
-            releaseStorage(vehicle.getPce());
+			var vehicle = q.poll(now);
             buffer.add(vehicle, now);
-        }
-
-        private void consumeStorage(double pce) {
-            occupiedStorageCap += pce;
-        }
-
-        private void releaseStorage(double pce) {
-            occupiedStorageCap -= pce;
         }
     }
 
@@ -257,14 +223,17 @@ public interface SimLink {
         @Getter
         private final int toPart;
 
-        private final double maxStorageCap;
-        private double occupiedStorageCap = 0;
-        private final Queue<SimVehicle> q = new LinkedList<>();
+		private final Queue<SimVehicle> q = new ArrayDeque<>();
+		// deliberately use implementation and NOT the interface, since the out link mirrors the downstream storage
+		// capacity. This is done best with the SimpleStorageCapacity implementation
+		private final SimpleStorageCapacity storageCapacity;
+		private final FlowCapacity inflowCapacity;
 
-        SplitOutLink(Link link, double effectiveCellSize) {
+		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity) {
             id = link.getId();
             this.toPart = (int) link.getToNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
-            maxStorageCap = link.getLength() * link.getNumberOfLanes() / effectiveCellSize;
+			this.storageCapacity = storageCapacity;
+			this.inflowCapacity = inflowCapacity;
         }
 
         @Override
@@ -273,9 +242,11 @@ public interface SimLink {
         }
 
         @Override
-        public boolean isAccepting(LinkPosition position) {
+		public boolean isAccepting(LinkPosition position, double now) {
             if (LinkPosition.QStart == position) {
-                return maxStorageCap - occupiedStorageCap > 0.;
+				storageCapacity.update(now);
+				inflowCapacity.update(now);
+				return storageCapacity.isAvailable() && inflowCapacity.isAvailable();
             }
             throw new IllegalArgumentException("Split out links can only accept vehicles at the start of the link. The end of the link is managed by the other partition.");
         }
@@ -308,8 +279,8 @@ public interface SimLink {
                 throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
 
             assert !q.contains(vehicle);
-
-            occupiedStorageCap += vehicle.getPce();
+			storageCapacity.consume(vehicle.getPce());
+			inflowCapacity.consume(vehicle.getPce());
             q.add(vehicle);
         }
 
@@ -330,8 +301,8 @@ public interface SimLink {
         }
 
         public void applyCapacityUpdate(double released, double consumed) {
-            occupiedStorageCap += consumed;
-            occupiedStorageCap -= released;
+			storageCapacity.consume(consumed);
+			storageCapacity.release(released, 0);
         }
     }
 
@@ -341,7 +312,6 @@ public interface SimLink {
         private final int fromPart;
         private final LocalLink localLink;
 
-        private double releasedStorageCap = 0;
         private double consumedStorageCap = 0;
 
         SplitInLink(LocalLink localLink, int fromPart) {
@@ -360,8 +330,8 @@ public interface SimLink {
         }
 
         @Override
-        public boolean isAccepting(LinkPosition position) {
-            return localLink.isAccepting(position);
+		public boolean isAccepting(LinkPosition position, double now) {
+			return localLink.isAccepting(position, now);
         }
 
         @Override
@@ -381,10 +351,7 @@ public interface SimLink {
 
         @Override
         public SimVehicle popVehicle() {
-
-            var vehicle = localLink.popVehicle();
-            releasedStorageCap += vehicle.getPce();
-            return vehicle;
+			return localLink.popVehicle();
         }
 
         @Override
@@ -401,20 +368,21 @@ public interface SimLink {
         @Override
         public boolean doSimStep(SimStepMessaging messaging, double now) {
 
-
             // report capacity changes to the upstream partition
-            var occupiedBeforeSimStep = localLink.occupiedStorageCap;
-            var keepActive = localLink.doSimStep(messaging, now);
-            var diffOccupied = occupiedBeforeSimStep - localLink.occupiedStorageCap;
-            var releasedTotal = releasedStorageCap + diffOccupied;
+			// during doSimStep, vehicles may leave the network, and if we operate in kinematicWaves mode
+			// backwardstravelling holes may reach the upstream end of a link, so that capacity becomes
+			// available.
+			var occupiedBeforeSimStep = localLink.q.getOccupied();
+			var localLinkActive = localLink.doSimStep(messaging, now);
+			var storageReleased = localLink.q.isAccepting(LinkPosition.QStart, now);
+			var occupiedAfterSimStep = localLink.q.getOccupied();
+			var diffOccupied = occupiedBeforeSimStep - occupiedAfterSimStep;
 
-            if (releasedTotal > 0 || consumedStorageCap > 0) {
-                messaging.collectStorageCapacityUpdate(getId(), releasedTotal, consumedStorageCap, fromPart);
-                releasedStorageCap = 0;
+			if (diffOccupied > 0 || consumedStorageCap > 0) {
+				messaging.collectStorageCapacityUpdate(getId(), diffOccupied, consumedStorageCap, fromPart);
                 consumedStorageCap = 0;
             }
-
-            return keepActive;
+			return localLinkActive || !storageReleased;
         }
 
         @Override

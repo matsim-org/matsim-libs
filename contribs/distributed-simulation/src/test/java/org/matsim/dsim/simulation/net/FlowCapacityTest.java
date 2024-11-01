@@ -5,13 +5,13 @@ import org.matsim.dsim.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FlowCapTest {
+class FlowCapacityTest {
 
     @Test
     public void init() {
         var link = TestUtils.createSingleLink();
         link.setCapacity(5432);
-        var cap = new FlowCap(link);
+		var cap = FlowCapacity.createOutflowCapacity(link);
 
         assertEquals(1.50888, cap.getMax(), 0.00001);
         assertTrue(cap.isAvailable());
@@ -21,7 +21,7 @@ class FlowCapTest {
     public void consume() {
         var link = TestUtils.createSingleLink();
         link.setCapacity(36000);
-        var cap = new FlowCap(link);
+		var cap = FlowCapacity.createOutflowCapacity(link);
 
         assertTrue(cap.isAvailable());
         cap.consume(20);
@@ -32,7 +32,7 @@ class FlowCapTest {
     public void maxCapacity() {
         var link = TestUtils.createSingleLink();
         link.setCapacity(36000);
-        var cap = new FlowCap(link);
+		var cap = FlowCapacity.createOutflowCapacity(link);
         assertEquals(10, cap.getMax());
 
         // drain the capacity
@@ -54,7 +54,7 @@ class FlowCapTest {
 
         var link = TestUtils.createSingleLink();
         link.setCapacity(900);
-        var cap = new FlowCap(link);
+		var cap = FlowCapacity.createOutflowCapacity(link);
         assertEquals(0.25, cap.getMax());
 
         // accumulated_capacity should be at -0.75 after this.
