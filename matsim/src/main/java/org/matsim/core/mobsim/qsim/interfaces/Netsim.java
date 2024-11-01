@@ -23,8 +23,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
+import org.matsim.core.mobsim.qsim.AgentTracker;
+import org.matsim.vis.snapshotwriters.VisMobsim;
 
-public interface Netsim extends ObservableMobsim {
+import java.util.Collection;
+
+public interface Netsim extends ObservableMobsim, ActivityEndRescheduler, VisMobsim {
 
 	NetsimNetwork getNetsimNetwork();
 
@@ -35,4 +40,6 @@ public interface Netsim extends ObservableMobsim {
 	Scenario getScenario();
 
 	MobsimTimer getSimTimer();
+
+	Collection<AgentTracker> getAgentTrackers();
 }

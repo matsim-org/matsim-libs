@@ -37,11 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -95,7 +91,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements VisMobsim, Netsim {
 
 	final private static Logger log = LogManager.getLogger(QSim.class);
 
@@ -154,7 +150,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 
 		@Override
-		public QSim getMobsim() {
+		public Netsim getMobsim() {
 			return QSim.this;
 		}
 
@@ -716,6 +712,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		};
 	}
 
+	@Override
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}
