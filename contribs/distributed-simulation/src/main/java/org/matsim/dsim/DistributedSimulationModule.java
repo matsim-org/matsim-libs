@@ -114,7 +114,7 @@ public class DistributedSimulationModule extends AbstractModule {
                 .build();
 
         // Receive node information from all ranks
-        List<Node> nodes = comm.allGather(node, 0, new LinkedList<>(), serializer);
+        List<Node> nodes = comm.allGather(node, 0, serializer);
         nodes.sort(Comparator.comparingInt(Node::getRank));
 
         Topology.TopologyBuilder topology = Topology.builder();

@@ -30,7 +30,7 @@ public class NullCommunicator implements Communicator {
     }
 
 	@Override
-	public <T extends Message> List<T> allGather(T msg, int tag, Queue<ByteBuffer> queue, SerializationProvider provider) {
-		return new ArrayList<>(List.of(msg));
+	public <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {
+		return Communicator.super.allGather(msg, tag, provider);
 	}
 }

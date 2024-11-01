@@ -21,6 +21,7 @@ package org.matsim.core.controler;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -299,22 +300,26 @@ public final class OutputDirectoryHierarchy {
 			}
 		}
 
-		if (!outputDir.exists() && !outputDir.mkdirs()) {
-			throw new RuntimeException(
-					"The output directory path " + outputPath
-					+ " could not be created. Check pathname and permissions! Full path: " + new File(outputPath).getAbsolutePath());
+		try {
+			Files.createDirectories(outputDir.toPath());
+		} catch (IOException e) {
+			throw new UncheckedIOException(
+				"The output directory path %s could not be created. Check pathname and permissions! Full path: %s".formatted(outputPath, new File(outputPath).getAbsolutePath()), e);
 		}
 
 		File tmpDir = new File(getTempPath());
-		if (!tmpDir.mkdir() && !tmpDir.exists()) {
-			throw new RuntimeException("The tmp directory "
-					+ getTempPath() + " could not be created.");
+		try {
+			Files.createDirectories(tmpDir.toPath());
+		} catch (IOException e) {
+			throw new UncheckedIOException("The tmp directory %s could not be created.".formatted(getTempPath()), e);
 		}
+
+
 		File itersDir = new File(outputPath + "/" + Controler.DIRECTORY_ITERS);
-		if (!itersDir.mkdir() && !itersDir.exists()) {
-			throw new RuntimeException("The iterations directory "
-					+ (outputPath + "/" + Controler.DIRECTORY_ITERS)
-					+ " could not be created.");
+		try {
+			Files.createDirectories(itersDir.toPath());
+		} catch (IOException e) {
+			throw new UncheckedIOException("The iterations directory %s could not be created.".formatted(itersDir), e);
 		}
 	}
 

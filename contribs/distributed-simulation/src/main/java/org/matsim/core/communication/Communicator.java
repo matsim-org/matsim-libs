@@ -106,15 +106,11 @@ public interface Communicator extends AutoCloseable {
 	 *
 	 * @param msg   Message to be sent
 	 * @param tag   Tag of the message, only message with the same tag will be received
-	 * @param queue Check queue for messages that might match the tag, received messages that do not match the tag are stored in the queue
 	 * @return All received messages, including the one sent
 	 */
-	default <T extends Message> List<T> allGather(T msg, int tag, Queue<ByteBuffer> queue, SerializationProvider provider) {
+	default <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {
 		List<T> messages = new ArrayList<>(getSize());
 		messages.add(msg);
-
-		// store messages that do not match the tag
-		List<ByteBuffer> remaining = new LinkedList<>();
 
 		byte[] bytes = provider.toBytes(msg);
 		try (Arena arena = Arena.ofConfined()) {
@@ -127,29 +123,14 @@ public interface Communicator extends AutoCloseable {
 
 			send(BROADCAST_TO_ALL, data, 0, data.byteSize());
 
-			recv(() -> {
+			recv(() -> messages.size() < getSize(), (buf) -> {
 
-					ByteBuffer b = queue.poll();
-					if (b != null && b.getInt(b.position()) == tag) {
-						b.getInt(); // skip tag
-						messages.add(provider.parse(b));
-					} else if (b != null)
-						remaining.add(b);
+				int t = buf.getInt();
+				if (tag != t)
+					throw new IllegalStateException("Unexpected tag, got: %d, expected: %d".formatted(t, tag));
 
-					return messages.size() < getSize();
-				},
-				(buf) -> {
-					int t = buf.getInt(buf.position());
-					if (tag != t) {
-						remaining.add(buf);
-					}
-
-					buf.getInt(); // skip tag
-					messages.add(provider.parse(buf));
-				});
-
-			// Don't use .addAll here because it is not implemented in some queues
-			remaining.forEach(queue::add);
+				messages.add(provider.parse(buf));
+			});
 
 			return messages;
 		}

@@ -2,6 +2,7 @@ package org.matsim.core.events.algorithms;
 
 import it.unimi.dsi.fastutil.doubles.DoubleObjectPair;
 import org.apache.commons.io.FilenameUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -34,7 +35,7 @@ public class EventsMergerXML {
 
 		List<Path> iters = Files.list(outputDir)
 			.filter(Files::isDirectory)
-			.filter(p -> p.getFileName().toString().startsWith("ITERS"))
+			.filter(p -> p.getFileName().toString().startsWith(Controler.DIRECTORY_ITERS))
 			.toList();
 
 

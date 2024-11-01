@@ -5,62 +5,23 @@ workflow:
     on_new_commit: interruptible
 
 stages:
-  - build
+  - test
 
-build-job:
-  stage: build
+test-job:
+  stage: test
   parallel:
     matrix:
       - module:
           - matsim
           # sorted from longest to shortest (to minimise the overall test stage duration)
           # (used in travis; not respected in GitHub Action workflows)
+          # This contains only a small subset of modules, full build takes to long otherwise
           - contribs/vsp
-          - contribs/common
-          - contribs/taxi
-          - contribs/minibus
-          - contribs/signals
           - contribs/bicycle
-          - contribs/cadytsIntegration
           - contribs/drt
           - contribs/drt-extensions
-          - contribs/discrete_mode_choice
-          - contribs/carsharing
-          - contribs/commercialTrafficApplications
-          - contribs/av
-          - contribs/locationchoice
-          - contribs/ev
           - contribs/dvrp
-          - contribs/emissions
-          - contribs/decongestion
-          - contribs/noise
-          - contribs/accidents
-          - contribs/freight
-          - contribs/freightreceiver
-          - contribs/parking
-          - contribs/matrixbasedptrouter
-          - contribs/accessibility
-          - contribs/integration
-          - contribs/multimodal
-          - contribs/protobuf
-          - contribs/shared_mobility
-          - contribs/socnetsim
-          - contribs/sumo
-          - contribs/pseudosimulation
-          - contribs/railsim
-          - contribs/roadpricing
-          - contribs/analysis
-          - contribs/hybridsim
-          - contribs/informed-mode-choice
-          - contribs/otfvis
-          - contribs/osm
-          - contribs/application
-          - contribs/simwrapper
-          - contribs/sbb-extensions
-          - contribs/simulatedannealing
-          - contribs/small-scale-traffic-generation
           - contribs/distributed-simulation
-          - benchmark
 
   cache:
     paths:

@@ -3,7 +3,9 @@ package org.matsim.core.communication;
 import io.aeron.CommonContext;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.agrona.concurrent.*;
+import org.agrona.concurrent.IdleStrategy;
+import org.agrona.concurrent.UnsafeBuffer;
+import org.agrona.concurrent.YieldingIdleStrategy;
 import org.agrona.concurrent.ringbuffer.ManyToOneRingBuffer;
 import org.agrona.concurrent.ringbuffer.RingBufferDescriptor;
 
@@ -22,168 +24,184 @@ import java.nio.channels.FileChannel;
 @Log4j2
 public class SharedMemoryCommunicator implements Communicator {
 
-    private final int rank;
-    private final int size;
+	private final int rank;
+	private final int size;
 
-    private final IdleStrategy idle = new YieldingIdleStrategy();
-    ;
-    private final IPC subscription;
-    private final IPC[] others;
+	private final IdleStrategy idle = new YieldingIdleStrategy();
 
-    @SneakyThrows
-    public SharedMemoryCommunicator(int rank, int size) {
-        this.rank = rank;
-        this.size = size;
+	private final IPC subscription;
+	private final IPC[] others;
 
-        subscription = new IPC(getName(rank), size);
-        others = new IPC[size];
-    }
+	@SneakyThrows
+	public SharedMemoryCommunicator(int rank, int size) {
+		this.rank = rank;
+		this.size = size;
 
-    public static void main(String[] args) {
-        SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1);
+		File name = getName(rank);
+		log.info("Serving on {}", name);
 
-        comm.connect();
-    }
+		this.subscription = new IPC(name, size, true);
+		this.others = new IPC[size];
+	}
 
-    private File getName(int rank) {
-        return new File(CommonContext.getAeronDirectoryName() + "/q-" + rank);
-    }
+	public static void main(String[] args) {
+		SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1);
 
-    @SneakyThrows
-    public void connect() {
+		comm.connect();
+	}
 
-        for (int i = 0; i < size; i++) {
-            if (i != rank) {
+	private File getName(int rank) {
+		return new File(CommonContext.getAeronDirectoryName() + "/q-" + rank);
+	}
 
-                File name = getName(i);
-                while (!name.exists())
-                    idle.idle();
+	@SneakyThrows
+	public void connect() {
 
-                others[i] = new IPC(name, size);
-            }
-        }
-    }
+		for (int i = 0; i < size; i++) {
+			if (i != rank) {
 
-    @Override
-    public void close() throws Exception {
+				File name = getName(i);
+				while (!name.exists())
+					idle.idle();
 
-        subscription.close(true);
-        for (int i = 0; i < size; i++) {
-            if (i != rank) {
-                others[i].close(false);
-            }
-        }
-    }
+				others[i] = new IPC(name, size, false);
+			}
+		}
+	}
 
-    @Override
-    public int getRank() {
-        return rank;
-    }
+	@Override
+	public void close() throws Exception {
 
-    @Override
-    public int getSize() {
-        return size;
-    }
+		subscription.close(true);
+		for (int i = 0; i < size; i++) {
+			if (i != rank) {
+				others[i].close(false);
+			}
+		}
+	}
 
-    @Override
-    public void send(int receiver, MemorySegment data, long offset, long length) {
+	@Override
+	public int getRank() {
+		return rank;
+	}
 
-        if (receiver == rank) {
-            throw new IllegalArgumentException("Cannot send to self");
-        }
+	@Override
+	public int getSize() {
+		return size;
+	}
 
-        UnsafeBuffer ub = new UnsafeBuffer(data.address() + offset, (int) length);
+	@Override
+	public void send(int receiver, MemorySegment data, long offset, long length) {
 
-        if (receiver == -1) {
-            for (int i = 0; i < size; i++) {
-                if (i != rank) {
-                    sendInternal(others[i], ub, length);
-                }
-            }
-        } else {
-            sendInternal(others[receiver], ub, length);
-        }
-    }
+		if (receiver == rank) {
+			throw new IllegalArgumentException("Cannot send to self");
+		}
 
-    private void sendInternal(IPC receiver, UnsafeBuffer ub, long length) {
+		UnsafeBuffer ub = new UnsafeBuffer(data.address() + offset, (int) length);
 
-        while (true) {
-            int idx = receiver.rb.tryClaim(1, (int) length);
-            if (idx <= 0) {
-                idle.idle();
-                continue;
-            }
+		if (receiver == -1) {
+			for (int i = 0; i < size; i++) {
+				if (i != rank) {
+					sendInternal(others[i], ub, length);
+				}
+			}
+		} else {
+			sendInternal(others[receiver], ub, length);
+		}
+	}
 
-            receiver.rb.buffer().putBytes(idx, ub, 0, (int) length);
-            receiver.rb.commit(idx);
-            break;
-        }
+	private void sendInternal(IPC receiver, UnsafeBuffer ub, long length) {
 
-        idle.reset();
-    }
+		while (true) {
+			int idx = receiver.rb.tryClaim(1, (int) length);
+			if (idx <= 0) {
+				idle.idle();
+				continue;
+			}
 
-    @Override
-    public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
-        while (expectsNext.expectsMoreMessages()) {
-            int read = subscription.rb.read((msgTypeId, buffer, index, length) -> {
-                ByteBuffer bb = buffer.byteBuffer();
-                if (bb == null)
-                    bb = ByteBuffer.wrap(buffer.byteArray(), index, length);
-                else
-                    bb = bb.slice(index, length);
+			receiver.rb.buffer().putBytes(idx, ub, 0, (int) length);
+			receiver.rb.commit(idx);
+			break;
+		}
 
-                try {
-                    handleReceive.consume(bb);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+		idle.reset();
+	}
 
-            if (read == 0) {
-                idle.idle();
-            }
-        }
+	@Override
+	public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
+		while (expectsNext.expectsMoreMessages()) {
+			int read = subscription.rb.read((msgTypeId, buffer, index, length) -> {
+				ByteBuffer bb = buffer.byteBuffer();
+				if (bb == null)
+					bb = ByteBuffer.wrap(buffer.byteArray(), index, length);
+				else
+					bb = bb.slice(index, length);
 
-        idle.reset();
-    }
+				try {
+					handleReceive.consume(bb);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
 
-    private static final class IPC {
+			if (read == 0) {
+				idle.idle();
+			}
+		}
 
-        final ManyToOneRingBuffer rb;
-        private final File path;
-        private final RandomAccessFile file;
-        private final FileChannel channel;
-        private final MappedByteBuffer buffer;
-        private final UnsafeBuffer ub;
+		idle.reset();
+	}
 
-        @SneakyThrows
-        public IPC(File path, int total) {
+	private static final class IPC {
 
-            this.path = path;
-            file = new RandomAccessFile(path, "rw");
-            channel = file.getChannel();
+		final ManyToOneRingBuffer rb;
+		private final File path;
+		private final RandomAccessFile file;
+		private final FileChannel channel;
+		private final MappedByteBuffer buffer;
+		private final UnsafeBuffer ub;
 
-            String bufferSize = System.getenv("MSG_BUFFER_SIZE");
-            int s = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
+		@SneakyThrows
+		public IPC(File path, long total, boolean clear) {
 
-            // Create a memory-mapped file
-            buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, 4L * s + RingBufferDescriptor.TRAILER_LENGTH);
-            ub = new UnsafeBuffer(buffer);
-            rb = new ManyToOneRingBuffer(ub);
-        }
+			this.path = path;
+			file = new RandomAccessFile(path, "rw");
+			channel = file.getChannel();
 
-        @SneakyThrows
-        public void close(boolean delete) {
-            channel.close();
-            file.close();
+			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
+			int s = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
 
-            if (delete) {
-                boolean deleted = path.delete();
-                if (!deleted) {
-                    log.warn("Could not delete file {}", path);
-                }
-            }
-        }
-    }
+			// Create a memory-mapped file
+			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, total * s + RingBufferDescriptor.TRAILER_LENGTH);
+
+			// Zero the buffer before using it
+			if (clear) {
+				while (buffer.hasRemaining()) {
+					buffer.put((byte) 0);
+				}
+				buffer.clear();
+			}
+
+			ub = new UnsafeBuffer(buffer);
+			rb = new ManyToOneRingBuffer(ub);
+		}
+
+		@SneakyThrows
+		public void close(boolean delete) {
+			channel.close();
+			file.close();
+
+			if (delete) {
+				delete();
+			}
+		}
+
+		private void delete() {
+			boolean deleted = path.delete();
+			if (!deleted) {
+				log.warn("Could not delete file {}", path);
+			}
+		}
+	}
 
 }
