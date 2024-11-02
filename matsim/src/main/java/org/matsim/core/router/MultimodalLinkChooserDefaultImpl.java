@@ -15,6 +15,15 @@ class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
     private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
 
     @Override
+    public Link decideAccessLink(RoutingRequest request, Network network) {
+    	return decideOnLink(request.getFromFacility(), network);
+    }
+    
+    @Override
+    public Link decideEgressLink(RoutingRequest request, Network network) {
+    	return decideOnLink(request.getToFacility(), network);
+    }
+    
     public Link decideOnLink(Facility facility, Network network) {
         Link accessActLink = null ;
 
