@@ -115,11 +115,14 @@ public interface Communicator extends AutoCloseable {
 		byte[] bytes = provider.toBytes(msg);
 		try (Arena arena = Arena.ofConfined()) {
 
-			MemorySegment data = arena.allocate(bytes.length + Integer.BYTES);
+			MemorySegment data = arena.allocate(bytes.length + Integer.BYTES * 3);
 
 			ByteBuffer bb = data.asByteBuffer();
+			// tag, sender, receiver
 			bb.putInt(0, tag);
-			bb.put(Integer.BYTES, bytes);
+			bb.putInt(Integer.BYTES, getRank());
+			bb.putInt(Integer.BYTES * 2, BROADCAST_TO_ALL);
+			bb.put(Integer.BYTES * 3, bytes);
 
 			send(BROADCAST_TO_ALL, data, 0, data.byteSize());
 
@@ -128,6 +131,9 @@ public interface Communicator extends AutoCloseable {
 				int t = buf.getInt();
 				if (tag != t)
 					throw new IllegalStateException("Unexpected tag, got: %d, expected: %d".formatted(t, tag));
+
+				buf.getInt(); // sender
+				buf.getInt(); // receiver
 
 				messages.add(provider.parse(buf));
 			});

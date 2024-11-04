@@ -463,7 +463,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
             throw new IllegalStateException(error);
         }
 
-        if (tag > seq) {
+        if (tag > seq || tag < 0) {
             aheadMsgs.add(clone(data));
             return;
         }
