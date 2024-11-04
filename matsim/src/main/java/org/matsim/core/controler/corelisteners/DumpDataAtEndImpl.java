@@ -121,6 +121,11 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if ( event.isUnexpected() ) {
 			return ;
 		}
+
+		// Only the primary process dumps the output
+		if (!node.isHeadNode())
+			return;
+
 		dumpPlans();
 		dumpNetwork();
 		dumpConfig();
@@ -162,6 +167,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				}
 
 				if (node.isDistributed() && node.isHeadNode() && format == ControllerConfigGroup.EventsFileFormat.xml) {
+
+					log.info("Merging events for iteration {} into single file.", iteration);
 
 					EventsMergerXML.mergeEvents(
 						this.controlerIO.getIterationPath(iteration),
