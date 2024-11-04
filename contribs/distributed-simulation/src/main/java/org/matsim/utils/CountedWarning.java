@@ -15,7 +15,7 @@ public class CountedWarning {
 		if (count <= maxCount) {
 			LogManager.getLogger(name).warn(message);
 		} else {
-			LogManager.getLogger(name).warn(message + " \n Further messages are suppressed.");
+			LogManager.getLogger(name).warn("{} \t Further messages are suppressed.", message);
 		}
 	}
 }

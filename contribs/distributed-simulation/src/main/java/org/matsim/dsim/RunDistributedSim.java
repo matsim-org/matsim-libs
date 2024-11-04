@@ -4,6 +4,7 @@ import org.matsim.core.communication.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -96,6 +97,7 @@ public class RunDistributedSim implements Callable<Integer> {
 		config.controller().setWriteEventsInterval(1);
 
         config.qsim().setUsePersonIdForMissingVehicleId(false);
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
         // Randomness might cause differences on different nodes
         config.routing().setRoutingRandomness(0);

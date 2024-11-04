@@ -7,8 +7,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ShutDownMessage;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.messages.StartUpMessage;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,14 +40,14 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
     @Inject
     private Topology topology;
 
+	@Inject
+	private SimulationNode node;
+
     @Inject
     private EventsManager manager;
 
     @Inject
     private Communicator comm;
-
-	@Inject
-	private MessageBroker broker;
 
     @Inject
     private SerializationProvider serializer;
@@ -65,6 +67,8 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
         // TODO: partitioning can be performed on one node only, and then broadcast to all nodes
         // TODO: one lp provider may want to access partition information of another lp
         NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
+
+		scenario.getNetwork().setPartitioning(new NetworkPartitioning(node, scenario.getNetwork()));
 
         StartUpMessage msg = StartUpMessage.builder()
                 .linkIds(Id.getAllIds(Link.class))
