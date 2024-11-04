@@ -24,7 +24,7 @@ class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
     	return decideOnLink(request.getToFacility(), network);
     }
     
-    public Link decideOnLink(Facility facility, Network network) {
+    private Link decideOnLink(Facility facility, Network network) {
         Link accessActLink = null ;
 
         Id<Link> accessActLinkId = null ;
