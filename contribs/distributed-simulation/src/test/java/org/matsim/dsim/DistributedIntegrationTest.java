@@ -24,75 +24,73 @@ import java.util.concurrent.Executors;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DistributedIntegrationTest {
 
-    @RegisterExtension
-    MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	MatsimTestUtils utils = new MatsimTestUtils();
 
-    private Config createScenario() {
+	private Config createScenario() {
 
-        URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config.xml");
+		URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config.xml");
 
-        Config config = ConfigUtils.loadConfig(kelheim);
+		Config config = ConfigUtils.loadConfig(kelheim);
 
-        config.controller().setOutputDirectory(utils.getOutputDirectory());
-        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.controller().setLastIteration(2);
-        config.controller().setMobsim("dsim");
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setLastIteration(2);
+		config.controller().setMobsim("dsim");
 
-        config.routing().setRoutingRandomness(0);
+		config.routing().setRoutingRandomness(0);
 
-        // Compatibility with many scenarios
-        Activities.addScoringParams(config);
+		// Compatibility with many scenarios
+		Activities.addScoringParams(config);
 
-        return config;
-    }
+		return config;
+	}
 
-    @Test
-    @Order(1)
-    @Disabled
-    void runLocal() {
+	@Test
+	@Order(1)
+	void runLocal() {
 
-        Config local = createScenario();
-        Scenario scenario = ScenarioUtils.loadScenario(local);
+		Config local = createScenario();
+		Scenario scenario = ScenarioUtils.loadScenario(local);
 
-        // Need to prepare network for freight
-        var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-        scenario.getNetwork().getLinks().values().parallelStream()
-                .filter(l -> l.getAllowedModes().contains(TransportMode.car))
-                .forEach(l -> l.setAllowedModes(carandfreight));
+		// Need to prepare network for freight
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
 
-        Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 
-        // TODO: single node module run script / controller is different from multi node setup
+		// TODO: single node module run script / controller is different from multi node setup
 
-        controler.addOverridingModule(new DistributedSimulationModule(4));
-        controler.run();
+		controler.addOverridingModule(new DistributedSimulationModule(4));
+		controler.run();
+	}
 
-    }
+	@Test
+	@Order(2)
+	@Disabled
+	void runDistributed() {
 
-    @Test
-    @Order(2)
-    @Disabled
-    void runDistributed() {
+		Config local = createScenario();
+		Scenario scenario = ScenarioUtils.loadScenario(local);
 
-        Config local = createScenario();
-        Scenario scenario = ScenarioUtils.loadScenario(local);
+		// Need to prepare network for freight
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
 
-        // Need to prepare network for freight
-        var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-        scenario.getNetwork().getLinks().values().parallelStream()
-                .filter(l -> l.getAllowedModes().contains(TransportMode.car))
-                .forEach(l -> l.setAllowedModes(carandfreight));
+		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
+			List<Communicator> comms = LocalCommunicator.create(4);
+			for (Communicator comm : comms) {
+				pool.submit(() -> {
+					Controler controler = new Controler(scenario);
+					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
+					controler.run();
+				});
+			}
+		}
 
-        try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-            List<Communicator> comms = LocalCommunicator.create(4);
-            for (Communicator comm : comms) {
-                pool.submit(() -> {
-                    Controler controler = new Controler(scenario);
-                    controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-                    controler.run();
-                });
-            }
-        }
-
-    }
+	}
 }

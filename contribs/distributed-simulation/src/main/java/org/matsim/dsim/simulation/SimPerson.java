@@ -61,9 +61,7 @@ public class SimPerson {
 		currentPlanElement++;
 		currentRouteElement = 0;
 
-		if (currentPlanElement >= planElements.size()) {
-			throw new IllegalStateException("Cannot advance plan for person " + this.id + ". There are no more plan elements.");
-		}
+		assert currentPlanElement < planElements.size() : "There are no more plan elements for person: " + this.id;
 	}
 
 	public enum Advance {One, Last}
@@ -110,7 +108,7 @@ public class SimPerson {
 	}
 
 	public boolean hasCurrentLeg() {
-		return (currentPlanElement & 1) == 0 && currentPlanElement < planElements.size();
+		return (currentPlanElement & 1) == 1 && currentPlanElement < planElements.size();
 	}
 
 	public Id<Link> getCurrentRouteElement() {

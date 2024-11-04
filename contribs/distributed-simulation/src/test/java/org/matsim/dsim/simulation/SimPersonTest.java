@@ -44,6 +44,7 @@ class SimPersonTest {
 		assertEquals(person.getSelectedPlan().getPlanElements().get(1), simPerson.getCurrentLeg());
 		assertThrows(RuntimeException.class, simPerson::getCurrentActivity);
 		assertEquals(SimPerson.State.LEG, simPerson.getCurrentState());
+		assertTrue(simPerson.hasCurrentLeg());
 	}
 
 	@Test
@@ -61,7 +62,6 @@ class SimPersonTest {
 		simPerson.advancePlan();
 		assertEquals(planIterator.next(), simPerson.getCurrentActivity());
 		assertEquals(SimPerson.State.ACTIVITY, simPerson.getCurrentState());
-		assertThrows(RuntimeException.class, simPerson::advancePlan);
 	}
 
 	@Test
