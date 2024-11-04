@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
@@ -39,11 +39,11 @@ public class VrpAgentSource implements AgentSource {
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
 	private final String dvrpMode;
-	private final QSim qSim;
+	private final Netsim qSim;
 	private final VehicleType vehicleType;
 
 	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, String dvrpMode,
-			QSim qSim, VehicleType vehicleType) {
+			Netsim qSim, VehicleType vehicleType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;

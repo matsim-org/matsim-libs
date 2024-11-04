@@ -1,8 +1,5 @@
 package org.matsim.core.communication;
 
-import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.serialization.SerializationProvider;
 
@@ -107,8 +104,8 @@ public interface Communicator extends AutoCloseable {
 	/**
 	 * Sends the msg to all other processes and receives messages from all other processes.
 	 *
-	 * @param msg Message to be sent
-	 * @param tag Tag of the message, only message with the same tag will be received
+	 * @param msg   Message to be sent
+	 * @param tag   Tag of the message, only message with the same tag will be received
 	 * @return All received messages, including the one sent
 	 */
 	default <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {
@@ -118,13 +115,15 @@ public interface Communicator extends AutoCloseable {
 		byte[] bytes = provider.toBytes(msg);
 		try (Arena arena = Arena.ofConfined()) {
 
-			MemorySegment data = arena.allocate(bytes.length + Integer.BYTES);
+			MemorySegment data = arena.allocate(bytes.length + Integer.BYTES * 3);
 
 			ByteBuffer bb = data.asByteBuffer();
+			// tag, sender, receiver
 			bb.putInt(0, tag);
-			bb.put(Integer.BYTES, bytes);
+			bb.putInt(Integer.BYTES, getRank());
+			bb.putInt(Integer.BYTES * 2, BROADCAST_TO_ALL);
+			bb.put(Integer.BYTES * 3, bytes);
 
-			LogManager.getLogger(Communicator.class).debug("#" + this.getRank() + " broadcasting data: ");
 			send(BROADCAST_TO_ALL, data, 0, data.byteSize());
 
 			recv(() -> messages.size() < getSize(), (buf) -> {
@@ -133,9 +132,10 @@ public interface Communicator extends AutoCloseable {
 				if (tag != t)
 					throw new IllegalStateException("Unexpected tag, got: %d, expected: %d".formatted(t, tag));
 
-				T received = provider.parse(buf);
-				LogManager.getLogger(Communicator.class).debug("#" + this.getRank() + " received message: " + received);
-				messages.add(received);
+				buf.getInt(); // sender
+				buf.getInt(); // receiver
+
+				messages.add(provider.parse(buf));
 			});
 
 			return messages;

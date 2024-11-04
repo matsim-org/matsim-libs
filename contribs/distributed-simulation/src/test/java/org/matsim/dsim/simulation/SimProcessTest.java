@@ -18,6 +18,7 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.dsim.MessageBroker;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.TestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -134,6 +135,7 @@ public class SimProcessTest {
                 bind(TimeInterpretation.class).in(Singleton.class);
                 bind(MessageBroker.class).toInstance(broker);
                 bind(EventsManager.class).toInstance(eventsManager);
+				bind(QSimCompatibility.class).toInstance(mock(QSimCompatibility.class));
                 bind(SimProvider.class);
             }
         });
@@ -172,7 +174,8 @@ public class SimProcessTest {
                 bind(TimeInterpretation.class).in(Singleton.class);
                 bind(MessageBroker.class).toInstance(broker);
                 bind(EventsManager.class).toInstance(em);
-                bind(SimProvider.class);
+				bind(QSimCompatibility.class).toInstance(mock(QSimCompatibility.class));
+				bind(SimProvider.class);
             }
         });
         var simProvider = injector.getInstance(SimProvider.class);

@@ -37,9 +37,9 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
@@ -72,7 +72,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	private static final Logger log = LogManager.getLogger(TransitQSimEngine.class);
 
-	private final QSim qSim;
+	private final Netsim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -89,7 +89,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		this.internalInterface = internalInterface ;
 	}
 
-	TransitQSimEngine(QSim queueSimulation) {
+	TransitQSimEngine(Netsim queueSimulation) {
 		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
 			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
 			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
@@ -97,7 +97,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	@Inject
-	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
+	public TransitQSimEngine(Netsim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
 							 UmlaufBuilder umlaufBuilder, TransitStopAgentTracker tracker,
 							 TransitDriverAgentFactory transitDriverFactory) {
 		this.qSim = queueSimulation;

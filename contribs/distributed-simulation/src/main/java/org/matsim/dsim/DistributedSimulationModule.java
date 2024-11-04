@@ -1,6 +1,8 @@
 package org.matsim.dsim;
 
+import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.SneakyThrows;
@@ -12,8 +14,10 @@ import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -23,121 +27,121 @@ import org.matsim.dsim.executors.SingleExecutor;
 import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.dsim.simulation.TimeInterpretation;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Log4j2
 public class DistributedSimulationModule extends AbstractModule {
 
-	private final Communicator comm;
-	private final int threads;
-	private final double oversubscribe;
-	private final SerializationProvider serializer = new SerializationProvider();
-	private final Topology topology;
+    private final Communicator comm;
+    private final int threads;
+    private final double oversubscribe;
+    private final SerializationProvider serializer = new SerializationProvider();
+    private final Topology topology;
 
-	public DistributedSimulationModule(Communicator comm, int threads, double oversubscribe) {
-		this.comm = comm;
-		this.threads = threads;
-		this.oversubscribe = oversubscribe;
+    public DistributedSimulationModule(Communicator comm, int threads, double oversubscribe) {
+        this.comm = comm;
+        this.threads = threads;
+        this.oversubscribe = oversubscribe;
 
-		// TODO: Connecting logic is currently here to support standard matsim controller without modification
-		log.info("#" + comm.getRank() + " Waiting for {} other nodes to connect...", comm.getSize() - 1);
-		try {
-			comm.connect();
-		} catch (Exception e) {
-			throw new RuntimeException("#" + comm.getRank() + "Failed to connect to other nodes", e);
-		}
+        // TODO: Connecting logic is currently here to support standard matsim controller without modification
+        log.info("Waiting for {} other nodes to connect...", comm.getSize() - 1);
+        try {
+            comm.connect();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect to other nodes", e);
+        }
 
-		log.info("#" + comm.getRank() + " All nodes connected");
+        log.info("All nodes connected");
 
-		// This may be relevant if we want to partition the network or other lps
-		topology = createTopology(serializer);
+        // This may be relevant if we want to partition the network or other lps
+        topology = createTopology(serializer);
 
-		log.info("Topology has {} partitions on {} nodes. Node {} is has parts: {}",
-			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
-	}
+        log.info("Topology has {} partitions on {} nodes. Node {} is has parts: {}",
+                topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
+    }
 
-	/**
-	 * Constructor for module, without communication.
-	 */
-	public DistributedSimulationModule(int threads) {
-		this(new NullCommunicator(), threads, 1);
-	}
+    /**
+     * Constructor for module, without communication.
+     */
+    public DistributedSimulationModule(int threads) {
+        this(new NullCommunicator(), threads, 1);
+    }
 
-	@SneakyThrows
-	@Override
-	public void install() {
+    @SneakyThrows
+    @Override
+    public void install() {
 
-		SimulationNode node = topology.getNode(comm.getRank());
+        SimulationNode node = topology.getNode(comm.getRank());
 
-		bind(Communicator.class).toInstance(comm);
-		bind(SimulationNode.class).toInstance(node);
-		bind(Topology.class).toInstance(topology);
-		bind(MessageBroker.class).in(Singleton.class);
-		bind(DSim.class).in(Singleton.class);
-		bind(SerializationProvider.class).toInstance(serializer);
-		bind(TimeInterpretation.class).in(Singleton.class);
+        bind(Communicator.class).toInstance(comm);
+        bind(SimulationNode.class).toInstance(node);
+        bind(Topology.class).toInstance(topology);
+        bind(MessageBroker.class).in(Singleton.class);
+        bind(DSim.class).in(Singleton.class);
+		bind(Netsim.class).to(Key.get(DSim.class));
+        bind(SerializationProvider.class).toInstance(serializer);
+        bind(TimeInterpretation.class).in(Singleton.class);
 
 		// Binds mobsim related things
 		install(new QSimComponentsModule());
 		installQSimModule(new TransitEngineModule());
 		installQSimModule(new PopulationModule());
 		bindMobsim().toProvider(DSimProvider.class);
+		bind(QSimCompatibility.class).in(Singleton.class);
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
 		addControlerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
-		// Optional single threaded execution
-		if (threads > 1) {
-			bind(LPExecutor.class).to(PoolExecutor.class).in(Singleton.class);
-		} else {
-			bind(LPExecutor.class).to(SingleExecutor.class).in(Singleton.class);
-		}
+        // Optional single threaded execution
+        if (threads > 1) {
+            bind(LPExecutor.class).to(PoolExecutor.class).in(Singleton.class);
+        } else {
+            bind(LPExecutor.class).to(SingleExecutor.class).in(Singleton.class);
+        }
 
-		Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder(), LPProvider.class);
-
+        Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder(), LPProvider.class);
 		lps.addBinding().to(SimProvider.class);
 
-		Multibinder<EventHandler> handler = Multibinder.newSetBinder(binder(), EventHandler.class);
-		handler.addBinding().to(TravelTimeCalculator.class);
+
+		// From the qsim module
+		bind( new TypeLiteral<Collection<AbstractQSimModule>>() {} ).to(new TypeLiteral<Set<AbstractQSimModule>>() {});
+
 	}
 
-	private Topology createTopology(SerializationProvider serializer) {
+    private Topology createTopology(SerializationProvider serializer) {
 
-		SimulationNode node = SimulationNode.builder()
-			.cores(threads)
-			.rank(comm.getRank())
-			.build();
+        SimulationNode node = SimulationNode.builder()
+                .cores(threads)
+                .rank(comm.getRank())
+                .build();
 
-		// Receive node information from all ranks
-		log.debug("#" + comm.getRank() + " createTopology before allGather node information");
-		List<SimulationNode> nodes = comm.allGather(node, 0, serializer);
-		log.debug("#" + comm.getRank() + " createTopology after allGather node information");
-		nodes.sort(Comparator.comparingInt(SimulationNode::getRank));
+        // Receive node information from all ranks
+        List<SimulationNode> nodes = comm.allGather(node, 0, serializer);
+        nodes.sort(Comparator.comparingInt(SimulationNode::getRank));
 
-		Topology.TopologyBuilder topology = Topology.builder();
-		List<SimulationNode> topoNodes = new ArrayList<>();
+        Topology.TopologyBuilder topology = Topology.builder();
+        List<SimulationNode> topoNodes = new ArrayList<>();
 
-		int total = 0;
-		for (SimulationNode value : nodes) {
 
-			SimulationNode.NodeBuilder n = value.toBuilder();
-			int parts = (int) (value.getCores() * oversubscribe);
+        int total = 0;
+        for (SimulationNode value : nodes) {
 
-			n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
+            SimulationNode.NodeBuilder n = value.toBuilder();
+            int parts = (int) (value.getCores() * oversubscribe);
+
+            n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
 			n.distributed(nodes.size() > 1);
 
-			total += parts;
-			topoNodes.add(n.build());
-		}
+            total += parts;
+            topoNodes.add(n.build());
+        }
 
-		// head nodes needs to build topology with all partition info
-		return topology
-			.nodes(topoNodes)
-			.totalPartitions(total)
-			.build();
-	}
+        // head nodes needs to build topology with all partition info
+        return topology
+                .nodes(topoNodes)
+                .totalPartitions(total)
+                .build();
+    }
 }

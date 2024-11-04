@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -57,19 +57,19 @@ import java.util.Set;
  * @author thibautd
  */
 public class PopulationAgentSourceWithVehicles implements AgentSource {
-	private final  Population population;
+	private final Population population;
 	private final AgentFactory agentFactory;
-	private final QSim qsim;
+	private final Netsim qsim;
 	private final Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
 
 	public PopulationAgentSourceWithVehicles(
 			final Population population,
 			final AgentFactory agentFactory,
-			final QSim qsim) {
+			final Netsim qsim) {
 		this.population = population;
 		this.agentFactory = agentFactory;
-		this.qsim = qsim;  
+		this.qsim = qsim;
 		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 		for (String mode : mainModes) {
@@ -99,7 +99,7 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 						final Vehicle basicVehicle = vehiclesFactory.createVehicle(
 								vehicleId,
 								modeVehicleTypes.get( leg.getMode() ) );
-						
+
 //						qsim.createAndParkVehicleOnLink( basicVehicle, vehicleLink);
 						QVehicle veh = new QVehicleImpl( basicVehicle ) ;
 						// yyyyyy better use the (new) QVehicleFactory. kai, nov'18
