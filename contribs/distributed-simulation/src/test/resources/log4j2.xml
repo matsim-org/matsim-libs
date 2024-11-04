@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <!-- Console appender for testing (optional, for seeing some test logs) -->
-    <Appenders>
+	<Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
@@ -9,10 +9,11 @@
 
     <Loggers>
         <!-- Disable logging the injector in tests -->
-        <Logger name="org.matsim.core.controler.Injector" level="OFF" additivity="false"/>
+		<Logger name="org.matsim.core.controler.Injector" level="OFF" additivity="false"/>
+		<Logger name="org.apache.fury.codegen.JaninoUtils" level="OFF" additivity="false"/>
 
-        <!-- Root logger for other logging (optional, adjust level as needed) -->
-        <Root level="INFO">
+		<!-- Root logger for other logging (optional, adjust level as needed) -->
+		<Root level="DEBUG">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

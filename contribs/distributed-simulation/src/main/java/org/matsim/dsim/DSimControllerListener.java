@@ -32,26 +32,26 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 
 	public static double PRIORITY = -100;
 
-    @Inject
-    private Scenario scenario;
+	@Inject
+	private Scenario scenario;
 
-    @Inject
-    private Topology topology;
+	@Inject
+	private Topology topology;
 
-    @Inject
-    private EventsManager manager;
+	@Inject
+	private EventsManager manager;
 
-    @Inject
-    private Communicator comm;
+	@Inject
+	private Communicator comm;
 
 	@Inject
 	private MessageBroker broker;
 
-    @Inject
-    private SerializationProvider serializer;
+	@Inject
+	private SerializationProvider serializer;
 
-    @Inject
-    private Injector injector;
+	@Inject
+	private Injector injector;
 
 	@Override
 	public double priority() {
@@ -59,48 +59,51 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 	}
 
 	@Override
-    public void notifyStartup(StartupEvent event) {
+	public void notifyStartup(StartupEvent event) {
 
-        // Right now every node is required to perform the same partitioning to that results are consistent
-        // TODO: partitioning can be performed on one node only, and then broadcast to all nodes
-        // TODO: one lp provider may want to access partition information of another lp
-        NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
+		// Right now every node is required to perform the same partitioning to that results are consistent
+		// TODO: partitioning can be performed on one node only, and then broadcast to all nodes
+		// TODO: one lp provider may want to access partition information of another lp
+		NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
 
-        StartUpMessage msg = StartUpMessage.builder()
-                .linkIds(Id.getAllIds(Link.class))
-                .nodeIds(Id.getAllIds(Node.class))
-                .personIds(Id.getAllIds(Person.class))
-                .build();
+		StartUpMessage msg = StartUpMessage.builder()
+			.linkIds(Id.getAllIds(Link.class))
+			.nodeIds(Id.getAllIds(Node.class))
+			.personIds(Id.getAllIds(Person.class))
+			.build();
 
 		log.info("Sending startup messages...");
 
-        // Check if Ids are consistent
-        List<StartUpMessage> all = comm.allGather(msg, 10, serializer);
-        for (StartUpMessage m : all) {
-            Id.check(Link.class, m.getLinkIds());
-            Id.check(Node.class, m.getNodeIds());
-            Id.check(Person.class, m.getPersonIds());
-        }
-    }
+		// Check if Ids are consistent
+		log.debug("#" + comm.getRank() + " notifyStartup before allGather Ids.");
+		List<StartUpMessage> all = comm.allGather(msg, 10, serializer);
+		log.debug("#" + comm.getRank() + " notifyStartup after allGather Ids.");
+		for (StartUpMessage m : all) {
+			Id.check(Link.class, m.getLinkIds());
+			Id.check(Node.class, m.getNodeIds());
+			Id.check(Person.class, m.getPersonIds());
+		}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+	}
 
-        // TODO: need to check if multiple syncs are required
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-        // Event handler have already been registered at this point
-        if (manager instanceof DistributedEventsManager d) {
-            d.syncEventRegistry(comm);
-        }
+		// TODO: need to check if multiple syncs are required
 
-    }
+		// Event handler have already been registered at this point
+		if (manager instanceof DistributedEventsManager d) {
+			d.syncEventRegistry(comm);
+		}
 
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
+	}
 
-        injector.getInstance(LPExecutor.class).shutdown();
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
 
-        // Wait for all nodes to finish
+		injector.getInstance(LPExecutor.class).shutdown();
+
+		// Wait for all nodes to finish
 		comm.allGather(new ShutDownMessage(), Integer.MAX_VALUE, serializer);
 
 		log.info("Simulation finished");

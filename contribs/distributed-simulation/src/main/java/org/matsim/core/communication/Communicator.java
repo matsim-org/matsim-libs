@@ -1,5 +1,8 @@
 package org.matsim.core.communication;
 
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.serialization.SerializationProvider;
 
@@ -104,8 +107,8 @@ public interface Communicator extends AutoCloseable {
 	/**
 	 * Sends the msg to all other processes and receives messages from all other processes.
 	 *
-	 * @param msg   Message to be sent
-	 * @param tag   Tag of the message, only message with the same tag will be received
+	 * @param msg Message to be sent
+	 * @param tag Tag of the message, only message with the same tag will be received
 	 * @return All received messages, including the one sent
 	 */
 	default <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {
@@ -121,6 +124,7 @@ public interface Communicator extends AutoCloseable {
 			bb.putInt(0, tag);
 			bb.put(Integer.BYTES, bytes);
 
+			LogManager.getLogger(Communicator.class).debug("#" + this.getRank() + " broadcasting data: ");
 			send(BROADCAST_TO_ALL, data, 0, data.byteSize());
 
 			recv(() -> messages.size() < getSize(), (buf) -> {
@@ -129,7 +133,9 @@ public interface Communicator extends AutoCloseable {
 				if (tag != t)
 					throw new IllegalStateException("Unexpected tag, got: %d, expected: %d".formatted(t, tag));
 
-				messages.add(provider.parse(buf));
+				T received = provider.parse(buf);
+				LogManager.getLogger(Communicator.class).debug("#" + this.getRank() + " received message: " + received);
+				messages.add(received);
 			});
 
 			return messages;

@@ -18,8 +18,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DistributedIntegrationTest {
@@ -70,27 +69,60 @@ public class DistributedIntegrationTest {
 	@Test
 	@Order(2)
 	@Disabled
-	void runDistributed() {
+	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException {
 
-		Config local = createScenario();
-		Scenario scenario = ScenarioUtils.loadScenario(local);
+		//Config local = createScenario();
+		//Scenario scenario = ScenarioUtils.loadScenario(local);
 
 		// Need to prepare network for freight
-		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-		scenario.getNetwork().getLinks().values().parallelStream()
-			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-			.forEach(l -> l.setAllowedModes(carandfreight));
+		//var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		//scenario.getNetwork().getLinks().values().parallelStream()
+		//	.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+		//	.forEach(l -> l.setAllowedModes(carandfreight));
 
+		var size = 4;
+		var pool = Executors.newFixedThreadPool(size);
+		var comms = LocalCommunicator.create(size);
+		var outputDir = utils.getOutputDirectory();
+
+		var futures = comms.stream()
+			.map(comm -> pool.submit(() -> {
+				Config config = ConfigUtils.createConfig();
+				config.controller().setOutputDirectory(outputDir);
+				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+				config.controller().setLastIteration(2);
+				config.controller().setMobsim("dsim");
+				Activities.addScoringParams(config);
+				DistributedController c = new DistributedController(comm, config, 1, 1);
+				c.run();
+				try {
+					comm.close();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}))
+			.toList();
+
+		for (var f : futures) {
+			f.get(2, TimeUnit.MINUTES);
+		}
+
+
+		/*
 		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
 			List<Communicator> comms = LocalCommunicator.create(4);
 			for (Communicator comm : comms) {
 				pool.submit(() -> {
-					Controler controler = new Controler(scenario);
-					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-					controler.run();
+					//Controler controler = new Controler(scenario);
+					//controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
+					//controler.run();
+					var distributedController = new DistributedController(comm, local, 1, 1);
+					distributedController.run();
 				});
 			}
 		}
+
+		 */
 
 	}
 }
