@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -161,6 +162,15 @@ public class SharedMemoryCommunicator implements Communicator {
 		private final MappedByteBuffer buffer;
 		private final UnsafeBuffer ub;
 
+		/**
+		 * Compute next power of two for the given value.
+		 * @param value
+		 * @return
+		 */
+		private long nextPowerOfTwo(long value) {
+			return 1L << (64 - Long.numberOfLeadingZeros(value - 1));
+		}
+
 		@SneakyThrows
 		public IPC(File path, long total, boolean clear) {
 
@@ -170,9 +180,15 @@ public class SharedMemoryCommunicator implements Communicator {
 
 			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
 			int s = bufferSize != null ? Integer.parseInt(bufferSize) : 32 * 1024 * 1024;
+			long n = nextPowerOfTwo(total * s + RingBufferDescriptor.TRAILER_LENGTH);
+			long size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
+			while (size > Integer.MAX_VALUE) {
+				n = n >> 1;
+				size = n * s + RingBufferDescriptor.TRAILER_LENGTH;
+			}
 
 			// Create a memory-mapped file
-			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, total * s + RingBufferDescriptor.TRAILER_LENGTH);
+			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, size);
 
 			// Zero the buffer before using it
 			if (clear) {
