@@ -1,9 +1,10 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.ccMapBinder;
 
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +46,18 @@ public final class MapBinderWithStringExample{
 		}
 		log.info("") ;
 
-		Map<String, Provider<MyInterface>> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, Provider<MyInterface>>>(){} ) );;
-		Provider<MyInterface> provider = map.get( "abc" );;
+		{
+			Map<String, MyInterface> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, MyInterface>>(){
+			} ) );
+			MyInterface result = map.get( "abc" );
+		}
+		{
+			Map<String, Provider<MyInterface>> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, Provider<MyInterface>>>(){
 
-//		for( Provider<MyInterface> provider : set ){
-			provider.get() ;
-//		}
+			} ) );
+			Provider<MyInterface> provider = map.get( "abc" );
+		}
+
 
 	}
 

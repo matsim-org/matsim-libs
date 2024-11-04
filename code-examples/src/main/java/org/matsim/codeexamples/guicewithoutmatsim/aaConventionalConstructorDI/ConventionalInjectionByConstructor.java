@@ -1,11 +1,11 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.aaConventionalConstructorDI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class ConventionalInjectionByConstructor{
 
-	private static final Logger log = LogManager.getLogger( BasicInjection.class ) ;
+	private static final Logger log = LogManager.getLogger( ConventionalInjectionByConstructor.class ) ;
 
 	public static void main(String[] args){
 		Helper helper = new MyHelper1();

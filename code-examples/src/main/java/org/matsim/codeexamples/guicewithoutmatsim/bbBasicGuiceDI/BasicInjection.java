@@ -1,9 +1,10 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.bbBasicGuiceDI;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.multibindings.MapBinder;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -15,19 +16,10 @@ class BasicInjection{
 			@Override protected void configure(){
 				bind(Simulation.class).to( MySimulation1.class ) ;
 				bind( Helper.class ).to( MyHelper1.class ) ;
-//				MapBinder<String,TravelTime>.newMapBinder( this, "car",   )
 			}
 		} );
 		Simulation sim = injector.getInstance(Simulation.class);
 		sim.run() ;
-	}
-
-	interface Simulation {
-		void run() ;
-	}
-
-	interface Helper {
-		Object getAccessToSomething() ;
 	}
 
 	static class MySimulation1 implements Simulation {
@@ -58,4 +50,13 @@ class BasicInjection{
 			return null ;
 		}
 	}
+
+	interface Simulation {
+		void run() ;
+	}
+
+	interface Helper {
+		Object getAccessToSomething() ;
+	}
+
 }
