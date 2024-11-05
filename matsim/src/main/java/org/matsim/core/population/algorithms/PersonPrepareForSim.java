@@ -39,7 +39,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import java.util.List;
 import java.util.Set;
@@ -178,17 +177,6 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 			leg.getRoute().setDistance(dist);
 			// using the full network for the distance calculation.  kai, jul'18
-		} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-			// replace deprecated ExperimentalTransitRoute with DefaultTransitPassengerRoute
-			ExperimentalTransitRoute oldRoute = (ExperimentalTransitRoute) leg.getRoute();
-			DefaultTransitPassengerRoute newRoute = new DefaultTransitPassengerRoute(
-					oldRoute.getStartLinkId(),
-					oldRoute.getEndLinkId(),
-					oldRoute.getAccessStopId(),
-					oldRoute.getEgressStopId(),
-					oldRoute.getLineId(),
-					oldRoute.getRouteId());
-			leg.setRoute(newRoute);
 		}
 	}
 

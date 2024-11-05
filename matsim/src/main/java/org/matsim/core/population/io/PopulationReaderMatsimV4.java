@@ -50,7 +50,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.xml.sax.Attributes;
 
 /**
@@ -339,7 +338,7 @@ import org.xml.sax.Attributes;
 	private void startRoute(final Attributes atts) {
 		Class<? extends Route> routeType = Route.class;
 		if ("pt".equals(this.currleg.getMode())) {
-			routeType = ExperimentalTransitRoute.class;
+			routeType = ExperimentalTransitRoute.class;// either not delete ExperimentalTransitRoute or delete this v4 reader here too
 		}
 		if ("car".equals(this.currleg.getMode())) {
 			routeType = NetworkRoute.class;

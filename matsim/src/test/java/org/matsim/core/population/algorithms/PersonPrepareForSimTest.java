@@ -49,7 +49,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -422,54 +421,6 @@ public class PersonPrepareForSimTest {
 
 			Assertions.assertThrows(RuntimeException.class, () -> new PersonPrepareForSim(new DummyRouter(), sc).run(person));
 		}
-	}
-
-	@Test
-	void testReplaceExperimentalTransitRoute() {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		createAndAddNetwork(sc);
-		Id<Link> startLink = Id.createLinkId("1");
-		Id<Link> endLink = Id.createLinkId("2");
-		TransitStopFacility stopFacility1 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
-				Id.create("stop1", TransitStopFacility.class),
-				sc.getNetwork().getLinks().get(startLink).getToNode().getCoord(),
-				false);
-		stopFacility1.setLinkId(startLink);
-		sc.getTransitSchedule().addStopFacility(stopFacility1);
-		TransitStopFacility stopFacility2 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
-				Id.create("stop2", TransitStopFacility.class),
-				sc.getNetwork().getLinks().get(endLink).getToNode().getCoord(),
-				false);
-		stopFacility2.setLinkId(endLink);
-		sc.getTransitSchedule().addStopFacility(stopFacility2);
-		Population pop = sc.getPopulation();
-		PopulationFactory pf = pop.getFactory();
-		Person person = pf.createPerson(Id.create("2", Person.class));
-		Plan plan = pf.createPlan();
-		Activity activity1 = pf.createActivityFromLinkId("h", startLink);
-		plan.addActivity(activity1);
-		Leg leg = pf.createLeg(TransportMode.pt);
-		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
-		Id<TransitLine> line = Id.create("line", TransitLine.class);
-		Id<TransitRoute> route = Id.create("route", TransitRoute.class);
-		ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
-				stopFacility1, stopFacility2, line, route);
-		leg.setRoute(experimentalTransitRoute);
-		plan.addLeg(leg);
-		Activity activity2 = pf.createActivityFromLinkId("w", endLink);
-		plan.addActivity(activity2);
-		person.addPlan(plan);
-		pop.addPerson(person);
-
-		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
-
-		Assertions.assertEquals(DefaultTransitPassengerRoute.ROUTE_TYPE, leg.getRoute().getRouteType());
-		Assertions.assertEquals(startLink, leg.getRoute().getStartLinkId());
-		Assertions.assertEquals(endLink, leg.getRoute().getEndLinkId());
-		Assertions.assertEquals(stopFacility1.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getAccessStopId());
-		Assertions.assertEquals(stopFacility2.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getEgressStopId());
-		Assertions.assertEquals(line, ((DefaultTransitPassengerRoute) leg.getRoute()).getLineId());
-		Assertions.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
 	}
 
 	@Test
