@@ -44,7 +44,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	requires = {"trips.csv", "persons.csv"},
 	produces = {
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
-		"mode_share_per_%s.csv", "population_trip_stats.csv", "trip_purposes_by_hour.csv",
+		"mode_share_per_%s.csv", "mode_share_per_purpose_per_%s.csv",
+		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
 		"mode_share_distance_distribution.csv", "mode_shift.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
@@ -284,7 +285,8 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeModeShare(joined, labels);
 
 		if (groups != null) {
-			groups.analyzeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			groups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			groups.writeModeSharePerPurpose(joined,modeOrder, (g) -> output.getPath("mode_share_per_purpose_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {

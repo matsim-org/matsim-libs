@@ -100,7 +100,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void analyzeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
+	void writeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
@@ -145,6 +145,12 @@ final class TripByGroupAnalysis {
 			String name = String.join("_", group.columns);
 			joined.write().csv(output.apply(name).toFile());
 		}
+	}
+
+	void writeModeSharePerPurpose(Table trips, List<String> modeOrder, Function<String, Path> output) {
+
+		// TODO: implement
+
 	}
 
 	void groupPersons(Table persons) {
