@@ -24,6 +24,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
+import tech.tablesaw.columns.strings.AbstractStringColumn;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
@@ -44,7 +45,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 	requires = {"trips.csv", "persons.csv"},
 	produces = {
 		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
-		"mode_share_per_%s.csv", "mode_share_per_purpose_per_%s.csv",
+		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
 		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
 		"mode_share_distance_distribution.csv", "mode_shift.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
@@ -282,11 +283,15 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		joined.addColumns(dist_group);
 
+		TextColumn purpose = joined.textColumn("end_activity_type");
+
+		// Remove suffix durations like _345
+		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
+
 		writeModeShare(joined, labels);
 
 		if (groups != null) {
 			groups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
-			groups.writeModeSharePerPurpose(joined,modeOrder, (g) -> output.getPath("mode_share_per_purpose_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {
@@ -310,6 +315,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		tryRun(this::writeTripDistribution, joined);
 		tryRun(this::writeModeShift, joined);
 		tryRun(this::writeModeChains, joined);
+		tryRun(this::writeModeStatsPerPurpose, joined);
 
 		return 0;
 	}
@@ -508,11 +514,6 @@ public class TripAnalysis implements MATSimAppCommand {
 			IntColumn.create("arrival_h", arrival.intStream().toArray())
 		);
 
-		TextColumn purpose = trips.textColumn("end_activity_type");
-
-		// Remove suffix durations like _345
-		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
-
 		Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 
 		tArrival.column(0).setName("purpose");
@@ -670,6 +671,33 @@ public class TripAnalysis implements MATSimAppCommand {
 				printer.printRecord(p.left(), (int) p.rightDouble(), p.rightDouble() / total);
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void writeModeStatsPerPurpose(Table trips) {
+
+		Table aggr = trips.summarize("trip_id", count).by("end_activity_type", "main_mode");
+
+		Comparator<Row> cmp = Comparator.comparing(row -> row.getString("end_activity_type"));
+		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
+
+		aggr.doubleColumn(aggr.columnCount() - 1).setName("share");
+		aggr.column("end_activity_type").setName("purpose");
+
+		Set<String> purposes = (Set<String>) aggr.column("purpose").asSet();
+
+		// Norm each purpose to 1
+		// It was not clear if the purpose is a string or text colum, therefor this code uses the abstract version
+		for (String label : purposes) {
+			DoubleColumn all = aggr.doubleColumn("share");
+			Selection sel = ((AbstractStringColumn<?>) aggr.column("purpose")).isEqualTo(label);
+
+			double total = all.where(sel).sum();
+			if (total > 0)
+				all.set(sel, all.divide(total));
+		}
+
+		aggr.write().csv(output.getPath("mode_share_per_purpose.csv").toFile());
 	}
 
 	/**

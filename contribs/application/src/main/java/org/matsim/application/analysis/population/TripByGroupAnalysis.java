@@ -147,12 +147,6 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void writeModeSharePerPurpose(Table trips, List<String> modeOrder, Function<String, Path> output) {
-
-		// TODO: implement
-
-	}
-
 	void groupPersons(Table persons) {
 
 		for (Group g : groups) {
