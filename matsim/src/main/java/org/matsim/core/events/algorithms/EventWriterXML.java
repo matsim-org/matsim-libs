@@ -36,7 +36,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-@DistributedEventHandler(DistributedMode.NODE_SINGLETON)
+@DistributedEventHandler(value = DistributedMode.PARTITION_SINGLETON, directProcessing = true)
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	private static final Logger LOG = LogManager.getLogger(EventWriterXML.class);
