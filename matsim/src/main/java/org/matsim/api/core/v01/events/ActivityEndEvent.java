@@ -102,7 +102,6 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 	public void writeAsXML(StringBuilder out) {
 		// Writes common attributes
 		writeXMLStart(out);
-		out.append(ATTRIBUTE_ACTTYPE).append("=\"");
 		writeEncodedAttributeKeyValue(out, ATTRIBUTE_ACTTYPE, this.acttype);
 		writeXMLEnd(out);
 	}
