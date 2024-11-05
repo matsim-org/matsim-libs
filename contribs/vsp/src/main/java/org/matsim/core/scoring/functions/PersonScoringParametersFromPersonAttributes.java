@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * which is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
  * This class additionaly allows for person-specific mode scoring parameters (for now ASC only) and marginalUtilityOfMoney.
  * In order to use this, you need to provide the respective attributes (otherwise default values for the subpopulation
- * are used). For mode scoring parameters use .... TODO
+ * are used). The person specific mode parameters are interpreted as offset added to the subpopulation's parameters.
  * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
  * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
@@ -160,9 +160,11 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
             Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
             if (personalScoringModeConstants != null) {
                 for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
-                    ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
+					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+					ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
                     try {
-                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()));
+                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()) +
+							subpopulationModeParams.getConstant());
                     } catch (NumberFormatException e) {
                         log.error("PersonalScoringModeConstants from person attribute could not be parsed for person " +
                                 person.getId().toString() + ".");
@@ -170,7 +172,6 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                     }
 
                     // copy other params from subpopulation config
-                    ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
                     modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
                     modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
                     modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
