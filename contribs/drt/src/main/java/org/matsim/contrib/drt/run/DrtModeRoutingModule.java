@@ -97,7 +97,8 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
 
-		bindModal(DrtRouteConstraintsCalculator.class).toProvider(modalProvider(getter -> new DefaultDrtRouteConstraintsCalculator())).in(Singleton.class);
+		bindModal(DrtRouteConstraintsCalculator.class).toProvider(modalProvider(getter -> new DefaultDrtRouteConstraintsCalculator(
+				drtCfg, getter.getModal(ConstraintSetChooser.class)))).in(Singleton.class);
 		DrtOptimizationConstraintsSet optimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(ConstraintSetChooser.class).toProvider(
 				() -> (departureTime, accessActLink, egressActLink, person, tripAttributes)
@@ -159,8 +160,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			var travelTime = getModalInstance(TravelTime.class);
 			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
 					travelTime, getModalInstance(TravelDisutilityFactory.class),
-					getModalInstance(DrtRouteConstraintsCalculator.class),
-					getModalInstance(ConstraintSetChooser.class));
+					getModalInstance(DrtRouteConstraintsCalculator.class));
 		}
 	}
 

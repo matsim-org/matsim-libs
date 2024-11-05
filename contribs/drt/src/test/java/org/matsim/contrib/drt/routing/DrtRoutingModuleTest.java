@@ -95,8 +95,8 @@ public class DrtRoutingModuleTest {
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
-				new DefaultDrtRouteConstraintsCalculator(),
-				(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(defaultConstraintsSet));
+				new DefaultDrtRouteConstraintsCalculator(drtCfg, 
+						(departureTime, accessActLink, egressActLink, person, tripAttributes) -> Optional.of(defaultConstraintsSet)));
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,

@@ -165,7 +165,10 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		SumoNetworkFeatureExtractor props = new SumoNetworkFeatureExtractor(handler);
 
 		try (CSVPrinter out = new CSVPrinter(IOUtils.getBufferedWriter(output), CSVFormat.DEFAULT)) {
-			out.printRecord(props.getHeader());
+			List<String> header = new ArrayList<>(props.getHeader());
+			header.addAll(handler.attributes);
+
+			out.printRecord(header);
 			props.print(out);
 
 		} catch (IOException e) {

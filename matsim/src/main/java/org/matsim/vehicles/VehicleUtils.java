@@ -20,16 +20,17 @@
 
 package org.matsim.vehicles;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -57,6 +58,7 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
+	private static final String INITIAL_LINK_ID = "initialLinkId";
 
 	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
 		return new VehicleType( typeId );
@@ -431,5 +433,14 @@ public final class VehicleUtils {
 	public static void writeVehicles( Vehicles vehicles, String filename ) {
 		new MatsimVehicleWriter( vehicles ).writeFile( filename );
 
+	}
+	
+	public static Id<Link> getInitialLinkId(Vehicle vehicle) {
+		String attribute = (String) vehicle.getAttributes().getAttribute(INITIAL_LINK_ID);
+		return attribute == null ? null : Id.createLinkId(attribute);
+	}
+
+	public static void setInitialLinkId(Vehicle vehicle, Id<Link> initialLinkId) {
+		vehicle.getAttributes().putAttribute(INITIAL_LINK_ID, initialLinkId.toString());
 	}
 }
