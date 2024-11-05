@@ -76,7 +76,7 @@ public class PersonArrivalEvent extends Event implements HasPersonId, HasLinkId 
 
 	@Override
 	public void writeAsXML(StringBuilder out) {
-		// All common attributes
+		// Writes all common attributes
 		writeXMLStart(out);
 		if (this.legMode != null) {
 			writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);

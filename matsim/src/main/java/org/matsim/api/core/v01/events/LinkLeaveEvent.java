@@ -79,7 +79,7 @@ public class LinkLeaveEvent extends Event implements HasLinkId, HasVehicleId {
 
 	@Override
 	public void writeAsXML(StringBuilder out) {
-		// All common attributes
+		// Writes all common attributes
 		writeXMLStart(out);
 		writeXMLEnd(out);
 	}
