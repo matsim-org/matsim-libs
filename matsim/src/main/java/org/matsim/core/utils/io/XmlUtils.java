@@ -39,8 +39,45 @@ public final class XmlUtils {
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
 	public static String encodeAttributeValue(final String attributeValue) {
-		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
-			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		if (attributeValue == null) {
+			return null;
+		}
+		int len = attributeValue.length();
+		boolean encode = false;
+		for (int pos = 0; pos < len; pos++) {
+			char ch = attributeValue.charAt(pos);
+			if (ch == '<') {
+				encode = true;
+				break;
+			} else if (ch == '>') {
+				encode = true;
+				break;
+			} else if (ch == '\"') {
+				encode = true;
+				break;
+			} else if (ch == '&') {
+				encode = true;
+				break;
+			}
+		}
+		if (encode) {
+			StringBuilder bf = new StringBuilder(attributeValue.length() + 30);
+			for (int pos = 0; pos < len; pos++) {
+				char ch = attributeValue.charAt(pos);
+				if (ch == '<') {
+					bf.append("&lt;");
+				} else if (ch == '>') {
+					bf.append("&gt;");
+				} else if (ch == '\"') {
+					bf.append("&quot;");
+				} else if (ch == '&') {
+					bf.append("&amp;");
+				} else {
+					bf.append(ch);
+				}
+			}
+
+			return bf.toString();
 		}
 		return attributeValue;
 	}

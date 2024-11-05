@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.core.utils.io.XmlUtils;
 
 public abstract class Event {
 
@@ -105,6 +106,26 @@ public abstract class Event {
 	public int hashCode() {
 		return getAttributes().hashCode(); // Two equal events must at least have the same attributes, so they will get the same hashCode like this.
 	}
+
+	/**
+	 * Write a xml representation of this event to the given writer.
+	 * The implementation must write the whole xml element <event ... />. Starting with \t and adding a newline at the end.
+	 *
+	 * The provided default implementation writes the whole element based on {@link #getAttributes()}. This is slow and should be overridden.
+	 * The overriding implementation must *not* call the super method.
+	 */
+	public void writeAsXML(StringBuilder out) {
+		out.append("\t<event ");
+		Map<String, String> attr = getAttributes();
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			out.append(entry.getKey());
+			out.append("=\"");
+			out.append(XmlUtils.encodeAttributeValue(entry.getValue()));
+			out.append("\" ");
+		}
+		out.append(" />\n");
+	}
+
 }
 
 
