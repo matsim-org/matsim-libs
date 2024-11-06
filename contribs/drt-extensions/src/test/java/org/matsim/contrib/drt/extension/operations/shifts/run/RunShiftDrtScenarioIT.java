@@ -132,7 +132,7 @@ public class RunShiftDrtScenarioIT {
         config.controller().setWriteEventsInterval(1);
 
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controller().setOutputDirectory("test/output/holzkirchen_shifts");
+        config.controller().setOutputDirectory("test/output/RunShiftDrtScenarioIT");
 
         DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
         ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);
