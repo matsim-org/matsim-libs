@@ -19,15 +19,16 @@
 
 package org.matsim.contrib.accessibility.run;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 
 import com.google.inject.multibindings.MapBinder;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -39,23 +40,25 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.*;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -95,8 +98,8 @@ public class TinyAccessibilityTest {
 
 	}
 
-	@Test @Disabled
-	public void runFromEventsDrt() {
+	@Test
+	public void runFromEventsDrt() throws IOException {
 		final Config config = createTestConfig();
 
 		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
@@ -112,14 +115,37 @@ public class TinyAccessibilityTest {
 		acg.setUseParallelization(false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
 
-//		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
-//			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
-//			.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
-//			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
-//			.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
-//			.build();
 
-		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+		String stopsInputFileName = utils.getInputDirectory() + "drtStops.xml";
+		{
+			Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			TransitScheduleFactory tf = dummyScenario.getTransitSchedule().getFactory();
+			TransitStopFacility a = tf.createTransitStopFacility(Id.create("a", TransitStopFacility.class), new Coord(120, 100), false);
+			a.setLinkId(Id.createLinkId("7"));
+			dummyScenario.getTransitSchedule().addStopFacility(a);
+
+
+			if (!Files.exists(Path.of(utils.getInputDirectory()))) {
+				Files.createDirectories(Path.of(utils.getInputDirectory()));
+			}
+
+			new TransitScheduleWriter(dummyScenario.getTransitSchedule()).writeFile(stopsInputFileName);
+		}
+
+
+		ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
+		drtConfigGroup.transitStopFile = stopsInputFileName;
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
 
 		// ---
 

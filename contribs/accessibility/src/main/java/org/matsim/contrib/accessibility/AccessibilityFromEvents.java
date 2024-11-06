@@ -4,7 +4,6 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -24,6 +23,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DirectTripBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
+import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
+import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
 
 import java.util.*;
 
@@ -91,8 +95,14 @@ public final class AccessibilityFromEvents{
 
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 
-				//TODO: Needed to bind DRT Estimator
-//				bind(DrtEstimator).toInstance()
+				DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+					.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+					.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
+					.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
+					.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
+					.build();
+
+				bind(DrtEstimator.class).toInstance(drtEstimator);
 
 				install( new TripRouterModule() ) ;
 				// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed
@@ -114,7 +124,7 @@ public final class AccessibilityFromEvents{
 					for( DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements() ){
 						install( new DrtModeModule( drtCfg ) );
 						installQSimModule( new DrtModeQSimModule( drtCfg ) );
-						install( new DrtModeAnalysisModule( drtCfg ) );
+//						install( new DrtModeAnalysisModule( drtCfg ) );
 
 						install( new AbstractDvrpModeModule( drtCfg.getMode() ){
 							// (= we need to install a ModeModule so we get access to the modal material)
