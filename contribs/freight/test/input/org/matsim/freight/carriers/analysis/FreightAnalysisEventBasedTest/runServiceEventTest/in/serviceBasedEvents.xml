@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="28800.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" actType="start"  />
+	<event time="28800.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" legMode="car"  />
+	<event time="28800.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="28800.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="28800.0" type="Freight tour starts" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" tourId="unknown"  />
+	<event time="28801.0" type="left link" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="28801.0" type="entered link" link="i(1,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="28935.0" type="left link" link="i(1,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="28935.0" type="entered link" link="j(1,1)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29069.0" type="left link" link="j(1,1)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29069.0" type="entered link" link="j(1,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29203.0" type="left link" link="j(1,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29203.0" type="entered link" link="i(2,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29337.0" type="left link" link="i(2,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29337.0" type="entered link" link="i(3,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29471.0" type="left link" link="i(3,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29471.0" type="entered link" link="i(4,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29605.0" type="left link" link="i(4,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29605.0" type="entered link" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29738.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="29738.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="29738.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" legMode="car"  />
+	<event time="29738.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" actType="service"  />
+	<event time="29738.0" type="Freight service starts" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="13" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="30039.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" actType="service"  />
+	<event time="30039.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" legMode="car"  />
+	<event time="30039.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30039.0" type="Freight service ends" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="13" serviceDuration="300.0"  />
+	<event time="30039.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="30040.0" type="left link" link="j(4,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30040.0" type="entered link" link="i(4,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30174.0" type="left link" link="i(4,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30174.0" type="entered link" link="j(3,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30308.0" type="left link" link="j(3,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30308.0" type="entered link" link="i(4,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30442.0" type="left link" link="i(4,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30442.0" type="entered link" link="i(5,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30576.0" type="left link" link="i(5,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30576.0" type="entered link" link="i(6,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30710.0" type="left link" link="i(6,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30710.0" type="entered link" link="j(6,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30844.0" type="left link" link="j(6,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30844.0" type="entered link" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30977.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="30977.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="30977.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" legMode="car"  />
+	<event time="30977.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" actType="service"  />
+	<event time="30977.0" type="Freight service starts" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="11" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="31278.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" actType="service"  />
+	<event time="31278.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" legMode="car"  />
+	<event time="31278.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31278.0" type="Freight service ends" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="11" serviceDuration="300.0"  />
+	<event time="31278.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="31279.0" type="left link" link="j(6,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31279.0" type="entered link" link="i(7,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31413.0" type="left link" link="i(7,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31413.0" type="entered link" link="i(8,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31547.0" type="left link" link="i(8,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31547.0" type="entered link" link="i(9,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31681.0" type="left link" link="i(9,0)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31681.0" type="entered link" link="j(9,1)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31815.0" type="left link" link="j(9,1)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31815.0" type="entered link" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31948.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="31948.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="31948.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" legMode="car"  />
+	<event time="31948.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" actType="service"  />
+	<event time="31948.0" type="Freight service starts" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="14" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="32249.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" actType="service"  />
+	<event time="32249.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" legMode="car"  />
+	<event time="32249.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32249.0" type="Freight service ends" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="14" serviceDuration="300.0"  />
+	<event time="32249.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="32250.0" type="left link" link="j(9,2)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32250.0" type="entered link" link="j(9,3)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32384.0" type="left link" link="j(9,3)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32384.0" type="entered link" link="j(9,4)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32518.0" type="left link" link="j(9,4)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32518.0" type="entered link" link="j(9,5)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32652.0" type="left link" link="j(9,5)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32652.0" type="entered link" link="j(9,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32786.0" type="left link" link="j(9,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32786.0" type="entered link" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32919.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="32919.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="32919.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" legMode="car"  />
+	<event time="32919.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" actType="service"  />
+	<event time="32919.0" type="Freight service starts" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="1" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="33220.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" actType="service"  />
+	<event time="33220.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" legMode="car"  />
+	<event time="33220.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33220.0" type="Freight service ends" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="1" serviceDuration="300.0"  />
+	<event time="33220.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="33221.0" type="left link" link="j(9,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33221.0" type="entered link" link="i(9,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33355.0" type="left link" link="i(9,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33355.0" type="entered link" link="i(8,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33489.0" type="left link" link="i(8,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33489.0" type="entered link" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33622.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="33622.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33622.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" legMode="car"  />
+	<event time="33622.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" actType="service"  />
+	<event time="33622.0" type="Freight service starts" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="16" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="33923.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" actType="service"  />
+	<event time="33923.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" legMode="car"  />
+	<event time="33923.0" type="Freight service ends" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="16" serviceDuration="300.0"  />
+	<event time="33923.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33923.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="33924.0" type="left link" link="i(7,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="33924.0" type="entered link" link="i(6,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34058.0" type="left link" link="i(6,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34058.0" type="entered link" link="i(5,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34192.0" type="left link" link="i(5,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34192.0" type="entered link" link="j(4,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34326.0" type="left link" link="j(4,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34326.0" type="entered link" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34459.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="34459.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34459.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" legMode="car"  />
+	<event time="34459.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" actType="service"  />
+	<event time="34459.0" type="Freight service starts" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="12" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="34760.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" actType="service"  />
+	<event time="34760.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" legMode="car"  />
+	<event time="34760.0" type="Freight service ends" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="12" serviceDuration="300.0"  />
+	<event time="34760.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34760.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="34761.0" type="left link" link="i(5,6)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34761.0" type="entered link" link="j(5,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34895.0" type="left link" link="j(5,7)" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="34895.0" type="entered link" link="i(5,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35029.0" type="left link" link="i(5,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35029.0" type="entered link" link="i(4,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35163.0" type="left link" link="i(4,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35163.0" type="entered link" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35296.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="35296.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35296.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" legMode="car"  />
+	<event time="35296.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" actType="service"  />
+	<event time="35296.0" type="Freight service starts" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="15" serviceDuration="300.0" capacityDemand="1"  />
+	<event time="35597.0" type="actend" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" actType="service"  />
+	<event time="35597.0" type="departure" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" legMode="car"  />
+	<event time="35597.0" type="PersonEntersVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35597.0" type="Freight service ends" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" serviceId="15" serviceDuration="300.0"  />
+	<event time="35597.0" type="vehicle enters traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="35598.0" type="left link" link="i(3,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35598.0" type="entered link" link="i(2,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35732.0" type="left link" link="i(2,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35732.0" type="entered link" link="i(1,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35866.0" type="left link" link="i(1,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="35866.0" type="entered link" link="j(0,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36000.0" type="left link" link="j(0,7)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36000.0" type="entered link" link="j(0,6)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36134.0" type="left link" link="j(0,6)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36134.0" type="entered link" link="j(0,5)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36268.0" type="left link" link="j(0,5)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36268.0" type="entered link" link="j(0,4)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36402.0" type="left link" link="j(0,4)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36402.0" type="entered link" link="j(0,3)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36536.0" type="left link" link="j(0,3)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36536.0" type="entered link" link="j(0,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36670.0" type="left link" link="j(0,2)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36670.0" type="entered link" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36803.0" type="vehicle leaves traffic" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" networkMode="car" relativePosition="1.0"  />
+	<event time="36803.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1"  />
+	<event time="36803.0" type="arrival" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" legMode="car"  />
+	<event time="36803.0" type="actstart" person="freight_carrier1_veh_carrier_19_heavyVehicle_1" link="j(0,1)R" actType="end"  />
+	<event time="36803.0" type="Freight tour ends" link="j(0,1)R" vehicle="freight_carrier1_veh_carrier_19_heavyVehicle_1" carrierId="carrier1" tourId="unknown"  />
+</events>

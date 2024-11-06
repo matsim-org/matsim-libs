@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="21600.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="start"  />
+	<event time="21600.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21600.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21600.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21600.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21600.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21600.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21600.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21600.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21600.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21600.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21600.0" type="Freight tour starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" tourId="1"  />
+	<event time="21600.0" type="Freight shipment pickup starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="11" pickupDuration="0.0" capacityDemand="3"  />
+	<event time="21600.0" type="Freight shipment pickup ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="11" pickupDuration="0.0" capacityDemand="3"  />
+	<event time="21601.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21601.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21601.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21601.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21601.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21601.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21601.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21601.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21601.0" type="Freight shipment pickup starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="12" pickupDuration="0.0" capacityDemand="5"  />
+	<event time="21601.0" type="Freight shipment pickup ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="12" pickupDuration="0.0" capacityDemand="5"  />
+	<event time="21602.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21602.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21602.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21602.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21602.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21602.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21602.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21602.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21602.0" type="Freight shipment pickup starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="14" pickupDuration="0.0" capacityDemand="10"  />
+	<event time="21602.0" type="Freight shipment pickup ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="14" pickupDuration="0.0" capacityDemand="10"  />
+	<event time="21603.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21603.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21603.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21603.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21603.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21603.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21603.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21603.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21603.0" type="Freight shipment pickup starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="13" pickupDuration="0.0" capacityDemand="7"  />
+	<event time="21603.0" type="Freight shipment pickup ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="13" pickupDuration="0.0" capacityDemand="7"  />
+	<event time="21604.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21604.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21604.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21604.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21604.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21604.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="pickup"  />
+	<event time="21604.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="21604.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21604.0" type="Freight shipment pickup starts" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="1" pickupDuration="0.0" capacityDemand="1"  />
+	<event time="21604.0" type="Freight shipment pickup ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="1" pickupDuration="0.0" capacityDemand="1"  />
+	<event time="21605.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="21606.0" type="left link" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21606.0" type="entered link" link="i(1,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21740.0" type="left link" link="i(1,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21740.0" type="entered link" link="i(2,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21874.0" type="left link" link="i(2,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="21874.0" type="entered link" link="i(3,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22008.0" type="left link" link="i(3,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22008.0" type="entered link" link="j(3,1)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22142.0" type="left link" link="j(3,1)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22142.0" type="entered link" link="j(3,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22276.0" type="left link" link="j(3,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22276.0" type="entered link" link="i(4,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22410.0" type="left link" link="i(4,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22410.0" type="entered link" link="i(5,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22544.0" type="left link" link="i(5,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22544.0" type="entered link" link="i(6,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22678.0" type="left link" link="i(6,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22678.0" type="entered link" link="j(6,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22812.0" type="left link" link="j(6,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22812.0" type="entered link" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22945.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="22945.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="22945.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" legMode="car"  />
+	<event time="22945.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" actType="delivery"  />
+	<event time="22945.0" type="Freight shipment delivered starts" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="11" dropoffDuration="300.0" capacityDemand="3"  />
+	<event time="23246.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" actType="delivery"  />
+	<event time="23246.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" legMode="car"  />
+	<event time="23246.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23246.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="23246.0" type="Freight shipment delivered ends" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="11" dropoffDuration="300.0" capacityDemand="3"  />
+	<event time="23247.0" type="left link" link="j(6,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23247.0" type="entered link" link="i(7,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23381.0" type="left link" link="i(7,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23381.0" type="entered link" link="i(8,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23515.0" type="left link" link="i(8,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23515.0" type="entered link" link="i(9,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23649.0" type="left link" link="i(9,0)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23649.0" type="entered link" link="j(9,1)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23783.0" type="left link" link="j(9,1)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23783.0" type="entered link" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23916.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="23916.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="23916.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" legMode="car"  />
+	<event time="23916.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" actType="delivery"  />
+	<event time="23916.0" type="Freight shipment delivered starts" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="14" dropoffDuration="300.0" capacityDemand="10"  />
+	<event time="24217.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" actType="delivery"  />
+	<event time="24217.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" legMode="car"  />
+	<event time="24217.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24217.0" type="Freight shipment delivered ends" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="14" dropoffDuration="300.0" capacityDemand="10"  />
+	<event time="24217.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="24218.0" type="left link" link="j(9,2)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24218.0" type="entered link" link="j(9,3)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24352.0" type="left link" link="j(9,3)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24352.0" type="entered link" link="j(9,4)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24486.0" type="left link" link="j(9,4)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24486.0" type="entered link" link="j(9,5)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24620.0" type="left link" link="j(9,5)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24620.0" type="entered link" link="j(9,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24754.0" type="left link" link="j(9,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24754.0" type="entered link" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24887.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="24887.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="24887.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" legMode="car"  />
+	<event time="24887.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" actType="delivery"  />
+	<event time="24887.0" type="Freight shipment delivered starts" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="1" dropoffDuration="300.0" capacityDemand="1"  />
+	<event time="25188.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" actType="delivery"  />
+	<event time="25188.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" legMode="car"  />
+	<event time="25188.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25188.0" type="Freight shipment delivered ends" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="1" dropoffDuration="300.0" capacityDemand="1"  />
+	<event time="25188.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="25189.0" type="left link" link="j(9,7)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25189.0" type="entered link" link="i(9,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25323.0" type="left link" link="i(9,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25323.0" type="entered link" link="i(8,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25457.0" type="left link" link="i(8,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25457.0" type="entered link" link="i(7,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25591.0" type="left link" link="i(7,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25591.0" type="entered link" link="i(6,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25725.0" type="left link" link="i(6,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25725.0" type="entered link" link="i(5,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25859.0" type="left link" link="i(5,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25859.0" type="entered link" link="j(4,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25993.0" type="left link" link="j(4,7)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="25993.0" type="entered link" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26126.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="26126.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26126.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" legMode="car"  />
+	<event time="26126.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" actType="delivery"  />
+	<event time="26126.0" type="Freight shipment delivered starts" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="12" dropoffDuration="300.0" capacityDemand="5"  />
+	<event time="26427.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" actType="delivery"  />
+	<event time="26427.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" legMode="car"  />
+	<event time="26427.0" type="Freight shipment delivered ends" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="12" dropoffDuration="300.0" capacityDemand="5"  />
+	<event time="26427.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26427.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="26428.0" type="left link" link="i(5,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26428.0" type="entered link" link="i(6,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26562.0" type="left link" link="i(6,6)" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26562.0" type="entered link" link="j(6,6)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26696.0" type="left link" link="j(6,6)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26696.0" type="entered link" link="i(6,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26830.0" type="left link" link="i(6,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26830.0" type="entered link" link="i(5,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26964.0" type="left link" link="i(5,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="26964.0" type="entered link" link="j(4,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27098.0" type="left link" link="j(4,5)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27098.0" type="entered link" link="j(4,4)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27232.0" type="left link" link="j(4,4)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27232.0" type="entered link" link="j(4,3)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27366.0" type="left link" link="j(4,3)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27366.0" type="entered link" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27499.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="27499.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27499.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" legMode="car"  />
+	<event time="27499.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" actType="delivery"  />
+	<event time="27499.0" type="Freight shipment delivered starts" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="13" dropoffDuration="300.0" capacityDemand="7"  />
+	<event time="27800.0" type="actend" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" actType="delivery"  />
+	<event time="27800.0" type="departure" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" legMode="car"  />
+	<event time="27800.0" type="PersonEntersVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27800.0" type="Freight shipment delivered ends" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" shipmentId="13" dropoffDuration="300.0" capacityDemand="7"  />
+	<event time="27800.0" type="vehicle enters traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="27801.0" type="left link" link="j(4,2)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27801.0" type="entered link" link="i(4,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27935.0" type="left link" link="i(4,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="27935.0" type="entered link" link="i(3,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28069.0" type="left link" link="i(3,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28069.0" type="entered link" link="i(2,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28203.0" type="left link" link="i(2,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28203.0" type="entered link" link="i(1,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28337.0" type="left link" link="i(1,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28337.0" type="entered link" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28470.0" type="vehicle leaves traffic" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" networkMode="car" relativePosition="1.0"  />
+	<event time="28470.0" type="PersonLeavesVehicle" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1"  />
+	<event time="28470.0" type="arrival" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" legMode="car"  />
+	<event time="28470.0" type="actstart" person="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" link="j(0,1)R" actType="end"  />
+	<event time="28470.0" type="Freight tour ends" link="j(0,1)R" vehicle="freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1" carrierId="carrier1" tourId="1"  />
+</events>
