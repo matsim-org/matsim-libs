@@ -76,6 +76,7 @@ public class DashboardTests {
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
 			.isDirectoryContaining("glob:**mode_share.csv")
+			.isDirectoryContaining("glob:**mode_share_per_purpose.csv")
 			.isDirectoryContaining("glob:**mode_shift.csv");
 	}
 

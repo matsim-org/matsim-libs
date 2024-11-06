@@ -26,7 +26,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -35,8 +36,7 @@ import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import java.util.Set;
 
 
 /**
@@ -55,28 +55,42 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
 			if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
 				throw new RuntimeException("separate modes together with link2link routing currently not implemented. doesn't look difficult, "
-						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
+					+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16");
 			}
+
+			Set<String> analyzedModes = getConfig().travelTimeCalculator().getAnalyzedModes();
+
 			// go through all modes:
 			//			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
-			for (final String mode : getConfig().routing().getNetworkModes() ) {
+			for (final String mode : getConfig().routing().getNetworkModes()) {
 
-				// generate and bind the observer:
-				bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
+				if (analyzedModes.contains(mode)) {
+					// generate and bind the observer:
+					bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
 
-				// bind the observer to travel time provider (for router):
-				addTravelTimeBinding(mode).toProvider(new Provider<TravelTime>() {
-					@Inject Injector injector;
-					@Override public TravelTime get() {
-						return injector.getInstance( Key.get( TravelTimeCalculator.class, Names.named( mode ) ) ).getLinkTravelTimes();
-					}
+					// bind the observer to travel time provider (for router):
+					addTravelTimeBinding(mode).toProvider(new Provider<TravelTime>() {
+						@Inject
+						Injector injector;
 
-					// the following is not there yet (leads to NPE).  Presumably, the collection into the underlying multi-binder is
-					// done later, and until then it is only available per annotation (as above)? kai, nov'19
+						@Override
+						public TravelTime get() {
+							return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(mode))).getLinkTravelTimes();
+						}
+
+						// the following is not there yet (leads to NPE).  Presumably, the collection into the underlying multi-binder is
+						// done later, and until then it is only available per annotation (as above)? kai, nov'19
 //					@Inject Map<String,TravelTime> travelTimes ;
 //					@Override public TravelTime get() { return travelTimes.get( mode ) ; }
-				}).in( Singleton.class );
-				// (This used to be without "Singleton".  I think that with Singleton it makes more sense, but don't know ramifications. kai, nov'19)
+					}).in(Singleton.class);
+					// (This used to be without "Singleton".  I think that with Singleton it makes more sense, but don't know ramifications. kai, nov'19)
+				} else {
+
+					// For modes that are not analyzed, no travel time calculator is bound
+					// however, travel time is still provided
+					addTravelTimeBinding(mode).to(FreeSpeedTravelTime.class).in(Singleton.class);
+
+				}
 
 			}
 		} else {
@@ -88,7 +102,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
 //				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
-				for ( String mode : getConfig().routing().getNetworkModes() ) {
+				for (String mode : getConfig().routing().getNetworkModes()) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
 				}
 			}
@@ -101,9 +115,12 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
 	private static class SingleModeTravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
-		@Inject TravelTimeCalculatorConfigGroup config;
-		@Inject EventsManager eventsManager;
-		@Inject Network network;
+		@Inject
+		TravelTimeCalculatorConfigGroup config;
+		@Inject
+		EventsManager eventsManager;
+		@Inject
+		Network network;
 
 		private String mode;
 
@@ -117,17 +134,17 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 //					config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
 //			eventsManager.addHandler(calculator);
 //			return TravelTimeCalculator.configure(calculator, config, network);
-			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( network );
-			builder.setTimeslice( config.getTraveltimeBinSize() );
-			builder.setMaxTime( config.getMaxTime() );
-			builder.setCalculateLinkTravelTimes( config.isCalculateLinkTravelTimes() );
-			builder.setCalculateLinkToLinkTravelTimes( config.isCalculateLinkToLinkTravelTimes() );
-			builder.setFilterModes( true ); // no point asking the config since we are in "separateModes" anyways.
-			builder.setAnalyzedModes( CollectionUtils.stringToSet( mode ) );
-			builder.configure( config );
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
+			builder.setTimeslice(config.getTraveltimeBinSize());
+			builder.setMaxTime(config.getMaxTime());
+			builder.setCalculateLinkTravelTimes(config.isCalculateLinkTravelTimes());
+			builder.setCalculateLinkToLinkTravelTimes(config.isCalculateLinkToLinkTravelTimes());
+			builder.setFilterModes(true); // no point asking the config since we are in "separateModes" anyways.
+			builder.setAnalyzedModes(CollectionUtils.stringToSet(mode));
+			builder.configure(config);
 			TravelTimeCalculator calculator = builder.build();
-			eventsManager.addHandler( calculator );
-			return calculator ;
+			eventsManager.addHandler(calculator);
+			return calculator;
 		}
 	}
 
