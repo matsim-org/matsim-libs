@@ -14,7 +14,6 @@ import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouterModule;
@@ -39,19 +38,29 @@ import java.util.*;
  * </code>
  */
 public final class AccessibilityFromEvents{
+	private final String actType;
+
 	public static final class Builder {
+		private final String actType;
 		private Scenario scenario;
 		private String eventsFile;
 		private final List<FacilityDataExchangeInterface> dataListeners = new ArrayList<>() ;
-		public Builder( Scenario scenario, String eventsFile ) {
+
+		public Builder( Scenario scenario, String eventsFile) {
+			this(scenario, eventsFile, null);
+		}
+		public Builder( Scenario scenario, String eventsFile, String actType) {
 			this.scenario = scenario;
 			this.eventsFile = eventsFile;
+			this.actType = actType;
 		}
+
+
 		public void addDataListener( FacilityDataExchangeInterface dataListener ) {
 			dataListeners.add( dataListener ) ;
 		}
 		public AccessibilityFromEvents build() {
-			return new AccessibilityFromEvents( scenario, eventsFile, dataListeners ) ;
+			return new AccessibilityFromEvents(scenario, eventsFile, dataListeners, actType);
 		}
 	}
 
@@ -59,10 +68,11 @@ public final class AccessibilityFromEvents{
 	private final String eventsFile;
 	private final List<FacilityDataExchangeInterface> dataListeners ;
 
-	private AccessibilityFromEvents( Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners) {
+	private AccessibilityFromEvents( Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, String actType) {
 		this.scenario = scenario;
 		this.eventsFile = eventsFile;
 		this.dataListeners = dataListeners;
+		this.actType = actType;
 	}
 
 	public void run() {
@@ -158,6 +168,9 @@ public final class AccessibilityFromEvents{
 				// install the accessiblity module:
 				{
 					final AccessibilityModule module = new AccessibilityModule();
+					if (actType != null) {
+						module.setConsideredActivityType(actType);
+					}
 					for( FacilityDataExchangeInterface dataListener : dataListeners ){
 						module.addFacilityDataExchangeListener( dataListener );
 					}
