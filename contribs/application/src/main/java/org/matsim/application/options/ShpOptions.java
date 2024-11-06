@@ -230,6 +230,7 @@ public final class ShpOptions {
 
 	/**
 	 * Return the union of all geometries in the shape file and project it to the target crs.
+	 *
 	 * @param toCRS target coordinate system
 	 */
 	public Geometry getGeometry(String toCRS) {

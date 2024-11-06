@@ -178,4 +178,11 @@ public class DashboardTests {
 
 		run(pt);
 	}
+
+	@Test
+	void activity() {
+		ActivityDashboard ad = new ActivityDashboard();
+
+		run(ad);
+	}
 }

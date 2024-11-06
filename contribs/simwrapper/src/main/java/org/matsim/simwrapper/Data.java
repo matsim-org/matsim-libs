@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import com.google.common.io.Resources;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
@@ -184,6 +185,17 @@ public final class Data {
 
 		resources.put(resolved, resource);
 		return this.getUnixPath(this.path.getParent().relativize(resolved));
+	}
+
+	public String resources(String... names) {
+		String first = null;
+		for (String name : names) {
+			String resource = resource(name);
+			if (first == null)
+				first = resource;
+		}
+
+		return first;
 	}
 
 	/**
