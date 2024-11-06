@@ -17,35 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.charging;
+ package org.matsim.contrib.ev.charging;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-
-import com.google.inject.Inject;
-
-public class ChargingHandler implements MobsimAfterSimStepListener {
-	private static final Logger log = LogManager.getLogger( ChargingHandler.class );
-	private final Iterable<Charger> chargers;
-	private final int chargeTimeStep;
-
-	@Inject
-	ChargingHandler(ChargingInfrastructure chargingInfrastructure, EvConfigGroup evConfig) {
-		this.chargers = chargingInfrastructure.getChargers().values();
-		this.chargeTimeStep = evConfig.chargeTimeStep;
-	}
-
-	@Override
-	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		if ((e.getSimulationTime() + 1) % chargeTimeStep == 0) {
-			for (Charger c : chargers) {
-				c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
-			}
-		}
-	}
-}
+ import org.matsim.contrib.ev.EvConfigGroup;
+ import org.matsim.contrib.ev.infrastructure.Charger;
+ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+ import org.matsim.core.mobsim.qsim.InternalInterface;
+ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+ 
+ import com.google.inject.Inject;
+ 
+ public class ChargingHandler implements MobsimEngine {
+	 private final Iterable<Charger> chargers;
+	 private final int chargeTimeStep;
+ 
+	 @Inject
+	 ChargingHandler(ChargingInfrastructure chargingInfrastructure, EvConfigGroup evConfig) {
+		 this.chargers = chargingInfrastructure.getChargers().values();
+		 this.chargeTimeStep = evConfig.chargeTimeStep;
+	 }
+ 
+	 @Override
+	 public void doSimStep(double time) {
+		 if (time % chargeTimeStep == 0) {
+			 for (Charger c : chargers) {
+				 c.getLogic().chargeVehicles(chargeTimeStep, time);
+			 }
+		 }
+	 }
+ 
+	 @Override
+	 public void onPrepareSim() {
+		 // empty
+	 }
+ 
+	 @Override
+	 public void afterSim() {
+		 // empty
+	 }
+ 
+	 @Override
+	 public void setInternalInterface(InternalInterface internalInterface) {
+		 // empty
+	 }
+ }
+ 
