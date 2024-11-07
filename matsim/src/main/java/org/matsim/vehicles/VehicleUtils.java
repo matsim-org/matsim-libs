@@ -64,6 +64,10 @@ public final class VehicleUtils {
 		return new VehicleType( typeId );
 	}
 
+	public static VehicleType createVehicleType( Id<VehicleType> typeId, String networkMode){
+		return new VehicleType( typeId, networkMode );
+	}
+
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
 	}
@@ -75,9 +79,9 @@ public final class VehicleUtils {
 	public static VehicleType createDefaultVehicleType() {
 		VehicleType defaultVehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
-		
+
 		defaultVehicleType.getCapacity().setSeats(4);
-		
+
 		return defaultVehicleType;
 	}
 
@@ -434,7 +438,7 @@ public final class VehicleUtils {
 		new MatsimVehicleWriter( vehicles ).writeFile( filename );
 
 	}
-	
+
 	public static Id<Link> getInitialLinkId(Vehicle vehicle) {
 		String attribute = (String) vehicle.getAttributes().getAttribute(INITIAL_LINK_ID);
 		return attribute == null ? null : Id.createLinkId(attribute);

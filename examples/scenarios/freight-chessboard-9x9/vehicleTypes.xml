@@ -10,11 +10,13 @@
 		<description>A heavy truck</description>
 		<capacity seats="1" standingRoomInPersons="0" other="50.0"/>
 		<costInformation  fixedCostsPerDay="130.0" costsPerMeter="7.7E-4" costsPerSecond="0.0080"/>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 	<vehicleType id="light">
 		<description>A light truck</description>
 		<capacity seats="1" standingRoomInPersons="0" other="5.0"/>
 		<costInformation  fixedCostsPerDay="84.0" costsPerMeter="4.7E-4" costsPerSecond="0.0080"/>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 
 </vehicleDefinitions>

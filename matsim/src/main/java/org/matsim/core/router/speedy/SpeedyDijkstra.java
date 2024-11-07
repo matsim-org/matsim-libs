@@ -73,6 +73,7 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 			this.currentIteration = Integer.MIN_VALUE;
 		}
 
+		boolean hasTurnRestrictions = this.graph.hasTurnRestrictions();
 		int startNodeIndex = startNode.getId().index();
 		int endNodeIndex = endNode.getId().index();
 
@@ -85,6 +86,11 @@ public class SpeedyDijkstra implements LeastCostPathCalculator {
 		while (!this.pq.isEmpty()) {
 			final int nodeIdx = this.pq.poll();
 			if (nodeIdx == endNodeIndex) {
+				foundEndNode = true;
+				break;
+			}
+			// if turn restrictions are used, we might be on a colored node, so check for the original node
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
 				foundEndNode = true;
 				break;
 			}

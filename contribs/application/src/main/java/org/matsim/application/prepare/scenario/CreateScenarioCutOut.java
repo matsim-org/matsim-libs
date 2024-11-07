@@ -2,10 +2,7 @@ package org.matsim.application.prepare.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +27,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -453,7 +451,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		if (scenario.getActivityFacilities() != null && activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId()))
 			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
 
-		return activity.getCoord();
+		if (activity.getCoord() != null)
+			return activity.getCoord();
+
+		if (activity.getLinkId() != null && scenario.getNetwork().getLinks().containsKey(activity.getLinkId()))
+			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+
+		return null;
 	}
 
 	/**
@@ -501,34 +505,44 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		boolean keepPerson = false;
 
 		List<Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan());
-
+		List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 		Set<Id<Link>> linkIds = new HashSet<>();
 		Set<Id<ActivityFacility>> facilityIds = new HashSet<>();
+
+		// Check activities first, some agent might be stationary
+		for (Activity act : activities) {
+			Coord coord = getActivityCoord(act);
+
+			if (coord == null && noActCoordsWarnings++ < 10) {
+				log.info("Activity coords for agent {} are null. Skipping Trip...", person.getId());
+			}
+
+			if (coord != null && geom.contains(MGC.coord2Point(coord))) {
+				keepPerson = true;
+			}
+
+			if (act.getFacilityId() != null)
+				facilityIds.add(act.getFacilityId());
+
+			if (act.getLinkId() != null)
+				linkIds.add(act.getLinkId());
+
+		}
 
 		for (Trip trip : trips) {
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
-			if (originCoord == null || destinationCoord == null) {
-				if (noActCoordsWarnings++ < 10)
-					log.info("Activity coords of trip is null. Skipping Trip...");
+			if (originCoord != null && destinationCoord != null) {
+				LineString line = geoFactory.createLineString(new Coordinate[]{
+					MGC.coord2Coordinate(originCoord),
+					MGC.coord2Coordinate(destinationCoord)
+				});
 
-				continue;
-			}
-
-			// keep all agents starting or ending in area
-			if (geom.contains(MGC.coord2Point(originCoord)) || geom.contains(MGC.coord2Point(destinationCoord))) {
-				keepPerson = true;
-			}
-
-			LineString line = geoFactory.createLineString(new Coordinate[]{
-				MGC.coord2Coordinate(originCoord),
-				MGC.coord2Coordinate(destinationCoord)
-			});
-
-			// also keep persons traveling through or close to area (beeline)
-			if (line.intersects(geom)) {
-				keepPerson = true;
+				// also keep persons traveling through or close to area (beeline)
+				if (line.intersects(geom)) {
+					keepPerson = true;
+				}
 			}
 
 			//Save route links
@@ -563,20 +577,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 						}
 					}
 					// There is no additional link freespeed information, that we could save. So we are finished here
-				}
-
-				if (trip.getOriginActivity().getFacilityId() != null)
-					facilityIds.add(trip.getOriginActivity().getFacilityId());
-
-				if (trip.getDestinationActivity().getFacilityId() != null)
-					facilityIds.add(trip.getDestinationActivity().getFacilityId());
-
-				if (trip.getOriginActivity().getLinkId() != null) {
-					linkIds.add(trip.getOriginActivity().getLinkId());
-				}
-
-				if (trip.getDestinationActivity().getLinkId() != null) {
-					linkIds.add(trip.getDestinationActivity().getLinkId());
 				}
 			}
 		}

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.XmlUtils;
 
 public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 
@@ -70,5 +71,17 @@ public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes all common attributes
+		writeXMLStart(out);
+
+		if (this.legMode != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);
+		}
+
+		writeXMLEnd(out);
 	}
 }
