@@ -271,6 +271,14 @@ final class Grid {
 		for (Coord coord : consideredActivityCoordsForSpatialFunctionality) {
 
 			// TODO maybe add a check here so we consider only the rp in the 9 surrounding cells?
+
+			//TODO: ts, nov' 24: this might lead to problems, when we conduct noise analysis only in a (small) focus area of the scenario
+			// i.e. when the Grid is considerable smaller than the network (e.g. by setting a corresponding shp when run through simwrapper).
+			// The problem would be that the edge cells are then filled with activities from the outside. Maybe we should only consider activities that are inside the grid (+ maybe a small buffer)!?
+			// As consideredActivityCoordsForSpatialFunctionality is cleared after running this method, here, we can conduct the filtering, here.
+			// In other words: activityCoord2receiverPointId is all that needs to be changes in this class.
+			// However, we then need to account for null values when querying that map from PersonActivityTracker.
+
 			ReceiverPoint rp = qTree.getClosest(coord.getX(), coord.getY());
 			if(rp != null) {
 				if(activityCoord2receiverPointId.put(coord, rp.getId()) != null){
