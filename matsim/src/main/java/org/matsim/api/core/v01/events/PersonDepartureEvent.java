@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.XmlUtils;
 
 public class PersonDepartureEvent extends Event implements HasPersonId, HasLinkId {
 
@@ -81,5 +82,17 @@ public class PersonDepartureEvent extends Event implements HasPersonId, HasLinkI
 			attr.put(ATTRIBUTE_ROUTING_MODE, this.routingMode);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		writeXMLStart(out);
+		if (this.legMode != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);
+		}
+		if (this.routingMode != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_ROUTING_MODE, this.routingMode);
+		}
+		writeXMLEnd(out);
 	}
 }
