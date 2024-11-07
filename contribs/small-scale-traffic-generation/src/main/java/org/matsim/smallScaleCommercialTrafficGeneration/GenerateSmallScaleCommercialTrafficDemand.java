@@ -481,7 +481,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //			Map the values to the new subcarriers
 			for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
 				for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
-					carrierId2carrierAttributes.put(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId));
+					if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
+						throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
 				}
 			}
 
@@ -709,7 +710,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
 							smallScaleCommercialTrafficType, vehicleDepots, odMatrixEntry);
-						carrierId2carrierAttributes.put(Id.create(carrierName, Carrier.class), carrierAttributes);
+						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
+							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
 						createNewCarrierAndAddVehicleTypes(
 							scenario, carrierName, carrierAttributes,
