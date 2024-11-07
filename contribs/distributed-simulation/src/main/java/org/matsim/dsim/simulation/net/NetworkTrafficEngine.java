@@ -57,7 +57,7 @@ public class NetworkTrafficEngine implements SimEngine {
 
         SimLink link = simNetwork.getLinks().get(currentRouteElement);
 
-        assert link != null : "Link %s not found in partition".formatted(currentRouteElement);
+        assert link != null : STR."Link\{currentRouteElement} not found in partition on partition #\{simNetwork.getPart()}";
 
         wait2Link.accept(vehicle, link);
     }

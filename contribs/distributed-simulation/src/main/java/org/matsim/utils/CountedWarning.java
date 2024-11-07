@@ -12,9 +12,9 @@ public class CountedWarning {
 
 	public static void warn(String name, int maxCount, String message) {
 		var count = registeredWarnings.computeIfAbsent(name, _ -> new AtomicInteger()).incrementAndGet();
-		if (count <= maxCount) {
+		if (count < maxCount) {
 			LogManager.getLogger(name).warn(message);
-		} else {
+		} if (count == maxCount) {
 			LogManager.getLogger(name).warn("{} \t Further messages are suppressed.", message);
 		}
 	}
