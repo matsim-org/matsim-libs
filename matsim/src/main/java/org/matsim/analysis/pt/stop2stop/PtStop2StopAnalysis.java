@@ -60,7 +60,8 @@ import java.util.stream.Collectors;
  * This class was intended to be run after the last iteration and the simulation has finished and no preconditions were
  * taken for TransitVehicle fleets which might change over the course of iterations (e.g. minibus). So running this
  * class as an EventsListener during the simulation might give wrong results and might need work to get the transit
- * vehicles updated before mobsim in each iteration.
+ * vehicles updated before mobsim in each iteration. Still it could be useful to run in each iteration in special cases,
+ * such as the minibus contrib.
  *
  * @author vsp-gleich
  */
@@ -234,30 +235,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 	record Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Departure> departureId, Id<TransitStopFacility> stopId,
 							  int stopSequence, Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
 							  double departureTimeScheduled, double departureDelay, int passengersAtArrival, double totalVehicleCapacity,
-							  int passengersAlighting, int passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {
-		Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId,
-					   Id<Departure> departureId, Id<TransitStopFacility> stopId, int stopSequence,
-					   Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
-					   double departureTimeScheduled, double departureDelay, int passengersAtArrival,
-					   double totalVehicleCapacity, int passengersAlighting, int passengersBoarding,
-					   List<Id<Link>> linkIdsSincePreviousStop) {
-			this.transitLineId = transitLineId;
-			this.transitRouteId = transitRouteId;
-			this.departureId = departureId;
-			this.stopId = stopId;
-			this.stopSequence = stopSequence;
-			this.stopPreviousId = stopPreviousId;
-			this.arrivalTimeScheduled = arrivalTimeScheduled;
-			this.arrivalDelay = arrivalDelay;
-			this.departureTimeScheduled = departureTimeScheduled;
-			this.departureDelay = departureDelay;
-			this.passengersAtArrival = passengersAtArrival;
-			this.totalVehicleCapacity = totalVehicleCapacity;
-			this.passengersAlighting = passengersAlighting;
-			this.passengersBoarding = passengersBoarding;
-			this.linkIdsSincePreviousStop = List.copyOf(linkIdsSincePreviousStop);
-		}
-	}
+							  int passengersAlighting, int passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {}
 
     static final String[] HEADER = {"transitLine", "transitRoute", "departure", "stop", "stopSequence",
             "stopPrevious", "arrivalTimeScheduled", "arrivalDelay", "departureTimeScheduled", "departureDelay",
