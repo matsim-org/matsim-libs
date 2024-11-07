@@ -680,14 +680,26 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								vehicleTypes.add(possibleVehicleType);
 						}
 
-						// find a (random) start category with existing employees in this zone
 						Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd);
 						String selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
+						// Find a (random) start category with existing employees in this zone
+						// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
+						// Otherwise, we have to find another category.
 						for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
-							if (count <= odMatrixEntry.possibleStartCategories.size())
-								selectedStartCategory = odMatrixEntry.possibleStartCategories.get(rnd.nextInt(odMatrixEntry.possibleStartCategories.size()));
-							else
+							if (count < odMatrixEntry.possibleStartCategories.size())
+								selectedStartCategory = odMatrixEntry.possibleStartCategories.get(count);
+							else {
+								// if no possible start category with employees is found, take a random category of the stop categories,
+								// the reason that no start category with employees is found is that traffic volume for employees in general is created,
+								// so that it is possible that we have traffic, although we have no employees in the given start category.
+								// That's why we exclude Inhabitants as a possible start category.
 								selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+								if (selectedStartCategory.equals("Inhabitants"))
+									selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+								if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
+									log.warn("No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
+									startZone, selectedStartCategory, odMatrixEntry.possibleStartCategories);
+							}
 						}
 
 						// Generate carrierName
@@ -746,20 +758,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 				selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 			for (int i = 0; i < numberOfJobs; i++) {
-				int serviceTimePerStop;
-				if (carrierAttributes.selectedStartCategory.equals("Inhabitants")){
-					CarrierAttributes inhabitantAttributes = new CarrierAttributes(carrierAttributes.purpose, carrierAttributes.startZone,
-						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(), carrierAttributes.modeORvehType,
-						carrierAttributes.smallScaleCommercialTrafficType, carrierAttributes.vehicleDepots, carrierAttributes.odMatrixEntry);
-					serviceTimePerStop = getServiceTimePerStop(newCarrier, inhabitantAttributes, 0);
+				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
 
-				}
-				else {
-					serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
-				}
-
-				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
-					36 * 3600); // extended time window, so that late tours can handle it
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow);
 			}
 		}
@@ -776,10 +778,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public Integer getServiceTimePerStop(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes,
 										 int additionalTravelBufferPerIterationInMinutes) {
 		GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey key;
+		// we use the start category for the service time selection because the start category represents the employees
 		if (carrierAttributes.smallScaleCommercialTrafficType().equals(
-			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString()))
-			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(), null,
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
+			if (!carrierAttributes.odMatrixEntry().possibleStartCategories.contains(carrierAttributes.selectedStartCategory()))
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry().possibleStartCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry().possibleStartCategories.size())), null, carrierAttributes.smallScaleCommercialTrafficType());
+			else
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(), null,
 				carrierAttributes.smallScaleCommercialTrafficType());
+		}
 		else if (carrierAttributes.smallScaleCommercialTrafficType().equals(
 			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
 			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(),
