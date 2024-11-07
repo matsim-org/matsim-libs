@@ -72,10 +72,16 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     private final Vehicles transitVehicles; // for vehicle capacity
     private final Map<Id<Vehicle>, PtVehicleData> transitVehicle2temporaryVehicleData = new HashMap<>();
     private final List<Stop2StopEntry> stop2StopEntriesForEachDeparture; // the output
+	private final double sampleUpscaleFactor;
     private static final Logger log = LogManager.getLogger(PtStop2StopAnalysis.class);
 
-    public PtStop2StopAnalysis(Vehicles transitVehicles) {
+	/**
+	 * @param transitVehicles needed to look up vehicle capacity
+	 * @param sampleUpscaleFactor : factor to scale up output passenger volumes to 100%
+	 */
+    public PtStop2StopAnalysis(Vehicles transitVehicles, double sampleUpscaleFactor) {
         this.transitVehicles = transitVehicles;
+		this.sampleUpscaleFactor = sampleUpscaleFactor;
         // set initial capacity to rough estimate of 30 entries by vehicle (should be sufficient)
         stop2StopEntriesForEachDeparture = new ArrayList<>(transitVehicles.getVehicles().size() * 30);
     }
@@ -113,13 +119,14 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
             log.error("Encountered a VehicleDepartsAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle " + event.getVehicleId() + " at facility " + event.getFacilityId() + " at time " + event.getTime() + ". This should not happen, this analysis might fail subsequently.");
         } else {
             // produce output entry
-            stop2StopEntriesForEachDeparture.add(new Stop2StopEntry(ptVehicleData.transitLineId,
-                    ptVehicleData.transitRouteId, ptVehicleData.departureId, event.getFacilityId(),
-                    ptVehicleData.stopSequenceCounter, ptVehicleData.lastStopId,
-                    ptVehicleData.lastVehicleArrivesAtFacilityEvent.getTime() - ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(),
-                    ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(), event.getTime() - event.getDelay(),
-                    event.getDelay(), ptVehicleData.currentPax, ptVehicleData.totalVehicleCapacity,
-                    ptVehicleData.alightings, ptVehicleData.boardings, ptVehicleData.linksTravelledOnSincePreviousStop));
+			stop2StopEntriesForEachDeparture.add(new Stop2StopEntry(ptVehicleData.transitLineId,
+				ptVehicleData.transitRouteId, ptVehicleData.departureId, event.getFacilityId(),
+				ptVehicleData.stopSequenceCounter, ptVehicleData.lastStopId,
+				ptVehicleData.lastVehicleArrivesAtFacilityEvent.getTime() - ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(),
+				ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(), event.getTime() - event.getDelay(),
+				event.getDelay(), ptVehicleData.currentPax * sampleUpscaleFactor, ptVehicleData.totalVehicleCapacity,
+				ptVehicleData.alightings * sampleUpscaleFactor, ptVehicleData.boardings * sampleUpscaleFactor,
+				List.copyOf(ptVehicleData.linksTravelledOnSincePreviousStop)));
             // calculate number of passengers at departure
             // (the Stop2StopEntry before needed the number of passengers at arrival so do not move this up!)
             ptVehicleData.currentPax = ptVehicleData.currentPax - ptVehicleData.alightings + ptVehicleData.boardings;
@@ -234,8 +241,8 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 	 */
 	record Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Departure> departureId, Id<TransitStopFacility> stopId,
 							  int stopSequence, Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
-							  double departureTimeScheduled, double departureDelay, int passengersAtArrival, double totalVehicleCapacity,
-							  int passengersAlighting, int passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {}
+							  double departureTimeScheduled, double departureDelay, double passengersAtArrival, double totalVehicleCapacity,
+							  double passengersAlighting, double passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {}
 
     static final String[] HEADER = {"transitLine", "transitRoute", "departure", "stop", "stopSequence",
             "stopPrevious", "arrivalTimeScheduled", "arrivalDelay", "departureTimeScheduled", "departureDelay",

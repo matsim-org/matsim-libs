@@ -71,7 +71,7 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
-		PtStop2StopAnalysis ptStop2StopEventHandler = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+		PtStop2StopAnalysis ptStop2StopEventHandler = new PtStop2StopAnalysis(scenario.getTransitVehicles(), sample.getUpscaleFactor());
 		eventsManager.addHandler(ptStop2StopEventHandler);
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);

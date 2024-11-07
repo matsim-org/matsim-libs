@@ -106,7 +106,7 @@ public class PtStop2StopAnalysisTest {
 
         String networkMode_bus = TransportMode.car;
 
-        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
 
         ParallelEventsManager events = new ParallelEventsManager(false);
         events.addHandler(ptStop2StopAnalysis);
@@ -256,7 +256,7 @@ public class PtStop2StopAnalysisTest {
         String networkMode_bus = TransportMode.car;
         String networkMode_train = TransportMode.train;
 
-        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
 
         ParallelEventsManager events = new ParallelEventsManager(false);
         events.addHandler(ptStop2StopAnalysis);
