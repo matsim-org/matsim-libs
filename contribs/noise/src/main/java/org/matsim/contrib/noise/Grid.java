@@ -268,27 +268,32 @@ final class Grid {
 		counter.printCounter();
 
 		counter = new Counter("compute nearest receiver-points #");
+		Counter otherCounter = new Counter("activities outside grid #");
 		for (Coord coord : consideredActivityCoordsForSpatialFunctionality) {
 
 			// TODO maybe add a check here so we consider only the rp in the 9 surrounding cells?
+			// ts, nov' 24:  ---> might be done by the following filtering (by grid) ??
 
-			//TODO: ts, nov' 24: this might lead to problems, when we conduct noise analysis only in a (small) focus area of the scenario
-			// i.e. when the Grid is considerable smaller than the network (e.g. by setting a corresponding shp when run through simwrapper).
-			// The problem would be that the edge cells are then filled with activities from the outside. Maybe we should only consider activities that are inside the grid (+ maybe a small buffer)!?
-			// As consideredActivityCoordsForSpatialFunctionality is cleared after running this method, here, we can conduct the filtering, here.
-			// In other words: activityCoord2receiverPointId is all that needs to be changes in this class.
-			// However, we then need to account for null values when querying that map from PersonActivityTracker.
+			// Filter activity coords that are within the quadTree.
+			// I do not know, why whe put a buffer around the grid when instantiating the QuadTree, above, but I'll keep it for now
+			// tschlenther, nov '24
+			if (coord.getX() >= xCoordMin && coord.getX() <= xCoordMax &&
+					coord.getY() >= yCoordMin && coord.getY() <= yCoordMax){
 
-			ReceiverPoint rp = qTree.getClosest(coord.getX(), coord.getY());
-			if(rp != null) {
-				if(activityCoord2receiverPointId.put(coord, rp.getId()) != null){
-					log.warn("this must not happen");
+				ReceiverPoint rp = qTree.getClosest(coord.getX(), coord.getY());
+				if(rp != null) {
+					if(activityCoord2receiverPointId.put(coord, rp.getId()) != null){
+						log.warn("this must not happen");
+					}
 				}
-			}
 
-			counter.incCounter();
+				counter.incCounter();
+			} else {
+				otherCounter.incCounter();
+			}
 		}
 		counter.printCounter();
+		otherCounter.printCounter();
 	}
 
 	private void readReceiverPoints(String file, CoordinateTransformation ct) throws IOException {
