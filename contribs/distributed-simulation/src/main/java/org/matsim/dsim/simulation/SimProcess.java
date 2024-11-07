@@ -4,10 +4,17 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LP;
 import org.matsim.api.SimEngine;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.dsim.messages.SimStepMessage;
@@ -19,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 @Log4j2
-public class SimProcess implements Steppable, LP, SimStepMessageProcessor {
+public class SimProcess implements Steppable, LP, SimStepMessageProcessor, InsertableMobsim {
 
     // The Qsim has flexible engines. However, Activity, Teleportation and Netsim Engine are treated
     // in a special way. I'll have them as explicit members here, until we need more flexibility.
@@ -29,21 +36,26 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor {
     private final NetworkTrafficEngine networkTrafficEngine;
 
     private final SimStepMessaging messaging;
-    private final EventsManager em;
+	private final NetworkPartition partition;
+	private final List<DistributedAgentSource> agentSources;
+
+	private final EventsManager em;
     //private final Config config;
     private final Set<String> mainModes;
 
     private double currentTime;
 
-    SimProcess(SimStepMessaging messaging, ActivityEngine activityEngine, TeleportationEngine teleportationEngine,
-               NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
-        this.em = em;
+    SimProcess(NetworkPartition partition, SimStepMessaging messaging, List<DistributedAgentSource> agentSources, ActivityEngine activityEngine, TeleportationEngine teleportationEngine,
+			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
+		this.partition = partition;
+		this.agentSources = agentSources;
+		this.em = em;
         this.messaging = messaging;
         this.activityEngine = activityEngine;
         this.teleportationEngine = teleportationEngine;
         this.networkTrafficEngine = networkTrafficEngine;
         this.engines = List.of(activityEngine, teleportationEngine, networkTrafficEngine);
-        for (var engine : engines) {
+        for (SimEngine engine : engines) {
             engine.setNextStateHandler(this::acceptForNextState);
         }
         mainModes = new HashSet<>(config.qsim().getMainModes());
@@ -87,7 +99,24 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor {
         }
     }
 
-    @Override
+	@Override
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
+		log.warn("Add vehicle {} at {}", veh, startLinkId);
+	}
+
+	@Override
+	public void insertAgentIntoMobsim(MobsimAgent agent) {
+		log.warn("Insert agent {}", agent);
+	}
+
+	@Override
+	public void onPrepareSim() {
+		for (DistributedAgentSource source : agentSources) {
+			source.createAgentsAndVehicles(partition, this);
+		}
+	}
+
+	@Override
     public void doSimStep(double time) {
 
         this.currentTime = time;

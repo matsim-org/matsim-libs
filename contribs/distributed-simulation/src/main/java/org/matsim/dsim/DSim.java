@@ -52,6 +52,7 @@ public final class DSim implements Netsim {
     private final Communicator comm;
     private final MessageBroker broker;
     private final Set<LPProvider> lps;
+	private final MobsimTimer timer;
 
     @Inject
     public DSim(Injector injector) {
@@ -59,6 +60,7 @@ public final class DSim implements Netsim {
         this.comm = injector.getInstance(Communicator.class);
         this.broker = injector.getInstance(MessageBroker.class);
         this.lps = injector.getInstance(get(new TypeLiteral<>() {}));
+		this.timer = new MobsimTimer();
     }
 
     private static double round(double v) {
@@ -102,7 +104,8 @@ public final class DSim implements Netsim {
 
         manager.initProcessing();
 
-        double time = config.qsim().getStartTime().seconds();
+		timer.setSimStartTime(config.qsim().getStartTime().seconds());
+		timer.setTime(timer.getSimStartTime());
 
         Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
@@ -110,11 +113,12 @@ public final class DSim implements Netsim {
 
         long start = System.currentTimeMillis();
 
-        while (time < config.qsim().getEndTime().seconds()) {
+		double time = timer.getTimeOfDay();
+        while (timer.getTimeOfDay() < config.qsim().getEndTime().seconds()) {
 
             long t = System.nanoTime();
 
-            if (time % 3600 == 0) {
+			if (time % 3600 == 0) {
                 var hour = (int) time / 3600;
                 var formattedDuration = String.format("%02d:00:00", hour);
                 log.info("#{} at sim step: {}", comm.getRank(), formattedDuration);
@@ -139,7 +143,7 @@ public final class DSim implements Netsim {
             manager.afterSimStep(time);
             broker.syncTimestep(time, false);
 
-            time += 1.0;
+			time = timer.incrementTime();
         }
 
 		manager.finishProcessing();
@@ -221,13 +225,12 @@ public final class DSim implements Netsim {
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		// TODO: This one is needed
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Not implemented. DistributedAgentSources should use the callback to insert agents.");
 	}
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		// TODO: important method
+		throw new UnsupportedOperationException("Not implemented. DistributedAgentSources should use the callback to insert agents.");
 	}
 
 	@Override
@@ -247,8 +250,7 @@ public final class DSim implements Netsim {
 
 	@Override
 	public MobsimTimer getSimTimer() {
-		// TODO: This is something we can implement
-		throw new UnsupportedOperationException();
+		return timer;
 	}
 
 	@Override

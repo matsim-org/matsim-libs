@@ -22,13 +22,19 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
@@ -42,8 +48,9 @@ import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
-public final class PopulationAgentSource implements AgentSource {
+public final class PopulationAgentSource implements AgentSource, DistributedAgentSource {
 	private static final Logger log = LogManager.getLogger( PopulationAgentSource.class );
 
 	private final Population population;
@@ -70,11 +77,11 @@ public final class PopulationAgentSource implements AgentSource {
 			qsim.insertAgentIntoMobsim(agent);
 		}
 		for (Person p : population.getPersons().values()) {
-			insertVehicles(p);
+			insertVehicles(p, qsim::addParkedVehicle);
 		}
 	}
 	private static int cnt = 5 ;
-	private void insertVehicles(Person person) {
+	private void insertVehicles(Person person, BiConsumer<MobsimVehicle, Id<Link> > vehicleInsertion) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
 
@@ -180,7 +187,7 @@ public final class PopulationAgentSource implements AgentSource {
 			} else {
 				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
 //				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
-				qsim.addParkedVehicle( this.qVehicleFactory.createQVehicle( vehicle ) , vehicleLinkId );
+				vehicleInsertion.accept( this.qVehicleFactory.createQVehicle( vehicle ) , vehicleLinkId );
 			}
 		}
 	}
@@ -226,4 +233,25 @@ public final class PopulationAgentSource implements AgentSource {
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
 
+	@Override
+	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
+		for (Person p : population.getPersons().values()) {
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+
+			if (partition.containsLink(agent.getCurrentLinkId())) {
+				mobsim.insertAgentIntoMobsim(agent);
+				insertVehicles(p, mobsim::addParkedVehicle);
+			}
+		}
+	}
+
+	@Override
+	public Class<? extends Message> getMessageClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimAgent fromMessage(Message message) {
+		return null;
+	}
 }

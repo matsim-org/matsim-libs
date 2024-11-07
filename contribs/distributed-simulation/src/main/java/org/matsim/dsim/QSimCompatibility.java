@@ -5,7 +5,7 @@ import com.google.inject.name.Named;
 import lombok.Getter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
-import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
@@ -28,7 +28,7 @@ public class QSimCompatibility {
 	private final Injector qsimInjector;
 
 	@Getter
-	private final List<AgentSource> agentSources = new ArrayList<>();
+	private final List<DistributedAgentSource> agentSources = new ArrayList<>();
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -99,7 +99,7 @@ public class QSimCompatibility {
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
-				if (qSimComponent instanceof AgentSource as) {
+				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 				}
 			}
