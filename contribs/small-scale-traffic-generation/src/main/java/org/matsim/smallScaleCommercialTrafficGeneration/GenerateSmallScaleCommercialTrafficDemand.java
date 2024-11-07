@@ -725,9 +725,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
 							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
-						createNewCarrierAndAddVehicleTypes(
-							scenario, carrierName, carrierAttributes,
-							vehicleTypes, numberOfDepots, fleetSize,
+						createNewCarrierAndAddVehicleTypes(scenario, carrierName, carrierAttributes, vehicleTypes, numberOfDepots, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation);
 
 						// Now Create services for this carrier
