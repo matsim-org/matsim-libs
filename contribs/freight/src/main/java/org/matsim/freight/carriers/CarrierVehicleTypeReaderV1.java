@@ -24,6 +24,7 @@ package org.matsim.freight.carriers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.CostInformation;
@@ -54,6 +55,9 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 		if(name.equals("vehicleType")){
 			Id<VehicleType> currentTypeId = Id.create( attributes.getValue( "id" ), VehicleType.class );
 			this.currentType = VehicleUtils.getFactory().createVehicleType( currentTypeId ) ;
+			// If no network mode is given, assume car, this is to be backwards compatible
+			// The v2 format will not make this assumption, and the network mode will be required
+			this.currentType.setNetworkMode(TransportMode.car);
 		}
 		if(name.equals("allowableWeight")){
 //			String weight = atts.getValue("weight");
