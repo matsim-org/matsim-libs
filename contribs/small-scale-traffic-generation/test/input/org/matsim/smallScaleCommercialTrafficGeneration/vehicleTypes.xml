@@ -146,7 +146,7 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-	
+
 	<vehicleType id="heavy26t">
 
 		<description>Heavy Vehicle 26t</description>
@@ -167,7 +167,7 @@
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
-	
+
 	<vehicleType id="heavy40t">
 
 		<description>Heavy Vehicle 40t</description>
@@ -187,7 +187,7 @@
 		<passengerCarEquivalents pce="1.0"/>
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>
-	</vehicleType>		
+	</vehicleType>
 
 	<vehicleType id="light8t_frozen">
 
@@ -226,5 +226,6 @@
 		<costInformation fixedCostsPerDay="982.98" costsPerMeter="8.46E-4" costsPerSecond="0.0">
 
 		</costInformation>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 </vehicleDefinitions>

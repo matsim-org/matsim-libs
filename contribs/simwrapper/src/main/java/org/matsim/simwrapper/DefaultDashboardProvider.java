@@ -8,6 +8,7 @@ import org.matsim.simwrapper.dashboard.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Default dashboards suited for every run.
@@ -19,7 +20,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		List<Dashboard> result = new ArrayList<>(List.of(
 			new OverviewDashboard(),
 			new TripDashboard(),
-			new TrafficDashboard()
+			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes()))
 		));
 
 		if (config.transit().isUseTransit()) {
