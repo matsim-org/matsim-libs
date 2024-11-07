@@ -178,5 +178,10 @@ public class DashboardTests {
 		pt.withCustomRouteTypes(crt, crtRail);
 
 		run(pt);
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "pt");
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz");
 	}
 }

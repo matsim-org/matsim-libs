@@ -15,6 +15,9 @@ public class TransitViewer extends Viz {
 	@JsonProperty(required = true)
 	public String transitSchedule;
 
+	@JsonProperty(required = true)
+	public String ptStop2stopFile;
+
 	public List<CustomRouteType> customRouteTypes;
 
 	public TransitViewer() {

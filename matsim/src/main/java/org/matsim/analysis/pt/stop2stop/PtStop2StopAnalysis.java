@@ -42,6 +42,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -271,12 +273,20 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     static Comparator<Stop2StopEntry> stop2StopEntryByStopSequenceComparator =
             Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::stopSequence));
 
-    public void writeStop2StopEntriesByDepartureCsv(String fileName, String columnSeparator, String listSeparatorInsideColumn) {
+	public void writeStop2StopEntriesByDepartureCsv(String fileName, String columnSeparator, String listSeparatorInsideColumn) {
+		writeStop2StopEntriesByDepartureCsv(IOUtils.getFileUrl(fileName), columnSeparator, listSeparatorInsideColumn);
+	}
+
+	public void writeStop2StopEntriesByDepartureCsv(Path path, String columnSeparator, String listSeparatorInsideColumn) {
+		writeStop2StopEntriesByDepartureCsv(IOUtils.getFileUrl(path.toString()), columnSeparator, listSeparatorInsideColumn);
+	}
+
+	public void writeStop2StopEntriesByDepartureCsv(URL url, String columnSeparator, String listSeparatorInsideColumn) {
         stop2StopEntriesForEachDeparture.sort(stop2StopEntryByTransitLineComparator.
                 thenComparing(stop2StopEntryByTransitRouteComparator).
                 thenComparing(stop2StopEntryByDepartureComparator).
                 thenComparing(stop2StopEntryByStopSequenceComparator));
-        try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(fileName),
+        try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(url),
 			CSVFormat.Builder.create()
 				.setDelimiter(columnSeparator)
 				.setHeader(HEADER)

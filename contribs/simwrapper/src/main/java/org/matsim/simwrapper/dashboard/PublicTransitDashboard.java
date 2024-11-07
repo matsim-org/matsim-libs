@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.application.analysis.pt.PublicTransitAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -36,6 +37,7 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.description = "Visualize the transit schedule.";
 			viz.network = "(*.)?output_network.xml.gz";
 			viz.transitSchedule = data.output("(*.)?output_transitSchedule.xml.gz");
+			viz.ptStop2stopFile = data.compute(PublicTransitAnalysis.class, "pt_pax_volumes.csv.gz");
 
 			if (!customRouteTypes.isEmpty())
 				viz.customRouteTypes = customRouteTypes;
