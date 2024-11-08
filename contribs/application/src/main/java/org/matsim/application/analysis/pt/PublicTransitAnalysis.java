@@ -59,7 +59,7 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 	private SampleOptions sample;
 
 	public static void main(String[] args) {
-		new AirPollutionAnalysis().execute(args);
+		new PublicTransitAnalysis().execute(args);
 	}
 
 	@Override

@@ -35,6 +35,9 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.title = "Transit Viewer";
 			viz.height = 12d;
 			viz.description = "Visualize the transit schedule.";
+
+			// TODO: can be replaced with avro network
+			// need to include an avro network that contains transit routes as well (unfiltered)
 			viz.network = "(*.)?output_network.xml.gz";
 			viz.transitSchedule = data.output("(*.)?output_transitSchedule.xml.gz");
 			viz.ptStop2stopFile = data.compute(PublicTransitAnalysis.class, "pt_pax_volumes.csv.gz");

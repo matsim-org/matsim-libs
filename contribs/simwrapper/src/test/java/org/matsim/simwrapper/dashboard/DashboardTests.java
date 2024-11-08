@@ -43,6 +43,8 @@ public class DashboardTests {
 		controler.run();
 	}
 
+	// TODO: merge some of these into one tests, because the test takes quite some time
+
 	@Test
 	void defaults() {
 
@@ -164,15 +166,11 @@ public class DashboardTests {
 		PublicTransitDashboard pt = new PublicTransitDashboard();
 
 		// bus
-		TransitViewer.CustomRouteType crt = new TransitViewer.CustomRouteType();
-		crt.label = "Bus";
-		crt.color = "#109192";
+		TransitViewer.CustomRouteType crt = TransitViewer.customRouteType("Bus", "#109192");
 		crt.addMatchGtfsRouteType(3);
 
 		// rail
-		TransitViewer.CustomRouteType crtRail = new TransitViewer.CustomRouteType();
-		crtRail.label = "Rail";
-		crtRail.color = "#EC0016";
+		TransitViewer.CustomRouteType crtRail = TransitViewer.customRouteType("Rail", "#EC0016");
 		crtRail.addMatchGtfsRouteType(2);
 
 		pt.withCustomRouteTypes(crt, crtRail);

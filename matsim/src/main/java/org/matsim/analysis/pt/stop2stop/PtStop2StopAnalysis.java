@@ -103,7 +103,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     public void handleEvent(VehicleArrivesAtFacilityEvent event) {
         PtVehicleData ptVehicleData = transitVehicle2temporaryVehicleData.get(event.getVehicleId());
         if (ptVehicleData == null) {
-            log.error("Encountered a VehicleArrivesAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle " + event.getVehicleId() + " at facility " + event.getFacilityId() + " at time " + event.getTime() + ". This should not happen, this analysis might fail subsequently.");
+			log.error("Encountered a VehicleArrivesAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle {} at facility {} at time {}. This should not happen, this analysis might fail subsequently.", event.getVehicleId(), event.getFacilityId(), event.getTime());
         } else {
             ptVehicleData.lastVehicleArrivesAtFacilityEvent = event;
         }
@@ -116,7 +116,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     public void handleEvent(VehicleDepartsAtFacilityEvent event) {
         PtVehicleData ptVehicleData = transitVehicle2temporaryVehicleData.get(event.getVehicleId());
         if (ptVehicleData == null) {
-            log.error("Encountered a VehicleDepartsAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle " + event.getVehicleId() + " at facility " + event.getFacilityId() + " at time " + event.getTime() + ". This should not happen, this analysis might fail subsequently.");
+			log.error("Encountered a VehicleDepartsAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle {} at facility {} at time {}. This should not happen, this analysis might fail subsequently.", event.getVehicleId(), event.getFacilityId(), event.getTime());
         } else {
             // produce output entry
 			stop2StopEntriesForEachDeparture.add(new Stop2StopEntry(ptVehicleData.transitLineId,
@@ -177,7 +177,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     @Override
     public void reset(int iteration) {
         if(!transitVehicle2temporaryVehicleData.isEmpty()) {
-            log.warn(transitVehicle2temporaryVehicleData.size() + " transit vehicles did not finish service in the last iteration.");
+			log.warn("{} transit vehicles did not finish service in the last iteration.", transitVehicle2temporaryVehicleData.size());
         }
         transitVehicle2temporaryVehicleData.clear();
         stop2StopEntriesForEachDeparture.clear();
