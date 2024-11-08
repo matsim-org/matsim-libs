@@ -246,7 +246,11 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
 
 		// add additional service tag
-		linkProperties.put(OsmTags.SERVICE, new LinkProperties(LinkProperties.LEVEL_LIVING_STREET, 1, 15 / 3.6, 450, false));
+		linkProperties.put(OsmTags.SERVICE, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 450, false));
+		linkProperties.put(OsmTags.PATH, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 10 / 3.6, 300, false));
+
+		// This is for bikes
+		linkProperties.put(OsmTags.CYCLEWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 10 / 3.6, 50, false));
 
 		for (SumoNetworkHandler.Edge edge : sumoHandler.edges.values()) {
 
