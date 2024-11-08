@@ -11,6 +11,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -26,14 +27,17 @@ public final class QSimCompatibility {
 	private final List<AbstractQSimModule> overridingModules;
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
+
+	@Getter
 	private final Injector injector;
-	private final Injector qsimInjector;
 
 	@Getter
 	private final List<DistributedAgentSource> agentSources = new ArrayList<>();
 
 	@Getter
 	private final List<MobsimEngine> engines = new ArrayList<>();
+
+	private Injector qsimInjector;
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -48,12 +52,14 @@ public final class QSimCompatibility {
 		this.components = components;
 		this.overridingModules = overridingModules;
 		this.overridingModulesFromAbstractModule = overridingModulesFromAbstractModule;
-		this.qsimInjector = createQSimInjector();
 	}
 
-	private Injector createQSimInjector() {
+	/**
+	 * Initialize module with underlying netsim.
+	 */
+	public void init(Netsim netsim) {
 		if (qsimInjector != null) {
-			return qsimInjector;
+			return;
 		}
 
 		modules.forEach(m -> m.setConfig(config));
@@ -79,10 +85,11 @@ public final class QSimCompatibility {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
+				bind(Netsim.class).toInstance(netsim);
 			}
 		};
 
-		Injector qsimInjector = injector.createChildInjector(module);
+		qsimInjector = injector.createChildInjector(module);
 
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
@@ -113,17 +120,5 @@ public final class QSimCompatibility {
 				}
 			}
 		}
-		return qsimInjector;
 	}
-
-	/**
-	 * Prepare engines for the simulation.
-	 */
-	void prepareSim(InternalInterface internalInterface) {
-		for (MobsimEngine engine : engines) {
-			engine.onPrepareSim();
-			engine.setInternalInterface(internalInterface);
-		}
-	}
-
 }

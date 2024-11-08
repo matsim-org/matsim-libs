@@ -129,8 +129,6 @@ public class SimProvider implements LPProvider {
 	@Override
 	public LP create(int part) {
 
-		QSimCompatibility qsim = injector.getInstance(QSimCompatibility.class);
-
 		NetworkPartition partition = network.getPartitioning().getPartition(part);
 
 		// wire up all the qsim parts. This can probably also be done with injection
@@ -143,16 +141,15 @@ public class SimProvider implements LPProvider {
 			.map(NetworkUtils::getPartition)
 			.collect(Collectors.toCollection(IntOpenHashSet::new));
 
-		List<DistributedAgentSource> agentSources = qsim.getAgentSources();
+		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
+
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, neighbors, part);
 		ActivityEngine activityEngine = createActivityEngine(part);
 		TeleportationEngine teleportationEngine = new TeleportationEngine(eventsManager, messaging, config);
 		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, messaging, eventsManager, part);
 
 		return new SimProcess(
-			partition,
-			messaging,
-			agentSources,
+			partition, messaging, compat,
 			activityEngine, teleportationEngine, networkTrafficEngine,
 			eventsManager,
 			config);

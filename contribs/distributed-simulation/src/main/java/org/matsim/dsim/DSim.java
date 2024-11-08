@@ -9,25 +9,15 @@ import lombok.extern.log4j.Log4j2;
 import org.HdrHistogram.Histogram;
 import org.matsim.api.LP;
 import org.matsim.api.LPProvider;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.SimulationNode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AgentTracker;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.dsim.executors.LPExecutor;
-import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisNetwork;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -37,14 +27,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.inject.Key.get;
 
 
 @Log4j2
-public final class DSim implements Netsim, InternalInterface {
+public final class DSim implements Mobsim {
 
     private final Injector injector;
     private final Communicator comm;
@@ -99,9 +91,6 @@ public final class DSim implements Netsim, InternalInterface {
                 injector.injectMembers(lp);
             }
         }
-
-		QSimCompatibility qsim = injector.getInstance(QSimCompatibility.class);
-		qsim.prepareSim(this);
 
 		manager.initProcessing();
 
@@ -218,96 +207,4 @@ public final class DSim implements Netsim, InternalInterface {
             });
         }
     }
-
-	@Override
-	public NetsimNetwork getNetsimNetwork() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		throw new UnsupportedOperationException("Not implemented. DistributedAgentSources should use the callback to insert agents.");
-	}
-
-	@Override
-	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		throw new UnsupportedOperationException("Not implemented. DistributedAgentSources should use the callback to insert agents.");
-	}
-
-	@Override
-	public EventsManager getEventsManager() {
-		return injector.getInstance(EventsManager.class);
-	}
-
-	@Override
-	public AgentCounter getAgentCounter() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Scenario getScenario() {
-		return injector.getInstance(Scenario.class);
-	}
-
-	@Override
-	public MobsimTimer getSimTimer() {
-		return timer;
-	}
-
-	@Override
-	public Collection<AgentTracker> getAgentTrackers() {
-		return List.of();
-	}
-
-	@Override
-	public VisNetwork getVisNetwork() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Map<Id<Person>, MobsimAgent> getAgents() {
-		// TODO: probably needed
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public VisData getNonNetworkAgentSnapshots() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addQueueSimulationListeners(MobsimListener listener) {
-		throw new UnsupportedOperationException();
-
-	}
-
-	@Override
-	public void rescheduleActivityEnd(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Netsim getMobsim() {
-		return this;
-	}
-
-	@Override
-	public void arrangeNextAgentState(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public List<DepartureHandler> getDepartureHandlers() {
-		throw new UnsupportedOperationException();
-	}
 }
