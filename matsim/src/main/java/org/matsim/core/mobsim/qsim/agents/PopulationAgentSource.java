@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -246,12 +247,22 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	}
 
 	@Override
-	public Class<? extends Message> getMessageClass() {
+	public Class<? extends Message> getAgentClass() {
 		return null;
 	}
 
 	@Override
-	public DistributedMobsimAgent fromMessage(Message message) {
+	public DistributedMobsimAgent agentFromMessage(Message message) {
+		return null;
+	}
+
+	@Override
+	public Class<? extends Message> getVehicleClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
 		return null;
 	}
 }

@@ -23,10 +23,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AgentTracker;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
@@ -46,7 +44,7 @@ import static com.google.inject.Key.get;
 
 
 @Log4j2
-public final class DSim implements Netsim {
+public final class DSim implements Netsim, InternalInterface {
 
     private final Injector injector;
     private final Communicator comm;
@@ -102,7 +100,10 @@ public final class DSim implements Netsim {
             }
         }
 
-        manager.initProcessing();
+		QSimCompatibility qsim = injector.getInstance(QSimCompatibility.class);
+		qsim.prepareSim(this);
+
+		manager.initProcessing();
 
 		timer.setSimStartTime(config.qsim().getStartTime().seconds());
 		timer.setTime(timer.getSimStartTime());
@@ -129,7 +130,7 @@ public final class DSim implements Netsim {
 
             try {
                 executor.doSimStep(time);
-            } catch (IllegalStateException e) {
+            } catch (Throwable e) {
                 log.error("Error in simulation step: %.2fs".formatted(time), e);
                 break;
             }
@@ -282,6 +283,31 @@ public final class DSim implements Netsim {
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Netsim getMobsim() {
+		return this;
+	}
+
+	@Override
+	public void arrangeNextAgentState(MobsimAgent agent) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<DepartureHandler> getDepartureHandlers() {
 		throw new UnsupportedOperationException();
 	}
 }

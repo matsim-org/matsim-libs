@@ -10,7 +10,10 @@ import java.util.Set;
  */
 public final class NetworkPartition {
 
-	static final NetworkPartition SINGLE_INSTANCE = new NetworkPartition();
+	/**
+	 * A partition that contains all links and nodes.
+	 */
+	public static final NetworkPartition SINGLE_INSTANCE = new NetworkPartition();
 
 	final Set<Id<Link>> links;
 	final Set<Id<Node>> nodes;

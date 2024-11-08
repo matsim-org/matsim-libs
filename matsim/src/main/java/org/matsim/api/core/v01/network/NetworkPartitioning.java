@@ -59,7 +59,8 @@ public final class NetworkPartitioning {
 		if (partitions.isEmpty())
 			return NetworkPartition.SINGLE_INSTANCE;
 
-		return partitions.get(partition);
+		// Will return an empty partition if not found
+		return partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition));
 	}
 
 	/**

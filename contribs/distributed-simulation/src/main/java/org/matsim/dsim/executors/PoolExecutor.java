@@ -96,6 +96,7 @@ public final class PoolExecutor implements LPExecutor {
             } catch (InterruptedException | ExecutionException e) {
                 log.error("Error while executing task", e);
                 executor.shutdown();
+				throw new RuntimeException(e.getCause());
             }
         }
 
@@ -122,8 +123,9 @@ public final class PoolExecutor implements LPExecutor {
 			try {
 				execution.get();
 			} catch (InterruptedException | ExecutionException e) {
-				log.error("Error while executing task", e);
+				log.error("Error while executing event handler", e);
 				executor.shutdown();
+				throw new RuntimeException(e.getCause());
 			}
 		}
 

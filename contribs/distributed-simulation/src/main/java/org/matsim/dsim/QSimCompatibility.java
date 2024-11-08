@@ -7,8 +7,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -16,7 +18,7 @@ import java.util.*;
 /**
  * Loads qsim components for providing these modules the distributed simulation.
  */
-public class QSimCompatibility {
+public final class QSimCompatibility {
 
 	private final Config config;
 	private final IterationCounter iterationCounter;
@@ -29,6 +31,9 @@ public class QSimCompatibility {
 
 	@Getter
 	private final List<DistributedAgentSource> agentSources = new ArrayList<>();
+
+	@Getter
+	private final List<MobsimEngine> engines = new ArrayList<>();
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -99,12 +104,26 @@ public class QSimCompatibility {
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
+				if (qSimComponent instanceof MobsimEngine m) {
+					engines.add(m);
+				}
+
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 				}
 			}
 		}
 		return qsimInjector;
+	}
+
+	/**
+	 * Prepare engines for the simulation.
+	 */
+	void prepareSim(InternalInterface internalInterface) {
+		for (MobsimEngine engine : engines) {
+			engine.onPrepareSim();
+			engine.setInternalInterface(internalInterface);
+		}
 	}
 
 }

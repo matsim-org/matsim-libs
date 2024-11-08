@@ -18,8 +18,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.router.TripStructureUtils;
@@ -29,7 +27,6 @@ import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -169,5 +166,4 @@ public class SimProvider implements LPProvider {
 			.toList();
 		return new ActivityEngine(personsOnPartition, timeInterpretation, eventsManager);
 	}
-
 }

@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.NetworkPartition;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
 /**
@@ -20,11 +21,15 @@ public interface DistributedAgentSource {
 	/**
 	 * Return the message class of the agents produced by this source.
 	 */
-	Class<? extends Message> getMessageClass();
+	Class<? extends Message> getAgentClass();
 
 	/**
 	 * Construct an agent from a message.
 	 */
-	DistributedMobsimAgent fromMessage(Message message);
+	DistributedMobsimAgent agentFromMessage(Message message);
+
+	Class<? extends Message> getVehicleClass();
+
+	DistributedMobsimVehicle vehicleFromMessage(Message message);
 
 }
