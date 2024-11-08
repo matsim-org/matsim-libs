@@ -3,13 +3,15 @@ package org.matsim.dsim;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import lombok.Getter;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -27,6 +29,9 @@ public final class QSimCompatibility {
 	private final List<AbstractQSimModule> overridingModules;
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
+
+	private final Map<Class<? extends Message>, DistributedAgentSource> agentTypes = new HashMap<>();
+	private final Map<Class<? extends Message>, DistributedAgentSource> vehicleSources = new HashMap<>();
 
 	@Getter
 	private final Injector injector;
@@ -117,8 +122,41 @@ public final class QSimCompatibility {
 
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
+
+					Class<? extends Message> aClass = as.getAgentClass();
+					if (aClass != null)
+						agentTypes.put(aClass, as);
+
+					Class<? extends Message> vClass = as.getVehicleClass();
+					if (vClass != null)
+						vehicleSources.put(vClass, as);
 				}
 			}
 		}
 	}
+
+	/**
+	 * Create a vehicle from a received message.
+	 */
+	public DistributedMobsimVehicle convertVehicle(Message m) {
+		DistributedAgentSource source = vehicleSources.get(m.getClass());
+		if (source == null) {
+			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
+		}
+
+		return source.vehicleFromMessage(m);
+	}
+
+	/**
+	 * Create an agent from a received message.
+	 */
+	public DistributedMobsimAgent convertAgent(Message m) {
+		DistributedAgentSource source = agentTypes.get(m.getClass());
+		if (source == null) {
+			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
+		}
+
+		return source.agentFromMessage(m);
+	}
+
 }

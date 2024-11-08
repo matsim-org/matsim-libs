@@ -20,13 +20,19 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
@@ -34,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-public class VrpAgentSource implements AgentSource {
+public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 	private final DynActionCreator nextActionCreator;
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
@@ -74,5 +80,55 @@ public class VrpAgentSource implements AgentSource {
 			qSim.addParkedVehicle(mobsimVehicle, startLinkId);
 			qSim.insertAgentIntoMobsim(vrpAgent);
 		}
+	}
+
+	@Override
+	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
+
+		VehiclesFactory vehicleFactory = this.qSim.getScenario().getVehicles().getFactory();
+
+		for (DvrpVehicle dvrpVehicle : fleet.getVehicles().values()) {
+			Id<DvrpVehicle> id = dvrpVehicle.getId();
+			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
+
+			if (!partition.containsLink(startLinkId)) {
+				continue;
+			}
+
+			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
+				qSim.getEventsManager());
+			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
+				vrpAgentLogic);
+			Vehicle matsimVehicle = dvrpVehicle.getSpecification()
+				.getMatsimVehicle()
+				.orElse(vehicleFactory.createVehicle(Id.create(id, Vehicle.class), vehicleType));
+			QVehicle mobsimVehicle = new QVehicleImpl(matsimVehicle);
+			vrpAgent.setVehicle(mobsimVehicle);
+			mobsimVehicle.setDriver(vrpAgent);
+
+			mobsim.addParkedVehicle(mobsimVehicle, startLinkId);
+			mobsim.insertAgentIntoMobsim(vrpAgent);
+		}
+
+	}
+
+	@Override
+	public Class<? extends Message> getAgentClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimAgent agentFromMessage(Message message) {
+		return null;
+	}
+
+	@Override
+	public Class<? extends Message> getVehicleClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
+		return null;
 	}
 }

@@ -27,11 +27,13 @@ import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
@@ -48,7 +50,7 @@ import org.matsim.vehicles.VehicleCapacity;
  * @author nagel
  */
 
-public class QVehicleImpl implements QVehicle {
+public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	private static final Logger log = LogManager.getLogger(QVehicleImpl.class);
 
@@ -222,5 +224,11 @@ public class QVehicleImpl implements QVehicle {
 	public final void setLinkEnterTime( double linkEnterTime ) {
 		// yyyyyy use in code!
 		this.linkEnterTime = linkEnterTime;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO: needs to be implemented
+		return new QVehicleMessage();
 	}
 }
