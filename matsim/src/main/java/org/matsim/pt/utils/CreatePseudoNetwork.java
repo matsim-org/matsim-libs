@@ -152,7 +152,14 @@ public class CreatePseudoNetwork {
 				}
 				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
+				Id<TransitStopArea> transitStopAreaId;
+				if (toFacility.getStopAreaId() == null) {
+					transitStopAreaId = Id.create(toFacility.getId(), TransitStopArea.class);
+					toFacility.setStopAreaId(transitStopAreaId);
+				} else {
+					transitStopAreaId = toFacility.getStopAreaId();
+				}
+				newFacility.setStopAreaId(transitStopAreaId);
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);
