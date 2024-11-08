@@ -136,7 +136,7 @@ public class SimProvider implements LPProvider {
 		// wire up all the qsim parts. This can probably also be done with injection
 		// but keep things simple for now.
 		IntSet neighbors = network.getLinks().values().stream()
-			.filter(l -> partition.containsLink(l.getId()))
+			.filter(partition::containsNodesOfLink)
 			.filter(SimProvider::isSplit)
 			.flatMap(l -> Stream.of(l.getFromNode(), l.getToNode()))
 			.filter(n -> !partition.containsNode(n.getId()))

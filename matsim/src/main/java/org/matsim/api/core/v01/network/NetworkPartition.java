@@ -56,6 +56,13 @@ public final class NetworkPartition {
 	}
 
 	/**
+	 * Return whether any of the nodes of a link is contained on this partition.
+	 */
+	public boolean containsNodesOfLink(Link link) {
+		return containsNode(link.getFromNode().getId()) || containsNode(link.getToNode().getId());
+	}
+
+	/**
 	 * Check whether the partition contains the given node.
 	 */
 	public boolean containsNode(Id<Node> nodeId) {

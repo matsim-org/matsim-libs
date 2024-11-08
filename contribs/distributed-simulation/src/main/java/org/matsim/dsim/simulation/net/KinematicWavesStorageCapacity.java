@@ -29,8 +29,9 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 		holeTravelTime = link.getLength() / HOLE_SPEED;
 
 		if (simpleStorageCapacity.getMax() < max) {
-			CountedWarning.warn("KinematicWavesStorageCapacity::init", 10, "Storage capacity of link " +
-				link.getId() + " increased for backwards travelling holes. This changes the traffic dynamics");
+			CountedWarning.warn("KinematicWavesStorageCapacity::init", 10,
+				"Storage capacity of link {} increased for backwards travelling holes. This changes the traffic dynamics", link.getId()
+			);
 		}
 	}
 

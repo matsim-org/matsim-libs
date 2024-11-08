@@ -21,8 +21,8 @@ class SimpleStorageCapacity implements StorageCapacity {
 		max = Math.max(defaultStorageCapacity, Math.max(minStorageCapacityForOutFlow, minStorageCapacityForSlowSpeed));
 
 		if (defaultStorageCapacity < max) {
-			CountedWarning.warn("SimpleStorageCapacity::Init", 10, "Storage capacity for link " +
-				link.getId() + " is increased to serve the outflow of the link. This changes traffic dynamics");
+			CountedWarning.warn("SimpleStorageCapacity::Init", 10,
+				"Storage capacity for link {} is increased to serve the outflow of the link. This changes traffic dynamics", link.getId());
 		}
 	}
 
