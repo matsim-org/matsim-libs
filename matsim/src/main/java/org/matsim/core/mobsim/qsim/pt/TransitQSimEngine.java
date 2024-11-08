@@ -231,8 +231,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
-		// TODO: leads to exceptions and commented out
-//		ptDrivers = createVehiclesAndDriversWithUmlaeufe(partition, mobsim);
+		ptDrivers = createVehiclesAndDriversWithUmlaeufe(partition, mobsim);
 	}
 
 	@Override

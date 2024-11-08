@@ -112,13 +112,13 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().seconds());
 
-		for (DistributedAgentSource source : qsim.getAgentSources()) {
-			source.createAgentsAndVehicles(partition, this);
+		for (MobsimEngine engine : qsim.getEngines()) {
+			engine.setInternalInterface(this);
+			engine.onPrepareSim();
 		}
 
-		for (MobsimEngine engine : qsim.getEngines()) {
-			engine.onPrepareSim();
-			engine.setInternalInterface(this);
+		for (DistributedAgentSource source : qsim.getAgentSources()) {
+			source.createAgentsAndVehicles(partition, this);
 		}
 	}
 
@@ -151,12 +151,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		log.warn("Add vehicle {} at {}", veh, startLinkId);
+		// TODO implement
+//		log.warn("Add vehicle {} at {}", veh, startLinkId);
 	}
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		log.warn("Insert agent {}", agent);
+		// TODO implement
+//		log.warn("Insert agent {}", agent);
 	}
 
 	@Override

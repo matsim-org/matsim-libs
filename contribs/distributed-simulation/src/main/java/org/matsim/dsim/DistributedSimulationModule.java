@@ -53,7 +53,7 @@ public class DistributedSimulationModule extends AbstractModule {
         // This may be relevant if we want to partition the network or other lps
         topology = createTopology(serializer);
 
-        log.info("Topology has {} partitions on {} nodes. Node {} is has parts: {}",
+        log.info("Topology has {} partitions on {} nodes. Node {} has parts: {}",
                 topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
     }
 
