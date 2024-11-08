@@ -44,6 +44,7 @@ public class TestScenario extends MATSimApplication {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setWriteEventsInterval(1);
+		config.scoring().setWriteExperiencedPlans(false); // avoid NoSuchFileException
 
 		return config;
 	}

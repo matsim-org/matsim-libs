@@ -10,6 +10,7 @@ import org.matsim.simwrapper.viz.Table;
 import org.matsim.simwrapper.viz.TransitViewer;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +71,44 @@ public class PublicTransitDashboard implements Dashboard {
 					.y("Count")
 			);
 
+		});
+
+		layout.row("ptSupplyStatisticsByHour").el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Share of active transit lines per mode and hour";
+				viz.description = "share of transit lines with at least one departure at any stop inside the shape file per hour";
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_lines_per_hour_per_mode_per_area.csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.yAxis(Axis.builder().title("Share").build())
+					.xAxis(Axis.builder().title("Hour").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+					.x("departureHour")
+					.y("share")
+					.name("transportMode", ColorScheme.Spectral)
+				);
+			}).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Share of active transit stops per mode and hour";
+			viz.description = "Share of transit stops with at least one departure in the given hour in respect to total number of stops having at least one departure anytime in the day. Filtered by shape file. Stops served by multiple modes are counted into both modes.";
+
+			Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_stops_per_hour_per_mode_per_area.csv"));
+
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.yAxis(Axis.builder().title("Share").build())
+				.xAxis(Axis.builder().title("Hour").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+				.build();
+
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+				.x("departureHour")
+				.y("share")
+				.name("transportMode", ColorScheme.Spectral)
+			);
 		});
 	}
 }
