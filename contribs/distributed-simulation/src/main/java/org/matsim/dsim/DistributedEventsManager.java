@@ -50,7 +50,7 @@ public final class DistributedEventsManager implements EventsManager {
     /**
      * Global event listeners with their index.
      */
-    private final Int2ObjectMap<IntList> globalListener = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<List<EventHandlerTask>> globalListener = new Int2ObjectOpenHashMap<>();
 
     /**
      * Listener for event types on other nodes/ranks. Always exactly one other node, or broadcast to all.
@@ -148,8 +148,6 @@ public final class DistributedEventsManager implements EventsManager {
 
     private void addTask(EventHandlerTask task, int part) {
 
-        int idx = tasks.size();
-
         broker.register(task, part);
 
         for (int type : task.getSupportedMessages()) {
@@ -163,7 +161,7 @@ public final class DistributedEventsManager implements EventsManager {
             if (task.isDirect()) {
                 // Not added to any queue, always local
             } else if (source == EventSource.GLOBAL) {
-                globalListener.computeIfAbsent(type, k -> new IntArrayList()).add(idx);
+                globalListener.computeIfAbsent(type, k -> new ArrayList<>()).add(task);
                 remoteSyncStep = Double.min(remoteSyncStep, task.getHandler().getProcessInterval());
 
             }
@@ -200,7 +198,7 @@ public final class DistributedEventsManager implements EventsManager {
         EventRegistry.EventRegistryBuilder registry = EventRegistry.builder();
 
         registry.rank(comm.getRank());
-        registry.eventTypes(globalListener.keySet());
+        registry.eventTypes(new IntOpenHashSet(globalListener.keySet()));
         registry.syncStep(remoteSyncStep);
 
         EventRegistry self = registry.build();
@@ -212,8 +210,7 @@ public final class DistributedEventsManager implements EventsManager {
 
             globalListener.forEach((type, list) -> {
                 String name = serializer.getType(type).getSimpleName();
-                for (Integer idx : list) {
-                    EventHandlerTask task = tasks.get(idx);
+                for (EventHandlerTask task : list) {
                     info.computeIfAbsent(task.getName(), _ -> new ArrayList<>()).add(name);
                 }
             });
@@ -271,9 +268,14 @@ public final class DistributedEventsManager implements EventsManager {
     @Override
     public void removeHandler(EventHandler handler) {
 
-		log.warn("##############################");
-		log.warn("Removing event handler is not supported yet. This need to be implemented or handlers will be duplicated every iteration.");
-		log.warn("##############################");
+		List<EventHandlerTask> toRemove = tasks.stream().filter(t -> t.getHandler() == handler).toList();
+
+		if (toRemove.isEmpty()) {
+			throw new IllegalArgumentException("Handler %s not found to be removed. If it was added as distributed handler, removing it is not supported via this method.");
+		}
+
+		tasks.removeAll(toRemove);
+		toRemove.forEach(executor::deregister);
     }
 
     @Override
@@ -335,16 +337,14 @@ public final class DistributedEventsManager implements EventsManager {
 
         // Only global handlers may have received events from other nodes
         for (Event event : events) {
-            globalListener.getOrDefault(Event.ANY_TYPE, IntList.of())
-                    .forEach(i -> {
-                        EventHandlerTask task = tasks.get(i);
+            globalListener.getOrDefault(Event.ANY_TYPE, List.of())
+                    .forEach(task -> {
                         task.add(event);
                         task.setSorting();
                     });
 
-            globalListener.getOrDefault(event.getType(), IntList.of())
-                    .forEach(i -> {
-                        EventHandlerTask task = tasks.get(i);
+            globalListener.getOrDefault(event.getType(), List.of())
+                    .forEach(task -> {
                         task.add(event);
                         task.setSorting();
                     });

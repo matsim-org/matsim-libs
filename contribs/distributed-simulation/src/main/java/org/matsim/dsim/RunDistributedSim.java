@@ -34,6 +34,9 @@ public class RunDistributedSim implements Callable<Integer> {
     @CommandLine.Option(names = {"--oversubscribe"}, description = "Create more partitions than cores", defaultValue = "1")
     private double oversubscribe;
 
+	@CommandLine.Option(names = {"--write-events"}, description = "Write events to the output directory", defaultValue = "false")
+	private boolean writeEvents;
+
     @CommandLine.Option(names = {"--nodes"}, description = "List of all nodes", defaultValue = "")
     private String nodes;
 
@@ -94,7 +97,7 @@ public class RunDistributedSim implements Callable<Integer> {
         // Compatibility with many scenarios
         Activities.addScoringParams(config);
         config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
-		config.controller().setWriteEventsInterval(1);
+		config.controller().setWriteEventsInterval(writeEvents ? 1 : 0);
 
         config.qsim().setUsePersonIdForMissingVehicleId(false);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
