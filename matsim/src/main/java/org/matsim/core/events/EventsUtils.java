@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Injector;
 import org.matsim.utils.eventsfilecomparison.*;
 
@@ -132,6 +133,22 @@ public final class EventsUtils {
 
 	public static ComparisonResult compareEventsFiles(String filename1, String filename2) {
 		return EventsFileComparator.compare(filename1, filename2);
+	}
+
+
+	/**
+	 * Determine if events should be written for the current iteration.
+	 */
+	public static boolean shouldWriteEvents(ControllerConfigGroup config, int currentIteration, boolean isLastIteration) {
+		int writeEventsInterval = config.getWriteEventsInterval();
+		int writeMoreUntilIteration = config.getWriteEventsUntilIteration();
+
+		final boolean writingEventsAtAll = writeEventsInterval > 0;
+		final boolean regularWriteEvents = writingEventsAtAll && (currentIteration > 0 && currentIteration % writeEventsInterval == 0);
+		// (w/o the "writingEventsAtAll && ..." this is a division by zero when writeEventsInterval=0. kai, apr'18)
+		final boolean earlyIteration = currentIteration <= writeMoreUntilIteration;
+
+		return writingEventsAtAll && (regularWriteEvents || earlyIteration || isLastIteration);
 	}
 
 }

@@ -23,10 +23,12 @@
 
 public class TeleportationModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "TeleportationEngine";
+	public final static String COMPONENT_LINK_EVENTS_NAME = "TeleportationEngine";
 
 	@Override
 	protected void configureQSim() {
 		bind(DefaultTeleportationEngine.class).asEagerSingleton();
 		addQSimComponentBinding( COMPONENT_NAME ).to( DefaultTeleportationEngine.class );
+		addQSimComponentBinding( COMPONENT_LINK_EVENTS_NAME ).to( TeleportationWithLinkEventsEngine.class );
 	}
 }

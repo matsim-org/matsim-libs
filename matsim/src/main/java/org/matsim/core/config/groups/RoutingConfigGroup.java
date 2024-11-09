@@ -50,7 +50,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
 	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
-
+	private static final String TELEPORTED_ROUTED_MODES = "teleportedRoutedModes";
 
 	public static final String UNDEFINED = "undefined";
 
@@ -65,6 +65,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private static final Logger log = LogManager.getLogger(RoutingConfigGroup.class) ;
 
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
+	private Collection<String> teleportedRoutedModes = List.of();
 
 	private boolean acceptModeParamsWithoutClearing;
 
@@ -515,6 +516,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 			setTeleportedModeSpeed(UNDEFINED, Double.parseDouble(value));
 		} else if (NETWORK_MODES.equals(key)) {
 			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
+		} else if (TELEPORTED_ROUTED_MODES.equals(key)) {
+			setTeleportedModeSpeeds(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
 			setTeleportedModeSpeed(key.substring(TELEPORTED_MODE_SPEEDS.length()), Double.parseDouble(value));
 		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)){
@@ -538,6 +541,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
+		map.put( TELEPORTED_ROUTED_MODES, CollectionUtils.arrayToString(this.teleportedRoutedModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
 		map.put(  ACCESSEGRESSTYPE, getAccessEgressType().toString()) ;
@@ -552,6 +556,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
+		map.put(TELEPORTED_ROUTED_MODES, "Network modes that will be routed and link events generated for them.");
+
 		map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
@@ -567,6 +573,14 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 	public void setNetworkModes(Collection<String> networkModes) {
 		this.networkModes = networkModes;
+	}
+
+	public Collection<String> getTeleportedRoutedModes() {
+		return this.teleportedRoutedModes;
+	}
+
+	public void setTeleportedModeSpeeds(Collection<String> teleportedRoutedModes) {
+		this.teleportedRoutedModes = teleportedRoutedModes;
 	}
 
 	public Map<String, Double> getTeleportedModeSpeeds() {

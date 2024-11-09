@@ -86,7 +86,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		// (w/o the "writingEventsAtAll && ..." this is a division by zero when writeEventsInterval=0. kai, apr'18)
 		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
 		final boolean lastIteration = event.isLastIteration();
-		if (writingEventsAtAll && (regularWriteEvents||earlyIteration || lastIteration ) ) {
+		if (writingEventsAtAll && (regularWriteEvents || earlyIteration || lastIteration ) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
 					case xml:
