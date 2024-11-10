@@ -71,8 +71,6 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private Double beelineDistanceFactor = 1.3 ;
 
 	public enum AccessEgressType {
-		@Deprecated none,
-
 		/**
 		 * Euclidian distance from facility to nearest point on link; then teleported walk.  In normal cases, all activities that belong to the
 		 * same link are mapped into the same facility; in consequence, in that situation all will have the same walk time.  kai, may'23
