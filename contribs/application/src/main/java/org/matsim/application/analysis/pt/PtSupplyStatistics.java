@@ -176,9 +176,13 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 			}
 		}
 
+		Table countsAllModes = departuresFromStops.
+			summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).apply().
+			addColumns(StringColumn.create("transportMode","allModes"));
 		Table countsPerMode = departuresFromStops.
 			summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).
 			by("transportMode").sortOn("transportMode");
+		countsPerMode = countsAllModes.append(countsPerMode);
 		// rename column names to Matsim TransitSchedule class names
 		countsPerMode.column("transportMode").setName("TransportMode");
 		countsPerMode.column(TableSliceGroup.aggregateColumnName("transitLine", countUnique.functionName())).setName("TransitLines");
