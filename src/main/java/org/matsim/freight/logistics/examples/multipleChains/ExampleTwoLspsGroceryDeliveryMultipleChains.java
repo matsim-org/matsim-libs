@@ -217,7 +217,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static void runCarrierAnalysis(String outputPath, Config config) {
     RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
-      freightAnalysis.runAnalysis();
+      freightAnalysis.runCompleteAnalysis();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
