@@ -35,13 +35,9 @@ import java.util.Collection;
 /**
  * Interface that combines the most important interfaces of the QSim.
  */
-public interface Netsim extends ObservableMobsim, ActivityEndRescheduler, VisMobsim {
+public interface Netsim extends ObservableMobsim, InsertableMobsim, ActivityEndRescheduler, VisMobsim {
 
 	NetsimNetwork getNetsimNetwork();
-
-	void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId);
-
-	void insertAgentIntoMobsim(MobsimAgent agent);
 
 	EventsManager getEventsManager();
 

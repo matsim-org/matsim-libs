@@ -1,0 +1,16 @@
+zoneID	mode/vehType	1	2	3	4	5
+area1	vehTyp3	0	1	4	4	3
+area2	vehTyp4	0	0	1	4	1
+area3	vehTyp5	0	0	1	3	1
+area1	vehTyp4	0	0	1	1	0
+area2	vehTyp5	0	0	3	21	9
+area1	vehTyp1	1	2	10	4	3
+area2	vehTyp2	0	0	2	3	7
+area3	vehTyp3	0	0	1	2	1
+area1	vehTyp2	0	0	2	1	2
+area2	vehTyp3	0	1	4	13	8
+area3	vehTyp4	0	0	0	1	0
+area3	vehTyp1	0	0	2	1	1
+area2	vehTyp1	1	2	11	10	9
+area3	vehTyp2	0	0	0	0	1
+area1	vehTyp5	0	0	3	7	3

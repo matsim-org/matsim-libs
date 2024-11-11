@@ -10,12 +10,12 @@ public class CountedWarning {
 
 	private static final ConcurrentMap<String, AtomicInteger> registeredWarnings = new ConcurrentHashMap<>();
 
-	public static void warn(String name, int maxCount, String message) {
+	public static void warn(String name, int maxCount, String message, Object arg) {
 		var count = registeredWarnings.computeIfAbsent(name, _ -> new AtomicInteger()).incrementAndGet();
 		if (count < maxCount) {
-			LogManager.getLogger(name).warn(message);
+			LogManager.getLogger(name).warn(message, arg);
 		} if (count == maxCount) {
-			LogManager.getLogger(name).warn("{} \t Further messages are suppressed.", message);
+			LogManager.getLogger(name).warn(message + " \t Further messages are suppressed.", arg);
 		}
 	}
 }

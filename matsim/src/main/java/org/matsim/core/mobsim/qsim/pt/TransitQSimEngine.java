@@ -29,17 +29,19 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
@@ -54,7 +56,7 @@ import jakarta.inject.Inject;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
+public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;
@@ -132,7 +134,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		}
 	}
 
-	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe() {
+	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
 		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<>();
@@ -141,8 +143,11 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
-				drivers.add(driver);
+				Id<Link> startLinkId = umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId();
+				if (partition.containsLink(startLinkId)) {
+					AbstractTransitDriverAgent driver = createAndScheduleVehicleAndDriver(mobsim, umlauf, basicVehicle);
+					drivers.add(driver);
+				}
 			}
 		}
 		return drivers;
@@ -157,7 +162,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return umlaufCache;
 	}
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle) {
+	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(InsertableMobsim mobsim, Umlauf umlauf, Vehicle vehicle) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
 		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
 		veh.setDriver(driver);
@@ -165,8 +170,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		driver.setVehicle(veh);
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
-		this.qSim.addParkedVehicle(veh, startLinkId);
-		this.qSim.insertAgentIntoMobsim(driver);
+		mobsim.addParkedVehicle(veh, startLinkId);
+		mobsim.insertAgentIntoMobsim(driver);
 		return driver;
 	}
 
@@ -217,12 +222,35 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		ptDrivers = createVehiclesAndDriversWithUmlaeufe();
+		ptDrivers = createVehiclesAndDriversWithUmlaeufe(NetworkPartition.SINGLE_INSTANCE, qSim);
 	}
 
 	public Collection<MobsimAgent> getPtDrivers() {
 		return Collections.unmodifiableCollection(ptDrivers);
 	}
 
+	@Override
+	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
+		ptDrivers = createVehiclesAndDriversWithUmlaeufe(partition, mobsim);
+	}
 
+	@Override
+	public Class<? extends Message> getAgentClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimAgent agentFromMessage(Message message) {
+		return null;
+	}
+
+	@Override
+	public Class<? extends Message> getVehicleClass() {
+		return null;
+	}
+
+	@Override
+	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
+		return null;
+	}
 }

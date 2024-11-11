@@ -22,6 +22,7 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,6 +68,15 @@ public class DistributedController implements ControlerI {
                             Id.create(l.getRoutingMode(), String.class);
                     }
                 });
+
+		// Automatically set the network mode which is now required
+		for (VehicleType value : scenario.getVehicles().getVehicleTypes().values()) {
+			try {
+				value.getNetworkMode();
+			} catch (NullPointerException e) {
+				value.setNetworkMode(value.getId().toString());
+			}
+		}
 
         log.warn("Adding freight and ride as modes to all car links. As we need this in some scenarios. Ideally, this would be encoded in the network already.");
 

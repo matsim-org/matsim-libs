@@ -1,6 +1,5 @@
 package org.matsim.dsim;
 
-import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
@@ -13,14 +12,11 @@ import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 import org.matsim.core.serialization.SerializationProvider;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
@@ -57,7 +53,7 @@ public class DistributedSimulationModule extends AbstractModule {
         // This may be relevant if we want to partition the network or other lps
         topology = createTopology(serializer);
 
-        log.info("Topology has {} partitions on {} nodes. Node {} is has parts: {}",
+        log.info("Topology has {} partitions on {} nodes. Node {} has parts: {}",
                 topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
     }
 
@@ -79,7 +75,6 @@ public class DistributedSimulationModule extends AbstractModule {
         bind(Topology.class).toInstance(topology);
         bind(MessageBroker.class).in(Singleton.class);
         bind(DSim.class).in(Singleton.class);
-		bind(Netsim.class).to(Key.get(DSim.class));
         bind(SerializationProvider.class).toInstance(serializer);
         bind(TimeInterpretation.class).in(Singleton.class);
 
@@ -88,7 +83,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		installQSimModule(new TransitEngineModule());
 		installQSimModule(new PopulationModule());
 		bindMobsim().toProvider(DSimProvider.class);
-		bind(QSimCompatibility.class).in(Singleton.class);
+		bind(QSimCompatibility.class);
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 

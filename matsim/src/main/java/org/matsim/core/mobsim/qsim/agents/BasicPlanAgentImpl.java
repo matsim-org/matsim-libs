@@ -21,10 +21,9 @@
 
  package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import jakarta.validation.constraints.NotNull;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,18 +32,10 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.VehicleUsingAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
@@ -55,15 +46,14 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
+import java.util.List;
 
-public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
-	
+public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
+
 	private static final Logger log = LogManager.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
 	private static int noRouteWrnCnt = 0;
-	
+
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
 	private boolean firstTimeToGetModifiablePlan = true;
@@ -75,13 +65,26 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 	final private TimeInterpretation timeInterpretation;
-	
+
 	/**
 	 * This notes how far a route is advanced.  One could move this into the DriverAgent(Impl).  There, however, is no method to know about the
 	 * start of the route, thus one has to guess when to set it back to zero.  Also, IMO there is really some logic to providing this as a service
 	 * by the entity that holds the plan. Better ideas are welcome.  kai, nov'14
 	 */
 	private int currentLinkIndex = 0;
+
+	public BasicPlanAgentImpl(BasicPlanAgentMessage message, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
+		this.plan = PopulationUtils.unmodifiablePlan(message.plan());
+		this.currentPlanElementIndex = message.currentPlanElementIndex();
+		this.activityEndTime = message.activityEndTime();
+		this.state = message.state();
+		this.currentLinkId = message.currentLinkId();
+		this.currentLinkIndex = message.currentLinkIndex();
+		this.scenario = scenario;
+		this.events = events;
+		this.simTimer = simTimer;
+		this.timeInterpretation = timeInterpretation;
+	}
 
 	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
 
@@ -102,11 +105,11 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		this.setState(State.ACTIVITY) ;
 		calculateAndSetDepartureTime(firstAct);
 	}
-	
+
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
-		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
+		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null))
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.getDestinationLinkId()
 					+ ", but arrived on link " + this.getCurrentLinkId() + ". Setting agent state to ABORT.");
@@ -115,7 +118,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 			advancePlan(now) ;
 		}
-		
+
 		this.currentLinkIndex = 0 ;
 	}
 
@@ -131,14 +134,14 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private void advancePlan(double now) {
 		this.currentPlanElementIndex++ ;
-	
+
 		// check if plan has run dry:
 		if ( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
 			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT (but continuing the mobsim).") ;
 			this.setState(MobsimAgent.State.ABORT) ;
 			return;
 		}
-	
+
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
@@ -152,7 +155,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	}
 
 	private void initializeLeg(Leg leg) {
-		this.setState(MobsimAgent.State.LEG) ;		
+		this.setState(MobsimAgent.State.LEG) ;
 		this.currentLinkIndex = 0 ;
 		if (leg.getRoute() == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT.");
@@ -162,7 +165,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			}
 			this.setState(MobsimAgent.State.ABORT) ;
 //			throw new RuntimeException("no route in leg") ;
-		} 
+		}
 	}
 
 	private void initializeActivity(Activity act, double now) {
@@ -181,7 +184,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private final void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
-	
+
 		if ( this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity of person driver agent id " + this.getId() + " has end time < infty; setting it to infty") ;
@@ -190,7 +193,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			}
 			departure = Double.POSITIVE_INFINITY ;
 		}
-	
+
 		this.activityEndTime = departure ;
 	}
 
@@ -201,11 +204,11 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
 		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
-	
+
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
 	}
-	@Override 
+	@Override
 	public final void resetCaches() {
 		if ( this.getCurrentPlanElement() instanceof Activity ) {
 			Activity act = (Activity) this.getCurrentPlanElement() ;
@@ -215,7 +218,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	// ============================================================================
 	// (nearly) pure getters and setters below here
-	
+
 	/**
 	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
 	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
@@ -306,7 +309,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	}
 
 	/* default */ final int getCurrentPlanElementIndex() {
-		// Should this be made public?  
+		// Should this be made public?
 		// Pro: Many programmers urgently seem to need this: They do everything possible to get to this index, including copy/paste of the whole class.
 		// Con: I don't think that it is needed in many of those cases with a bit of thinking, and without it it really makes the code more flexible including
 		// the possibility to, say, "consume" the plan while it is executed.
@@ -325,38 +328,38 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	public final Person getPerson() {
 		return this.plan.getPerson() ;
 	}
-	
+
 	public final Scenario getScenario() {
 		return scenario;
 	}
-	
+
 	public final EventsManager getEvents() {
 		return events;
 	}
-	
+
 	final MobsimTimer getSimTimer() {
 		return simTimer;
 	}
-	
+
 	@Override
 	public final MobsimVehicle getVehicle() {
 		return vehicle;
 	}
-	
+
 	@Override
 	public final void setVehicle(MobsimVehicle vehicle) {
 		this.vehicle = vehicle;
 	}
-	
+
 	@Override
 	public final Id<Link> getCurrentLinkId() {
 		return this.currentLinkId;
 	}
-	
+
 	/* package */ final void setCurrentLinkId(@NotNull Id<Link> linkId ) {
 		this.currentLinkId = Preconditions.checkNotNull(linkId);
 	}
-	
+
 	@Override
 	public final Id<Link> getDestinationLinkId() {
 		return this.getCurrentLeg().getRoute().getEndLinkId() ;
@@ -373,7 +376,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	final void setState(MobsimAgent.State state) {
 		this.state = state;
 	}
-	
+
 	final Leg getCurrentLeg() {
 		return (Leg) this.getCurrentPlanElement() ;
 	}
@@ -383,7 +386,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		// case an indexOf search fails.  kai, nov'17
 		return currentLinkIndex;
 	}
-	
+
 	final void incCurrentLinkIndex() {
 		currentLinkIndex++ ;
 	}
@@ -416,6 +419,11 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			return null;
 		}
 		throw new RuntimeException("unexpected type of PlanElement");
+	}
+
+	@Override
+	public BasicPlanAgentMessage toMessage() {
+		return new BasicPlanAgentMessage(plan, currentPlanElementIndex, activityEndTime, state, currentLinkId, currentLinkIndex);
 	}
 
 	@Override

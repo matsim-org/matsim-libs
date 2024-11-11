@@ -481,7 +481,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //			Map the values to the new subcarriers
 			for (Id<Carrier> oldCarrierId : carrierId2subCarrierIds.keySet()) {
 				for (Id<Carrier> newCarrierId : carrierId2subCarrierIds.get(oldCarrierId)) {
-					carrierId2carrierAttributes.put(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId));
+					if (carrierId2carrierAttributes.putIfAbsent(newCarrierId, carrierId2carrierAttributes.get(oldCarrierId)) != null)
+						throw new Exception("CarrierAttributes already exist for the carrier " + newCarrierId.toString());
 				}
 			}
 
@@ -679,14 +680,26 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								vehicleTypes.add(possibleVehicleType);
 						}
 
-						// find a (random) start category with existing employees in this zone
 						Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd);
 						String selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
+						// Find a (random) start category with existing employees in this zone
+						// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
+						// Otherwise, we have to find another category.
 						for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
-							if (count <= odMatrixEntry.possibleStartCategories.size())
-								selectedStartCategory = odMatrixEntry.possibleStartCategories.get(rnd.nextInt(odMatrixEntry.possibleStartCategories.size()));
-							else
+							if (count < odMatrixEntry.possibleStartCategories.size())
+								selectedStartCategory = odMatrixEntry.possibleStartCategories.get(count);
+							else {
+								// if no possible start category with employees is found, take a random category of the stop categories,
+								// the reason that no start category with employees is found is that traffic volume for employees in general is created,
+								// so that it is possible that we have traffic, although we have no employees in the given start category.
+								// That's why we exclude Inhabitants as a possible start category.
 								selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+								if (selectedStartCategory.equals("Inhabitants"))
+									selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+								if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
+									log.warn("No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
+									startZone, selectedStartCategory, odMatrixEntry.possibleStartCategories);
+							}
 						}
 
 						// Generate carrierName
@@ -709,11 +722,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
 							smallScaleCommercialTrafficType, vehicleDepots, odMatrixEntry);
-						carrierId2carrierAttributes.put(Id.create(carrierName, Carrier.class), carrierAttributes);
+						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
+							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
-						createNewCarrierAndAddVehicleTypes(
-							scenario, carrierName, carrierAttributes,
-							vehicleTypes, numberOfDepots, fleetSize,
+						createNewCarrierAndAddVehicleTypes(scenario, carrierName, carrierAttributes, vehicleTypes, numberOfDepots, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation);
 
 						// Now Create services for this carrier
@@ -731,8 +743,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Generates and adds the services for the given carrier.
 	 */
-	private void createServices(Carrier newCarrier,
-								CarrierAttributes carrierAttributes) {
+	private void createServices(Carrier newCarrier, CarrierAttributes carrierAttributes) {
 		log.info("Create services for carrier: {}", newCarrier.getId());
 		for (String stopZone : odMatrix.getListOfZones()) {
 			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
@@ -745,22 +756,51 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 				selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 			for (int i = 0; i < numberOfJobs; i++) {
-				int serviceTimePerStop;
-				if (carrierAttributes.selectedStartCategory.equals("Inhabitants")){
-					CarrierAttributes inhabitantAttributes = new CarrierAttributes(carrierAttributes.purpose, carrierAttributes.startZone,
-						carrierAttributes.odMatrixEntry.possibleStartCategories.getFirst(), carrierAttributes.modeORvehType,
-						carrierAttributes.smallScaleCommercialTrafficType, carrierAttributes.vehicleDepots, carrierAttributes.odMatrixEntry);
-					serviceTimePerStop = unhandledServicesSolution.getServiceTimePerStop(newCarrier, inhabitantAttributes, 0);
+				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
 
-				}
-				else {
-					serviceTimePerStop = unhandledServicesSolution.getServiceTimePerStop(newCarrier, carrierAttributes, 0);
-				}
-
-				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0,
-					36 * 3600); // extended time window, so that late tours can handle it
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow);
 			}
+		}
+	}
+
+	/**
+	 * Give a service duration based on the purpose and the trafficType under a given probability
+	 *
+	 * @param carrier                                     The carrier for which the service time should be calculated
+	 * @param carrierAttributes                           The attributes of the carrier
+	 * @param additionalTravelBufferPerIterationInMinutes Additional travel buffer per recalculation iteration for a carrier in minutes
+	 * @return The service time in seconds
+	 */
+	public Integer getServiceTimePerStop(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes,
+										 int additionalTravelBufferPerIterationInMinutes) {
+		GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey key;
+		// we use the start category for the service time selection because the start category represents the employees
+		if (carrierAttributes.smallScaleCommercialTrafficType().equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic.toString())) {
+			if (!carrierAttributes.odMatrixEntry().possibleStartCategories.contains(carrierAttributes.selectedStartCategory()))
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry().possibleStartCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry().possibleStartCategories.size())), null, carrierAttributes.smallScaleCommercialTrafficType());
+			else
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(), null,
+				carrierAttributes.smallScaleCommercialTrafficType());
+		}
+		else if (carrierAttributes.smallScaleCommercialTrafficType().equals(
+			GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic.toString())) {
+			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(),
+				carrierAttributes.modeORvehType(), carrierAttributes.smallScaleCommercialTrafficType());
+		} else {
+			throw new RuntimeException("Unknown traffic type: " + carrierAttributes.smallScaleCommercialTrafficType());
+		}
+		// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
+		if (additionalTravelBufferPerIterationInMinutes == 0) {
+			GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
+
+			int serviceDurationLowerBound = serviceDurationBounds.minDuration();
+			int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
+			return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
+		} else {
+			return unhandledServicesSolution.changeServiceTimePerStop(carrier, carrierAttributes, key, additionalTravelBufferPerIterationInMinutes);
 		}
 	}
 
@@ -814,7 +854,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (String singleDepot : carrierAttributes.vehicleDepots) {
 			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
-
 			int vehicleStartTime = t.getVehicleStartTime();
 			int tourDuration = t.getVehicleTourDuration();
 			int vehicleEndTime = vehicleStartTime + tourDuration;

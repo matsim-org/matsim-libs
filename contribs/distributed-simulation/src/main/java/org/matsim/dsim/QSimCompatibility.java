@@ -3,12 +3,17 @@ package org.matsim.dsim;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import lombok.Getter;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
-import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DistributedAgentSource;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -16,7 +21,7 @@ import java.util.*;
 /**
  * Loads qsim components for providing these modules the distributed simulation.
  */
-public class QSimCompatibility {
+public final class QSimCompatibility {
 
 	private final Config config;
 	private final IterationCounter iterationCounter;
@@ -24,11 +29,20 @@ public class QSimCompatibility {
 	private final List<AbstractQSimModule> overridingModules;
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
-	private final Injector injector;
-	private final Injector qsimInjector;
+
+	private final Map<Class<? extends Message>, DistributedAgentSource> agentTypes = new HashMap<>();
+	private final Map<Class<? extends Message>, DistributedAgentSource> vehicleSources = new HashMap<>();
 
 	@Getter
-	private final List<AgentSource> agentSources = new ArrayList<>();
+	private final Injector injector;
+
+	@Getter
+	private final List<DistributedAgentSource> agentSources = new ArrayList<>();
+
+	@Getter
+	private final List<MobsimEngine> engines = new ArrayList<>();
+
+	private Injector qsimInjector;
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -43,12 +57,14 @@ public class QSimCompatibility {
 		this.components = components;
 		this.overridingModules = overridingModules;
 		this.overridingModulesFromAbstractModule = overridingModulesFromAbstractModule;
-		this.qsimInjector = createQSimInjector();
 	}
 
-	private Injector createQSimInjector() {
+	/**
+	 * Initialize module with underlying netsim.
+	 */
+	public void init(Netsim netsim) {
 		if (qsimInjector != null) {
-			return qsimInjector;
+			return;
 		}
 
 		modules.forEach(m -> m.setConfig(config));
@@ -74,10 +90,11 @@ public class QSimCompatibility {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
+				bind(Netsim.class).toInstance(netsim);
 			}
 		};
 
-		Injector qsimInjector = injector.createChildInjector(module);
+		qsimInjector = injector.createChildInjector(module);
 
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
@@ -99,12 +116,47 @@ public class QSimCompatibility {
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
-				if (qSimComponent instanceof AgentSource as) {
+				if (qSimComponent instanceof MobsimEngine m) {
+					engines.add(m);
+				}
+
+				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
+
+					Class<? extends Message> aClass = as.getAgentClass();
+					if (aClass != null)
+						agentTypes.put(aClass, as);
+
+					Class<? extends Message> vClass = as.getVehicleClass();
+					if (vClass != null)
+						vehicleSources.put(vClass, as);
 				}
 			}
 		}
-		return qsimInjector;
+	}
+
+	/**
+	 * Create a vehicle from a received message.
+	 */
+	public DistributedMobsimVehicle convertVehicle(Message m) {
+		DistributedAgentSource source = vehicleSources.get(m.getClass());
+		if (source == null) {
+			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
+		}
+
+		return source.vehicleFromMessage(m);
+	}
+
+	/**
+	 * Create an agent from a received message.
+	 */
+	public DistributedMobsimAgent convertAgent(Message m) {
+		DistributedAgentSource source = agentTypes.get(m.getClass());
+		if (source == null) {
+			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
+		}
+
+		return source.agentFromMessage(m);
 	}
 
 }

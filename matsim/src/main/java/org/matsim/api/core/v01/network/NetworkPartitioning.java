@@ -14,7 +14,9 @@ public final class NetworkPartitioning {
 	public final static NetworkPartitioning SINGLE_INSTANCE = new NetworkPartitioning();
 	public final static String ATTRIBUTE = "partition";
 
-	private final Int2ObjectMap<IdSet<Link>> byNode = new Int2ObjectOpenHashMap<>();
+	private final IdSet<Link> byNode;
+	private final Int2ObjectMap<NetworkPartition> partitions = new Int2ObjectOpenHashMap<>();
+
 	private final SimulationNode node;
 
 	/**
@@ -22,6 +24,7 @@ public final class NetworkPartitioning {
 	 */
 	public NetworkPartitioning() {
 		node = null;
+		byNode = null;
 	}
 
 	/**
@@ -29,23 +32,46 @@ public final class NetworkPartitioning {
 	 */
 	public NetworkPartitioning(SimulationNode node, Network network) {
 		this.node = node;
+		this.byNode = new IdSet<>(Link.class);
 		for (Link link : network.getLinks().values()) {
 			Integer partition = (Integer) link.getAttributes().getAttribute(ATTRIBUTE);
+
 			if (partition != null) {
-				byNode.computeIfAbsent(partition, k -> new IdSet<>(Link.class)).add(link.getId());
+				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).links.add(link.getId());
+
+				if (node.getParts().contains((int) partition))
+					byNode.add(link.getId());
 			}
 		}
+
+		for (Node n : network.getNodes().values()) {
+			Integer partition = (Integer) n.getAttributes().getAttribute(ATTRIBUTE);
+			if (partition != null) {
+				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).nodes.add(n.getId());
+			}
+		}
+	}
+
+	/**
+	 * Retrieve the network information for a single partition.
+	 */
+	public NetworkPartition getPartition(int partition) {
+		if (partitions.isEmpty())
+			return NetworkPartition.SINGLE_INSTANCE;
+
+		// Will return an empty partition if not found
+		return partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition));
 	}
 
 	/**
 	 * Check whether link id is on the current node.
 	 */
 	public boolean isLinkOnCurrentNode(Id<Link> linkId) {
-		if (node == null || byNode.isEmpty()) {
+		if (node == null || byNode == null) {
 			return true;
 		}
 
-		return byNode.get(node.getRank()).contains(linkId);
+		return byNode.contains(linkId);
 	}
 
 }

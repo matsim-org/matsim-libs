@@ -100,7 +100,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void analyzeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
+	void writeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
