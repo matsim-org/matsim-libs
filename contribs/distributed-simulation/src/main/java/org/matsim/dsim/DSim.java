@@ -92,9 +92,9 @@ public final class DSim implements Mobsim {
             }
         }
 
-		manager.initProcessing();
+        manager.initProcessing();
 
-		timer.setSimStartTime(config.qsim().getStartTime().seconds());
+		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
 		timer.setTime(timer.getSimStartTime());
 
         Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
@@ -104,11 +104,11 @@ public final class DSim implements Mobsim {
         long start = System.currentTimeMillis();
 
 		double time = timer.getTimeOfDay();
-        while (timer.getTimeOfDay() < config.qsim().getEndTime().seconds()) {
+        while (timer.getTimeOfDay() < config.qsim().getEndTime().orElse(86400)) {
 
             long t = System.nanoTime();
 
-			if (time % 3600 == 0) {
+            if (time % 3600 == 0) {
                 var hour = (int) time / 3600;
                 var formattedDuration = String.format("%02d:00:00", hour);
                 log.info("#{} at sim step: {}", comm.getRank(), formattedDuration);

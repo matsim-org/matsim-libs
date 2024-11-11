@@ -17,54 +17,56 @@ import java.util.Queue;
 @RequiredArgsConstructor
 class Wait2Link implements Steppable {
 
-    private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
-    private final EventsManager em;
-    private final ActiveLinks activeLinks;
+	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
+	private final EventsManager em;
+	private final ActiveLinks activeLinks;
 
-    void accept(SimVehicle vehicle, SimLink link) {
-        waitingVehicles
-                .computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
-                .add(new Waiting(vehicle, link));
-    }
+	void accept(SimVehicle vehicle, SimLink link) {
 
-    @Override
-    public void doSimStep(double now) {
-        //  use an iterator, as we might have to remove entries from the map
-        var it = waitingVehicles.values().iterator();
-        while (it.hasNext()) {
-            var waitingQ = it.next();
+		waitingVehicles
+			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
+			.add(new Waiting(vehicle, link));
+	}
 
-            // try to push all vehicles from the queue onto the link.
-            while (!waitingQ.isEmpty()) {
-                var link = waitingQ.peek().link();
-                var vehicle = waitingQ.peek().vehicle();
-                var position = vehicle.getNextRouteElement() == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
+	@Override
+	public void doSimStep(double now) {
+		//  use an iterator, as we might have to remove entries from the map
+		var it = waitingVehicles.values().iterator();
+		while (it.hasNext()) {
+			var waitingQ = it.next();
+
+			// try to push all vehicles from the queue onto the link.
+			while (!waitingQ.isEmpty()) {
+				var link = waitingQ.peek().link();
+				var vehicle = waitingQ.peek().vehicle();
+				var position = vehicle.getNextRouteElement() == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
 
 				if (link.isAccepting(position, now)) {
-                    waitingQ.poll();
-                    pushVehicleOntoLink(vehicle, link, position, now);
-                } else {
-                    break;
-                }
-            }
+					waitingQ.poll();
+					pushVehicleOntoLink(vehicle, link, position, now);
+				} else {
+					break;
+				}
+			}
 
-            // in case there are no waiting vehicles for the link,
-            // remove the entry
-            if (waitingQ.isEmpty()) {
-                it.remove();
-            }
-        }
-    }
+			// in case there are no waiting vehicles for the link,
+			// remove the entry
+			if (waitingQ.isEmpty()) {
+				it.remove();
+			}
+		}
+	}
 
-    private void pushVehicleOntoLink(SimVehicle vehicle, SimLink link, SimLink.LinkPosition position, double now) {
-        em.processEvent(new VehicleEntersTrafficEvent(
-                now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
-                vehicle.getDriver().getCurrentLeg().getMode(), 1.0)
-        );
-        link.pushVehicle(vehicle, position, now);
-        activeLinks.activate(link);
-    }
+	private void pushVehicleOntoLink(SimVehicle vehicle, SimLink link, SimLink.LinkPosition position, double now) {
 
-    private record Waiting(SimVehicle vehicle, SimLink link) {
-    }
+		em.processEvent(new VehicleEntersTrafficEvent(
+			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
+			vehicle.getDriver().getCurrentLeg().getMode(), 1.0)
+		);
+		link.pushVehicle(vehicle, position, now);
+		activeLinks.activate(link);
+	}
+
+	private record Waiting(SimVehicle vehicle, SimLink link) {
+	}
 }
