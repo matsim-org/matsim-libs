@@ -16,90 +16,109 @@ import java.util.*;
 @Log4j2
 public class ActivityEngine implements SimEngine {
 
-    @Getter
-    private final Queue<SimPersonEntry> agentsAtActivities = new PriorityQueue<>(Comparator.comparingDouble(SimPersonEntry::endTime));
-    private final Collection<SimPerson> finishedAgents = new ArrayList<>();
-    private final TimeInterpretation timeInterpretation;
-    private final EventsManager em;
+	@Getter
+	private final Queue<SimPersonEntry> agentsAtActivities = new PriorityQueue<>(new PersonEntryComparator());
+	private final Collection<SimPerson> finishedAgents = new ArrayList<>();
+	private final TimeInterpretation timeInterpretation;
+	private final EventsManager em;
 
-    // This has to be settable if engines are supposed to be passed to the
-    // simulation and the simulation wires up a callback later.
-    @Setter
-    private NextStateHandler nextStateHandler;
+	// This has to be settable if engines are supposed to be passed to the
+	// simulation and the simulation wires up a callback later.
+	@Setter
+	private NextStateHandler nextStateHandler;
 
-    public ActivityEngine(Collection<SimPerson> persons, TimeInterpretation timeInterpretation, EventsManager em) {
-        this.timeInterpretation = timeInterpretation;
-        for (SimPerson person : persons) {
-            var endTime = timeInterpretation.getActivityEndTime(person.getCurrentActivity(), 0);
-            agentsAtActivities.add(new SimPersonEntry(endTime, person));
-        }
-        this.em = em;
-    }
+	public ActivityEngine(Collection<SimPerson> persons, TimeInterpretation timeInterpretation, EventsManager em) {
+		this.timeInterpretation = timeInterpretation;
+		for (SimPerson person : persons) {
+			var endTime = timeInterpretation.getActivityEndTime(person.getCurrentActivity(), 0);
+			agentsAtActivities.add(new SimPersonEntry(endTime, person));
+		}
+		this.em = em;
+	}
 
-    @Override
-    public void accept(SimPerson person, double now) {
+	@Override
+	public void accept(SimPerson person, double now) {
 
-        Activity act = person.getCurrentActivity();
-        double endTime = timeInterpretation.getActivityEndTime(act, now);
+		Activity act = person.getCurrentActivity();
+		double endTime = timeInterpretation.getActivityEndTime(act, now);
 
-        var actStartEvent = new ActivityStartEvent(now,
-                person.getId(),
-                act.getLinkId(),
-                act.getFacilityId(),
-                act.getType(),
-                act.getCoord()
-        );
+		var actStartEvent = new ActivityStartEvent(now,
+			person.getId(),
+			act.getLinkId(),
+			act.getFacilityId(),
+			act.getType(),
+			act.getCoord()
+		);
 
-        em.processEvent(actStartEvent);
+		em.processEvent(actStartEvent);
 
-        if (Double.isInfinite(endTime)) {
-            finishedAgents.add(person);
-        } else if (endTime <= now) {
-            var actEndEvent = new ActivityEndEvent(
-                    now,
-                    person.getId(),
-                    act.getLinkId(),
-                    act.getFacilityId(),
-                    act.getType(),
-                    act.getCoord()
-            );
-            em.processEvent(actEndEvent);
-            nextStateHandler.accept(person, now);
-        } else {
-            agentsAtActivities.add(new SimPersonEntry(endTime, person));
-        }
-    }
+		if (Double.isInfinite(endTime)) {
+			finishedAgents.add(person);
+		} else if (endTime <= now) {
+			var actEndEvent = new ActivityEndEvent(
+				now,
+				person.getId(),
+				act.getLinkId(),
+				act.getFacilityId(),
+				act.getType(),
+				act.getCoord()
+			);
+			em.processEvent(actEndEvent);
+			nextStateHandler.accept(person, now);
+		} else {
+			agentsAtActivities.add(new SimPersonEntry(endTime, person));
+		}
+	}
 
-    @Override
-    public void process(SimStepMessage stepMessage, double now) {
-        // don't do anything. We ar not expecting any messages
-    }
+	@Override
+	public void process(SimStepMessage stepMessage, double now) {
+		// don't do anything. We ar not expecting any messages
+	}
 
-    @Override
-    public void doSimStep(double now) {
+	@Override
+	public void doSimStep(double now) {
 
-        while (firstPersonReady(now)) {
-            var entry = agentsAtActivities.poll();
-            var person = entry.person();
-            var act = person.getCurrentActivity();
+		while (firstPersonReady(now)) {
+			var entry = agentsAtActivities.poll();
+			var person = entry.person();
+			var act = person.getCurrentActivity();
 
-            var actEndEvent = new ActivityEndEvent(
-                    now,
-                    person.getId(),
-                    act.getLinkId(),
-                    act.getFacilityId(),
-                    act.getType(),
-                    act.getCoord()
-            );
-            em.processEvent(actEndEvent);
-            nextStateHandler.accept(entry.person(), now);
-        }
-    }
+			var actEndEvent = new ActivityEndEvent(
+				now,
+				person.getId(),
+				act.getLinkId(),
+				act.getFacilityId(),
+				act.getType(),
+				act.getCoord()
+			);
+			em.processEvent(actEndEvent);
+			nextStateHandler.accept(entry.person(), now);
+		}
+	}
 
-    private boolean firstPersonReady(double now) {
-        return !agentsAtActivities.isEmpty() && agentsAtActivities.peek().endTime() <= now;
-    }
+	private boolean firstPersonReady(double now) {
+		return !agentsAtActivities.isEmpty() && agentsAtActivities.peek().endTime() <= now;
+	}
 
-    private record SimPersonEntry(double endTime, SimPerson person) {
-    }
+	private record SimPersonEntry(double endTime, SimPerson person) {
+	}
+
+	/**
+	 * Have a custom comparator for Persons here. If two persons in the queue have the same exit time, we determine the order in the queue using their
+	 * IDs as a secondary ordering attribute. This is necessary to avoid inconsistencies between varying numbers of processes.
+	 */
+	private static class PersonEntryComparator implements Comparator<SimPersonEntry> {
+
+		private final Comparator<SimPersonEntry> endTimeComparator = Comparator.comparingDouble(SimPersonEntry::endTime);
+
+		@Override
+		public int compare(SimPersonEntry o1, SimPersonEntry o2) {
+			var endTimeResult = endTimeComparator.compare(o1, o2);
+			if (endTimeResult == 0) {
+				return o1.person.getId().compareTo(o2.person.getId());
+			} else {
+				return endTimeResult;
+			}
+		}
+	}
 }
