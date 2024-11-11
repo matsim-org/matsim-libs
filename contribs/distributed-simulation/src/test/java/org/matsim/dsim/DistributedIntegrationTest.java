@@ -87,12 +87,13 @@ public class DistributedIntegrationTest {
 
 		var futures = comms.stream()
 			.map(comm -> pool.submit(() -> {
-				Config config = ConfigUtils.createConfig();
-				config.controller().setOutputDirectory(outputDir);
-				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-				config.controller().setLastIteration(2);
-				config.controller().setMobsim("dsim");
-				Activities.addScoringParams(config);
+//				Config config = ConfigUtils.createConfig();
+//				config.controller().setOutputDirectory(outputDir);
+//				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//				config.controller().setLastIteration(2);
+//				config.controller().setMobsim("dsim");
+//				Activities.addScoringParams(config);
+				var config = createScenario();
 				DistributedController c = new DistributedController(comm, config, 1, 1);
 				c.run();
 				try {

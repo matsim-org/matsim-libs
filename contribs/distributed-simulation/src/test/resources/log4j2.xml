@@ -13,7 +13,7 @@
 		<Logger name="org.apache.fury.codegen.JaninoUtils" level="OFF" additivity="false"/>
 
 		<!-- Root logger for other logging (optional, adjust level as needed) -->
-		<Root level="DEBUG">
+		<Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
