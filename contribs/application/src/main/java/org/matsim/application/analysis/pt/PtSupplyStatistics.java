@@ -22,7 +22,6 @@ package org.matsim.application.analysis.pt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.ApplicationUtils;
@@ -39,6 +38,8 @@ import org.matsim.pt.transitSchedule.api.*;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.table.TableSliceGroup;
+
+import java.util.List;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.*;
 
@@ -113,13 +114,13 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 			StringColumn.create("transportMode"),
 			StringColumn.create("gtfsRouteType"),
 			IntColumn.create("departureHour"),
-			StringColumn.create("shpFilter")
+			StringColumn.create("shpFilter"),
+			StringColumn.create("stopAreaOrStop") // attempt to aggregate nearby stops or read parent stop id from gtfs
 			// TODO: could add linkIds, however only as a single String since no list column is available
 		);
 
 		// prepare filtering by shape file, e.g. in Berlin vs. outside Berlin
 		Geometry filterGeometry = null;
-		GeometryFactory geometryFactory = new GeometryFactory();
 		if (shp.isDefined()) {
 			filterGeometry = shp.getGeometry(coordinateSystem);
 		}
@@ -130,11 +131,13 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 					int stopSequence = 0;
 					Id<TransitStopFacility> previousStop = null;
 					for (TransitRouteStop transitRouteStop : route.getStops()) {
+						TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
+
 						Row row = departuresFromStops.appendRow();
 						row.setString("transitLine", line.getId().toString());
 						row.setString("transitRoute", route.getId().toString());
 						row.setString("departure", departure.getId().toString());
-						row.setString("stop", transitRouteStop.getStopFacility().getId().toString());
+						row.setString("stop", stopFacility.getId().toString());
 						row.setInt("stopSequence", stopSequence);
 						row.setString("stopPrevious", previousStop == null ? "" : previousStop.toString());
 						double arrivalTime = departure.getDepartureTime() + transitRouteStop.getArrivalOffset().orElse(0.0);
@@ -142,22 +145,28 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 						double departureTime = departure.getDepartureTime() + transitRouteStop.getDepartureOffset().orElse(0.0);
 						row.setDouble("departureTimeScheduled", departureTime);
 						row.setString("transportMode", route.getTransportMode());
-						Object attr = line.getAttributes().getAttribute("gtfs_route_type");
-						if (attr != null) {
-							row.setString("gtfsRouteType", (String) attr);
+						Object lineAttr = line.getAttributes().getAttribute("gtfs_route_type");
+						if (lineAttr != null) {
+							row.setString("gtfsRouteType", (String) lineAttr);
 						} else {
 							row.setMissing("gtfsRouteType");
 						}
 						row.setInt("departureHour", (int) departureTime / 3600);
 
 						if (filterGeometry != null) {
-							if (filterGeometry.contains(MGC.coord2Point(transitRouteStop.getStopFacility().getCoord()))) {
+							if (filterGeometry.contains(MGC.coord2Point(stopFacility.getCoord()))) {
 								row.setString("shpFilter", "in area");
 							} else {
 								row.setString("shpFilter", "outside area");
 							}
 						} else {
 							row.setString("shpFilter", "no area defined");
+						}
+
+						if (stopFacility.getStopAreaId() != null) {
+							row.setString("stopAreaOrStop", stopFacility.getStopAreaId().toString());
+						} else {
+							row.setString("stopAreaOrStop", stopFacility.getId().toString());
 						}
 
 						stopSequence++;
@@ -168,7 +177,7 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 		}
 
 		Table countsPerMode = departuresFromStops.
-			summarize("transitLine", "transitRoute", "departure", "stop", countUnique).
+			summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).
 			by("transportMode").sortOn("transportMode");
 		// rename column names to Matsim TransitSchedule class names
 		countsPerMode.column("transportMode").setName("TransportMode");
@@ -176,9 +185,10 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 		countsPerMode.column(TableSliceGroup.aggregateColumnName("transitRoute", countUnique.functionName())).setName("TransitRoutes");
 		countsPerMode.column(TableSliceGroup.aggregateColumnName("departure", countUnique.functionName())).setName("Departures");
 		countsPerMode.column(TableSliceGroup.aggregateColumnName("stop", countUnique.functionName())).setName("TransitStopFacilities");
+		countsPerMode.column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName())).setName("TransitStopAreasAndSingleStops");
 
-		countsPerMode = countsPerMode.reorderColumns("TransportMode", "TransitLines", "TransitRoutes", "Departures", "TransitStopFacilities");
-		countsPerMode.write().csv(output.getPath("pt_count_unique_ids_per_mode.csv").toString()); // TODO: fix: messes up the column order established before
+		countsPerMode = countsPerMode.reorderColumns("TransportMode", "TransitLines", "TransitRoutes", "Departures", "TransitStopFacilities", "TransitStopAreasAndSingleStops");
+		countsPerMode.write().csv(output.getPath("pt_count_unique_ids_per_mode.csv").toString());
 
 		// Count number of departures per hour and mode (summing up over all stops)
 		Table departuresPerHourAndMode = departuresFromStops.countBy("departureHour", "transportMode").
@@ -222,22 +232,22 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 			where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"));
 		activeTransitLinesPerHourAndArea.write().csv(output.getPath("pt_active_transit_lines_per_hour_per_mode_per_area.csv").toString());
 
-		// Share of active transit stops (at least one departure) per hour and mode
+		// Share of active TransitStopAreas (at least one departure) per hour and mode
 		Table activeTransitStopsPerHourAndArea = departuresFromStops.
-			summarize("stop", countUnique).
+			summarize("stopAreaOrStop", countUnique).
 			by("shpFilter", "departureHour", "transportMode").
 			sortOn("shpFilter", "departureHour", "transportMode");
 
 		activeTransitStopsPerHourAndArea.
-			column(TableSliceGroup.aggregateColumnName("stop", countUnique.functionName())).
+			column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName())).
 			setName("activeTransitStopsInHourAndArea");
 
 		Table transitStopsPerArea = departuresFromStops.
-			summarize("stop", countUnique).
+			summarize("stopAreaOrStop", countUnique).
 			by("shpFilter", "transportMode").
 			sortOn("shpFilter", "transportMode");
 		transitStopsPerArea.
-			column(TableSliceGroup.aggregateColumnName("stop", countUnique.functionName())).
+			column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName())).
 			setName("totalNumberOfTransitStopsInArea");
 
 		activeTransitStopsPerHourAndArea = activeTransitStopsPerHourAndArea.

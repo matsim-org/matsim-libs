@@ -49,8 +49,8 @@ public class PublicTransitDashboard implements Dashboard {
 		});
 
 		layout.row("ptSupplyStatistics").el(Table.class, (viz, data) -> {
-			viz.title = "Number of scheduled pt services";
-			viz.description = "per mode";
+			viz.title = "Number of scheduled pt services per mode";
+			viz.description = "Stops without field stopAreaId are handled as 1 additional stop area.";
 			viz.showAllRows = true;
 			viz.dataset = data.compute(PtSupplyStatistics.class, "pt_count_unique_ids_per_mode.csv");
 			viz.width = 1d;
@@ -76,7 +76,7 @@ public class PublicTransitDashboard implements Dashboard {
 		layout.row("ptSupplyStatisticsByHour").el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Share of active transit lines per mode and hour";
-				viz.description = "share of transit lines with at least one departure at any stop inside the shape file per hour";
+				viz.description = "transit lines with >= 1 departure at any stop inside the shape file per hour";
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_lines_per_hour_per_mode_per_area.csv"));
 
@@ -93,8 +93,8 @@ public class PublicTransitDashboard implements Dashboard {
 				);
 			}).el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Share of active transit stops per mode and hour";
-			viz.description = "Share of transit stops with at least one departure in the given hour in respect to total number of stops having at least one departure anytime in the day. Filtered by shape file. Stops served by multiple modes are counted into both modes.";
+			viz.title = "Share of active transit stop areas per mode and hour";
+			viz.description = "Stop areas with >= 1 departure in hour / stop areas in shape file with >= 1 departure per day.";
 
 			Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_stops_per_hour_per_mode_per_area.csv"));
 
