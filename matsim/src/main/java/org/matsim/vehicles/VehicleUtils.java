@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -81,7 +82,7 @@ public final class VehicleUtils {
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
 
 		defaultVehicleType.getCapacity().setSeats(4);
-		defaultVehicleType.setNetworkMode("car");
+		defaultVehicleType.setNetworkMode(TransportMode.car);
 		return defaultVehicleType;
 	}
 
