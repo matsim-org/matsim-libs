@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -29,7 +30,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Provider;
+import java.util.Set;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for
@@ -39,16 +40,22 @@ import jakarta.inject.Provider;
  */
 public class ReRoute extends AbstractMultithreadedModule {
 
-	private ActivityFacilities facilities;
+	private final ActivityFacilities facilities;
 	private final TimeInterpretation timeInterpretation;
-
 	private final Provider<TripRouter> tripRouterProvider;
+	private final Set<String> uncongestedModes;
 
-	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, TimeInterpretation timeInterpretation) {
+	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup,
+				   TimeInterpretation timeInterpretation, Set<String> uncongestedModes) {
 		super(globalConfigGroup);
 		this.facilities = facilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.timeInterpretation = timeInterpretation;
+		this.uncongestedModes = uncongestedModes;
+	}
+
+	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, TimeInterpretation timeInterpretation) {
+		this(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation, Set.of());
 	}
 
 	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
@@ -57,11 +64,7 @@ public class ReRoute extends AbstractMultithreadedModule {
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
-			return new PlanRouter(
-					tripRouterProvider.get(),
-					facilities,
-					timeInterpretation
-					);
+		return new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation, uncongestedModes);
 	}
 
 }

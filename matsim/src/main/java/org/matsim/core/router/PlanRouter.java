@@ -37,6 +37,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
@@ -50,6 +51,7 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 	private final TimeInterpretation timeInterpretation;
+	private final Set<String> ignoreModes;
 
 	/**
 	 * Initialises an instance.
@@ -57,11 +59,22 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
+	 * @param ignoreModes modes for which routing should be skipped if possible.
 	 */
-	public PlanRouter( final TripRouter tripRouter, final ActivityFacilities facilities, final TimeInterpretation timeInterpretation) {
+	public PlanRouter(final TripRouter tripRouter, final ActivityFacilities facilities,
+					  final TimeInterpretation timeInterpretation, Set<String> ignoreModes) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 		this.timeInterpretation = timeInterpretation;
+		this.ignoreModes = ignoreModes;
+	}
+
+	/**
+	 * Initialises an instance.
+	 * @see #PlanRouter(TripRouter, ActivityFacilities, TimeInterpretation, Set)
+	 */
+	public PlanRouter( final TripRouter tripRouter, final ActivityFacilities facilities, final TimeInterpretation timeInterpretation) {
+		this( tripRouter, facilities, timeInterpretation, Set.of() );
 	}
 
 	/**
@@ -80,22 +93,40 @@ public final class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
 			timeTracker.addActivity(oldTrip.getOriginActivity());
 
-			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
-			final List<? extends PlanElement> newTripElements = tripRouter.calcRoute( //
+			final List<? extends PlanElement> newTripElements;
+
+			// Skip routing if this mode can be ignored and it does not need any additional routing information.
+			if (ignoreModes.contains(routingMode) && !needsRouting(oldTrip)) {
+
+				newTripElements = oldTrip.getTripElements();
+
+			} else {
+				if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
+				newTripElements = tripRouter.calcRoute( //
 					routingMode, //
 					FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities), //
 					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
 					timeTracker.getTime().seconds(), //
 					plan.getPerson(), //
 					oldTrip.getTripAttributes() //
-			);
+				);
 
-			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTripElements);
+				putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTripElements);
+			}
 
-			TripRouter.insertTrip( plan, oldTrip.getOriginActivity(), newTripElements, oldTrip.getDestinationActivity());
-
+			TripRouter.insertTrip(plan, oldTrip.getOriginActivity(), newTripElements, oldTrip.getDestinationActivity());
 			timeTracker.addElements(newTripElements);
 		}
+	}
+
+	/**
+	 * Whether any time information is missing and this trip needs to be routed.
+	 */
+	public static boolean needsRouting(final Trip trip) {
+
+		// TODO:
+
+		return true;
 	}
 
 	/**
