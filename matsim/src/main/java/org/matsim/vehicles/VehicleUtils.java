@@ -81,7 +81,7 @@ public final class VehicleUtils {
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
 
 		defaultVehicleType.getCapacity().setSeats(4);
-
+		defaultVehicleType.setNetworkMode("car");
 		return defaultVehicleType;
 	}
 
