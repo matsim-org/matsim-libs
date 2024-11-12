@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -49,6 +50,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class CollectionLSPScoringTest {
 
@@ -69,8 +71,15 @@ public class CollectionLSPScoringTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
-		VehicleType collectionVehType = CarrierVehicleType.Builder.newInstance(Id.create("CollectionCarrierVehicleType", VehicleType.class))
-				.setCapacity(10).setCostPerDistanceUnit(0.0004).setCostPerTimeUnit(0.38).setFixCost(49).setMaxVelocity(50 / 3.6).build();
+
+		VehicleType collectionVehType = VehicleUtils.createVehicleType(Id.create("CollectionCarrierVehicleType", VehicleType.class), TransportMode.car);
+		collectionVehType.getCapacity().setOther(10);
+		collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		collectionVehType.getCostInformation().setCostsPerSecond(0.38);
+		collectionVehType.getCostInformation().setFixedCost(49.);
+		collectionVehType.setMaximumVelocity(50 / 3.6);
+		collectionVehType.setNetworkMode(TransportMode.car);
+
 
 		Link collectionLink = network.getLinks().get(Id.createLinkId("(4 2) (4 3)")); // (make sure that the link exists)
 
