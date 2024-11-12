@@ -33,4 +33,6 @@
 	  */
 	 Message toMessage();
 
+	 void computeNextAction(double now);
+
  }

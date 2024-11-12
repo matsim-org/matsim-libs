@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.messages.SimStepMessage;
@@ -39,7 +40,7 @@ public class ActivityEngineReimplementation implements SimEngine {
 	}
 
 	@Override
-	public void accept(MobsimAgent person, double now) {
+	public void accept(DistributedMobsimAgent person, double now) {
 
 //		Activity act = person.getCurrentActivity();
 //		double endTime = timeInterpretation.getActivityEndTime(act, now);

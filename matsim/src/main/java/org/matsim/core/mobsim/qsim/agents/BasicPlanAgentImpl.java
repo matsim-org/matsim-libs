@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.agents;
+package org.matsim.core.mobsim.qsim.agents;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -60,7 +60,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final MobsimTimer simTimer;
-	private MobsimVehicle vehicle ;
+	private MobsimVehicle vehicle;
 	private double activityEndTime;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
@@ -88,66 +88,65 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 
 	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
 
-		this.plan = PopulationUtils.unmodifiablePlan(plan2) ;
+		this.plan = PopulationUtils.unmodifiablePlan(plan2);
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 
-		this.scenario = scenario ;
-		this.events = events ;
-		this.simTimer = simTimer ;
+		this.scenario = scenario;
+		this.events = events;
+		this.simTimer = simTimer;
 		this.timeInterpretation = timeInterpretation;
 
 		List<PlanElement> planElements = this.plan.getPlanElements();
 		Preconditions.checkArgument(!planElements.isEmpty(), "Plan must consist of at least one activity");
 		Activity firstAct = (Activity) planElements.get(0);
 		//this.setCurrentLinkId( firstAct.getLinkId() ) ;
-		final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
-		this.setCurrentLinkId( linkId );
-		this.setState(State.ACTIVITY) ;
+		final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig());
+		this.setCurrentLinkId(linkId);
+		this.setState(State.ACTIVITY);
 		calculateAndSetDepartureTime(firstAct);
 	}
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
-		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null))
-				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
+		this.getEvents().processEvent(new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
+		if ((!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null))
+			&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.getDestinationLinkId()
-					+ ", but arrived on link " + this.getCurrentLinkId() + ". Setting agent state to ABORT.");
-			this.setState(MobsimAgent.State.ABORT) ;
+				+ ", but arrived on link " + this.getCurrentLinkId() + ". Setting agent state to ABORT.");
+			this.setState(MobsimAgent.State.ABORT);
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-			advancePlan(now) ;
+			computeNextAction(now);
+			var act = (Activity) plan.getPlanElements().get(currentPlanElementIndex);
+			this.getEvents().processEvent(new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+				act.getCoord()));
 		}
-
-		this.currentLinkIndex = 0 ;
 	}
 
 	@Override
 	public final void setStateToAbort(final double now) {
-		this.setState(MobsimAgent.State.ABORT) ;
+		this.setState(MobsimAgent.State.ABORT);
 	}
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
-		this.setCurrentLinkId( linkId ) ;
+		this.setCurrentLinkId(linkId);
 	}
 
-	private void advancePlan(double now) {
-		this.currentPlanElementIndex++ ;
+	public void computeNextAction(double now) {
+		this.currentPlanElementIndex++;
 
 		// check if plan has run dry:
-		if ( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
-			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT (but continuing the mobsim).") ;
-			this.setState(MobsimAgent.State.ABORT) ;
+		if (this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size()) {
+			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT (but continuing the mobsim).");
+			this.setState(MobsimAgent.State.ABORT);
 			return;
 		}
 
-		PlanElement pe = this.getCurrentPlanElement() ;
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
+		PlanElement pe = this.getCurrentPlanElement();
+		if (pe instanceof Activity act) {
 			initializeActivity(act, now);
-		} else if (pe instanceof Leg) {
-			Leg leg = (Leg) pe;
+		} else if (pe instanceof Leg leg) {
 			initializeLeg(leg);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
@@ -155,23 +154,21 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	}
 
 	private void initializeLeg(Leg leg) {
-		this.setState(MobsimAgent.State.LEG) ;
-		this.currentLinkIndex = 0 ;
+		this.setState(MobsimAgent.State.LEG);
+		this.currentLinkIndex = 0;
 		if (leg.getRoute() == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT.");
-			if ( noRouteWrnCnt < 1 ) {
-				log.info( "(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)") ;
-				noRouteWrnCnt++ ;
+			if (noRouteWrnCnt < 1) {
+				log.info("(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)");
+				noRouteWrnCnt++;
 			}
-			this.setState(MobsimAgent.State.ABORT) ;
+			this.setState(MobsimAgent.State.ABORT);
 //			throw new RuntimeException("no route in leg") ;
 		}
 	}
 
 	private void initializeActivity(Activity act, double now) {
-		this.setState(MobsimAgent.State.ACTIVITY) ;
-		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
-				act.getCoord() ) );
+		this.setState(MobsimAgent.State.ACTIVITY);
 		calculateAndSetDepartureTime(act);
 		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);
@@ -182,36 +179,37 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
 	private final void calculateAndSetDepartureTime(Activity act) {
-		double now = this.getSimTimer().getTimeOfDay() ;
+		double now = this.getSimTimer().getTimeOfDay();
 		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
 
-		if ( this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size()-1 ) {
-			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
-				log.error( "last activity of person driver agent id " + this.getId() + " has end time < infty; setting it to infty") ;
-				log.error( Gbl.ONLYONCE ) ;
-				finalActHasDpTimeWrnCnt++ ;
+		if (this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size() - 1) {
+			if (finalActHasDpTimeWrnCnt < 1 && departure != Double.POSITIVE_INFINITY) {
+				log.error("last activity of person driver agent id " + this.getId() + " has end time < infty; setting it to infty");
+				log.error(Gbl.ONLYONCE);
+				finalActHasDpTimeWrnCnt++;
 			}
-			departure = Double.POSITIVE_INFINITY ;
+			departure = Double.POSITIVE_INFINITY;
 		}
 
-		this.activityEndTime = departure ;
+		this.activityEndTime = departure;
 	}
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-		if ( ! ( this.getCurrentPlanElement() instanceof Activity ) ){
-			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
+		if (!(this.getCurrentPlanElement() instanceof Activity)) {
+			log.warn("trying to end an activity but current plan element is not an activity; agentId=" + this.getId());
 		}
-		Activity act = (Activity) this.getCurrentPlanElement() ;
-		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
+		Activity act = (Activity) this.getCurrentPlanElement();
+		this.getEvents().processEvent(new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
 
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-		advancePlan(now);
+		computeNextAction(now);
 	}
+
 	@Override
 	public final void resetCaches() {
-		if ( this.getCurrentPlanElement() instanceof Activity ) {
-			Activity act = (Activity) this.getCurrentPlanElement() ;
+		if (this.getCurrentPlanElement() instanceof Activity) {
+			Activity act = (Activity) this.getCurrentPlanElement();
 			this.calculateAndSetDepartureTime(act);
 		}
 	}
@@ -228,87 +226,95 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	public final Plan getModifiablePlan() {
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 		if (firstTimeToGetModifiablePlan) {
-			firstTimeToGetModifiablePlan = false ;
+			firstTimeToGetModifiablePlan = false;
 			Plan newPlan = PopulationUtils.createPlan(this.getCurrentPlan().getPerson());
 			PopulationUtils.copyFromTo(this.getCurrentPlan(), newPlan);
 			this.plan = newPlan;
 		}
 		return this.getCurrentPlan();
 	}
+
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
 		NetworkRoute route = (NetworkRoute) this.getCurrentLeg().getRoute(); // if casts fail: illegal state.
 		if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		}
-		Gbl.assertIf( scenario.getConfig().qsim().getUsePersonIdForMissingVehicleId() );
+		Gbl.assertIf(scenario.getConfig().qsim().getUsePersonIdForMissingVehicleId());
 		return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 	}
+
 	@Override
 	public final String getMode() {
-		if( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
+		if (this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size()) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question,
 			// thus we answer with "null".  This will likely result in an "abort". kai, nov'14
-			return null ;
+			return null;
 		}
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
-		return ((Leg) currentPlanElement).getMode() ;
+		return ((Leg) currentPlanElement).getMode();
 	}
+
 	@Override
 	public final OptionalTime getExpectedTravelTime() {
-		return timeInterpretation.decideOnLegTravelTime((Leg)this.getCurrentPlanElement());
+		return timeInterpretation.decideOnLegTravelTime((Leg) this.getCurrentPlanElement());
 	}
 
-    @Override
-    public final Double getExpectedTravelDistance() {
-        PlanElement currentPlanElement = this.getCurrentPlanElement();
-        if (!(currentPlanElement instanceof Leg)) {
-            return null;
-        }
-        return ((Leg) currentPlanElement).getRoute().getDistance();
-    }
+	@Override
+	public final Double getExpectedTravelDistance() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return ((Leg) currentPlanElement).getRoute().getDistance();
+	}
 
-    @Override
+	@Override
 	public final PlanElement getCurrentPlanElement() {
 		return this.plan.getPlanElements().get(this.currentPlanElementIndex);
 	}
+
 	@Override
 	public final PlanElement getNextPlanElement() {
-		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size()-1 ) {
-			return this.plan.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
+		if (this.currentPlanElementIndex < this.plan.getPlanElements().size() - 1) {
+			return this.plan.getPlanElements().get(this.currentPlanElementIndex + 1);
 		} else {
-			return null ;
-		}
-	}
-	public final Activity getNextActivity() {
-		for ( int idx = this.currentPlanElementIndex+1 ; idx < this.plan.getPlanElements().size(); idx++ ) {
-			if ( this.plan.getPlanElements().get(idx) instanceof Activity ) {
-				return (Activity)  this.plan.getPlanElements().get(idx) ;
-			}
-		}
-		return null ;
-	}
-	public final Activity getPreviousActivity() {
-		for ( int idx = this.currentPlanElementIndex-1 ; idx>=0 ; idx-- ) {
-			if ( this.plan.getPlanElements().get(idx) instanceof Activity ) {
-				return (Activity)  this.plan.getPlanElements().get(idx) ;
-			}
-		}
-		return null ;
-	}
-	@Override
-	public final PlanElement getPreviousPlanElement() {
-		if ( this.currentPlanElementIndex >=1 ) {
-			return this.plan.getPlanElements().get( this.currentPlanElementIndex-1 ) ;
-		} else {
-			return null ;
+			return null;
 		}
 	}
 
-	/* default */ final int getCurrentPlanElementIndex() {
+	public final Activity getNextActivity() {
+		for (int idx = this.currentPlanElementIndex + 1; idx < this.plan.getPlanElements().size(); idx++) {
+			if (this.plan.getPlanElements().get(idx) instanceof Activity) {
+				return (Activity) this.plan.getPlanElements().get(idx);
+			}
+		}
+		return null;
+	}
+
+	public final Activity getPreviousActivity() {
+		for (int idx = this.currentPlanElementIndex - 1; idx >= 0; idx--) {
+			if (this.plan.getPlanElements().get(idx) instanceof Activity) {
+				return (Activity) this.plan.getPlanElements().get(idx);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public final PlanElement getPreviousPlanElement() {
+		if (this.currentPlanElementIndex >= 1) {
+			return this.plan.getPlanElements().get(this.currentPlanElementIndex - 1);
+		} else {
+			return null;
+		}
+	}
+
+	/* default */
+	final int getCurrentPlanElementIndex() {
 		// Should this be made public?
 		// Pro: Many programmers urgently seem to need this: They do everything possible to get to this index, including copy/paste of the whole class.
 		// Con: I don't think that it is needed in many of those cases with a bit of thinking, and without it it really makes the code more flexible including
@@ -316,17 +322,20 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		// kai, may'15
 		return currentPlanElementIndex;
 	}
+
 	@Override
 	public final Plan getCurrentPlan() {
 		return plan;
 	}
+
 	@Override
 	public final Id<Person> getId() {
-		return this.plan.getPerson().getId() ;
+		return this.plan.getPerson().getId();
 	}
+
 	@Override
 	public final Person getPerson() {
-		return this.plan.getPerson() ;
+		return this.plan.getPerson();
 	}
 
 	public final Scenario getScenario() {
@@ -356,18 +365,21 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		return this.currentLinkId;
 	}
 
-	/* package */ final void setCurrentLinkId(@NotNull Id<Link> linkId ) {
+	/* package */
+	final void setCurrentLinkId(@NotNull Id<Link> linkId) {
 		this.currentLinkId = Preconditions.checkNotNull(linkId);
 	}
 
 	@Override
 	public final Id<Link> getDestinationLinkId() {
-		return this.getCurrentLeg().getRoute().getEndLinkId() ;
+		return this.getCurrentLeg().getRoute().getEndLinkId();
 	}
+
 	@Override
 	public final double getActivityEndTime() {
 		return this.activityEndTime;
 	}
+
 	@Override
 	public final MobsimAgent.State getState() {
 		return state;
@@ -378,8 +390,9 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	}
 
 	final Leg getCurrentLeg() {
-		return (Leg) this.getCurrentPlanElement() ;
+		return (Leg) this.getCurrentPlanElement();
 	}
+
 	@Override
 	public final int getCurrentLinkIndex() {
 		// Other then getPlanElementIndex, it seems that this one here has to be accessible, since routes may contain loops, in which
@@ -388,29 +401,29 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	}
 
 	final void incCurrentLinkIndex() {
-		currentLinkIndex++ ;
+		currentLinkIndex++;
 	}
 
 	@Override
 	public Facility getCurrentFacility() {
-		PlanElement pe = this.getCurrentPlanElement() ;
-		Activity activity ;
-		if ( pe instanceof Activity ) {
+		PlanElement pe = this.getCurrentPlanElement();
+		Activity activity;
+		if (pe instanceof Activity) {
 			activity = (Activity) pe;
-		} else if ( pe instanceof Leg ) {
-			activity = this.getPreviousActivity() ;
+		} else if (pe instanceof Leg) {
+			activity = this.getPreviousActivity();
 		} else {
-			throw new RuntimeException("unexpected type of PlanElement") ;
+			throw new RuntimeException("unexpected type of PlanElement");
 		}
-		return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
+		return FacilitiesUtils.toFacility(activity, scenario.getActivityFacilities());
 	}
 
 	@Override
 	public Facility getDestinationFacility() {
-		PlanElement pe = this.getCurrentPlanElement() ;
-		if ( pe instanceof Leg ) {
-			Activity activity = this.getNextActivity() ;
-			return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
+		PlanElement pe = this.getCurrentPlanElement();
+		if (pe instanceof Leg) {
+			Activity activity = this.getNextActivity();
+			return FacilitiesUtils.toFacility(activity, scenario.getActivityFacilities());
 
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
@@ -429,11 +442,11 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
-				.add("plan", plan)
-				.add("vehicle", vehicle)
-				.add("state", state)
-				.add("currentPlanElementIndex", currentPlanElementIndex)
-				.add("currentLinkId", currentLinkId)
-				.toString();
+			.add("plan", plan)
+			.add("vehicle", vehicle)
+			.add("state", state)
+			.add("currentPlanElementIndex", currentPlanElementIndex)
+			.add("currentLinkId", currentLinkId)
+			.toString();
 	}
 }

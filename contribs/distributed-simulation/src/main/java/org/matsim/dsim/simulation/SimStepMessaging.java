@@ -6,9 +6,12 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
@@ -23,112 +26,116 @@ import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
  * we can mock this object in tests easily
  */
 public interface SimStepMessaging {
-    void collectTeleportation(SimPerson person, double exitTime);
+	void collectTeleportation(DistributedMobsimAgent person, double exitTime);
 
-    void collectStorageCapacityUpdate(Id<Link> linkId, double released, double consumed, int targetPart);
+	void collectStorageCapacityUpdate(Id<Link> linkId, double released, double consumed, int targetPart);
 
-    void collectVehicle(SimVehicle simVehicle);
+	void collectVehicle(DistributedMobsimVehicle simVehicle);
 
-    void sendMessages(double time);
+	void sendMessages(double time);
 
-    boolean isLocal(Id<Link> linkId);
+	boolean isLocal(Id<Link> linkId);
 
-    int getPart();
+	int getPart();
 
-    IntSet getNeighbors();
+	IntSet getNeighbors();
 
-    static SimStepMessaging create(Network network, MessageBroker messageBroker, IntSet neighbors, int part) {
-        return new SimStepMessagingImpl(network, messageBroker, neighbors, part);
-    }
+	static SimStepMessaging create(Network network, MessageBroker messageBroker, IntSet neighbors, int part) {
+		return new SimStepMessagingImpl(network, messageBroker, neighbors, part);
+	}
 
-    class SimStepMessagingImpl implements SimStepMessaging {
+	@Log4j2
+	class SimStepMessagingImpl implements SimStepMessaging {
 
-        // values that don't change over the simulation
-        private final Object2IntMap<Id<Link>> part2Link;
-        @Getter
-        private final int part;
-        @Getter
-        private final IntSet neighbors;
+		// values that don't change over the simulation
+		private final Object2IntMap<Id<Link>> part2Link;
+		@Getter
+		private final int part;
+		@Getter
+		private final IntSet neighbors;
 
-        // members are final but are mutable during the simulation
-        private final MessageBroker messageBroker;
-        private final Int2ObjectMap<SimStepMessage.SimStepMessageBuilder> msgs = new Int2ObjectOpenHashMap<>();
+		// members are final but are mutable during the simulation
+		private final MessageBroker messageBroker;
+		private final Int2ObjectMap<SimStepMessage.SimStepMessageBuilder> msgs = new Int2ObjectOpenHashMap<>();
 
-        public SimStepMessagingImpl(Network globalNetwork, MessageBroker messageBroker, IntSet neighbors, int part) {
-            this.messageBroker = messageBroker;
-            var link2RankMapping = new Object2IntOpenHashMap<Id<Link>>();
-            for (var link : globalNetwork.getLinks().values()) {
-                var id = link.getId();
-                var rank = (int) link.getAttributes().getAttribute(PARTITION_ATTR_KEY);
-                link2RankMapping.put(id, rank);
-            }
-            this.part2Link = link2RankMapping;
-            this.neighbors = neighbors;
-            this.part = part;
-            for (var neighbor : neighbors) {
-                msgs.computeIfAbsent(neighbor, _ -> SimStepMessage.builder());
-            }
-        }
+		public SimStepMessagingImpl(Network globalNetwork, MessageBroker messageBroker, IntSet neighbors, int part) {
+			this.messageBroker = messageBroker;
+			var link2RankMapping = new Object2IntOpenHashMap<Id<Link>>();
+			for (var link : globalNetwork.getLinks().values()) {
+				var id = link.getId();
+				var rank = (int) link.getAttributes().getAttribute(PARTITION_ATTR_KEY);
+				link2RankMapping.put(id, rank);
+			}
+			this.part2Link = link2RankMapping;
+			this.neighbors = neighbors;
+			this.part = part;
+			for (var neighbor : neighbors) {
+				msgs.computeIfAbsent(neighbor, _ -> SimStepMessage.builder());
+			}
+		}
 
-        public void collectTeleportation(SimPerson person, double exitTime) {
+		public void collectTeleportation(DistributedMobsimAgent person, double exitTime) {
 
-            // figure out where the person has to go and store the person // we are expecting teleported persons here.
-            var targetPart = part2Link.getInt(person.getRouteElement(SimPerson.RouteAccess.Last));
-            var teleportation = Teleportation.builder()
-                    .setPerson(person.toMessage())
-                    .setExitTime(exitTime)
-                    .build();
+			// figure out where the person has to go and store the person // we are expecting teleported persons here.
+			var targetPart = part2Link.getInt(person.getDestinationLinkId());
+			var teleportation = Teleportation.builder()
+				//.setPerson(person.toMessage())
+				//.setExitTime(exitTime)
+				.build();
 
-            msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
-                    .setTeleportationMsg(teleportation);
-        }
+			log.warn("implement transformation from DistributedMobsimAgent into SimStepMessage .");
 
-        public void collectStorageCapacityUpdate(Id<Link> linkId, double released, double consumed, int targetPart) {
-            var capacityUpdateMessage = CapacityUpdate.builder()
-                    .setLinkId(linkId)
-                    .setReleased(released)
-                    .setConsumed(consumed)
-                    .build();
-            msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
-                    .setCapacityUpdate(capacityUpdateMessage);
-        }
+			msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
+				.setTeleportationMsg(teleportation);
+		}
 
-        public void collectVehicle(SimVehicle simVehicle) {
+		public void collectStorageCapacityUpdate(Id<Link> linkId, double released, double consumed, int targetPart) {
+			var capacityUpdateMessage = CapacityUpdate.builder()
+				.setLinkId(linkId)
+				.setReleased(released)
+				.setConsumed(consumed)
+				.build();
+			msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
+				.setCapacityUpdate(capacityUpdateMessage);
+		}
 
-            var currentLinkId = simVehicle.getCurrentRouteElement();
-            var targetPart = part2Link.getInt(currentLinkId);
-            VehicleMsg simVehicleMessage = simVehicle.toMessage();
-            msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
-                    .setVehicleMsg(simVehicleMessage);
-        }
+		public void collectVehicle(DistributedMobsimVehicle simVehicle) {
 
-        public void sendMessages(double now) {
+			var currentLinkId = simVehicle.getDriver().getCurrentLinkId();
+			var targetPart = part2Link.getInt(currentLinkId);
+			//VehicleMsg simVehicleMessage = simVehicle.toMessage();
+			//msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
+			//	.setVehicleMsg(simVehicleMessage);
+			log.warn("Implement transformation from DistributedMobsimVehicle into SimStepMessage .");
+		}
 
-            var it = msgs.int2ObjectEntrySet().iterator();
-            while (it.hasNext()) {
+		public void sendMessages(double now) {
 
-                // build and send a message to the target partition
-                var msgEntry = it.next();
-                SimStepMessage.SimStepMessageBuilder msgBuilder = msgEntry.getValue();
-                int targetPart = msgEntry.getIntKey();
-                messageBroker.send(msgBuilder.setSimstep(now).build(), targetPart);
+			var it = msgs.int2ObjectEntrySet().iterator();
+			while (it.hasNext()) {
 
-                // update the bookkeeping. Since we must send to neighbor partitions, we clear the builder and keep it
-                // if we encounter a message builder for a remote partition, i.e. for teleportation, we remove it from
-                // the map, as we don't know whether we will need it in the next time step.
-                if (neighbors.contains(targetPart)) {
-                    msgBuilder.clearVehicleMsgs();
-                    msgBuilder.clearCapacityUpdates();
-                    msgBuilder.clearTeleportationMsgs();
-                } else {
-                    it.remove();
-                }
-            }
-        }
+				// build and send a message to the target partition
+				var msgEntry = it.next();
+				SimStepMessage.SimStepMessageBuilder msgBuilder = msgEntry.getValue();
+				int targetPart = msgEntry.getIntKey();
+				messageBroker.send(msgBuilder.setSimstep(now).build(), targetPart);
 
-        public boolean isLocal(Id<Link> linkId) {
-            var linkRank = part2Link.getInt(linkId);
-            return linkRank == part;
-        }
-    }
+				// update the bookkeeping. Since we must send to neighbor partitions, we clear the builder and keep it
+				// if we encounter a message builder for a remote partition, i.e. for teleportation, we remove it from
+				// the map, as we don't know whether we will need it in the next time step.
+				if (neighbors.contains(targetPart)) {
+					msgBuilder.clearVehicleMsgs();
+					msgBuilder.clearCapacityUpdates();
+					msgBuilder.clearTeleportationMsgs();
+				} else {
+					it.remove();
+				}
+			}
+		}
+
+		public boolean isLocal(Id<Link> linkId) {
+			var linkRank = part2Link.getInt(linkId);
+			return linkRank == part;
+		}
+	}
 }

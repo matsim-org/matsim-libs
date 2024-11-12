@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -59,7 +60,7 @@ public class NetworkTrafficEngine implements SimEngine {
 	}
 
 	@Override
-	public void accept(MobsimAgent person, double now) {
+	public void accept(DistributedMobsimAgent person, double now) {
 		// this will be more complicated but do it the simple way first
 
 		// place person into vehicle
@@ -68,7 +69,7 @@ public class NetworkTrafficEngine implements SimEngine {
 			throw new RuntimeException("Only driver agents are supported");
 		}
 
-		DistributedMobsimVehicle mobsimVehicle = parkedVehicles.get(driver.getPlannedVehicleId());
+		DistributedMobsimVehicle mobsimVehicle = parkedVehicles.remove(driver.getPlannedVehicleId());
 		driver.setVehicle(mobsimVehicle);
 		mobsimVehicle.setDriver(driver);
 
@@ -97,7 +98,7 @@ public class NetworkTrafficEngine implements SimEngine {
 	private void processVehicleMessage(VehicleMsg vehicleMessage, double now) {
 		DistributedMobsimVehicle vehicle = qsim.convertVehicle(vehicleMessage);
 
-		Id<Link> linkId = vehicle.getCurrentRouteElement();
+		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
 
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
@@ -132,29 +133,28 @@ public class NetworkTrafficEngine implements SimEngine {
 		activeLinks.doSimStep(now);
 	}
 
-	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(MobsimVehicle vehicle, SimLink link, double now) {
+	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
+		var driver = vehicle.getDriver();
 		// the vehicle has more elements in the route. Keep going.
-		if (vehicle.getNextRouteElement() != null)
+		if (!driver.isWantingToArriveOnCurrentLink())
 			return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
 
 		// the vehicle has no more route elements. It should leave the network
 		em.processEvent(new VehicleLeavesTrafficEvent(
-			now, vehicle.getDriver().getId(), vehicle.getCurrentRouteElement(),
-			vehicle.getId(), vehicle.getDriver().getCurrentLeg().getMode(),
+			now, driver.getId(), link.getId(), vehicle.getId(), driver.getMode(),
 			1.0
 		));
 
-		SimPerson driver = simVehicleProvider.parkVehicle(vehicle, now);
+		this.parkedVehicles.put(vehicle.getId(), vehicle);
 
 		// TODO: assumes driver is person arriving
 		// Assumes legMode=networkMode, which is not always the case
 		em.processEvent(new PersonArrivalEvent(
-			now, vehicle.getDriver().getId(), vehicle.getCurrentRouteElement(),
-			vehicle.getDriver().getCurrentLeg().getMode()
+			now, driver.getId(), link.getId(), driver.getMode()
 		));
 
-		internalInterface.arrangeNextAgentState(driver);
+		internalInterface.arrangeNextAgentState(vehicle.getDriver());
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 	}
 

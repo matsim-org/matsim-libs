@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation.net;
 import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 
 @RequiredArgsConstructor
 class SimQueue {
@@ -37,25 +38,25 @@ class SimQueue {
 		return storageCapacity.getOccupied();
 	}
 
-	SimVehicle peek() {
+	DistributedMobsimVehicle peek() {
 		return internalQ.peek();
 	}
 
-	SimVehicle poll(double now) {
+	DistributedMobsimVehicle poll(double now) {
 		var vehicle = internalQ.poll();
-		storageCapacity.release(vehicle.getPce(), now);
+		storageCapacity.release(vehicle.getSizeInEquivalents(), now);
 		return vehicle;
 	}
 
-	void add(SimVehicle vehicle, SimLink.LinkPosition position) {
+	void add(DistributedMobsimVehicle vehicle, SimLink.LinkPosition position) {
 
 		// in any case we want to consume storage capacity
-		storageCapacity.consume(vehicle.getPce());
+		storageCapacity.consume(vehicle.getSizeInEquivalents());
 		switch (position) {
 			case QStart -> {
 				// if a vehicle is added from upstream we also want to enfore the inflow capacity constraint
 				internalQ.addLast(vehicle);
-				inflowCapacity.consume(vehicle.getPce());
+				inflowCapacity.consume(vehicle.getSizeInEquivalents());
 			}
 			case QEnd -> internalQ.addFirst(vehicle);
 			case Buffer -> throw new IllegalArgumentException("Vehicle can't be added into the buffer, because this method is in the" +

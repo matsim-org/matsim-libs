@@ -144,7 +144,7 @@ public class SimProvider implements LPProvider {
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, neighbors, part);
 		ActivityEngineReimplementation activityEngine = createActivityEngine(part);
 		TeleportationEngine teleportationEngine = new TeleportationEngine(eventsManager, messaging, config);
-		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, messaging, eventsManager, part);
+		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, compat, messaging, eventsManager, part);
 
 		return new SimProcess(
 			partition, messaging, compat,
