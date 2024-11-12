@@ -315,8 +315,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 		double nextBeginTime = pickupIdx == dropoffIdx ? //
 				pickupStopTask.getEndTime() : // asap
-				stops.get(pickupIdx).task instanceof DefaultDrtStopTaskWithVehicleCapacityChange taskWithCapacityChange ?
-					taskWithCapacityChange.getBeginTime() :
+				stops.get(pickupIdx).task instanceof CapacityChangeTask capacityChangeTask ?
+					capacityChangeTask.getBeginTime() :
 				stops.get(pickupIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)

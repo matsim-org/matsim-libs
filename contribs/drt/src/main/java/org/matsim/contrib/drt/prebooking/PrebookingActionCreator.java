@@ -74,10 +74,10 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 				DrtStopTask stopTask = (DrtStopTask) task;
 
 				incomingOccupancy = incomingOccupancy.addTo(stopTask.getDropoffRequests().values().stream()
-					.map(AcceptedDrtRequest::getPassengerCount).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
 
 				incomingOccupancy = incomingOccupancy.subtract(stopTask.getPickupRequests().values().stream()
-					.map(AcceptedDrtRequest::getPassengerCount).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
 
 				if (task == referenceTask) {
 					return incomingOccupancy;

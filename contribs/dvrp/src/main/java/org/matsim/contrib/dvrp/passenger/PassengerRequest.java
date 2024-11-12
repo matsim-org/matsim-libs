@@ -48,5 +48,5 @@ public interface PassengerRequest extends Request {
 
 	String getMode();
 
-	DvrpVehicleLoad getPassengerCount();
+	DvrpVehicleLoad getLoad();
 }

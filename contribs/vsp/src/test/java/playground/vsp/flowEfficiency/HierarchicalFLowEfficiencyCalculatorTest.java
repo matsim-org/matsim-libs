@@ -151,7 +151,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 				FleetSpecificationImpl fleet = new FleetSpecificationImpl();
 				for (int i = 0; i < 1800 * 1.5; i++) {
 					fleet.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
-							.capacity(new ScalarVehicleLoad(1))
+							.capacity(1)
 							.serviceBeginTime(0)
 							.serviceEndTime(24*3600)
 							.startLinkId(Id.createLinkId( (i % 3 == 0) ? 228 : 227))

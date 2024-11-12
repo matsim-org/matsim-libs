@@ -131,6 +131,10 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 			return this;
 		}
 
+		public Builder capacity(int val) {
+			return this.capacity(new ScalarVehicleLoad(val));
+		}
+
 		public Builder serviceBeginTime(double val) {
 			serviceBeginTime = val;
 			return this;

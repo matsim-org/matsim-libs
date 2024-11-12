@@ -134,7 +134,7 @@ public class InsertionGenerator {
 			this.vehicleEntry = vehicleEntry;
 			pickup = createPickupInsertion(request, vehicleEntry, pickupIdx, pickupIdx == dropoffIdx);
 			dropoff = createDropoffInsertion(request, vehicleEntry, pickup, dropoffIdx);
-			this.insertedLoad = request.getPassengerCount();
+			this.insertedLoad = request.getLoad();
 		}
 
 		@Override
@@ -160,7 +160,18 @@ public class InsertionGenerator {
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
 
 		// Since the vehicle capacity can change during the day. We need to check the load added by the request against all future capacities to be able to exit early.
-		if(Stream.concat(Stream.of(vEntry.vehicle.getCapacity()), vEntry.stops.stream().filter(stop -> stop instanceof Waypoint.StopWithCapacityChange).map(stop -> ((Waypoint.StopWithCapacityChange) stop).getNewVehicleCapacity())).noneMatch(drtRequest.getPassengerCount()::fitsIn)) {
+		boolean compatibleWithOneCapacity = drtRequest.getLoad().fitsIn(vEntry.vehicle.getCapacity());
+		if (!compatibleWithOneCapacity) {
+			for(Waypoint.Stop stop: vEntry.stops) {
+				if(stop instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange) {
+					if(drtRequest.getLoad().fitsIn(stopWithCapacityChange.getNewVehicleCapacity())) {
+						compatibleWithOneCapacity = true;
+						break;
+					}
+				}
+			}
+		}
+		if(!compatibleWithOneCapacity) {
 			return Collections.EMPTY_LIST;
 		}
 
@@ -171,11 +182,11 @@ public class InsertionGenerator {
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			// (0) we first make sure that the request load is compatible with the capacity of the vehicle
-			boolean allowed = drtRequest.getPassengerCount().fitsIn(vehicleCapacity);
+			boolean allowed = drtRequest.getLoad().fitsIn(vehicleCapacity);
 
 			// (1) only not fully loaded arcs
 			// This is different than using allowed &= ... which causes the right hand expression to be always evaluated even if left variable is already false
-			allowed = allowed && occupancy.addTo(drtRequest.getPassengerCount()).fitsIn(vehicleCapacity);
+			allowed = allowed && occupancy.addTo(drtRequest.getLoad()).fitsIn(vehicleCapacity);
 
 			// (2) check if the request wants to depart after the departure time of the next
 			// stop. We can early on filter out the current insertion, because we will
@@ -218,7 +229,7 @@ public class InsertionGenerator {
 		}
 
 		// here we still have to check if the load of the request is compatible with the last vehicle capacity
-		if(drtRequest.getPassengerCount().fitsIn(vehicleCapacity)) {
+		if(drtRequest.getLoad().fitsIn(vehicleCapacity)) {
 			generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
 		}
 
@@ -292,7 +303,7 @@ public class InsertionGenerator {
 			if(currentStop instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange) {
 				capacity = stopWithCapacityChange.getNewVehicleCapacity();
 			}
-			if (!request.getPassengerCount().fitsIn(capacity) || !currentStop.outgoingOccupancy.addTo(request.getPassengerCount()).fitsIn(capacity)) {
+			if (!request.getLoad().fitsIn(capacity) || !currentStop.outgoingOccupancy.addTo(request.getLoad()).fitsIn(capacity)) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,
@@ -326,7 +337,7 @@ public class InsertionGenerator {
 			capacity = stopWithCapacityChange.getNewVehicleCapacity();
 		}
 
-		if(request.getPassengerCount().fitsIn(capacity)) {
+		if(request.getLoad().fitsIn(capacity)) {
 			addInsertion(insertions,
 				createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 					stopCount));
@@ -370,7 +381,7 @@ public class InsertionGenerator {
 	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
 			InsertionPoint pickupInsertion, double fromPickupTT, PickupDetourInfo pickupDetourInfo, int dropoffIdx) {
 		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
-		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, request.getPassengerCount());
+		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, request.getLoad());
 
 		double toDropoffDepartureTime = pickupInsertion.index == dropoffIdx ?
 				pickupDetourInfo.departureTime :

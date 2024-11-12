@@ -94,7 +94,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public DvrpVehicleLoad getPassengerCount() {
+	public DvrpVehicleLoad getLoad() {
 		return new ScalarVehicleLoad(passengerIds.size());
 	}
 

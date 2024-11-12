@@ -25,7 +25,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
+import org.matsim.contrib.drt.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
@@ -92,17 +92,17 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				precedingStayTimes.add(accumulatedStayTime);
 				accumulatedStayTime = 0.0;
 			}
-			if(task instanceof DefaultDrtStopTaskWithVehicleCapacityChange defaultDrtStopTaskWithVehicleCapacityChange) {
-				outgoingOccupancy = defaultDrtStopTaskWithVehicleCapacityChange.getNewVehicleCapacity().getEmptyLoad();
+			if(task instanceof CapacityChangeTask capacityChangeTask) {
+				outgoingOccupancy = capacityChangeTask.getNewVehicleCapacity().getEmptyLoad();
 			}
 		}
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
 		for (int i = stops.length - 1; i >= 0; i--) {
-			if(stopTasks.get(i) instanceof DefaultDrtStopTaskWithVehicleCapacityChange stopTaskWithVehicleCapacityChange) {
+			if(stopTasks.get(i) instanceof CapacityChangeTask capacityChangeTask) {
 				assert outgoingOccupancy.isEmpty();
-				outgoingOccupancy = stopTaskWithVehicleCapacityChange.getPreviousVehicleCapacity().getEmptyLoad();
-				stops[i] = new Waypoint.StopWithCapacityChange(stopTaskWithVehicleCapacityChange);
+				outgoingOccupancy = capacityChangeTask.getPreviousVehicleCapacity().getEmptyLoad();
+				stops[i] = new Waypoint.StopWithCapacityChange(capacityChangeTask);
 			} else {
 				Waypoint.Stop s = stops[i] = new Waypoint.StopWithPickupAndDropoff(stopTasks.get(i), outgoingOccupancy);
 				outgoingOccupancy = outgoingOccupancy.subtract(s.getOccupancyChange());
@@ -110,7 +110,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		}
 
 		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? startTask instanceof DefaultDrtStopTaskWithVehicleCapacityChange stopTaskWithVehicleCapacityChange ? new Waypoint.StopWithCapacityChange(stopTaskWithVehicleCapacityChange) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
+				? startTask instanceof CapacityChangeTask capacityChangeTask ? new Waypoint.StopWithCapacityChange(capacityChangeTask) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
 				: null;
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);

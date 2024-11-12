@@ -101,7 +101,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			Id<Request> requestId = leaveTimes.poll().id;
 			passengerHandler.dropOffPassengers(driver, requestId, now);
 			prebookingManager.notifyDropoff(requestId);
-			onboard = onboard.subtract(dropoffRequests.get(requestId).getPassengerCount());
+			onboard = onboard.subtract(dropoffRequests.get(requestId).getLoad());
 		}
 
 		return leaveTimes.isEmpty();
@@ -175,7 +175,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			DvrpVehicleLoad availableCapacity = vehicle.getCapacity().subtract(onboard);
 
 			if (entry.time <= now) {
-				DvrpVehicleLoad requiredCapacity = pickupRequests.get(entry.id).getPassengerCount();
+				DvrpVehicleLoad requiredCapacity = pickupRequests.get(entry.id).getLoad();
 
 				if (requiredCapacity.fitsIn(availableCapacity) ) {
 					// let agent enter now

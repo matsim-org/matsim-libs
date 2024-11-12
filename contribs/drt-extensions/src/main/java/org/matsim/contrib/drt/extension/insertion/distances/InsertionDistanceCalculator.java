@@ -58,7 +58,15 @@ public class InsertionDistanceCalculator {
 	}
 
 	private DvrpVehicleLoad getPassengers(Collection<AcceptedDrtRequest> requests) {
-		return requests.stream().map(r -> r.getPassengerCount()).reduce(DvrpVehicleLoad::addTo).orElse(null);
+		DvrpVehicleLoad load = null;
+		for(AcceptedDrtRequest acceptedDrtRequest: requests) {
+			if(load == null) {
+				load = acceptedDrtRequest.getLoad();
+			} else {
+				load = load.addTo(acceptedDrtRequest.getLoad());
+			}
+		}
+		return load;
 	}
 
 	public VehicleDistance calculateInsertionDistance(Insertion insertion, DetourTimeInfo detourTimeInfo,

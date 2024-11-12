@@ -409,7 +409,7 @@ public class PtAlongALineTest {
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
 					.id(Id.create(vehPrefix + i, DvrpVehicle.class))
 					.startLinkId(startLinkId)
-					.capacity(new ScalarVehicleLoad(capacity))
+					.capacity(capacity)
 					.serviceBeginTime(0)
 					.serviceEndTime(36 * 3600)
 					.build());

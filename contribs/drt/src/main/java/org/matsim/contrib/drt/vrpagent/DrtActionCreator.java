@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.vrpagent;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import org.matsim.contrib.drt.passenger.DrtStopActivity;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
+import org.matsim.contrib.drt.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.DrtCapacityChangeActivity;
@@ -55,10 +55,9 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		switch (getBaseTypeOrElseThrow(task)) {
 			case DRIVE:
 				return legFactory.create(vehicle);
-
 			case STOP:
-				if(task instanceof DefaultDrtStopTaskWithVehicleCapacityChange stopTaskWithVehicleCapacityChange) {
-					return new DrtCapacityChangeActivity(DRT_CAPACITY_CHANGE_NAME, vehicle, stopTaskWithVehicleCapacityChange.getNewVehicleCapacity(), task.getEndTime());
+				if(task instanceof CapacityChangeTask capacityChangeTask) {
+					return new DrtCapacityChangeActivity(DRT_CAPACITY_CHANGE_NAME, vehicle, capacityChangeTask.getNewVehicleCapacity(), task.getEndTime());
 				} else {
 					DrtStopTask t = (DrtStopTask)task;
 					return new DrtStopActivity(passengerHandler, dynAgent, t::getEndTime, t.getDropoffRequests(), t.getPickupRequests(),

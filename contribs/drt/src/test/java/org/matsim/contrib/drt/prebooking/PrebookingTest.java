@@ -11,7 +11,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
@@ -644,7 +643,7 @@ public class PrebookingTest {
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
-				.setVehicleCapacity(new ScalarVehicleLoad(2)) //
+				.setVehicleCapacity(2) //
 				.addRequest("requestA1", 1, 1, 8, 8, 2000.0, 1.0) // forward
 				.addRequest("requestA2", 1, 1, 8, 8, 2000.0, 2.0) // forward
 				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 3.0) // backward
@@ -712,7 +711,7 @@ public class PrebookingTest {
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
-				.setVehicleCapacity(new ScalarVehicleLoad(2)) //
+				.setVehicleCapacity(2) //
 				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1.0) // forward
 				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 2.0) // backward
 				.addRequest("requestB2", 8, 8, 1, 1, 2356.0, 3.0) // backward

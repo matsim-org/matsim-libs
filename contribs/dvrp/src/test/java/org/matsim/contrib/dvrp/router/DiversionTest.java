@@ -166,7 +166,7 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(new ScalarVehicleLoad(4)) //
+					.capacity(4) //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(2000.0) //
@@ -494,7 +494,7 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(new ScalarVehicleLoad(4)) //
+					.capacity(4) //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(2000.0) //

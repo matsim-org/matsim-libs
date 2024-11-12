@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
+import org.matsim.contrib.drt.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -138,7 +138,6 @@ public interface Waypoint {
 			return MoreObjects.toStringHelper(this).add("link", link).add("arrivalTime", arrivalTime).toString();
 		}
 	}
-
 	abstract class Stop implements Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
@@ -184,8 +183,8 @@ public interface Waypoint {
 		}
 
 		public DvrpVehicleLoad getOccupancyChange() {
-			DvrpVehicleLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getPassengerCount).reduce(DvrpVehicleLoad::addTo).orElse(null);
-			DvrpVehicleLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getPassengerCount).reduce(DvrpVehicleLoad::addTo).orElse(null);
+			DvrpVehicleLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(null);
+			DvrpVehicleLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(null);
 			if(pickedUp == null && droppedOff == null) {
 				return null;
 			} else if(pickedUp == null) {
@@ -248,12 +247,12 @@ public interface Waypoint {
 	}
 
 	class StopWithCapacityChange extends Stop {
-		public StopWithCapacityChange(DefaultDrtStopTaskWithVehicleCapacityChange task) {
+		public StopWithCapacityChange(CapacityChangeTask task) {
 			super(task, task.getNewVehicleCapacity().getEmptyLoad());
 		}
 
 		public DvrpVehicleLoad getNewVehicleCapacity() {
-			return ((DefaultDrtStopTaskWithVehicleCapacityChange) this.task).getNewVehicleCapacity();
+			return ((CapacityChangeTask) this.task).getNewVehicleCapacity();
 		}
 
 		@Override

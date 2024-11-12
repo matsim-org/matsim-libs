@@ -7,7 +7,7 @@ import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask {
+public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements CapacityChangeTask {
 
 	private final DvrpVehicleLoad newVehicleCapacity;
 	private final DvrpVehicleLoad previousVehicleCapacity;
@@ -18,10 +18,12 @@ public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopT
 		this.newVehicleCapacity = newVehicleCapacity;
 	}
 
+	@Override
 	public DvrpVehicleLoad getNewVehicleCapacity() {
 		return this.newVehicleCapacity;
 	}
 
+	@Override
 	public DvrpVehicleLoad getPreviousVehicleCapacity() {
 		return this.previousVehicleCapacity;
 	}
@@ -52,10 +54,5 @@ public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopT
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean isMovable() {
-		return false;
 	}
 }
