@@ -16,6 +16,7 @@ import org.matsim.vehicles.Vehicles;
 import java.util.Objects;
 
 @Log4j2
+@Deprecated
 class SimVehicleProvider {
 
 	private final double stuckThreshold;

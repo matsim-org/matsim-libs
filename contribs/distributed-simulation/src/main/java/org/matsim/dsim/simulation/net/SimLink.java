@@ -6,6 +6,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.ArrayDeque;
@@ -32,7 +34,7 @@ public interface SimLink {
 
     SimVehicle popVehicle();
 
-    void pushVehicle(SimVehicle vehicle, LinkPosition position, double now);
+    void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now);
 
     void addLeaveHandler(OnLeaveQueue onLeaveQueue);
 
@@ -161,7 +163,7 @@ public interface SimLink {
         }
 
         @Override
-        public void pushVehicle(SimVehicle vehicle, LinkPosition position, double now) {
+        public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 
             // calculate the speed directly. This should be done with a link speed calculator later
             var distanceToTravel = switch (position) {
@@ -274,7 +276,7 @@ public interface SimLink {
         }
 
         @Override
-        public void pushVehicle(SimVehicle vehicle, LinkPosition position, double now) {
+        public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
             if (LinkPosition.QStart != position)
                 throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
 
@@ -355,7 +357,7 @@ public interface SimLink {
         }
 
         @Override
-        public void pushVehicle(SimVehicle vehicle, LinkPosition position, double now) {
+        public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 
             localLink.pushVehicle(vehicle, position, now);
 

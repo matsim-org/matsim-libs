@@ -13,6 +13,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.messages.SimStepMessage;
@@ -34,7 +36,7 @@ public class TeleportationEngine implements SimEngine {
     private final Object2DoubleMap<String> modeBeelineDistanceFactors;
 
     @Setter
-    private NextStateHandler nextStateHandler;
+    private InternalInterface internalInterface;
 
     TeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, Config config) {
         this.simStepMessaging = simStepMessaging;
@@ -44,7 +46,7 @@ public class TeleportationEngine implements SimEngine {
     }
 
     @Override
-    public void accept(SimPerson person, double now) {
+    public void accept(MobsimAgent person, double now) {
 
         // the original engine has a travel time check. The default config parameter (qsim.usingTravelTimeCheckInTeleportation)
         // is 'false' and is not settable from xml. This is usually an indicator that a feature is rarely used.

@@ -6,6 +6,7 @@ import org.matsim.dsim.messages.VehicleMsg;
 import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.vehicles.Vehicle;
 
+@Deprecated
 public interface SimVehicle {
 
     // property access

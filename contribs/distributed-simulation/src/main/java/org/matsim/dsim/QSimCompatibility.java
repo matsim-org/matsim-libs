@@ -11,9 +11,7 @@ import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -41,6 +39,12 @@ public final class QSimCompatibility {
 
 	@Getter
 	private final List<MobsimEngine> engines = new ArrayList<>();
+
+	@Getter
+	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+
+	@Getter
+	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 
 	private Injector qsimInjector;
 
@@ -120,6 +124,14 @@ public final class QSimCompatibility {
 					engines.add(m);
 				}
 
+				if (qSimComponent instanceof ActivityHandler ah) {
+					activityHandlers.add(ah);
+				}
+
+				if (qSimComponent instanceof DepartureHandler dh) {
+					departureHandlers.add(dh);
+				}
+
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 
@@ -155,6 +167,8 @@ public final class QSimCompatibility {
 		if (source == null) {
 			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
 		}
+
+
 
 		return source.agentFromMessage(m);
 	}

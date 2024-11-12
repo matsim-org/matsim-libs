@@ -10,6 +10,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Objects;
 
+@Deprecated
 public class BasicSimVehicle implements SimVehicle {
 
     @Getter

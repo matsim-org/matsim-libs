@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.*;
 
-class ActivityEngineTest {
+class ActivityEngineReimplementationTest {
 
     @Test
     public void init() {
@@ -28,7 +28,7 @@ class ActivityEngineTest {
         var timeInterpretation = new TimeInterpretation(ConfigUtils.createConfig());
         var em = mock(EventsManager.class);
         var persons = createPersons();
-        var engine = new ActivityEngine(persons, timeInterpretation, em);
+        var engine = new ActivityEngineReimplementation(persons, timeInterpretation, em);
 
         assertEquals(persons.size(), engine.getAgentsAtActivities().size());
     }
@@ -39,7 +39,7 @@ class ActivityEngineTest {
         var timeInterpretation = new TimeInterpretation(ConfigUtils.createConfig());
         var em = mock(EventsManager.class);
         var persons = createPersons();
-        var engine = new ActivityEngine(persons, timeInterpretation, em);
+        var engine = new ActivityEngineReimplementation(persons, timeInterpretation, em);
 
         persons.sort(Comparator.comparingDouble(p -> timeInterpretation.getActivityEndTime(p.getCurrentActivity(), 0)));
         var personsIterator = persons.iterator();
@@ -63,7 +63,7 @@ class ActivityEngineTest {
         var timeInterpretation = new TimeInterpretation(ConfigUtils.createConfig());
         var em = mock(EventsManager.class);
         var persons = createPersons();
-        var engine = new ActivityEngine(persons, timeInterpretation, em);
+        var engine = new ActivityEngineReimplementation(persons, timeInterpretation, em);
         var expected = List.of(
                 Tuple.of(Id.createPersonId("some-other-person"), 10),
                 Tuple.of(Id.createPersonId("accepted-person"), 15),
@@ -128,7 +128,7 @@ class ActivityEngineTest {
             }
             return null;
         }).when(em).processEvent(any());
-        var engine = new ActivityEngine(List.of(), timeInterpretation, em);
+        var engine = new ActivityEngineReimplementation(List.of(), timeInterpretation, em);
         engine.setNextStateHandler((_, _) -> {
             // nothing to do here
         });

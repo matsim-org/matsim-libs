@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -21,7 +23,7 @@ class Wait2Link implements Steppable {
 	private final EventsManager em;
 	private final ActiveLinks activeLinks;
 
-	void accept(SimVehicle vehicle, SimLink link) {
+	void accept(QVehicle vehicle, SimLink link) {
 
 		waitingVehicles
 			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
@@ -33,13 +35,15 @@ class Wait2Link implements Steppable {
 		//  use an iterator, as we might have to remove entries from the map
 		var it = waitingVehicles.values().iterator();
 		while (it.hasNext()) {
-			var waitingQ = it.next();
+			Queue<Waiting> waitingQ = it.next();
 
 			// try to push all vehicles from the queue onto the link.
 			while (!waitingQ.isEmpty()) {
-				var link = waitingQ.peek().link();
-				var vehicle = waitingQ.peek().vehicle();
-				var position = vehicle.getNextRouteElement() == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
+				SimLink link = waitingQ.peek().link();
+				MobsimVehicle vehicle = waitingQ.peek().vehicle();
+
+				Id<Link> nextLinkId = vehicle.getDriver().chooseNextLinkId();
+				SimLink.LinkPosition position = nextLinkId == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
 
 				if (link.isAccepting(position, now)) {
 					waitingQ.poll();
@@ -57,16 +61,16 @@ class Wait2Link implements Steppable {
 		}
 	}
 
-	private void pushVehicleOntoLink(SimVehicle vehicle, SimLink link, SimLink.LinkPosition position, double now) {
+	private void pushVehicleOntoLink(MobsimVehicle vehicle, SimLink link, SimLink.LinkPosition position, double now) {
 
 		em.processEvent(new VehicleEntersTrafficEvent(
 			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
-			vehicle.getDriver().getCurrentLeg().getMode(), 1.0)
+			vehicle.getDriver().getMode(), 1.0)
 		);
 		link.pushVehicle(vehicle, position, now);
 		activeLinks.activate(link);
 	}
 
-	private record Waiting(SimVehicle vehicle, SimLink link) {
+	private record Waiting(MobsimVehicle vehicle, SimLink link) {
 	}
 }
