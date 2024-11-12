@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -44,6 +45,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
  *
@@ -57,24 +59,18 @@ import org.matsim.vehicles.VehicleType;
   private static LSP createLSPWithScorer(Scenario scenario) {
 
     // The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
-    var carrierVehicleType =
-        CarrierVehicleType.Builder.newInstance(
-                Id.create("CollectionCarrierVehicleType", VehicleType.class))
-            .setCapacity(10)
-            .setCostPerDistanceUnit(0.0004)
-            .setCostPerTimeUnit(0.38)
-            .setFixCost(49)
-            .setMaxVelocity(50 / 3.6)
-            .build();
+    final VehicleType carrierVehType = VehicleUtils.createVehicleType( Id.create("CollectionCarrierVehicleType", VehicleType.class), TransportMode.car);
+    carrierVehType.getCapacity().setOther(10);
+    carrierVehType.getCostInformation().setCostsPerMeter(0.0004);
+    carrierVehType.getCostInformation().setCostsPerSecond(0.38);
+    carrierVehType.getCostInformation().setFixedCost(49.);
+    carrierVehType.setMaximumVelocity(50 / 3.6);
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 
     CarrierCapabilities capabilities =
         CarrierCapabilities.Builder.newInstance()
-            //									      .addType(carrierVehicleType )
-            .addVehicle(
-                CarrierVehicle.newInstance(
-                    Id.createVehicleId("CollectionVehicle"), collectionLinkId, carrierVehicleType))
+            .addVehicle(CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, carrierVehType))
             .setFleetSize(FleetSize.INFINITE)
             .build();
 

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -59,6 +60,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MultipleIterationsCompleteLSPMobsimTest {
 
@@ -81,18 +83,17 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
-		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder collectionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(collectionVehicleTypeId);
-		collectionVehicleTypeBuilder.setCapacity(10);
-		collectionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		collectionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		collectionVehicleTypeBuilder.setFixCost(49);
-		collectionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
+		Id<VehicleType> collectionVehTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
+		org.matsim.vehicles.VehicleType collectionVehType = VehicleUtils.createVehicleType(collectionVehTypeId, TransportMode.car);
+		collectionVehType.getCapacity().setOther(10);
+		collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		collectionVehType.getCostInformation().setCostsPerSecond(0.38);
+		collectionVehType.getCostInformation().setFixedCost(49.);
+		collectionVehType.setMaximumVelocity(50 / 3.6);
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
+		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionVehType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
@@ -129,19 +130,18 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 		LogisticChainElement firstHubElement = firstHubElementBuilder.build();
 
 		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(mainRunVehicleTypeId);
-		mainRunVehicleTypeBuilder.setCapacity(30);
-		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
-		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		mainRunVehicleTypeBuilder.setFixCost(120);
-		mainRunVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
+		Id<VehicleType> mainRunVehTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+		org.matsim.vehicles.VehicleType mainRunVehType = VehicleUtils.createVehicleType(mainRunVehTypeId, TransportMode.car);
+		mainRunVehType.getCapacity().setOther(30);
+		mainRunVehType.getCostInformation().setCostsPerMeter(0.0002);
+		mainRunVehType.getCostInformation().setCostsPerSecond(0.38);
+		mainRunVehType.getCostInformation().setFixedCost(120.);
+		mainRunVehType.setMaximumVelocity(50 / 3.6);
 
 
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunVehType);
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
@@ -180,18 +180,17 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 		LogisticChainElement secondHubElement = secondHubElementBuilder.build();
 
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
-		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
-		dsitributionVehicleTypeBuilder.setCapacity(10);
-		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		dsitributionVehicleTypeBuilder.setFixCost(49);
-		dsitributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		Id<VehicleType> distributionVehTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
+		org.matsim.vehicles.VehicleType distributionVehType = VehicleUtils.createVehicleType(distributionVehTypeId, TransportMode.car);
+		distributionVehType.getCapacity().setOther(10);
+		distributionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		distributionVehType.getCostInformation().setCostsPerSecond(0.38);
+		distributionVehType.getCostInformation().setFixedCost(49.);
+		distributionVehType.setMaximumVelocity(50 / 3.6);
 
 		Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionVehType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);

@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.CommandLine;
@@ -52,6 +53,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * The LSP have to possibilities to send the goods from the first depot to the recipients: A) via
@@ -240,19 +242,18 @@ import org.matsim.vehicles.VehicleType;
       Carrier mainRunCarrier =
           CarriersUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
 
-      VehicleType mainRunVehicleType =
-          CarrierVehicleType.Builder.newInstance(
-                  Id.create("MainRunCarrierVehicleType", VehicleType.class))
-              .setCapacity(30)
-              .setCostPerDistanceUnit(0.0002)
-              .setCostPerTimeUnit(0.38)
-              .setFixCost(120)
-              .setMaxVelocity(50 / 3.6)
-              .build();
+      Id<VehicleType> mainRunCarrierVehicleType = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+      VehicleType mainRunVehType = VehicleUtils.createVehicleType(mainRunCarrierVehicleType, TransportMode.car);
+      mainRunVehType.getCapacity().setOther(30);
+      mainRunVehType.getCostInformation().setCostsPerMeter(0.0002);
+      mainRunVehType.getCostInformation().setCostsPerSecond(0.38);
+      mainRunVehType.getCostInformation().setFixedCost(120.);
+      mainRunVehType.setMaximumVelocity(50 / 3.6);
+      mainRunVehType.setNetworkMode(TransportMode.car);
 
       CarrierVehicle mainRunCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
-                  Id.createVehicleId("MainRunVehicle"), depotLinkId, mainRunVehicleType)
+                  Id.createVehicleId("MainRunVehicle"), depotLinkId, mainRunVehType)
               .build();
 
       mainRunCarrier.setCarrierCapabilities(
@@ -309,12 +310,12 @@ import org.matsim.vehicles.VehicleType;
     LogisticChainElement distributionElement;
     {
       // The Carrier for distribution from reloading Point is created
-      VehicleType distributionVehicleType =
+      VehicleType distributionVehType =
           createCarrierVehicleType("DistributionCarrierVehicleType");
 
       CarrierVehicle distributionCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
-                  Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehicleType)
+                  Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehType)
               .build();
 
       Carrier distributionCarrier =
@@ -349,14 +350,14 @@ import org.matsim.vehicles.VehicleType;
     LogisticChainElement directDistributionElement;
     {
       // The Carrier for distribution from reloading Point is created
-      VehicleType directDistributionVehicleType =
+      VehicleType directdistributionVehType =
           createCarrierVehicleType("DirectDistributionCarrierVehicleType");
 
       CarrierVehicle directDistributionCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
                   Id.createVehicleId("DirectDistributionVehicle"),
                   depotLinkId,
-                  directDistributionVehicleType)
+                  directdistributionVehType)
               .build();
 
       CarrierCapabilities directDistributionCarrierCapabilities =
@@ -533,13 +534,15 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private static VehicleType createCarrierVehicleType(String vehicleTypeId) {
-    return CarrierVehicleType.Builder.newInstance(Id.create(vehicleTypeId, VehicleType.class))
-        .setCapacity(10)
-        .setCostPerDistanceUnit(0.0004)
-        .setCostPerTimeUnit(0.38)
-        .setFixCost(49)
-        .setMaxVelocity(50 / 3.6)
-        .build();
+    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeId, VehicleType.class), TransportMode.car);
+    vehicleType.getCapacity().setOther(10);
+    vehicleType.getCostInformation().setCostsPerMeter(0.0004);
+    vehicleType.getCostInformation().setCostsPerSecond(0.38);
+    vehicleType.getCostInformation().setFixedCost(49.);
+    vehicleType.setMaximumVelocity(50 / 3.6);
+    vehicleType.setNetworkMode(TransportMode.car);
+
+    return vehicleType;
   }
 
   private static Collection<LspShipment> createInitialLSPShipments(Network network) {

@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -39,6 +40,7 @@ import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class DistributionElementTest {
 
@@ -56,17 +58,16 @@ public class DistributionElementTest {
 
         Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(10);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		VehicleType distributionType = vehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType distributionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		distributionVehType.getCapacity().setOther(10);
+		distributionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		distributionVehType.getCostInformation().setCostsPerSecond(0.38);
+		distributionVehType.getCostInformation().setFixedCost(49.);
+		distributionVehType.setMaximumVelocity(50 / 3.6);
 
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionVehType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addVehicle(carrierVehicle);
