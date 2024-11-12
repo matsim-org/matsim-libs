@@ -113,13 +113,14 @@ public class CompleteLogisticChainTest {
 				.setResource(firstTransshipmentHubBuilder.build())
 				.build();
 
-		VehicleType mainRunType  = CarrierVehicleType.Builder
-				.newInstance(collectionVehTypeId)
-				.setCapacity(30)
-				.setCostPerDistanceUnit(0.0002)
-				.setCostPerTimeUnit(0.38)
-				.setFixCost(120).setMaxVelocity(50 / 3.6)
-				.build();
+
+		final VehicleType mainRunType = VehicleUtils.createVehicleType(Id.create("small05", VehicleType.class), TransportMode.car);
+		mainRunType.getCapacity().setOther(30);
+		mainRunType.getCostInformation().setCostsPerMeter(0.0002);
+		mainRunType.getCostInformation().setCostsPerSecond(0.38);
+		mainRunType.getCostInformation().setFixedCost(120.);
+		mainRunType.setMaximumVelocity(50 / 3.6);
+		mainRunType.setNetworkMode(TransportMode.car);
 
 		final Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("MainRunVehicle"), fromLinkId, mainRunType);

@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -54,6 +55,7 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 final class ExampleMultipleOneEchelonChainsReplanning {
 
@@ -62,23 +64,32 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
   private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 
-  private static final VehicleType VEH_TYPE_SMALL_05 =
-      CarrierVehicleType.Builder.newInstance(Id.create("small05", VehicleType.class))
-          .setCapacity(5)
-          .setMaxVelocity(10)
-          .setFixCost(5)
-          .setCostPerDistanceUnit(0.001)
-          .setCostPerTimeUnit(0.01)
-          .build();
+  private static final VehicleType VEH_TYPE_LARGE_50 = createVehTypeLarge50();
+  private static final VehicleType VEH_TYPE_SMALL_05 = createVehTypeSmall05();
 
-  private static final VehicleType VEH_TYPE_LARGE_50 =
-      CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
-          .setCapacity(50)
-          .setMaxVelocity(10)
-          .setFixCost(150)
-          .setCostPerDistanceUnit(0.01)
-          .setCostPerTimeUnit(0.01)
-          .build();
+  private static VehicleType createVehTypeLarge50() {
+    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("large50", VehicleType.class), TransportMode.car);
+    vehicleType.getCapacity().setOther(50);
+    vehicleType.getCostInformation().setCostsPerMeter(0.01);
+    vehicleType.getCostInformation().setCostsPerSecond(0.01);
+    vehicleType.getCostInformation().setFixedCost(150.);
+    vehicleType.setMaximumVelocity(10);
+    vehicleType.setNetworkMode(TransportMode.car);
+
+    return vehicleType;
+  }
+
+  private static VehicleType createVehTypeSmall05() {
+    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("small05", VehicleType.class), TransportMode.car);
+    vehicleType.getCapacity().setOther(5);
+    vehicleType.getCostInformation().setCostsPerMeter(0.001);
+    vehicleType.getCostInformation().setCostsPerSecond(0.005);
+    vehicleType.getCostInformation().setFixedCost(25.);
+    vehicleType.setMaximumVelocity(10);
+    vehicleType.setNetworkMode(TransportMode.car);
+
+    return vehicleType;
+  }
 
   private ExampleMultipleOneEchelonChainsReplanning() {}
 
