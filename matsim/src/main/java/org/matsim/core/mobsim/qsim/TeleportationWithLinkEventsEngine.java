@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -84,12 +85,19 @@ public final class TeleportationWithLinkEventsEngine implements TeleportationEng
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 
+		// TODO: how to make sure this is called before the "normal" teleportation engine?
+
 		// This engine is only active when events are being written
 		if (!active)
 			return false;
 
 		if (!modes.contains(agent.getMode()))
 			return false;
+
+		if (!(agent instanceof MobsimDriverAgent driver))
+			return false;
+
+		System.out.println(driver.chooseNextLinkId());
 
 		TravelTime tt = travelTimes.get(agent.getMode());
 
