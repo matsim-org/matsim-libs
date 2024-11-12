@@ -96,7 +96,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
     CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
     vehicleTypeReader.readFile(VEHICLE_TYPE_FILE);
-    //The following is needed, because sinde fall 2024 the vehicle types are not assigned to a network mode by default.
+    //The following is needed, because since fall 2024 the vehicle types are not assigned to a network mode by default.
     for (VehicleType vehicleType : vehicleTypes.getVehicleTypes().values()) {
       vehicleType.setNetworkMode(TransportMode.car);
     }
