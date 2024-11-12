@@ -79,7 +79,7 @@ public class EqualVehicleDensityTargetCalculatorTest {
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
 					.id(Id.create(i + "", DvrpVehicle.class))
 					.startLinkId(Id.createLinkId("a"))
-					.capacity(new ScalarVehicleLoad(1))
+					.capacity(1)
 					.serviceBeginTime(0)
 					.serviceEndTime(100)
 					.build());

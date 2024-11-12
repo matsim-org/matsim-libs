@@ -44,7 +44,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -605,7 +604,7 @@ public class ComplexUnschedulerTest {
 
 			DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder() //
 					.id(Id.create("vehicle", DvrpVehicle.class)) //
-					.capacity(new ScalarVehicleLoad(4)) //
+					.capacity(4) //
 					.serviceBeginTime(0.0) //
 					.serviceEndTime(30.0 * 3600.0) //
 					.startLinkId(depotLink.getId()) //
@@ -633,7 +632,7 @@ public class ComplexUnschedulerTest {
 		AcceptedDrtRequest createRequest() {
 			AcceptedDrtRequest request = Mockito.mock(AcceptedDrtRequest.class);
 			Mockito.when(request.getId()).thenReturn(Id.create("req_" + requestIndex++, Request.class));
-			Mockito.when(request.getPassengerCount()).thenReturn(new ScalarVehicleLoad(0));
+			Mockito.when(request.getLoad()).thenReturn(new ScalarVehicleLoad(0));
 			return request;
 		}
 

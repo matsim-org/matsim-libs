@@ -85,7 +85,7 @@ public class DefaultRequestInsertionSchedulerTest {
         fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
                 .id(V_1_ID)
                 .startLinkId(startLink.getId())
-                .capacity(new ScalarVehicleLoad(6))
+                .capacity(6)
                 .serviceBeginTime(0)
                 .serviceEndTime(1000)
                 .build()

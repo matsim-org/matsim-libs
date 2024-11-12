@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
@@ -53,9 +55,13 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author michalm (Michal Maciejewski)
  */
+
+
 public class VehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
 		TaskEndedEventHandler {
+
+	private final static Logger logger = LogManager.getLogger(VehicleOccupancyProfileCalculator.class);
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
@@ -82,7 +88,7 @@ public class VehicleOccupancyProfileCalculator
 	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
-	private final DvrpVehicleLoad maxCapacity;
+	private final int maxCapacity;
 
 	private final String dvrpMode;
 
@@ -102,15 +108,14 @@ public class VehicleOccupancyProfileCalculator
 				.orElse(0);
 		analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(analysisEndTime), timeInterval);
-
 		maxCapacity = fleet.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(DvrpVehicleSpecification::getCapacity)
-				.reduce((left, right) -> left.fitsIn(right) ? right : left)
-				.orElse(null);
-
-		Verify.verify(maxCapacity instanceof ScalarVehicleLoad);
+				.filter(dvrpVehicleLoad -> dvrpVehicleLoad instanceof ScalarVehicleLoad)
+				.mapToInt(dvrpVehicleLoad -> ((ScalarVehicleLoad) dvrpVehicleLoad).getLoad())
+				.max()
+				.orElse(-1);
 	}
 
 	private void consolidate() {
@@ -173,16 +178,20 @@ public class VehicleOccupancyProfileCalculator
 
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
-		Verify.verify(state.occupancy instanceof ScalarVehicleLoad);
-		ScalarVehicleLoad currentVehicleOccupancy = (ScalarVehicleLoad) state.occupancy;
-		ScalarVehicleLoad vehicleCapacity = (ScalarVehicleLoad) maxCapacity;
-		Verify.verify(currentVehicleOccupancy.getLoad() >= 0);
-		Verify.verify(currentVehicleOccupancy.getLoad() <= vehicleCapacity.getLoad());
-
-		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || currentVehicleOccupancy.getLoad() > 0;
+		if(! (state.occupancy instanceof ScalarVehicleLoad)) {
+			logger.warn("Presence of occupancies that are not Scalar, these will not be considered by VehicleOccupancyProfileCalculator");
+			return;
+		}
+		int currentVehicleOccupancy = ((ScalarVehicleLoad) state.occupancy).getLoad();
+		Verify.verify(currentVehicleOccupancy >= 0);
+		if(currentVehicleOccupancy > maxCapacity) {
+			logger.warn("Current limitation of VehicleOccupancyProfileCalculator does not allow to consider changing scalar capacities that are greater than the initial maximum capacity of the fleet");
+			return;
+		}
+		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || currentVehicleOccupancy > 0;
 
 		double[] profile = servingPassengers ?
-				vehicleOccupancyProfiles.get(((ScalarVehicleLoad)state.occupancy).getLoad()) :
+				vehicleOccupancyProfiles.get(currentVehicleOccupancy) :
 				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
 						v -> new double[timeDiscretizer.getIntervalCount()]);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
@@ -265,7 +274,7 @@ public class VehicleOccupancyProfileCalculator
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
-		vehicleOccupancyProfiles = IntStream.rangeClosed(0, ((ScalarVehicleLoad)maxCapacity).getLoad())
+		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
 				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
 				.collect(toImmutableList());
 

@@ -71,7 +71,7 @@ public class DefaultPassengerEngineTest {
 			.serviceBeginTime(0)
 			.serviceEndTime(3600)
 			.startLinkId(fixture.linkAB.getId())
-			.capacity(new ScalarVehicleLoad(1))
+			.capacity(1)
 			.build(), fixture.linkAB);
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 

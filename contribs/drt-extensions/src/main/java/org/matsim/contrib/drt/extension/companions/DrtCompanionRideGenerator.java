@@ -81,7 +81,7 @@
 			 final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		 this.scenario = scenario;
 		 this.drtMode = drtMode;
-		 //TODO check before merge. I guess this functionality will only be used with the ScalarVehicleLoad implementation of the DvrpVehicleLoad. So I will just filter the vehicle capacities. Tarek.
+		 //TODO[Sebastian]. I guess this functionality will only be used with the ScalarVehicleLoad implementation of the DvrpVehicleLoad. So I will just filter the vehicle capacities. Tarek.
 		 this.maxCapacity = fleet.getVehicleSpecifications()
 				 .values()
 				 .stream()

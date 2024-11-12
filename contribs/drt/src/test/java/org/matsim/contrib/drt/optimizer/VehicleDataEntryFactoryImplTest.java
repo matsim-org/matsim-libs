@@ -132,7 +132,7 @@ public class VehicleDataEntryFactoryImplTest {
 		var vehicle = new DvrpVehicleImpl(ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create("a", DvrpVehicle.class))
 				.startLinkId(depot.getId())
-				.capacity(new ScalarVehicleLoad(0))
+				.capacity(0)
 				.serviceBeginTime(0)
 				.serviceEndTime(vehicleEndTime)
 				.build(), depot);

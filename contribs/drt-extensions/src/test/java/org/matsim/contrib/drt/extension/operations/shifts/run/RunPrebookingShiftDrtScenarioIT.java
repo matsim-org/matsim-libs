@@ -366,7 +366,7 @@ public class RunPrebookingShiftDrtScenarioIT {
         FleetSpecification fleetSpecification = new FleetSpecificationImpl();
         fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
                 .id(Id.create("v1", DvrpVehicle.class)) //
-                .capacity(new ScalarVehicleLoad(1)) //
+                .capacity(1) //
                 .serviceBeginTime(0.0) //
                 .serviceEndTime(24 * 3600) //
                 .startLinkId(Id.createLinkId(1)) //

@@ -27,9 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -288,7 +286,7 @@ public class DrtSpeedUpTest {
 	DvrpVehicleSpecification vehicleSpecification(String id) {
 		return ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create(id, DvrpVehicle.class))
-				.capacity(new ScalarVehicleLoad(1))
+				.capacity(1)
 				.startLinkId(linkAB.getId())
 				.serviceBeginTime(0)
 				.serviceEndTime(3600)

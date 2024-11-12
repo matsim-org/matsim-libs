@@ -1,7 +1,6 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.compress.utils.Sets;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -45,7 +44,7 @@ public class PassengerGroupTest {
 			.serviceBeginTime(0)
 			.serviceEndTime(3600)
 			.startLinkId(fixture.linkAB.getId())
-			.capacity(new ScalarVehicleLoad(1))
+			.capacity(1)
 			.build(), fixture.linkAB);
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 

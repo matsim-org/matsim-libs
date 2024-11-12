@@ -111,8 +111,8 @@ public class AcceptedDrtRequest {
 		return request.getPassengerIds();
 	}
 
-	public DvrpVehicleLoad getPassengerCount() {
-		return request.getPassengerCount();
+	public DvrpVehicleLoad getLoad() {
+		return request.getLoad();
 	}
 
 	public String getMode() {

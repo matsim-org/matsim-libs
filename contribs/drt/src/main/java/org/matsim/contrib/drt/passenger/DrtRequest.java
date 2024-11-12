@@ -134,7 +134,7 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public DvrpVehicleLoad getPassengerCount() {
+	public DvrpVehicleLoad getLoad() {
 		return this.scalarVehicleLoadGetter.apply(passengerIds);
 	}
 

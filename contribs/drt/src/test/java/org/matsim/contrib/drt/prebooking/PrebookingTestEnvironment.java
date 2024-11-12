@@ -143,6 +143,11 @@ public class PrebookingTestEnvironment {
 		return this;
 	}
 
+	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+		this.vehicleCapacity = new ScalarVehicleLoad(vehicleCapacity);
+		return this;
+	}
+
 	public Controler build() {
 		Config config = ConfigUtils.createConfig();
 		buildConfig(config);
