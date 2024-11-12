@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -61,6 +62,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 class ExampleCheckRequirementsOfAssigner {
 
@@ -72,20 +74,19 @@ class ExampleCheckRequirementsOfAssigner {
 
     // Create red LogisticsSolution which has the corresponding info
     final Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
-    final VehicleType collectionType =
-        CarrierVehicleType.Builder.newInstance(
-                Id.create("RedCarrierVehicleType", VehicleType.class))
-            .setCapacity(10)
-            .setCostPerDistanceUnit(0.0004)
-            .setCostPerTimeUnit(0.38)
-            .setFixCost(49)
-            .setMaxVelocity(50 / 3.6)
-            .build();
+    final Id<VehicleType> collectionVehTypeId = Id.create("RedCarrierVehicleType", VehicleType.class);
+    final VehicleType collectionVehType = VehicleUtils.createVehicleType(collectionVehTypeId, TransportMode.car);
+    collectionVehType.getCapacity().setOther(10);
+    collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
+    collectionVehType.getCostInformation().setCostsPerSecond(0.38);
+    collectionVehType.getCostInformation().setFixedCost(49.);
+    collectionVehType.setMaximumVelocity(50 / 3.6);
+    collectionVehType.setNetworkMode(TransportMode.car);
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
     CarrierVehicle redVehicle =
-        CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
+        CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities redCapabilities =
         CarrierCapabilities.Builder.newInstance()
@@ -121,7 +122,7 @@ class ExampleCheckRequirementsOfAssigner {
     Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
     Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
     CarrierVehicle blueVehicle =
-        CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionType);
+        CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities blueCapabilities =
         CarrierCapabilities.Builder.newInstance()

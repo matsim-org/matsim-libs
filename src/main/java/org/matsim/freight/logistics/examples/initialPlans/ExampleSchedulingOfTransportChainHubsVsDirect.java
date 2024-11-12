@@ -240,7 +240,7 @@ import org.matsim.vehicles.VehicleType;
       Carrier mainRunCarrier =
           CarriersUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
 
-      VehicleType mainRunVehicleType =
+      VehicleType mainRunVehType =
           CarrierVehicleType.Builder.newInstance(
                   Id.create("MainRunCarrierVehicleType", VehicleType.class))
               .setCapacity(30)
@@ -252,7 +252,7 @@ import org.matsim.vehicles.VehicleType;
 
       CarrierVehicle mainRunCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
-                  Id.createVehicleId("MainRunVehicle"), depotLinkId, mainRunVehicleType)
+                  Id.createVehicleId("MainRunVehicle"), depotLinkId, mainRunVehType)
               .build();
 
       mainRunCarrier.setCarrierCapabilities(
@@ -309,12 +309,12 @@ import org.matsim.vehicles.VehicleType;
     LogisticChainElement distributionElement;
     {
       // The Carrier for distribution from reloading Point is created
-      VehicleType distributionVehicleType =
+      VehicleType distributionVehType =
           createCarrierVehicleType("DistributionCarrierVehicleType");
 
       CarrierVehicle distributionCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
-                  Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehicleType)
+                  Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehType)
               .build();
 
       Carrier distributionCarrier =
@@ -349,14 +349,14 @@ import org.matsim.vehicles.VehicleType;
     LogisticChainElement directDistributionElement;
     {
       // The Carrier for distribution from reloading Point is created
-      VehicleType directDistributionVehicleType =
+      VehicleType directdistributionVehType =
           createCarrierVehicleType("DirectDistributionCarrierVehicleType");
 
       CarrierVehicle directDistributionCarrierVehicle =
           CarrierVehicle.Builder.newInstance(
                   Id.createVehicleId("DirectDistributionVehicle"),
                   depotLinkId,
-                  directDistributionVehicleType)
+                  directdistributionVehType)
               .build();
 
       CarrierCapabilities directDistributionCarrierCapabilities =

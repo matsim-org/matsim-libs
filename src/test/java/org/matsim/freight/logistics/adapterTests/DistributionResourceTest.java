@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -38,13 +39,14 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.DistributionCarrierResourceBuilder;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class DistributionResourceTest {
 
 	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
 
-	private org.matsim.vehicles.VehicleType distributionType;
+	private org.matsim.vehicles.VehicleType distributionVehType;
 	private CarrierVehicle distributionCarrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier distributionCarrier;
@@ -61,17 +63,16 @@ public class DistributionResourceTest {
 
         Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(10);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		distributionType = vehicleTypeBuilder.build();
+		distributionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		distributionVehType.getCapacity().setOther(10);
+		distributionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		distributionVehType.getCostInformation().setCostsPerSecond(0.38);
+		distributionVehType.getCostInformation().setFixedCost(49.);
+		distributionVehType.setMaximumVelocity(50 / 3.6);
 
 		distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+		distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, this.distributionVehType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
@@ -113,18 +114,18 @@ public class DistributionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.getFirst(), distributionType);
-					assertEquals(10, distributionType.getCapacity().getOther().intValue());
-					assertEquals(0.0004, distributionType.getCostInformation().getCostsPerMeter(), 0.0);
-					assertEquals(0.38, distributionType.getCostInformation().getCostsPerSecond(), 0.0);
-					assertEquals(49, distributionType.getCostInformation().getFixedCosts(), 0.0);
-					assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
+					assertSame(types.getFirst(), distributionVehType);
+					assertEquals(10, distributionVehType.getCapacity().getOther().intValue());
+					assertEquals(0.0004, distributionVehType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, distributionVehType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(49, distributionVehType.getCostInformation().getFixedCosts(), 0.0);
+					assertEquals((50 / 3.6), distributionVehType.getMaximumVelocity(), 0.0);
 
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.getFirst(), distributionCarrierVehicle);
-					assertSame(distributionCarrierVehicle.getType(), distributionType);
+					assertSame(distributionCarrierVehicle.getType(), distributionVehType);
 					assertSame(distributionCarrierVehicle.getLinkId(), distributionLinkId);
 				}
 			}
