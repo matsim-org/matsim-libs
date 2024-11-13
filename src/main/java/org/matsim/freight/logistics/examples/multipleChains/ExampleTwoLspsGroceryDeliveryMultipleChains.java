@@ -145,8 +145,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
             .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controler.run();
 
-    //Todo: reactivate Analysis, as soon there is a fix. Currently it has a new issue, I need to investigate.... kmt' nov'24
-    //runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
