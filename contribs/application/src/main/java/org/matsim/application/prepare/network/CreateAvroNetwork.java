@@ -108,8 +108,11 @@ public class CreateAvroNetwork implements MATSimAppCommand {
 			filter = filter.and(link -> p.matcher(link.getId().toString()).matches());
 		}
 
+		// Strings that could have been added in the list, due to command line parsing
+		modes.removeIf(m -> m.isBlank() || m.equals("none") || m.equals("\"") || m.equals("\"\""));
+
 		// At least one of the specified modes needs to be contained
-		if (!modes.isEmpty() && !modes.equals(Set.of("none"))) {
+		if (!modes.isEmpty()) {
 			filter = filter.and(link -> modes.stream().anyMatch(m -> link.getAllowedModes().contains(m)));
 		}
 
