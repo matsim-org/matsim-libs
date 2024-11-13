@@ -3,26 +3,24 @@ package org.matsim.dsim.simulation.net;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.NextStateHandler;
-import org.matsim.api.SimEngine;
+import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.VehicleMsg;
-import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
@@ -30,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Log4j2
-public class NetworkTrafficEngine implements SimEngine {
+public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Getter
 	private final SimNetwork simNetwork;
@@ -42,13 +40,13 @@ public class NetworkTrafficEngine implements SimEngine {
 	private final boolean wait2LinkFirst;
 
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
-	private final QSimCompatibility qsim;
+	private final QSimCompatibility qSimCompatibility;
 
 	@Setter
 	private InternalInterface internalInterface;
 
-	public NetworkTrafficEngine(Scenario scenario, QSimCompatibility qsim, SimStepMessaging simStepMessaging, EventsManager em, int part) {
-		this.qsim = qsim;
+	public NetworkTrafficEngine(Scenario scenario, QSimCompatibility qSimCompatibility, SimStepMessaging simStepMessaging, EventsManager em, int part) {
+		this.qSimCompatibility = qSimCompatibility;
 		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, part);
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
@@ -61,25 +59,20 @@ public class NetworkTrafficEngine implements SimEngine {
 
 	@Override
 	public void accept(DistributedMobsimAgent person, double now) {
-		// this will be more complicated but do it the simple way first
-
-		// place person into vehicle
 
 		if (!(person instanceof MobsimDriverAgent driver)) {
 			throw new RuntimeException("Only driver agents are supported");
 		}
 
+		// place person into vehicle
 		DistributedMobsimVehicle mobsimVehicle = parkedVehicles.remove(driver.getPlannedVehicleId());
 		driver.setVehicle(mobsimVehicle);
 		mobsimVehicle.setDriver(driver);
 
-		// TODO: next link id?
-		Id<Link> currentRouteElement = mobsimVehicle.getCurrentLink().getId();
-
+		Id<Link> currentRouteElement = person.getCurrentLinkId();
 		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(mobsimVehicle.getId());
 
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
-
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
 		wait2Link.accept(mobsimVehicle, link);
@@ -95,8 +88,16 @@ public class NetworkTrafficEngine implements SimEngine {
 		}
 	}
 
-	private void processVehicleMessage(VehicleMsg vehicleMessage, double now) {
-		DistributedMobsimVehicle vehicle = qsim.convertVehicle(vehicleMessage);
+	private void processVehicleMessage(Message vehicleMessage, double now) {
+		var vehicle = qSimCompatibility.vehicleFromMessage(vehicleMessage);
+
+		var driver = switch (vehicleMessage) {
+			case QVehicleMessage qm -> qSimCompatibility.agentFromMessage(qm);
+			default -> throw new UnsupportedOperationException("Only QVehicleMessage is supported at the moment.");
+		};
+
+		vehicle.setDriver((DriverAgent) driver);
+		((DriverAgent) driver).setVehicle(vehicle);
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);

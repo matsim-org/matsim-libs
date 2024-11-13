@@ -37,6 +37,7 @@ import static playground.vsp.flowEfficiency.LinkTurnDirectionAttributesFromGraph
 /**
  * this class is experimental! please do not use without caution!
  * tschlenther dec '20
+ *
  * @author tschlenther
  */
 public class BunchingFlowEfficencyImpact implements SituationalFlowEfficiencyImpact {
@@ -58,28 +59,30 @@ public class BunchingFlowEfficencyImpact implements SituationalFlowEfficiencyImp
 	public double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, @Nullable Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
 
 		// currently, we can not call chooseNextLinkId for TransitQVehicles because no link Id caching is performed!
-		if(qVehicle instanceof TransitQVehicle) { return 1;}
+		if (qVehicle instanceof TransitQVehicle) {
+			return 1;
+		}
 
 		//querying the next link id forces the driver to take it (diversion can only take place after next link)
 		//this might change drt performance
 		Id<Link> nextLinkId = qVehicle.getDriver().chooseNextLinkId();
 
-		if(previousQVehicle == null || timeGapToPreviousVeh == null || nextLinkId == null) return 1;
+		if (previousQVehicle == null || timeGapToPreviousVeh == null || nextLinkId == null) return 1;
 
 		double flowCapPerSecond = link.getFlowCapacityPerSec();
 		double standardMinTimeGap = 1 / flowCapPerSecond;
 
-		if(timeGapToPreviousVeh < standardMinTimeGap * toleratedTimeGapDeviationFactor && //is the time gap between the two vehicles small enough?
-				this.bunchableVehicleTypes.contains(qVehicle.getVehicle().getType()) && //are the two vehicles able to bunch? (i.e. can they communicate or whatever..)
-				this.bunchableVehicleTypes.contains(previousQVehicle.getVehicle().getType()) &&
-				previousQVehicle.getCurrentLink().getId().equals(nextLinkId)){ // do they drive in the same direction?
+		if (timeGapToPreviousVeh < standardMinTimeGap * toleratedTimeGapDeviationFactor && //is the time gap between the two vehicles small enough?
+			this.bunchableVehicleTypes.contains(qVehicle.getVehicle().getType()) && //are the two vehicles able to bunch? (i.e. can they communicate or whatever..)
+			this.bunchableVehicleTypes.contains(previousQVehicle.getVehicle().getType()) &&
+			previousQVehicle.getCurrentLinkId().equals(nextLinkId)) { // do they drive in the same direction?
 
-			if(link.getAttributes().getAttribute("turns") != null){
+			if (link.getAttributes().getAttribute("turns") != null) {
 				Map<String, String> turns = (Map<String, String>) link.getAttributes().getAttribute("turns");
 				String direction = turns.get(nextLinkId.toString());
 				Preconditions.checkNotNull(direction, "could not find toLinkId=" + nextLinkId + " in turns map of link " + link);
 
-				if(direction.equals(TurnDirection.STRAIGHT.toString())){ //bunching only in straight direction
+				if (direction.equals(TurnDirection.STRAIGHT.toString())) { //bunching only in straight direction
 					return impact;
 				}
 			} else {

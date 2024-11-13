@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 
 class VehicularDepartureHandler implements DepartureHandler {
 
-    private static final Logger log = LogManager.getLogger(VehicularDepartureHandler.class);
+	private static final Logger log = LogManager.getLogger(VehicularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 
@@ -47,14 +47,14 @@ class VehicularDepartureHandler implements DepartureHandler {
 	VehicularDepartureHandler(QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes =qsimConfig.getMainModes();
+		this.transportModes = qsimConfig.getMainModes();
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (this.transportModes.contains(agent.getMode())) {
-			if ( agent instanceof MobsimDriverAgent ) {
-				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
+			if (agent instanceof MobsimDriverAgent) {
+				handleCarDeparture(now, (MobsimDriverAgent) agent, linkId);
 				return true;
 			} else {
 				throw new UnsupportedOperationException("wrong agent type to depart on a network mode");
@@ -69,59 +69,59 @@ class VehicularDepartureHandler implements DepartureHandler {
 		// This however caused some problems in some cases, as apparently for taxicabs.
 		// Thus, such trips are now simulated normally.
 		// See MATSIM-233 for details. td apr'14
-		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
+		Id<Vehicle> vehicleId = agent.getPlannedVehicleId();
 		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.teleport) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
-				if ( vehicle==null ) {
+				if (vehicle == null) {
 					// log a maximum of information, to help the user identifying the cause of the problem
-					final String msg = "could not find requested vehicle "+vehicleId+" in simulation for agent "+agent+" with id "+agent.getId()+" on link "+agent.getCurrentLinkId()+" at time "+now+".";
-					log.error( msg );
-					log.error( "Note that, with AgentSource and if the agent starts on a leg, the "
-							+ "vehicle needs to be inserted BEFORE the agent!") ;
-					throw new RuntimeException( msg+" aborting ...") ;
+					final String msg = "could not find requested vehicle " + vehicleId + " in simulation for agent " + agent + " with id " + agent.getId() + " on link " + agent.getCurrentLinkId() + " at time " + now + ".";
+					log.error(msg);
+					log.error("Note that, with AgentSource and if the agent starts on a leg, the "
+						+ "vehicle needs to be inserted BEFORE the agent!");
+					throw new RuntimeException(msg + " aborting ...");
 				}
 				teleportVehicleTo(vehicle, linkId);
 
 				vehicle.setDriver(agent);
-				agent.setVehicle(vehicle) ;
+				agent.setVehicle(vehicle);
 
 				qlink.letVehicleDepart(vehicle);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
-			} else if (vehicleBehavior == VehicleBehavior.wait ) {
+			} else if (vehicleBehavior == VehicleBehavior.wait) {
 				// While we are waiting for our car
 				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {
-				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId + " at time "+ now);
+				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId + " at time " + now);
 			}
 		} else {
 			vehicle.setDriver(agent);
-			agent.setVehicle(vehicle) ;
+			agent.setVehicle(vehicle);
 			qlink.letVehicleDepart(vehicle);
 		}
 	}
 
 	private void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId) {
-		if (vehicle.getCurrentLink() != null) {
+		if (vehicle.getCurrentLinkId() != null) {
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;
-				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
+				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLinkId() + " to link " + linkId);
 				if (cntTeleportVehicle == 9) {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLinkId());
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
-			if ( result==null ) {
-				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 
+			if (result == null) {
+				throw new RuntimeException("Could not remove parked vehicle with id " + vehicle.getId() + " on the link id "
 //						+ linkId
-						+ vehicle.getCurrentLink().getId()
-						+ ".  Maybe it is currently used by someone else?"
-						+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
-						+ "Maybe was never placed onto a link?" );
+					+ vehicle.getCurrentLinkId()
+					+ ".  Maybe it is currently used by someone else?"
+					+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
+					+ "Maybe was never placed onto a link?");
 			}
 		}
 	}

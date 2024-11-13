@@ -150,7 +150,7 @@ public final class QSimCompatibility {
 	/**
 	 * Create a vehicle from a received message.
 	 */
-	public DistributedMobsimVehicle convertVehicle(Message m) {
+	public DistributedMobsimVehicle vehicleFromMessage(Message m) {
 		DistributedAgentSource source = vehicleSources.get(m.getClass());
 		if (source == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
@@ -162,12 +162,11 @@ public final class QSimCompatibility {
 	/**
 	 * Create an agent from a received message.
 	 */
-	public DistributedMobsimAgent convertAgent(Message m) {
+	public DistributedMobsimAgent agentFromMessage(Message m) {
 		DistributedAgentSource source = agentTypes.get(m.getClass());
 		if (source == null) {
 			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
 		}
-
 
 
 		return source.agentFromMessage(m);

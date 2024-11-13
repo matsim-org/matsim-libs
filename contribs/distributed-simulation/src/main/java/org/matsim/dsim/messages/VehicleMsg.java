@@ -10,10 +10,10 @@ import org.matsim.vehicles.Vehicle;
 @Data
 public class VehicleMsg implements Message {
 
-    private final Id<Vehicle> id;
-    private final PersonMsg driver;
+	private final Id<Vehicle> id;
+	private final Message driver;
 
-    private final double pce;
-    private final double maxV;
+	private final double pce;
+	private final double maxV;
 
 }

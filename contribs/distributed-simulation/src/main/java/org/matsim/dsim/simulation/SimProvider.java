@@ -142,23 +142,22 @@ public class SimProvider implements LPProvider {
 		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
 
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, neighbors, part);
-		ActivityEngineReimplementation activityEngine = createActivityEngine(part);
-		TeleportationEngine teleportationEngine = new TeleportationEngine(eventsManager, messaging, config);
+		//ActivityEngineReimplementation activityEngine = createActivityEngine(part);
+		TeleportationEngine teleportationEngine = new TeleportationEngine(eventsManager, messaging, compat);
 		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, compat, messaging, eventsManager, part);
 
 		return new SimProcess(
-			partition, messaging, compat,
-			activityEngine, teleportationEngine, networkTrafficEngine,
+			partition, messaging, compat, teleportationEngine, networkTrafficEngine,
 			eventsManager,
 			config);
 	}
 
-	private ActivityEngineReimplementation createActivityEngine(int part) {
-		var personsOnPartition = scenario.getPopulation().getPersons().values().stream()
-			.filter(p -> startOnPartition(p, part, scenario.getNetwork(), scenario.getActivityFacilities()))
-			.map(p -> assignLinkIds(p, scenario.getNetwork(), scenario.getActivityFacilities()))
-			.map(SimPerson::new)
-			.toList();
-		return new ActivityEngineReimplementation(personsOnPartition, timeInterpretation, eventsManager);
-	}
+//	private ActivityEngineReimplementation createActivityEngine(int part) {
+//		var personsOnPartition = scenario.getPopulation().getPersons().values().stream()
+//			.filter(p -> startOnPartition(p, part, scenario.getNetwork(), scenario.getActivityFacilities()))
+//			.map(p -> assignLinkIds(p, scenario.getNetwork(), scenario.getActivityFacilities()))
+//			.map(SimPerson::new)
+//			.toList();
+//		return new ActivityEngineReimplementation(personsOnPartition, timeInterpretation, eventsManager);
+//	}
 }

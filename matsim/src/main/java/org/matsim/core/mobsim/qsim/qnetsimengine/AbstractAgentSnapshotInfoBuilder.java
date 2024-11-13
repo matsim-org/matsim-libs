@@ -87,17 +87,17 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (MobsimAgent agent : agentsInActivities) {
 
 			var position = builder
-					.setPersonId(agent.getId())
-					.setLinkId(link.getId())
-					.setFromCoord(link.getFromNode().getCoord())
-					.setToCoord(link.getToNode().getCoord())
-					.setDistanceOnLink(link.getLength() * 0.9)
-					.setLinkLength(link.getLength())
-					.setLane(cnt2)
-					.setAgentState(getAgentStateForActivity(agent.getId()))
-					.build();
+				.setPersonId(agent.getId())
+				.setLinkId(link.getId())
+				.setFromCoord(link.getFromNode().getCoord())
+				.setToCoord(link.getToNode().getCoord())
+				.setDistanceOnLink(link.getLength() * 0.9)
+				.setLinkLength(link.getLength())
+				.setLane(cnt2)
+				.setAgentState(getAgentStateForActivity(agent.getId()))
+				.build();
 			positions.add(position);
-			cnt2++ ;
+			cnt2++;
 		}
 		return cnt2;
 	}
@@ -120,36 +120,35 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		var builder = newBuilder();
 
 		var position = builder
-				.setPersonId(driverAgent.getId())
-				.setVehicleId(veh.getId())
-				.setLinkId(veh.getCurrentLink().getId())
-				.setFromCoord(startCoord)
-				.setToCoord(endCoord)
-				.setDistanceOnLink(distanceFromFromNode)
-				.setLane(lane)
-				.setLinkLength(lengthOfCurve)
-				.setAgentState(getAgentState(driverAgent))
-				.setColorValue(speedValueBetweenZeroAndOne)
-				.build();
+			.setPersonId(driverAgent.getId())
+			.setVehicleId(veh.getId())
+			.setLinkId(veh.getCurrentLinkId())
+			.setFromCoord(startCoord)
+			.setToCoord(endCoord)
+			.setDistanceOnLink(distanceFromFromNode)
+			.setLane(lane)
+			.setLinkLength(lengthOfCurve)
+			.setAgentState(getAgentState(driverAgent))
+			.setColorValue(speedValueBetweenZeroAndOne)
+			.build();
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord,
-				endCoord, lengthOfCurve, lane + 5, speedValueBetweenZeroAndOne);
+			endCoord, lengthOfCurve, lane + 5, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
 
 		positions.add(position);
 	}
 
-	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine( Collection<AgentSnapshotInfo> positions,
-									      double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
-									      Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
-									      int numberOfLanesAsInt, Queue<Hole> holes, AbstractQLink.QLinkInternalInterface qLinkInternalInterface )
-	{
-		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
+	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
+																		 double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
+																		 Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
+																		 int numberOfLanesAsInt, Queue<Hole> holes, AbstractQLink.QLinkInternalInterface qLinkInternalInterface) {
+		double spacingOfOnePCE = this.calculateVehicleSpacing(curvedLength, storageCapacity, vehs);
 		// ("vehs" is needed since the link may be more than full because of squeezing.  In this case, spacingOfOnePCE is smaller than one "cell".)
 
-		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H*1000./3600.);
+		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H * 1000. / 3600.);
 
-		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
+		TreeMap<Double, Hole> consumableHoles = new TreeMap<>();
 
 		// holes or kinematicWaves, if applicable:
 
@@ -160,10 +159,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			case withHoles:
 			case withHolesAndShowHoles:
 			case kinematicWaves:
-				if ( !holes.isEmpty() ) {
-					double firstHolePosition = Double.NaN ;
-					double distanceOfHoleFromFromNode = Double.NaN ;
-					double sum = 0 ;
+				if (!holes.isEmpty()) {
+					double firstHolePosition = Double.NaN;
+					double distanceOfHoleFromFromNode = Double.NaN;
+					double sum = 0;
 					for (Hole hole : holes) {
 						sum += hole.getSizeInEquivalents();
 						distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance(ttimeOfHoles, hole, now, curvedLength);
@@ -183,29 +182,30 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 							addHolePosition(positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord);
 						}
 					}
-					final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
+					final double spaceConsumptionOfHoles = sum * spacingOfOnePCE;
 					final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
-					if ( wrnCnt < 10 ) {
-						wrnCnt++ ;
-						if ( spaceConsumptionOfHoles > spaceAvailableForHoles ) {
-							log.warn("we have a problem: holes consume too much space:" ) ;
-							log.warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
-							log.warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
+					if (wrnCnt < 10) {
+						wrnCnt++;
+						if (spaceConsumptionOfHoles > spaceAvailableForHoles) {
+							log.warn("we have a problem: holes consume too much space:");
+							log.warn("summed up space consumption of holes: " + spaceConsumptionOfHoles);
+							log.warn("distance bw first and last hole: " + spaceAvailableForHoles);
 						}
 						if (wrnCnt == 10) {
-							log.warn(Gbl.FUTURE_SUPPRESSED ) ;
+							log.warn(Gbl.FUTURE_SUPPRESSED);
 						}
 					}
 				}
 				break;
-			default: throw new RuntimeException("The traffic dynmics "+scenario.getConfig().qsim().getSnapshotStyle()+" is not implemented yet.");
+			default:
+				throw new RuntimeException("The traffic dynmics " + scenario.getConfig().qsim().getSnapshotStyle() + " is not implemented yet.");
 		}
 
 		// yyyyyy might be faster by sorting holes into a regular array list ...
 
 		double distanceFromFromNode = Double.NaN;
 
-		for ( MobsimVehicle mveh : vehs) {
+		for (MobsimVehicle mveh : vehs) {
 			final QVehicle veh = (QVehicle) mveh;
 
 			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now;
@@ -213,15 +213,15 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 			final double vehicleSpacing = mveh.getSizeInEquivalents() * spacingOfOnePCE;
 
-			double speed = min( freeSpeed, veh.getMaximumVelocity() );
-			if ( qLinkInternalInterface!=null ){
-				speed = qLinkInternalInterface.getMaximumVelocityFromLinkSpeedCalculator( veh, now );
+			double speed = min(freeSpeed, veh.getMaximumVelocity());
+			if (qLinkInternalInterface != null) {
+				speed = qLinkInternalInterface.getMaximumVelocityFromLinkSpeedCalculator(veh, now);
 			}
 
 			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(
-					now, curvedLength,
-					speed, // min( freeSpeed, veh.getMaximumVelocity()),
-					vehicleSpacing, distanceFromFromNode, remainingTravelTime
+				now, curvedLength,
+				speed, // min( freeSpeed, veh.getMaximumVelocity()),
+				vehicleSpacing, distanceFromFromNode, remainingTravelTime
 			);
 			// yyyy if the LinkSpeedCalculator says something that is not free speed, we are out of luck here.  kai, jan'23
 
@@ -236,12 +236,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					break;
 				case withHoles:
 				case kinematicWaves:
-					while ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
-						Map.Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
-						distanceFromFromNode -= spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+					while (!consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey()) {
+						Map.Entry<Double, Hole> entry = consumableHoles.pollLastEntry();
+						distanceFromFromNode -= spacingOfOnePCE * entry.getValue().getSizeInEquivalents();
 					}
 					break;
-				default: throw new RuntimeException("The traffic dynmics "+this.scenario.getConfig().qsim().getTrafficDynamics()+" is not implemented yet.");
+				default:
+					throw new RuntimeException("The traffic dynmics " + this.scenario.getConfig().qsim().getTrafficDynamics() + " is not implemented yet.");
 			}
 		}
 
@@ -256,26 +257,26 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
 	abstract double calculateOdometerDistanceFromFromNode(double time, double linkLength, double freespeed,
-			double spacing, double prevVehicleDistance, double remainingTravelTime);
+														  double spacing, double prevVehicleDistance, double remainingTravelTime);
 
 	private int positionStack(final Collection<AgentSnapshotInfo> positions, final Collection<QVehicle> vehicles, final int startCount) {
 		var builder = newBuilder();
 
 		var counter = startCount;
 		for (var vehicle : vehicles) {
-			var link = vehicle.getCurrentLink();
+			var link = scenario.getNetwork().getLinks().get(vehicle.getCurrentLinkId());
 			for (var passenger : VisUtils.getPeopleInVehicle(vehicle)) {
 				var position = builder
-						.setPersonId(passenger.getId())
-						.setVehicleId(vehicle.getId())
-						.setLinkId(link.getId())
-						.setFromCoord(link.getFromNode().getCoord())
-						.setToCoord(link.getToNode().getCoord())
-						.setDistanceOnLink(link.getLength() * 0.9)
-						.setLane(counter)
-						.setLinkLength(link.getLength())
-						.setAgentState(getAgentState(passenger))
-						.build();
+					.setPersonId(passenger.getId())
+					.setVehicleId(vehicle.getId())
+					.setLinkId(link.getId())
+					.setFromCoord(link.getFromNode().getCoord())
+					.setToCoord(link.getToNode().getCoord())
+					.setDistanceOnLink(link.getLength() * 0.9)
+					.setLane(counter)
+					.setLinkLength(link.getLength())
+					.setAgentState(getAgentState(passenger))
+					.build();
 				positions.add(position);
 				counter++;
 			}
@@ -294,17 +295,17 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (PassengerAgent passenger : passengers) {
 			int lanePos = laneInt - 2 * cnt;
 			var passengerPosition = builder
-					.setPersonId(passenger.getId())
-					.setVehicleId(passenger.getVehicle().getId())
-					.setLinkId(passenger.getCurrentLinkId())
-					.setFromCoord(startCoord)
-					.setToCoord(endCoord)
-					.setDistanceOnLink(distanceOnLink)
-					.setLane(lanePos)
-					.setLinkLength(lengthOfCurve)
-					.setColorValue(speedValueBetweenZeroAndOne)
-					.setAgentState(getAgentState(passenger))
-					.build();
+				.setPersonId(passenger.getId())
+				.setVehicleId(passenger.getVehicle().getId())
+				.setLinkId(passenger.getCurrentLinkId())
+				.setFromCoord(startCoord)
+				.setToCoord(endCoord)
+				.setDistanceOnLink(distanceOnLink)
+				.setLane(lanePos)
+				.setLinkLength(lengthOfCurve)
+				.setColorValue(speedValueBetweenZeroAndOne)
+				.setAgentState(getAgentState(passenger))
+				.build();
 
 			positions.add(passengerPosition);
 			cnt--;
@@ -318,17 +319,17 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		var builder = newBuilder();
 
 		var position = builder
-				.setPersonId(Id.createPersonId("hole"))
-				.setVehicleId(Id.createVehicleId(veh.getId()))
-				.setLinkId(null)
-				.setFromCoord(upstreamCoord)
-				.setToCoord(downstreamCoord)
-				.setDistanceOnLink(distanceFromFromNode)
-				.setLane(lane)
-				.setLinkLength(curvedLength)
-				.setColorValue(speedValue)
-				.setAgentState(AgentState.PERSON_OTHER_MODE)
-				.build();
+			.setPersonId(Id.createPersonId("hole"))
+			.setVehicleId(Id.createVehicleId(veh.getId()))
+			.setLinkId(null)
+			.setFromCoord(upstreamCoord)
+			.setToCoord(downstreamCoord)
+			.setDistanceOnLink(distanceFromFromNode)
+			.setLane(lane)
+			.setLinkLength(curvedLength)
+			.setColorValue(speedValue)
+			.setAgentState(AgentState.PERSON_OTHER_MODE)
+			.build();
 		positions.add(position);
 	}
 

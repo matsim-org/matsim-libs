@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.ArrayDeque;
@@ -174,6 +173,7 @@ public interface SimLink {
 			var duration = distanceToTravel / speed;
 			var earliestExitTime = now + duration;
 			vehicle.setEarliestLinkExitTime(earliestExitTime);
+			vehicle.setCurrentLinkId(id);
 
 			switch (position) {
 				case QStart, QEnd -> q.add(vehicle, position);

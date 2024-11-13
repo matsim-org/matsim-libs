@@ -1,12 +1,11 @@
 package org.matsim.api;
 
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.messages.SimStepMessage;
 
-public interface SimEngine extends Steppable {
+public interface DistributedMobsimEngine extends Steppable {
 
 	/**
 	 * @param person person to accept

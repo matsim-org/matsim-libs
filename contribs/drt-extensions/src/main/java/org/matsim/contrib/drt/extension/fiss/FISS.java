@@ -42,27 +42,25 @@ import java.util.Random;
 
 /**
  * FISS Flow-inflated selective sampling (working title).
- *
+ * <p>
  * The aim is to only assign a specified fraction of vehicular agents and teleport the rest.
  * This is achieved by making use of a VehicularDepartureHandler (so far not enforced, as the
  * implementation is not exposed, so in theory could be any DepartureHandler) and a TeleportationEngine.
  * Both used as delegates.
- *
+ * <p>
  * Transit driver agents are always assigned. In addition does not handle DynAgents (e.g., DVRP agents)
- *
- *
+ * <p>
+ * <p>
  * Also implements MobsimEngine to delegate required teleportation steps (such as arrivals).
  *
- *
  * @author nkuehnel / MOIA, hrewald
- *
  */
 public class FISS implements DepartureHandler, MobsimEngine {
 
 	private static final Logger LOG = LogManager.getLogger(FISS.class);
 
 	private final QNetsimEngineI qNetsimEngine;
-    private final DepartureHandler delegate;
+	private final DepartureHandler delegate;
 	private final FISSConfigGroup fissConfigGroup;
 	private final TeleportationEngine teleport;
 	private final Network network;
@@ -73,9 +71,9 @@ public class FISS implements DepartureHandler, MobsimEngine {
 
 
 	FISS(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-			TravelTime travelTime) {
+		 TravelTime travelTime) {
 		this.qNetsimEngine = qNetsimEngine;
-        this.delegate = qNetsimEngine.getDepartureHandler();
+		this.delegate = qNetsimEngine.getDepartureHandler();
 		this.fissConfigGroup = fissConfigGroup;
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		this.travelTime = travelTime;
@@ -84,8 +82,8 @@ public class FISS implements DepartureHandler, MobsimEngine {
 		this.matsimServices = matsimServices;
 	}
 
-    @Override
-    public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (this.fissConfigGroup.sampledModes.contains(agent.getMode())) {
 			if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
 				return delegate.handleDeparture(now, agent, linkId);
@@ -97,17 +95,17 @@ public class FISS implements DepartureHandler, MobsimEngine {
 						NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 						Person person = planAgent.getCurrentPlan().getPerson();
 						Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
-								.get(networkRoute.getVehicleId());
+							.get(networkRoute.getVehicleId());
 
 						// update travel time with travel times of last iteration
 						double newTravelTime = 0.0;
 						// start and end link are not considered in NetworkRoutingModule for travel time
 						for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
 							newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-									now + newTravelTime, person, vehicle);
+								now + newTravelTime, person, vehicle);
 						}
 						LOG.debug("New travelTime: {}, was {}", newTravelTime,
-								networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
+							networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 						networkRoute.setTravelTime(newTravelTime);
 					}
 					// remove vehicle of teleported agent from parking spot
@@ -119,12 +117,12 @@ public class FISS implements DepartureHandler, MobsimEngine {
 						removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
 						if (removedVehicle == null) {
 							throw new RuntimeException(
-									"Could not remove parked vehicle with id " + vehicleId + " on the link id "
+								"Could not remove parked vehicle with id " + vehicleId + " on the link id "
 									// + linkId
-											+ vehicle.getCurrentLink().getId()
-											+ ".  Maybe it is currently used by someone else?"
-											+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
-											+ "Maybe was never placed onto a link?");
+									+ vehicle.getCurrentLinkId()
+									+ ".  Maybe it is currently used by someone else?"
+									+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
+									+ "Maybe was never placed onto a link?");
 						}
 					}
 					boolean result = teleport.handleDeparture(now, agent, linkId);
@@ -132,7 +130,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 					if (removedVehicle != null) {
 						Id<Link> destinationLinkId = agent.getDestinationLinkId();
 						QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork()
-								.getNetsimLink(destinationLinkId);
+							.getNetsimLink(destinationLinkId);
 						qLinkDest.addParkedVehicle(removedVehicle);
 					}
 					return result;
@@ -157,7 +155,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
 		for (String sampledQsimModes : fissConfigGroup.sampledModes) {
-			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes,VehicleType.class));
+			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes, VehicleType.class));
 			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.sampleFactor);
 		}
 	}
