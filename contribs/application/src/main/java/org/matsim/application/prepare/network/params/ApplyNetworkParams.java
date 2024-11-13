@@ -53,8 +53,8 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--model", description = "Reference to the network model class", required = true)
 	private Class<? extends NetworkModel> modelClazz;
 
-	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound). " +
-		"Can be negative to indicate absolute speed bounds", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower, upper bound). " +
+		"Can be negative to indicate absolute speed bounds (in km/h)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
 	private double[] speedFactorBounds;
 
 	@CommandLine.Option(names = "--capacity-bounds", split = ",", defaultValue = "0.4,0.6,0.8",
