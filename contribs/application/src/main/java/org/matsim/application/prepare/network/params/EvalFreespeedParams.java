@@ -132,11 +132,11 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 					double freespeed = allowedSpeed * speedFactor;
 
 					// Check absolute bounds on the freespeed
-					if (speedFactorBounds[0] < 0 && freespeed > -speedFactorBounds[0]/3.6) {
+					if (speedFactorBounds[0] < 0 && freespeed < -speedFactorBounds[0]/3.6) {
 						freespeed = -speedFactorBounds[0]/3.6;
 						speedFactor = freespeed / allowedSpeed;
 					}
-					if (speedFactorBounds[1] < 0 && freespeed < -speedFactorBounds[1]/3.6) {
+					if (speedFactorBounds[1] < 0 && freespeed > -speedFactorBounds[1]/3.6) {
 						freespeed = -speedFactorBounds[1]/3.6;
 						speedFactor = freespeed / allowedSpeed;
 					}
