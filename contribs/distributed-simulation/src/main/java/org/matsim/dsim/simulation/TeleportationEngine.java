@@ -10,12 +10,10 @@ import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.Teleportation;
 
 
 import java.util.*;
 
-@RequiredArgsConstructor
 @Log4j2
 public class TeleportationEngine implements DistributedMobsimEngine {
 
@@ -52,7 +50,7 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
 		for (var teleportation : stepMessage.getTeleportationMsgs()) {
-			var exitTime = teleportation.getExitTime();
+			var exitTime = teleportation.exitTime();
 			if (exitTime < now) {
 				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +
 					exitTime + " but simulation time is already at: " + now + ". This might happen, if partitions " +
@@ -60,7 +58,7 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 					" error might be an indicator, that the speed of the teleported leg is too fast.");
 			}
 
-			var agent = qsimCompatibility.agentFromMessage(teleportation.getPersonMessage());
+			var agent = qsimCompatibility.agentFromMessage(teleportation.personMessage());
 			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
 		}
 	}
