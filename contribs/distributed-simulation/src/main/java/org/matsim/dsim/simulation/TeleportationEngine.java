@@ -67,10 +67,10 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 	public void doSimStep(double now) {
 
 		while (firstPersonReady(now)) {
-			var entry = personsTeleporting.remove();
-			var person = entry.person();
-			var mode = person.getMode();
-			var distance = person.getExpectedTravelDistance();
+			TeleportationEntry entry = personsTeleporting.remove();
+			DistributedMobsimAgent person = entry.person();
+			String mode = person.getMode();
+			Double distance = person.getExpectedTravelDistance();
 			em.processEvent(new TeleportationArrivalEvent(now, person.getId(), distance, mode));
 
 			person.endLegAndComputeNextState(now);

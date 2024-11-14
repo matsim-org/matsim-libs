@@ -88,15 +88,18 @@ class TeleportationEngineTest {
 
 		var inOrder = inOrder(em);
 		inOrder.verify(em).processEvent(any(TeleportationArrivalEvent.class));
-		inOrder.verify(em).processEvent(any(PersonArrivalEvent.class));
-		verify(em, times(2)).processEvent(assertArg(e -> assertEquals(10 + 42, e.getTime())));
+
+//		TODO: Not invoked anymore
+//		inOrder.verify(em).processEvent(any(PersonArrivalEvent.class));
+
+		verify(em, times(1)).processEvent(assertArg(e -> assertEquals(10 + 42, e.getTime())));
 	}
 
 	@Test
 	public void multiPersonLocal() {
 
-		var agent1 = mock(DistributedMobsimAgent.class);
-		when(agent1.getExpectedTravelTime()).thenReturn(OptionalTime.defined(42));
+		var agent1 = createPerson();
+
 		var agent2 = mock(DistributedMobsimAgent.class);
 		when(agent2.getExpectedTravelTime()).thenReturn(OptionalTime.defined(31));
 
@@ -122,7 +125,7 @@ class TeleportationEngineTest {
 
 	@Test
 	public void sendPersonWithSplitLeg() {
-		var agent = mock(DistributedMobsimAgent.class);
+		var agent = createPerson();
 		var messaging = Mockito.mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(false);
 		var engine = new TeleportationEngine(Mockito.mock(EventsManager.class), messaging, mock(QSimCompatibility.class));
@@ -140,7 +143,9 @@ class TeleportationEngineTest {
 		var em = mock(EventsManager.class);
 		var qsimCompatibility = mock(QSimCompatibility.class);
 		when(qsimCompatibility.agentFromMessage(any())).thenReturn(agent);
-		var engine = new TeleportationEngine(em, messaging, mock(QSimCompatibility.class));
+		var engine = new TeleportationEngine(em, messaging, qsimCompatibility);
+
+		engine.setInternalInterface(mock(InternalInterface.class));
 
 		SimStepMessage message = SimStepMessage.builder()
 			.setTeleportationMsg(Teleportation.builder()

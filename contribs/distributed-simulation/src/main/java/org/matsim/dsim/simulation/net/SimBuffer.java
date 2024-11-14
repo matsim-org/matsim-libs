@@ -57,6 +57,6 @@ class SimBuffer {
 
 
 	boolean isStuck(double now) {
-		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold < now;
+		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold <= now;
 	}
 }

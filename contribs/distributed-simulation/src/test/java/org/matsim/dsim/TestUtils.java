@@ -136,8 +136,8 @@ public class TestUtils {
             assertInstanceOf(Event.class, firstArg);
             var event = (Event) firstArg;
             var expectedEvent = expectedEvents.removeFirst();
-            assertEquals(expectedEvent.getTime(), event.getTime());
-            assertEquals(expectedEvent.getType(), event.getType());
+
+			assertEquals(expectedEvent, event);
             return null;
         }).when(result).processEvent(any());
         return result;

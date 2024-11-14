@@ -32,7 +32,7 @@ public class ThreeLinkIntegrationTest {
     MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
-    void oneAgentOneThreads() throws URISyntaxException {
+    void oneAgentOneThread() throws URISyntaxException {
 
         var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
         var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());

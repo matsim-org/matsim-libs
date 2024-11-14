@@ -26,13 +26,16 @@ class SimBufferTest {
 		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), stuckThreshold);
         var vehicle = TestUtils.createVehicle("vehicle-1", 10, 10);
 
-        // push vehicle which consumes flow capacity and starts the stuck timer of the vehicle.
+        // push vehicle which consumes flow capacity and starts the stuck timer
 		assertTrue(buffer.isAvailable(0));
         buffer.add(vehicle, 0);
 		assertFalse(buffer.isAvailable(0));
         assertEquals(vehicle.getSizeInEquivalents(), buffer.getPceInBuffer());
         assertFalse(buffer.isStuck(0));
         assertTrue(buffer.isStuck(stuckThreshold));
+
+		// Remove the vehicle
+		buffer.pollFirst();
 
         // make sure that flow capacity is rebuild slowly
         var now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity() - 1;

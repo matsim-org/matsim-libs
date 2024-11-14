@@ -109,8 +109,7 @@ public class ActiveNodes implements Steppable {
 		SimLink nextLink = outLinks.get(nextLinkId);
 		assert nextLink != null : "Next link %s not found in outLinks".formatted(nextLinkId);
 
-		//TODO implement stuck timer
-		return nextLink.isAccepting(SimLink.LinkPosition.QStart, now); //|| vehicle.isStuck(now);
+		return nextLink.isAccepting(SimLink.LinkPosition.QStart, now) || inLink.isStuck(now);
 	}
 
 	private void move(SimLink inLink, DistributedMobsimVehicle vehicle, Map<Id<Link>, SimLink> outLinks, double now) {

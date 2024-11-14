@@ -13,6 +13,7 @@ import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.messages.SimStepMessage;
+import org.matsim.dsim.messages.VehicleContainer;
 import org.mockito.ArgumentCaptor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,15 +80,15 @@ class SimStepMessagingTest {
         var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
 
         var remotePerson = mock(DistributedMobsimAgent.class);
-        when(remotePerson.getCurrentLinkId()).thenReturn(Id.createLinkId("l3"));
+        when(remotePerson.getDestinationLinkId()).thenReturn(Id.createLinkId("l3"));
         when(remotePerson.toMessage()).thenReturn(Empty.INSTANCE);
 
         var neighborPerson = mock(DistributedMobsimAgent.class);
-        when(neighborPerson.getCurrentLinkId()).thenReturn(Id.createLinkId("l2"));
+        when(neighborPerson.getDestinationLinkId()).thenReturn(Id.createLinkId("l2"));
         when(neighborPerson.toMessage()).thenReturn(Empty.INSTANCE);
 
 		var localPerson = mock(DistributedMobsimAgent.class);
-        when(localPerson.getCurrentLinkId()).thenReturn(Id.createLinkId("l1"));
+        when(localPerson.getDestinationLinkId()).thenReturn(Id.createLinkId("l1"));
         when(localPerson.toMessage()).thenReturn(Empty.INSTANCE);
 
         messaging.collectTeleportation(remotePerson, 10);
@@ -113,6 +114,7 @@ class SimStepMessagingTest {
         var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
         var vehicle = mock(DistributedMobsimVehicle.class);
 
+		when(qsim.vehicleToContainer(any())).thenReturn(VehicleContainer.builder().setVehicle(Empty.INSTANCE).build());
         when(vehicle.getCurrentLinkId()).thenReturn(Id.createLinkId("l2"));
         when(vehicle.toMessage()).thenReturn(Empty.INSTANCE);
 
@@ -123,8 +125,7 @@ class SimStepMessagingTest {
         verify(messageBroker, times(1)).send(assertArg(message -> {
             var simStepMessage = (SimStepMessage) message;
             assertEquals(1, simStepMessage.getVehicleMsgsCount());
-			// TODO: will break
-            assertEquals(Empty.INSTANCE, simStepMessage.getVehicles().getFirst());
+            assertEquals(Empty.INSTANCE, simStepMessage.getVehicles().getFirst().getVehicle());
 
         }), anyInt());
     }

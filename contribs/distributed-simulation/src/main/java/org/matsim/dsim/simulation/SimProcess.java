@@ -195,8 +195,9 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	public void arrangeNextAgentState(MobsimAgent agent) {
 
 		if (!(agent instanceof DistributedMobsimAgent dma)) {
-			throw new IllegalArgumentException("Distributed Simulation only works with DistributedMobsimAgent implementations. Even though the interface" +
-				" only requires MobsimAgent");
+			throw new IllegalArgumentException(
+				"Distributed Simulation only works with DistributedMobsimAgent implementations. " +
+					"Even though the interface only requires MobsimAgent. Provided agent is of type: " + agent.getClass());
 		}
 
 		switch (agent.getState()) {

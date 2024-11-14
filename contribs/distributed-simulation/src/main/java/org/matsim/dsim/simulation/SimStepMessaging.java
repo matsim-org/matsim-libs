@@ -100,7 +100,7 @@ public interface SimStepMessaging {
 
 		public void collectVehicle(DistributedMobsimVehicle simVehicle) {
 
-			Id<Link> currentLinkId = simVehicle.getDriver().getCurrentLinkId();
+			Id<Link> currentLinkId = simVehicle.getCurrentLinkId();
 			int targetPart = part2Link.getInt(currentLinkId);
 			msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
 				.setVehicle(qsim.vehicleToContainer(simVehicle));
