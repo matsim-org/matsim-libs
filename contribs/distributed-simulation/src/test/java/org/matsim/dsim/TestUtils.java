@@ -6,10 +6,15 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.dsim.messages.PersonMsg;
 import org.matsim.dsim.simulation.SimPerson;
+import org.matsim.dsim.simulation.SimpleAgent;
+import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.dsim.simulation.net.BasicSimVehicle;
+import org.matsim.dsim.simulation.net.SimLink;
 import org.matsim.dsim.simulation.net.SimVehicle;
 
 import java.util.List;
@@ -22,6 +27,12 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 public class TestUtils {
+
+	public static SimLink createLink(Link link, int part, double stuckTime) {
+		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
+		defaultQsimConfig.setStuckTime(stuckTime);
+		return SimLink.create(link, (_, _, _) -> SimLink.OnLeaveQueueInstruction.MoveToBuffer, defaultQsimConfig, 7.5, part);
+	}
 
     public static Link createSingleLink() {
         var f = NetworkUtils.createNetwork().getFactory();
@@ -95,16 +106,27 @@ public class TestUtils {
         return network;
     }
 
-    public static SimVehicle createVehicle() {
-        return createVehicle("vehicle", 1, 50, 30);
+	public static SimpleAgent createAgent(String id) {
+		return SimpleAgent.builder()
+				.setId(Id.createPersonId(id))
+				.build();
+	}
+
+    public static SimpleVehicle createVehicle() {
+        return createVehicle("vehicle", 1, 50);
     }
 
-    public static SimVehicle createVehicle(String id, double pce, double maxV, double stuckThreshold) {
-        return new BasicSimVehicle(
-                Id.createVehicleId(id),
-                new SimPerson(PersonMsg.builder().setId(Id.createPersonId("person")).build()),
-                pce, maxV, stuckThreshold
-        );
+	public static SimpleVehicle createVehicle(String id, double pce, double maxV) {
+		return createVehicle(id, createAgent("driver"), pce, maxV);
+	}
+
+    public static SimpleVehicle createVehicle(String id, SimpleAgent driver, double pce, double maxV) {
+        return SimpleVehicle.builder()
+				.setId(Id.createVehicleId(id))
+				.setDriver(driver)
+				.setMaximumVelocity(maxV)
+				.setSizeInEquivalents(pce)
+				.build();
     }
 
     public static EventsManager mockExpectingEventsManager(List<Event> expectedEvents) {

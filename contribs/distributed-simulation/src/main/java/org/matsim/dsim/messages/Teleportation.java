@@ -7,5 +7,4 @@ import org.matsim.api.core.v01.Message;
 
 @Builder(setterPrefix = "set")
 public record Teleportation(Message personMessage, double exitTime) {
-
 }

@@ -3,9 +3,11 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.dsim.simulation.SimpleLeg;
 
 import java.util.List;
@@ -25,21 +27,20 @@ class Wait2LinkTest {
         var wait2link = new Wait2Link(em, activeLinks);
         var link = TestUtils.createSingleLink(0, 0);
         link.setCapacity(3600);
-        var simLink = SimLink.create(link, 0);
-        var simPerson1 = mock(SimPerson.class);
-        when(simPerson1.getRouteElement(any())).thenReturn(Id.createLinkId("any-next-link"));
-        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
-        var simPerson2 = mock(SimPerson.class);
-        when(simPerson2.getRouteElement(any())).thenReturn(null);
-        var simVehicle1 = new BasicSimVehicle(
-                Id.createVehicleId("veh-1"), simPerson1, 2, 1, 1
-        );
-        var simVehicle2 = new BasicSimVehicle(
-                Id.createVehicleId("veh-2"), simPerson1, 2, 1, 1
-        );
-        var blockingVehicle = new BasicSimVehicle(
-                Id.createVehicleId("blocking-vehicle"), simPerson2, 2, 1, 1
-        );
+        var simLink = TestUtils.createLink(link, 0, 10);
+        var simPerson1 = mock(SimpleAgent.class);
+
+        when(simPerson1.chooseNextLinkId()).thenReturn(Id.createLinkId("any-next-link"));
+
+		// TODO: leg won't be defined
+//        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
+
+        var simPerson2 = mock(SimpleAgent.class);
+        when(simPerson2.chooseNextLinkId()).thenReturn(null);
+        var simVehicle1 = TestUtils.createVehicle("veh-1", simPerson1, 2, 1);
+        var simVehicle2 = TestUtils.createVehicle("veh-2", simPerson1, 2, 1);
+        var blockingVehicle = TestUtils.createVehicle("blocking-vehicle", simPerson2, 2, 1);
+
         simLink.pushVehicle(blockingVehicle, SimLink.LinkPosition.Buffer, 0);
 
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
@@ -80,21 +81,18 @@ class Wait2LinkTest {
         var wait2link = new Wait2Link(em, activeLinks);
         var link = TestUtils.createSingleLink(0, 0);
         link.setCapacity(3600);
-        var simLink = SimLink.create(link, 0);
-        var simPerson1 = mock(SimPerson.class);
-        when(simPerson1.getRouteElement(any())).thenReturn(null);
-        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
-        var simPerson2 = mock(SimPerson.class);
-        when(simPerson2.getRouteElement(any())).thenReturn(null);
-        var simVehicle1 = new BasicSimVehicle(
-                Id.createVehicleId("veh-1"), simPerson1, 2, 1, 1
-        );
-        var simVehicle2 = new BasicSimVehicle(
-                Id.createVehicleId("veh-2"), simPerson1, 2, 1, 1
-        );
-        var blockingVehicle = new BasicSimVehicle(
-                Id.createVehicleId("blocking-vehicle"), simPerson2, 100, 1, 1
-        );
+        var simLink = TestUtils.createLink(link, 0, 1);
+        var simPerson1 = mock(SimpleAgent.class);
+        when(simPerson1.chooseNextLinkId()).thenReturn(null);
+//        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
+
+        var simPerson2 = mock(SimpleAgent.class);
+        when(simPerson2.chooseNextLinkId()).thenReturn(null);
+
+        var simVehicle1 = TestUtils.createVehicle("veh-1", simPerson1, 2, 1);
+        var simVehicle2 = TestUtils.createVehicle("veh-2", simPerson1, 2, 1);
+        var blockingVehicle = TestUtils.createVehicle("blocking-vehicle", simPerson2, 100, 1);
+
         simLink.pushVehicle(blockingVehicle, SimLink.LinkPosition.QEnd, 0);
 
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
@@ -133,19 +131,17 @@ class Wait2LinkTest {
         link1.setCapacity(3600);
         var link2 = TestUtils.createSingleLink(0, 0);
         link2.setCapacity(3600);
-        var simLink1 = SimLink.create(link1, 0);
-        var simLink2 = SimLink.create(link2, 0);
-        var simPerson1 = mock(SimPerson.class);
-        when(simPerson1.getRouteElement(any())).thenReturn(Id.createLinkId("some-element"));
-        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
-        var simPerson2 = mock(SimPerson.class);
-        when(simPerson2.getRouteElement(any())).thenReturn(null);
-        var simVehicle1 = new BasicSimVehicle(
-                Id.createVehicleId("veh-1"), simPerson1, 2, 1, 1
-        );
-        var simVehicle2 = new BasicSimVehicle(
-                Id.createVehicleId("veh-2"), simPerson1, 2, 1, 1
-        );
+        var simLink1 = TestUtils.createLink(link1, 0, 1);
+        var simLink2 = TestUtils.createLink(link2, 0, 1);
+        var simPerson1 = mock(SimpleAgent.class);
+        when(simPerson1.chooseNextLinkId()).thenReturn(Id.createLinkId("some-element"));
+//        when(simPerson1.getCurrentLeg()).thenReturn(SimpleLeg.builder().setMode("some-mode").build());
+
+        var simPerson2 = mock(SimpleAgent.class);
+        when(simPerson2.chooseNextLinkId()).thenReturn(null);
+
+        var simVehicle1 = TestUtils.createVehicle("veh-1", simPerson1, 2, 1);
+		var simVehicle2 = TestUtils.createVehicle("veh-2", simPerson1, 2, 1);
 
         assertFalse(simLink1.isOffering());
         assertFalse(simLink2.isOffering());

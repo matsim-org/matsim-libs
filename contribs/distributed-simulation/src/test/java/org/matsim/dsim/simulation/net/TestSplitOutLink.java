@@ -15,7 +15,7 @@ public class TestSplitOutLink {
     public void init() {
         var toPart = 42;
         var link = TestUtils.createSingleLink(0, toPart);
-        var simLink = SimLink.create(link, 0);
+        var simLink = TestUtils.createLink(link, 0, 10);
 
         assertInstanceOf(SimLink.SplitOutLink.class, simLink);
         assertEquals(link.getId(), simLink.getId());
@@ -50,9 +50,9 @@ public class TestSplitOutLink {
 
         // the link can take 2 vehicles. Push two and test whether there is space left.
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50, 30), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50, 30), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 	}
 
@@ -70,14 +70,14 @@ public class TestSplitOutLink {
 		// push one vehicle which consumes inflow capacity
 		var now = 0;
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
-		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50, 30), SimLink.LinkPosition.QStart, now);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
 		// inflow is restored after 4 seconds
 		now = 4;
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
 
 		// push another vehicle
-		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50, 30), SimLink.LinkPosition.QStart, now);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
 		// inflow is restored after 4 seconds, but storage capacity is exhausted
 		now = 8;
@@ -90,8 +90,8 @@ public class TestSplitOutLink {
 		var config = ConfigUtils.createConfig();
 		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 50, 0);
 
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50, 30), SimLink.LinkPosition.QStart, 0);
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50, 30), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
 
         // call do sim step, which should pass vehicles to the messagin
         var messaging = mock(SimStepMessaging.class);

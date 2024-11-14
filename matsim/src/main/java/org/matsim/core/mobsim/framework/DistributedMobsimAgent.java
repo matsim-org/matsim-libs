@@ -33,6 +33,8 @@
 	  */
 	 Message toMessage();
 
+	 // TODO we want to keep this?
+	 @Deprecated
 	 void computeNextAction(double now);
 
  }

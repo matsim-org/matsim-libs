@@ -1,5 +1,7 @@
 package org.matsim.dsim.simulation.net;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import lombok.Getter;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 
@@ -9,7 +11,11 @@ import java.util.Queue;
 class SimBuffer {
 
 	private final Queue<DistributedMobsimVehicle> internalBuffer;
+	private final DoubleArrayFIFOQueue arrivalTimes = new DoubleArrayFIFOQueue();
+
+
 	private final FlowCapacity flowCap;
+	private final double stuckThreshold;
 
 	@Getter
 	private double pceInBuffer = 0;
@@ -18,26 +24,25 @@ class SimBuffer {
 		return flowCap.getMax();
 	}
 
-	SimBuffer(FlowCapacity outflowCapacity) {
-		var minCapacity = Math.max(1, outflowCapacity.getMax());
+	SimBuffer(FlowCapacity outflowCapacity, double stuckThreshold) {
+		this.stuckThreshold = stuckThreshold;
+		double minCapacity = Math.max(1, outflowCapacity.getMax());
 		this.internalBuffer = new ArrayDeque<>((int) minCapacity);
 		this.flowCap = outflowCapacity;
 	}
 
 	void add(DistributedMobsimVehicle vehicle, double now) {
 		// TODO add flow efficiency
-		//TODO implement stuck timer elsewhere
-		//vehicle.startStuckTimer(now);
 		this.flowCap.consume(vehicle.getSizeInEquivalents());
 		this.pceInBuffer += vehicle.getSizeInEquivalents();
 		this.internalBuffer.add(vehicle);
+		this.arrivalTimes.enqueue(now);
 	}
 
 	DistributedMobsimVehicle pollFirst() {
-		var result = this.internalBuffer.remove();
+		DistributedMobsimVehicle result = this.internalBuffer.remove();
 		this.pceInBuffer -= result.getSizeInEquivalents();
-		//TODO implement stuck time elsewhere
-		//result.resetStuckTimer();
+		this.arrivalTimes.dequeueDouble();
 		return result;
 	}
 
@@ -48,5 +53,10 @@ class SimBuffer {
 	boolean isAvailable(double now) {
 		flowCap.update(now);
 		return pceInBuffer < flowCap.getMax() && flowCap.isAvailable();
+	}
+
+
+	boolean isStuck(double now) {
+		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold < now;
 	}
 }

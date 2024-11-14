@@ -2,7 +2,6 @@ package org.matsim.dsim.simulation.net;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.dsim.messages.VehicleMsg;
 import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.vehicles.Vehicle;
 
@@ -37,5 +36,5 @@ public interface SimVehicle {
     void resetStuckTimer();
 
     // transform
-    VehicleMsg toMessage();
+//    VehicleMsg toMessage();
 }

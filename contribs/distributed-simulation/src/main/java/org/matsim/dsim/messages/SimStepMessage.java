@@ -22,7 +22,7 @@ public class SimStepMessage implements Message {
 	private final List<Teleportation> teleportationMsgs;
 
 	@Singular
-	private final List<Message> vehicleMsgs;
+	private final List<VehicleContainer> vehicles;
 
 	public int getCapacityUpdateMsgsCount() {
 		return this.capacityUpdates.size();
@@ -33,6 +33,6 @@ public class SimStepMessage implements Message {
 	}
 
 	public int getVehicleMsgsCount() {
-		return this.vehicleMsgs.size();
+		return this.vehicles.size();
 	}
 }

@@ -21,11 +21,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
+import org.matsim.dsim.messages.VehicleContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Log4j2
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
@@ -65,7 +67,10 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		}
 
 		// place person into vehicle
-		DistributedMobsimVehicle mobsimVehicle = parkedVehicles.remove(driver.getPlannedVehicleId());
+		DistributedMobsimVehicle mobsimVehicle = Objects.requireNonNull(
+			parkedVehicles.remove(driver.getPlannedVehicleId()),
+			() -> "Vehicle not found: " + driver.getPlannedVehicleId()
+		);
 		driver.setVehicle(mobsimVehicle);
 		mobsimVehicle.setDriver(driver);
 
@@ -80,24 +85,17 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
-		for (var vehicleMessage : stepMessage.getVehicleMsgs()) {
+		for (VehicleContainer vehicleMessage : stepMessage.getVehicles()) {
 			processVehicleMessage(vehicleMessage, now);
 		}
-		for (var updateMessage : stepMessage.getCapacityUpdates()) {
+
+		for (CapacityUpdate updateMessage : stepMessage.getCapacityUpdates()) {
 			processUpdateMessage(updateMessage);
 		}
 	}
 
-	private void processVehicleMessage(Message vehicleMessage, double now) {
-		var vehicle = qSimCompatibility.vehicleFromMessage(vehicleMessage);
-
-		var driver = switch (vehicleMessage) {
-			case QVehicleMessage qm -> qSimCompatibility.agentFromMessage(qm);
-			default -> throw new UnsupportedOperationException("Only QVehicleMessage is supported at the moment.");
-		};
-
-		vehicle.setDriver((DriverAgent) driver);
-		((DriverAgent) driver).setVehicle(vehicle);
+	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
+		DistributedMobsimVehicle vehicle = qSimCompatibility.vehicleFromContainer(vehicleContainer);
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);

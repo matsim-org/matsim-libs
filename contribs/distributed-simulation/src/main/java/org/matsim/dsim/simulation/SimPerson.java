@@ -22,6 +22,7 @@ import java.util.List;
  * frequently
  */
 @Log4j2
+@Deprecated
 public class SimPerson {
 
 	public enum State {ACTIVITY, LEG}

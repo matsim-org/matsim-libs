@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.dsim.messages.VehicleMsg;
 import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.vehicles.Vehicle;
 
@@ -59,15 +58,6 @@ public class BasicSimVehicle implements SimVehicle {
         stuckTimer.reset();
     }
 
-
-    public VehicleMsg toMessage() {
-        return VehicleMsg.builder()
-                .setId(this.id)
-                .setDriver(driver.toMessage())
-                .setMaxV(this.maxV)
-                .setPce(this.pce)
-                .build();
-    }
 
     @Override
     public boolean equals(Object o) {

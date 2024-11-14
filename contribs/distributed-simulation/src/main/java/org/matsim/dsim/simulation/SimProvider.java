@@ -141,7 +141,7 @@ public class SimProvider implements LPProvider {
 
 		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
 
-		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, neighbors, part);
+		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, compat, neighbors, part);
 		//ActivityEngineReimplementation activityEngine = createActivityEngine(part);
 		TeleportationEngine teleportationEngine = new TeleportationEngine(eventsManager, messaging, compat);
 		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, compat, messaging, eventsManager, part);

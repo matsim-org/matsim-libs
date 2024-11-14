@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.dsim.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
@@ -16,7 +17,7 @@ class SimLinkTest {
 
         var part = 0;
         var link = createLink(part, part);
-        var simLink = SimLink.create(link, part);
+        var simLink = TestUtils.createLink(link, part, 10);
 
         assertInstanceOf(SimLink.LocalLink.class, simLink);
     }
@@ -27,7 +28,7 @@ class SimLinkTest {
         var part = 0;
         var toPart = 1;
         var link = createLink(part, toPart);
-        var simLink = SimLink.create(link, part);
+        var simLink = TestUtils.createLink(link, part, 10);
 
         assertInstanceOf(SimLink.SplitOutLink.class, simLink);
     }
@@ -38,8 +39,8 @@ class SimLinkTest {
         var part = 0;
         var fromPart = 1;
         var link = createLink(fromPart, part);
-        var simLink = SimLink.create(link, part);
-        
+        var simLink = TestUtils.createLink(link, part, 10);
+
         assertInstanceOf(SimLink.SplitInLink.class, simLink);
     }
 

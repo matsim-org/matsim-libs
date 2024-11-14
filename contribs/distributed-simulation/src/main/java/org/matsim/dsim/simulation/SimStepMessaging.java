@@ -13,11 +13,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.dsim.MessageBroker;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
 import org.matsim.dsim.messages.Teleportation;
-import org.matsim.dsim.messages.VehicleMsg;
-import org.matsim.dsim.simulation.net.SimVehicle;
 
 import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
 
@@ -40,8 +39,8 @@ public interface SimStepMessaging {
 
 	IntSet getNeighbors();
 
-	static SimStepMessaging create(Network network, MessageBroker messageBroker, IntSet neighbors, int part) {
-		return new SimStepMessagingImpl(network, messageBroker, neighbors, part);
+	static SimStepMessaging create(Network network, MessageBroker messageBroker, QSimCompatibility qsim, IntSet neighbors, int part) {
+		return new SimStepMessagingImpl(network, messageBroker, qsim, neighbors, part);
 	}
 
 	@Log4j2
@@ -56,14 +55,16 @@ public interface SimStepMessaging {
 
 		// members are final but are mutable during the simulation
 		private final MessageBroker messageBroker;
+		private final QSimCompatibility qsim;
 		private final Int2ObjectMap<SimStepMessage.SimStepMessageBuilder> msgs = new Int2ObjectOpenHashMap<>();
 
-		public SimStepMessagingImpl(Network globalNetwork, MessageBroker messageBroker, IntSet neighbors, int part) {
+		public SimStepMessagingImpl(Network globalNetwork, MessageBroker messageBroker, QSimCompatibility qsim, IntSet neighbors, int part) {
 			this.messageBroker = messageBroker;
+			this.qsim = qsim;
 			var link2RankMapping = new Object2IntOpenHashMap<Id<Link>>();
 			for (var link : globalNetwork.getLinks().values()) {
-				var id = link.getId();
-				var rank = (int) link.getAttributes().getAttribute(PARTITION_ATTR_KEY);
+				Id<Link> id = link.getId();
+				int rank = (int) link.getAttributes().getAttribute(PARTITION_ATTR_KEY);
 				link2RankMapping.put(id, rank);
 			}
 			this.part2Link = link2RankMapping;
@@ -77,13 +78,11 @@ public interface SimStepMessaging {
 		public void collectTeleportation(DistributedMobsimAgent person, double exitTime) {
 
 			// figure out where the person has to go and store the person // we are expecting teleported persons here.
-			var targetPart = part2Link.getInt(person.getDestinationLinkId());
-			var teleportation = Teleportation.builder()
-				//.setPerson(person.toMessage())
-				//.setExitTime(exitTime)
+			int targetPart = part2Link.getInt(person.getDestinationLinkId());
+			Teleportation teleportation = Teleportation.builder()
+				.setPersonMessage(person.toMessage())
+				.setExitTime(exitTime)
 				.build();
-
-			log.warn("implement transformation from DistributedMobsimAgent into SimStepMessage .");
 
 			msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
 				.setTeleportationMsg(teleportation);
@@ -101,12 +100,10 @@ public interface SimStepMessaging {
 
 		public void collectVehicle(DistributedMobsimVehicle simVehicle) {
 
-			var currentLinkId = simVehicle.getDriver().getCurrentLinkId();
-			var targetPart = part2Link.getInt(currentLinkId);
-			//VehicleMsg simVehicleMessage = simVehicle.toMessage();
-			//msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
-			//	.setVehicleMsg(simVehicleMessage);
-			log.warn("Implement transformation from DistributedMobsimVehicle into SimStepMessage .");
+			Id<Link> currentLinkId = simVehicle.getDriver().getCurrentLinkId();
+			int targetPart = part2Link.getInt(currentLinkId);
+			msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
+				.setVehicle(qsim.vehicleToContainer(simVehicle));
 		}
 
 		public void sendMessages(double now) {
@@ -124,7 +121,7 @@ public interface SimStepMessaging {
 				// if we encounter a message builder for a remote partition, i.e. for teleportation, we remove it from
 				// the map, as we don't know whether we will need it in the next time step.
 				if (neighbors.contains(targetPart)) {
-					msgBuilder.clearVehicleMsgs();
+					msgBuilder.clearVehicles();
 					msgBuilder.clearCapacityUpdates();
 					msgBuilder.clearTeleportationMsgs();
 				} else {

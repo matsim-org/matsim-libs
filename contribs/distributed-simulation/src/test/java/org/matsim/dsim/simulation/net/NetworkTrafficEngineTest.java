@@ -5,17 +5,26 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -28,24 +37,48 @@ class NetworkTrafficEngineTest {
         var scenario = createScenario();
         var expectedEvents = createExpectedEvents();
         var eventsManager = TestUtils.mockExpectingEventsManager(expectedEvents);
-        var engine = new NetworkTrafficEngine(scenario, mock(SimStepMessaging.class), eventsManager, 0);
 
-        var simPerson = new SimPerson(scenario.getPopulation().getPersons().get(Id.createPersonId("person")));
-        simPerson.advancePlan();
+        var engine = new NetworkTrafficEngine(scenario, mock(QSimCompatibility.class),
+			mock(SimStepMessaging.class), eventsManager, 0);
 
-        engine.setNextStateHandler((person, now) -> {
-            assertEquals(112, now);
-            assertEquals(simPerson.getId(), person.getId());
-        });
+		SimpleAgent simPerson = TestUtils.createAgent("person");
+		AtomicInteger i = new AtomicInteger(0);
+
+		engine.setInternalInterface(new InternalInterface() {
+			@Override
+			public Netsim getMobsim() {
+				return mock(Netsim.class);
+			}
+
+			@Override
+			public void arrangeNextAgentState(MobsimAgent agent) {
+				assertEquals(112, i.get());
+				assertEquals(simPerson.getId(), agent.getId());
+			}
+
+			@Override
+			public void registerAdditionalAgentOnLink(MobsimAgent agent) {
+
+			}
+
+			@Override
+			public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+				return null;
+			}
+
+			@Override
+			public List<DepartureHandler> getDepartureHandlers() {
+				return List.of();
+			}
+		});
 
         engine.accept(simPerson, 0);
 
         // now, do the simulation part
-
-        for (int i = 0; i <= 120; i++) {
-            engine.doSimStep(i);
-        }
-    }
+		while (i.get() <= 120) {
+			engine.doSimStep(i.getAndIncrement());
+		}
+	}
 
     private static List<Event> createExpectedEvents() {
         var personId = Id.createPersonId("person");

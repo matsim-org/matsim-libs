@@ -8,10 +8,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.dsim.messages.VehicleContainer;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -148,9 +151,40 @@ public final class QSimCompatibility {
 	}
 
 	/**
-	 * Create a vehicle from a received message.
+	 * Create a vehicle container, which includes all the occupants.
 	 */
-	public DistributedMobsimVehicle vehicleFromMessage(Message m) {
+	public VehicleContainer vehicleToContainer(DistributedMobsimVehicle vehicle) {
+		return VehicleContainer.builder()
+			.setVehicle(vehicle.toMessage())
+			.setDriver(((DistributedMobsimAgent) vehicle.getDriver()).toMessage())
+			.setPassengers(vehicle.getPassengers().stream().map(p -> ((DistributedMobsimAgent) p).toMessage()).toList())
+			.build();
+	}
+
+	/**
+	 * Create a vehicle and its occupants from received container.
+	 */
+	public DistributedMobsimVehicle vehicleFromContainer(VehicleContainer container) {
+
+		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicle());
+		DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver());
+		vehicle.setDriver(driver);
+		driver.setVehicle(vehicle);
+
+		for (Message passenger : container.getPassengers()) {
+			PassengerAgent p = (PassengerAgent) agentFromMessage(passenger);
+			vehicle.addPassenger(p);
+			p.setVehicle(vehicle);
+		}
+
+		return vehicle;
+	}
+
+	/**
+	 * Create a vehicle from a received message. This should normally not be used directly.
+	 * @see #vehicleFromContainer(VehicleContainer)
+	 */
+	private DistributedMobsimVehicle vehicleFromMessage(Message m) {
 		DistributedAgentSource source = vehicleSources.get(m.getClass());
 		if (source == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));

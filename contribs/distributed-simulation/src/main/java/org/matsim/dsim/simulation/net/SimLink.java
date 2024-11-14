@@ -29,6 +29,8 @@ public interface SimLink {
 
 	boolean isOffering();
 
+	boolean isStuck(double now);
+
 	DistributedMobsimVehicle peekFirstVehicle();
 
 	DistributedMobsimVehicle popVehicle();
@@ -60,22 +62,16 @@ public interface SimLink {
 		}
 	}
 
-
-	static SimLink create(Link link, int part) {
-		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
-		return create(link, (_, _, _) -> OnLeaveQueueInstruction.MoveToBuffer, defaultQsimConfig, 7.5, part);
-	}
-
 	static SimLink create(Link link, OnLeaveQueue onLeaveQueue, QSimConfigGroup config, double effectiveCellSize, int part) {
 		var fromPart = getPartition(link.getFromNode());
 		var toPart = getPartition(link.getToNode());
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
 		if (fromPart == toPart) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			return new LocalLink(link, q, outflowCapacity, onLeaveQueue);
+			return new LocalLink(link, q, outflowCapacity, onLeaveQueue, config.getStuckTime());
 		} else if (toPart == part) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			var localLink = new LocalLink(link, q, outflowCapacity, onLeaveQueue);
+			var localLink = new LocalLink(link, q, outflowCapacity, onLeaveQueue, config.getStuckTime());
 			return new SplitInLink(localLink, fromPart);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
@@ -113,12 +109,12 @@ public interface SimLink {
 		private final double freespeed;
 
 
-		LocalLink(Link link, SimQueue q, FlowCapacity outflowCapacity, OnLeaveQueue defaultOnLeaveQueue) {
+		LocalLink(Link link, SimQueue q, FlowCapacity outflowCapacity, OnLeaveQueue defaultOnLeaveQueue, double stuckTime) {
 			id = link.getId();
 			this.q = q;
 			length = link.getLength();
 			freespeed = link.getFreespeed();
-			buffer = new SimBuffer(outflowCapacity);
+			buffer = new SimBuffer(outflowCapacity, stuckTime);
 			toNode = link.getToNode().getId();
 			this.onLeaveQueue = defaultOnLeaveQueue;
 		}
@@ -211,6 +207,11 @@ public interface SimLink {
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
 			this.onLeaveQueue = this.onLeaveQueue.compose(onLeaveQueue);
+		}
+
+		@Override
+		public boolean isStuck(double now) {
+			return buffer.isStuck(now);
 		}
 
 		private void moveVehicle(double now) {
@@ -306,6 +307,11 @@ public interface SimLink {
 			storageCapacity.consume(consumed);
 			storageCapacity.release(released, 0);
 		}
+
+		@Override
+		public boolean isStuck(double now) {
+			return false;
+		}
 	}
 
 	class SplitInLink implements SimLink {
@@ -390,6 +396,11 @@ public interface SimLink {
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
 			localLink.addLeaveHandler(onLeaveQueue);
+		}
+
+		@Override
+		public boolean isStuck(double now) {
+			return localLink.isStuck(now);
 		}
 	}
 }

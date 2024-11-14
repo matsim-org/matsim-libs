@@ -58,7 +58,7 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 					" error might be an indicator, that the speed of the teleported leg is too fast.");
 			}
 
-			var agent = qsimCompatibility.agentFromMessage(teleportation.personMessage());
+			DistributedMobsimAgent agent = qsimCompatibility.agentFromMessage(teleportation.personMessage());
 			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
 		}
 	}
