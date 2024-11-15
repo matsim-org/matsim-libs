@@ -87,15 +87,16 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	}
 
 	private final Umlauf umlauf;
-	private final Iterator<UmlaufStueckI> iUmlaufStueck;
+	private final ListIterator<UmlaufStueckI> iUmlaufStueck;
 	private final ListIterator<PlanElement> iPlanElement;
+
+	private final Scenario scenario;
 	private NetworkRoute carRoute;
 	private double departureTime;
 	private PlanElement currentPlanElement;
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 	private Departure departure;
-	private Scenario scenario;
 
 	public TransitDriverAgentImpl(Umlauf umlauf, String transportMode,
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
@@ -104,7 +105,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 		this.scenario = internalInterface.getMobsim().getScenario() ;
 		// (yy AbstractTransitDriverAgent already keeps both of them. kai, dec'15)
-		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
+		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().listIterator();
 		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
@@ -127,9 +128,34 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		this.umlauf = umlauf;
 		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 		this.scenario = internalInterface.getMobsim().getScenario();
-		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
-		// TODO: internally, this agent uses the whole plan, but only via the interator
-		iPlanElement = null;
+
+		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		PlanBuilder planBuilder = new PlanBuilder();
+		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
+			NetworkRoute carRoute2 = umlaufStueck.getCarRoute();
+			Gbl.assertNotNull(carRoute2);
+			planBuilder.addTrip(getWrappedCarRoute(carRoute2), transportMode);
+		}
+		Plan plan = planBuilder.build();
+		driverPerson.addPlan(plan);
+		driverPerson.setSelectedPlan(plan);
+		setDriver(driverPerson);
+
+		// Forward one less because below the iterators are used
+		iUmlaufStueck = this.umlauf.getUmlaufStuecke().listIterator(message.umlaufIndex() - 1);
+		iPlanElement = plan.getPlanElements().listIterator(message.planIndex - 1);
+		state = message.state;
+		departureTime = message.departureTime;
+
+		this.currentPlanElement = iPlanElement.next();
+		UmlaufStueckI umlaufStueck = iUmlaufStueck.next();
+		if (umlaufStueck.isFahrt()) {
+			setLeg(umlaufStueck.getLine(), umlaufStueck.getRoute(), umlaufStueck.getDeparture());
+		} else {
+			setWenden(umlaufStueck.getCarRoute());
+		}
+
+		init(message.stopIndex, message.nextLinkIndex, message.atEnd);
 	}
 
 	@Override
@@ -332,12 +358,26 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 
 	@Override
 	public Message toMessage() {
-		return new TransitDriverMessage(umlauf.getId());
+		return new TransitDriverMessage(umlauf.getId(),
+			iUmlaufStueck.previousIndex() + 1,
+			iPlanElement.previousIndex() + 1,
+			getNextLinkIndex(),
+			getStopIndex(),
+			nextStop == null,
+			state,
+			departureTime
+		);
 	}
 
-
 	public record TransitDriverMessage(
-		Id<Umlauf> umlaufId
+		Id<Umlauf> umlaufId,
+		int umlaufIndex,
+		int planIndex,
+		int nextLinkIndex,
+		int stopIndex,
+		boolean atEnd,
+		MobsimAgent.State state,
+		double departureTime
 	) implements Message {
 	}
 

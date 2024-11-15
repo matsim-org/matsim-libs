@@ -99,6 +99,26 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		this.nextLinkIndex = 0;
 	}
 
+	final void init(int stopIndex, int nextLinkIndex, boolean atEnd) {
+
+		// TODO: Something wrong here:  Transit vehicle is not yet at last stop!
+		// TODO: check what happens if stops are on the boundary of partitions
+
+		if (getTransitRoute() != null) {
+			if (atEnd) {
+				this.stopIterator = getTransitRoute().getStops().listIterator(stopIndex);
+				this.nextStop = null;
+			} else {
+				this.stopIterator = getTransitRoute().getStops().listIterator(stopIndex - 1);
+				this.currentStop = null;
+				this.nextStop = stopIterator.next();
+			}
+		} else {
+			this.nextStop = null;
+		}
+		this.nextLinkIndex = nextLinkIndex;
+	}
+
 	final void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
 	}
@@ -145,6 +165,10 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	@Override
 	public final void notifyMoveOverNode(Id<Link> nextLinkId) {
 		this.nextLinkIndex++;
+	}
+
+	protected final int getStopIndex() {
+		return stopIterator.previousIndex() + 1;
 	}
 
 	protected final int getNextLinkIndex() {
