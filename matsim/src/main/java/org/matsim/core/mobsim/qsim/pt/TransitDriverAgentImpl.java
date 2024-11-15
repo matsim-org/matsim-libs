@@ -97,8 +97,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	private Departure departure;
 	private Scenario scenario;
 
-	public TransitDriverAgentImpl(Umlauf umlauf,
-			String transportMode,
+	public TransitDriverAgentImpl(Umlauf umlauf, String transportMode,
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
@@ -120,6 +119,17 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		iPlanElement = plan.getPlanElements().listIterator();
 		this.currentPlanElement = iPlanElement.next();
 		setNextLeg();
+	}
+
+	public TransitDriverAgentImpl(TransitDriverMessage message, Umlauf umlauf, String transportMode,
+								  TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
+		super(internalInterface, thisAgentTracker);
+		this.umlauf = umlauf;
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+		this.scenario = internalInterface.getMobsim().getScenario();
+		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
+		// TODO: internally, this agent uses the whole plan, but only via the interator
+		iPlanElement = null;
 	}
 
 	@Override
@@ -322,13 +332,13 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 
 	@Override
 	public Message toMessage() {
-		// TODO
-		return new TransitDriverMessage();
+		return new TransitDriverMessage(umlauf.getId());
 	}
 
 
-	public static class TransitDriverMessage implements Message {
-
+	public record TransitDriverMessage(
+		Id<Umlauf> umlaufId
+	) implements Message {
 	}
 
 }

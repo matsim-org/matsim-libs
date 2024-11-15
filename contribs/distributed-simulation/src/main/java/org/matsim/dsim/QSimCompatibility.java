@@ -191,7 +191,7 @@ public final class QSimCompatibility {
 	 * @see #vehicleFromContainer(VehicleContainer)
 	 */
 	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {
-		DistributedAgentSource source = vehicleTypes.get(m.getClass());
+		DistributedAgentSource source = vehicleTypes.get(type);
 		if (source == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
 		}
