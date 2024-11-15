@@ -70,7 +70,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		qsim.init(this);
 
-		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().seconds());
+		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().orElse(0));
 
 		for (DistributedMobsimEngine engine : engines) {
 			engine.setInternalInterface(this);
@@ -119,7 +119,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-
 		networkTrafficEngine.addParkedVehicle(veh, startLinkId);
 	}
 
@@ -177,7 +176,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public void addQueueSimulationListeners(MobsimListener listener) {
 		throw new UnsupportedOperationException();
-
 	}
 
 	@Override
@@ -216,12 +214,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
+		// don't do anything.
 	}
 
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	@Override

@@ -5,19 +5,17 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
@@ -67,20 +65,21 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		}
 
 		// place person into vehicle
-		DistributedMobsimVehicle mobsimVehicle = Objects.requireNonNull(
+		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
 			parkedVehicles.remove(driver.getPlannedVehicleId()),
 			() -> "Vehicle not found: " + driver.getPlannedVehicleId()
 		);
-		driver.setVehicle(mobsimVehicle);
-		mobsimVehicle.setDriver(driver);
+		driver.setVehicle(vehicle);
+		vehicle.setDriver(driver);
+		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 
 		Id<Link> currentRouteElement = person.getCurrentLinkId();
-		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(mobsimVehicle.getId());
+		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(vehicle.getId());
 
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
-		wait2Link.accept(mobsimVehicle, link);
+		wait2Link.accept(vehicle, link);
 	}
 
 	@Override
@@ -134,30 +133,28 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
+		// TODO: assumes driver is person arriving
 		var driver = vehicle.getDriver();
 		// the vehicle has more elements in the route. Keep going.
 		if (!driver.isWantingToArriveOnCurrentLink())
 			return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
 
 		// the vehicle has no more route elements. It should leave the network
+		// Assumes legMode=networkMode, which is not always the case
 		em.processEvent(new VehicleLeavesTrafficEvent(
 			now, driver.getId(), link.getId(), vehicle.getId(), driver.getMode(),
 			1.0
 		));
 
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
+		em.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), vehicle.getId()));
 
-		// TODO: assumes driver is person arriving
-		// Assumes legMode=networkMode, which is not always the case
-		em.processEvent(new PersonArrivalEvent(
-			now, driver.getId(), link.getId(), driver.getMode()
-		));
-
-		internalInterface.arrangeNextAgentState(vehicle.getDriver());
+		driver.endLegAndComputeNextState(now);
+		internalInterface.arrangeNextAgentState(driver);
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> _startLinkId) {
 		if (veh instanceof DistributedMobsimVehicle dv) {
 			parkedVehicles.put(veh.getId(), dv);
 		} else {
