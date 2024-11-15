@@ -7,16 +7,16 @@
     </attributes>
 
 
-    <!-- ====================================================================== -->
+	<!-- ====================================================================== -->
 
-    <person id="p1">
+	<person id="p1">
         <plan selected="yes">
             <activity type="start" link="l1" x="0" y="100" end_time="00:00:31"/>
             <leg mode="walk" dep_time="00:00:30">
                 <attributes>
                     <attribute name="routingMode" class="java.lang.String">car</attribute>
                 </attributes>
-                <route type="generic" start_link="l1" end_link="l1" trav_time="00:00:30"/>
+                <route type="generic" start_link="l1" end_link="l1" trav_time="00:00:30" distance="100.0"/>
             </leg>
             <activity type="car interaction" max_dur="00:00:00" link="l1" x="0" y="0"/>
             <leg mode="car">
@@ -30,7 +30,7 @@
                 <attributes>
                     <attribute name="routingMode" class="java.lang.String">car</attribute>
                 </attributes>
-                <route type="generic" start_link="l3" end_link="l3" trav_time="00:00:30"/>
+                <route type="generic" start_link="l3" end_link="l3" trav_time="00:00:30" distance="100.0"/>
             </leg>
             <activity type="end" link="l3" x="1200" y="100"/>
         </plan>
@@ -42,9 +42,9 @@
                 <attributes>
                     <attribute name="routingMode" class="java.lang.String">slow-car</attribute>
                 </attributes>
-                <route type="generic" start_link="l1" end_link="l1" trav_time="00:00:30"/>
+                <route type="generic" start_link="l1" end_link="l1" trav_time="00:00:30" distance="100.0"/>
             </leg>
-            <activity type="slow-car interaction" max_dur="00:00:00" link="l2" x="1100" y="0"/>
+            <activity type="slow-car interaction" max_dur="00:00:00" link="l1" x="0" y="0"/>
             <leg mode="slow-car">
                 <attributes>
                     <attribute name="routingMode" class="java.lang.String">slow-car</attribute>
@@ -56,7 +56,7 @@
                 <attributes>
                     <attribute name="routingMode" class="java.lang.String">slow-car</attribute>
                 </attributes>
-                <route type="generic" start_link="l3" end_link="l3" trav_time="00:00:30"/>
+                <route type="generic" start_link="l3" end_link="l3" trav_time="00:00:30" distance="100.0"/>
             </leg>
             <activity type="end" link="l3" x="1200" y="100"/>
         </plan>
