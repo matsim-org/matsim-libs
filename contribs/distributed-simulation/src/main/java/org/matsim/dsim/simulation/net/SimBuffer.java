@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
-import it.unimi.dsi.fastutil.doubles.DoubleList;
 import lombok.Getter;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 
@@ -12,7 +11,6 @@ class SimBuffer {
 
 	private final Queue<DistributedMobsimVehicle> internalBuffer;
 	private final DoubleArrayFIFOQueue arrivalTimes = new DoubleArrayFIFOQueue();
-
 
 	private final FlowCapacity flowCap;
 	private final double stuckThreshold;
@@ -54,7 +52,6 @@ class SimBuffer {
 		flowCap.update(now);
 		return pceInBuffer < flowCap.getMax() && flowCap.isAvailable();
 	}
-
 
 	boolean isStuck(double now) {
 		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold <= now;

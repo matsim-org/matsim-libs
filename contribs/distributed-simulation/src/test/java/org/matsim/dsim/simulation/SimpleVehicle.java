@@ -54,4 +54,9 @@ public class SimpleVehicle implements Message, DistributedMobsimVehicle {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return "Id: " + this.id + " driver: " + driver.getId() + " exitTime: + " + earliestLinkExitTime;
+	}
+
 }
