@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -38,6 +39,7 @@ import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MainRunElementTest {
 
@@ -55,18 +57,17 @@ public class MainRunElementTest {
 
         Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(30);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(120);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		org.matsim.vehicles.VehicleType mainRunType = vehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType mainRunVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		mainRunVehType.getCapacity().setOther(30);
+		mainRunVehType.getCostInformation().setCostsPerMeter(0.0002);
+		mainRunVehType.getCostInformation().setCostsPerSecond(0.38);
+		mainRunVehType.getCostInformation().setFixedCost(120.);
+		mainRunVehType.setMaximumVelocity(50 / 3.6);
 
 
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId, mainRunType);
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId, mainRunVehType);
 
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();

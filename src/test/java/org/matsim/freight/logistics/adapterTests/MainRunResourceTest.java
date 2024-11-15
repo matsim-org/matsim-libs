@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -37,6 +38,7 @@ import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MainRunResourceTest {
 
@@ -59,18 +61,17 @@ public class MainRunResourceTest {
 
         Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(30);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0008);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(120);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		mainRunType = vehicleTypeBuilder.build();
+		mainRunType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		mainRunType.getCapacity().setOther(30);
+		mainRunType.getCostInformation().setCostsPerMeter(0.0008);
+		mainRunType.getCostInformation().setCostsPerSecond(0.38);
+		mainRunType.getCostInformation().setFixedCost(120.);
+		mainRunType.setMaximumVelocity(50 / 3.6);
 
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("MainRunVehicle");
-		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId, mainRunType);
+		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId, this.mainRunType);
 
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();

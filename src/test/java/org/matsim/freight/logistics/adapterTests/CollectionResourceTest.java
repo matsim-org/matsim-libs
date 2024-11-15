@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -37,13 +38,13 @@ import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class CollectionResourceTest {
 
 	//Die Tracker sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
-
-	private org.matsim.vehicles.VehicleType collectionType;
+	private VehicleType collectionVehType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
 	private LSPCarrierResource carrierResource;
@@ -59,18 +60,17 @@ public class CollectionResourceTest {
         scenario.getNetwork();
 
         Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
-		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(10);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		collectionType = vehicleTypeBuilder.build();
+				Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
+		collectionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		collectionVehType.getCapacity().setOther(10);
+		collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
+		collectionVehType.getCostInformation().setCostsPerSecond(0.38);
+		collectionVehType.getCostInformation().setFixedCost(49.);
+		collectionVehType.setMaximumVelocity(50 / 3.6);
 
 		collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
+		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionVehType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addVehicle(collectionCarrierVehicle);
@@ -112,18 +112,18 @@ public class CollectionResourceTest {
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {
-					assertSame(types.getFirst(), collectionType);
-					assertEquals(10, collectionType.getCapacity().getOther().intValue());
-					assertEquals(0.0004, collectionType.getCostInformation().getCostsPerMeter(), 0.0);
-					assertEquals(0.38, collectionType.getCostInformation().getCostsPerSecond(), 0.0);
-					assertEquals(49, collectionType.getCostInformation().getFixedCosts(), 0.0);
-					assertEquals((50 / 3.6), collectionType.getMaximumVelocity(), 0.0);
+					assertSame(types.getFirst(), collectionVehType);
+					assertEquals(10, collectionVehType.getCapacity().getOther().intValue());
+					assertEquals(0.0004, collectionVehType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, collectionVehType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(49, collectionVehType.getCostInformation().getFixedCosts(), 0.0);
+					assertEquals((50 / 3.6), collectionVehType.getMaximumVelocity(), 0.0);
 
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if (vehicles.size() == 1) {
 					assertSame(vehicles.getFirst(), collectionCarrierVehicle);
-					assertSame(collectionCarrierVehicle.getType(), collectionType);
+					assertSame(collectionCarrierVehicle.getType(), collectionVehType);
 					assertSame(collectionCarrierVehicle.getLinkId(), collectionLinkId);
 				}
 			}

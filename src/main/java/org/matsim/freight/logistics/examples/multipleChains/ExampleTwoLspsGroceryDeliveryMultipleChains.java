@@ -50,6 +50,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -112,6 +113,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
     CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(vehicleTypes);
     vehicleTypeReader.readFile(VEHICLE_TYPE_FILE);
+    //The following is needed, because since fall 2024 the vehicle types are not assigned to a network mode by default.
+    for (VehicleType vehicleType : vehicleTypes.getVehicleTypes().values()) {
+      vehicleType.setNetworkMode(TransportMode.car);
+    }
 
     Carriers carriers = new Carriers();
     CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
@@ -215,7 +220,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   private static void runCarrierAnalysis(String outputPath, Config config) {
     RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
-      freightAnalysis.runAnalysis();
+      freightAnalysis.runCompleteAnalysis();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

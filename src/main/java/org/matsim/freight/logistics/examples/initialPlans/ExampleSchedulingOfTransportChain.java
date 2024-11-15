@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -43,6 +44,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /*A transport chain with five elements (collection-> reloading -> main run -> reloading -> delivery) is created and scheduled
  *
@@ -57,19 +59,17 @@ import org.matsim.vehicles.VehicleType;
     // The Carrier for collection is created
     Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
     Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
-    CarrierVehicleType.Builder vehicleTypeBuilder =
-        CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-    vehicleTypeBuilder.setCapacity(10);
-    vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-    vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-    vehicleTypeBuilder.setFixCost(49);
-    vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-    VehicleType collectionType = vehicleTypeBuilder.build();
+    VehicleType collectionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+    collectionVehType.getCapacity().setOther(10);
+    collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
+    collectionVehType.getCostInformation().setCostsPerSecond(0.38);
+    collectionVehType.getCostInformation().setFixedCost(49.);
+    collectionVehType.setMaximumVelocity(50 / 3.6);
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
     CarrierVehicle carrierVehicle =
-        CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
+        CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
     capabilitiesBuilder.addVehicle(carrierVehicle);
@@ -124,20 +124,20 @@ import org.matsim.vehicles.VehicleType;
 
     // The Carrier for the main run Resource is created
     Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
-    final VehicleType mainRunType =
-        CarrierVehicleType.Builder.newInstance(
-                Id.create("MainRunCarrierVehicleType", VehicleType.class))
-            .setCapacity(30)
-            .setCostPerDistanceUnit(0.0002)
-            .setCostPerTimeUnit(0.38)
-            .setFixCost(120)
-            .setMaxVelocity(50 / 3.6)
-            .build();
+    Id<VehicleType> mainRunVehTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+    final VehicleType mainRunVehType = VehicleUtils.createVehicleType(mainRunVehTypeId, TransportMode.car);
+    mainRunVehType.getCapacity().setOther(30);
+    mainRunVehType.getCostInformation().setCostsPerMeter(0.0002);
+    mainRunVehType.getCostInformation().setCostsPerSecond(0.38);
+    mainRunVehType.getCostInformation().setFixedCost(120.);
+    mainRunVehType.setMaximumVelocity(50 / 3.6);
+    mainRunVehType.setNetworkMode(TransportMode.car);
+
 
     Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
     CarrierVehicle mainRunCarrierVehicle =
-        CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
+        CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunVehType);
 
     CarrierCapabilities mainRunCapabilities =
         CarrierCapabilities.Builder.newInstance()
@@ -190,21 +190,20 @@ import org.matsim.vehicles.VehicleType;
 
     // The Carrier for distribution is created
     Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
-    Id<VehicleType> distributionVehicleTypeId =
-        Id.create("DistributionCarrierVehicleType", VehicleType.class);
-    VehicleType distributionType =
-        CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId)
-            .setCapacity(10)
-            .setCostPerDistanceUnit(0.0004)
-            .setCostPerTimeUnit(0.38)
-            .setFixCost(49)
-            .setMaxVelocity(50 / 3.6)
-            .build();
+    Id<VehicleType> distributionVehTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
+    final VehicleType distributionVehType = VehicleUtils.createVehicleType(distributionVehTypeId, TransportMode.car);
+    distributionVehType.getCapacity().setOther(10);
+    distributionVehType.getCostInformation().setCostsPerMeter(0.0004);
+    distributionVehType.getCostInformation().setCostsPerSecond(0.38);
+    distributionVehType.getCostInformation().setFixedCost(49.);
+    distributionVehType.setMaximumVelocity(50 / 3.6);
+    distributionVehType.setNetworkMode(TransportMode.car);
+
 
     Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
     Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
     CarrierVehicle distributionCarrierVehicle =
-        CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+        CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionVehType);
 
     CarrierCapabilities.Builder distributionCapabilitiesBuilder =
         CarrierCapabilities.Builder.newInstance();
