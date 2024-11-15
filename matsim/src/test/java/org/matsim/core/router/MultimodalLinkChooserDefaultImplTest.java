@@ -41,7 +41,7 @@ import org.matsim.facilities.ActivityFacility;
  *
  */
 
-public class MultimodalLinkChooserTest {
+public class MultimodalLinkChooserDefaultImplTest {
 
 	@Test
 	void testDecideOnLink() {
@@ -75,11 +75,13 @@ public class MultimodalLinkChooserTest {
 
         MultimodalLinkChooser linkChooser = new MultimodalLinkChooserDefaultImpl();
 
-        Link linkFromFacLinkId = linkChooser.decideOnLink(facilityLinkIdNotNull, network);
+        RoutingRequest request = DefaultRoutingRequest.of(facilityLinkIdNotNull, facilityLinkIdNull, 0, null, null);
+        
+        Link linkFromFacLinkId = linkChooser.decideAccessLink(request, network);
 
         Assertions.assertEquals(networkLink, linkFromFacLinkId);
 
-        Link linkFromFacCoord = linkChooser.decideOnLink(facilityLinkIdNull, network);
+        Link linkFromFacCoord = linkChooser.decideEgressLink(request, network);
 
         Assertions.assertEquals(networkLink, linkFromFacCoord);
 
