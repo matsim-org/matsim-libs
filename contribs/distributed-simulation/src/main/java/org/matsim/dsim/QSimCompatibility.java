@@ -193,7 +193,7 @@ public final class QSimCompatibility {
 	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {
 		DistributedAgentSource source = vehicleTypes.get(type);
 		if (source == null) {
-			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
+			throw new RuntimeException("No vehicle provider found for %s".formatted(type));
 		}
 
 		return source.vehicleFromMessage(type, m);
@@ -206,7 +206,7 @@ public final class QSimCompatibility {
 	public <T extends DistributedMobsimAgent> T agentFromMessage(Class<T> type, Message m) {
 		DistributedAgentSource source = agentTypes.get(type);
 		if (source == null) {
-			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
+			throw new RuntimeException("No agent provider found for %s".formatted(type));
 		}
 
 		return (T) source.agentFromMessage(type, m);

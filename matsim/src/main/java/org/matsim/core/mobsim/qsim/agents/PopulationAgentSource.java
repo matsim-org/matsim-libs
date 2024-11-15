@@ -251,7 +251,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 	@Override
 	public Set<Class<? extends DistributedMobsimAgent>> getAgentClasses() {
-		return Set.of(BasicPlanAgentImpl.class);
+		return Set.of(BasicPlanAgentImpl.class, PersonDriverAgentImpl.class);
 	}
 
 	@Override
