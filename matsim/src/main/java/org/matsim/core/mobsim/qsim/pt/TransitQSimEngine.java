@@ -20,9 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.*;
-import java.util.Map.Entry;
-
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
@@ -40,6 +38,7 @@ import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentMessage;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
@@ -49,7 +48,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import jakarta.inject.Inject;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author mrieser
@@ -267,5 +267,17 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 			// The transport mode here does not seem to matter
 			return new TransitDriverAgentImpl(driverMessage, umlauf, TransportMode.car, agentTracker, internalInterface);
 		}
+	}
+
+	@Override
+	public Set<Class<? extends DistributedMobsimVehicle>> getVehicleClasses() {
+		return Set.of(TransitQVehicle.class);
+	}
+
+	@Override
+	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
+		TransitQVehicle transitVehicle = new TransitQVehicle((QVehicleMessage) message);
+		transitVehicle.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(transitVehicle.getVehicle()));
+		return transitVehicle;
 	}
 }

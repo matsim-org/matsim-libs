@@ -20,18 +20,20 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
 
-public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
+public class TransitQVehicle extends QVehicleImpl implements DistributedMobsimVehicle, TransitVehicle {
 
 	private TransitStopHandler stopHandler;
 
 	public TransitQVehicle(final Vehicle basicVehicle) {
 		super(basicVehicle);
-		
+
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
 			throw new NullPointerException("No capacity set in vehicle type.");
@@ -42,7 +44,11 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 			throw new NullPointerException("No capacity set in vehicle type.");
 		}
 	}
-	
+
+	public TransitQVehicle(QVehicleMessage message) {
+		super(message);
+	}
+
 	public void setStopHandler(TransitStopHandler stopHandler) {
 		this.stopHandler = stopHandler;
 	}
@@ -51,5 +57,4 @@ public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 	public TransitStopHandler getStopHandler() {
 		return this.stopHandler;
 	}
-
 }
