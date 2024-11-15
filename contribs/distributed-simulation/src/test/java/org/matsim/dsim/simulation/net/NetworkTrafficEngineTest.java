@@ -102,15 +102,16 @@ class NetworkTrafficEngineTest {
 
 		return new ArrayList<>(List.of(
 			new ActivityEndEvent(0, personId, Id.createLinkId("l1"), null, "start", new Coord(-100, 100)),
-//                new PersonEntersVehicleEvent(0, personId, vehicleId),
+			new PersonEntersVehicleEvent(0, personId, vehicleId),
 			new VehicleEntersTrafficEvent(0, personId, Id.createLinkId("l1"), vehicleId, "car", 1.0),
 			new LinkLeaveEvent(1, vehicleId, Id.createLinkId("l1")),
 			new LinkEnterEvent(1, vehicleId, Id.createLinkId("l2")),
 			new LinkLeaveEvent(102, vehicleId, Id.createLinkId("l2")),
 			new LinkEnterEvent(102, vehicleId, Id.createLinkId("l3")),
 			new VehicleLeavesTrafficEvent(112, personId, Id.createLinkId("l3"), vehicleId, "car", 1.0),
-//                new PersonLeavesVehicleEvent(112, personId, vehicleId),
-			new PersonArrivalEvent(112, personId, Id.createLinkId("l3"), "car")
+			new PersonLeavesVehicleEvent(112, personId, vehicleId),
+			new PersonArrivalEvent(112, personId, Id.createLinkId("l3"), "car"),
+			new ActivityStartEvent(112, personId, Id.createLinkId("l3"), null, "destination", new Coord(1200, 0))
 		));
 	}
 

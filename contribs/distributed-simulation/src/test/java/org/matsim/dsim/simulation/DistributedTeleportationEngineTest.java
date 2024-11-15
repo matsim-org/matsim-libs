@@ -34,6 +34,7 @@ class DistributedTeleportationEngineTest {
 		var timer = new MobsimTimer();
 		var timeInterpretation = TimeInterpretation.create(config);
 		var person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(id));
+		scenario.getPopulation().addPerson(person);
 		var plan = PopulationUtils.createPlan(person);
 		var leg = PopulationUtils.createLeg("car");
 		leg.setRoutingMode("car");
