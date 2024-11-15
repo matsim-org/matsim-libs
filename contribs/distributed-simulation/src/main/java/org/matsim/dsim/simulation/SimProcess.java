@@ -2,8 +2,8 @@ package org.matsim.dsim.simulation;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.LP;
 import org.matsim.api.DistributedMobsimEngine;
+import org.matsim.api.LP;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -21,12 +21,11 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.QSimCompatibility;
+import org.matsim.dsim.messages.SimStepMessage;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
-import org.matsim.dsim.messages.SimStepMessage;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
-
 
 import java.util.*;
 
@@ -36,7 +35,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	// The Qsim has flexible engines. However, Activity, Teleportation and Netsim Engine are treated
 	// in a special way. I'll have them as explicit members here, until we need more flexibility.
 	private final Collection<? extends DistributedMobsimEngine> engines;
-	private final TeleportationEngine teleportationEngine;
+	private final DistributedTeleportationEngine teleportationEngine;
 	private final NetworkTrafficEngine networkTrafficEngine;
 
 	private final SimStepMessaging messaging;
@@ -49,7 +48,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 
-	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, TeleportationEngine teleportationEngine,
+	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, DistributedTeleportationEngine teleportationEngine,
 			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
 		this.partition = partition;
 		this.qsim = qsim;
@@ -106,7 +105,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public void process(SimStepMessage msg) {
 
-		assert msg.getSimstep() <= currentTime.getTimeOfDay() : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.getSimstep(), currentTime);
+		assert msg.getSimstep() <= currentTime.getTimeOfDay() : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.getSimstep(), currentTime.getTimeOfDay());
 
 		for (DistributedMobsimEngine engine : engines) {
 			engine.process(msg, currentTime.getTimeOfDay());

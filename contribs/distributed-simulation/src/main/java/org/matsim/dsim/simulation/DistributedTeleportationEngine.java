@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation;
 
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.DistributedMobsimEngine;
@@ -11,11 +10,12 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.SimStepMessage;
 
-
-import java.util.*;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 @Log4j2
-public class TeleportationEngine implements DistributedMobsimEngine {
+public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
@@ -25,7 +25,7 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 	@Setter
 	private InternalInterface internalInterface;
 
-	TeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, QSimCompatibility qsimCompatibility) {
+	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, QSimCompatibility qsimCompatibility) {
 		this.simStepMessaging = simStepMessaging;
 		this.em = em;
 		this.qsimCompatibility = qsimCompatibility;
@@ -69,6 +69,8 @@ public class TeleportationEngine implements DistributedMobsimEngine {
 		while (firstPersonReady(now)) {
 			TeleportationEntry entry = personsTeleporting.remove();
 			DistributedMobsimAgent person = entry.person();
+			person.notifyArrivalOnLinkByNonNetworkMode(person.getDestinationLinkId());
+
 			String mode = person.getMode();
 			Double distance = person.getExpectedTravelDistance();
 			em.processEvent(new TeleportationArrivalEvent(now, person.getId(), distance, mode));

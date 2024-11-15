@@ -19,16 +19,9 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
+package org.matsim.core.mobsim.qsim;
 
 import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -46,32 +39,33 @@ import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 /**
  * Includes all agents that have transportation modes unknown to the
  * NetsimEngine (often all != "car") or have two activities on the same link
  */
 public final class DefaultTeleportationEngine implements TeleportationEngine {
-	private static final Logger log = LogManager.getLogger( DefaultTeleportationEngine.class ) ;
+	private static final Logger log = LogManager.getLogger(DefaultTeleportationEngine.class);
 
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
-			30, new Comparator<Tuple<Double, MobsimAgent>>() {
-
-		@Override
-		public int compare(Tuple<Double, MobsimAgent> o1, Tuple<Double, MobsimAgent> o2) {
-			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-			if (ret == 0) {
-				ret = o2.getSecond()
-						.getId()
-						.compareTo(o1.getSecond()
-								.getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-			}
-			return ret;
+		30, (o1, o2) -> {
+		int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+		if (ret == 0) {
+			ret = o2.getSecond()
+				.getId()
+				.compareTo(o1.getSecond()
+					.getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
 		}
+		return ret;
 	});
 	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
 	private InternalInterface internalInterface;
-	private Scenario scenario;
-	private EventsManager eventsManager;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
 
 	private final boolean withTravelTimeCheck;
 
@@ -91,28 +85,30 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		if (agent.getExpectedTravelTime().isUndefined()) {
 			LogManager.getLogger(this.getClass()).info("mode: " + agent.getMode());
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
-					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
+				+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16");
 		}
 
-		double travelTime = agent.getExpectedTravelTime().seconds() ;
-		if ( withTravelTimeCheck ) {
-			Double speed = scenario.getConfig().routing().getTeleportedModeSpeeds().get( agent.getMode() ) ;
-			Facility dpfac = agent.getCurrentFacility() ;
-			Facility arfac = agent.getDestinationFacility() ;
+		double travelTime = agent.getExpectedTravelTime().seconds();
+		if (withTravelTimeCheck) {
+			Double speed = scenario.getConfig().routing().getTeleportedModeSpeeds().get(agent.getMode());
+			Facility dpfac = agent.getCurrentFacility();
+			Facility arfac = agent.getDestinationFacility();
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
 		}
 
-		double arrivalTime = now + travelTime ;
+		double arrivalTime = now + travelTime;
 		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
 
 		// === below here is only visualization, no dynamics ===
-		Id<Person> agentId = agent.getId();
+		/*Id<Person> agentId = agent.getId();
 		Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
 		Link destLink = this.scenario .getNetwork().getLinks().get(agent.getDestinationLinkId());
 		Coord fromCoord = currLink.getToNode().getCoord();
 		Coord toCoord = destLink.getToNode().getCoord();
 		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
 		this.teleportationData.put(agentId, agentInfo);
+
+		 */
 
 		return true;
 	}
@@ -141,7 +137,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
 				this.eventsManager.processEvent(
-						new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
+					new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);
@@ -171,35 +167,35 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	private static Double travelTimeCheck(Double travelTime, Double speed, Facility dpfac, Facility arfac) {
-		if ( speed==null ) {
+		if (speed == null) {
 			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
-			return travelTime ;
+			return travelTime;
 		}
 
-		if ( dpfac == null || arfac == null ) {
-			log.warn( "dpfac = " + dpfac ) ;
-			log.warn( "arfac = " + arfac ) ;
-			throw new RuntimeException("have bushwhacking mode but nothing that leads to coordinates; don't know what to do ...") ;
+		if (dpfac == null || arfac == null) {
+			log.warn("dpfac = " + dpfac);
+			log.warn("arfac = " + arfac);
+			throw new RuntimeException("have bushwhacking mode but nothing that leads to coordinates; don't know what to do ...");
 			// (means that the agent is not correctly implemented)
 		}
 
-		if ( dpfac.getCoord()==null || arfac.getCoord()==null ) {
+		if (dpfac.getCoord() == null || arfac.getCoord() == null) {
 			// yy this is for example the case if activities are initialized at links, without coordinates.  Could use the link coordinate
 			// instead, but somehow this does not feel any better. kai, feb'16
 
-			return travelTime ;
+			return travelTime;
 		}
 
 		final Coord dpCoord = dpfac.getCoord();
 		final Coord arCoord = arfac.getCoord();
 
-		double dist = NetworkUtils.getEuclideanDistance( dpCoord, arCoord ) ;
-		double travelTimeTmp = dist / speed ;
+		double dist = NetworkUtils.getEuclideanDistance(dpCoord, arCoord);
+		double travelTimeTmp = dist / speed;
 
-		if ( travelTimeTmp < travelTime ) {
-			return travelTime ;
+		if (travelTimeTmp < travelTime) {
+			return travelTime;
 		}
 
-		return travelTimeTmp ;
+		return travelTimeTmp;
 	}
 }

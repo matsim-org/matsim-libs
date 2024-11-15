@@ -114,16 +114,14 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		this.getEvents().processEvent(new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if ((!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null))
 			&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
-			log.error("The agent {} has destination link {}, but arrived on link {}. Setting agent state to ABORT.",
-				this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLinkId());
+			log.error("The agent {} has destination link {}, but arrived on link {}. Setting agent state to ABORT.", this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLinkId());
 			this.setState(MobsimAgent.State.ABORT);
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-			computeNextAction(now);
-			var act = (Activity) plan.getPlanElements().get(currentPlanElementIndex);
-			this.getEvents().processEvent(new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
-				act.getCoord()));
+			advancePlan(now);
 		}
+
+		this.currentLinkIndex = 0;
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		this.setCurrentLinkId(linkId);
 	}
 
-	public void computeNextAction(double now) {
+	private void advancePlan(double now) {
 		this.currentPlanElementIndex++;
 
 		// check if plan has run dry:
@@ -171,8 +169,10 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 
 	private void initializeActivity(Activity act, double now) {
 		this.setState(MobsimAgent.State.ACTIVITY);
+		this.getEvents().processEvent(new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+			act.getCoord()));
 		calculateAndSetDepartureTime(act);
-		((Activity) getCurrentPlanElement()).setStartTime(now);
+		act.setStartTime(now);
 	}
 
 	/**
@@ -204,7 +204,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 		this.getEvents().processEvent(new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
 
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-		computeNextAction(now);
+		advancePlan(now);
 	}
 
 	@Override
