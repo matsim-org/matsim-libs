@@ -237,6 +237,8 @@ public final class LSPUtils {
     }
 
     public LogisticChain build() {
+      //TODO: Prüfe of das alle Elemente Verbunden sind (in irgendeiner Art). Plus Hinweis auf die Änderung.
+
       return new LogisticChainImpl(this);
     }
   }
