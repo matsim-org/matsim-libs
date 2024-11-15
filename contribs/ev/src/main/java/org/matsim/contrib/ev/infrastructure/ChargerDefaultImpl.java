@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Preconditions;
 
@@ -75,6 +76,11 @@ class ChargerDefaultImpl implements Charger {
 	@Override
 	public int getPlugCount() {
 		return specification.getPlugCount();
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return specification.getAttributes();
 	}
 
 	//TODO in order to add a separate coord: adapt DTD, ChargerSpecification and ChargerReader/Writer

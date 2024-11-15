@@ -29,7 +29,7 @@ public class DashboardTests {
 	private void run(Dashboard... dashboards) {
 
 		Config config = TestScenario.loadConfig(utils);
-		config.controller().setLastIteration(2);
+		config.controller().setLastIteration(1);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.sampleSize = 0.001;
@@ -43,40 +43,29 @@ public class DashboardTests {
 		controler.run();
 	}
 
+
 	@Test
 	void defaults() {
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+		Path out = Path.of(utils.getOutputDirectory(), "analysis");
 
 		run();
 
 		// Ensure default dashboards have been added
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**stuck_agents.csv");
-	}
-
-	@Test
-	void stuckAgents() {
-
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
-
-		run(new StuckAgentDashboard());
-
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**stuck_agents.csv");
-
-	}
-
-	@Test
-	void trip() {
-
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
-
-		run(new TripDashboard());
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv")
-			.isDirectoryContaining("glob:**mode_shift.csv");
+			// Stuck agents
+			.isDirectoryRecursivelyContaining("glob:**stuck_agents.csv")
+			// Trip stats
+			.isDirectoryRecursivelyContaining("glob:**trip_stats.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_per_purpose.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_shift.csv")
+			// Traffic stats
+			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_link_daily.csv")
+			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
+			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_road_type_daily.csv")
+			// PT
+			.isDirectoryRecursivelyContaining("glob:**pt_pax_volumes.csv.gz");
 	}
 
 	@Test
@@ -131,21 +120,6 @@ public class DashboardTests {
 	}
 
 	@Test
-	void traffic() {
-
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
-
-		run(new TrafficDashboard());
-
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
-			.isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
-			.isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
-
-
-	}
-
-	@Test
 	void odTrips() {
 		run(new ODTripDashboard(Set.of("car", "pt", "walk", "bike", "ride"), "EPSG:25832"));
 
@@ -163,19 +137,20 @@ public class DashboardTests {
 		PublicTransitDashboard pt = new PublicTransitDashboard();
 
 		// bus
-		TransitViewer.CustomRouteType crt = new TransitViewer.CustomRouteType();
-		crt.label = "Bus";
-		crt.color = "#109192";
+		TransitViewer.CustomRouteType crt = TransitViewer.customRouteType("Bus", "#109192");
 		crt.addMatchGtfsRouteType(3);
 
 		// rail
-		TransitViewer.CustomRouteType crtRail = new TransitViewer.CustomRouteType();
-		crtRail.label = "Rail";
-		crtRail.color = "#EC0016";
+		TransitViewer.CustomRouteType crtRail = TransitViewer.customRouteType("Rail", "#EC0016");
 		crtRail.addMatchGtfsRouteType(2);
 
 		pt.withCustomRouteTypes(crt, crtRail);
 
 		run(pt);
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "pt");
+
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz");
 	}
 }
