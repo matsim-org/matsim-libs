@@ -3,6 +3,8 @@ package org.matsim.dsim.messages;
 import lombok.Builder;
 import lombok.Data;
 import org.matsim.api.core.v01.Message;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 
 import java.util.List;
 
@@ -13,8 +15,16 @@ import java.util.List;
 @Data
 public class VehicleContainer implements Message {
 
+	private final Class<? extends DistributedMobsimVehicle> vehicleType;
 	private final Message vehicle;
-	private final Message driver;
-	private final List<Message> passengers;
+
+	private final Occupant driver;
+	private final List<Occupant> passengers;
+
+	public record Occupant(Class<? extends DistributedMobsimAgent> type, Message occupant ) {
+		public Occupant(DistributedMobsimAgent agent) {
+			this(agent.getClass(), agent.toMessage());
+		}
+	}
 
 }

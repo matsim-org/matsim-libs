@@ -20,10 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +38,11 @@ import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentMessage;
+import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
@@ -82,6 +83,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
+	private final TimeInterpretation timeInterpretation;
 	private final TransitDriverAgentFactory transitDriverFactory;
 
 	private InternalInterface internalInterface = null ;
@@ -95,18 +97,21 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
 			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
 			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
+			TimeInterpretation.create(queueSimulation.getScenario().getConfig()),
 			new DefaultTransitDriverAgentFactory());
 	}
 
 	@Inject
 	public TransitQSimEngine(Netsim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
 							 UmlaufBuilder umlaufBuilder, TransitStopAgentTracker tracker,
+							 TimeInterpretation timeInterpretation,
 							 TransitDriverAgentFactory transitDriverFactory) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.umlaufBuilder = umlaufBuilder;
 		this.agentTracker = tracker;
 		this.stopHandlerFactory = stopHandlerFactory;
+		this.timeInterpretation = timeInterpretation;
 		this.transitDriverFactory = transitDriverFactory;
 	}
 
@@ -235,22 +240,18 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	@Override
-	public Class<? extends Message> getAgentClass() {
-		return null;
+	public Set<Class<? extends DistributedMobsimAgent>> getAgentClasses() {
+		return Set.of(TransitAgent.class, TransitDriverAgentImpl.class);
 	}
 
 	@Override
-	public DistributedMobsimAgent agentFromMessage(Message message) {
-		return null;
-	}
-
-	@Override
-	public Class<? extends Message> getVehicleClass() {
-		return null;
-	}
-
-	@Override
-	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
-		return null;
+	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
+		if (type == TransitAgent.class) {
+			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentMessage) message, qSim.getScenario(),
+				qSim.getEventsManager(), qSim.getSimTimer(), timeInterpretation);
+			return TransitAgent.createTransitAgent(delegate, qSim.getScenario());
+		} else {
+			throw new RuntimeException("Unsupported agent type: " + type);
+		}
 	}
 }

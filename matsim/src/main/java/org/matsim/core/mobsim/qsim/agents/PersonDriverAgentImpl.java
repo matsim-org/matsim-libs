@@ -63,6 +63,11 @@ public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriv
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
 	}
 
+	public PersonDriverAgentImpl(final BasicPlanAgentMessage message, final Netsim simulation, final TimeInterpretation timeInterpretation) {
+		basicAgentDelegate = new BasicPlanAgentImpl(message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation ) ;
+		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
+	}
+
 	public PersonDriverAgentImpl(final Plan plan1, Scenario scenario, EventsManager eventsManager, MobsimTimer timer, final TimeInterpretation timeInterpretation) {
 		basicAgentDelegate = new BasicPlanAgentImpl(plan1, scenario, eventsManager, timer, timeInterpretation);
 		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);

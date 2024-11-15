@@ -31,8 +31,8 @@ public final class QSimCompatibility {
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
 
-	private final Map<Class<? extends Message>, DistributedAgentSource> agentTypes = new HashMap<>();
-	private final Map<Class<? extends Message>, DistributedAgentSource> vehicleSources = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimAgent>, DistributedAgentSource> agentTypes = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimVehicle>, DistributedAgentSource> vehicleTypes = new HashMap<>();
 
 	@Getter
 	private final Injector injector;
@@ -137,14 +137,19 @@ public final class QSimCompatibility {
 
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
+					for (Class<? extends DistributedMobsimAgent> agentClass : as.getAgentClasses()) {
+						if (agentTypes.containsKey(agentClass))
+							throw new IllegalStateException("Duplicate agent provider found for %s".formatted(agentClass));
 
-					Class<? extends Message> aClass = as.getAgentClass();
-					if (aClass != null)
-						agentTypes.put(aClass, as);
+						agentTypes.put(agentClass, as);
+					}
 
-					Class<? extends Message> vClass = as.getVehicleClass();
-					if (vClass != null)
-						vehicleSources.put(vClass, as);
+					for (Class<? extends DistributedMobsimVehicle> vehicleClass : as.getVehicleClasses()) {
+						if (vehicleTypes.containsKey(vehicleClass))
+							throw new IllegalStateException("Duplicate vehicle provider found for %s".formatted(vehicleClass));
+
+						vehicleTypes.put(vehicleClass, as);
+					}
 				}
 			}
 		}
@@ -155,9 +160,10 @@ public final class QSimCompatibility {
 	 */
 	public VehicleContainer vehicleToContainer(DistributedMobsimVehicle vehicle) {
 		return VehicleContainer.builder()
+			.setVehicleType(vehicle.getClass())
 			.setVehicle(vehicle.toMessage())
-			.setDriver(((DistributedMobsimAgent) vehicle.getDriver()).toMessage())
-			.setPassengers(vehicle.getPassengers().stream().map(p -> ((DistributedMobsimAgent) p).toMessage()).toList())
+			.setDriver(new VehicleContainer.Occupant((DistributedMobsimAgent) vehicle.getDriver()))
+			.setPassengers(vehicle.getPassengers().stream().map(p -> new VehicleContainer.Occupant((DistributedMobsimAgent) p)).toList())
 			.build();
 	}
 
@@ -166,13 +172,13 @@ public final class QSimCompatibility {
 	 */
 	public DistributedMobsimVehicle vehicleFromContainer(VehicleContainer container) {
 
-		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicle());
-		DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver());
+		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicleType(), container.getVehicle());
+		DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver().type(), container.getDriver().occupant());
 		vehicle.setDriver(driver);
 		driver.setVehicle(vehicle);
 
-		for (Message passenger : container.getPassengers()) {
-			PassengerAgent p = (PassengerAgent) agentFromMessage(passenger);
+		for (VehicleContainer.Occupant occ : container.getPassengers()) {
+			PassengerAgent p = (PassengerAgent) agentFromMessage(occ.type(), occ.occupant());
 			vehicle.addPassenger(p);
 			p.setVehicle(vehicle);
 		}
@@ -184,26 +190,26 @@ public final class QSimCompatibility {
 	 * Create a vehicle from a received message. This should normally not be used directly.
 	 * @see #vehicleFromContainer(VehicleContainer)
 	 */
-	private DistributedMobsimVehicle vehicleFromMessage(Message m) {
-		DistributedAgentSource source = vehicleSources.get(m.getClass());
+	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {
+		DistributedAgentSource source = vehicleTypes.get(m.getClass());
 		if (source == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(m.getClass()));
 		}
 
-		return source.vehicleFromMessage(m);
+		return source.vehicleFromMessage(type, m);
 	}
 
 	/**
 	 * Create an agent from a received message.
 	 */
-	public DistributedMobsimAgent agentFromMessage(Message m) {
-		DistributedAgentSource source = agentTypes.get(m.getClass());
+	@SuppressWarnings("unchecked")
+	public <T extends DistributedMobsimAgent> T agentFromMessage(Class<T> type, Message m) {
+		DistributedAgentSource source = agentTypes.get(type);
 		if (source == null) {
 			throw new RuntimeException("No agent provider found for %s".formatted(m.getClass()));
 		}
 
-
-		return source.agentFromMessage(m);
+		return (T) source.agentFromMessage(type, m);
 	}
 
 }

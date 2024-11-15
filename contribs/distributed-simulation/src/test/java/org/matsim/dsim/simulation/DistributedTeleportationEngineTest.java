@@ -123,14 +123,14 @@ class DistributedTeleportationEngineTest {
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var qsimCompatibility = mock(QSimCompatibility.class);
-		when(qsimCompatibility.agentFromMessage(any())).thenReturn(agent);
+		when(qsimCompatibility.agentFromMessage(any(), any())).thenReturn(agent);
 		var engine = new DistributedTeleportationEngine(em, messaging, qsimCompatibility);
 
 		engine.setInternalInterface(mock(InternalInterface.class));
 
 		SimStepMessage message = SimStepMessage.builder()
 			.setTeleportationMsg(Teleportation.builder()
-				.setPersonMessage(agent.toMessage())
+				.setAgent(agent.toMessage())
 				.setExitTime(42)
 				.build())
 			.build();
@@ -154,11 +154,11 @@ class DistributedTeleportationEngineTest {
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var qsimCompatibility = mock(QSimCompatibility.class);
-		when(qsimCompatibility.agentFromMessage(any())).thenReturn(agent);
+		when(qsimCompatibility.agentFromMessage(any(), any())).thenReturn(agent);
 		var engine = new DistributedTeleportationEngine(em, messaging, qsimCompatibility);
 		var message = SimStepMessage.builder()
 			.setTeleportationMsg(Teleportation.builder()
-				.setPersonMessage(agent.toMessage())
+				.setAgent(agent.toMessage())
 				.setExitTime(42)
 				.build())
 			.build();

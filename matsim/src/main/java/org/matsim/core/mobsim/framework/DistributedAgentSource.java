@@ -5,6 +5,8 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
+import java.util.Set;
+
 /**
  * Interface for creating agents and vehicles for the mobsim. This interface
  */
@@ -19,17 +21,27 @@ public interface DistributedAgentSource {
 	void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim);
 
 	/**
-	 * Return the message class of the agents produced by this source.
+	 * Return classes of agent that this source will create.
 	 */
-	Class<? extends Message> getAgentClass();
+	Set<Class<? extends DistributedMobsimAgent>> getAgentClasses();
 
 	/**
 	 * Construct an agent from a message.
 	 */
-	DistributedMobsimAgent agentFromMessage(Message message);
+	DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message);
 
-	Class<? extends Message> getVehicleClass();
+	/**
+	 * The vehicle classes this provider will support.
+	 */
+	default Set<Class<? extends DistributedMobsimVehicle>> getVehicleClasses() {
+		return Set.of();
+	}
 
-	DistributedMobsimVehicle vehicleFromMessage(Message message);
+	/**
+	 * Construct a vehicle from a message.
+	 */
+	default DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
+		return null;
+	}
 
 }

@@ -20,7 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -45,4 +47,10 @@ public class TransitAgentFactory implements AgentFactory {
 		return agent;
 	}
 
+	@Override
+	public DistributedMobsimAgent createMobsimAgentFromMessage(Message message) {
+
+		BasicPlanAgentImpl agent = new BasicPlanAgentImpl((BasicPlanAgentMessage) message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation);
+		return TransitAgent.createTransitAgent(agent, simulation.getScenario());
+	}
 }

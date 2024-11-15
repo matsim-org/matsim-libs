@@ -51,6 +51,7 @@ import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public final class PopulationAgentSource implements AgentSource, DistributedAgentSource {
@@ -249,25 +250,22 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	}
 
 	@Override
-	public Class<? extends Message> getAgentClass() {
-		return BasicPlanAgentMessage.class;
+	public Set<Class<? extends DistributedMobsimAgent>> getAgentClasses() {
+		return Set.of(BasicPlanAgentImpl.class);
 	}
 
 	@Override
-	public DistributedMobsimAgent agentFromMessage(Message message) {
-		// TODO
-		return new BasicPlanAgentImpl((BasicPlanAgentMessage) message, qsim.getScenario(),
-			qsim.getEventsManager(), qsim.getSimTimer(), null);
+	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
+		return this.agentFactory.createMobsimAgentFromMessage(message);
 	}
 
 	@Override
-	public Class<? extends Message> getVehicleClass() {
-		return QVehicleMessage.class;
+	public Set<Class<? extends DistributedMobsimVehicle>> getVehicleClasses() {
+		return Set.of(QVehicleImpl.class);
 	}
 
 	@Override
-	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
-		// TODO
-		return new QVehicleImpl(null);
+	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
+		return new QVehicleImpl((QVehicleMessage) message);
 	}
 }

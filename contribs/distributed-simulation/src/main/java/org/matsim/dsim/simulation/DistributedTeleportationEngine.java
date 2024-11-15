@@ -9,6 +9,7 @@ import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.SimStepMessage;
+import org.matsim.dsim.messages.Teleportation;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -49,7 +50,7 @@ public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
-		for (var teleportation : stepMessage.getTeleportationMsgs()) {
+		for (Teleportation teleportation : stepMessage.getTeleportationMsgs()) {
 			var exitTime = teleportation.exitTime();
 			if (exitTime < now) {
 				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +
@@ -58,7 +59,7 @@ public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 					" error might be an indicator, that the speed of the teleported leg is too fast.");
 			}
 
-			DistributedMobsimAgent agent = qsimCompatibility.agentFromMessage(teleportation.personMessage());
+			DistributedMobsimAgent agent = qsimCompatibility.agentFromMessage(teleportation.type(), teleportation.agent());
 			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
 		}
 	}

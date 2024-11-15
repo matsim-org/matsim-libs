@@ -94,6 +94,15 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 		}
 	}
 
+	public QVehicleImpl(QVehicleMessage message) {
+		this.id = message.vehicle().getId();
+		this.vehicle = message.vehicle();
+		this.passengerCapacity = message.passengerCapacity();
+		this.linkEnterTime = message.linkEnterTime();
+		this.earliestLinkExitTime = message.earliestLinkExitTime();
+		this.currentLinkId = message.currentLinkId();
+	}
+
 	@Override
 	public void setCurrentLinkId(final Id<Link> linkId) {
 		this.currentLinkId = linkId;
@@ -215,17 +224,6 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public Message toMessage() {
-		// TODO: needs to be implemented
-		try {
-			var driverMessage = ((DistributedMobsimAgent) driver).toMessage();
-			var passengerMessages = passengers.stream()
-				.map(p -> (DistributedMobsimAgent) p)
-				.map(p -> toMessage())
-				.toList();
-
-			return new QVehicleMessage(id, driverMessage, passengerMessages, earliestLinkExitTime);
-		} catch (ClassCastException e) {
-			throw new RuntimeException("Only DistributeMobsimAgents can be send as messages.", e);
-		}
+		return new QVehicleMessage(this.linkEnterTime, this.earliestLinkExitTime, this.currentLinkId, this.vehicle, this.passengerCapacity);
 	}
 }

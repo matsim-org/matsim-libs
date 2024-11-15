@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.PopulationUtils;
@@ -52,7 +54,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author michaz
  */
-public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
+public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implements DistributedMobsimAgent {
 
 	private final EventsManager eventsManager;
 
@@ -94,7 +96,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	private TransitRoute transitRoute;
 	private Departure departure;
 	private Scenario scenario;
-	
+
 	public TransitDriverAgentImpl(Umlauf umlauf,
 			String transportMode,
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
@@ -123,8 +125,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	@Override
 	public void endActivityAndComputeNextState(final double now) {
 		this.currentPlanElement = iPlanElement.next();
-		sendTransitDriverStartsEvent(now);	
-		
+		sendTransitDriverStartsEvent(now);
+
 //		this.sim.arrangeAgentDeparture(this);
 		this.state = MobsimAgent.State.LEG ;
 //		this.sim.reInsertAgentIntoMobsim(this) ;
@@ -152,10 +154,10 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			// * in general, a MobsimAgent can construct its path through the day on the fly
 			// * in this particular instance, the agent pretends to have a plan
 			// kai, mar'12
-			
+
 			this.state = MobsimAgent.State.ACTIVITY ;
 			this.departureTime = Double.POSITIVE_INFINITY ;
-			
+
 		}
 	}
 
@@ -188,7 +190,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	Leg getCurrentLeg() {
 		return (Leg) this.currentPlanElement;
 	}
-	
+
 	@Override
 	public OptionalTime getExpectedTravelTime() {
 		return ((Leg) this.currentPlanElement).getTravelTime();
@@ -203,11 +205,11 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	public String getMode() {
 		return ((Leg)this.currentPlanElement).getMode();
 	}
-	
+
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
 		Route route = ((Leg)this.currentPlanElement).getRoute() ;
-		return ((NetworkRoute)route).getVehicleId() ; 
+		return ((NetworkRoute)route).getVehicleId() ;
 	}
 
 //	@Override
@@ -217,7 +219,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	@Override
 	public PlanElement getCurrentPlanElement() {
-		return this.currentPlanElement; 
+		return this.currentPlanElement;
 	}
 
 	@Override
@@ -270,7 +272,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	public double getActivityEndTime() {
 		return this.departureTime;
 	}
-	
+
 	@Override
 	public Plan getCurrentPlan() {
 		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
@@ -317,7 +319,16 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		throw new RuntimeException("unexpected type of PlanElement") ;
 	}
 
-	
-	
+
+	@Override
+	public Message toMessage() {
+		// TODO
+		return new TransitDriverMessage();
+	}
+
+
+	public static class TransitDriverMessage implements Message {
+
+	}
 
 }

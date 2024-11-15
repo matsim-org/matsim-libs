@@ -25,10 +25,13 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -47,24 +50,33 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
+public final class TransitAgent implements DistributedMobsimAgent, MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
 	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger(TransitAgent.class);
 
-	private BasicPlanAgentImpl basicAgentDelegate ;
-	private PlanBasedDriverAgentImpl driverAgentDelegate ;
-	private TransitAgentImpl transitAgentDelegate ;
+	private final BasicPlanAgentImpl basicAgentDelegate ;
+	private final PlanBasedDriverAgentImpl driverAgentDelegate ;
+	private final TransitAgentImpl transitAgentDelegate ;
 
 	public static TransitAgent createTransitAgent(Person p, Netsim simulation, TimeInterpretation timeInterpretation) {
-		TransitAgent agent = new TransitAgent(p, simulation, timeInterpretation);
-		return agent;
+		return new TransitAgent(p, simulation, timeInterpretation);
+	}
+
+	public static TransitAgent createTransitAgent(BasicPlanAgentImpl basicAgentDelegate, Scenario scenario) {
+		return new TransitAgent(basicAgentDelegate, scenario);
 	}
 
 	private TransitAgent(final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
-		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
+		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(),
 				simulation.getSimTimer(), timeInterpretation ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
 		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, simulation.getScenario().getConfig().transit().getBoardingAcceptance() );
+	}
+
+	private TransitAgent(BasicPlanAgentImpl basicAgentDelegate, Scenario scenario) {
+		this.basicAgentDelegate = basicAgentDelegate;
+		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
+		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, scenario.getConfig().transit().getBoardingAcceptance() );
 	}
 
 	@Override
@@ -102,7 +114,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	@Override
 	public final Double getExpectedTravelDistance() {
 		return basicAgentDelegate.getExpectedTravelDistance();
-	}	
+	}
 	@Override
 	public final PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
@@ -212,4 +224,8 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		return this.basicAgentDelegate.getCurrentLinkIndex();
 	}
 
+	@Override
+	public Message toMessage() {
+		return null;
+	}
 }

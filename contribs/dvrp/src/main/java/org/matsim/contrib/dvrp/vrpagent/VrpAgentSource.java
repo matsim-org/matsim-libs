@@ -40,6 +40,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
+import java.util.Set;
+
 public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 	private final DynActionCreator nextActionCreator;
 	private final Fleet fleet;
@@ -112,23 +114,15 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 
 	}
 
-	@Override
-	public Class<? extends Message> getAgentClass() {
-		return null;
-	}
 
 	@Override
-	public DistributedMobsimAgent agentFromMessage(Message message) {
-		return null;
+	public Set<Class<? extends DistributedMobsimAgent>> getAgentClasses() {
+		return Set.of(DynAgent.class);
 	}
 
-	@Override
-	public Class<? extends Message> getVehicleClass() {
-		return null;
-	}
 
 	@Override
-	public DistributedMobsimVehicle vehicleFromMessage(Message message) {
+	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
 		return null;
 	}
 }

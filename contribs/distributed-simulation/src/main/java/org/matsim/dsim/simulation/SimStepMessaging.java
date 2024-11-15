@@ -80,7 +80,7 @@ public interface SimStepMessaging {
 			// figure out where the person has to go and store the person // we are expecting teleported persons here.
 			int targetPart = part2Link.getInt(person.getDestinationLinkId());
 			Teleportation teleportation = Teleportation.builder()
-				.setPersonMessage(person.toMessage())
+				.setAgent(person.toMessage())
 				.setExitTime(exitTime)
 				.build();
 
