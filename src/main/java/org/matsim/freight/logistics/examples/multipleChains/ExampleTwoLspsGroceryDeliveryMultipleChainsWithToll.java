@@ -26,7 +26,6 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -159,7 +158,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     return config;
   }
 
-  private static @NotNull Controler prepareControler(Scenario scenario, RoadPricingScheme rpScheme) {
+  private static Controler prepareControler(Scenario scenario, RoadPricingScheme rpScheme) {
     log.info("Prepare controler");
     Controler controler = new Controler(scenario);
     controler.addOverridingModule(
