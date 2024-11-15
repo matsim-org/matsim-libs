@@ -226,7 +226,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public List<DepartureHandler> getDepartureHandlers() {
-		throw new UnsupportedOperationException();
+		return qsim.getDepartureHandlers();
 	}
 
 	@Override
@@ -240,6 +240,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		em.processEvent(new PersonDepartureEvent(
 			now, agent.getId(), agent.getCurrentLinkId(), agent.getMode(), routingMode
 		));
+
+		// TODO: also use existing departure handlers
 
 		// this should be extended if we have more engines, such as pt or drt and others.
 		// qsimconfiggroup has a set as main modes. Otherwise, we could maintain our own set
