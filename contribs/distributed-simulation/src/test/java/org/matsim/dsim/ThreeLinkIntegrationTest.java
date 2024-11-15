@@ -75,7 +75,7 @@ public class ThreeLinkIntegrationTest {
 		controller.run();
 
 		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
 
 		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
@@ -98,7 +98,7 @@ public class ThreeLinkIntegrationTest {
 		controller.run();
 
 		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-2-plans.xml";
-		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
 
 		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
@@ -133,7 +133,7 @@ public class ThreeLinkIntegrationTest {
 		}
 
 		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml.gz";
+		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
 
 		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);

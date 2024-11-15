@@ -52,19 +52,19 @@ public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriv
 	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger(PersonDriverAgentImpl.class);
 
-	private final BasicPlanAgentImpl basicAgentDelegate ;
-	private final PlanBasedDriverAgentImpl driverAgentDelegate ;
+	private final BasicPlanAgentImpl basicAgentDelegate;
+	private final PlanBasedDriverAgentImpl driverAgentDelegate;
 
 	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation, final TimeInterpretation timeInterpretation) {
 		basicAgentDelegate = new BasicPlanAgentImpl(plan1, simulation.getScenario(), simulation.getEventsManager(),
-				simulation.getSimTimer(), timeInterpretation ) ;
-		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate) ;
+			simulation.getSimTimer(), timeInterpretation);
+		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
 
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
 	}
 
-	public PersonDriverAgentImpl(final BasicPlanAgentMessage message, final Netsim simulation, final TimeInterpretation timeInterpretation) {
-		basicAgentDelegate = new BasicPlanAgentImpl(message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation ) ;
+	public PersonDriverAgentImpl(final BasicPlanAgentImpl.BasicPlanAgentMessage message, final Netsim simulation, final TimeInterpretation timeInterpretation) {
+		basicAgentDelegate = new BasicPlanAgentImpl(message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation);
 		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
 	}
 
@@ -108,12 +108,12 @@ public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriv
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
 
-    @Override
-    public final Double getExpectedTravelDistance() {
-        return basicAgentDelegate.getExpectedTravelDistance();
-    }
+	@Override
+	public final Double getExpectedTravelDistance() {
+		return basicAgentDelegate.getExpectedTravelDistance();
+	}
 
-    @Override
+	@Override
 	public String toString() {
 		return basicAgentDelegate.toString();
 	}
@@ -189,23 +189,28 @@ public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriv
 	}
 
 	final Leg getCurrentLeg() {
-		return basicAgentDelegate.getCurrentLeg() ;
+		return basicAgentDelegate.getCurrentLeg();
 	}
+
 	@Override
 	public final int getCurrentLinkIndex() {
-		return basicAgentDelegate.getCurrentLinkIndex() ;
+		return basicAgentDelegate.getCurrentLinkIndex();
 	}
+
 	final int getCurrentPlanElementIndex() {
-		return basicAgentDelegate.getCurrentPlanElementIndex() ;
+		return basicAgentDelegate.getCurrentPlanElementIndex();
 	}
+
 	@Override
 	public final Plan getModifiablePlan() {
-		return basicAgentDelegate.getModifiablePlan() ;
+		return basicAgentDelegate.getModifiablePlan();
 	}
-//	final void calculateAndSetDepartureTime( Activity act ) {
+
+	//	final void calculateAndSetDepartureTime( Activity act ) {
 //		basicAgentDelegate.calculateAndSetDepartureTime(act);
 //	}
-	@Override public final void resetCaches() {
+	@Override
+	public final void resetCaches() {
 		basicAgentDelegate.resetCaches();
 		driverAgentDelegate.resetCaches();
 	}

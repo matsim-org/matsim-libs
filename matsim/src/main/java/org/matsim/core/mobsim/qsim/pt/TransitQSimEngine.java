@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
-import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentMessage;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
@@ -84,13 +83,13 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	private final TimeInterpretation timeInterpretation;
 	private final TransitDriverAgentFactory transitDriverFactory;
 
-	private InternalInterface internalInterface = null ;
+	private InternalInterface internalInterface = null;
 
 	private Map<Id<Umlauf>, Umlauf> umlaeufe = null;
 
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 	}
 
 	TransitQSimEngine(Netsim queueSimulation) {
@@ -132,7 +131,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
+				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), ((MobsimAgent) agent).getMode()));
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
 			}
@@ -143,7 +142,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<>();
-		Map<Id<Umlauf>, Umlauf> umlaufCache = getOrCreateUmlaufe( scenario );
+		Map<Id<Umlauf>, Umlauf> umlaufCache = getOrCreateUmlaufe(scenario);
 
 		for (Umlauf umlauf : umlaufCache.values()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
@@ -206,9 +205,9 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
 			double now = this.qSim.getSimTimer().getTimeOfDay();
 			this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
-			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
+			this.internalInterface.registerAdditionalAgentOnLink(planAgent);
 		} else {
-			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
+			throw new TransitAgentTriesToTeleportException("Agent " + planAgent.getId() + " tries to enter a transit stop at link " + stop.getLinkId() + " but really is at " + linkId + "!");
 		}
 	}
 
@@ -218,9 +217,9 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		String requestedMode = agent.getMode();
 		if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
 			handleAgentPTDeparture(agent, linkId);
-			return true ;
+			return true;
 		}
-		return false ;
+		return false;
 	}
 
 	public TransitStopAgentTracker getAgentTracker() {
@@ -258,7 +257,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	@Override
 	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
 		if (type == TransitAgent.class) {
-			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentMessage) message, qSim.getScenario(),
+			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, qSim.getScenario(),
 				qSim.getEventsManager(), qSim.getSimTimer(), timeInterpretation);
 			return TransitAgent.createTransitAgent(delegate, qSim.getScenario());
 		} else {

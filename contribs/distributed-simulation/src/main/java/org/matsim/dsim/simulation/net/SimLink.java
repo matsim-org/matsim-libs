@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.dsim.simulation.SimStepMessaging;
@@ -284,6 +283,7 @@ public interface SimLink {
 			assert !q.contains(vehicle);
 			storageCapacity.consume(vehicle.getSizeInEquivalents());
 			inflowCapacity.consume(vehicle.getSizeInEquivalents());
+			vehicle.setCurrentLinkId(id);
 			q.add(vehicle);
 		}
 

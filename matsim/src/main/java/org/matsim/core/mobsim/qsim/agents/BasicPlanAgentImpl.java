@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -76,7 +77,8 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	public BasicPlanAgentImpl(BasicPlanAgentMessage message, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
 
 		// use the plan from the message, as a message should have been generated from a BasicPlanAgentImpl, with its own copy of the plan.
-		this.plan = message.plan();
+		this.plan = PopulationUtils.createPlan(message.planElements());
+		this.plan.setPerson(scenario.getPopulation().getPersons().get(message.personId()));
 		this.currentPlanElementIndex = message.currentPlanElementIndex();
 		this.activityEndTime = message.activityEndTime();
 		this.state = message.state();
@@ -431,7 +433,7 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 
 	@Override
 	public BasicPlanAgentMessage toMessage() {
-		return new BasicPlanAgentMessage(plan, currentPlanElementIndex, activityEndTime, state, currentLinkId, currentLinkIndex);
+		return new BasicPlanAgentMessage(plan.getPerson().getId(), plan.getPlanElements(), currentPlanElementIndex, activityEndTime, state, currentLinkId, currentLinkIndex);
 	}
 
 	@Override
@@ -443,5 +445,19 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 			.add("currentPlanElementIndex", currentPlanElementIndex)
 			.add("currentLinkId", currentLinkId)
 			.toString();
+	}
+
+	/**
+	 * Class to represent a basic plan agent as message object.
+	 */
+	public record BasicPlanAgentMessage(
+		Id<Person> personId,
+		List<PlanElement> planElements,
+		int currentPlanElementIndex,
+		double activityEndTime,
+		MobsimAgent.State state,
+		Id<Link> currentLinkId,
+		int currentLinkIndex
+	) implements Message {
 	}
 }

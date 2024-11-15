@@ -20,14 +20,13 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.utils.timing.TimeInterpretation;
-
-import jakarta.inject.Inject;
 
 
 public class TransitAgentFactory implements AgentFactory {
@@ -43,14 +42,13 @@ public class TransitAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverPassengerAgent agent = TransitAgent.createTransitAgent(p, this.simulation, timeInterpretation);
-		return agent;
+		return TransitAgent.createTransitAgent(p, this.simulation, timeInterpretation);
 	}
 
 	@Override
 	public DistributedMobsimAgent createMobsimAgentFromMessage(Message message) {
 
-		BasicPlanAgentImpl agent = new BasicPlanAgentImpl((BasicPlanAgentMessage) message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation);
+		BasicPlanAgentImpl agent = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation);
 		return TransitAgent.createTransitAgent(agent, simulation.getScenario());
 	}
 }

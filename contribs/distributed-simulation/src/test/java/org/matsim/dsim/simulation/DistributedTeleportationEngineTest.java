@@ -11,7 +11,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
-import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentMessage;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,7 +41,7 @@ class DistributedTeleportationEngineTest {
 		leg.setTravelTime(42);
 		leg.setRoute(new GenericRouteImpl(Id.createLinkId("l1"), Id.createLinkId("l2")));
 		plan.addLeg(leg);
-		var msg = new BasicPlanAgentMessage(plan, 0, 0, MobsimAgent.State.ACTIVITY, Id.createLinkId("bla"), 0);
+		var msg = new BasicPlanAgentImpl.BasicPlanAgentMessage(person.getId(), plan.getPlanElements(), 0, 0, MobsimAgent.State.ACTIVITY, Id.createLinkId("bla"), 0);
 
 		return new BasicPlanAgentImpl(msg, scenario, em, timer, timeInterpretation);
 	}

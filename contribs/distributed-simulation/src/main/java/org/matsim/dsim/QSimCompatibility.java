@@ -8,12 +8,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.DistributedAgentSource;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.messages.VehicleContainer;
 
 import java.lang.annotation.Annotation;
@@ -51,6 +55,8 @@ public final class QSimCompatibility {
 
 	private Injector qsimInjector;
 
+	private Netsim netsim;
+
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
 					  Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
@@ -73,6 +79,8 @@ public final class QSimCompatibility {
 		if (qsimInjector != null) {
 			return;
 		}
+
+		this.netsim = netsim;
 
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
@@ -172,8 +180,15 @@ public final class QSimCompatibility {
 	 */
 	public DistributedMobsimVehicle vehicleFromContainer(VehicleContainer container) {
 
-		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicleType(), container.getVehicle());
-		DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver().type(), container.getDriver().occupant());
+		// assuming that we are passing around QVehicles and Plan based agents
+		//TODO use vehiclefrommessage and agentfromessage functions below
+		var vehicle = new QVehicleImpl((QVehicleMessage) container.getVehicle());
+		//var netsim = injector.getInstance(Netsim.class);
+		var timeInterpretation = injector.getInstance(TimeInterpretation.class);
+		var driver = new PersonDriverAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) container.getDriver().occupant(), netsim, timeInterpretation);
+
+		//DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicleType(), container.getVehicle());
+		//DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver().type(), container.getDriver().occupant());
 		vehicle.setDriver(driver);
 		driver.setVehicle(vehicle);
 
@@ -188,6 +203,7 @@ public final class QSimCompatibility {
 
 	/**
 	 * Create a vehicle from a received message. This should normally not be used directly.
+	 *
 	 * @see #vehicleFromContainer(VehicleContainer)
 	 */
 	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {

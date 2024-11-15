@@ -47,6 +47,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	//private final Config config;
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
+	private final AgentCounter agentCounter = new DummyAgentCounter();
 
 	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, DistributedTeleportationEngine teleportationEngine,
 			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
@@ -139,7 +140,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public AgentCounter getAgentCounter() {
-		throw new UnsupportedOperationException();
+		return agentCounter;
 	}
 
 	@Override
