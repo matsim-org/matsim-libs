@@ -52,11 +52,6 @@ public class SimpleAgent implements Message, DistributedMobsimAgent, MobsimDrive
 	}
 
 	@Override
-	public void computeNextAction(double now) {
-		throw new UnsupportedOperationException("Not supported in this test class");
-	}
-
-	@Override
 	public Id<Link> chooseNextLinkId() {
 		return null;
 	}

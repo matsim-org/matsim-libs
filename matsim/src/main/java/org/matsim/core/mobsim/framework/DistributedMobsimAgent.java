@@ -32,9 +32,4 @@
 	  * Convert the agent to a message that can be sent to other nodes. The message can be any java object, but should be as lightweight as possible.
 	  */
 	 Message toMessage();
-
-	 // TODO we want to keep this?
-	 @Deprecated
-	 void computeNextAction(double now);
-
  }

@@ -224,9 +224,4 @@ public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriv
 	public Message toMessage() {
 		return this.basicAgentDelegate.toMessage();
 	}
-
-	@Override
-	public void computeNextAction(double now) {
-		this.basicAgentDelegate.computeNextAction(now);
-	}
 }

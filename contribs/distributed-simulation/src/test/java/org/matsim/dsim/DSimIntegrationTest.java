@@ -26,7 +26,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Log4j2
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MobsimIntegrationTest {
+public class DSimIntegrationTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
