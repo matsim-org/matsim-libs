@@ -129,4 +129,8 @@ public final class SparseMatrix {
 	void setRow(Node fromNode, SparseRow row) {
 		rows[fromNode.getId().index()] = row;
 	}
+
+	SparseRow[] getRows() {
+		return rows;
+	}
 }
