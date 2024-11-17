@@ -129,10 +129,8 @@ public class TripRouterFactoryImplTest {
 				0,
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
+
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
@@ -206,10 +204,7 @@ public class TripRouterFactoryImplTest {
 				0,
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();

@@ -456,11 +456,7 @@ public class ControlerIT {
 		assertEquals(f.link1.getId(), act2a.getLinkId());
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 
-		int expectedPlanLength = 3 ;
-		if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
-			expectedPlanLength = 7 ;
-		}
+		int expectedPlanLength = 7 ;
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		//assertNotNull(leg1.getRoute());
@@ -474,11 +470,9 @@ public class ControlerIT {
 			assertNotNull(
 					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
 					"null route in plan "+plan.getPlanElements());
-			if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-				assertNotNull(
-					((Leg) plan.getPlanElements().get( 3 )).getRoute(),
-					"null route in plan "+plan.getPlanElements());
-			}
+			assertNotNull(
+				((Leg) plan.getPlanElements().get( 3 )).getRoute(),
+				"null route in plan "+plan.getPlanElements());
 		}
 	}
 

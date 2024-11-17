@@ -57,18 +57,6 @@ public final class DefaultRoutingModules {
                 params.getBeelineDistanceFactor() );
 	}
 
-	/**
-	 * Creates network router without access/egress.
-	 */
-	@Deprecated // use AccessEgressNetworkRouter instead
-	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		return new NetworkRoutingModule(
-				mode,
-				popFact,
-				net,
-				routeAlgo);
-	}
-
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,

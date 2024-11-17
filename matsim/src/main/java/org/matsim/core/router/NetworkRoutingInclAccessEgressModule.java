@@ -114,10 +114,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
 		this.accessEgressType = config.routing().getAccessEgressType();
 		this.timeInterpretation = timeInterpretation;
-		if (accessEgressType.equals(AccessEgressType.none)) {
-			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
-					+ "currently not supported; there are too many other problems");
-		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
+		if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
 			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
 					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress ");

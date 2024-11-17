@@ -94,12 +94,8 @@ public class EditRoutesTest {
 		createScenario();
 
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
@@ -153,16 +149,10 @@ public class EditRoutesTest {
 
 		createScenario();
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndAct = 2 ;
-		int scndCarLeg = 3 ; // 3-->9
-		int thrdAct = 4 ;
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndAct = 6 ;
-			scndCarLeg = 9 ; // 3-->9
-			thrdAct = 12 ;
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndAct = 6 ;
+		int scndCarLeg = 9 ; // 3-->9
+		int thrdAct = 12 ;
 
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
 
@@ -233,12 +223,8 @@ public class EditRoutesTest {
 	// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 	{
 		createScenario();
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 
 
@@ -283,12 +269,8 @@ public class EditRoutesTest {
 		// create new routes for HW-trip
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityW1;
 
@@ -309,12 +291,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 
 		Activity activityW1;
@@ -331,12 +309,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 
 		Activity activityW1;
@@ -354,12 +328,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityH2;
 
@@ -375,12 +345,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityH2;
 
@@ -396,12 +362,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityH2;
 
@@ -417,12 +379,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityH2;
 
@@ -438,12 +396,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 		Activity activityH2;
 
@@ -461,12 +415,8 @@ public class EditRoutesTest {
 		createScenario();	// reset scenario
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
-		int firstCarLeg = 1 ; // 1-->3
-		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			firstCarLeg = 3 ; // 1-->3
-			scndCarLeg = 9 ; // 3-->9
-		}
+		int firstCarLeg = 3 ; // 1-->3
+		int scndCarLeg = 9 ; // 3-->9
 
 
 		Leg legHW = (Leg) plan.getPlanElements().get(firstCarLeg);

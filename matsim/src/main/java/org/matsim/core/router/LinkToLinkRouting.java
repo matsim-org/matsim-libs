@@ -120,18 +120,17 @@ public class LinkToLinkRouting
         );
 
         // see NetworkRoutingProvider for some notes
-        if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
-            if (mode.equals(TransportMode.walk)) {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);
-            } else {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation, multimodalLinkChooser);
-            }
+		if (mode.equals(TransportMode.walk)) {
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+					filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);
+		} else {
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+					filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation, multimodalLinkChooser);
+		}
 
-        } else {
-            // pure inverted router
-            return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
-        }
+		// pure inverted router
+		// TODO: I have disabled this Link2Link Router and instead make it 100% use AccessEgress. Make sure, that this is okay #aleks
+		//return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
+
     }
 }

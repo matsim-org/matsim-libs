@@ -54,11 +54,11 @@ public class ScoreStatsModuleTest {
 
 	@ParameterizedTest
 	@MethodSource("arguments")
-	void testScoreStats(boolean isUsingFastCapacityUpdate, boolean isInsertingAccessEgressWalk) {
+	void testScoreStats(boolean isUsingFastCapacityUpdate) { //TODO changed method signature, check if this broke something #aleks
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		config.routing().setAccessEgressType(isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.controller().setLastIteration(1);
 		Controler controler = new Controler(config);
@@ -90,65 +90,44 @@ public class ScoreStatsModuleTest {
 			//            }
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
-			if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+			// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
+//			if(config.qsim().isUsingFastCapacityUpdate()) {
 				{
-					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.78366379257605, array[1], DELTA);
-				} {
-					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
+				Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
+				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
 				}{
-					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.81273255910591, array[1], DELTA);
+				Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
+				Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
 				}{
-					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
+				Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
+				Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
+				}{
+				Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
+				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
 				}
-				} else {
-					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
-//					if(config.qsim().isUsingFastCapacityUpdate()) {
-						{
-						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
-						}
-//					} else {
-//						{
-//						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
-//						}
-//					}
-				}
-			}
+//			} else {
+//				{
+//				Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
+//				Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
+//				Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
+//				}{
+//				Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
+//				Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
+//				Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
+//				}{
+//				Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
+//				Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[0], array[0], DELTA);
+//				Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[1], array[1], DELTA);
+//				}{
+//				Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
+//				Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
+//				Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
+//				}
+//			}
 		}
-
 	}
+}
