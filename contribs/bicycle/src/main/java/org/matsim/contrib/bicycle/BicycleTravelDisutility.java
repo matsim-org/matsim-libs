@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -39,6 +40,8 @@ import java.util.Random;
 class BicycleTravelDisutility implements TravelDisutility {
 	private static final Logger LOG = LogManager.getLogger(BicycleTravelDisutility.class);
 
+	@Inject
+	private BicycleParams bicycleParams;
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
 	private final double marginalCostOfInfrastructure_m;
@@ -102,13 +105,13 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
 
-		double comfortFactor = BicycleUtils.getComfortFactor(surface );
+		double comfortFactor = bicycleParams.getComfortFactor(surface );
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = BicycleUtils.getGradient(link );
+		double gradientFactor = bicycleParams.getGradient(link );
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
 		double userDefinedNetworkAttritubeDisutility = 0.;
