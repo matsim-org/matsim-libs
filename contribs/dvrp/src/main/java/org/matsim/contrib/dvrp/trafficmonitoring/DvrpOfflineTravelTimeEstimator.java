@@ -90,7 +90,7 @@ public class DvrpOfflineTravelTimeEstimator
 		this.delimiter = delimiter;
 
 		alpha = travelTimeEstimationAlpha;
-		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
+		checkArgument(alpha >= 0 && alpha <= 1, "travelTimeEstimationAlpha must be in [0,1]");
 
 		linkTravelTimes = DvrpOfflineTravelTimes.convertToLinkTravelTimeMatrix(initialTT, network.getLinks().values(),
 				timeDiscretizer);
@@ -114,7 +114,9 @@ public class DvrpOfflineTravelTimeEstimator
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		updateTTs(observedTT, alpha);
+		if(alpha > 0) {
+			updateTTs(observedTT, alpha);
+		}
 	}
 
 	@Override

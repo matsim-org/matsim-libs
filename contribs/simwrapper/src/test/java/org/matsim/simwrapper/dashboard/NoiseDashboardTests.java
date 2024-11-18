@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import com.opencsv.CSVReader;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -15,6 +16,7 @@ import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 
+import java.io.FileReader;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -38,7 +40,7 @@ public class NoiseDashboardTests {
 
 		simWrapperConfigGroup.defaultParams().shp = IOUtils.extendUrl(kelheim, "area/area.shp").toString();
 
-		SimWrapper sw = SimWrapper.create(config).addDashboard(new NoiseDashboard());
+		SimWrapper sw = SimWrapper.create(config).addDashboard(new NoiseDashboard(config.global().getCoordinateSystem()));
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 
 		controler.run();
@@ -51,6 +53,19 @@ public class NoiseDashboardTests {
 			.isDirectoryContaining("glob:**damages_receiverPoint_per_day.avro")
 			.isDirectoryContaining("glob:**noise_stats.csv");
 
-		//TODO check content / values of the files
+		double totalDamages;
+		double totalImmissions;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(utils.getOutputDirectory() + "analysis/noise/noise_stats.csv"));
+			reader.skip(1);
+			totalDamages = Double.parseDouble(reader.readNext()[1]);
+			totalImmissions = Double.parseDouble(reader.readNext()[1]);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		Assertions.assertThat(totalDamages == 3573114.25);
+		Assertions.assertThat( totalImmissions == 2.688);
+
 	}
 }

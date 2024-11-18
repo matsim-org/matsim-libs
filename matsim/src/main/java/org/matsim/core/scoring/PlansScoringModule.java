@@ -32,5 +32,6 @@ public final class PlansScoringModule extends AbstractModule {
 		bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
 		bind(PlansScoring.class).to(PlansScoringImpl.class);
 		bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class).asEagerSingleton();
+		bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
 	}
 }

@@ -97,9 +97,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 	 void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
 
-//		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike");
 		config.routing().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
 		// (this is now newly taken from the router network modes. kai, feb'19)
+		 // analyzed modes still need to be set correctly now, because these two settings can differ  rakow, oct'24
 
 		config.travelTimeCalculator().setSeparateModes(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
