@@ -81,9 +81,9 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		List<Double> precedingStayTimes = new ArrayList<>();
 
-		// With changing capacities, we need to start the loop for (int i = stops.length - 1; i >= 0; i--) with the last vehicle capacity
-		DvrpVehicleLoad outgoingOccupancy = vehicle.getCapacity().getEmptyLoad();
-
+		// With changing capacities, we collect the sequence of capacities that the vehicle is scheduled to have. So that we can track them backwards in the next loop
+		List<DvrpVehicleLoad> vehicleCapacities = new ArrayList<>(tasks.size() - nextTaskIdx);
+		vehicleCapacities.add(vehicle.getCapacity().getEmptyLoad());
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (STAY.isBaseTypeOf(task)) {
 				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
@@ -93,15 +93,19 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				accumulatedStayTime = 0.0;
 			}
 			if(task instanceof CapacityChangeTask capacityChangeTask) {
-				outgoingOccupancy = capacityChangeTask.getNewVehicleCapacity().getEmptyLoad();
+				vehicleCapacities.add(capacityChangeTask.getNewVehicleCapacity());
 			}
 		}
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
+		int capacityIndex = vehicleCapacities.size() - 1;
+		DvrpVehicleLoad outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
+
 		for (int i = stops.length - 1; i >= 0; i--) {
 			if(stopTasks.get(i) instanceof CapacityChangeTask capacityChangeTask) {
 				assert outgoingOccupancy.isEmpty();
-				outgoingOccupancy = capacityChangeTask.getPreviousVehicleCapacity().getEmptyLoad();
+				capacityIndex--;
+				outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
 				stops[i] = new Waypoint.StopWithCapacityChange(capacityChangeTask);
 			} else {
 				Waypoint.Stop s = stops[i] = new Waypoint.StopWithPickupAndDropoff(stopTasks.get(i), outgoingOccupancy);

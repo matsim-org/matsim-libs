@@ -7,7 +7,4 @@ import java.util.Random;
 public interface CapacityChangeTask extends DrtStopTask{
 
 	DvrpVehicleLoad getNewVehicleCapacity();
-
-	//TODO remove this method
-	DvrpVehicleLoad getPreviousVehicleCapacity();
 }
