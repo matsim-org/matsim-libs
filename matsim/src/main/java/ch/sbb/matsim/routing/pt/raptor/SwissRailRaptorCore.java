@@ -110,6 +110,7 @@ public class SwissRailRaptorCore {
         reset();
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
+		// Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
         Map<TransitStopFacility, InitialStop> destinationStops = new LinkedHashMap<>();
 
         // go through all egressStops; check if already in destinationStops; if so, check if current cost is smaller; if so, then replace.  This can
@@ -133,6 +134,7 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
+		// Also, using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
         Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);

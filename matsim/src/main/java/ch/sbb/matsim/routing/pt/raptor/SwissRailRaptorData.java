@@ -138,7 +138,8 @@ public class SwissRailRaptorData {
         // enumerate TransitStopFacilities along their usage in transit routes to (hopefully) achieve a better memory locality
         // well, I'm not even sure how often we'll need the transit stop facilities, likely we'll use RouteStops more often
         Map<TransitStopFacility, Integer> stopFacilityIndices = new HashMap<>((int) (schedule.getFacilities().size() * 1.5));
-        Map<TransitStopFacility, int[]> routeStopsPerStopFacility = new LinkedHashMap<>();
+        // Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+		Map<TransitStopFacility, int[]> routeStopsPerStopFacility = new LinkedHashMap<>();
 
         boolean useModeMapping = staticConfig.isUseModeMappingForPassengers();
         for (TransitLine line : schedule.getTransitLines().values()) {
