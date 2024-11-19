@@ -23,9 +23,7 @@ import org.matsim.dsim.events.EventMessagingPattern;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -162,6 +160,11 @@ public final class EventHandlerTask implements SimTask {
 
                 Method[] methods = ifType.getDeclaredMethods();
 
+				// Could be an aggregated interface without methods, this can be ignored
+				// Event handler not implementing a EventHandler interface will not be recognized
+				if (methods.length == 0)
+					continue;
+
                 if ((!methods[0].getName().equals("process") && !methods[0].getName().equals("handleEvent")) || methods[0].getParameterCount() != 1)
                     continue;
 
@@ -183,6 +186,12 @@ public final class EventHandlerTask implements SimTask {
                 }
             }
         }
+
+		if (consumers.isEmpty()) {
+			throw new IllegalStateException(("No event handling methods found for: %s. " +
+				"This is most likely due to unsupported class hierarchy. " +
+				"Please explicitly implement needed EventHandler").formatted(handler.getClass().getName()));
+		}
 
         // Register consumers for message patterns
         if (handler instanceof AggregatingEventHandler<?>) {

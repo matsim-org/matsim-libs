@@ -89,14 +89,6 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-        // TODO: need to check if multiple syncs are required
-
-        // Event handler have already been registered at this point
-        if (manager instanceof DistributedEventsManager d) {
-            d.syncEventRegistry(comm);
-        }
-
     }
 
     @Override

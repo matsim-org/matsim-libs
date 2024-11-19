@@ -91,10 +91,9 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	@Override
-	public void addHandler(Provider<EventHandler> provider) {
-		addInternal(provider.get(), provider);
+	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
+		return addInternal(provider.get(), provider);
 	}
-
 
 	@Override
 	public void addHandler(EventHandler handler) {
@@ -108,9 +107,12 @@ public final class DistributedEventsManager implements EventsManager {
 		addInternal(handler, null);
 	}
 
-	private void addInternal(EventHandler handler, Provider<EventHandler> provider) {
+	private  <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
 
 		String name = handler.getName();
+
+		List<T> handlers = new ArrayList<>();
+		handlers.add(handler);
 
 		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
 
@@ -130,10 +132,11 @@ public final class DistributedEventsManager implements EventsManager {
 				addTask(task, part);
 
 				if (partition.value() == DistributedMode.PARTITION) {
-					EventHandler next = provider.get();
+					T next = provider.get();
 					if (handler == next)
 						throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 
+					handlers.add(next);
 					handler = next;
 				}
 			}
@@ -144,6 +147,7 @@ public final class DistributedEventsManager implements EventsManager {
 			addTask(task, part);
 		}
 
+		return handlers;
 	}
 
 	private void addTask(EventHandlerTask task, int part) {
@@ -215,7 +219,9 @@ public final class DistributedEventsManager implements EventsManager {
 				}
 			});
 
-			log.warn("Globals listener on this node: {}", info);
+			log.warn("Globals listener on this node: \n\t{}", String.join("\n\t", info.entrySet().stream()
+				.map(e -> "%s: %s".formatted(e.getKey(), e.getValue()))
+				.toList()));
 
 			log.warn("### Global event listeners reduce parallelism and impact performance negatively. ###");
 		}

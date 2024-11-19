@@ -64,13 +64,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			messaging.getPart(),
 			networkTrafficEngine.getSimNetwork().getLinks().size(),
 			networkTrafficEngine.getSimNetwork().getNodes().size());
+
+		// There can be components that register additional event handler
+		// These must be created the simulation starts running
+		this.qsim.init(this);
 	}
 
 	@Override
 	public void onPrepareSim() {
-
-		qsim.init(this);
-
 		currentTime.setSimStartTime(getScenario().getConfig().qsim().getStartTime().orElse(0));
 
 		for (DistributedMobsimEngine engine : engines) {

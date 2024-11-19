@@ -7,6 +7,8 @@ import org.matsim.core.events.EventArray;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 
+import java.util.List;
+
 
 /**
  * This should be split into two interfaces:
@@ -29,9 +31,13 @@ public interface EventsManager  {
 
 	/**
 	 * Add handler to the event manager via its provider. This method is necesarry for distributed event handlers, which will have multiple instances.
+	 *
+	 * @return list of handlers that have been created.
 	 */
-	default void addHandler(final Provider<EventHandler> provider) {
-		addHandler(provider.get());
+	default <T extends EventHandler> List<T> addHandler(final Provider<T> provider) {
+		T handler = provider.get();
+		addHandler(handler);
+		return List.of(handler);
 	}
 
 	public void removeHandler(final EventHandler handler);

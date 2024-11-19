@@ -93,16 +93,32 @@ public class DrtIntegrationTest {
                 .get(Id.create("autonomous_vehicle", VehicleType.class))
                 .getMaximumVelocity();
 
+		controler.getScenario().getVehicles().getVehicleTypes().values().forEach(vt -> vt.setNetworkMode(TransportMode.car));
+
         controler.addOverridingModule(
                 new DvrpModeLimitedMaxSpeedTravelTimeModule("av", config.qsim().getTimeStepSize(),
                         maxSpeed));
 
     }
 
+	@Test
+	@Order(1)
+	void runSingleThread() {
+
+		Scenario scenario = createScenario();
+
+		Controler controler = new Controler(scenario);
+
+		prepareController(controler);
+
+		controler.addOverridingModule(new DistributedSimulationModule(1));
+		controler.run();
+
+	}
+
     @Test
-    @Order(1)
-    @Disabled
-    void runLocal() {
+    @Order(2)
+    void runMultiThreaded() {
 
         Scenario scenario = createScenario();
 
@@ -116,7 +132,7 @@ public class DrtIntegrationTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     @Disabled
     void runDistributed() {
 
