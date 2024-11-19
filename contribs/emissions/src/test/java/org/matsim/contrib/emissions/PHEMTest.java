@@ -331,7 +331,7 @@ public class PHEMTest {
 	}
 
 	private double computePercentageDiff(double a, double b){
-		return (b-a)/((a+b)/2)*100;
+		return (a-b)/((a+b)/2)*100;
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
