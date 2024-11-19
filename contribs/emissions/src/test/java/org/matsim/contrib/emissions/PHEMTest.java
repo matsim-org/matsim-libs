@@ -7,25 +7,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class PHEMTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
+
+	//TODO Check if the used hbefa files are correct
+	private final static String HBEFA_4_1_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
+	private final static String HBEFA_HOT = HBEFA_4_1_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
+	private final static String HBEFA_COLD = HBEFA_4_1_PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc";
 
 	// TODO DEBUG ONLY
 	static CSVPrinter csvPrinter = null;
@@ -126,24 +141,80 @@ public class PHEMTest {
 	}
 
 	@Test
-	public void test() throws IOException {
-		// TODO DEBUG ONLY
-		fileWriter = new FileWriter(utils.getOutputDirectory().toString() + "cuts.csv");
-		csvPrinter = new CSVPrinter(fileWriter, CSVFormat.DEFAULT);
-
-
+	public void test() throws IOException, URISyntaxException {
 		// Prepare test
-		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("short_wltp_cycle.csv");
+//		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("short_wltp_cycle.csv");
+//		Network network = NetworkUtils.createNetwork();
+//		createTestLinks(network, dir);
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
+		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable ); //TODO Check that this is correct
+		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT);
+		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD);
+
+		Config config = ConfigUtils.createConfig(ecg);
+
+		// Create network
 		Network network = NetworkUtils.createNetwork();
-		createTestLinks(network, dir);
+		network.addNode(NetworkUtils.createNode(Id.createNodeId("n0"), new Coord(0,0)));
+		int[] times = new int[]{589, 433, 455, 323};
+		int[] lengths = new int[]{3095, 4756, 7158, 8254};
+		double[] freespeeds = new double[]{15.69, 21.28, 27.06, 36.47};
+		String[] hbefaStreetTypes = new String[]{"URB/Local/50", "URB/MW-City/80", "RUR/MW/100", "RUR/MW/>130"}; // TODO URB/Distr/100 was changed into RUR/MW/100
+
+		/*List<LinkEnterEvent> linkEnterEvents = new ArrayList<>();
+		List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
+		for(int i = 0; i < 4; i++){
+			network.addNode(NetworkUtils.createNode(
+				Id.createNodeId("n" + (i+1)),
+				new Coord(network.getNodes().get(Id.createNodeId("n" + i)).getCoord().getX()+lengths[i],0)));
+
+			Link l = NetworkUtils.createAndAddLink(
+				network,
+				Id.createLinkId("l" + i),
+				network.getNodes().get(Id.createNodeId("n" + i)),
+				network.getNodes().get(Id.createNodeId("n" + (i+1))),
+				3095,
+				freespeeds[i],
+				10000,
+				1);
+			EmissionUtils.setHbefaRoadType(l, hbefaKeys[i]);
+
+			linkEnterEvents.add(new LinkEnterEvent(
+				Arrays.stream(times).limit(i).sum(),
+				Id.createVehicleId("TODO"),
+				Id.createLinkId("l" + i)
+			));
+
+			linkLeaveEvents.add(new LinkLeaveEvent(
+				Arrays.stream(times).limit(i+1).sum(),
+				Id.createVehicleId("TODO"),
+				Id.createLinkId("l" + i)
+			));
+		}*/
+
+		// Create Scenario and EventManager
+		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
+			.setNetwork(network) // TODO: Check if this is even needed
+			.build();
+		EventsManager manager = EventsUtils.createEventsManager(config);
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
+			HbefaVehicleCategory.PASSENGER_CAR,
+			new HbefaVehicleAttributes()); // TODO: Input the actual vehicle data here, currently just "average"
+
+		EmissionModule module = new EmissionModule(scenario, manager);
+		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
+		for(int i = 0; i < 4; i++){
+			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(times[i], hbefaStreetTypes[i], freespeeds[i], lengths[i], vehHbefaInfo));
+		}
+
+		// No we need to read in the sumo-files
 
 		System.out.println();
 
 		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "net.xml");
-
-		// TODO DEBUG ONLY
-		fileWriter.flush();
-		fileWriter.close();
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
