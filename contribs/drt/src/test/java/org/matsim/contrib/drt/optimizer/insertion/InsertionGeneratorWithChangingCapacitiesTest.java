@@ -49,8 +49,8 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
 	}
 
-	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpVehicleLoad previousCapacity, DvrpVehicleLoad newCapacity) {
-		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, previousCapacity, newCapacity));
+	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpVehicleLoad newCapacity) {
+		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, newCapacity));
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
@@ -98,7 +98,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
-		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
+		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequestA, entry,
 			//pickup after start
@@ -114,7 +114,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
 		Waypoint.Stop stop0 = stop(0, link("stop0"), new TestScalarVehicleLoadA(1)); //pickup
 		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadA(0)); // dropoff
-		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);
+		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), CHANGED_VEHICLE_CAPACITY);
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 
@@ -133,7 +133,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	@Test
 	void startEmpty_capacityChangeThenRequest_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
-		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), STARTING_VEHICLE_CAPACITY, CHANGED_VEHICLE_CAPACITY);
+		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);
 		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadB(1)); //pickup
 		Waypoint.Stop stop2 = stop(0, link("stop2"), new TestScalarVehicleLoadB(0)); // dropoff
 

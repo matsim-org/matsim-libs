@@ -119,7 +119,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 				//Then we insert a capacity change with a duration of one minute
 				Task capacityChangeTask = new DefaultDrtStopTaskWithVehicleCapacityChange(capacityChangeBeginTime,
-					capacityChangeBeginTime, link, dvrpVehicle.getCapacity(), newVehicleLoad);
+					capacityChangeBeginTime, link, newVehicleLoad);
 
 				//Then we insert a stay task there
 				DrtStayTask stayAfterCapacityChangeTask = new DrtStayTask(capacityChangeTask.getEndTime(), Math.max(initialEndTime, capacityChangeTask.getEndTime()+60), link);

@@ -10,22 +10,15 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements CapacityChangeTask {
 
 	private final DvrpVehicleLoad newVehicleCapacity;
-	private final DvrpVehicleLoad previousVehicleCapacity;
 
-	public DefaultDrtStopTaskWithVehicleCapacityChange(double beginTime, double endTime, Link link, DvrpVehicleLoad previousVehicleCapacity, DvrpVehicleLoad newVehicleCapacity) {
+	public DefaultDrtStopTaskWithVehicleCapacityChange(double beginTime, double endTime, Link link, DvrpVehicleLoad newVehicleCapacity) {
 		super(beginTime, endTime, link);
-		this.previousVehicleCapacity = previousVehicleCapacity;
 		this.newVehicleCapacity = newVehicleCapacity;
 	}
 
 	@Override
 	public DvrpVehicleLoad getNewVehicleCapacity() {
 		return this.newVehicleCapacity;
-	}
-
-	@Override
-	public DvrpVehicleLoad getPreviousVehicleCapacity() {
-		return this.previousVehicleCapacity;
 	}
 
 	@Override
