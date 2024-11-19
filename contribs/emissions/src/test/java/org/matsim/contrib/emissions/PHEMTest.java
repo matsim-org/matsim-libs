@@ -142,10 +142,7 @@ public class PHEMTest {
 
 	@Test
 	public void test() throws IOException, URISyntaxException {
-		// Prepare test
-//		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("short_wltp_cycle.csv");
-//		Network network = NetworkUtils.createNetwork();
-//		createTestLinks(network, dir);
+		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
@@ -153,69 +150,44 @@ public class PHEMTest {
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD);
 
+		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
 
-		// Create network
-		Network network = NetworkUtils.createNetwork();
-		network.addNode(NetworkUtils.createNode(Id.createNodeId("n0"), new Coord(0,0)));
-		int[] times = new int[]{589, 433, 455, 323};
-		int[] lengths = new int[]{3095, 4756, 7158, 8254};
-		double[] freespeeds = new double[]{15.69, 21.28, 27.06, 36.47};
-		String[] hbefaStreetTypes = new String[]{"URB/Local/50", "URB/MW-City/80", "RUR/MW/100", "RUR/MW/>130"}; // TODO URB/Distr/100 was changed into RUR/MW/100
+		// Define Test-case (WLTP Class 3b) -> Creates a link for each wltp-segment
+		WLTPLinkAttributes[] wltpLinkAttributes = new WLTPLinkAttributes[]{
+			new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"),
+			new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"),
+			new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"),
+			new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/>130"),
+		};
 
-		/*List<LinkEnterEvent> linkEnterEvents = new ArrayList<>();
-		List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
-		for(int i = 0; i < 4; i++){
-			network.addNode(NetworkUtils.createNode(
-				Id.createNodeId("n" + (i+1)),
-				new Coord(network.getNodes().get(Id.createNodeId("n" + i)).getCoord().getX()+lengths[i],0)));
-
-			Link l = NetworkUtils.createAndAddLink(
-				network,
-				Id.createLinkId("l" + i),
-				network.getNodes().get(Id.createNodeId("n" + i)),
-				network.getNodes().get(Id.createNodeId("n" + (i+1))),
-				3095,
-				freespeeds[i],
-				10000,
-				1);
-			EmissionUtils.setHbefaRoadType(l, hbefaKeys[i]);
-
-			linkEnterEvents.add(new LinkEnterEvent(
-				Arrays.stream(times).limit(i).sum(),
-				Id.createVehicleId("TODO"),
-				Id.createLinkId("l" + i)
-			));
-
-			linkLeaveEvents.add(new LinkLeaveEvent(
-				Arrays.stream(times).limit(i+1).sum(),
-				Id.createVehicleId("TODO"),
-				Id.createLinkId("l" + i)
-			));
-		}*/
-
-		// Create Scenario and EventManager
-		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
-			.setNetwork(network) // TODO: Check if this is even needed
-			.build();
-		EventsManager manager = EventsUtils.createEventsManager(config);
-
+		// Define vehicle
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
 			new HbefaVehicleAttributes()); // TODO: Input the actual vehicle data here, currently just "average"
 
+		// Create Scenario and EventManager
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		EventsManager manager = EventsUtils.createEventsManager(config);
+
+		// Calculate MATSim-emissions
 		EmissionModule module = new EmissionModule(scenario, manager);
 		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
 		for(int i = 0; i < 4; i++){
-			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(times[i], hbefaStreetTypes[i], freespeeds[i], lengths[i], vehHbefaInfo));
+			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+				wltpLinkAttributes[i].time,
+				wltpLinkAttributes[i].hbefaStreetType,
+				wltpLinkAttributes[i].freespeed,
+				wltpLinkAttributes[i].length,
+				vehHbefaInfo));
 		}
 
 		// No we need to read in the sumo-files
 
 		System.out.println();
-
-		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "net.xml");
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
+
+	private record WLTPLinkAttributes(int time, int length, double freespeed, String hbefaStreetType){}
 }
