@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -20,14 +21,15 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import pabeles.concurrency.IntOperatorTask;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +142,103 @@ public class PHEMTest {
 		}
 	}
 
+	private static List<SumoEntry> readSumoFile(Path path){
+		List<SumoEntry> sumoSeconds = new ArrayList<>();
+
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(";")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
+
+		try (var reader = Files.newBufferedReader(path); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				sumoSeconds.add(new SumoEntry(
+					SumoEntry.Type.SECOND,
+					Integer.parseInt(record.get(0)),
+					Double.parseDouble(record.get(1)),
+					Double.parseDouble(record.get(2)),
+					Double.parseDouble(record.get(3)),
+					Double.parseDouble(record.get(4)),
+					Double.parseDouble(record.get(5)),
+					Double.parseDouble(record.get(6)),
+					Double.parseDouble(record.get(7)),
+					Double.parseDouble(record.get(8)),
+					Double.parseDouble(record.get(9)),
+					Double.parseDouble(record.get(10))
+				));
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+
+		return sumoSeconds;
+	}
+
+	/**
+	 * Read a SUMO emissionsDrivingCycle csv-output and maps the emissions to the test links, given in {@code wltpLinkAttributes}.
+	 * @param path Path to SUMO output-file
+	 * @param wltpLinkAttributes Array of records, containing the information of each WLTP-test-segment
+	 * @return a {@link SumoEntry} for each WLTP-test-segment
+	 */
+	private static List<SumoEntry> readSumoEmissionsForLinks(Path path, WLTPLinkAttributes[] wltpLinkAttributes){
+		List<SumoEntry> sumoSeconds = readSumoFile(path);
+		List<SumoEntry> sumoSegments = new ArrayList<>();
+
+		/*
+		Partition the SumoSeconds into the segments, given in wltpLinkAttributes.
+		 */
+		int currentSecond = 0;
+		for(WLTPLinkAttributes wltpLink : wltpLinkAttributes){
+			int travelTime = wltpLink.time;
+			double sumVelocity = 0;
+			double sumAcceleration = 0;
+			double sumSlope = 0;
+			double sumCO = 0;
+			double sumCO2 = 0;
+			double sumHC = 0;
+			double sumPMx = 0;
+			double sumNOx = 0;
+			double sumFuel = 0;
+			double sumElectricity = 0;
+
+			for(int i = currentSecond; i < currentSecond + wltpLink.time; i++){
+				sumVelocity += sumoSeconds.get(i).velocity;
+				sumAcceleration += sumoSeconds.get(i).acceleration;
+				sumSlope += sumoSeconds.get(i).slope;
+				sumCO += sumoSeconds.get(i).CO;
+				sumCO2 += sumoSeconds.get(i).CO2;
+				sumHC += sumoSeconds.get(i).HC;
+				sumPMx += sumoSeconds.get(i).PMx;
+				sumNOx += sumoSeconds.get(i).NOx;
+				sumFuel += sumoSeconds.get(i).fuel;
+				sumElectricity += sumoSeconds.get(i).electricity;
+			}
+
+			currentSecond = wltpLink.time;
+
+			sumoSegments.add(new SumoEntry(
+				SumoEntry.Type.SEGMENT,
+				travelTime,
+				sumVelocity/travelTime,
+				sumAcceleration/travelTime,
+				sumSlope/travelTime,
+				sumCO,
+				sumCO2,
+				sumHC,
+				sumPMx,
+				sumNOx,
+				sumFuel,
+				sumElectricity
+			));
+		}
+
+		//Make sure, that everything went right
+		assert sumoSegments.size() == wltpLinkAttributes.length;
+
+		return sumoSegments;
+	}
+
 	@Test
 	public void test() throws IOException, URISyntaxException {
 		// Prepare emission-config
@@ -173,7 +272,7 @@ public class PHEMTest {
 		// Calculate MATSim-emissions
 		EmissionModule module = new EmissionModule(scenario, manager);
 		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
-		for(int i = 0; i < 4; i++){
+		for(int i = 0; i < wltpLinkAttributes.length; i++){
 			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
 				wltpLinkAttributes[i].time,
 				wltpLinkAttributes[i].hbefaStreetType,
@@ -182,12 +281,90 @@ public class PHEMTest {
 				vehHbefaInfo));
 		}
 
-		// No we need to read in the sumo-files
+		// Now we need to read in the sumo-files and get the SUMO results
+		// output-files comes from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
 
-		System.out.println();
+		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_output.csv");
+		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
+
+		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions and save them in a csv
+		CSVPrinter writer = new CSVPrinter(
+			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_out.csv"),
+			CSVFormat.DEFAULT);
+		writer.printRecord(
+			"segment",
+			"startTime",
+			"travelTime",
+			"CO-Diff",
+			"CO-%Diff",
+			"CO2-Diff",
+			"CO2-%Diff",
+			"HC-Diff",
+			"HC-%Diff",
+			"PMx-Diff",
+			"PMx-%Diff",
+			"NOx-Diff",
+			"NOx-%Diff"
+		);
+
+		// TODO Add max diff values
+		int currentSecond = 0;
+		for(int i = 0; i < wltpLinkAttributes.length; i++){
+			writer.printRecord(
+				i,
+				currentSecond,
+				wltpLinkAttributes[i].time,
+				sumoSegments.get(i).CO/1000 - link_pollutant2grams.get(i).get(Pollutant.CO),
+				computePercentageDiff(sumoSegments.get(i).CO/1000, link_pollutant2grams.get(i).get(Pollutant.CO)),
+				sumoSegments.get(i).CO2/1000 - link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
+				computePercentageDiff(sumoSegments.get(i).CO2/1000, link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL)),
+				sumoSegments.get(i).HC/1000 - link_pollutant2grams.get(i).get(Pollutant.HC),
+				computePercentageDiff(sumoSegments.get(i).HC/1000, link_pollutant2grams.get(i).get(Pollutant.HC)),
+				sumoSegments.get(i).PMx/1000 - link_pollutant2grams.get(i).get(Pollutant.PM),
+				computePercentageDiff(sumoSegments.get(i).PMx/1000, link_pollutant2grams.get(i).get(Pollutant.PM)),
+				sumoSegments.get(i).NOx/1000 - link_pollutant2grams.get(i).get(Pollutant.NOx),
+				computePercentageDiff(sumoSegments.get(i).NOx/1000, link_pollutant2grams.get(i).get(Pollutant.NOx))
+			);
+		}
+		writer.flush();
+		writer.close();
+	}
+
+	private double computePercentageDiff(double a, double b){
+		return (b-a)/((a+b)/2)*100;
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
 
+	/**
+	 * Represents a row of the SUMO output-file / a segment of the WLTP-cycle.
+	 * The enum defines which of them it represents.
+	 * @param type wheter this rentry represents a second / segment
+	 * @param second start time in [s] / travel time in [s]
+	 * @param velocity [m/s] / avg velocity [m/s]
+	 * @param acceleration [m/s^2] / avg acceleration [m/s^2]
+	 * @param slope [°] / avg slope [°]
+	 * @param CO [mg/s] / [mg]
+	 * @param CO2 [mg/s] / [mg]
+	 * @param HC [mg/s] / [mg]
+	 * @param PMx [mg/s] / [mg]
+	 * @param NOx [mg/s] / [mg]
+	 * @param fuel [mg/s] / [mg]
+	 * @param electricity [Wh/s] / [Wh]
+	 */
+	private record SumoEntry(SumoEntry.Type type, int second, double velocity, double acceleration, double slope, double CO, double CO2, double HC, double PMx, double NOx, double fuel, double electricity){
+		private enum Type{
+			SECOND,
+			SEGMENT
+		}
+	}
+
+	/**
+	 * Represents a segment of the WLTP-cycle. Each segment would be one link in MATSim.
+	 * @param time travelTime [s]
+	 * @param length [m]
+	 * @param freespeed [m/s]
+	 * @param hbefaStreetType More information at: {@link VspHbefaRoadTypeMapping}
+	 */
 	private record WLTPLinkAttributes(int time, int length, double freespeed, String hbefaStreetType){}
 }
