@@ -82,9 +82,6 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.betaWalkTT_h = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
-		// todo: I added a getter to access the stop finder. Is this ok?
-//		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();
-
 	}
 
 
