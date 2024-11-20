@@ -14,6 +14,7 @@ import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouterModule;
@@ -38,10 +39,10 @@ import java.util.*;
  * </code>
  */
 public final class AccessibilityFromEvents{
-	private final String actType;
+	private final List<String> actTypes;
 
 	public static final class Builder {
-		private final String actType;
+		private final List<String> actTypes;
 		private Scenario scenario;
 		private String eventsFile;
 		private final List<FacilityDataExchangeInterface> dataListeners = new ArrayList<>() ;
@@ -49,10 +50,10 @@ public final class AccessibilityFromEvents{
 		public Builder( Scenario scenario, String eventsFile) {
 			this(scenario, eventsFile, null);
 		}
-		public Builder( Scenario scenario, String eventsFile, String actType) {
+		public Builder( Scenario scenario, String eventsFile, List<String> actTypes) {
 			this.scenario = scenario;
 			this.eventsFile = eventsFile;
-			this.actType = actType;
+			this.actTypes = actTypes;
 		}
 
 
@@ -60,7 +61,7 @@ public final class AccessibilityFromEvents{
 			dataListeners.add( dataListener ) ;
 		}
 		public AccessibilityFromEvents build() {
-			return new AccessibilityFromEvents(scenario, eventsFile, dataListeners, actType);
+			return new AccessibilityFromEvents(scenario, eventsFile, dataListeners, actTypes);
 		}
 	}
 
@@ -68,11 +69,11 @@ public final class AccessibilityFromEvents{
 	private final String eventsFile;
 	private final List<FacilityDataExchangeInterface> dataListeners ;
 
-	private AccessibilityFromEvents( Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, String actType) {
+	private AccessibilityFromEvents(Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, List<String> actType) {
 		this.scenario = scenario;
 		this.eventsFile = eventsFile;
 		this.dataListeners = dataListeners;
-		this.actType = actType;
+		this.actTypes = actType;
 	}
 
 	public void run() {
@@ -92,7 +93,6 @@ public final class AccessibilityFromEvents{
 		AbstractModule module = new AbstractModule(){
 			@Override public void install(){
 				AccessibilityConfigGroup accessibilityConfig = ConfigUtils.addOrGetModule( this.getConfig(), AccessibilityConfigGroup.class );
-
 
 				install( new TimeInterpretationModule() );
 				// has to do with config
@@ -126,15 +126,20 @@ public final class AccessibilityFromEvents{
 				install( new TravelDisutilityModule() ) ;
 				// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
 
+
+				install(new EventsManagerModule()); // is this needed?
 				if ( accessibilityConfig.getIsComputingMode().contains( Modes4Accessibility.estimatedDrt ) ){
 
-					//				install(new EventsManagerModule());
+
 					install( new DvrpModule() );
+
 					MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), MultiModeDrtConfigGroup.class );
 					for( DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements() ){
 						install( new DrtModeModule( drtCfg ) );
 						installQSimModule( new DrtModeQSimModule( drtCfg ) );
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = Double.MAX_VALUE;
 //						install( new DrtModeAnalysisModule( drtCfg ) );
+
 
 						install( new AbstractDvrpModeModule( drtCfg.getMode() ){
 							// (= we need to install a ModeModule so we get access to the modal material)
@@ -166,16 +171,25 @@ public final class AccessibilityFromEvents{
 
 //
 				// install the accessiblity module:
-				{
+				if (actTypes == null || actTypes.isEmpty()) {
 					final AccessibilityModule module = new AccessibilityModule();
-					if (actType != null) {
-						module.setConsideredActivityType(actType);
-					}
 					for( FacilityDataExchangeInterface dataListener : dataListeners ){
 						module.addFacilityDataExchangeListener( dataListener );
 					}
 					install( module );
+				}else {
+					for(String actType : actTypes){
+						final AccessibilityModule module = new AccessibilityModule();
+						if (actType != null) {
+							module.setConsideredActivityType(actType);
+						}
+						for( FacilityDataExchangeInterface dataListener : dataListeners ){
+							module.addFacilityDataExchangeListener( dataListener );
+						}
+						install( module);
+					}
 				}
+
 			}
 		};
 
