@@ -56,18 +56,21 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 //	private final LeastCostPathCalculator router;
 	TripRouter tripRouter ;
+
+
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
 	private final DrtEstimator drtEstimator;
 
 
-	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, TripRouter tripRouter, DrtEstimator drtEstimator) {
+	public EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, DvrpRoutingModule.AccessEgressFacilityFinder stopFinder, TripRouter tripRouter, DrtEstimator drtEstimator) {
 
 		this.mode = mode;
 
 		this.scenario = scenario;
 		this.scoringConfigGroup = scenario.getConfig().scoring();
 		this.tripRouter = tripRouter;
+		this.stopFinder = stopFinder;
 		this.drtEstimator = drtEstimator;
 
 		// drt params
@@ -80,7 +83,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.betaWalkDist_m = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		// todo: I added a getter to access the stop finder. Is this ok?
-		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();
+//		stopFinder = ((DvrpRoutingModule) tripRouter.getRoutingModule(TransportMode.drt)).getStopFinder();
 
 	}
 
@@ -159,7 +162,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
 
 			//TODO: replace actual person with a fake person, or find workaround.
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().values().stream().findFirst().get(), null);
 			Leg mainLeg = extractLeg(planElements, TransportMode.car);
 			double directRideDistance_m = mainLeg.getRoute().getDistance();
 
@@ -234,7 +237,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		List<Leg> legList = planElementsMain.stream().filter(pe -> pe instanceof Leg && ((Leg) pe).getMode().equals(mode)).map(pe -> (Leg) pe).toList();
 
 		if (legList.size() != 1) {
-			throw new RuntimeException("for these accesibility calculations, there should be exactly one leg");
+			throw new RuntimeException("for these accessibility calculations, there should be exactly one leg");
 		}
 
 		return legList.get(0);
@@ -245,7 +248,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	public EstimatedDrtAccessibilityContributionCalculator duplicate() {
 		LOG.info("Creating another EstimatedDrtAccessibilityContributionCalculator object.");
 		EstimatedDrtAccessibilityContributionCalculator estimatedDrtAccessibilityContributionCalculator =
-			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, this.tripRouter, this.drtEstimator);
+			new EstimatedDrtAccessibilityContributionCalculator(this.mode, this.scenario, this.stopFinder, this.tripRouter, this.drtEstimator);
 		estimatedDrtAccessibilityContributionCalculator.subNetwork = this.subNetwork;
 //		estimatedDrtAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		estimatedDrtAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
