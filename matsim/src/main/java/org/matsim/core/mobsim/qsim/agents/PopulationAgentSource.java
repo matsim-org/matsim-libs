@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +27,6 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -43,11 +43,9 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,18 +53,18 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 public final class PopulationAgentSource implements AgentSource, DistributedAgentSource {
-	private static final Logger log = LogManager.getLogger( PopulationAgentSource.class );
+	private static final Logger log = LogManager.getLogger(PopulationAgentSource.class);
 
 	private final Population population;
 	private final AgentFactory agentFactory;
 	private final QVehicleFactory qVehicleFactory;
 	private final Netsim qsim;
 	private final Collection<String> mainModes;
-	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
-    private int warnCnt = 0;
+	private final Map<Id<Vehicle>, Id<Link>> seenVehicleIds = new HashMap<>();
+	private int warnCnt = 0;
 
 	@Inject
-	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim ) {
+	PopulationAgentSource(Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qVehicleFactory = qVehicleFactory;
@@ -76,37 +74,41 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 	@Override
 	public void insertAgentsIntoMobsim() {
+		// insert vehicles first, as this modifies plans by setting vehicle ids. When MobsimAgents are created from Persons, they might make
+		// a copy of the person's plan so that changes to the plan after that point are not reflected in the MobsimAgent's plan. Janek nov' 24
+		for (Person p : population.getPersons().values()) {
+			insertVehicles(p, qsim::addParkedVehicle);
+		}
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			qsim.insertAgentIntoMobsim(agent);
 		}
-		for (Person p : population.getPersons().values()) {
-			insertVehicles(p, qsim::addParkedVehicle);
-		}
 	}
-	private static int cnt = 5 ;
-	private void insertVehicles(Person person, BiConsumer<MobsimVehicle, Id<Link> > vehicleInsertion) {
+
+	private static int cnt = 5;
+
+	private void insertVehicles(Person person, BiConsumer<MobsimVehicle, Id<Link>> vehicleInsertion) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
 
-		Map<String,Id<Vehicle>> seenModes = new HashMap<>();
-		for ( Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan()) ) {
+		Map<String, Id<Vehicle>> seenModes = new HashMap<>();
+		for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
 
 			// only simulated modes get vehicles:
-			if ( !this.mainModes.contains(leg.getMode()) ) {
-				continue ;
+			if (!this.mainModes.contains(leg.getMode())) {
+				continue;
 			}
 
 			// determine the vehicle ID
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			Id<Vehicle> vehicleId = null ;
+			Id<Vehicle> vehicleId = null;
 			if (route != null) {
 				vehicleId = route.getVehicleId();
 			}
 			if (vehicleId == null) {
 				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-				if(route!=null) {
-					route.setVehicleId( vehicleId );
+				if (route != null) {
+					route.setVehicleId(vehicleId);
 				}
 			}
 
@@ -114,7 +116,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 			final QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
 
-			if ( vehiclesSource!= QSimConfigGroup.VehiclesSource.fromVehiclesData ){
+			if (vehiclesSource != QSimConfigGroup.VehiclesSource.fromVehiclesData) {
 				// without this condition, it is surely wrong when the vehicles come from the vehicles data ... because a second vehicle for
 				// the same mode is not placed.  kai, nov'19
 
@@ -122,17 +124,17 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 				// mode) already should contain a map of all the vehicles per person.   ???  kai, nov'19
 
 				// we have seen the mode before in the plan:
-				if( seenModes.keySet().contains( leg.getMode() ) ){
-					if( vehicleId == null && route != null ){
-						vehicleId = seenModes.get( leg.getMode() );
-						route.setVehicleId( vehicleId );
+				if (seenModes.containsKey(leg.getMode())) {
+					if (vehicleId == null && route != null) {
+						vehicleId = seenModes.get(leg.getMode());
+						route.setVehicleId(vehicleId);
 						// yyyy what is the meaning of route==null? kai, jun'18
 
-						if ( cnt > 0 ) {
-							log.warn( "encountered vehicleId=null where I am not sure how and why this should happen ..." );
-							cnt-- ;
-							if ( cnt==0 ) {
-								log.warn(  Gbl.FUTURE_SUPPRESSED );
+						if (cnt > 0) {
+							log.warn("encountered vehicleId=null where I am not sure how and why this should happen ...");
+							cnt--;
+							if (cnt == 0) {
+								log.warn(Gbl.FUTURE_SUPPRESSED);
 							}
 						}
 					}
@@ -143,44 +145,44 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			// if we are here, we haven't seen the mode before in this plan
 
 			// now memorizing mode and its vehicle ID:
-			seenModes.put(leg.getMode(),vehicleId);
+			seenModes.put(leg.getMode(), vehicleId);
 
 			// find the vehicle from the vehicles container.  It should be there, see automatic vehicle creation in PrepareForSim.
 			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
-			if ( vehicle==null ) {
-				String msg = "Could not get the requested vehicle with ID=" + vehicleId + " from the vehicles container. " ;
-				switch ( vehiclesSource ) {
+			if (vehicle == null) {
+				String msg = "Could not get the requested vehicle with ID=" + vehicleId + " from the vehicles container. ";
+				switch (vehiclesSource) {
 					case defaultVehicle:
 					case modeVehicleTypesFromVehiclesData:
 						msg += "You are using the config switch qsim.vehiclesSource=" + vehiclesSource.name() + "; this should have worked so " +
-								   "please report under matsim.org/faq ." ;
+							"please report under matsim.org/faq .";
 						break;
 					case fromVehiclesData:
 						msg += "You are using the config switch qsim.vehiclesSource=" + vehiclesSource.name() + "; with that setting, you have to" +
-								   " provide all needed vehicles yourself." ;
+							" provide all needed vehicles yourself.";
 						break;
 					default:
-						throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
+						throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
 				}
-				throw new RuntimeException( msg ) ;
+				throw new RuntimeException(msg);
 			}
 
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person, vehicle);
 
 			// Checking if the vehicle has been seen before:
-			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
-			if ( result != null ) {
-                if (warnCnt <= 5) {
-                    log.info("have seen vehicle with id " + vehicleId + " before; not placing it again.");
-                }
-                if (warnCnt == 5) {
-                    log.warn(Gbl.FUTURE_SUPPRESSED);
-                }
-                warnCnt++;
-				if ( result != vehicleLinkId ) {
+			Id<Link> result = this.seenVehicleIds.get(vehicleId);
+			if (result != null) {
+				if (warnCnt <= 5) {
+					log.info("have seen vehicle with id {} before; not placing it again.", vehicleId);
+				}
+				if (warnCnt == 5) {
+					log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+				warnCnt++;
+				if (result != vehicleLinkId) {
 					throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId +
-											   "; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ;
+						"; previous placement link=" + vehicleLinkId + "; current placement link=" + result);
 				}
 				// yyyyyy The above condition is too strict; it should be possible that one person drives
 				// a car to some place, and some other person picks it up there.  However, this
@@ -189,16 +191,17 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 				// to resolve this.)
 
 			} else {
-				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
+				this.seenVehicleIds.put(vehicleId, vehicleLinkId);
 //				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
-				vehicleInsertion.accept( this.qVehicleFactory.createQVehicle( vehicle ) , vehicleLinkId );
+				vehicleInsertion.accept(this.qVehicleFactory.createQVehicle(vehicle), vehicleLinkId);
 			}
 		}
 	}
 
 	/**
-	 *	A more careful way to decide where this agent should have its vehicles created
-	 *  than to ask agent.getCurrentLinkId() after creation.
+	 * A more careful way to decide where this agent should have its vehicles created
+	 * than to ask agent.getCurrentLinkId() after creation.
+	 *
 	 * @param person TODO
 	 */
 	private Id<Link> findVehicleLink(Person person, Vehicle vehicle) {
@@ -219,16 +222,12 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 		 *  Also see comment in insertVehicles.
 		 */
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
-			if (planElement instanceof Activity) {
-				Activity activity = (Activity) planElement;
-				ActivityFacilities facilities = this.qsim.getScenario().getActivityFacilities() ;
-				Config config = this.qsim.getScenario().getConfig() ;
-				final Id<Link> activityLinkId = PopulationUtils.computeLinkIdFromActivity(activity, facilities, config ) ;
+			if (planElement instanceof Activity activity) {
+				final Id<Link> activityLinkId = PopulationUtils.decideOnLinkIdForActivity(activity, qsim.getScenario());
 				if (activityLinkId != null) {
 					return activityLinkId;
 				}
-			} else if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
+			} else if (planElement instanceof Leg leg) {
 				if (leg.getRoute().getStartLinkId() != null) {
 					return leg.getRoute().getStartLinkId();
 				}
