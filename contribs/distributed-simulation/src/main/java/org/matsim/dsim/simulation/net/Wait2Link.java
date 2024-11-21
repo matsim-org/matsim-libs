@@ -6,11 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -26,6 +23,8 @@ class Wait2Link implements Steppable {
 	private final ActiveLinks activeLinks;
 
 	void accept(DistributedMobsimVehicle vehicle, SimLink link) {
+
+		assert vehicle.getDriver().getCurrentLinkId() == link.getId();
 
 		waitingVehicles
 			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
@@ -44,8 +43,7 @@ class Wait2Link implements Steppable {
 				SimLink link = waitingQ.peek().link();
 				var vehicle = waitingQ.peek().vehicle();
 
-				Id<Link> nextLinkId = vehicle.getDriver().chooseNextLinkId();
-				SimLink.LinkPosition position = nextLinkId == null ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
+				SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink() ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
 
 				if (link.isAccepting(position, now)) {
 					waitingQ.poll();

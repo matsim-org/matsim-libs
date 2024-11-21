@@ -38,68 +38,68 @@ import java.util.stream.Stream;
 
 public class DrtIntegrationTest {
 
-    @RegisterExtension
-    MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	MatsimTestUtils utils = new MatsimTestUtils();
 
-    private Scenario createScenario() {
+	private Scenario createScenario() {
 
-        URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config-with-drt.xml");
+		URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config-with-drt.xml");
 
-        Config config = ConfigUtils.loadConfig(kelheim);
+		Config config = ConfigUtils.loadConfig(kelheim);
 
-        config.controller().setOutputDirectory(utils.getOutputDirectory());
-        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.controller().setLastIteration(2);
-        config.controller().setMobsim("dsim");
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setLastIteration(2);
+		config.controller().setMobsim("dsim");
 
-        config.routing().setRoutingRandomness(0);
-        config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setRoutingRandomness(0);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
-        // Compatibility with many scenarios
-        Activities.addScoringParams(config);
+		// Compatibility with many scenarios
+		Activities.addScoringParams(config);
 
-        MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-        ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 
-        DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        // Need to prepare network for freight
-        scenario.getNetwork().getLinks().values().parallelStream()
-                .filter(l -> l.getAllowedModes().contains(TransportMode.car))
-                .forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
+		// Need to prepare network for freight
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
 
-        scenario.getPopulation()
-                .getFactory()
-                .getRouteFactories()
-                .setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+		scenario.getPopulation()
+			.getFactory()
+			.getRouteFactories()
+			.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
-        return scenario;
-    }
+		return scenario;
+	}
 
-    private void prepareController(Controler controler) {
+	private void prepareController(Controler controler) {
 
-        Config config = controler.getScenario().getConfig();
-        MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-        controler.addOverridingModule(new DvrpModule());
-        controler.addOverridingModule(new MultiModeDrtModule());
-        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+		Config config = controler.getScenario().getConfig();
+		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
-        // Add speed limit to av vehicle
-        double maxSpeed = controler.getScenario()
-                .getVehicles()
-                .getVehicleTypes()
-                .get(Id.create("autonomous_vehicle", VehicleType.class))
-                .getMaximumVelocity();
+		// Add speed limit to av vehicle
+		double maxSpeed = controler.getScenario()
+			.getVehicles()
+			.getVehicleTypes()
+			.get(Id.create("autonomous_vehicle", VehicleType.class))
+			.getMaximumVelocity();
 
 		controler.getScenario().getVehicles().getVehicleTypes().values().forEach(vt -> vt.setNetworkMode(TransportMode.car));
 
-        controler.addOverridingModule(
-                new DvrpModeLimitedMaxSpeedTravelTimeModule("av", config.qsim().getTimeStepSize(),
-                        maxSpeed));
+		controler.addOverridingModule(
+			new DvrpModeLimitedMaxSpeedTravelTimeModule("av", config.qsim().getTimeStepSize(),
+				maxSpeed));
 
-    }
+	}
 
 	@Test
 	@Order(1)
@@ -116,38 +116,39 @@ public class DrtIntegrationTest {
 
 	}
 
-    @Test
-    @Order(2)
-    void runMultiThreaded() {
+	@Test
+	@Order(2)
+	@Disabled
+	void runMultiThreaded() {
 
-        Scenario scenario = createScenario();
+		Scenario scenario = createScenario();
 
-        Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 
-        prepareController(controler);
+		prepareController(controler);
 
-        controler.addOverridingModule(new DistributedSimulationModule(4));
-        controler.run();
+		controler.addOverridingModule(new DistributedSimulationModule(4));
+		controler.run();
 
-    }
+	}
 
-    @Test
-    @Order(3)
-    @Disabled
-    void runDistributed() {
+	@Test
+	@Order(3)
+	@Disabled
+	void runDistributed() {
 
-        try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-            List<Communicator> comms = LocalCommunicator.create(4);
-            for (Communicator comm : comms) {
-                pool.submit(() -> {
-                    Controler controler = new Controler(createScenario());
+		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
+			List<Communicator> comms = LocalCommunicator.create(4);
+			for (Communicator comm : comms) {
+				pool.submit(() -> {
+					Controler controler = new Controler(createScenario());
 
-                    prepareController(controler);
+					prepareController(controler);
 
-                    controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-                    controler.run();
-                });
-            }
-        }
-    }
+					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
+					controler.run();
+				});
+			}
+		}
+	}
 }

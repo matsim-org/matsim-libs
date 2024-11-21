@@ -19,20 +19,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
@@ -51,6 +43,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ListIterator;
+
 /**
  * @author michaz
  */
@@ -65,13 +59,13 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		static final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 		public void addTrip(NetworkRoute networkRoute, String transportMode) {
-			Activity lastActivity;
-			if (!plan.getPlanElements().isEmpty()) {
-				lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
-				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());
+
+			if (plan.getPlanElements().isEmpty()) {
+				var newAct = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getStartLinkId());
+				plan.addActivity(newAct);
 			} else {
-				lastActivity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getStartLinkId());
-				plan.addActivity(lastActivity);
+				var lastActOfPlan = (Activity) plan.getPlanElements().getLast();
+				assert lastActOfPlan.getLinkId().equals(networkRoute.getStartLinkId());
 			}
 			Leg leg = PopulationUtils.createLeg(transportMode);
 			leg.setRoute(networkRoute);
@@ -83,7 +77,6 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		public Plan build() {
 			return plan;
 		}
-
 	}
 
 	private final Umlauf umlauf;
@@ -99,11 +92,11 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	private Departure departure;
 
 	public TransitDriverAgentImpl(Umlauf umlauf, String transportMode,
-			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
+								  TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.eventsManager = internalInterface.getMobsim().getEventsManager();
-		this.scenario = internalInterface.getMobsim().getScenario() ;
+		this.scenario = internalInterface.getMobsim().getScenario();
 		// (yy AbstractTransitDriverAgent already keeps both of them. kai, dec'15)
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().listIterator();
 		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
@@ -162,17 +155,13 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	public void endActivityAndComputeNextState(final double now) {
 		this.currentPlanElement = iPlanElement.next();
 		sendTransitDriverStartsEvent(now);
-
-//		this.sim.arrangeAgentDeparture(this);
-		this.state = MobsimAgent.State.LEG ;
-//		this.sim.reInsertAgentIntoMobsim(this) ;
-
+		this.state = MobsimAgent.State.LEG;
 	}
 
 	@Override
 	public void endLegAndComputeNextState(final double now) {
 		eventsManager.processEvent(
-				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+			new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();
@@ -181,7 +170,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 			}
 
 //			this.sim.arrangeActivityStart(this);
-			this.state = MobsimAgent.State.ACTIVITY ;
+			this.state = MobsimAgent.State.ACTIVITY;
 //			this.sim.reInsertAgentIntoMobsim(this) ;
 
 
@@ -191,8 +180,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 			// * in this particular instance, the agent pretends to have a plan
 			// kai, mar'12
 
-			this.state = MobsimAgent.State.ACTIVITY ;
-			this.departureTime = Double.POSITIVE_INFINITY ;
+			this.state = MobsimAgent.State.ACTIVITY;
+			this.departureTime = Double.POSITIVE_INFINITY;
 
 		}
 	}
@@ -232,26 +221,21 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		return ((Leg) this.currentPlanElement).getTravelTime();
 	}
 
-    @Override
-    public Double getExpectedTravelDistance() {
-        return ((Leg) this.currentPlanElement).getRoute().getDistance();
-    }
+	@Override
+	public Double getExpectedTravelDistance() {
+		return ((Leg) this.currentPlanElement).getRoute().getDistance();
+	}
 
-    @Override
+	@Override
 	public String getMode() {
-		return ((Leg)this.currentPlanElement).getMode();
+		return ((Leg) this.currentPlanElement).getMode();
 	}
 
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
-		Route route = ((Leg)this.currentPlanElement).getRoute() ;
-		return ((NetworkRoute)route).getVehicleId() ;
+		Route route = ((Leg) this.currentPlanElement).getRoute();
+		return ((NetworkRoute) route).getVehicleId();
 	}
-
-//	@Override
-//	public Activity getCurrentActivity() {
-//		return (Activity) this.currentPlanElement;
-//	}
 
 	@Override
 	public PlanElement getCurrentPlanElement() {
@@ -265,9 +249,10 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 			iPlanElement.previous(); // ...rewind iterator by one step
 			return next;
 		} else {
-			return null ;
+			return null;
 		}
 	}
+
 	@Override
 	public PlanElement getPreviousPlanElement() {
 		if (iPlanElement.hasPrevious()) {
@@ -275,7 +260,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 			iPlanElement.next(); // ...rewind iterator by one step
 			return prev;
 		} else {
-			return null ;
+			return null;
 		}
 	}
 
@@ -318,25 +303,21 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	public boolean isWantingToArriveOnCurrentLink() {
 		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
 		// kai, nov'14
-		if ( this.chooseNextLinkId()==null ) {
-			return true ;
-		} else {
-			return false ;
-		}
+		return this.chooseNextLinkId() == null;
 	}
 
 	@Override
 	public Facility getCurrentFacility() {
-		PlanElement pe = this.getCurrentPlanElement() ;
-		Activity activity ;
-		if ( pe instanceof Activity ) {
+		PlanElement pe = this.getCurrentPlanElement();
+		Activity activity;
+		if (pe instanceof Activity) {
 			activity = (Activity) pe;
-		} else if ( pe instanceof Leg ) {
-			activity = (Activity) this.getPreviousPlanElement() ;
+		} else if (pe instanceof Leg) {
+			activity = (Activity) this.getPreviousPlanElement();
 		} else {
-			throw new RuntimeException("unexpected type of PlanElement") ;
+			throw new RuntimeException("unexpected type of PlanElement");
 		}
-		return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
+		return FacilitiesUtils.toFacility(activity, this.scenario.getActivityFacilities());
 
 		// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 		// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
@@ -345,14 +326,14 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 
 	@Override
 	public Facility getDestinationFacility() {
-		PlanElement pe = this.getCurrentPlanElement() ;
-		if ( pe instanceof Leg ) {
-			Activity activity = (Activity)this.getNextPlanElement() ;
-			return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
-		} else if ( pe instanceof Activity ) {
-			return null ;
+		PlanElement pe = this.getCurrentPlanElement();
+		if (pe instanceof Leg) {
+			Activity activity = (Activity) this.getNextPlanElement();
+			return FacilitiesUtils.toFacility(activity, this.scenario.getActivityFacilities());
+		} else if (pe instanceof Activity) {
+			return null;
 		}
-		throw new RuntimeException("unexpected type of PlanElement") ;
+		throw new RuntimeException("unexpected type of PlanElement");
 	}
 
 
