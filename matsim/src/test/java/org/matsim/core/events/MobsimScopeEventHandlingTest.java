@@ -20,15 +20,16 @@
 
 package org.matsim.core.events;
 
+import static org.mockito.Mockito.*;
+
 import com.google.inject.Provider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.List;
-
-import static org.mockito.Mockito.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -38,15 +39,29 @@ public class MobsimScopeEventHandlingTest {
 	private final MobsimScopeEventHandling eventHandling = new MobsimScopeEventHandling(eventsManager);
 	private final MobsimScopeEventHandler handler = mock(MobsimScopeEventHandler.class);
 
+	@BeforeEach
+	void setUp() {
+
+		// The mock must return the event handler of the provider
+		when(eventsManager.addHandler((Provider<? extends EventHandler>) any())).then(invocation -> {
+			Provider<? extends EventHandler> provider = invocation.getArgument(0);
+			EventHandler handler = provider.get();
+			return List.of(handler);
+		});
+	}
+
 	@Test
 	void test_addMobsimScopeHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
-		verify(eventsManager, times(1)).addHandler(argThat((Provider<EventHandler> h) -> h.get() == handler));
+
+		verify(eventsManager, times(1)).addHandler(
+			(Provider<? extends EventHandler>) argThat(arg -> ((Provider<? extends EventHandler>) arg).get() == handler)
+		);
 	}
 
 	@Test
 	void test_notifyAfterMobsim_oneHandler() {
-		when(eventsManager.addHandler((Provider<EventHandler>) any())).thenReturn(List.of(handler));
+
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
@@ -56,7 +71,6 @@ public class MobsimScopeEventHandlingTest {
 
 	@Test
 	void test_notifyAfterMobsim_noHandlersAfterRemoval() {
-		when(eventsManager.addHandler((Provider<EventHandler>) any())).thenReturn(List.of(handler));
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
