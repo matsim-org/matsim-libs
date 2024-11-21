@@ -172,8 +172,18 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 //			getAlphaBeta(null, null, null);
 
-			double waitTime_s = 421.87; //TODO
+			//Model: Conventional DRT 50km/h 3vh seed 1
+			double waitTime_s = 421.87;
 			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+
+			//Model: Conventional DRT 50km/h 3vh all seeds
+//			double waitTime_s = 404.30495552731895;
+//			double rideTime_s = 101.95878208117924 + 0.10293967925399317* directRideDistance_m;
+
+			//KEXI data
+//			double waitTime_s = 596.301;
+//			double rideTime_s = 296.4 + 0.065* directRideDistance_m;
+
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m;
