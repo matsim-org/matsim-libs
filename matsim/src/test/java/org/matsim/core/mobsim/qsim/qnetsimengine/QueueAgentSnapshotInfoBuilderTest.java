@@ -1,7 +1,5 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,6 +27,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class QueueAgentSnapshotInfoBuilderTest {
 
@@ -58,7 +58,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
 		// assert
 		assertEquals(1, outCollection.size());
-		AgentSnapshotInfo firstEntry = outCollection.iterator().next();
+		AgentSnapshotInfo firstEntry = outCollection.getFirst();
 
 		double expectedEasting = setUp.freespeed * now;
 
@@ -139,7 +139,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
 		assertEquals(5, outCollection.size());
 
 		// we expect 2 cars to be congested at the end of the link with an offset of 10 and a speed of 0
-		var vehicle1 = outCollection.get(0);
+		var vehicle1 = outCollection.getFirst();
 		assertEquals(100, vehicle1.getEasting(), 0.0001);
 		assertEquals(0.0, vehicle1.getColorValueBetweenZeroAndOne(), 0.00001);
 		var vehicle2 = outCollection.get(1);
@@ -227,10 +227,10 @@ public class QueueAgentSnapshotInfoBuilderTest {
 		var waitingList = createTransitVehicles(setUp.link, 1, 100);
 
 		// act
-		var newCount = builder.positionVehiclesFromTransitStop(outCollection, setUp.link, waitingList, setUp.counter);
+		builder.positionVehiclesFromTransitStop(outCollection, setUp.link, waitingList, setUp.counter);
 
 		// this is the driver
-		var firstPosition = outCollection.remove(0);
+		var firstPosition = outCollection.removeFirst();
 		assertEquals(AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, firstPosition.getAgentState());
 		assertEquals(setUp.linkLength * 0.9, firstPosition.getEasting(), 0.00001);
 		assertEquals(-15, firstPosition.getNorthing(), 0.00001);
@@ -266,6 +266,9 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
 		SimpleTestSetUp() {
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+			scenario.getNetwork().addNode(link.getToNode());
+			scenario.getNetwork().addNode(link.getFromNode());
+			scenario.getNetwork().addLink(link);
 		}
 	}
 
