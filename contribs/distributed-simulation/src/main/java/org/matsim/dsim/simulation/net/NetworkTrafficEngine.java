@@ -3,26 +3,35 @@ package org.matsim.dsim.simulation.net;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.NextStateHandler;
-import org.matsim.api.SimEngine;
+import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.CapacityUpdate;
 import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.VehicleMsg;
-import org.matsim.dsim.simulation.SimPerson;
+import org.matsim.dsim.messages.VehicleContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Log4j2
-public class NetworkTrafficEngine implements SimEngine {
+public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Getter
 	private final SimNetwork simNetwork;
-	private final SimVehicleProvider simVehicleProvider;
 	private final EventsManager em;
 
 	private final ActiveNodes activeNodes;
@@ -30,12 +39,15 @@ public class NetworkTrafficEngine implements SimEngine {
 	private final Wait2Link wait2Link;
 	private final boolean wait2LinkFirst;
 
-	@Setter
-	private NextStateHandler nextStateHandler;
+	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
+	private final QSimCompatibility qSimCompatibility;
 
-	public NetworkTrafficEngine(Scenario scenario, SimStepMessaging simStepMessaging, EventsManager em, int part) {
+	@Setter
+	private InternalInterface internalInterface;
+
+	public NetworkTrafficEngine(Scenario scenario, QSimCompatibility qSimCompatibility, SimStepMessaging simStepMessaging, EventsManager em, int part) {
+		this.qSimCompatibility = qSimCompatibility;
 		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, part);
-		simVehicleProvider = new SimVehicleProvider(scenario, em);
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
@@ -46,35 +58,45 @@ public class NetworkTrafficEngine implements SimEngine {
 	}
 
 	@Override
-	public void accept(SimPerson person, double now) {
-		// this will be more complicated but do it the simple way first
+	public void accept(DistributedMobsimAgent person, double now) {
+
+		if (!(person instanceof MobsimDriverAgent driver)) {
+			throw new RuntimeException("Only driver agents are supported");
+		}
 
 		// place person into vehicle
-		SimVehicle vehicle = simVehicleProvider.unparkVehicle(person, now);
-		Id<Link> currentRouteElement = vehicle.getCurrentRouteElement();
+		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
+			parkedVehicles.remove(driver.getPlannedVehicleId()),
+			() -> "Vehicle not found: " + driver.getPlannedVehicleId()
+		);
+		driver.setVehicle(vehicle);
+		vehicle.setDriver(driver);
+		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 
+		Id<Link> currentRouteElement = person.getCurrentLinkId();
 		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(vehicle.getId());
 
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
-
-		assert link != null : STR."Link\{currentRouteElement} not found in partition on partition #\{simNetwork.getPart()}";
+		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
 		wait2Link.accept(vehicle, link);
 	}
 
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
-		for (var vehicleMessage : stepMessage.getVehicleMsgs()) {
+		for (VehicleContainer vehicleMessage : stepMessage.getVehicles()) {
 			processVehicleMessage(vehicleMessage, now);
 		}
-		for (var updateMessage : stepMessage.getCapacityUpdates()) {
+
+		for (CapacityUpdate updateMessage : stepMessage.getCapacityUpdates()) {
 			processUpdateMessage(updateMessage);
 		}
 	}
 
-	private void processVehicleMessage(VehicleMsg vehicleMessage, double now) {
-		SimVehicle vehicle = simVehicleProvider.vehicleFromMessage(vehicleMessage);
-		Id<Link> linkId = vehicle.getCurrentRouteElement();
+	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
+		DistributedMobsimVehicle vehicle = qSimCompatibility.vehicleFromContainer(vehicleContainer);
+
+		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
 
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
@@ -109,29 +131,34 @@ public class NetworkTrafficEngine implements SimEngine {
 		activeLinks.doSimStep(now);
 	}
 
-	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(SimVehicle vehicle, SimLink link, double now) {
+	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
+		// TODO: assumes driver is person arriving
+		var driver = vehicle.getDriver();
 		// the vehicle has more elements in the route. Keep going.
-		if (vehicle.getNextRouteElement() != null)
+		if (!driver.isWantingToArriveOnCurrentLink())
 			return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
 
 		// the vehicle has no more route elements. It should leave the network
+		// Assumes legMode=networkMode, which is not always the case
 		em.processEvent(new VehicleLeavesTrafficEvent(
-			now, vehicle.getDriver().getId(), vehicle.getCurrentRouteElement(),
-			vehicle.getId(), vehicle.getDriver().getCurrentLeg().getMode(),
+			now, driver.getId(), link.getId(), vehicle.getId(), driver.getMode(),
 			1.0
 		));
 
-		SimPerson driver = simVehicleProvider.parkVehicle(vehicle, now);
+		this.parkedVehicles.put(vehicle.getId(), vehicle);
+		em.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), vehicle.getId()));
 
-		// TODO: assumes driver is person arriving
-		// Assumes legMode=networkMode, which is not always the case
-		em.processEvent(new PersonArrivalEvent(
-			now, vehicle.getDriver().getId(), vehicle.getCurrentRouteElement(),
-			vehicle.getDriver().getCurrentLeg().getMode()
-		));
-
-		nextStateHandler.accept(driver, now);
+		driver.endLegAndComputeNextState(now);
+		internalInterface.arrangeNextAgentState(driver);
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
+	}
+
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> _startLinkId) {
+		if (veh instanceof DistributedMobsimVehicle dv) {
+			parkedVehicles.put(veh.getId(), dv);
+		} else {
+			throw new RuntimeException("Only QVehicles are supported");
+		}
 	}
 }

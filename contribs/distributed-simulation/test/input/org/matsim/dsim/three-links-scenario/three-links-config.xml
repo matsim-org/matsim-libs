@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
     <module name="controler">
         <param name="lastIteration" value="0"/>
         <param name="overwriteFiles" value="failIfDirectoryExists"/>
         <param name="runId" value="three-links"/>
         <param name="mobsim" value="dsim"/>
+		<param name="compressionType" value="none"/>
     </module>
     <module name="qsim">
         <param name="mainMode" value="car,slow-car"/>
@@ -35,12 +35,12 @@
     </module>
     <module name="routing">
         <!-- We have a one directional network, which will be cleaned by the network cleaner otherwise -->
-        <param name="networkRouteConsistencyCheck" value="disable"/>
+		<param name="networkRouteConsistencyCheck" value="disable"/>
     </module>
     <module name="scoring">
         <parameterset type="scoringParameters">
             <!-- apparently, this needs to be set, if pt is not part of the simulation -->
-            <param name="waitingPt" value="-1.0"/>
+			<param name="waitingPt" value="-1.0"/>
             <parameterset type="modeParams">
                 <param name="mode" value="car"/>
                 <param name="constant" value="-1"/>

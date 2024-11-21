@@ -3,8 +3,11 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimPerson;
+import org.matsim.dsim.simulation.SimpleAgent;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ class ActiveNodesTest {
         activeNodes.setActivateLink(_ -> fail());
         var network = TestUtils.createLocalThreeLinkNetwork();
         var simLinks = network.getLinks().values().stream()
-                .map(l -> SimLink.create(l, 0))
+                .map(l -> TestUtils.createLink(l, 0, 10))
                 .collect(Collectors.toMap(SimLink::getId, l -> l));
         var node = network.getNodes().get(Id.createNodeId("n2"));
         var simNode = SimNode.create(node, simLinks);
@@ -34,11 +37,13 @@ class ActiveNodesTest {
     @Test
     public void doSimStepOfferingLinksOnly() {
 
-        var driver = mock(SimPerson.class);
-        when(driver.getRouteElement(any())).thenReturn(Id.createLinkId("next-link"));
-        var vehicle = new BasicSimVehicle(Id.createVehicleId("vehicle"), driver, 1000., 100., 1000.);
+        var driver = mock(SimpleAgent.class);
+        when(driver.getCurrentLinkId()).thenReturn(Id.createLinkId("next-link"));
+		when(driver.chooseNextLinkId()).thenReturn(Id.createLinkId("next-link"));
+
+        var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
         var link = TestUtils.createSingleLink(0, 0);
-        var offeringLink = SimLink.create(link, 0);
+        var offeringLink = TestUtils.createLink(link, 0, 1000);
         offeringLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
         offeringLink.doSimStep(null, 100.);
         offeringLink = spy(offeringLink);
@@ -48,6 +53,7 @@ class ActiveNodesTest {
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
 		var nextLinkId = Id.createLinkId("next-link");
 		when(nextLink.getId()).thenReturn(nextLinkId);
+
 		var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(nextLinkId, nextLink));
         var activeNodes = new ActiveNodes(mock(EventsManager.class));
 		activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a.getId()));
@@ -65,11 +71,12 @@ class ActiveNodesTest {
     @Test
     public void doSimStepStorageCapacity() {
 
-        var driver = mock(SimPerson.class);
-        when(driver.getRouteElement(any())).thenReturn(Id.createLinkId("next-link"));
-        var vehicle = new BasicSimVehicle(Id.createVehicleId("vehicle"), driver, 1000., 100., 1000.);
+        var driver = mock(SimpleAgent.class);
+        when(driver.chooseNextLinkId()).thenReturn(Id.createLinkId("next-link"));
 
-        var inLink = SimLink.create(TestUtils.createSingleLink(0, 0), 0);
+        var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
+
+        var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), 0, 1000);
         inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
         var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
@@ -95,16 +102,16 @@ class ActiveNodesTest {
 
     @Test
     public void doSimStepFlowCapacity() {
-        var driver = mock(SimPerson.class);
-        when(driver.getRouteElement(any())).thenReturn(Id.createLinkId("next-link"));
+        SimpleAgent driver = mock(SimpleAgent.class);
+        when(driver.chooseNextLinkId()).thenReturn(Id.createLinkId("next-link"));
 
         var link = TestUtils.createSingleLink(0, 0);
         link.setCapacity(1800); // the link can release one vehicle every two seconds
         link.setLength(100);
         link.setFreespeed(200);
-        var inLink = SimLink.create(link, 0);
+        var inLink = TestUtils.createLink(link, 0, 1000);
         for (var i = 0; i < 100; i++) {
-            inLink.pushVehicle(new BasicSimVehicle(Id.createVehicleId(i), driver, 1, 200, 1000), SimLink.LinkPosition.QStart, 0);
+            inLink.pushVehicle(TestUtils.createVehicle(String.valueOf(i), driver, 1, 200), SimLink.LinkPosition.QStart, 0);
         }
         // call dostimstep here, so that the first vehicle is moved to the buffer
         inLink.doSimStep(null, 99);
@@ -129,11 +136,12 @@ class ActiveNodesTest {
     public void doSimStepStuckTime() {
         final var stuckThreshold = 42;
 
-        var driver = mock(SimPerson.class);
-        when(driver.getRouteElement(any())).thenReturn(Id.createLinkId("next-link"));
-        var vehicle = new BasicSimVehicle(Id.createVehicleId("test"), driver, 1, 100, stuckThreshold);
+        var driver = mock(SimpleAgent.class);
+        when(driver.chooseNextLinkId()).thenReturn(Id.createLinkId("next-link"));
 
-        var inLink = SimLink.create(TestUtils.createSingleLink(0, 0), 0);
+        var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
+
+        var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), 0, stuckThreshold);
         inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
         inLink.doSimStep(null, 100); // move vehicle into the buffer, which starts the stuck timer
 

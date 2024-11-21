@@ -13,26 +13,26 @@ import java.util.List;
 @Data
 public class SimStepMessage implements Message {
 
-    private final double simstep;
+	private final double simstep;
 
-    @Singular
-    private final List<CapacityUpdate> capacityUpdates;
+	@Singular
+	private final List<CapacityUpdate> capacityUpdates;
 
-    @Singular
-    private final List<Teleportation> teleportationMsgs;
+	@Singular
+	private final List<Teleportation> teleportationMsgs;
 
-    @Singular
-    private final List<VehicleMsg> vehicleMsgs;
+	@Singular
+	private final List<VehicleContainer> vehicles;
 
-    public int getCapacityUpdateMsgsCount() {
-        return this.capacityUpdates.size();
-    }
+	public int getCapacityUpdateMsgsCount() {
+		return this.capacityUpdates.size();
+	}
 
-    public int getTeleportationMsgsCount() {
-        return this.teleportationMsgs.size();
-    }
+	public int getTeleportationMsgsCount() {
+		return this.teleportationMsgs.size();
+	}
 
-    public int getVehicleMsgsCount() {
-        return this.vehicleMsgs.size();
-    }
+	public int getVehicleMsgsCount() {
+		return this.vehicles.size();
+	}
 }

@@ -14,7 +14,7 @@ public class TestLocalLink {
     @Test
     public void init() {
         var link = TestUtils.createSingleLink(0, 0);
-        var simLink = SimLink.create(link, 0);
+        var simLink = TestUtils.createLink(link, 0, 30);
 
         assertInstanceOf(SimLink.LocalLink.class, simLink);
         assertEquals(link.getId(), simLink.getId());
@@ -27,9 +27,9 @@ public class TestLocalLink {
 
         var link = TestUtils.createSingleLink(0, 0);
         link.setFreespeed(20);
-        var simLink = SimLink.create(link, 0);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
+        var simLink = TestUtils.createLink(link, 0, 30);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
         simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -42,8 +42,8 @@ public class TestLocalLink {
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 
         assertEquals(vehicle1.getId(), simLink.peekFirstVehicle().getId());
-        assertEquals(link.getLength() / vehicle1.getMaxV(), vehicle1.getEarliestExitTime());
-        assertEquals(link.getLength() / vehicle2.getMaxV(), vehicle2.getEarliestExitTime());
+        assertEquals(link.getLength() / vehicle1.getMaximumVelocity(), vehicle1.getEarliestLinkExitTime());
+        assertEquals(link.getLength() / vehicle2.getMaximumVelocity(), vehicle2.getEarliestLinkExitTime());
     }
 
     @Test
@@ -53,8 +53,8 @@ public class TestLocalLink {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 7.5, 0);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
         simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -67,8 +67,8 @@ public class TestLocalLink {
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 
         assertEquals(vehicle2.getId(), simLink.peekFirstVehicle().getId());
-        assertEquals(link.getLength() / vehicle1.getMaxV(), vehicle1.getEarliestExitTime());
-        assertEquals(link.getLength() / vehicle2.getMaxV(), vehicle2.getEarliestExitTime());
+        assertEquals(link.getLength() / vehicle1.getMaximumVelocity(), vehicle1.getEarliestLinkExitTime());
+        assertEquals(link.getLength() / vehicle2.getMaximumVelocity(), vehicle2.getEarliestLinkExitTime());
     }
 
 	@Test
@@ -78,7 +78,7 @@ public class TestLocalLink {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 7.5, 0);
-		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10., 1, 30);
+		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10., 1);
 
 		// push one vehicle. This consumes the entire inflow, but only some storage
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -94,9 +94,9 @@ public class TestLocalLink {
     public void pushVehicleAtEnd() {
 
         var link = TestUtils.createSingleLink(0, 0);
-        var simLink = SimLink.create(link, 0);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
+        var simLink = TestUtils.createLink(link, 0, 30);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
         // empty links should accept vehicles
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -115,8 +115,8 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 
-        assertEquals(link.getLength() / link.getFreespeed(), vehicle1.getEarliestExitTime());
-        assertEquals(0, vehicle2.getEarliestExitTime());
+        assertEquals(link.getLength() / link.getFreespeed(), vehicle1.getEarliestLinkExitTime());
+        assertEquals(0, vehicle2.getEarliestLinkExitTime());
         assertEquals(vehicle2.getId(), simLink.peekFirstVehicle().getId());
     }
 
@@ -124,10 +124,10 @@ public class TestLocalLink {
     public void pushVehicleAtBuffer() {
 
         var link = TestUtils.createSingleLink(0, 0);
-        var simLink = SimLink.create(link, 0);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
-        var vehicle3 = TestUtils.createVehicle("vehicle-3", 10, 10, 30);
+        var simLink = TestUtils.createLink(link, 0, 30);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
+        var vehicle3 = TestUtils.createVehicle("vehicle-3", 10, 10);
 
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
@@ -141,30 +141,30 @@ public class TestLocalLink {
 
         simLink.pushVehicle(vehicle3, SimLink.LinkPosition.Buffer, 0);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
-        assertEquals(0, vehicle3.getEarliestExitTime());
+        assertEquals(0, vehicle3.getEarliestLinkExitTime());
     }
 
     @Test
     public void doSimStep() {
         var link = TestUtils.createSingleLink(0, 0);
-        var simLink = SimLink.create(link, 0);
         var stuckThreshold = 42;
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10, stuckThreshold);
+        var simLink = TestUtils.createLink(link, 0, stuckThreshold);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10);
         simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
 
-        var now = vehicle1.getEarliestExitTime() - 1;
+        var now = vehicle1.getEarliestLinkExitTime() - 1;
         simLink.doSimStep(null, now);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
         assertFalse(simLink.isOffering());
 
-        now = vehicle1.getEarliestExitTime();
+        now = vehicle1.getEarliestLinkExitTime();
         simLink.doSimStep(null, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
         assertTrue(simLink.isOffering());
-        assertFalse(simLink.peekFirstVehicle().isStuck(now));
+        assertFalse(simLink.isStuck(now));
 
-        now = vehicle1.getEarliestExitTime() + stuckThreshold;
-        assertTrue(simLink.peekFirstVehicle().isStuck(now));
+        now = vehicle1.getEarliestLinkExitTime() + stuckThreshold;
+        assertTrue(simLink.isStuck(now));
     }
 
     @Test
@@ -173,24 +173,24 @@ public class TestLocalLink {
         var link = TestUtils.createSingleLink(0, 0);
         // 2 pce per second
         link.setCapacity(7200);
-        var simLink = SimLink.create(link, 0);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 3, 10, 30);
-        var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10, 30);
+        var simLink = TestUtils.createLink(link, 0, 30);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 3, 10);
+        var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10);
 
         simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
         simLink.pushVehicle(vehicle2, SimLink.LinkPosition.QStart, 0);
         simLink.pushVehicle(vehicle3, SimLink.LinkPosition.QStart, 0);
 
         // move vehicles 1 and 2 to the buffer
-        var now = vehicle1.getEarliestExitTime();
+        var now = vehicle1.getEarliestLinkExitTime();
         simLink.doSimStep(null, now);
         assertTrue(simLink.isOffering());
         assertEquals(vehicle1.getId(), simLink.popVehicle().getId());
         assertTrue(simLink.isOffering());
         assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
 
-        now = now + (vehicle1.getPce() + vehicle2.getPce()) / simLink.getMaxFlowCapacity() - 1;
+        now = now + (vehicle1.getSizeInEquivalents() + vehicle2.getSizeInEquivalents()) / simLink.getMaxFlowCapacity() - 1;
         simLink.doSimStep(null, now);
         assertFalse(simLink.isOffering());
 
@@ -210,7 +210,7 @@ public class TestLocalLink {
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 7.5, 0);
 		//var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10, 30);
 		//var vehicle2 = TestUtils.createVehicle("vehicle-2", 3, 10, 30);
-		var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10, 30);
+		var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10);
 
 		//simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QEnd, 0);
 		//simLink.pushVehicle(vehicle2, SimLink.LinkPosition.QEnd, 0);
@@ -241,17 +241,17 @@ public class TestLocalLink {
         var link = TestUtils.createSingleLink(0, 0);
         link.setCapacity(3600);
 		link.setFreespeed(10);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
-        var simLink = SimLink.create(link, 0);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
+        var simLink = TestUtils.createLink(link, 0, 30);
         simLink.addLeaveHandler((v, l, n) -> {
             assertEquals(link.getId(), l.getId());
             if (v.getId().equals(vehicle1.getId())) {
-                assertEquals(vehicle1.getEarliestExitTime(), n);
+                assertEquals(vehicle1.getEarliestLinkExitTime(), n);
                 return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
             }
             if (v.getId().equals(vehicle2.getId())) {
-                assertEquals(vehicle2.getEarliestExitTime(), n);
+                assertEquals(vehicle2.getEarliestLinkExitTime(), n);
                 return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
             }
 
@@ -266,7 +266,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 
         // remove the first vehicle
-        var now = vehicle1.getEarliestExitTime();
+        var now = vehicle1.getEarliestLinkExitTime();
         simLink.doSimStep(null, now);
 
         // vehicle2 should be at the head of the queue
@@ -274,7 +274,7 @@ public class TestLocalLink {
         assertFalse(simLink.isOffering());
 
         // move second vehicle into the buffer
-        now = vehicle2.getEarliestExitTime();
+        now = vehicle2.getEarliestLinkExitTime();
         simLink.doSimStep(null, now);
         assertTrue(simLink.isOffering());
         assertEquals(vehicle2.getId(), simLink.popVehicle().getId());
@@ -285,15 +285,15 @@ public class TestLocalLink {
         var link = TestUtils.createSingleLink(0, 0);
         link.setCapacity(3600);
 		link.setFreespeed(10);
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10, 30);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 30);
-        var simLink = SimLink.create(link, 0);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
+        var simLink = TestUtils.createLink(link, 0, 30);
         var leaveHandlerCounter = new AtomicInteger(0);
         var blockTime = 42;
         simLink.addLeaveHandler((v, _, n) -> {
             if (leaveHandlerCounter.get() == 0) {
                 leaveHandlerCounter.incrementAndGet();
-                v.setEarliestExitTime(n + blockTime);
+                v.setEarliestLinkExitTime(n + blockTime);
                 return SimLink.OnLeaveQueueInstruction.BlockQueue;
             } else {
                 return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
@@ -308,7 +308,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 
         // first vehicle blocks the queue
-        var now = vehicle1.getEarliestExitTime();
+        var now = vehicle1.getEarliestLinkExitTime();
         simLink.doSimStep(null, now);
         assertEquals(vehicle1.getId(), simLink.peekFirstVehicle().getId());
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -320,22 +320,22 @@ public class TestLocalLink {
         assertTrue(simLink.isOffering());
         var pop1 = simLink.popVehicle();
         assertEquals(vehicle1.getId(), pop1.getId());
-        assertEquals(now, pop1.getEarliestExitTime());
+        assertEquals(now, pop1.getEarliestLinkExitTime());
 
         // move the blocked vehicle, after flow capacity is restored
-        now = now + pop1.getPce() / simLink.getMaxFlowCapacity();
+        now = now + pop1.getSizeInEquivalents() / simLink.getMaxFlowCapacity();
         simLink.doSimStep(null, now);
         assertTrue(simLink.isOffering());
         var pop2 = simLink.popVehicle();
         assertEquals(vehicle2.getId(), pop2.getId());
-        assertEquals(link.getLength() / link.getFreespeed(), pop2.getEarliestExitTime());
+        assertEquals(link.getLength() / link.getFreespeed(), pop2.getEarliestLinkExitTime());
     }
 
     @Test
     public void popVehicleEmptyBuffer() {
 
         var link = TestUtils.createSingleLink(0, 0);
-        var simLink = SimLink.create(link, 0);
+        var simLink = TestUtils.createLink(link, 0, 30);
         assertThrows(RuntimeException.class, simLink::popVehicle);
     }
 }

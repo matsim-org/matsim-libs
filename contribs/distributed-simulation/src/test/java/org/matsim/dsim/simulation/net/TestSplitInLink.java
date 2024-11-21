@@ -32,8 +32,8 @@ public class TestSplitInLink {
 		var config = ConfigUtils.createConfig();
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 10, 0);
         // push vehicles onto link and check that the consumed capacity is passed upstream
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10, 10), SimLink.LinkPosition.Buffer, 0);
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10, 10), SimLink.LinkPosition.QEnd, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.Buffer, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QEnd, 0);
 
         var messaging1 = mock(SimStepMessaging.class);
         simLink.doSimStep(messaging1, 0);
@@ -51,8 +51,8 @@ public class TestSplitInLink {
 		var config = ConfigUtils.createConfig();
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 10, 0);
         // push vehicles onto link and check that the consumed capacity is passed upstream
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10, 10), SimLink.LinkPosition.QEnd, 0);
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10, 10), SimLink.LinkPosition.QEnd, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.QEnd, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QEnd, 0);
 
         var messaging = mock(SimStepMessaging.class);
         simLink.doSimStep(messaging, 0);
@@ -78,7 +78,7 @@ public class TestSplitInLink {
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 10, 0);
 		// push vehicle onto link and check that the consumed capacity is passed upstream
-		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 42, 10, 10), SimLink.LinkPosition.QEnd, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 42, 10), SimLink.LinkPosition.QEnd, 0);
 
 		var messaging = mock(SimStepMessaging.class);
 		assertTrue(simLink.doSimStep(messaging, 0));
@@ -102,8 +102,8 @@ public class TestSplitInLink {
 		var config = ConfigUtils.createConfig();
 		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 10, 0);
         // push vehicles onto link and check that the consumed capacity is passed upstream
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10, 10), SimLink.LinkPosition.QStart, 0);
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10, 10), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.QStart, 0);
+        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QStart, 0);
         simLink.addLeaveHandler((_, _, _) -> SimLink.OnLeaveQueueInstruction.RemoveVehicle);
         simLink.doSimStep(mock(SimStepMessaging.class), 99);
 

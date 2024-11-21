@@ -92,7 +92,10 @@ public final class DSim implements Mobsim {
             }
         }
 
-        manager.initProcessing();
+		// Sync after all components have been added
+		manager.syncEventRegistry(comm);
+
+		manager.initProcessing();
 
 		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
 		timer.setTime(timer.getSimStartTime());

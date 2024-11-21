@@ -3,18 +3,18 @@ package org.matsim.dsim.simulation;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.NextStateHandler;
-import org.matsim.api.SimEngine;
+import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.messages.SimStepMessage;
 
 import java.util.*;
 
+@Deprecated
 @Log4j2
-public class ActivityEngine implements SimEngine {
+public class ActivityEngineReimplementation implements DistributedMobsimEngine {
 
 	@Getter
 	private final Queue<SimPersonEntry> agentsAtActivities = new PriorityQueue<>(new PersonEntryComparator());
@@ -25,9 +25,9 @@ public class ActivityEngine implements SimEngine {
 	// This has to be settable if engines are supposed to be passed to the
 	// simulation and the simulation wires up a callback later.
 	@Setter
-	private NextStateHandler nextStateHandler;
+	private InternalInterface internalInterface;
 
-	public ActivityEngine(Collection<SimPerson> persons, TimeInterpretation timeInterpretation, EventsManager em) {
+	public ActivityEngineReimplementation(Collection<SimPerson> persons, TimeInterpretation timeInterpretation, EventsManager em) {
 		this.timeInterpretation = timeInterpretation;
 		for (SimPerson person : persons) {
 			var endTime = timeInterpretation.getActivityEndTime(person.getCurrentActivity(), 0);
@@ -37,37 +37,37 @@ public class ActivityEngine implements SimEngine {
 	}
 
 	@Override
-	public void accept(SimPerson person, double now) {
+	public void accept(DistributedMobsimAgent person, double now) {
 
-		Activity act = person.getCurrentActivity();
-		double endTime = timeInterpretation.getActivityEndTime(act, now);
-
-		var actStartEvent = new ActivityStartEvent(now,
-			person.getId(),
-			act.getLinkId(),
-			act.getFacilityId(),
-			act.getType(),
-			act.getCoord()
-		);
-
-		em.processEvent(actStartEvent);
-
-		if (Double.isInfinite(endTime)) {
-			finishedAgents.add(person);
-		} else if (endTime <= now) {
-			var actEndEvent = new ActivityEndEvent(
-				now,
-				person.getId(),
-				act.getLinkId(),
-				act.getFacilityId(),
-				act.getType(),
-				act.getCoord()
-			);
-			em.processEvent(actEndEvent);
-			nextStateHandler.accept(person, now);
-		} else {
-			agentsAtActivities.add(new SimPersonEntry(endTime, person));
-		}
+//		Activity act = person.getCurrentActivity();
+//		double endTime = timeInterpretation.getActivityEndTime(act, now);
+//
+//		var actStartEvent = new ActivityStartEvent(now,
+//			person.getId(),
+//			act.getLinkId(),
+//			act.getFacilityId(),
+//			act.getType(),
+//			act.getCoord()
+//		);
+//
+//		em.processEvent(actStartEvent);
+//
+//		if (Double.isInfinite(endTime)) {
+//			finishedAgents.add(person);
+//		} else if (endTime <= now) {
+//			var actEndEvent = new ActivityEndEvent(
+//				now,
+//				person.getId(),
+//				act.getLinkId(),
+//				act.getFacilityId(),
+//				act.getType(),
+//				act.getCoord()
+//			);
+//			em.processEvent(actEndEvent);
+////			nextStateHandler.accept(person, now);
+//		} else {
+//			agentsAtActivities.add(new SimPersonEntry(endTime, person));
+//		}
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ActivityEngine implements SimEngine {
 				act.getCoord()
 			);
 			em.processEvent(actEndEvent);
-			nextStateHandler.accept(entry.person(), now);
+//			nextStateHandler.accept(entry.person(), now);
 		}
 	}
 

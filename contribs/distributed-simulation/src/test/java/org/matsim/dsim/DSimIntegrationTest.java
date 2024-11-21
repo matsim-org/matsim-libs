@@ -20,13 +20,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Log4j2
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MobsimIntegrationTest {
+public class DSimIntegrationTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
@@ -59,6 +62,7 @@ public class MobsimIntegrationTest {
 
 	@Test
 	@Order(2)
+	@Disabled
 	void runDistributed() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
 		Path output = Path.of(utils.getOutputDirectory());

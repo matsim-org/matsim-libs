@@ -1,13 +1,9 @@
 package org.matsim.dsim.messages;
 
 import lombok.Builder;
-import lombok.Getter;
+import org.matsim.api.core.v01.Message;
+import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
 
 @Builder(setterPrefix = "set")
-@Getter
-public class Teleportation {
-
-    private final PersonMsg person;
-    private final double exitTime;
-
+public record Teleportation(Class<? extends DistributedMobsimAgent> type, Message agent, double exitTime) {
 }

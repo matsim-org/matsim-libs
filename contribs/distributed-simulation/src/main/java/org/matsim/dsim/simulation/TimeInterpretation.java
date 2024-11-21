@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 
+@Deprecated
 public class TimeInterpretation {
 
     private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;

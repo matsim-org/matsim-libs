@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -101,21 +102,21 @@ public class ActiveNodes implements Steppable {
 		// check if next link has space, or if the vehicle is stuck.
 		// move the vehicle if either the next link has sufficient space, or if the vehicle
 		// has reached its stuck time, move it regardless
-		SimVehicle vehicle = inLink.peekFirstVehicle();
-		Id<Link> nextLinkId = vehicle.getNextRouteElement();
+		DistributedMobsimVehicle vehicle = inLink.peekFirstVehicle();
+		Id<Link> nextLinkId = vehicle.getDriver().chooseNextLinkId();
 		assert nextLinkId != null : "Vehicle %s has no next route element".formatted(vehicle.getId());
 
 		SimLink nextLink = outLinks.get(nextLinkId);
 		assert nextLink != null : "Next link %s not found in outLinks".formatted(nextLinkId);
 
-		return nextLink.isAccepting(SimLink.LinkPosition.QStart, now) || vehicle.isStuck(now);
+		return nextLink.isAccepting(SimLink.LinkPosition.QStart, now) || inLink.isStuck(now);
 	}
 
-	private void move(SimLink inLink, SimVehicle vehicle, Map<Id<Link>, SimLink> outLinks, double now) {
+	private void move(SimLink inLink, DistributedMobsimVehicle vehicle, Map<Id<Link>, SimLink> outLinks, double now) {
 
 		em.processEvent(new LinkLeaveEvent(now, vehicle.getId(), inLink.getId()));
-		vehicle.advanceRoute();
-		var nextLinkId = vehicle.getCurrentRouteElement();
+		var nextLinkId = vehicle.getDriver().chooseNextLinkId();
+		vehicle.getDriver().notifyMoveOverNode(nextLinkId);
 		var nextLink = outLinks.get(nextLinkId);
 
 		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), nextLinkId));

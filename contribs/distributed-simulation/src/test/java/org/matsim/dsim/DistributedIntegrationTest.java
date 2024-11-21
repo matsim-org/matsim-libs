@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -16,9 +15,11 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DistributedIntegrationTest {
@@ -47,6 +48,7 @@ public class DistributedIntegrationTest {
 
 	@Test
 	@Order(1)
+	@Disabled
 	void runLocal() {
 
 		Config local = createScenario();

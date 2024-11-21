@@ -9,8 +9,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Agent source will create needed messages.
+ */
 @Data
 @Builder(setterPrefix = "set", toBuilder = true)
+@Deprecated
 public class PersonMsg {
 
     private final int currentPlanElement;

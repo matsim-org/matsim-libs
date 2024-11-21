@@ -16,23 +16,23 @@ class SimQueueTest {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
-		var vehicle1 = TestUtils.createVehicle("veh-1", 4, 10, 30);
-		var vehicle2 = TestUtils.createVehicle("veh-2", 4, 10, 30);
-		var vehicle3 = TestUtils.createVehicle("veh-3", 4, 10, 30);
+		var vehicle1 = TestUtils.createVehicle("veh-1", 4, 10);
+		var vehicle2 = TestUtils.createVehicle("veh-2", 4, 10);
+		var vehicle3 = TestUtils.createVehicle("veh-3", 4, 10);
 		var queue = SimQueue.create(link, config.qsim(), 10);
 
 		assertTrue(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
 
 		// capacity should be consumed immediately
-		vehicle1.setEarliestExitTime(10);
+		vehicle1.setEarliestLinkExitTime(10);
 		queue.add(vehicle1, SimLink.LinkPosition.QStart);
 		assertFalse(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
-		vehicle2.setEarliestExitTime(9);
+		vehicle2.setEarliestLinkExitTime(9);
 		queue.add(vehicle2, SimLink.LinkPosition.QStart);
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
-		vehicle3.setEarliestExitTime(10);
+		vehicle3.setEarliestLinkExitTime(10);
 		queue.add(vehicle3, SimLink.LinkPosition.QEnd);
 		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
 
@@ -51,19 +51,19 @@ class SimQueueTest {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
-		var vehicle1 = TestUtils.createVehicle("veh-1", 5, 10, 30);
-		var vehicle2 = TestUtils.createVehicle("veh-2", 5, 10, 30);
+		var vehicle1 = TestUtils.createVehicle("veh-1", 5, 10);
+		var vehicle2 = TestUtils.createVehicle("veh-2", 5, 10);
 		var queue = SimQueue.create(link, config.qsim(), 10);
 
 		assertTrue(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
 
 		// capacity should be consumed immediately
-		vehicle1.setEarliestExitTime(10);
+		vehicle1.setEarliestLinkExitTime(10);
 		queue.add(vehicle1, SimLink.LinkPosition.QStart);
 		assertFalse(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
-		vehicle2.setEarliestExitTime(9);
+		vehicle2.setEarliestLinkExitTime(9);
 		queue.add(vehicle2, SimLink.LinkPosition.QStart);
 		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
 
@@ -87,8 +87,8 @@ class SimQueueTest {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
-		var vehicle1 = TestUtils.createVehicle("veh-1", 2, 10, 30);
-		var vehicle2 = TestUtils.createVehicle("veh-2", 1, 10, 30);
+		var vehicle1 = TestUtils.createVehicle("veh-1", 2, 10);
+		var vehicle2 = TestUtils.createVehicle("veh-2", 1, 10);
 		var queue = SimQueue.create(link, config.qsim(), 5);
 
 		assertTrue(queue.isEmpty());

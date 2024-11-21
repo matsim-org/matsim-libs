@@ -54,7 +54,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	private final String mode;
 	private final Set<String> departureModes;
-	
+
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 
@@ -95,6 +95,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		this.passengerGroupIdentifier = passengerGroupIdentifier;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+	}
+
+	@Override
+	public String getName() {
+		return "DefaultPassengerEngine{" + mode + "}";
 	}
 
 	@Override
@@ -288,7 +293,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			rejectedRequestsEvents.add(event);
 		}
 	}
-	
+
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return createProvider(mode, Collections.singleton(mode));
 	}

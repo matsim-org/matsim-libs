@@ -1,6 +1,7 @@
 package org.matsim.dsim.simulation.net;
 
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.dsim.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,9 +10,9 @@ class SimBufferTest {
 
     @Test
     void init() {
-		var link = TestUtils.createSingleLink();
+		Link link = TestUtils.createSingleLink();
 		link.setCapacity(23 * 3600);
-		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link));
+		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), 30);
         assertEquals(23, buffer.getMaxFlowCapacity());
         assertEquals(0, buffer.getPceInBuffer());
 		assertTrue(buffer.isAvailable(0));
@@ -22,26 +23,25 @@ class SimBufferTest {
         var stuckThreshold = 11;
 		var link = TestUtils.createSingleLink();
 		link.setCapacity(7200);
-		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link));
-        var vehicle = TestUtils.createVehicle("vehicle-1", 10, 10, stuckThreshold);
+		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), stuckThreshold);
+        var vehicle = TestUtils.createVehicle("vehicle-1", 10, 10);
 
-        // push vehicle which consumes flow capacity and starts the stuck timer of the vehicle.
+        // push vehicle which consumes flow capacity and starts the stuck timer
 		assertTrue(buffer.isAvailable(0));
         buffer.add(vehicle, 0);
 		assertFalse(buffer.isAvailable(0));
-        assertEquals(vehicle.getPce(), buffer.getPceInBuffer());
-        assertFalse(buffer.peek().isStuck(0));
-        assertTrue(buffer.peek().isStuck(stuckThreshold));
+        assertEquals(vehicle.getSizeInEquivalents(), buffer.getPceInBuffer());
+        assertFalse(buffer.isStuck(0));
+        assertTrue(buffer.isStuck(stuckThreshold));
 
-        // remove the vehicle which resets the stuck timer
-        var polled = buffer.pollFirst();
-        assertFalse(polled.isStuck(stuckThreshold));
+		// Remove the vehicle
+		buffer.pollFirst();
 
         // make sure that flow capacity is rebuild slowly
-        var now = vehicle.getPce() / buffer.getMaxFlowCapacity() - 1;
+        var now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity() - 1;
 		assertFalse(buffer.isAvailable(now));
 
-        now = vehicle.getPce() / buffer.getMaxFlowCapacity();
+        now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity();
 		assertTrue(buffer.isAvailable(now));
     }
 
@@ -50,9 +50,9 @@ class SimBufferTest {
 
 		var link = TestUtils.createSingleLink();
 		link.setCapacity(15 * 3500);
-		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link));
-        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10, 10);
-        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10, 10);
+		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), 10);
+        var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
+        var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
         // add vehicles
 		assertTrue(buffer.isAvailable(0));
