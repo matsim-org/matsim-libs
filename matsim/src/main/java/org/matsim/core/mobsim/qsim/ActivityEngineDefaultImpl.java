@@ -34,8 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.interfaces.DistributedActivityEngine;
 
-class ActivityEngineDefaultImpl implements ActivityEngine {
+class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	private static final Logger log = LogManager.getLogger( ActivityEngineDefaultImpl.class ) ;
 
 	private final EventsManager eventsManager;

@@ -93,11 +93,11 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		this.currentTime.setTime(time);
 
-		for (var engine : qsim.getEngines()) {
+		for (MobsimEngine engine : qsim.getEngines()) {
 			engine.doSimStep(time);
 		}
 
-		for (var engine : engines) {
+		for (DistributedMobsimEngine engine : engines) {
 			engine.doSimStep(time);
 		}
 
@@ -207,7 +207,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
-		for (ActivityHandler activityHandler : this.qsim.getActivityHandlers()) {
+		for (ActivityHandler activityHandler : this.qsim.getActivityEngines()) {
 			if (activityHandler.handleActivity(agent)) {
 				return;
 			}
@@ -241,15 +241,22 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			now, agent.getId(), agent.getCurrentLinkId(), agent.getMode(), routingMode
 		));
 
-		// TODO: also use existing departure handlers
 
-		// this should be extended if we have more engines, such as pt or drt and others.
-		// qsimconfiggroup has a set as main modes. Otherwise, we could maintain our own set
 		if (mainModes.contains(agent.getMode())) {
 			networkTrafficEngine.accept(agent, now);
-		} else {
-			teleportationEngine.accept(agent, now);
+			return;
 		}
+
+		// Try to handle departure with standard qsim handlers
+		Id<Link> linkId = agent.getCurrentLinkId();
+		for (DepartureHandler departureHandler : this.qsim.getDepartureHandlers()) {
+			if (departureHandler.handleDeparture(now, agent, linkId)) {
+				return;
+			}
+		}
+
+		// At last, teleport agent
+		teleportationEngine.accept(agent, now);
 	}
 
 	private String routingModeOrNull(MobsimAgent agent) {
