@@ -20,12 +20,15 @@
 
 package org.matsim.core.events;
 
-import static org.mockito.Mockito.*;
-
+import com.google.inject.Provider;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
+
+import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -38,12 +41,12 @@ public class MobsimScopeEventHandlingTest {
 	@Test
 	void test_addMobsimScopeHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
-
-		verify(eventsManager, times(1)).addHandler((EventHandler) argThat(arg -> arg == handler));
+		verify(eventsManager, times(1)).addHandler(argThat((Provider<EventHandler> h) -> h.get() == handler));
 	}
 
 	@Test
 	void test_notifyAfterMobsim_oneHandler() {
+		when(eventsManager.addHandler((Provider<EventHandler>) any())).thenReturn(List.of(handler));
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
@@ -53,6 +56,7 @@ public class MobsimScopeEventHandlingTest {
 
 	@Test
 	void test_notifyAfterMobsim_noHandlersAfterRemoval() {
+		when(eventsManager.addHandler((Provider<EventHandler>) any())).thenReturn(List.of(handler));
 		eventHandling.addMobsimScopeHandler(handler);
 		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
