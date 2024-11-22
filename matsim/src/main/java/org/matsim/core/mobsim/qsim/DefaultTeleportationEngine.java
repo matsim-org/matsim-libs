@@ -56,7 +56,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		public int compare(TeleportationEntry o1, TeleportationEntry o2) {
 			var arrivalTimeResult = arrivalTimeComparator.compare(o1, o2);
 			if (arrivalTimeResult == 0) {
-				return o1.agent().getId().compareTo(o2.agent().getId());
+				return o2.agent().getId().compareTo(o1.agent().getId());
 			} else {
 				return arrivalTimeResult;
 			}

@@ -1,7 +1,6 @@
 package org.matsim.dsim;
 
 import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.SneakyThrows;
@@ -12,18 +11,15 @@ import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.PopulationModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
-import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
 import org.matsim.dsim.simulation.SimProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @Log4j2
@@ -76,13 +72,8 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(DSim.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);
-
-		// Binds mobsim related things
-		install(new QSimComponentsModule());
-		installQSimModule(new TransitEngineModule());
-		installQSimModule(new PopulationModule());
-		installQSimModule(new ActivityEngineModule());
 		bindMobsim().toProvider(DSimProvider.class);
+
 		bind(QSimCompatibility.class);
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
@@ -98,13 +89,6 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder(), LPProvider.class);
 		lps.addBinding().to(SimProvider.class);
-
-
-		// From the qsim module
-		bind(new TypeLiteral<Collection<AbstractQSimModule>>() {
-		}).to(new TypeLiteral<Set<AbstractQSimModule>>() {
-		});
-
 	}
 
 	private Topology createTopology(SerializationProvider serializer) {

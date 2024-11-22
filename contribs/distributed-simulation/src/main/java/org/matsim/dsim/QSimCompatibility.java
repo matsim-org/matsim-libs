@@ -3,6 +3,7 @@ package org.matsim.dsim;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
@@ -13,11 +14,13 @@ import org.matsim.core.mobsim.disim.VehicleContainer;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.lang.annotation.Annotation;
@@ -26,6 +29,7 @@ import java.util.*;
 /**
  * Loads qsim components for providing these modules the distributed simulation.
  */
+@Log4j2
 public final class QSimCompatibility {
 
 	private final Config config;
@@ -48,7 +52,7 @@ public final class QSimCompatibility {
 	private final List<MobsimEngine> engines = new ArrayList<>();
 
 	@Getter
-	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+	private final List<ActivityEngine> activityEngines = new ArrayList<>();
 
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
@@ -63,7 +67,7 @@ public final class QSimCompatibility {
 					  @Named("overrides") List<AbstractQSimModule> overridingModules,
 					  @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
-		this.modules = modules;
+		this.modules = new ArrayList<>(modules);
 		// (these are the implementations)
 		this.config = config;
 		this.iterationCounter = iterationCounter;
@@ -83,6 +87,10 @@ public final class QSimCompatibility {
 		this.netsim = netsim;
 
 		modules.forEach(m -> m.setConfig(config));
+
+		// Remove modules that are known to be incompatible and are not needed
+		modules.removeIf(m -> m instanceof QNetsimEngineModule);
+
 		overridingModules.forEach(m -> m.setConfig(config));
 
 		int iterationNumber = iterationCounter.getIterationNumber();
@@ -125,27 +133,31 @@ public final class QSimCompatibility {
 			try {
 				providers = qsimInjector.getInstance(activeComponentKey);
 			} catch (ProvisionException | ConfigurationException e) {
-				// ignore
+				log.warn("Failed to load component %s".formatted(activeComponent), e);
 				continue;
 			}
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
-				if (qSimComponent instanceof MobsimEngine m) {
+
+				int n = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+
+				if (qSimComponent instanceof DistributedMobsimEngine m) {
 					engines.add(m);
 				}
 
-				if (qSimComponent instanceof ActivityHandler ah) {
-					activityHandlers.add(ah);
+				if (qSimComponent instanceof DistributedActivityEngine ah) {
+					activityEngines.add(ah);
 				}
 
-				if (qSimComponent instanceof DepartureHandler dh) {
+				if (qSimComponent instanceof DistributedDepartureHandler dh) {
 					departureHandlers.add(dh);
 				}
 
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 					for (Class<? extends DistributedMobsimAgent> agentClass : as.getAgentClasses()) {
+						// TODO: Need other type system
 						if (agentTypes.containsKey(agentClass))
 							throw new IllegalStateException("Duplicate agent provider found for %s".formatted(agentClass));
 
@@ -159,6 +171,12 @@ public final class QSimCompatibility {
 						vehicleTypes.put(vehicleClass, as);
 					}
 				}
+
+				int m = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+				if (n == m) {
+					log.warn("Ignored component not compatible with distributed simulation: {}", qSimComponent);
+				}
+
 			}
 		}
 	}

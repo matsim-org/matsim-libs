@@ -20,6 +20,7 @@ import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -50,7 +51,7 @@ public class DrtIntegrationTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(2);
-		config.controller().setMobsim("dsim");
+		config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 
 		config.routing().setRoutingRandomness(0);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);

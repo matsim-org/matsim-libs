@@ -58,7 +58,7 @@ import java.util.Map.Entry;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
+public class TransitQSimEngine implements DistributedDepartureHandler, DistributedMobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;
