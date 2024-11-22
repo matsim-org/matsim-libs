@@ -1003,7 +1003,7 @@ public final class DemandReaderFromCSV {
 			}
 		}
 		if (combineSimilarJobs)
-			reduceNumberOfJobsIfSameCharacteristics(scenario, newDemandInformationElement);
+			combineSimilarJobs(scenario, newDemandInformationElement);
 	}
 
 	/** Creates a single shipment.
@@ -1163,8 +1163,8 @@ public final class DemandReaderFromCSV {
 	 * @param scenario 						Scenario
 	 * @param newDemandInformationElement 	single DemandInformationElement
 	 */
-	private static void reduceNumberOfJobsIfSameCharacteristics(Scenario scenario,
-			DemandInformationElement newDemandInformationElement) {
+	private static void combineSimilarJobs(Scenario scenario,
+										   DemandInformationElement newDemandInformationElement) {
 
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
