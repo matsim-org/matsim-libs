@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import jakarta.inject.Provider;
+import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
@@ -33,6 +33,7 @@ import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -43,6 +44,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+
+import jakarta.inject.Provider;
 
 /**
  * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects.
@@ -90,8 +93,15 @@ public final class DvrpModule extends AbstractModule {
 				DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 				ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
 					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
-				return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
+				
+				if (params.cachePath == null) {
+					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize());
+				} else {
+					File cachePath = new File(ConfigGroup.getInputFileURL(getConfig().getContext(), params.cachePath).getPath());
+					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, params, numberOfThreads,
+						qSimConfigGroup.getTimeStepSize(), cachePath);
+				}
 			}
 		}).in(Singleton.class);
 
