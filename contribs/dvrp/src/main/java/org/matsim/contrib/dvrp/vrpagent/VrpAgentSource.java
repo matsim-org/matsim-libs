@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -39,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 public class VrpAgentSource implements AgentSource, DistributedAgentSource {
@@ -122,6 +124,13 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 
 	@Override
 	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
-		return null;
+		throw new UnsupportedOperationException("Not implemented");
+	}
+
+
+	@Nullable
+	@Override
+	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
+		throw new UnsupportedOperationException("Not implemented");
 	}
 }
