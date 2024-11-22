@@ -562,7 +562,8 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape, jobDurationCalculator);
 		}
 		if (combineSimilarJobs)
-			combineSimilarJobs(scenario, jobDurationCalculator);
+			combineSimilarJobs(scenario);
+		jobDurationCalculator.recalculateJobDurations(scenario);
 	}
 
 	/**
@@ -1168,9 +1169,8 @@ public final class DemandReaderFromCSV {
 	 * they will be combined to one job.
 	 *
 	 * @param scenario                    Scenario
-	 * @param jobDurationCalculator			Calculator for the job duration
 	 */
-	private static void combineSimilarJobs(Scenario scenario, JobDurationCalculator jobDurationCalculator) {
+	private static void combineSimilarJobs(Scenario scenario) {
 
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
@@ -1220,7 +1220,7 @@ public final class DemandReaderFromCSV {
 				for (CarrierShipment carrierShipment : shipmentsToAdd) {
 					thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 				}
-				jobDurationCalculator.recalculateShipmentDurations(thisCarrier);
+
 				log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
 			}
 			if (!thisCarrier.getServices().isEmpty()) {
@@ -1262,7 +1262,6 @@ public final class DemandReaderFromCSV {
 				for (CarrierService carrierService : servicesToAdd) {
 					thisCarrier.getServices().put(carrierService.getId(), carrierService);
 				}
-				jobDurationCalculator.recalculateServiceDurations(thisCarrier);
 				log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
 			}
 		}
