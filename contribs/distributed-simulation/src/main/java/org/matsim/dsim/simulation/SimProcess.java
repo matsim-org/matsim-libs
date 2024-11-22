@@ -13,10 +13,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.disim.DistributedAgentSource;
-import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
-import org.matsim.core.mobsim.disim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.disim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.DistributedAgentSource;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -246,14 +246,15 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			now, agent.getId(), agent.getCurrentLinkId(), agent.getMode(), routingMode
 		));
 
+		Id<Link> linkId = agent.getCurrentLinkId();
 
+		// TODO: network traffic engine must check for itself if it is responsible for the agent
 		if (mainModes.contains(agent.getMode())) {
-			networkTrafficEngine.accept(agent, now);
+			networkTrafficEngine.handleDeparture(now, agent, linkId);
 			return;
 		}
 
 		// Try to handle departure with standard qsim handlers
-		Id<Link> linkId = agent.getCurrentLinkId();
 		for (DepartureHandler departureHandler : this.qsim.getDepartureHandlers()) {
 			if (departureHandler.handleDeparture(now, agent, linkId)) {
 				return;
@@ -261,7 +262,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		}
 
 		// At last, teleport agent
-		teleportationEngine.accept(agent, now);
+		teleportationEngine.handleDeparture(now, agent, linkId);
 	}
 
 	private String routingModeOrNull(MobsimAgent agent) {

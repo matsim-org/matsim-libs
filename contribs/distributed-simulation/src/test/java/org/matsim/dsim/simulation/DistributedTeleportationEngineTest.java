@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.disim.SimStepMessage;
-import org.matsim.core.mobsim.disim.Teleportation;
+import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -58,7 +58,7 @@ class DistributedTeleportationEngineTest {
 		var internalInterface = mock(InternalInterface.class);
 		engine.setInternalInterface(internalInterface);
 
-		engine.accept(simPerson, 10);
+		engine.handleDeparture(10, simPerson, simPerson.getCurrentLinkId());
 		// this should not fetch the person from the teleportation queue
 		engine.doSimStep(10 + 41);
 		verify(internalInterface, never()).arrangeNextAgentState(any());
@@ -88,8 +88,8 @@ class DistributedTeleportationEngineTest {
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(QSimCompatibility.class));
 		engine.setInternalInterface(internalInterface);
 
-		engine.accept(agent1, 10);
-		engine.accept(agent2, 10);
+		engine.handleDeparture(10, agent1, agent1.getCurrentLinkId());
+		engine.handleDeparture(10, agent2, agent2.getCurrentLinkId());
 
 		// use a timestep where both persons could be ready. person2 should finish first,
 		// as it has a shorter travel time
@@ -111,7 +111,7 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(false);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(QSimCompatibility.class));
 
-		engine.accept(agent, 11);
+		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
 		verify(messaging).collectTeleportation(eq(agent), eq(11 + 42.));
 	}
 

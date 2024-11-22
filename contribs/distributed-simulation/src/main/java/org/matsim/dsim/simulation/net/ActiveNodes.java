@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.Steppable;
 
 import java.util.HashSet;

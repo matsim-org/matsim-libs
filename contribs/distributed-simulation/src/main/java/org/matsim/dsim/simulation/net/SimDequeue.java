@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
-import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 /**
  * Have this interface here, because it is pretty tedious to implement an entire Deque<T> interface for

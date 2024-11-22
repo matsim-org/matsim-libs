@@ -2,7 +2,7 @@ package org.matsim.dsim.simulation.net;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
 import lombok.Getter;
-import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

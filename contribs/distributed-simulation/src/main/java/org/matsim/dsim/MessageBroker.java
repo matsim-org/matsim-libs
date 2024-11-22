@@ -277,7 +277,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
         } else {
             list = byAddress.get(address(receiverPartition, msg.getType()));
         }
-        //log.info("#{} received message to send local. {}", getRank(), msg.toDebugString());
+//        log.info("#{} received message to send local. {}", getRank(), msg);
         list.forEach(t -> t.add(msg));
     }
 

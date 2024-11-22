@@ -1,7 +1,8 @@
-package org.matsim.core.mobsim.disim;
+package org.matsim.core.mobsim.dsim;
 
 
 import org.matsim.api.core.v01.Message;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,9 @@ public record SimStepMessage(double simstep, List<CapacityUpdate> capUpdates, Li
 	public static class Builder {
 
 		private double simstep;
-		private final List<CapacityUpdate> capUpdates = new ArrayList<>();
-		private final List<Teleportation> teleportations = new ArrayList<>();
-		private final List<VehicleContainer> vehicles = new ArrayList<>();
+		private List<CapacityUpdate> capUpdates = new ArrayList<>();
+		private List<Teleportation> teleportations = new ArrayList<>();
+		private List<VehicleContainer> vehicles = new ArrayList<>();
 
 		public Builder setSimstep(double simstep) {
 			this.simstep = simstep;
@@ -45,10 +46,12 @@ public record SimStepMessage(double simstep, List<CapacityUpdate> capUpdates, Li
 		}
 
 		public void clear() {
-			capUpdates.clear();
-			teleportations.clear();
-			vehicles.clear();
+			// Need to create new lists, because the current ones are passed as references to other partitions
+			capUpdates = new ArrayList<>();
+			teleportations = new ArrayList<>();
+			vehicles = new ArrayList<>();
 			simstep = 0;
 		}
 	}
+
 }

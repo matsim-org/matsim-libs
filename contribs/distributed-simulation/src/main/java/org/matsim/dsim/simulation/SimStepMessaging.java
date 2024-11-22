@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.disim.*;
+import org.matsim.core.mobsim.dsim.*;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.QSimCompatibility;
 
@@ -92,7 +92,8 @@ public class SimStepMessaging {
 			var msgEntry = it.next();
 			var msgBuilder = msgEntry.getValue();
 			int targetPart = msgEntry.getIntKey();
-			messageBroker.send(msgBuilder.setSimstep(now).build(), targetPart);
+			SimStepMessage msg = msgBuilder.setSimstep(now).build();
+			messageBroker.send(msg, targetPart);
 
 			// update the bookkeeping. Since we must send to neighbor partitions, we clear the builder and keep it
 			// if we encounter a message builder for a remote partition, i.e. for teleportation, we remove it from

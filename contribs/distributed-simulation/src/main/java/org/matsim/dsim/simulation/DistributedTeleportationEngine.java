@@ -2,11 +2,16 @@ package org.matsim.dsim.simulation;
 
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
-import org.matsim.core.mobsim.disim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.disim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.QSimCompatibility;
 
@@ -15,7 +20,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 @Log4j2
-public class DistributedTeleportationEngine implements DistributedMobsimEngine {
+public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
@@ -32,7 +37,11 @@ public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 	}
 
 	@Override
-	public void accept(DistributedMobsimAgent person, double now) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+
+		if (!(agent instanceof DistributedMobsimAgent person)) {
+			throw new IllegalStateException("Teleported agent must implement DistributedMobsimAgent");
+		}
 
 		// the original engine has a travel time check. The default config parameter (qsim.usingTravelTimeCheckInTeleportation)
 		// is 'false' and is not settable from xml. This is usually an indicator that a feature is rarely used.
@@ -45,6 +54,8 @@ public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 		} else {
 			simStepMessaging.collectTeleportation(person, exitTime);
 		}
+
+		return true;
 	}
 
 	@Override

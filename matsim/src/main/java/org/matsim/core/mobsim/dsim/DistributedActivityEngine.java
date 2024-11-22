@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.interfaces;
+package org.matsim.core.mobsim.dsim;
 
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 

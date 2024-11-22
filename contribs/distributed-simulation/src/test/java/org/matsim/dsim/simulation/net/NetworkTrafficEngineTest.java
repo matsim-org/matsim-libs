@@ -87,7 +87,7 @@ class NetworkTrafficEngineTest {
 			}
 		});
 
-		engine.accept(agent, 0);
+		engine.handleDeparture(0, agent, agent.getCurrentLinkId());
 
 		do {
 			engine.doSimStep(i.get());

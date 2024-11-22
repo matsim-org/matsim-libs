@@ -10,7 +10,8 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.disim.*;
+import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -23,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Log4j2
-public class NetworkTrafficEngine implements DistributedMobsimEngine {
+public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
 
 	@Getter
 	private final SimNetwork simNetwork;
@@ -52,10 +53,11 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		wait2LinkFirst = scenario.getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles();
 	}
 
-	@Override
-	public void accept(DistributedMobsimAgent person, double now) {
 
-		if (!(person instanceof MobsimDriverAgent driver)) {
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+
+		if (!(agent instanceof MobsimDriverAgent driver)) {
 			throw new RuntimeException("Only driver agents are supported");
 		}
 
@@ -68,13 +70,14 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		vehicle.setDriver(driver);
 		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 
-		Id<Link> currentRouteElement = person.getCurrentLinkId();
+		Id<Link> currentRouteElement = agent.getCurrentLinkId();
 		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(vehicle.getId());
 
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
 		wait2Link.accept(vehicle, link);
+		return true;
 	}
 
 	@Override
