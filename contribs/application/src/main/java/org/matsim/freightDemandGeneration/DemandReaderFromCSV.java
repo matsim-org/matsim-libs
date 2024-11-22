@@ -561,7 +561,8 @@ public final class DemandReaderFromCSV {
 				createShipments(scenario, newDemandInformationElement, indexShape, population,
 						crsTransformationNetworkAndShape, jobDurationCalculator);
 		}
-
+		if (combineSimilarJobs)
+			combineSimilarJobs(scenario, jobDurationCalculator);
 	}
 
 	/**
@@ -758,8 +759,6 @@ public final class DemandReaderFromCSV {
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
-		if (combineSimilarJobs)
-			combineSimilarJobs(scenario, newDemandInformationElement);
 	}
 
 	/**
@@ -1015,8 +1014,6 @@ public final class DemandReaderFromCSV {
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
-		if (combineSimilarJobs)
-			combineSimilarJobs(scenario, newDemandInformationElement);
 	}
 
 	/**
@@ -1170,109 +1167,104 @@ public final class DemandReaderFromCSV {
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
 	 *
-	 * @param scenario 						Scenario
-	 * @param newDemandInformationElement 	single DemandInformationElement
+	 * @param scenario                    Scenario
+	 * @param jobDurationCalculator			Calculator for the job duration
 	 */
-	private static void combineSimilarJobs(Scenario scenario,
-										   DemandInformationElement newDemandInformationElement) {
+	private static void combineSimilarJobs(Scenario scenario, JobDurationCalculator jobDurationCalculator) {
 
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
-		int connectedJobs = 0;
-		if (newDemandInformationElement.getTypeOfDemand().equals("shipment")) {
-			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<>();
-			ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<>();
-			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
-					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-			for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
-				if (!shipmentsToRemove.containsKey(baseShipmentId)) {
-					CarrierShipment baseShipment = thisCarrier.getShipments().get(baseShipmentId);
-					HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<>();
-					shipmentsToConnect.put(baseShipmentId, baseShipment);
-					for (Id<CarrierShipment> thisShipmentId : thisCarrier.getShipments().keySet()) {
-						if (!shipmentsToRemove.containsKey(thisShipmentId)) {
-							CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
-							if (baseShipment.getId() != thisShipment.getId()
+		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			if (!thisCarrier.getShipments().isEmpty()) {
+				int shipmentsBeforeConnection = thisCarrier.getShipments().size();
+				HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<>();
+				ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<>();
+				for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
+					if (!shipmentsToRemove.containsKey(baseShipmentId)) {
+						CarrierShipment baseShipment = thisCarrier.getShipments().get(baseShipmentId);
+						HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<>();
+						shipmentsToConnect.put(baseShipmentId, baseShipment);
+						for (Id<CarrierShipment> thisShipmentId : thisCarrier.getShipments().keySet()) {
+							if (!shipmentsToRemove.containsKey(thisShipmentId)) {
+								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
+								if (baseShipment.getId() != thisShipment.getId()
 									&& baseShipment.getFrom() == thisShipment.getFrom()
 									&& baseShipment.getTo() == thisShipment.getTo()
 									&& baseShipment.getPickupTimeWindow() == thisShipment.getPickupTimeWindow()
 									&& baseShipment.getDeliveryTimeWindow() == thisShipment.getDeliveryTimeWindow())
-								shipmentsToConnect.put(thisShipmentId, thisShipment);
+									shipmentsToConnect.put(thisShipmentId, thisShipment);
+							}
 						}
-					}
-					Id<CarrierShipment> idNewShipment = baseShipment.getId();
-					int demandForThisLink = 0;
-					double serviceTimePickup = 0;
-					double serviceTimeDelivery = 0;
-					for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-						demandForThisLink = demandForThisLink + carrierShipment.getSize();
-						serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
-						serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
-						shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
-						connectedJobs++;
-					}
-					CarrierShipment newShipment = CarrierShipment.Builder
+						Id<CarrierShipment> idNewShipment = baseShipment.getId();
+						int demandForThisLink = 0;
+						double serviceTimePickup = 0;
+						double serviceTimeDelivery = 0;
+						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
+							demandForThisLink = demandForThisLink + carrierShipment.getSize();
+							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
+							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
+							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
+						}
+						CarrierShipment newShipment = CarrierShipment.Builder
 							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
 							.setPickupServiceTime(serviceTimePickup)
 							.setPickupTimeWindow(baseShipment.getPickupTimeWindow())
 							.setDeliveryServiceTime(serviceTimeDelivery)
 							.setDeliveryTimeWindow(baseShipment.getDeliveryTimeWindow()).build();
-
-					shipmentsToAdd.add(newShipment);
-					connectedJobs++;
+						shipmentsToAdd.add(newShipment);
+					}
 				}
-			}
-			for (CarrierShipment id : shipmentsToRemove.values())
-				thisCarrier.getShipments().remove(id.getId(), id);
+				for (CarrierShipment id : shipmentsToRemove.values())
+					thisCarrier.getShipments().remove(id.getId(), id);
 
-			for (CarrierShipment carrierShipment : shipmentsToAdd) {
-				thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+				for (CarrierShipment carrierShipment : shipmentsToAdd) {
+					thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+				}
+				jobDurationCalculator.recalculateShipmentDurations(thisCarrier);
+				log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
 			}
-			log.warn("Number of reduced shipments: {}", connectedJobs);
-		}
-		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
-			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<>();
-			ArrayList<CarrierService> servicesToAdd = new ArrayList<>();
-			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
-					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-			for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
-				if (!servicesToRemove.containsKey(baseServiceId)) {
-					CarrierService baseService = thisCarrier.getServices().get(baseServiceId);
-					HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<>();
-					servicesToConnect.put(baseServiceId, baseService);
-					for (Id<CarrierService> thisServiceId : thisCarrier.getServices().keySet()) {
-						if (!servicesToRemove.containsKey(thisServiceId)) {
-							CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
-							if (baseService.getId() != thisService.getId()
+			if (!thisCarrier.getServices().isEmpty()) {
+				int servicesBeforeConnection = thisCarrier.getServices().size();
+				HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<>();
+				ArrayList<CarrierService> servicesToAdd = new ArrayList<>();
+				for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
+					if (!servicesToRemove.containsKey(baseServiceId)) {
+						CarrierService baseService = thisCarrier.getServices().get(baseServiceId);
+						HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<>();
+						servicesToConnect.put(baseServiceId, baseService);
+						for (Id<CarrierService> thisServiceId : thisCarrier.getServices().keySet()) {
+							if (!servicesToRemove.containsKey(thisServiceId)) {
+								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
+								if (baseService.getId() != thisService.getId()
 									&& baseService.getLocationLinkId() == thisService.getLocationLinkId() && baseService
-											.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
-								servicesToConnect.put(thisServiceId, thisService);
+									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
+									servicesToConnect.put(thisServiceId, thisService);
+							}
 						}
-					}
-					Id<CarrierService> idNewService = baseService.getId();
-					int demandForThisLink = 0;
-					double serviceTimeService = 0;
-					for (CarrierService carrierService : servicesToConnect.values()) {
-						demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
-						serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
-						servicesToRemove.put(carrierService.getId(), carrierService);
-						connectedJobs++;
-					}
-					CarrierService newService = CarrierService.Builder
+						Id<CarrierService> idNewService = baseService.getId();
+						int demandForThisLink = 0;
+						double serviceTimeService = 0;
+						for (CarrierService carrierService : servicesToConnect.values()) {
+							demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
+							serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
+							servicesToRemove.put(carrierService.getId(), carrierService);
+						}
+						CarrierService newService = CarrierService.Builder
 							.newInstance(idNewService, baseService.getLocationLinkId())
 							.setServiceDuration(serviceTimeService)
 							.setServiceStartTimeWindow(baseService.getServiceStartTimeWindow())
 							.setCapacityDemand(demandForThisLink).build();
-					servicesToAdd.add(newService);
-					connectedJobs++;
+						servicesToAdd.add(newService);
+					}
 				}
+				for (CarrierService id : servicesToRemove.values())
+					thisCarrier.getServices().remove(id.getId(), id);
+				for (CarrierService carrierService : servicesToAdd) {
+					thisCarrier.getServices().put(carrierService.getId(), carrierService);
+				}
+				jobDurationCalculator.recalculateServiceDurations(thisCarrier);
+				log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
 			}
-			for (CarrierService id : servicesToRemove.values())
-				thisCarrier.getServices().remove(id.getId(), id);
-			for (CarrierService carrierService : servicesToAdd) {
-				thisCarrier.getServices().put(carrierService.getId(), carrierService);
-			}
-			log.warn("Number of reduced shipments: {}", connectedJobs);
 		}
 	}
 
