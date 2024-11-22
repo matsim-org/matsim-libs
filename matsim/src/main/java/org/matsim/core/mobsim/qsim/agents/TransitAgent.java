@@ -253,6 +253,6 @@ public final class TransitAgent implements DistributedMobsimAgent, MobsimDriverP
 
 	@Override
 	public Message toMessage() {
-		return null;
+		return basicAgentDelegate.toMessage();
 	}
 }
