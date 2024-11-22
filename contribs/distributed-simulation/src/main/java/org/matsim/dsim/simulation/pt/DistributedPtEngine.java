@@ -8,6 +8,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.dsim.simulation.net.SimLink;
 import org.matsim.dsim.simulation.net.SimNetwork;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -26,7 +27,9 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			.map(TransitRoute::getRoute)
 			.flatMap(netRoute -> Stream.concat(Stream.of(netRoute.getStartLinkId(), netRoute.getEndLinkId()), netRoute.getLinkIds().stream()))
 			.distinct()
+			.filter(id -> simNetwork.getLinks().containsKey(id))
 			.map(id -> simNetwork.getLinks().get(id))
+			.filter(link -> link instanceof SimLink.LocalLink || link instanceof SimLink.SplitInLink)
 			.map(PtLink::new)
 			.toList();
 		// override existing normal links with pt link.

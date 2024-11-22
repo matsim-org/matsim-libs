@@ -95,8 +95,8 @@ public class PtLink implements SimLink {
 	public boolean doSimStep(SimStepMessaging messaging, double now) {
 		// The original implementation fetches vehicles from the stop queue, puts them into a buffer list, and retrieves them in reverse order.
 		// This is to keep the original order, by which vehicles are fetched from the stop queue. However, the vehicles in the queue are sorted
-		// by exit time and then by id index. The order by which vehicles are polled from the queue is an arbitrary order anyway. So, I think
-		// we can poll and push onto the link directly instead.
+		// by exit time and then by id index. Therefore, the order by which vehicles are polled from the queue is an arbitrary order anyway. So,
+		// I think we can poll and push onto the link directly instead.
 		while (headVehicleReady(now)) {
 			var entry = vehiclesAtStop.remove();
 			link.pushVehicle(entry.vehicle(), LinkPosition.QEnd, now);
