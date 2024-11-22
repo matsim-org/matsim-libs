@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.vehicles.Vehicle;

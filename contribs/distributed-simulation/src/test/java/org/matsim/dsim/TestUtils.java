@@ -7,15 +7,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.dsim.messages.PersonMsg;
-import org.matsim.dsim.simulation.SimPerson;
 import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.dsim.simulation.SimpleVehicle;
-import org.matsim.dsim.simulation.net.BasicSimVehicle;
 import org.matsim.dsim.simulation.net.SimLink;
-import org.matsim.dsim.simulation.net.SimVehicle;
 
 import java.util.List;
 
@@ -34,112 +29,112 @@ public class TestUtils {
 		return SimLink.create(link, (_, _, _) -> SimLink.OnLeaveQueueInstruction.MoveToBuffer, defaultQsimConfig, 7.5, part);
 	}
 
-    public static Link createSingleLink() {
-        var f = NetworkUtils.createNetwork().getFactory();
-        var from = f.createNode(Id.createNodeId("from"), new Coord(0, 0));
-        var to = f.createNode(Id.createNodeId("to"), new Coord(100, 0));
+	public static Link createSingleLink() {
+		var f = NetworkUtils.createNetwork().getFactory();
+		var from = f.createNode(Id.createNodeId("from"), new Coord(0, 0));
+		var to = f.createNode(Id.createNodeId("to"), new Coord(100, 0));
 
-        return NetworkUtils.createNetwork().getFactory()
-                .createLink(Id.createLinkId("id"), from, to);
-    }
+		return NetworkUtils.createNetwork().getFactory()
+			.createLink(Id.createLinkId("id"), from, to);
+	}
 
-    public static Link createSingleLink(int fromPart, int toPart) {
-        var link = createSingleLink();
-        link.getFromNode().getAttributes().putAttribute(PARTITION_ATTR_KEY, fromPart);
-        link.getToNode().getAttributes().putAttribute(PARTITION_ATTR_KEY, toPart);
-        return link;
-    }
+	public static Link createSingleLink(int fromPart, int toPart) {
+		var link = createSingleLink();
+		link.getFromNode().getAttributes().putAttribute(PARTITION_ATTR_KEY, fromPart);
+		link.getToNode().getAttributes().putAttribute(PARTITION_ATTR_KEY, toPart);
+		return link;
+	}
 
-    public static Network createLocalThreeLinkNetwork() {
+	public static Network createLocalThreeLinkNetwork() {
 
-        var network = NetworkUtils.createNetwork();
-        var n1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
-        n1.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        var n2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(0, 100));
-        n2.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        var n3 = network.getFactory().createNode(Id.createNodeId("n3"), new Coord(0, 1100));
-        n3.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        var n4 = network.getFactory().createNode(Id.createNodeId("n4"), new Coord(0, 1200));
-        n4.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var network = NetworkUtils.createNetwork();
+		var n1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
+		n1.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var n2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(0, 100));
+		n2.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var n3 = network.getFactory().createNode(Id.createNodeId("n3"), new Coord(0, 1100));
+		n3.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var n4 = network.getFactory().createNode(Id.createNodeId("n4"), new Coord(0, 1200));
+		n4.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
 
-        var l1 = network.getFactory().createLink(Id.createLinkId("l1"), n1, n2);
-        l1.setFreespeed(27.78);
-        l1.setCapacity(3600);
-        l1.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        var l2 = network.getFactory().createLink(Id.createLinkId("l2"), n2, n3);
-        l2.setFreespeed(27.78);
-        l2.setCapacity(3600);
-        l2.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        var l3 = network.getFactory().createLink(Id.createLinkId("l3"), n3, n4);
-        l3.setFreespeed(27.78);
-        l3.setCapacity(3600);
-        l3.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var l1 = network.getFactory().createLink(Id.createLinkId("l1"), n1, n2);
+		l1.setFreespeed(27.78);
+		l1.setCapacity(3600);
+		l1.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var l2 = network.getFactory().createLink(Id.createLinkId("l2"), n2, n3);
+		l2.setFreespeed(27.78);
+		l2.setCapacity(3600);
+		l2.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		var l3 = network.getFactory().createLink(Id.createLinkId("l3"), n3, n4);
+		l3.setFreespeed(27.78);
+		l3.setCapacity(3600);
+		l3.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
 
-        network.addNode(n1);
-        network.addNode(n2);
-        network.addNode(n3);
-        network.addNode(n4);
-        network.addLink(l1);
-        network.addLink(l2);
-        network.addLink(l3);
+		network.addNode(n1);
+		network.addNode(n2);
+		network.addNode(n3);
+		network.addNode(n4);
+		network.addLink(l1);
+		network.addLink(l2);
+		network.addLink(l3);
 
-        return network;
-    }
+		return network;
+	}
 
-    public static Network createDistributedThreeLinkNetwork() {
-        var network = TestUtils.createLocalThreeLinkNetwork();
-        network.getLinks().get(Id.createLinkId("l1"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        network.getLinks().get(Id.createLinkId("l2"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
-        network.getLinks().get(Id.createLinkId("l3"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 2);
+	public static Network createDistributedThreeLinkNetwork() {
+		var network = TestUtils.createLocalThreeLinkNetwork();
+		network.getLinks().get(Id.createLinkId("l1"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		network.getLinks().get(Id.createLinkId("l2"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
+		network.getLinks().get(Id.createLinkId("l3"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 2);
 
-        network.getNodes().get(Id.createNodeId("n1"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
-        network.getNodes().get(Id.createNodeId("n2"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
-        network.getNodes().get(Id.createNodeId("n3"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
-        network.getNodes().get(Id.createNodeId("n4"))
-                .getAttributes().putAttribute(PARTITION_ATTR_KEY, 2);
-        return network;
-    }
+		network.getNodes().get(Id.createNodeId("n1"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 0);
+		network.getNodes().get(Id.createNodeId("n2"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
+		network.getNodes().get(Id.createNodeId("n3"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 1);
+		network.getNodes().get(Id.createNodeId("n4"))
+			.getAttributes().putAttribute(PARTITION_ATTR_KEY, 2);
+		return network;
+	}
 
 	public static SimpleAgent createAgent(String id) {
 		return SimpleAgent.builder()
-				.setId(Id.createPersonId(id))
-				.build();
+			.setId(Id.createPersonId(id))
+			.build();
 	}
 
-    public static SimpleVehicle createVehicle() {
-        return createVehicle("vehicle", 1, 50);
-    }
+	public static SimpleVehicle createVehicle() {
+		return createVehicle("vehicle", 1, 50);
+	}
 
 	public static SimpleVehicle createVehicle(String id, double pce, double maxV) {
 		return createVehicle(id, createAgent("driver"), pce, maxV);
 	}
 
-    public static SimpleVehicle createVehicle(String id, SimpleAgent driver, double pce, double maxV) {
-        return SimpleVehicle.builder()
-				.setId(Id.createVehicleId(id))
-				.setDriver(driver)
-				.setMaximumVelocity(maxV)
-				.setSizeInEquivalents(pce)
-				.build();
-    }
+	public static SimpleVehicle createVehicle(String id, SimpleAgent driver, double pce, double maxV) {
+		return SimpleVehicle.builder()
+			.setId(Id.createVehicleId(id))
+			.setDriver(driver)
+			.setMaximumVelocity(maxV)
+			.setSizeInEquivalents(pce)
+			.build();
+	}
 
-    public static EventsManager mockExpectingEventsManager(List<Event> expectedEvents) {
-        var result = mock(EventsManager.class);
-        doAnswer(call -> {
-            var firstArg = call.getArgument(0);
-            assertInstanceOf(Event.class, firstArg);
-            var event = (Event) firstArg;
-            var expectedEvent = expectedEvents.removeFirst();
+	public static EventsManager mockExpectingEventsManager(List<Event> expectedEvents) {
+		var result = mock(EventsManager.class);
+		doAnswer(call -> {
+			var firstArg = call.getArgument(0);
+			assertInstanceOf(Event.class, firstArg);
+			var event = (Event) firstArg;
+			var expectedEvent = expectedEvents.removeFirst();
 
 			assertEquals(expectedEvent, event);
-            return null;
-        }).when(result).processEvent(any());
-        return result;
-    }
+			return null;
+		}).when(result).processEvent(any());
+		return result;
+	}
 }

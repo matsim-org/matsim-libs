@@ -3,7 +3,7 @@ package org.matsim.dsim.simulation.net;
 import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
 
 @RequiredArgsConstructor
 class SimQueue {

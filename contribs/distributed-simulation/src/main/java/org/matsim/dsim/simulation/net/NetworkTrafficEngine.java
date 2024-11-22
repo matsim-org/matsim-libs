@@ -3,7 +3,6 @@ package org.matsim.dsim.simulation.net;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -11,15 +10,11 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.*;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.QSimCompatibility;
-import org.matsim.dsim.messages.CapacityUpdate;
-import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.VehicleContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
@@ -84,11 +79,11 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
-		for (VehicleContainer vehicleMessage : stepMessage.getVehicles()) {
+		for (VehicleContainer vehicleMessage : stepMessage.vehicles()) {
 			processVehicleMessage(vehicleMessage, now);
 		}
 
-		for (CapacityUpdate updateMessage : stepMessage.getCapacityUpdates()) {
+		for (CapacityUpdate updateMessage : stepMessage.capUpdates()) {
 			processUpdateMessage(updateMessage);
 		}
 	}
@@ -105,9 +100,9 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private void processUpdateMessage(CapacityUpdate updateMessage) {
 
-		Id<Link> linkId = updateMessage.getLinkId();
-		double released = updateMessage.getReleased();
-		double consumed = updateMessage.getConsumed();
+		Id<Link> linkId = updateMessage.linkId();
+		double released = updateMessage.released();
+		double consumed = updateMessage.consumed();
 		SimLink link = simNetwork.getLinks().get(linkId);
 
 		if (link instanceof SimLink.SplitOutLink so) {

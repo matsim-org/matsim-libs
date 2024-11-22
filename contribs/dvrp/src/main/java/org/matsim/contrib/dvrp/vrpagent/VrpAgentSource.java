@@ -28,10 +28,9 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.mobsim.disim.DistributedAgentSource;
+import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.DistributedAgentSource;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -51,7 +50,7 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 	private final VehicleType vehicleType;
 
 	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, String dvrpMode,
-			Netsim qSim, VehicleType vehicleType) {
+						  Netsim qSim, VehicleType vehicleType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
@@ -69,12 +68,12 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
 
 			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
-					qSim.getEventsManager());
+				qSim.getEventsManager());
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
-					vrpAgentLogic);
+				vrpAgentLogic);
 			Vehicle matsimVehicle = dvrpVehicle.getSpecification()
-					.getMatsimVehicle()
-					.orElse(vehicleFactory.createVehicle(Id.create(id, Vehicle.class), vehicleType));
+				.getMatsimVehicle()
+				.orElse(vehicleFactory.createVehicle(Id.create(id, Vehicle.class), vehicleType));
 			QVehicle mobsimVehicle = new QVehicleImpl(matsimVehicle);
 			vrpAgent.setVehicle(mobsimVehicle);
 			mobsimVehicle.setDriver(vrpAgent);

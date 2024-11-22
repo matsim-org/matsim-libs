@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

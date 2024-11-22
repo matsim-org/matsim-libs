@@ -20,24 +20,23 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The ``Q'' implementation of the MobsimVehicle.

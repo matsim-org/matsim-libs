@@ -18,9 +18,10 @@
   *                                                                         *
   * *********************************************************************** */
 
- package org.matsim.core.mobsim.framework;
+ package org.matsim.core.mobsim.disim;
 
  import org.matsim.api.core.v01.Message;
+ import org.matsim.core.mobsim.framework.MobsimAgent;
 
  /**
   * Extensions of the {@link MobsimAgent} interface that are used in distributed simulations.

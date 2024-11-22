@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.disim.SimStepMessage;
+import org.matsim.core.mobsim.disim.Teleportation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -16,8 +18,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.QSimCompatibility;
-import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.Teleportation;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -129,10 +129,9 @@ class DistributedTeleportationEngineTest {
 		engine.setInternalInterface(mock(InternalInterface.class));
 
 		SimStepMessage message = SimStepMessage.builder()
-			.setTeleportationMsg(Teleportation.builder()
-				.setAgent(agent.toMessage())
-				.setExitTime(42)
-				.build())
+			.addTeleportation(new Teleportation(
+				agent.getClass(), agent.toMessage(), 42
+			))
 			.build();
 
 		engine.process(message, 20);
@@ -157,10 +156,9 @@ class DistributedTeleportationEngineTest {
 		when(qsimCompatibility.agentFromMessage(any(), any())).thenReturn(agent);
 		var engine = new DistributedTeleportationEngine(em, messaging, qsimCompatibility);
 		var message = SimStepMessage.builder()
-			.setTeleportationMsg(Teleportation.builder()
-				.setAgent(agent.toMessage())
-				.setExitTime(42)
-				.build())
+			.addTeleportation(new Teleportation(
+				agent.getClass(), agent.toMessage(), 42
+			))
 			.build();
 
 		assertThrows(IllegalStateException.class, () -> engine.process(message, 100));

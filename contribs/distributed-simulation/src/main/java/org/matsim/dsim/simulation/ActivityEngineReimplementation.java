@@ -3,12 +3,12 @@ package org.matsim.dsim.simulation;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.disim.SimStepMessage;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.dsim.messages.SimStepMessage;
 
 import java.util.*;
 

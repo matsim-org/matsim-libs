@@ -2,14 +2,13 @@ package org.matsim.dsim.simulation;
 
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.disim.SimStepMessage;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.dsim.QSimCompatibility;
-import org.matsim.dsim.messages.SimStepMessage;
-import org.matsim.dsim.messages.Teleportation;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -50,7 +49,7 @@ public class DistributedTeleportationEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
-		for (Teleportation teleportation : stepMessage.getTeleportationMsgs()) {
+		for (var teleportation : stepMessage.teleportations()) {
 			var exitTime = teleportation.exitTime();
 			if (exitTime < now) {
 				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +

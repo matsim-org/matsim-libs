@@ -6,15 +6,19 @@ import lombok.Getter;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
-import org.matsim.core.mobsim.framework.DistributedAgentSource;
-import org.matsim.core.mobsim.framework.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedAgentSource;
+import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.disim.VehicleContainer;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.dsim.messages.VehicleContainer;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -163,12 +167,15 @@ public final class QSimCompatibility {
 	 * Create a vehicle container, which includes all the occupants.
 	 */
 	public VehicleContainer vehicleToContainer(DistributedMobsimVehicle vehicle) {
-		return VehicleContainer.builder()
-			.setVehicleType(vehicle.getClass())
-			.setVehicle(vehicle.toMessage())
-			.setDriver(new VehicleContainer.Occupant((DistributedMobsimAgent) vehicle.getDriver()))
-			.setPassengers(vehicle.getPassengers().stream().map(p -> new VehicleContainer.Occupant((DistributedMobsimAgent) p)).toList())
-			.build();
+		var passengers = vehicle.getPassengers().stream()
+			.map(p -> new VehicleContainer.Occupant((DistributedMobsimAgent) p))
+			.toList();
+		return new VehicleContainer(
+			vehicle.getClass(),
+			vehicle.toMessage(),
+			new VehicleContainer.Occupant((DistributedMobsimAgent) vehicle.getDriver()),
+			passengers
+		);
 	}
 
 	/**
@@ -176,12 +183,12 @@ public final class QSimCompatibility {
 	 */
 	public DistributedMobsimVehicle vehicleFromContainer(VehicleContainer container) {
 
-		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.getVehicleType(), container.getVehicle());
-		DriverAgent driver = (DriverAgent) agentFromMessage(container.getDriver().type(), container.getDriver().occupant());
+		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.vehicleType(), container.vehicle());
+		DriverAgent driver = (DriverAgent) agentFromMessage(container.driver().type(), container.driver().occupant());
 		vehicle.setDriver(driver);
 		driver.setVehicle(vehicle);
 
-		for (VehicleContainer.Occupant occ : container.getPassengers()) {
+		for (VehicleContainer.Occupant occ : container.passengers()) {
 			PassengerAgent p = (PassengerAgent) agentFromMessage(occ.type(), occ.occupant());
 			vehicle.addPassenger(p);
 			p.setVehicle(vehicle);

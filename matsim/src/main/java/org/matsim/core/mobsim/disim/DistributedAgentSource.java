@@ -1,8 +1,7 @@
-package org.matsim.core.mobsim.framework;
+package org.matsim.core.mobsim.disim;
 
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.NetworkPartition;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
 import java.util.Set;
@@ -16,7 +15,7 @@ public interface DistributedAgentSource {
 	 * Create agents and vehicles for the given network partition.
 	 *
 	 * @param partition for which to create agents and vehicles
-	 * @param mobsim to insert agents and vehicles into the simulation
+	 * @param mobsim    to insert agents and vehicles into the simulation
 	 */
 	void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim);
 

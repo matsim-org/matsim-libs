@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.qsim.interfaces.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.disim.DistributedMobsimVehicle;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.ArrayDeque;

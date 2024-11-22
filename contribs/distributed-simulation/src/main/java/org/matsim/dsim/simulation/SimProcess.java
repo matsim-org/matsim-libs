@@ -2,7 +2,6 @@ package org.matsim.dsim.simulation;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.DistributedMobsimEngine;
 import org.matsim.api.LP;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,14 +13,20 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.disim.DistributedAgentSource;
+import org.matsim.core.mobsim.disim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.disim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.disim.SimStepMessage;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.QSimCompatibility;
-import org.matsim.dsim.messages.SimStepMessage;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -107,7 +112,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public void process(SimStepMessage msg) {
 
-		assert msg.getSimstep() <= currentTime.getTimeOfDay() : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.getSimstep(), currentTime.getTimeOfDay());
+		assert msg.simstep() <= currentTime.getTimeOfDay() : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.simstep(), currentTime.getTimeOfDay());
 
 		for (DistributedMobsimEngine engine : engines) {
 			engine.process(msg, currentTime.getTimeOfDay());
