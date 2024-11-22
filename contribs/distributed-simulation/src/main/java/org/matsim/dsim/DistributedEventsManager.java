@@ -7,11 +7,11 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.messages.EventRegistry;
 import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -107,7 +107,7 @@ public final class DistributedEventsManager implements EventsManager {
 		addInternal(handler, null);
 	}
 
-	private  <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
+	private <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
 
 		String name = handler.getName();
 
@@ -195,6 +195,23 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
+	 * Remove task from internal data structures.
+	 */
+	private void removeTask(EventHandlerTask task) {
+
+		byPartitionAndType.values().forEach(list -> list.remove(task));
+		globalListener.values().forEach(list -> list.remove(task));
+
+		if (task.isDirect())
+			for (int type : task.getSupportedMessages()) {
+				Consumer<Message> c = task.getConsumer(type);
+				directListener.values().forEach(list -> list.remove(c));
+			}
+
+		tasks.remove(task);
+	}
+
+	/**
 	 * Communicates with all messages broker to synchronize
 	 */
 	void syncEventRegistry(Communicator comm) {
@@ -277,10 +294,10 @@ public final class DistributedEventsManager implements EventsManager {
 		List<EventHandlerTask> toRemove = tasks.stream().filter(t -> t.getHandler() == handler).toList();
 
 		if (toRemove.isEmpty()) {
-			throw new IllegalArgumentException("Handler %s not found to be removed. If it was added as distributed handler, removing it is not supported via this method.");
+			throw new IllegalArgumentException("Handler %s not found to be removed.");
 		}
 
-		tasks.removeAll(toRemove);
+		toRemove.forEach(this::removeTask);
 		toRemove.forEach(executor::deregister);
 	}
 

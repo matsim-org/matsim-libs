@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
@@ -26,7 +27,9 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct an agent from a message.
+	 * @return null if this source is not responsible for the given message.
 	 */
+	@Nullable
 	DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message);
 
 	/**
@@ -38,7 +41,9 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct a vehicle from a message.
+  	 * @return null if this source is not responsible for the given message.
 	 */
+	@Nullable
 	default DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
 		return null;
 	}

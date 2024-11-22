@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
@@ -98,7 +99,15 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		this.currentTime.setTime(time);
 
+		// Within day engine must be processed first
+		if (this.qsim.getWithinDayEngine() != null)
+			this.qsim.getWithinDayEngine().doSimStep(time);
+
 		for (MobsimEngine engine : qsim.getEngines()) {
+
+			if (engine == this.qsim.getWithinDayEngine())
+				continue;
+
 			engine.doSimStep(time);
 		}
 
@@ -187,7 +196,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
+		for (ActivityHandler activityHandler : qsim.getActivityEngines()) {
+			Gbl.assertNotNull(activityHandler);
+			activityHandler.rescheduleActivityEnd(agent);
+		}
 	}
 
 	@Override
@@ -221,11 +233,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		// don't do anything.
+		// This method is for visualization purposes only and not supported
 	}
 
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+		// This method is for visualization purposes only and not supported
 		return null;
 	}
 

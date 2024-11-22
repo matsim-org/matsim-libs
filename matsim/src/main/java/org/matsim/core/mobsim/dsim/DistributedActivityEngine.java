@@ -9,4 +9,12 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
  * @see ActivityEngine
  */
 public interface DistributedActivityEngine extends ActivityEngine, DistributedMobsimEngine {
+
+	/**
+	 * Activity engines are sorted by their priority in descending order.
+	 */
+	default double priority() {
+		return 0.0;
+	}
+
 }
