@@ -746,7 +746,7 @@ public final class DemandReaderFromCSV {
 			}
 		}
 		if (combineSimilarJobs)
-			reduceNumberOfJobsIfSameCharacteristics(scenario, newDemandInformationElement);
+			combineSimilarJobs(scenario, newDemandInformationElement);
 	}
 
 	/**
