@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation.pt;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -18,7 +19,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	private final TransitQSimEngine transitQSimEngine;
 
-	DistributedPtEngine(Scenario scenario, TransitQSimEngine transitQSimEngine, SimNetwork simNetwork) {
+	@Inject
+	public DistributedPtEngine(Scenario scenario, TransitQSimEngine transitQSimEngine, SimNetwork simNetwork) {
 		this.transitQSimEngine = transitQSimEngine;
 
 		// find out which links are pt links.

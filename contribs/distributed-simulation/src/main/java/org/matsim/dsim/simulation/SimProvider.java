@@ -73,7 +73,11 @@ public class SimProvider implements LPProvider {
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, compat, neighbors, part);
 		//ActivityEngineReimplementation activityEngine = createActivityEngine(part);
 		DistributedTeleportationEngine teleportationEngine = new DistributedTeleportationEngine(eventsManager, messaging, compat);
+		//var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, part);
 		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, compat, messaging, eventsManager, part);
+		var simNetwork = networkTrafficEngine.getSimNetwork();
+		//var qsimPtEngine = injector.getInstance(TransitQSimEngine.class);
+		//var ptEngine = new DistributedPtEngine(scenario, qsimPtEngine, simNetwork);
 
 		return new SimProcess(
 			partition, messaging, compat, teleportationEngine, networkTrafficEngine,

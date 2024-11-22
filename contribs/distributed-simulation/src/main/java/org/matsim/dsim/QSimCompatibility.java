@@ -11,7 +11,6 @@ import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -57,6 +56,7 @@ public final class QSimCompatibility {
 	@Getter
 	private WithinDayEngine withinDayEngine;
 
+	@Getter
 	private Injector qsimInjector;
 
 	@Inject
@@ -86,6 +86,7 @@ public final class QSimCompatibility {
 
 		// Remove modules that are known to be incompatible and are not needed
 		modules.removeIf(m -> m instanceof QNetsimEngineModule);
+		//modules.removeIf(m -> m instanceof TransitEngineModule);
 
 		overridingModules.forEach(m -> m.setConfig(config));
 
@@ -96,10 +97,12 @@ public final class QSimCompatibility {
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.emptyList());
 
 		for (AbstractQSimModule override : overridingModulesFromAbstractModule) {
+			override.setConfig(config);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
 		for (AbstractQSimModule override : overridingModules) {
+			override.setConfig(config);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
