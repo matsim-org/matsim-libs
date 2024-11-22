@@ -239,11 +239,19 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	@Override
 	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
 		for (Person p : population.getPersons().values()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+			var start = switch (p.getSelectedPlan().getPlanElements().getFirst()) {
+				case Activity a -> PopulationUtils.decideOnLinkIdForActivity(a, qsim.getScenario());
+				case Leg l -> l.getRoute().getStartLinkId();
+				default -> throw new IllegalStateException("Unexpected class: " + p.getSelectedPlan().getPlanElements().getFirst().getClass());
+			};
 
-			if (partition.containsLink(agent.getCurrentLinkId())) {
-				mobsim.insertAgentIntoMobsim(agent);
+			if (partition.containsLink(start)) {
+				// first create vehicles, then create persons, as the 'insertVehicles' method sets vehicle ids on the plan
+				// create mobsim agent might copy the plan so that changes to the original plan must be set before the mobsim
+				// agent is created.
 				insertVehicles(p, mobsim::addParkedVehicle);
+				var agent = this.agentFactory.createMobsimAgentFromPerson(p);
+				mobsim.insertAgentIntoMobsim(agent);
 			}
 		}
 	}
