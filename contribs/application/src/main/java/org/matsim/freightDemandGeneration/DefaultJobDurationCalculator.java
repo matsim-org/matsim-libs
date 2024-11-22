@@ -1,6 +1,6 @@
 package org.matsim.freightDemandGeneration;
 
-import org.matsim.freight.carriers.Carrier;
+import org.matsim.api.core.v01.Scenario;
 
 public class DefaultJobDurationCalculator implements JobDurationCalculator {
 	@Override
@@ -19,24 +19,19 @@ public class DefaultJobDurationCalculator implements JobDurationCalculator {
 	}
 
 	@Override
-	public void recalculateServiceDurations(Carrier thisCarrier) {
-		// Do nothing
-	}
-
-	@Override
-	public void recalculateShipmentDurations(Carrier thisCarrier) {
-		// Do nothing
+	public void recalculateJobDurations(Scenario scenario) {
+		// do nothing
 	}
 
 	/**
-	 * @param serviceTimePerUnit		service time per unit
+	 * @param timePerUnit				time per unit
 	 * @param demandForThisService		demand for this service
 	 * @return							default calculation
 	 */
-	private int getDefaultCalculation(int serviceTimePerUnit, int demandForThisService) {
+	private int getDefaultCalculation(int timePerUnit, int demandForThisService) {
 		if (demandForThisService == 0)
-			return serviceTimePerUnit;
+			return timePerUnit;
 		else
-			return serviceTimePerUnit * demandForThisService;
+			return timePerUnit * demandForThisService;
 	}
 }
