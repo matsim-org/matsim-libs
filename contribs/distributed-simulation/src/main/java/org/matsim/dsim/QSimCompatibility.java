@@ -10,8 +10,8 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -53,6 +53,9 @@ public final class QSimCompatibility {
 
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
+
+	@Getter
+	private final Set<MobsimListener> listeners = new HashSet<>();
 
 	@Getter
 	private WithinDayEngine withinDayEngine;
@@ -115,6 +118,9 @@ public final class QSimCompatibility {
 
 		qsimInjector = injector.createChildInjector(module);
 
+		// Retrieve all mobsim listeners
+		 listeners.addAll(qsimInjector.getInstance(Key.get(new TypeLiteral<Set<MobsimListener>>() {})));
+
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
@@ -170,12 +176,14 @@ public final class QSimCompatibility {
 					log.warn("Ignored component not compatible with distributed simulation: {}", qSimComponent);
 				}
 
+				if (qSimComponent instanceof MobsimListener l) {
+					listeners.add(l);
+				}
 			}
 		}
 
 		// Order engines by priority
 		activityHandlers.sort(Comparator.comparingDouble(DistributedActivityHandler::priority).reversed());
-
 	}
 
 	/**

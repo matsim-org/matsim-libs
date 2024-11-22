@@ -17,7 +17,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.dsim.executors.LPExecutor;
+import org.matsim.dsim.simulation.SimProcess;
+import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,6 +32,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -72,6 +77,7 @@ public final class DSim implements Mobsim {
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
 
         List<LPTask> tasks = new ArrayList<>();
+		Set<MobsimListener> listeners = new HashSet<>();
 
         for (LPProvider lpp : lps) {
             for (int part : node.getParts()) {
@@ -82,6 +88,10 @@ public final class DSim implements Mobsim {
                 if (lp == null)
                     continue;
 
+				if (lp instanceof SimProcess p) {
+					listeners.addAll(p.getListeners());
+				}
+
                 log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), node.getRank(), part);
 
                 LPTask task = executor.register(lp, manager, part);
@@ -91,6 +101,15 @@ public final class DSim implements Mobsim {
                 injector.injectMembers(lp);
             }
         }
+
+		// TODO: some listener could be executed on the partition, some are probably global (but might be also executed within partition)
+		// TODO: needs to be decided on case by case, via Annotation or similar
+		MobsimListenerManager listenerManager = new MobsimListenerManager(this);
+
+		// Incompatible, they do unsupported cast
+		listeners.removeIf(l -> l instanceof SnapshotWriterManager);
+
+		listeners.forEach(listenerManager::addQueueSimulationListener);
 
 		// Sync after all components have been added
 		manager.syncEventRegistry(comm);
@@ -104,6 +123,8 @@ public final class DSim implements Mobsim {
 
         log.info("Starting simulation");
 
+		listenerManager.fireQueueSimulationInitializedEvent();
+
         long start = System.currentTimeMillis();
 
 		double time = timer.getTimeOfDay();
@@ -116,6 +137,8 @@ public final class DSim implements Mobsim {
                 var formattedDuration = String.format("%02d:00:00", hour);
                 log.info("#{} at sim step: {}", comm.getRank(), formattedDuration);
             }
+
+			listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 
             manager.beforeSimStep(time);
             broker.beforeSimStep(time);
@@ -136,6 +159,8 @@ public final class DSim implements Mobsim {
             manager.afterSimStep(time);
             broker.syncTimestep(time, false);
 
+			listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+
 			time = timer.incrementTime();
         }
 
@@ -151,6 +176,8 @@ public final class DSim implements Mobsim {
                 round(mu),
                 round(rtr)
         );
+
+		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
         writeRuntimeStats(topology.getTotalPartitions(), node.getRank(), runtime, rtr);
         writeRuntimes(node, histogram, broker.getRuntime(), executor, runtime);

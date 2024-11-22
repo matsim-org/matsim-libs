@@ -94,6 +94,13 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		}
 	}
 
+	/**
+	 * Return the local mobsim listeners.
+	 */
+	public Set<MobsimListener> getListeners() {
+		return qsim.getListeners();
+	}
+
 	@Override
 	public void doSimStep(double time) {
 
@@ -180,7 +187,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public Map<Id<Person>, MobsimAgent> getAgents() {
-		// TODO: probably needed
+		// TODO: Few engines night this, but did not occurred yet
 		throw new UnsupportedOperationException();
 	}
 

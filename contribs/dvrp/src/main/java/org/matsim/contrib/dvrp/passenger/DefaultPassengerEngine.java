@@ -288,6 +288,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	@Override
+	public double getProcessInterval() {
+		// TODO: for now process events every second
+		return 1;
+	}
+
+	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
 		if (event.getMode().equals(mode)) {
 			rejectedRequestsEvents.add(event);
