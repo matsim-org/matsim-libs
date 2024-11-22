@@ -324,16 +324,18 @@ public final class DemandReaderFromCSV {
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
 	 * @param population                       Population
 	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
-	 * @throws IOException						if the csv file cannot be read
+	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @throws IOException if the csv file cannot be read
 	 */
 	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
 									ShpOptions.Index indexShape, boolean combineSimilarJobs,
-									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory) throws IOException {
+									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory,
+									JobDurationCalculator jobDurationCalculator) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
 		checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
-				crsTransformationNetworkAndShape);
+				crsTransformationNetworkAndShape, jobDurationCalculator);
 	}
 
 	/**
@@ -538,25 +540,26 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates for every demand information the services/shipments for the carriers
 	 *
-	 * @param scenario                     		Scenario
-	 * @param indexShape                   		ShpOptions.Index for the shape file
-	 * @param demandInformation            		Set<DemandInformationElement> with the demand information
-	 * @param population                   		Population
-	 * @param combineSimilarJobs           		boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param demandInformation                Set<DemandInformationElement> with the demand information
+	 * @param population                       Population
+	 * @param combineSimilarJobs               boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	static void createDemandForCarriers(Scenario scenario, ShpOptions.Index indexShape,
-			Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
-			CoordinateTransformation crsTransformationNetworkAndShape) {
+										Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
+										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		for (DemandInformationElement newDemandInformationElement : demandInformation) {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
-				createServices(scenario, newDemandInformationElement, indexShape, population, combineSimilarJobs,
-						crsTransformationNetworkAndShape);
+				createServices(scenario, newDemandInformationElement, indexShape, population,
+						crsTransformationNetworkAndShape, jobDurationCalculator);
 			else if (newDemandInformationElement.getTypeOfDemand().equals("shipment"))
-				createShipments(scenario, newDemandInformationElement, indexShape, population, combineSimilarJobs,
-						crsTransformationNetworkAndShape);
+				createShipments(scenario, newDemandInformationElement, indexShape, population,
+						crsTransformationNetworkAndShape, jobDurationCalculator);
 		}
 
 	}
@@ -564,16 +567,16 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates the services.
 	 *
-	 * @param scenario                  		Scenario
-	 * @param newDemandInformationElement 		single DemandInformationElement
-	 * @param indexShape              			ShpOptions.Index
-	 * @param population              			Population
-	 * @param combineSimilarJobs      			boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param newDemandInformationElement      single DemandInformationElement
+	 * @param indexShape                       ShpOptions.Index
+	 * @param population                       Population
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	private static void createServices(Scenario scenario, DemandInformationElement newDemandInformationElement,
-									   ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
-									   CoordinateTransformation crsTransformationNetworkAndShape) {
+									   ShpOptions.Index indexShape, Population population,
+									   CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
@@ -643,8 +646,8 @@ public final class DemandReaderFromCSV {
 					Link link = findNextUsedLink(scenario, indexShape, possibleLinksForService, numberOfJobs,
 							areasForServiceLocations, locationsOfServices, usedServiceLocations,
 							possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
-					double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
 					int demandForThisLink = 1;
+					double serviceTime = jobDurationCalculator.calculateServiceDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), demandForThisLink);
 					usedServiceLocations.add(link.getId().toString());
 					Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
@@ -680,6 +683,9 @@ public final class DemandReaderFromCSV {
 							singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
 						double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit()
 							* singleDemandForThisLink;
+						double serviceTime = jobDurationCalculator.calculateServiceDuration(
+							newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
+
 						Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
@@ -728,6 +734,8 @@ public final class DemandReaderFromCSV {
 						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
 					else
 						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
+					double serviceTime = jobDurationCalculator.calculateServiceDuration(
+						newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
 					usedServiceLocations.add(link.getId().toString());
 
 					Id<CarrierService> idNewService = Id.create(
@@ -752,16 +760,16 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates the shipments of a carrier.
 	 *
-	 * @param scenario 							Scenario
-	 * @param newDemandInformationElement 		single DemandInformationElement
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param population 						Population
-	 * @param combineSimilarJobs 				boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param newDemandInformationElement      single DemandInformationElement
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param population                       Population
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	private static void createShipments(Scenario scenario, DemandInformationElement newDemandInformationElement,
-										ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
-										CoordinateTransformation crsTransformationNetworkAndShape) {
+										ShpOptions.Index indexShape, Population population,
+										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
@@ -900,7 +908,7 @@ public final class DemandReaderFromCSV {
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
 
-					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink);
+					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink, jobDurationCalculator);
 				}
 			} else
 			// creates a demand on each link, demand depends on the length of the link
@@ -968,7 +976,7 @@ public final class DemandReaderFromCSV {
 
 					if (demandForThisLink > 0) {
 						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink);
+							demandForThisLink, jobDurationCalculator);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
@@ -998,7 +1006,7 @@ public final class DemandReaderFromCSV {
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
 
 				createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-					demandForThisLink);
+					demandForThisLink, jobDurationCalculator);
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
@@ -1012,9 +1020,10 @@ public final class DemandReaderFromCSV {
 	 * @param linkPickup                  Link for the pickup
 	 * @param linkDelivery                Link for the delivery
 	 * @param demandForThisLink           Demand for this link
+	 * @param jobDurationCalculator			Calculator for the job duration
 	 */
 	private static void createSingleShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
-											 Link linkPickup, Link linkDelivery, int demandForThisLink) {
+											 Link linkPickup, Link linkDelivery, int demandForThisLink, JobDurationCalculator jobDurationCalculator) {
 
 		Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
@@ -1038,6 +1047,9 @@ public final class DemandReaderFromCSV {
 				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * singleDemandForThisLink;
 				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * singleDemandForThisLink;
 			}
+			double serviceTimePickup = jobDurationCalculator.calculatePickupDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
+			double serviceTimeDelivery = jobDurationCalculator.calculateDeliveryDuration(newDemandInformationElement.getSecondJobElementTimePerUnit(), singleDemandForThisLink);
+
 			CarrierShipment thisShipment = CarrierShipment.Builder
 				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), singleDemandForThisLink)
 				.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
