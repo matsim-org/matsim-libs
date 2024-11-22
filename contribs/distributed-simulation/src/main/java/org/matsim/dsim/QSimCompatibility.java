@@ -18,6 +18,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -53,9 +54,10 @@ public final class QSimCompatibility {
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 
-	private Injector qsimInjector;
+	@Getter
+	private WithinDayEngine withinDayEngine;
 
-	private Netsim netsim;
+	private Injector qsimInjector;
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -79,8 +81,6 @@ public final class QSimCompatibility {
 		if (qsimInjector != null) {
 			return;
 		}
-
-		this.netsim = netsim;
 
 		modules.forEach(m -> m.setConfig(config));
 
@@ -159,6 +159,10 @@ public final class QSimCompatibility {
 					for (Class<? extends DistributedMobsimVehicle> vehicleClass : as.getVehicleClasses()) {
 						vehicleTypes.computeIfAbsent(vehicleClass, (_) -> new ArrayList<>()).add(as);
 					}
+				}
+
+				if (qSimComponent instanceof WithinDayEngine wde) {
+					withinDayEngine = wde;
 				}
 
 				int m = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
