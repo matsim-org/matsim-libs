@@ -50,7 +50,8 @@ public class DrtIntegrationTest {
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controller().setLastIteration(2);
+		config.controller().setLastIteration(1);
+		config.controller().setWriteEventsInterval(1);
 		config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 
 		config.routing().setRoutingRandomness(0);

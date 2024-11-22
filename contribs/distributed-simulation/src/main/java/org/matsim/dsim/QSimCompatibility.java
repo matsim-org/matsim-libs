@@ -16,8 +16,8 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -35,8 +35,8 @@ public final class QSimCompatibility {
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
 
-	private final Map<Class<? extends DistributedMobsimAgent>, DistributedAgentSource> agentTypes = new HashMap<>();
-	private final Map<Class<? extends DistributedMobsimVehicle>, DistributedAgentSource> vehicleTypes = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimAgent>, List<DistributedAgentSource>> agentTypes = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimVehicle>, List<DistributedAgentSource>> vehicleTypes = new HashMap<>();
 
 	@Getter
 	private final Injector injector;
@@ -48,7 +48,7 @@ public final class QSimCompatibility {
 	private final List<MobsimEngine> engines = new ArrayList<>();
 
 	@Getter
-	private final List<ActivityEngine> activityEngines = new ArrayList<>();
+	private final List<DistributedActivityEngine> activityEngines = new ArrayList<>();
 
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
@@ -153,18 +153,11 @@ public final class QSimCompatibility {
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 					for (Class<? extends DistributedMobsimAgent> agentClass : as.getAgentClasses()) {
-						// TODO: Need other type system
-						if (agentTypes.containsKey(agentClass))
-							throw new IllegalStateException("Duplicate agent provider found for %s".formatted(agentClass));
-
-						agentTypes.put(agentClass, as);
+						agentTypes.computeIfAbsent(agentClass, (_) -> new ArrayList<>()).add(as);
 					}
 
 					for (Class<? extends DistributedMobsimVehicle> vehicleClass : as.getVehicleClasses()) {
-						if (vehicleTypes.containsKey(vehicleClass))
-							throw new IllegalStateException("Duplicate vehicle provider found for %s".formatted(vehicleClass));
-
-						vehicleTypes.put(vehicleClass, as);
+						vehicleTypes.computeIfAbsent(vehicleClass, (_) -> new ArrayList<>()).add(as);
 					}
 				}
 
@@ -175,6 +168,10 @@ public final class QSimCompatibility {
 
 			}
 		}
+
+		// Order engines by priority
+		activityEngines.sort(Comparator.comparingDouble(DistributedActivityEngine::priority).reversed());
+
 	}
 
 	/**
@@ -217,12 +214,19 @@ public final class QSimCompatibility {
 	 * @see #vehicleFromContainer(VehicleContainer)
 	 */
 	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {
-		DistributedAgentSource source = vehicleTypes.get(type);
-		if (source == null) {
+		List<DistributedAgentSource> sources = vehicleTypes.get(type);
+		if (sources == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(type));
 		}
 
-		return source.vehicleFromMessage(type, m);
+		for (DistributedAgentSource source : sources) {
+			DistributedMobsimVehicle vehicle = source.vehicleFromMessage(type, m);
+			if (vehicle != null) {
+				return vehicle;
+			}
+		}
+
+		throw new IllegalStateException("No vehicle provider found for type %s with message %s".formatted(type, m));
 	}
 
 	/**
@@ -230,12 +234,19 @@ public final class QSimCompatibility {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends DistributedMobsimAgent> T agentFromMessage(Class<T> type, Message m) {
-		DistributedAgentSource source = agentTypes.get(type);
-		if (source == null) {
-			throw new RuntimeException("No agent provider found for %s".formatted(type));
+		List<DistributedAgentSource> sources = agentTypes.get(type);
+		if (sources == null) {
+			throw new RuntimeException("No agent provider found for type %s".formatted(type));
 		}
 
-		return (T) source.agentFromMessage(type, m);
+		for (DistributedAgentSource source : sources) {
+			T agent = (T) source.agentFromMessage(type, m);
+			if (agent != null) {
+				return agent;
+			}
+		}
+
+		throw new IllegalStateException("No agent provider found for type %s with message %s".formatted(type, m));
 	}
 
 }
