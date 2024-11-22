@@ -260,12 +260,14 @@ public class TransitQSimEngine implements DistributedDepartureHandler, Distribut
 			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, qSim.getScenario(),
 				qSim.getEventsManager(), qSim.getSimTimer(), timeInterpretation);
 			return TransitAgent.createTransitAgent(delegate, qSim.getScenario());
-		} else {
+		} else if (type == TransitDriverAgentImpl.class) {
 			TransitDriverAgentImpl.TransitDriverMessage driverMessage = (TransitDriverAgentImpl.TransitDriverMessage) message;
 			Umlauf umlauf = umlaeufe.get(driverMessage.umlaufId());
 			// The transport mode here does not seem to matter
 			return new TransitDriverAgentImpl(driverMessage, umlauf, TransportMode.car, agentTracker, internalInterface);
 		}
+
+		return null;
 	}
 
 	@Override
