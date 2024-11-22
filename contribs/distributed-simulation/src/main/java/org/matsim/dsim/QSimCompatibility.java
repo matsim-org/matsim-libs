@@ -49,7 +49,7 @@ public final class QSimCompatibility {
 	private final List<MobsimEngine> engines = new ArrayList<>();
 
 	@Getter
-	private final List<DistributedActivityEngine> activityEngines = new ArrayList<>();
+	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
@@ -136,14 +136,14 @@ public final class QSimCompatibility {
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
 
-				int n = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+				int n = engines.size() + activityHandlers.size() + departureHandlers.size() + agentSources.size();
 
 				if (qSimComponent instanceof DistributedMobsimEngine m) {
 					engines.add(m);
 				}
 
-				if (qSimComponent instanceof DistributedActivityEngine ah) {
-					activityEngines.add(ah);
+				if (qSimComponent instanceof DistributedActivityHandler ah) {
+					activityHandlers.add(ah);
 				}
 
 				if (qSimComponent instanceof DistributedDepartureHandler dh) {
@@ -165,7 +165,7 @@ public final class QSimCompatibility {
 					withinDayEngine = wde;
 				}
 
-				int m = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+				int m = engines.size() + activityHandlers.size() + departureHandlers.size() + agentSources.size();
 				if (n == m) {
 					log.warn("Ignored component not compatible with distributed simulation: {}", qSimComponent);
 				}
@@ -174,7 +174,7 @@ public final class QSimCompatibility {
 		}
 
 		// Order engines by priority
-		activityEngines.sort(Comparator.comparingDouble(DistributedActivityEngine::priority).reversed());
+		activityHandlers.sort(Comparator.comparingDouble(DistributedActivityHandler::priority).reversed());
 
 	}
 

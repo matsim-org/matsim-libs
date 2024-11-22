@@ -196,7 +196,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		for (ActivityHandler activityHandler : qsim.getActivityEngines()) {
+		for (ActivityHandler activityHandler : qsim.getActivityHandlers()) {
 			Gbl.assertNotNull(activityHandler);
 			activityHandler.rescheduleActivityEnd(agent);
 		}
@@ -224,7 +224,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
-		for (ActivityHandler activityHandler : this.qsim.getActivityEngines()) {
+		for (ActivityHandler activityHandler : this.qsim.getActivityHandlers()) {
 			if (activityHandler.handleActivity(agent)) {
 				return;
 			}

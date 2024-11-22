@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.mobsim.dsim.DistributedActivityEngine;
+import org.matsim.core.mobsim.dsim.DistributedActivityHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
-public class DynActivityEngine implements DistributedMobsimEngine, DistributedActivityEngine {
+public class DynActivityEngine implements DistributedMobsimEngine, DistributedActivityHandler {
 	public final static String COMPONENT_NAME = "DynActivityEngine";
 
 	private InternalInterface internalInterface;
