@@ -6,8 +6,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 
-public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements CapacityChangeTask {
+public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements DrtStopTaskWithVehicleCapacityChange {
 
 	private final DvrpVehicleLoad newVehicleCapacity;
 

@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dynagent.DynAction;
@@ -86,6 +87,9 @@ public final class VrpAgentLogic implements DynAgentLogic {
 				case STARTED:
 					Task task = schedule.getCurrentTask();
 					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
+					if(task instanceof CapacityChangeTask capacityChangeTask) {
+						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, vehicle.getId(), capacityChangeTask.getNewVehicleCapacity()));
+					}
 					break;
 
 				case PLANNED:

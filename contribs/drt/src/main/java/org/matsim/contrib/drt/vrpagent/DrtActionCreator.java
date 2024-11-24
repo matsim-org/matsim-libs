@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.vrpagent;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import org.matsim.contrib.drt.passenger.DrtStopActivity;
-import org.matsim.contrib.drt.schedule.CapacityChangeTask;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.DrtCapacityChangeActivity;

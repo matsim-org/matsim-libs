@@ -25,8 +25,8 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -92,7 +92,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				precedingStayTimes.add(accumulatedStayTime);
 				accumulatedStayTime = 0.0;
 			}
-			if(task instanceof CapacityChangeTask capacityChangeTask) {
+			if(task instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask) {
 				vehicleCapacities.add(capacityChangeTask.getNewVehicleCapacity());
 			}
 		}
@@ -102,7 +102,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		DvrpVehicleLoad outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
 
 		for (int i = stops.length - 1; i >= 0; i--) {
-			if(stopTasks.get(i) instanceof CapacityChangeTask capacityChangeTask) {
+			if(stopTasks.get(i) instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask) {
 				assert outgoingOccupancy.isEmpty();
 				capacityIndex--;
 				outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
@@ -114,7 +114,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		}
 
 		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? startTask instanceof CapacityChangeTask capacityChangeTask ? new Waypoint.StopWithCapacityChange(capacityChangeTask) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
+				? startTask instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask ? new Waypoint.StopWithCapacityChange(capacityChangeTask) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
 				: null;
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);

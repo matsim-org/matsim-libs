@@ -29,7 +29,8 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.CapacityChangeTask;
+import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -247,7 +248,7 @@ public interface Waypoint {
 	}
 
 	class StopWithCapacityChange extends Stop {
-		public StopWithCapacityChange(CapacityChangeTask task) {
+		public StopWithCapacityChange(DrtStopTaskWithVehicleCapacityChange task) {
 			super(task, task.getNewVehicleCapacity().getEmptyLoad());
 		}
 
