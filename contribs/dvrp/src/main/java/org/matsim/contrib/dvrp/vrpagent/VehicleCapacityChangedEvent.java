@@ -3,8 +3,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
 
 import java.util.Map;
 
@@ -18,9 +18,9 @@ public class VehicleCapacityChangedEvent extends Event {
 	public static final String ATTRIBUTE_NEW_CAPACITY = "newCapacity";
 
 	private final Id<DvrpVehicle> vehicleId;
-	private final DvrpVehicleLoad newVehicleCapacity;
+	private final DvrpLoad newVehicleCapacity;
 
-	public VehicleCapacityChangedEvent(double time, Id<DvrpVehicle> vehicleId, DvrpVehicleLoad newVehicleCapacity) {
+	public VehicleCapacityChangedEvent(double time, Id<DvrpVehicle> vehicleId, DvrpLoad newVehicleCapacity) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.newVehicleCapacity = newVehicleCapacity;
@@ -30,7 +30,7 @@ public class VehicleCapacityChangedEvent extends Event {
 		return vehicleId;
 	}
 
-	public DvrpVehicleLoad getNewVehicleCapacity() {
+	public DvrpLoad getNewVehicleCapacity() {
 		return newVehicleCapacity;
 	}
 

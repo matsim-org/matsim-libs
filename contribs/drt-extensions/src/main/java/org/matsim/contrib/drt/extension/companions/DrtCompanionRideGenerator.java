@@ -43,7 +43,7 @@
  import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
  import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
  import org.matsim.contrib.dvrp.fleet.FleetSpecification;
- import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+ import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
  import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
  import org.matsim.core.controler.events.AfterMobsimEvent;
  import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -86,9 +86,9 @@
 				 .values()
 				 .stream()
 			     .map(DvrpVehicleSpecification::getCapacity)
-			 	 .filter(dvrpVehicleLoad -> dvrpVehicleLoad instanceof ScalarVehicleLoad)
-			 	 .map(dvrpVehicleLoad -> (ScalarVehicleLoad) dvrpVehicleLoad)
-			     .mapToInt(ScalarVehicleLoad::getLoad)
+			 	 .filter(dvrpVehicleLoad -> dvrpVehicleLoad instanceof IntegerLoad)
+			 	 .map(dvrpVehicleLoad -> (IntegerLoad) dvrpVehicleLoad)
+			     .mapToInt(IntegerLoad::getLoad)
 				 .max()
 				 .orElse(0);
 		 installSampler(drtWithExtensionsConfigGroup);

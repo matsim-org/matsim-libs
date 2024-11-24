@@ -36,9 +36,9 @@ public class FleetReader extends MatsimXmlParser {
 	private static final int DEFAULT_CAPACITY = 1;
 
 	private final FleetSpecification fleet;
-	private final DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator;
+	private final DvrpLoadFromFleet dvrpVehicleLoadCreator;
 
-	public FleetReader(FleetSpecification fleet, DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator) {
+	public FleetReader(FleetSpecification fleet, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
 		super(ValidationType.DTD_ONLY);
 		this.fleet = fleet;
 		this.dvrpVehicleLoadCreator = dvrpVehicleLoadCreator;
@@ -66,7 +66,7 @@ public class FleetReader extends MatsimXmlParser {
 				.build();
 	}
 
-	private static DvrpVehicleLoad getCapacity(String capacityAttribute, Id<DvrpVehicle> vehicleId, DvrpFleetReaderLoadFromScalarCreator dvrpVehicleLoadCreator) {
+	private static DvrpLoad getCapacity(String capacityAttribute, Id<DvrpVehicle> vehicleId, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
 		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
 		if ((int)capacity != capacity) {
 			//for backwards compatibility: use double when reading files (capacity used to be double)

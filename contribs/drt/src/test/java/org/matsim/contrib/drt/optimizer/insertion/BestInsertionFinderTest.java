@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -48,6 +48,8 @@ public class BestInsertionFinderTest {
 	private final DrtRequest request = mock(DrtRequest.class);
 	private final InsertionCostCalculator insertionCostCalculator = mock(InsertionCostCalculator.class);
 	private final BestInsertionFinder bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
+
+	private final IntegerLoadType scalarVehicleLoadFactory = new DefaultIntegerLoadType();
 
 	@Test
 	void noInsertions_empty() {
@@ -140,6 +142,6 @@ public class BestInsertionFinderTest {
 		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
 
 		return new InsertionWithDetourData(
-				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, new ScalarVehicleLoad(1)), null, null);
+				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, scalarVehicleLoadFactory.fromInt(1)), null, null);
 	}
 }

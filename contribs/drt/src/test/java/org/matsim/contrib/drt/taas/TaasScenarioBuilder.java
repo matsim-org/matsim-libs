@@ -144,12 +144,12 @@ public class TaasScenarioBuilder {
 
 	// SERVICE PART
 
-	record VehicleItem(String identifier, int depotX, int depotY, DvrpVehicleLoad capacity) {
+	record VehicleItem(String identifier, int depotX, int depotY, DvrpLoad capacity) {
 	}
 
 	private List<VehicleItem> vehicles = new LinkedList<>();
 
-	public TaasScenarioBuilder addVehicle(String identifier, int depotX, int depotY, DvrpVehicleLoad capacity) {
+	public TaasScenarioBuilder addVehicle(String identifier, int depotX, int depotY, DvrpLoad capacity) {
 		vehicles.add(new VehicleItem(identifier, depotX, depotY, capacity));
 		return this;
 	}

@@ -24,7 +24,7 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 import java.util.List;
@@ -111,7 +111,7 @@ public class AcceptedDrtRequest {
 		return request.getPassengerIds();
 	}
 
-	public DvrpVehicleLoad getLoad() {
+	public DvrpLoad getLoad() {
 		return request.getLoad();
 	}
 

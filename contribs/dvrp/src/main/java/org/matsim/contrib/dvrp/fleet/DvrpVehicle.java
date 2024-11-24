@@ -40,9 +40,9 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return the amount of people/goods that can be served/transported at the same time
 	 */
-	DvrpVehicleLoad getCapacity();
+	DvrpLoad getCapacity();
 
-	default void setCapacity(DvrpVehicleLoad capacity) {
+	default void setCapacity(DvrpLoad capacity) {
 		throw new UnsupportedOperationException();
 	}
 

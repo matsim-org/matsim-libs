@@ -62,7 +62,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	}
 
 	@Override
-	public DvrpVehicleLoad getCapacity() {
+	public DvrpLoad getCapacity() {
 		return specification.getCapacity();
 	}
 

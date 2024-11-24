@@ -38,6 +38,10 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.ScalarLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.ScalarLoadType;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
@@ -65,16 +69,16 @@ public class VehicleOccupancyProfileCalculator
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
-		private DvrpVehicleLoad occupancy;
+		private ScalarLoad occupancy;
 		private double beginTime;
 
-		public VehicleState(Task.TaskType taskType, DvrpVehicleLoad occupancy, double beginTime) {
+		public VehicleState(Task.TaskType taskType, ScalarLoad occupancy, double beginTime) {
 			this.taskType = taskType;
 			this.occupancy = occupancy;
 			this.beginTime = beginTime;
 		}
 
-		public VehicleState(DvrpVehicleLoad occupancy) {
+		public VehicleState(ScalarLoad occupancy) {
 			this(null, occupancy, 0.0);
 		}
 	}
@@ -89,6 +93,8 @@ public class VehicleOccupancyProfileCalculator
 
 	private final double analysisEndTime;
 	private final int maxCapacity;
+	//We create one ScalarVehicleLoadFactory here to avoid creating one each time we need a ScalarVehicleLoad
+	private final ScalarLoadType scalarVehicleLoadFactory = new DefaultIntegerLoadType();
 
 	private final String dvrpMode;
 
@@ -112,8 +118,8 @@ public class VehicleOccupancyProfileCalculator
 				.values()
 				.stream()
 				.map(DvrpVehicleSpecification::getCapacity)
-				.filter(dvrpVehicleLoad -> dvrpVehicleLoad instanceof ScalarVehicleLoad)
-				.mapToInt(dvrpVehicleLoad -> ((ScalarVehicleLoad) dvrpVehicleLoad).getLoad())
+				.filter(dvrpVehicleLoad -> dvrpVehicleLoad instanceof IntegerLoad)
+				.mapToInt(dvrpVehicleLoad -> ((IntegerLoad) dvrpVehicleLoad).getLoad())
 				.max()
 				.orElse(-1);
 	}
@@ -178,11 +184,11 @@ public class VehicleOccupancyProfileCalculator
 
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
-		if(! (state.occupancy instanceof ScalarVehicleLoad)) {
+		if(! (state.occupancy instanceof IntegerLoad)) {
 			logger.warn("Presence of occupancies that are not Scalar, these will not be considered by VehicleOccupancyProfileCalculator");
 			return;
 		}
-		int currentVehicleOccupancy = ((ScalarVehicleLoad) state.occupancy).getLoad();
+		int currentVehicleOccupancy = ((IntegerLoad) state.occupancy).getLoad();
 		Verify.verify(currentVehicleOccupancy >= 0);
 		if(currentVehicleOccupancy > maxCapacity) {
 			logger.warn("Current limitation of VehicleOccupancyProfileCalculator does not allow to consider changing scalar capacities that are greater than the initial maximum capacity of the fleet");
@@ -227,7 +233,7 @@ public class VehicleOccupancyProfileCalculator
 		}
 		final VehicleState state;
 		if (event.getTaskIndex() == 0) {
-			state = new VehicleState(new ScalarVehicleLoad(0));
+			state = new VehicleState(scalarVehicleLoadFactory.getEmptyLoad());
 			vehicleStates.put(event.getDvrpVehicleId(), state);
 		} else {
 			state = vehicleStates.get(event.getDvrpVehicleId());
@@ -261,7 +267,7 @@ public class VehicleOccupancyProfileCalculator
 		VehicleState state = vehicleStates.get(Id.create(vehicleId, DvrpVehicle.class));
 		if (state != null && !isDriver(event.getPersonId(), vehicleId)) {
 			increment(state, event.getTime());
-			state.occupancy = state.occupancy.addTo(new ScalarVehicleLoad(change));
+			state.occupancy = state.occupancy.addTo(state.occupancy.getType().fromNumber(change));
 			state.beginTime = event.getTime();
 		}
 	}

@@ -24,8 +24,8 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
@@ -49,7 +49,7 @@ public class DrtRequest implements PassengerRequest {
 
 	private final Link fromLink;
 	private final Link toLink;
-	private final Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter;
+	private final Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter;
 
 	private DrtRequest(Builder builder) {
 		id = builder.id;
@@ -134,7 +134,7 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public DvrpVehicleLoad getLoad() {
+	public DvrpLoad getLoad() {
 		return this.scalarVehicleLoadGetter.apply(passengerIds);
 	}
 
@@ -165,7 +165,7 @@ public class DrtRequest implements PassengerRequest {
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
-		private Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter = passengerIds -> new ScalarVehicleLoad(passengerIds.size());
+		private Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter = passengerIds -> new DefaultIntegerLoadType().fromInt(passengerIds.size());
 
 		private Builder() {
 		}
@@ -220,7 +220,7 @@ public class DrtRequest implements PassengerRequest {
 			return this;
 		}
 
-		public Builder scalarDvrpVehicleLoadGetter(Function<Collection<Id<Person>>, DvrpVehicleLoad> scalarVehicleLoadGetter) {
+		public Builder scalarDvrpVehicleLoadGetter(Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter) {
 			this.scalarVehicleLoadGetter = scalarVehicleLoadGetter;
 			return this;
 		}

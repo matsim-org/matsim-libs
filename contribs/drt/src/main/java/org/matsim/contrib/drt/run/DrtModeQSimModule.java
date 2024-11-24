@@ -27,7 +27,8 @@ import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.ScalarLoadType;
 import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
@@ -92,7 +93,10 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
-		bindModal(DvrpLoadFromPassengers.class).toInstance(passengerIds -> new ScalarVehicleLoad(passengerIds.size()));
+		bindModal(DvrpLoadFromPassengers.class).toProvider(modalProvider(getter -> {
+			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
+			return passengerIds -> scalarVehicleLoadFactory.fromInt(passengerIds.size());
+		})).asEagerSingleton();
 
 		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);

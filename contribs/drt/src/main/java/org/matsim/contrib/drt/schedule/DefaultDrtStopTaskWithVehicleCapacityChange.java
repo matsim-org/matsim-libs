@@ -4,21 +4,21 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 
 public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements DrtStopTaskWithVehicleCapacityChange {
 
-	private final DvrpVehicleLoad newVehicleCapacity;
+	private final DvrpLoad newVehicleCapacity;
 
-	public DefaultDrtStopTaskWithVehicleCapacityChange(double beginTime, double endTime, Link link, DvrpVehicleLoad newVehicleCapacity) {
+	public DefaultDrtStopTaskWithVehicleCapacityChange(double beginTime, double endTime, Link link, DvrpLoad newVehicleCapacity) {
 		super(beginTime, endTime, link);
 		this.newVehicleCapacity = newVehicleCapacity;
 	}
 
 	@Override
-	public DvrpVehicleLoad getNewVehicleCapacity() {
+	public DvrpLoad getNewVehicleCapacity() {
 		return this.newVehicleCapacity;
 	}
 

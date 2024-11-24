@@ -13,6 +13,8 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
 import java.util.Arrays;
@@ -45,11 +47,11 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
-	private Waypoint.Stop stop(double beginTime, Link link, DvrpVehicleLoad outgoingOccupancy) {
+	private Waypoint.Stop stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
 		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
 	}
 
-	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpVehicleLoad newCapacity) {
+	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
 		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, newCapacity));
 	}
 
@@ -64,40 +66,47 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
 	}
 
-	private static class TestScalarVehicleLoadA extends ScalarVehicleLoad {
-		public TestScalarVehicleLoadA(int capacity) {
-			super(capacity);
+	private static class TestIntegerLoadTypeA extends IntegerLoadType {
+		public TestIntegerLoadTypeA() {
+			super("loadA", "A");
 		}
 
-		public static TestScalarVehicleLoadA fromPersonIds(Collection<Id<Person>> personIds) {
-			return new TestScalarVehicleLoadA(personIds.size());
+		@Override
+		public IntegerLoad fromInt(int load) {
+			return new IntegerLoad(load, this);
 		}
 
-		protected ScalarVehicleLoad fromInt(int load) {
-			return new TestScalarVehicleLoadA(load);
+		public IntegerLoad fromPersonIds(Collection<Id<Person>> personIds) {
+			return fromInt(personIds.size());
 		}
 	}
-	private static class TestScalarVehicleLoadB extends ScalarVehicleLoad {
-		public TestScalarVehicleLoadB(int capacity) {
-			super(capacity);
+
+	private static class TestIntegerLoadTypeB extends IntegerLoadType {
+
+		public TestIntegerLoadTypeB() {
+			super("loadB", "B");
 		}
 
-		public static TestScalarVehicleLoadB fromPersonIds(Collection<Id<Person>> personIds) {
-			return new TestScalarVehicleLoadB(personIds.size());
+		@Override
+		public IntegerLoad fromInt(int load) {
+			return new IntegerLoad(load, this);
 		}
-
-		protected ScalarVehicleLoad fromInt(int load) {
-			return new TestScalarVehicleLoadB(load);
+		public IntegerLoad fromPersonIds(Collection<Id<Person>> personIds) {
+			return fromInt(personIds.size());
 		}
 	}
-	private static final DvrpVehicleLoad STARTING_VEHICLE_CAPACITY = new TestScalarVehicleLoadA(4);
-	private static final DvrpVehicleLoad CHANGED_VEHICLE_CAPACITY = new TestScalarVehicleLoadB(4);
-	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).scalarDvrpVehicleLoadGetter(TestScalarVehicleLoadA::fromPersonIds).build();
-	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).scalarDvrpVehicleLoadGetter(TestScalarVehicleLoadB::fromPersonIds).build();
+
+	private static final TestIntegerLoadTypeA FACTORY_A = new TestIntegerLoadTypeA();
+	private static final TestIntegerLoadTypeB FACTORY_B = new TestIntegerLoadTypeB();
+
+	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = FACTORY_A.fromInt(4);
+	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = FACTORY_B.fromInt(4);
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).scalarDvrpVehicleLoadGetter(FACTORY_A::fromPersonIds).build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).scalarDvrpVehicleLoadGetter(FACTORY_B::fromPersonIds).build();
 
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequestA, entry,
@@ -111,9 +120,9 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@Test
 	void startOccupied_capacityChange_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
-		Waypoint.Stop stop0 = stop(0, link("stop0"), new TestScalarVehicleLoadA(1)); //pickup
-		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadA(0)); // dropoff
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
+		Waypoint.Stop stop0 = stop(0, link("stop0"), FACTORY_A.fromInt(1)); //pickup
+		Waypoint.Stop stop1 = stop(0, link("stop1"), FACTORY_A.getEmptyLoad()); // dropoff
 		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), CHANGED_VEHICLE_CAPACITY);
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
@@ -132,10 +141,10 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@Test
 	void startEmpty_capacityChangeThenRequest_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, new TestScalarVehicleLoadA(0)); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);
-		Waypoint.Stop stop1 = stop(0, link("stop1"), new TestScalarVehicleLoadB(1)); //pickup
-		Waypoint.Stop stop2 = stop(0, link("stop2"), new TestScalarVehicleLoadB(0)); // dropoff
+		Waypoint.Stop stop1 = stop(0, link("stop1"), FACTORY_B.fromInt(1)); //pickup
+		Waypoint.Stop stop2 = stop(0, link("stop2"), FACTORY_B.fromInt(0)); // dropoff
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 
@@ -153,7 +162,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private void assertInsertionsOnly(DrtRequest drtRequest, VehicleEntry entry, InsertionGenerator.Insertion... expectedInsertions) {
 		int stopCount = entry.stops.size();
-		DvrpVehicleLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
+		DvrpLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy.isEmpty());//make sure the input is valid
 
 		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;

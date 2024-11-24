@@ -52,6 +52,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -942,10 +943,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	 * @return
 	 */
 	static int findMaxVehicleCapacity(FleetSpecification fleet) {
-		DvrpVehicleLoad dvrpVehicleLoad = fleet.getVehicleSpecifications().values().stream().map(DvrpVehicleSpecification::getCapacity).reduce((a, b) -> a.fitsIn(b) ? b : a).orElse(null);
-		Verify.verify(dvrpVehicleLoad != null);
-		Verify.verify(dvrpVehicleLoad instanceof ScalarVehicleLoad);
-		ScalarVehicleLoad scalarVehicleLoad = (ScalarVehicleLoad) dvrpVehicleLoad;
+		DvrpLoad dvrpLoad = fleet.getVehicleSpecifications().values().stream().map(DvrpVehicleSpecification::getCapacity).reduce((a, b) -> a.fitsIn(b) ? b : a).orElse(null);
+		Verify.verify(dvrpLoad != null);
+		Verify.verify(dvrpLoad instanceof IntegerLoad);
+		IntegerLoad scalarVehicleLoad = (IntegerLoad) dvrpLoad;
 		return scalarVehicleLoad.getLoad();
 	}
 

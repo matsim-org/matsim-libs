@@ -28,13 +28,9 @@ import java.util.List;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -82,8 +78,8 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		List<Double> precedingStayTimes = new ArrayList<>();
 
 		// With changing capacities, we collect the sequence of capacities that the vehicle is scheduled to have. So that we can track them backwards in the next loop
-		List<DvrpVehicleLoad> vehicleCapacities = new ArrayList<>(tasks.size() - nextTaskIdx);
-		vehicleCapacities.add(vehicle.getCapacity().getEmptyLoad());
+		List<DvrpLoad> vehicleCapacities = new ArrayList<>(tasks.size() - nextTaskIdx);
+		vehicleCapacities.add(vehicle.getCapacity().getType().getEmptyLoad());
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (STAY.isBaseTypeOf(task)) {
 				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
@@ -99,13 +95,13 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
 		int capacityIndex = vehicleCapacities.size() - 1;
-		DvrpVehicleLoad outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
+		DvrpLoad outgoingOccupancy = vehicleCapacities.get(capacityIndex).getType().getEmptyLoad();
 
 		for (int i = stops.length - 1; i >= 0; i--) {
 			if(stopTasks.get(i) instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask) {
 				assert outgoingOccupancy.isEmpty();
 				capacityIndex--;
-				outgoingOccupancy = vehicleCapacities.get(capacityIndex).getEmptyLoad();
+				outgoingOccupancy = vehicleCapacities.get(capacityIndex).getType().getEmptyLoad();
 				stops[i] = new Waypoint.StopWithCapacityChange(capacityChangeTask);
 			} else {
 				Waypoint.Stop s = stops[i] = new Waypoint.StopWithPickupAndDropoff(stopTasks.get(i), outgoingOccupancy);
@@ -114,7 +110,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		}
 
 		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? startTask instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask ? new Waypoint.StopWithCapacityChange(capacityChangeTask) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getEmptyLoad())
+				? startTask instanceof DrtStopTaskWithVehicleCapacityChange capacityChangeTask ? new Waypoint.StopWithCapacityChange(capacityChangeTask) : new Waypoint.StopWithPickupAndDropoff((DrtStopTask) startTask, vehicle.getCapacity().getType().getEmptyLoad())
 				: null;
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);
