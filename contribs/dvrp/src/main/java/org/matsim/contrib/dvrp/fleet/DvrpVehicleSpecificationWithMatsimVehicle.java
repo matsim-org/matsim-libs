@@ -38,14 +38,14 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	public static final String SERVICE_BEGIN_TIME = "serviceBeginTime";
 	public static final String SERVICE_END_TIME = "serviceEndTime";
 
-	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles, DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator) {
+	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles, DvrpLoadFromVehicle dvrpLoadFromVehicle) {
 		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
 		vehicles.getVehicles()
 				.values()
 				.stream()
 				.filter(vehicle -> mode.equals(
 						vehicle.getAttributes().getAttribute(DVRP_MODE)))
-				.map(vehicle -> new DvrpVehicleSpecificationWithMatsimVehicle(vehicle, dvrpFleetReaderLoadFromScalarCreator))
+				.map(vehicle -> new DvrpVehicleSpecificationWithMatsimVehicle(vehicle, dvrpLoadFromVehicle))
 				.forEach(fleetSpecification::addVehicleSpecification);
 		return fleetSpecification;
 	}
@@ -53,17 +53,17 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	private final Id<DvrpVehicle> id;
 	private final Vehicle matsimVehicle;// matsim vehicle is mutable!
 	private final Id<Link> startLinkId;
-	private final DvrpVehicleLoad capacity;
+	private final DvrpLoad capacity;
 
 	// time window
 	private final double serviceBeginTime;
 	private final double serviceEndTime;
 
-	public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle, DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator) {
+	public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle, DvrpLoadFromVehicle dvrpLoadFromVehicle) {
 		id = Objects.requireNonNull(Id.create(matsimVehicle.getId(), DvrpVehicle.class));
 		this.matsimVehicle = matsimVehicle;
 
-		this.capacity = dvrpFleetReaderLoadFromScalarCreator.getDvrpVehicleLoad(matsimVehicle.getType().getCapacity().getSeats(), id);
+		this.capacity = dvrpLoadFromVehicle.getLoad(matsimVehicle);
 
 		var attributes = matsimVehicle.getAttributes();
 		this.startLinkId = Objects.requireNonNull(Id.createLinkId((String)attributes.getAttribute(START_LINK)));
@@ -87,7 +87,7 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	}
 
 	@Override
-	public DvrpVehicleLoad getCapacity() {
+	public DvrpLoad getCapacity() {
 		return capacity;
 	}
 

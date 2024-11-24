@@ -39,7 +39,8 @@ import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -56,6 +57,7 @@ import com.google.common.collect.ImmutableTable;
 public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	private final static Link fromLink = link("from");
 	private final static Link toLink = link("to");
+	private final static IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
 
 	private static final DrtRequest drtRequestInitial = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 	private static final DrtRequest drtRequestAdded = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
@@ -266,13 +268,13 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Start start(Task task, double time, Link link) {
-		return new Waypoint.Start(task, link, time, new ScalarVehicleLoad(0));
+		return new Waypoint.Start(task, link, time, integerLoadType.getEmptyLoad());
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
 		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
 		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
-		return new Waypoint.StopWithPickupAndDropoff(stopTask, new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(stopTask, integerLoadType.getEmptyLoad());
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

@@ -5,17 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.taas.TaasScenarioBuilder.TestScenario;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TaasIntegrationTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
+	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+
 	@Test
 	public void testExample() {
 		TestScenario test = new TaasScenarioBuilder(utils) //
-				.addVehicle("veh", 0, 0, new ScalarVehicleLoad(4)) //
+				.addVehicle("veh", 0, 0, integerLoadType.fromInt(4)) //
 				.addDemand("passenger", "A", 3600.0, 0, 0, 5, 5) //
 				.addDemand("parcel", "B", 3600.0, 5, 5, 2, 2) //
 				.build();

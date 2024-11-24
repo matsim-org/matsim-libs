@@ -24,6 +24,8 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -69,19 +71,30 @@ public class FleetModule extends AbstractDvrpModeModule {
 		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
 		//     i.e. VehiclesSource.fromVehiclesData)
 		// - vehicle specifications provided via a custom binding for FleetSpecification
-		bindModal(DvrpFleetReaderLoadFromScalarCreator.class).toInstance((capacity, id) -> new ScalarVehicleLoad(capacity));
+		bindModal(IntegerLoadType.class).to(DefaultIntegerLoadType.class).asEagerSingleton();
+
+		bindModal(DvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
+			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
+			return (capacity, vehicleId) -> scalarVehicleLoadFactory.fromInt(capacity);
+		})).asEagerSingleton();
+
+		bindModal(DvrpLoadFromVehicle.class).toProvider(modalProvider(getter -> {
+			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
+			return new DefaultDvrpLoadFromVehicle(integerLoadType);
+		}));
+
 		if (fleetSpecificationUrl != null) {
 			bindModal(FleetSpecification.class).toProvider(modalProvider((getter) -> {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-				DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator = getter.getModal(DvrpFleetReaderLoadFromScalarCreator.class);
-				new FleetReader(fleetSpecification, dvrpFleetReaderLoadFromScalarCreator).parse(fleetSpecificationUrl);
+				DvrpLoadFromFleet dvrpLoadFromFleet = getter.getModal(DvrpLoadFromFleet.class);
+				new FleetReader(fleetSpecification, dvrpLoadFromFleet).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			})).asEagerSingleton();
 		} else {
 			bindModal(FleetSpecification.class).toProvider(modalProvider(getter -> {
 				Vehicles vehicles = getter.get(Vehicles.class);
-				DvrpFleetReaderLoadFromScalarCreator dvrpFleetReaderLoadFromScalarCreator = getter.getModal(DvrpFleetReaderLoadFromScalarCreator.class);
-				return DvrpVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(getMode(), vehicles, dvrpFleetReaderLoadFromScalarCreator);
+				DvrpLoadFromVehicle dvrpLoadFromVehicle = getter.getModal(DvrpLoadFromVehicle.class);
+				return DvrpVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(getMode(), vehicles, dvrpLoadFromVehicle);
 			})).asEagerSingleton();
 		}
 

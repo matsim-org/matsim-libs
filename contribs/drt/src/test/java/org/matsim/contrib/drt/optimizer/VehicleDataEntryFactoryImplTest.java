@@ -35,7 +35,8 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.ScalarVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -49,6 +50,7 @@ public class VehicleDataEntryFactoryImplTest {
 
 	//time slack: 30 (departure is the constraint)
 	private final Stop stop1 = stop(300, 340, 400, 430);
+	private static final IntegerLoadType SCALAR_VEHICLE_LOAD_FACTORY = new DefaultIntegerLoadType();
 
 	@Test
 	void computeSlackTimes_withStops() {
@@ -125,7 +127,7 @@ public class VehicleDataEntryFactoryImplTest {
 	}
 
 	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
-		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, new ScalarVehicleLoad(0));
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
 	}
 
 	private DvrpVehicle vehicle(double vehicleEndTime, double lastStayTaskBeginTime) {

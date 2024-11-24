@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.operations.eshifts.fleet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -43,7 +43,7 @@ public class EvShiftDvrpVehicle extends EvDvrpVehicle implements ShiftDvrpVehicl
 	}
 
 	@Override
-	public DvrpVehicleLoad getCapacity() {
+	public DvrpLoad getCapacity() {
 		return vehicle.getCapacity();
 	}
 

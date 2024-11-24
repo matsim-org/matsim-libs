@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -51,7 +51,7 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 
 		if (getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STOP)) {
 			DrtStopTask stopTask = (DrtStopTask) task;
-			DvrpVehicleLoad incomingCapacity = getIncomingOccupancy(vehicle, stopTask);
+			DvrpLoad incomingCapacity = getIncomingOccupancy(vehicle, stopTask);
 
 			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
@@ -61,8 +61,8 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 		return delegate.createAction(dynAgent, vehicle, now);
 	}
 
-	private DvrpVehicleLoad getIncomingOccupancy(DvrpVehicle vehicle, DrtStopTask referenceTask) {
-		DvrpVehicleLoad incomingOccupancy = vehicle.getCapacity().getEmptyLoad();
+	private DvrpLoad getIncomingOccupancy(DvrpVehicle vehicle, DrtStopTask referenceTask) {
+		DvrpLoad incomingOccupancy = vehicle.getCapacity().getType().getEmptyLoad();
 
 		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 
@@ -74,10 +74,10 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 				DrtStopTask stopTask = (DrtStopTask) task;
 
 				incomingOccupancy = incomingOccupancy.addTo(stopTask.getDropoffRequests().values().stream()
-					.map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
 				incomingOccupancy = incomingOccupancy.subtract(stopTask.getPickupRequests().values().stream()
-					.map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(vehicle.getCapacity().getEmptyLoad()));
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
 				if (task == referenceTask) {
 					return incomingOccupancy;

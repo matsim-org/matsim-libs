@@ -32,7 +32,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
@@ -48,15 +48,15 @@ public interface Waypoint {
 
 	double getDepartureTime();
 
-	DvrpVehicleLoad getOutgoingOccupancy();
+	DvrpLoad getOutgoingOccupancy();
 
 	class Start implements Waypoint {
 		public final Optional<Task> task;// empty if schedule status is PLANNED
 		public final Link link;
 		public final double time;
-		public final DvrpVehicleLoad occupancy;
+		public final DvrpLoad occupancy;
 
-		public Start(@Nullable Task task, Link link, double time, DvrpVehicleLoad occupancy) {
+		public Start(@Nullable Task task, Link link, double time, DvrpLoad occupancy) {
 			this.task = Optional.ofNullable(task);
 			this.link = link;
 			this.time = time;
@@ -79,7 +79,7 @@ public interface Waypoint {
 		}
 
 		@Override
-		public DvrpVehicleLoad getOutgoingOccupancy() {
+		public DvrpLoad getOutgoingOccupancy() {
 			return occupancy;
 		}
 
@@ -130,7 +130,7 @@ public interface Waypoint {
 		}
 
 		@Override
-		public DvrpVehicleLoad getOutgoingOccupancy() {
+		public DvrpLoad getOutgoingOccupancy() {
 			throw new UnsupportedOperationException("End is the terminal waypoint");
 		}
 
@@ -143,9 +143,9 @@ public interface Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
 		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
-		public final DvrpVehicleLoad outgoingOccupancy;
+		public final DvrpLoad outgoingOccupancy;
 
-		public Stop(DrtStopTask task, DvrpVehicleLoad outgoingOccupancy) {
+		public Stop(DrtStopTask task, DvrpLoad outgoingOccupancy) {
 			this.task = task;
 			this.outgoingOccupancy = outgoingOccupancy;
 
@@ -156,7 +156,7 @@ public interface Waypoint {
 			latestDepartureTime = calcLatestDepartureTime();
 		}
 
-		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpVehicleLoad outgoingOccupancy) {
+		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy) {
 			this.task = task;
 			this.latestArrivalTime = latestArrivalTime;
 			this.latestDepartureTime = latestDepartureTime;
@@ -179,17 +179,17 @@ public interface Waypoint {
 		}
 
 		@Override
-		public DvrpVehicleLoad getOutgoingOccupancy() {
+		public DvrpLoad getOutgoingOccupancy() {
 			return outgoingOccupancy;
 		}
 
-		public DvrpVehicleLoad getOccupancyChange() {
-			DvrpVehicleLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(null);
-			DvrpVehicleLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpVehicleLoad::addTo).orElse(null);
+		public DvrpLoad getOccupancyChange() {
+			DvrpLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(null);
+			DvrpLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(null);
 			if(pickedUp == null && droppedOff == null) {
 				return null;
 			} else if(pickedUp == null) {
-				return droppedOff.getEmptyLoad().subtract(droppedOff);
+				return droppedOff.getType().getEmptyLoad().subtract(droppedOff);
 			} else if(droppedOff == null) {
 				return pickedUp;
 			} else {
@@ -216,11 +216,11 @@ public interface Waypoint {
 
 	class StopWithPickupAndDropoff extends Stop {
 
-		public StopWithPickupAndDropoff(DrtStopTask task, DvrpVehicleLoad outgoingOccupancy) {
+		public StopWithPickupAndDropoff(DrtStopTask task, DvrpLoad outgoingOccupancy) {
 			super(task, outgoingOccupancy);
 		}
 
-		public StopWithPickupAndDropoff(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpVehicleLoad outgoingOccupancy) {
+		public StopWithPickupAndDropoff(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy) {
 			super(task, latestArrivalTime, latestDepartureTime, outgoingOccupancy);
 		}
 
@@ -249,10 +249,10 @@ public interface Waypoint {
 
 	class StopWithCapacityChange extends Stop {
 		public StopWithCapacityChange(DrtStopTaskWithVehicleCapacityChange task) {
-			super(task, task.getNewVehicleCapacity().getEmptyLoad());
+			super(task, task.getNewVehicleCapacity().getType().getEmptyLoad());
 		}
 
-		public DvrpVehicleLoad getNewVehicleCapacity() {
+		public DvrpLoad getNewVehicleCapacity() {
 			return ((CapacityChangeTask) this.task).getNewVehicleCapacity();
 		}
 
@@ -290,7 +290,7 @@ public interface Waypoint {
 		}
 
 		@Override
-		public DvrpVehicleLoad getOutgoingOccupancy() {
+		public DvrpLoad getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -323,7 +323,7 @@ public interface Waypoint {
 		}
 
 		@Override
-		public DvrpVehicleLoad getOutgoingOccupancy() {
+		public DvrpLoad getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
 		}
 

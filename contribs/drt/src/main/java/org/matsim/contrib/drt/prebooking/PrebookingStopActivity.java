@@ -15,7 +15,7 @@ import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
@@ -54,13 +54,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final AbandonVoter abandonVoter;
 
 	private final Supplier<Double> endTime;
-	private DvrpVehicleLoad onboard;
+	private DvrpLoad onboard;
 
 	public PrebookingStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
 			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
-			PrebookingManager prebookingManager, AbandonVoter abandonVoter, DvrpVehicleLoad initialOccupancy) {
+			PrebookingManager prebookingManager, AbandonVoter abandonVoter, DvrpLoad initialOccupancy) {
 		super(activityType);
 		this.passengerHandler = passengerHandler;
 		this.driver = driver;
@@ -172,10 +172,10 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 		while (enterIterator.hasNext()) {
 			var entry = enterIterator.next();
-			DvrpVehicleLoad availableCapacity = vehicle.getCapacity().subtract(onboard);
+			DvrpLoad availableCapacity = vehicle.getCapacity().subtract(onboard);
 
 			if (entry.time <= now) {
-				DvrpVehicleLoad requiredCapacity = pickupRequests.get(entry.id).getLoad();
+				DvrpLoad requiredCapacity = pickupRequests.get(entry.id).getLoad();
 
 				if (requiredCapacity.fitsIn(availableCapacity) ) {
 					// let agent enter now

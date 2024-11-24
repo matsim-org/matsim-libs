@@ -11,6 +11,8 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -41,29 +43,45 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	static class PersonsDvrpVehicleLoad extends ScalarVehicleLoad {
 
-		public PersonsDvrpVehicleLoad(int capacity) {
-			super(capacity);
+	static class PersonsDvrpLoadType extends IntegerLoadType {
+		public PersonsDvrpLoadType() {
+			super("personsLoad", "persons");
 		}
 
 		@Override
-		public ScalarVehicleLoad fromInt(int load) {
-			return new PersonsDvrpVehicleLoad(load);
+		public PersonsDvrpLoad fromInt(int load) {
+			return new PersonsDvrpLoad(load, this);
 		}
 	}
 
-	static class GoodsDvrpVehicleLoad extends ScalarVehicleLoad {
+	static class PersonsDvrpLoad extends IntegerLoad {
 
-		public GoodsDvrpVehicleLoad(int capacity) {
-			super(capacity);
+		public PersonsDvrpLoad(int capacity, PersonsDvrpLoadType factory) {
+			super(capacity, factory);
+		}
+	}
+
+	static class GoodsDvrpLoadType extends IntegerLoadType {
+		public GoodsDvrpLoadType() {
+			super("goodsLoad", "goods");
 		}
 
 		@Override
-		public ScalarVehicleLoad fromInt(int load) {
-			return new GoodsDvrpVehicleLoad(load);
+		public GoodsDvrpLoad fromInt(int load) {
+			return new GoodsDvrpLoad(load, this);
 		}
 	}
+
+	static class GoodsDvrpLoad extends IntegerLoad {
+
+		public GoodsDvrpLoad(int capacity, GoodsDvrpLoadType factory) {
+			super(capacity, factory);
+		}
+	}
+
+	private static final PersonsDvrpLoadType PERSONS_LOAD_FACTORY = new PersonsDvrpLoadType();
+	private static final GoodsDvrpLoadType GOODS_LOAD_FACTORY = new GoodsDvrpLoadType();
 
 	static class CapacityChangeSchedulerEngine implements MobsimEngine {
 		private final Fleet fleet;
@@ -88,13 +106,13 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 		public void onPrepareSim() {
 			this.fleet.getVehicles().values().stream().forEach(dvrpVehicle -> {
 				Schedule schedule = dvrpVehicle.getSchedule();
-				DvrpVehicleLoad newVehicleLoad;
+				DvrpLoad newVehicleLoad;
 
 				// To be more generic in case other pats of the code change, we just switch the capacity type
-				if(dvrpVehicle.getCapacity() instanceof PersonsDvrpVehicleLoad personsDvrpVehicleLoad) {
-					newVehicleLoad = new GoodsDvrpVehicleLoad(personsDvrpVehicleLoad.getLoad());
-				} else if(dvrpVehicle.getCapacity() instanceof GoodsDvrpVehicleLoad goodsDvrpVehicleLoad) {
-					newVehicleLoad = new PersonsDvrpVehicleLoad(goodsDvrpVehicleLoad.getLoad());
+				if(dvrpVehicle.getCapacity() instanceof PersonsDvrpLoad personsDvrpVehicleLoad) {
+					newVehicleLoad = GOODS_LOAD_FACTORY.fromInt(personsDvrpVehicleLoad.getLoad());
+				} else if(dvrpVehicle.getCapacity() instanceof GoodsDvrpLoad goodsDvrpVehicleLoad) {
+					newVehicleLoad = PERSONS_LOAD_FACTORY.fromInt(goodsDvrpVehicleLoad.getLoad());
 				} else {
 					throw new IllegalStateException();
 				}
@@ -166,7 +184,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			@Override
 			public void install() {
 				// All vehicles start with a compatibility with persons
-				bindModal(DvrpFleetReaderLoadFromScalarCreator.class).toInstance((capacity, vehicleId) -> new PersonsDvrpVehicleLoad(capacity));
+				bindModal(DvrpLoadFromFleet.class).toInstance((capacity, vehicleId) -> PERSONS_LOAD_FACTORY.fromInt(capacity));
 			}
 		});
 
@@ -183,9 +201,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 					}
 					if(personParity%2 == 0) {
-						return new PersonsDvrpVehicleLoad(personIds.size());
+						return PERSONS_LOAD_FACTORY.fromInt(personIds.size());
 					} else {
-						return new GoodsDvrpVehicleLoad(personIds.size());
+						return GOODS_LOAD_FACTORY.fromInt(personIds.size());
 					}
 				});
 
@@ -232,7 +250,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			@Override
 			public void install() {
 				// All vehicles start with a compatibility with persons
-				bindModal(DvrpFleetReaderLoadFromScalarCreator.class).toInstance((capacity, vehicleId) -> new PersonsDvrpVehicleLoad(capacity));
+				bindModal(DvrpLoadFromFleet.class).toInstance((capacity, vehicleId) -> PERSONS_LOAD_FACTORY.fromInt(capacity));
 			}
 		});
 
@@ -249,9 +267,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 					}
 					if(personParity%2 == 0) {
-						return new PersonsDvrpVehicleLoad(personIds.size());
+						return PERSONS_LOAD_FACTORY.fromInt(personIds.size());
 					} else {
-						return new GoodsDvrpVehicleLoad(personIds.size());
+						return GOODS_LOAD_FACTORY.fromInt(personIds.size());
 					}
 				});
 

@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -32,7 +31,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
@@ -121,9 +120,9 @@ public class InsertionGenerator {
 		public final VehicleEntry vehicleEntry;
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
-		public final DvrpVehicleLoad insertedLoad;
+		public final DvrpLoad insertedLoad;
 
-		public Insertion(VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff, DvrpVehicleLoad insertedLoad) {
+		public Insertion(VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff, DvrpLoad insertedLoad) {
 			this.vehicleEntry = vehicleEntry;
 			this.pickup = pickup;
 			this.dropoff = dropoff;
@@ -175,8 +174,8 @@ public class InsertionGenerator {
 			return Collections.EMPTY_LIST;
 		}
 
-		DvrpVehicleLoad vehicleCapacity = vEntry.vehicle.getCapacity();
-		DvrpVehicleLoad occupancy = vEntry.start.occupancy;
+		DvrpLoad vehicleCapacity = vEntry.vehicle.getCapacity();
+		DvrpLoad occupancy = vEntry.start.occupancy;
 
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
@@ -294,7 +293,7 @@ public class InsertionGenerator {
 			return; // skip all insertions: i -> pickup -> dropoff
 		}
 
-		DvrpVehicleLoad capacity = vEntry.getVehicleCapacityAtStop(i-1);
+		DvrpLoad capacity = vEntry.getVehicleCapacityAtStop(i-1);
 
 		for (int j = i + 1; j < stopCount; j++) {// insertions up to before last stop
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
