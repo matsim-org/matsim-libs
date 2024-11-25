@@ -55,7 +55,6 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 
 	private final IdMap<Zone, Zone> zones = new IdMap<>(Zone.class);
 
-	private final IdMap<Zone, List<Link>> zoneToLinksMap = new IdMap<>(Zone.class);
 	private final Map<Integer, List<Link>> index2Links;
 	private final Network network;
 
@@ -114,7 +113,7 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 
 	@Override
 	public List<Link> getLinksForZoneId(Id<Zone> zone) {
-		return zoneToLinksMap.get(zone);
+		return this.index2Links.get(Integer.parseInt(zone.toString()));
 	}
 
 	private Optional<Zone> getOrCreateZone(Coord coord) {
@@ -129,12 +128,6 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 			if(zoneFilter.test(zone)) {
 				internalZones[index] = zone;
 				zones.put(zone.getId(), zone);
-				List<Link> linkList = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId -> new ArrayList<>());
-				List<Link> links = index2Links.get(index);
-				if(links!=null)
-				{
-					linkList.addAll(links);
-				}
 			} else {
 				return Optional.empty();
 			}
