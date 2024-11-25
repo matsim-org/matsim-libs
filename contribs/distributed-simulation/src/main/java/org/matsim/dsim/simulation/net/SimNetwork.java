@@ -18,34 +18,33 @@ import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
 @Getter
 public class SimNetwork {
 
-    private final Map<Id<Link>, SimLink> links;
-    private final Map<Id<Node>, SimNode> nodes;
-	@Getter
+	private final Map<Id<Link>, SimLink> links;
+	private final Map<Id<Node>, SimNode> nodes;
 	private final int part;
 
-    SimNetwork(Network network, Config config, SimLink.OnLeaveQueue vehicleEndsRouteHandler, int part) {
+	SimNetwork(Network network, Config config, SimLink.OnLeaveQueue vehicleEndsRouteHandler, int part) {
 
-        var localNodes = network.getNodes().values().stream()
-                .filter(n -> isOnPartition(n, part))
-                .collect(Collectors.toMap(Node::getId, n -> n));
+		var localNodes = network.getNodes().values().stream()
+			.filter(n -> isOnPartition(n, part))
+			.collect(Collectors.toMap(Node::getId, n -> n));
 
-        var linkIds = localNodes.values().stream()
-                .flatMap(n -> Streams.concat(n.getInLinks().values().stream(), n.getOutLinks().values().stream()))
-                .map(Link::getId)
-                .collect(Collectors.toSet());
+		var linkIds = localNodes.values().stream()
+			.flatMap(n -> Streams.concat(n.getInLinks().values().stream(), n.getOutLinks().values().stream()))
+			.map(Link::getId)
+			.collect(Collectors.toSet());
 
-        links = linkIds.stream()
-                .map(id -> network.getLinks().get(id))
-                .map(link ->
-					SimLink.create(link, vehicleEndsRouteHandler, config.qsim(), network.getEffectiveCellSize(), part))
-                .collect(Collectors.toMap(SimLink::getId, simLink -> simLink));
-        nodes = localNodes.values().stream()
-                .map(node -> Tuple.of(node.getId(), SimNode.create(node, links)))
-                .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+		links = linkIds.stream()
+			.map(id -> network.getLinks().get(id))
+			.map(link ->
+				SimLink.create(link, vehicleEndsRouteHandler, config.qsim(), network.getEffectiveCellSize(), part))
+			.collect(Collectors.toMap(SimLink::getId, simLink -> simLink));
+		nodes = localNodes.values().stream()
+			.map(node -> Tuple.of(node.getId(), SimNode.create(node, links)))
+			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 		this.part = part;
-    }
+	}
 
-    private static boolean isOnPartition(Attributable element, int part) {
-        return (int) element.getAttributes().getAttribute(PARTITION_ATTR_KEY) == part;
-    }
+	private static boolean isOnPartition(Attributable element, int part) {
+		return (int) element.getAttributes().getAttribute(PARTITION_ATTR_KEY) == part;
+	}
 }
