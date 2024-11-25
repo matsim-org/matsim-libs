@@ -258,6 +258,9 @@ public class PHEMTest {
 			new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/>130"),
 		};
 
+		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_output.csv");
+		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
+
 		// Define vehicle
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
@@ -279,11 +282,21 @@ public class PHEMTest {
 				vehHbefaInfo));
 		}
 
+		var file = Paths.get("/Users/janek/Desktop/aggregate.csv");
+		try(var bufWriter = Files.newBufferedWriter(file); var csv = CSVFormat.DEFAULT.print(bufWriter)) {
+			for (var i = 0; i < wltpLinkAttributes.length; i++) {
+				var length_m = wltpLinkAttributes[i].length;
+				var matsim_em = link_pollutant2grams.get(i);
+				var sumo_em = sumoSegments.get(i).NOx();
+				var matsim_em_g_km = matsim_em.get(Pollutant.NOx) / ((double) length_m / 1000);
+				var sumo_em_g_km = sumo_em / ((double) length_m / 1000);
+				System.out.println("Link " + i + ": MATSim NOx=" + matsim_em_g_km + " g/km, SUMO NOx=" + sumo_em_g_km + " g/km");
+			}
+		}
 		// Now we need to read in the sumo-files and get the SUMO results
 		// output-files comes from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
 
-		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_output.csv");
-		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
+
 
 		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions and save them in a csv
 		CSVPrinter writer = new CSVPrinter(
