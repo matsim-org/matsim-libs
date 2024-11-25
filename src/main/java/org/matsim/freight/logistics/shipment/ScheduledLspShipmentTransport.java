@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -37,6 +38,7 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
   private final Id<Link> fromLinkId;
   private final Id<Link> toLinkId;
   private final CarrierService carrierService;
+  private final CarrierShipment carrierShipment; //TODO: Put CarrierShipment and CarrieTask behind one interface and use that here (CarrierTask...)
 
   ScheduledLspShipmentTransport(LspShipmentUtils.ScheduledShipmentTransportBuilder builder) {
     this.startTime = builder.startTime;
@@ -47,6 +49,7 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
     this.fromLinkId = builder.fromLinkId;
     this.toLinkId = builder.toLinkId;
     this.carrierService = builder.carrierService;
+    this.carrierShipment = builder.carrierShipment;
   }
 
   @Override
@@ -102,5 +105,9 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
   @Override
   public CarrierService getCarrierService() {
     return carrierService;
+  }
+
+  public CarrierShipment getCarrierShipment() {
+    return carrierShipment;
   }
 }

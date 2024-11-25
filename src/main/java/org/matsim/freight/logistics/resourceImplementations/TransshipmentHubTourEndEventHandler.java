@@ -213,7 +213,7 @@ import org.matsim.freight.logistics.shipment.*;
               .setResourceId(resourceId)
               .setStartTime(startTime)
               .setEndTime(endTime)
-              .setLogisticsChainElement(servicesWaitedFor.get(carrierService).element)
+              .setLogisticsChainElement(servicesWaitedFor.get(carrierService).logisticChainElement)
               .build();
       Id<LspShipmentPlanElement> loadId =
           Id.create(
@@ -268,11 +268,11 @@ import org.matsim.freight.logistics.shipment.*;
 
   public static class TransshipmentHubEventHandlerPair {
     public final LspShipment lspShipment;
-    public final LogisticChainElement element;
+    public final LogisticChainElement logisticChainElement;
 
     public TransshipmentHubEventHandlerPair(LspShipment lspShipment, LogisticChainElement element) {
       this.lspShipment = lspShipment;
-      this.element = element;
+      this.logisticChainElement = element;
     }
   }
 }

@@ -103,6 +103,9 @@ import org.matsim.vehicles.VehicleUtils;
         .controller()
         .setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
     var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -170,12 +173,7 @@ import org.matsim.vehicles.VehicleUtils;
         });
 
     log.info("Run MATSim");
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
-    controler
-        .getConfig()
-        .vspExperimental()
-        .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+
     controler.run();
 
     // print the schedules for the assigned LSPShipments

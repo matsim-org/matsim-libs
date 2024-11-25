@@ -43,6 +43,10 @@ public class CarrierSchedulerUtils {
    * @return Carrier  with the solution of the VehicleRoutingProblem and the routed plan.
    */
   public static Carrier solveVrpWithJsprit(Carrier carrier, Scenario scenario) {
+    // Maybe it make sense to store this object instead of rebuilding it for each carrier (in each iteration) ???
+    // pro: save computation time
+    // con: interdependencies, if something changes in the network (load), the object is not up-to-date & it is not clear, if the object is thread safe
+    // Decision for the time being: rebuild it for each carrier to have a clear state KMT/KN Aug'24
     NetworkBasedTransportCosts netbasedTransportCosts;
     Network network = scenario.getNetwork();
     RoadPricingScheme roadPricingScheme = null;
@@ -127,10 +131,16 @@ public class CarrierSchedulerUtils {
      * This decides later, whether the VRP is build base on {@link org.matsim.freight.carriers.CarrierService}s or {@link org.matsim.freight.carriers.CarrierShipment}s.
      *
      * @param carrier The carrier for which the setting should be got.
-     * @return the logic of the VRP
+     * @return the logic of the VRP, returns {@link LSPUtils.LogicOfVrp#serviceBased} if not set.
      */
   public static LSPUtils.LogicOfVrp getVrpLogic(Carrier carrier){
-    return (LSPUtils.LogicOfVrp) carrier.getAttributes().getAttribute(LOGIC_OF_VRP);
+    LSPUtils.LogicOfVrp result = (LSPUtils.LogicOfVrp) carrier.getAttributes().getAttribute(LOGIC_OF_VRP);
+    if (result == null){
+      log.error("VRPLogic not found for carrier {}. Will return {}", carrier.getId(), LSPUtils.LogicOfVrp.serviceBased);
+      return LSPUtils.LogicOfVrp.serviceBased;
+    } else {
+      return result ;
+    }
   }
 
 }

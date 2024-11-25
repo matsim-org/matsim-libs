@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
-import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -92,17 +91,21 @@ import org.matsim.vehicles.VehicleType;
       // TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach
       // das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere
       // gibt???
-      VehicleType vehicleType =
-              ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
-      if ((load + lspShipment.getSize())
-              > vehicleType.getCapacity().getOther().intValue()) {
+      VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
+      if ((load + lspShipment.getSize()) > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
         Carrier auxiliaryCarrier =
                 CarrierSchedulerUtils.solveVrpWithJsprit(
                         createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
                         scenario);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
-        carrier.getServices().putAll(auxiliaryCarrier.getServices());
+        var vrpLogic = CarrierSchedulerUtils.getVrpLogic(carrier);
+        switch (vrpLogic) {
+          case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
+          case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments()); }
+          default -> throw new IllegalStateException("Unexpected value: " + vrpLogic);
+        }
+
         cumulatedLoadingTime = 0;
         shipmentsInCurrentTour.clear();
       }
@@ -115,11 +118,19 @@ import org.matsim.vehicles.VehicleType;
     if (!shipmentsInCurrentTour.isEmpty()) {
       Carrier auxiliaryCarrier =
               CarrierSchedulerUtils.solveVrpWithJsprit(
-                      createAuxiliaryCarrier(
-                              shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+                      createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
                       scenario);
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
-      carrier.getServices().putAll(auxiliaryCarrier.getServices());
+
+      switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
+        case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
+        case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
+          //TODO: When using shipmentbased, only ONE Vrp should be created and solved. -> No need for the auxiliary carrier(s). KMT'Aug 24
+          //Then we can also just pass all the vehicles over :)
+          //And need the TimeWindows for the Shipments...
+        }
+        default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
+      }
       shipmentsInCurrentTour.clear();
     }
 
@@ -173,6 +184,8 @@ import org.matsim.vehicles.VehicleType;
   private CarrierService convertToCarrierService(LspShipment lspShipment) {
     Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
     CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo())
+            //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
+            //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
             .setCapacityDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
@@ -184,21 +197,66 @@ import org.matsim.vehicles.VehicleType;
     return carrierService;
   }
 
+  /**
+   * This method converts a LspShipment to a CarrierShipment.
+   * Please note: This method may get removed in the future, in case that the LSPShipment and the CarrierShipment are merged. KMT'Aug'24
+
+   * @param lspShipment the LspShipment to convert
+   * @return a CarrierShipment
+   */
+  private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
+    Id<CarrierShipment> serviceId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
+    CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
+            //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
+            //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+            .setDeliveryServiceTime(lspShipment.getDeliveryServiceTime())
+            .build();
+    //ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
+    if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
+      log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
+              new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+    }
+    return carrierShipment;
+  }
+
+
   @Override
   protected void updateShipments() {
     for (LspShipment lspShipment : lspShipmentsToSchedule) {
       for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
         Tour tour = scheduledTour.getTour();
-        for (TourElement element : tour.getTourElements()) {
-          if (element instanceof ServiceActivity serviceActivity) {
-            if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
-              addShipmentLoadElement(lspShipment, tour);
-              addShipmentTransportElement(lspShipment, tour, serviceActivity);
-              addShipmentUnloadElement(lspShipment, tour, serviceActivity);
-              addDistributionTourStartEventHandler(serviceActivity.getService(), lspShipment, resource, tour);
-              addDistributionServiceEventHandler(serviceActivity.getService(), lspShipment, resource);
+
+        switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
+          case serviceBased -> {
+            for (TourElement element : tour.getTourElements()) {
+              if (element instanceof Tour.ServiceActivity serviceActivity) {
+                if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
+                  addShipmentLoadElement(lspShipment, tour);
+                  addShipmentTransportElement(lspShipment, tour, serviceActivity);
+                  addShipmentUnloadElement(lspShipment, serviceActivity);
+                  addDistributionTourStartEventHandler(serviceActivity, lspShipment, resource, tour);
+                  addDistributionServiceEventHandler(serviceActivity, lspShipment, resource);
+                }
+              }
             }
           }
+          case shipmentBased -> {
+            //TODO needs to get fixed. KMT'Aug'24
+            for (TourElement element : tour.getTourElements()) {
+              if (element instanceof Tour.Delivery deliveryActivity) {
+                if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
+                  addShipmentLoadElement(lspShipment, tour);
+                  addShipmentTransportElement(lspShipment, tour, deliveryActivity);
+                  addShipmentUnloadElement(lspShipment, deliveryActivity);
+                  addDistributionTourStartEventHandler(deliveryActivity, lspShipment, resource, tour);
+                  addDistributionServiceEventHandler(deliveryActivity, lspShipment, resource);
+                }
+              }
+            }
+          }
+          default ->
+                  throw new IllegalStateException(
+                          "Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
         }
       }
     }
@@ -220,7 +278,7 @@ import org.matsim.vehicles.VehicleType;
     double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     double cumulatedLoadingTime = 0;
     for (TourElement element : tour.getTourElements()) {
-      if (element instanceof ServiceActivity activity) {
+      if (element instanceof Tour.ServiceActivity activity) {
         cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
       }
     }
@@ -236,7 +294,7 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentTransportElement(
-          LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+    LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
             LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
@@ -250,7 +308,7 @@ import org.matsim.vehicles.VehicleType;
 
     int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
     final Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
-    final int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
+    final int serviceIndex = tour.getTourElements().indexOf(tourActivity);
     final Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
     final double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
     final double endTimeOfTransport =
@@ -266,8 +324,15 @@ import org.matsim.vehicles.VehicleType;
     builder.setEndTime(endTimeOfTransport);
     builder.setCarrierId(carrier.getId());
     builder.setFromLinkId(tour.getStartLinkId());
-    builder.setToLinkId(serviceActivity.getLocation());
-    builder.setCarrierService(serviceActivity.getService());
+    builder.setToLinkId(tourActivity.getLocation());
+	  switch( tourActivity ){
+		  case Tour.ServiceActivity serviceActivity -> builder.setCarrierService( serviceActivity.getService() );
+		  case Tour.ShipmentBasedActivity shipment -> builder.setCarrierShipment( shipment.getShipment() );
+          default ->  throw new IllegalStateException("Unexpected value: " + tourActivity);
+          // yyyy: At the jsprit level, it makes sense to have these different since services run about 10x faster than shipments.  However,
+                  // at the matsim level we could consider to either only have shipments (from depot to xx for what used to be services), or only have
+                  // services. See also MATSim issue #3510  kai/kai, oct'24
+	  }
     LspShipmentPlanElement transport = builder.build();
     String idString =
             transport.getResourceId()
@@ -279,8 +344,7 @@ import org.matsim.vehicles.VehicleType;
             .addPlanElement(id, transport);
   }
 
-  private void addShipmentUnloadElement(
-          LspShipment tuple, Tour tour, Tour.ServiceActivity serviceActivity) {
+  private void addShipmentUnloadElement(LspShipment tuple, Tour.TourActivity tourActivity) {
 
     LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
             LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
@@ -292,11 +356,27 @@ import org.matsim.vehicles.VehicleType;
       }
     }
 
-    int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-    ServiceActivity serviceAct = (ServiceActivity) tour.getTourElements().get(serviceIndex);
+    final double startTime = tourActivity.getExpectedArrival();
+    final double endTime = startTime + tourActivity.getDuration();
+    //Todo: Check if it also works with shipmentBased activity, or if we in that case need the way with the switch-case and the data from the shipmentBasedActivity. KMT Oct'24
 
-    final double startTime = serviceAct.getExpectedArrival();
-    final double endTime = startTime + serviceAct.getDuration();
+//    switch( tourActivity ){
+//      case Tour.ServiceActivity serviceActivity -> {
+//        startTime = tourActivity.getExpectedArrival();
+//        endTime = startTime + tourActivity.getDuration();
+//
+////        startTime = serviceActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
+////        endTime = startTime + serviceActivity.getDuration();
+//      }
+//      case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
+//        //Todo: Not tested ; maybe we need to take the data from the shipment itself (as is was originally done with the service: serviceActivity.getService() ,..... KMT Oct'24
+//        startTime = shipmentBasedActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
+//        endTime = startTime + shipmentBasedActivity.getDuration();
+//
+//      }
+//      default -> {}
+//    }
+
     Assert.isTrue(
             endTime >= startTime,
             "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
@@ -317,36 +397,55 @@ import org.matsim.vehicles.VehicleType;
   private Carrier createAuxiliaryCarrier(ArrayList<LspShipment> shipmentsInCurrentTour, double startTime) {
     final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
     carrierCnt++;
-    Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);
-    CarrierVehicle carrierVehicle =
-            carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
-    final VehicleType vehicleType = carrierVehicle.getType();
 
-    CarrierVehicle.Builder vBuilder =
-            CarrierVehicle.Builder.newInstance(
-                    carrierVehicle.getId(), carrierVehicle.getLinkId(), vehicleType);
-    vBuilder.setEarliestStart(startTime);
-    vBuilder.setLatestEnd(24 * 60 * 60);
-    CarrierVehicle cv = vBuilder.build();
+    CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
+    CarrierVehicle cv = CarrierVehicle.Builder.newInstance(
+                    carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
+            .setEarliestStart(startTime)
+            .setLatestEnd(24 * 60 * 60)
+            .build();
+    Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);
     auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
     auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 
-    for (LspShipment lspShipment : shipmentsInCurrentTour) {
-      CarrierService carrierService = convertToCarrierService(lspShipment);
-      auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
+    switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
+      case serviceBased -> {
+        for (LspShipment lspShipment : shipmentsInCurrentTour) {
+          CarrierService carrierService = convertToCarrierService(lspShipment);
+          auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
+        }
+      }
+      case shipmentBased -> {
+        for (LspShipment lspShipment : shipmentsInCurrentTour) {
+          CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
+          auxiliaryCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+        }
+      }
+      default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
     }
+
+
     return auxiliaryCarrier;
   }
 
   private void addDistributionServiceEventHandler(
-          CarrierService carrierService,
+          Tour.TourActivity tourActivity,
           LspShipment lspShipment,
           LSPCarrierResource resource) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        DistributionServiceStartEventHandler handler =
-                new DistributionServiceStartEventHandler(carrierService, lspShipment, element, resource);
+        DistributionServiceStartEventHandler handler;
+        switch (tourActivity) {
+          case Tour.ServiceActivity serviceActivity-> {
+            handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
+          }
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
+            handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
+          }
+          default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
+        }
+
         lspShipment.addSimulationTracker(handler);
         break;
       }
@@ -354,19 +453,29 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addDistributionTourStartEventHandler(
-          CarrierService carrierService,
+          Tour.TourActivity tourActivity,
           LspShipment lspShipment,
           LSPCarrierResource resource,
           Tour tour) {
 
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        LSPTourStartEventHandler handler =
-                new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
+        LSPTourStartEventHandler handler;
+        switch (tourActivity) {
+          case Tour.ServiceActivity serviceActivity-> {
+            handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
+          }
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
+            handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
+          }
+          default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
+        }
+
         lspShipment.addSimulationTracker(handler);
         break;
       }
     }
   }
+
 
 }

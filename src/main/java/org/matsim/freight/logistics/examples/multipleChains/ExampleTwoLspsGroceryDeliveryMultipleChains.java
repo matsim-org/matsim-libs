@@ -70,6 +70,7 @@ import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
@@ -131,17 +132,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
-
     Controler controler = prepareControler(scenario);
 
     log.info("Run MATSim");
 
-    // The VSP default settings are designed for person transport simulation. After talking to Kai,
-    // they will be set to WARN here. Kai MT may'23
-    controler
-            .getConfig()
-            .vspExperimental()
-            .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controler.run();
 
     runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
@@ -165,6 +159,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     config.global().setCoordinateSystem("EPSG:31468");
     config.global().setRandomSeed(4177);
     config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
     FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -346,6 +344,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
             .getCarrierCapabilities()
             //.setNumberOfJspritIterations // TODO Das mal hier einbauen. --> Ist aktuell in CarrierUtils.
             .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+   CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.serviceBased);
 
     CarriersUtils.addCarrierVehicle(
             distributionCarrier,
@@ -421,6 +420,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     LogisticChain directChain;
     Carrier directCarrier = CarriersUtils.createCarrier(Id.create(lspName +"_directCarrier", Carrier.class));
     directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+    CarrierSchedulerUtils.setVrpLogic(directCarrier, LSPUtils.LogicOfVrp.serviceBased);
 
     CarriersUtils.addCarrierVehicle(directCarrier,
             CarrierVehicle.newInstance(
