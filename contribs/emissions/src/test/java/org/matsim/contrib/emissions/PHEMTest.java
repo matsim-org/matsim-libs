@@ -5,7 +5,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -22,7 +21,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import pabeles.concurrency.IntOperatorTask;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -295,16 +293,26 @@ public class PHEMTest {
 			"segment",
 			"startTime",
 			"travelTime",
+			"CO-SUMO",
+			"CO-MATSIM",
 			"CO-Diff",
-			"CO-%Diff",
+			"CO-Factor",
+			"CO2-SUMO",
+			"CO2-MATSIM",
 			"CO2-Diff",
-			"CO2-%Diff",
+			"CO2-Factor",
+			"HC-SUMO",
+			"HC-MATSIM",
 			"HC-Diff",
-			"HC-%Diff",
+			"HC-Factor",
+			"PMx-SUMO",
+			"PMx-MATSIM",
 			"PMx-Diff",
-			"PMx-%Diff",
+			"PMx-Factor",
+			"NOx-SUMO",
+			"NOx-MATSIM",
 			"NOx-Diff",
-			"NOx-%Diff"
+			"NOx-Factor"
 		);
 
 		// TODO Add max diff values
@@ -314,24 +322,40 @@ public class PHEMTest {
 				i,
 				currentSecond,
 				wltpLinkAttributes[i].time,
-				sumoSegments.get(i).CO/1000 - link_pollutant2grams.get(i).get(Pollutant.CO),
-				computePercentageDiff(sumoSegments.get(i).CO/1000, link_pollutant2grams.get(i).get(Pollutant.CO)),
-				sumoSegments.get(i).CO2/1000 - link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
-				computePercentageDiff(sumoSegments.get(i).CO2/1000, link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL)),
-				sumoSegments.get(i).HC/1000 - link_pollutant2grams.get(i).get(Pollutant.HC),
-				computePercentageDiff(sumoSegments.get(i).HC/1000, link_pollutant2grams.get(i).get(Pollutant.HC)),
-				sumoSegments.get(i).PMx/1000 - link_pollutant2grams.get(i).get(Pollutant.PM),
-				computePercentageDiff(sumoSegments.get(i).PMx/1000, link_pollutant2grams.get(i).get(Pollutant.PM)),
-				sumoSegments.get(i).NOx/1000 - link_pollutant2grams.get(i).get(Pollutant.NOx),
-				computePercentageDiff(sumoSegments.get(i).NOx/1000, link_pollutant2grams.get(i).get(Pollutant.NOx))
+
+				sumoSegments.get(i).CO/1000,
+				link_pollutant2grams.get(i).get(Pollutant.CO),
+				link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
+				computeFactor(link_pollutant2grams.get(i).get(Pollutant.CO), sumoSegments.get(i).CO/1000),
+
+				sumoSegments.get(i).CO2/1000,
+				link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
+				link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
+				computeFactor(link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL), sumoSegments.get(i).CO2/1000),
+
+				sumoSegments.get(i).HC/1000,
+				link_pollutant2grams.get(i).get(Pollutant.HC),
+				link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
+				computeFactor(link_pollutant2grams.get(i).get(Pollutant.HC), sumoSegments.get(i).HC/1000),
+
+				sumoSegments.get(i).PMx/1000,
+				link_pollutant2grams.get(i).get(Pollutant.PM),
+				link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
+				computeFactor(link_pollutant2grams.get(i).get(Pollutant.PM),sumoSegments.get(i).PMx/1000),
+
+				sumoSegments.get(i).NOx/1000,
+				link_pollutant2grams.get(i).get(Pollutant.NOx),
+				link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
+				computeFactor(link_pollutant2grams.get(i).get(Pollutant.NOx), sumoSegments.get(i).NOx/1000)
 			);
+			currentSecond += wltpLinkAttributes[i].time;
 		}
 		writer.flush();
 		writer.close();
 	}
 
-	private double computePercentageDiff(double a, double b){
-		return (a-b)/((a+b)/2)*100;
+	private double computeFactor(double a, double b){
+		return a/b;
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
