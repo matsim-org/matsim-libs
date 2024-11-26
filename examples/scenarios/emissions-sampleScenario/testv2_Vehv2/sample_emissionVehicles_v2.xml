@@ -14,6 +14,7 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
 			</attributes>
 		</engineInformation>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 
 	<vehicleType id="car_petrol">
@@ -27,6 +28,7 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">PC-P-Euro-1</attribute>
 			</attributes>
 		</engineInformation>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 
 	<vehicleType id="car_diesel">
@@ -40,6 +42,7 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">PC-D-Euro-3</attribute>
 			</attributes>
 		</engineInformation>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 
 	<vehicleType id="truck">
@@ -56,6 +59,7 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
 			</attributes>
 		</engineInformation>
+		<networkMode networkMode="car"/>
 	</vehicleType>
 
 	<vehicle id="555928.1#7278" type="car_diesel"/>

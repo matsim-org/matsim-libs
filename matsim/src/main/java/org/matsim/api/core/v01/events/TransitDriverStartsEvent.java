@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -45,7 +46,7 @@ public class TransitDriverStartsEvent extends Event {
 	private final Id<TransitLine> transitLineId;
 	private final Id<Departure> departureId;
 
-	public TransitDriverStartsEvent(final double time, final Id<Person> driverId, final Id<Vehicle> vehicleId, 
+	public TransitDriverStartsEvent(final double time, final Id<Person> driverId, final Id<Vehicle> vehicleId,
 			final Id<TransitLine> transitLineId, final Id<TransitRoute> transitRouteId, final Id<Departure> departureId) {
 		super(time);
 		this.driverId = driverId;
@@ -54,23 +55,23 @@ public class TransitDriverStartsEvent extends Event {
 		this.transitLineId = transitLineId;
 		this.departureId = departureId;
 	}
-	
+
 	public Id<Person> getDriverId() {
 		return driverId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
-	
+
 	public Id<TransitRoute> getTransitRouteId() {
 		return transitRouteId;
 	}
-	
+
 	public Id<TransitLine> getTransitLineId() {
 		return transitLineId;
 	}
-	
+
 	public Id<Departure> getDepartureId() {
 		return departureId;
 	}
@@ -79,7 +80,7 @@ public class TransitDriverStartsEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
@@ -89,5 +90,18 @@ public class TransitDriverStartsEvent extends Event {
 		atts.put(ATTRIBUTE_TRANSIT_ROUTE_ID, this.getTransitRouteId().toString());
 		atts.put(ATTRIBUTE_DEPARTURE_ID, this.getDepartureId().toString());
 		return atts;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		writeXMLStart(out);
+
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_DRIVER_ID, this.getDriverId().toString());
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_VEHICLE_ID, this.getVehicleId().toString());
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_TRANSIT_LINE_ID, this.getTransitLineId().toString());
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_TRANSIT_ROUTE_ID, this.getTransitRouteId().toString());
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_DEPARTURE_ID, this.getDepartureId().toString());
+
+		writeXMLEnd(out);
 	}
 }

@@ -20,17 +20,26 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 public final class ChargerWriter extends MatsimXmlWriter {
 	private final Stream<? extends ChargerSpecification> chargerSpecifications;
+
+    private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
+	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	public ChargerWriter(Stream<? extends ChargerSpecification> chargerSpecifications) {
 		this.chargerSpecifications = chargerSpecifications;
@@ -45,13 +54,34 @@ public final class ChargerWriter extends MatsimXmlWriter {
 		close();
 	}
 
-	private void writeChargers() {
+	private void writeChargers() throws UncheckedIOException {
 		chargerSpecifications.forEach(c -> {
 			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", c.getId().toString()),
 					Tuple.of("link", c.getLinkId() + ""), Tuple.of("type", c.getChargerType()),
 					Tuple.of("plug_power", EvUnits.W_to_kW(c.getPlugPower()) + ""),
 					Tuple.of("plug_count", c.getPlugCount() + ""));
-			writeStartTag("charger", atts, true);
+			if (c.getAttributes().size() == 0) {
+				writeStartTag("charger", atts, true);
+			} else {
+				writeStartTag("charger", atts, false);
+
+				try {
+					this.writer.write("\n");
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+
+				attributesWriter.writeAttributes("\t\t", this.writer, c.getAttributes(), false);
+				writeEndTag("charger");
+			}
 		});
 	}
+
+	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+        this.attributeConverters.putAll(converters);
+    }
+
+    public void putAttributeConverter(Class<?> key, AttributeConverter<?> converter) {
+        this.attributeConverters.put(key, converter);
+    }
 }

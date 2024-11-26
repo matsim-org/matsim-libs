@@ -26,6 +26,7 @@ package org.matsim.contrib.noise;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -134,9 +135,9 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 
 	private String[] hgvIdPrefixes = {"lkw", "truck", "freight"};
+	private Set<String> networkModesToIgnore = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
 	private Set<String> busIdIdentifier = new HashSet<>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<>();
-	private Set<String> networkModesToIgnore = new HashSet<>();
 
 	private double noiseTollFactor = 1.0;
 
@@ -209,7 +210,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put(USE_DEM, "Set to 'true' if a DEM (digital elevation model) should be used for road gradients. Otherwise set to 'false'.");
 		comments.put(DEM_FILE, "Path to the geoTiff file of the DEM.");
 
-		comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
+		comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation. By default, the following modes are excluded: [bike, walk, transit_walk, non_network_walk].");
 
 		comments.put(NOISE_COMPUTATION_METHOD, "Specifies the computation method of different guidelines: " + Arrays.toString(NoiseComputationMethod.values()));
 
@@ -312,6 +313,37 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 				log.warn("Cannot consider noise barriers without a specified file path to the geojson file of barriers / buildings.");
 				this.considerNoiseBarriers = false;
 			}
+		}
+
+		List<String> walkAndBikeModes = List.of(TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk);
+		String exclude = "[";
+		for (String mode : walkAndBikeModes){
+			exclude += mode + ",";
+		}
+		exclude = exclude.substring(0, exclude.lastIndexOf(',')) + "]";
+		String warning = "You should set networkModesToIgnore such that all of the standard walk and bike modes are included!" +
+			" These are " + exclude + ".";
+		if (this.networkModesToIgnore.isEmpty() ||
+			! this.networkModesToIgnore.containsAll(walkAndBikeModes)){
+			boolean bikeOrWalkIsNetworkMode = config.routing().getNetworkModes().stream()
+				.filter(networkMode -> networkModesToIgnore.contains(networkMode))
+				.findAny()
+				.isPresent();
+			if (bikeOrWalkIsNetworkMode){
+				//TODO: use enum for consistencyCheckLevel and replace all RunTimeExceptions thrown within this class.
+				throw new RuntimeException(warning + " You configured one of these modes as networkMode in config().routing.getNetworkModes()! This will lead to wrong results!" +
+					"Make sure ignore all network modes that do not model a car, a heavy-goods-vehicle (HGV) or a transit vehicle to be considered by the noise analysis!!! Will abort now...");
+			} else {
+				log.warn( warning +
+					" Otherwise, your results will turn wrong as soon as you are routing these modes on the network (which luckily appears not to be the case in your current setup).");
+			}
+		}
+
+		Set<String> defaultHGVIdPrefixes = Set.of("lkw", "truck", "freight");
+
+		if (! defaultHGVIdPrefixes.stream().allMatch(defaultPrefix ->
+			Arrays.stream(this.hgvIdPrefixes).anyMatch(prefix -> defaultPrefix.equals(prefix)))){
+			log.warn("You are not considering all of [lkw, truck, freight] as HGV prefixes, which you should! Especially when you use scenarios created by VSP!!");
 		}
 	}
 

@@ -38,6 +38,7 @@ import org.matsim.freight.carriers.events.CarrierEventsReaders;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 //import static org.matsim.application.ApplicationUtils.globFile;
 
@@ -80,13 +81,15 @@ public class RunFreightAnalysisEventBased {
 //		Path carriersPath = globFile(simOutputPath, "*output_carriers.*");
 //		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
 
-//		this.EVENTS_PATH = simOutputPath.resolve("*output_events.xml.gz");
-//		Path vehiclesPath = simOutputPath.resolve("*output_allVehicles.xml.gz");
-//		Path networkPath = simOutputPath.resolve("*output_network.xml.gz");
-//		Path carriersPath = simOutputPath.resolve("*output_carriers.xml.gz");
-//		Path carriersVehicleTypesPath = simOutputPath.resolve("*output_carriersVehicleTypes.xml.gz");
-//
-//		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
+		// the better version with the globFile method is not available since there is a circular dependency between the modules application and freight
+
+		this.EVENTS_PATH = Path.of(simOutputPath).resolve("output_events.xml.gz").toString();
+		String vehiclesPath = Path.of(simOutputPath).resolve("output_allVehicles.xml.gz").toString();
+		String networkPath = Path.of(simOutputPath).resolve("output_network.xml.gz").toString();
+		String carriersPath = Path.of(simOutputPath).resolve("output_carriers.xml.gz").toString();
+		String carriersVehicleTypesPath = Path.of(simOutputPath).resolve("output_carriersVehicleTypes.xml.gz").toString();
+
+		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**

@@ -140,9 +140,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = multimodalLinkChooser.decideOnLink(fromFacility, filteredNetwork);
-
-		Link egressActLink = multimodalLinkChooser.decideOnLink(toFacility, filteredNetwork);
+		Link accessActLink = multimodalLinkChooser.decideAccessLink(request, filteredNetwork);
+		Link egressActLink = multimodalLinkChooser.decideEgressLink(request, filteredNetwork);
 
 		double now = departureTime;
 
