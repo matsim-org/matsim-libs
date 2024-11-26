@@ -47,6 +47,8 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 
+	public static final String MATSIM_TEMP_DIR_PROPERTY = "matsim.tempDir";
+
 	private static final  Logger log = LogManager.getLogger(OutputDirectoryHierarchy.class);
 
 	private String runId = null;
@@ -108,7 +110,11 @@ public final class OutputDirectoryHierarchy {
 	 * @return path to a temp-directory.
 	 */
 	public final String getTempPath() {
-		return outputPath + "/tmp";
+		String matsimTempDir = System.getProperty(MATSIM_TEMP_DIR_PROPERTY);
+		if (matsimTempDir == null) {
+			matsimTempDir = outputPath + "/tmp";
+		}
+		return matsimTempDir;
 	}
 
 	/**

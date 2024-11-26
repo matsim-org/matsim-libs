@@ -15,19 +15,17 @@ public class TransitViewer extends Viz {
 	@JsonProperty(required = true)
 	public String transitSchedule;
 
+	@JsonProperty
+	public String ptStop2stopFile;
+
 	public List<CustomRouteType> customRouteTypes;
 
 	public TransitViewer() {
 		super("transit");
 	}
 
-	public CustomRouteType addCustomRouteType(String label, String color, boolean hide) {
-		CustomRouteType crt = new CustomRouteType();
-		crt.label = label;
-		crt.color = color;
-		crt.hide = hide;
-		customRouteTypes.add(crt);
-		return crt;
+	public static CustomRouteType customRouteType(String label, String color) {
+		return new CustomRouteType(label, color);
 	}
 
 	public static class CustomRouteType {
@@ -35,6 +33,11 @@ public class TransitViewer extends Viz {
 		public String color;
 		public Boolean hide;
 		Match match;
+
+		private CustomRouteType(String label, String color) {
+			this.label = label;
+			this.color = color;
+		}
 
 		public CustomRouteType addMatchTransportMode(String... transportMode) {
 			if (match == null)

@@ -42,7 +42,6 @@ import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author dtamleh
@@ -107,7 +106,7 @@ public class PtStop2StopAnalysisTest {
 
         String networkMode_bus = TransportMode.car;
 
-        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
 
         ParallelEventsManager events = new ParallelEventsManager(false);
         events.addHandler(ptStop2StopAnalysis);
@@ -141,34 +140,34 @@ public class PtStop2StopAnalysisTest {
 
         // Tests
         List<PtStop2StopAnalysis.Stop2StopEntry> line1_route1_dep1_stop1 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream()
-                .filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1)
-                        && entry.departureId.equals(departureId_bus1_route1_dep1) && entry.stopId.equals(transitStopFacilityId1)
-                        && entry.stopSequence == 0).collect(Collectors.toList());
+                .filter(entry -> entry.transitLineId().equals(transitLineId_bus1) && entry.transitRouteId().equals(transitRouteId_bus1_route1)
+                        && entry.departureId().equals(departureId_bus1_route1_dep1) && entry.stopId().equals(transitStopFacilityId1)
+                        && entry.stopSequence() == 0).toList();
         System.out.println(line1_route1_dep1_stop1.size());
         Assertions.assertEquals(1, line1_route1_dep1_stop1.size(), "Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_route1_dep1 + ", " + departureId_bus1_route1_dep1 + ", " + transitStopFacilityId1 + ", 0");
-        Assertions.assertNull(line1_route1_dep1_stop1.get(0).stopPreviousId, "There should be no previous stop, but there was");
-        Assertions.assertEquals(1.0, line1_route1_dep1_stop1.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
-        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
-        Assertions.assertEquals(3.0, line1_route1_dep1_stop1.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(veh_bus1.getType().getCapacity().getSeats() + veh_bus1.getType().getCapacity().getStandingRoom(), line1_route1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(2.0, line1_route1_dep1_stop1.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assertions.assertNull(line1_route1_dep1_stop1.get(0).stopPreviousId(), "There should be no previous stop, but there was");
+        Assertions.assertEquals(1.0, line1_route1_dep1_stop1.get(0).arrivalTimeScheduled(), MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
+        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
+        Assertions.assertEquals(3.0, line1_route1_dep1_stop1.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).departureDelay(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).passengersAtArrival(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(veh_bus1.getType().getCapacity().getSeats() + veh_bus1.getType().getCapacity().getStandingRoom(), line1_route1_dep1_stop1.get(0).totalVehicleCapacity(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, line1_route1_dep1_stop1.get(0).passengersAlighting(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(2.0, line1_route1_dep1_stop1.get(0).passengersBoarding(), MatsimTestUtils.EPSILON);
         List<Id<Link>> linkList = new ArrayList<>();
         linkList.add(linkId1);
-        Assertions.assertEquals(linkList, line1_route1_dep1_stop1.get(0).linkIdsSincePreviousStop, "Wrong links");
+        Assertions.assertEquals(linkList, line1_route1_dep1_stop1.get(0).linkIdsSincePreviousStop(), "Wrong links");
 
         List<PtStop2StopAnalysis.Stop2StopEntry> line1_route1_dep1_stop3 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream()
-                .filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1)
-                        && entry.departureId.equals(departureId_bus1_route1_dep1) && entry.stopId.equals(transitStopFacilityId3)
-                        && entry.stopSequence == 2).collect(Collectors.toList());
+                .filter(entry -> entry.transitLineId().equals(transitLineId_bus1) && entry.transitRouteId().equals(transitRouteId_bus1_route1)
+                        && entry.departureId().equals(departureId_bus1_route1_dep1) && entry.stopId().equals(transitStopFacilityId3)
+                        && entry.stopSequence() == 2).toList();
         Assertions.assertEquals(1, line1_route1_dep1_stop3.size(), "Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_route1_dep1 + ", " + departureId_bus1_route1_dep1 + ", " + transitStopFacilityId3 + ", 0");
-        Assertions.assertEquals(transitStopFacilityId2, line1_route1_dep1_stop3.get(0).stopPreviousId, "There is no previous stop");
-        Assertions.assertEquals(12.0, line1_route1_dep1_stop3.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(12.0, line1_route1_dep1_stop3.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
-        Assertions.assertEquals(-1.0, line1_route1_dep1_stop3.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrival delay");
-        Assertions.assertEquals(1.0, line1_route1_dep1_stop3.get(0).departureDelay, MatsimTestUtils.EPSILON, "Wrong departure delay");
+        Assertions.assertEquals(transitStopFacilityId2, line1_route1_dep1_stop3.get(0).stopPreviousId(), "There is no previous stop");
+        Assertions.assertEquals(12.0, line1_route1_dep1_stop3.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(12.0, line1_route1_dep1_stop3.get(0).arrivalTimeScheduled(), MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
+        Assertions.assertEquals(-1.0, line1_route1_dep1_stop3.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrival delay");
+        Assertions.assertEquals(1.0, line1_route1_dep1_stop3.get(0).departureDelay(), MatsimTestUtils.EPSILON, "Wrong departure delay");
     }
 
 //    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -257,7 +256,7 @@ public class PtStop2StopAnalysisTest {
         String networkMode_bus = TransportMode.car;
         String networkMode_train = TransportMode.train;
 
-        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+        PtStop2StopAnalysis ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
 
         ParallelEventsManager events = new ParallelEventsManager(false);
         events.addHandler(ptStop2StopAnalysis);
@@ -444,54 +443,54 @@ public class PtStop2StopAnalysisTest {
 
 
         // Tests
-        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop1 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId1) && entry.stopSequence == 0).collect(Collectors.toList());
+        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop1 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId().equals(transitLineId_bus1) && entry.transitRouteId().equals(transitRouteId_bus1_route1) && entry.departureId().equals(departureId_bus1_dep1) && entry.stopId().equals(transitStopFacilityId1) && entry.stopSequence() == 0).toList();
         Assertions.assertEquals(1, bus1_dep1_stop1.size(), "Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId1 + ", 0");
-        Assertions.assertNull(bus1_dep1_stop1.get(0).stopPreviousId, "There should be no previous stop, but there was");
-        Assertions.assertEquals(1.0, bus1_dep1_stop1.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
-        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
-        Assertions.assertEquals(3.0, bus1_dep1_stop1.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(2.0, bus1_dep1_stop1.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assertions.assertNull(bus1_dep1_stop1.get(0).stopPreviousId(), "There should be no previous stop, but there was");
+        Assertions.assertEquals(1.0, bus1_dep1_stop1.get(0).arrivalTimeScheduled(), MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
+        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
+        Assertions.assertEquals(3.0, bus1_dep1_stop1.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).departureDelay(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).passengersAtArrival(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop1.get(0).passengersAlighting(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(2.0, bus1_dep1_stop1.get(0).passengersBoarding(), MatsimTestUtils.EPSILON);
 
         List<Id<Link>> linkList = new ArrayList<>();
         linkList.add(linkId1);
-        Assertions.assertEquals(linkList, bus1_dep1_stop1.get(0).linkIdsSincePreviousStop, "Wrong links");
+        Assertions.assertEquals(linkList, bus1_dep1_stop1.get(0).linkIdsSincePreviousStop(), "Wrong links");
 
-        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop3 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId4) && entry.stopSequence == 2).collect(Collectors.toList());
+        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop3 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId().equals(transitLineId_bus1) && entry.transitRouteId().equals(transitRouteId_bus1_route1) && entry.departureId().equals(departureId_bus1_dep1) && entry.stopId().equals(transitStopFacilityId4) && entry.stopSequence() == 2).toList();
         System.out.println(bus1_dep1_stop3.isEmpty());
         Assertions.assertEquals(1, bus1_dep1_stop3.size(), "Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId4 + ", 0");
-        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
-        Assertions.assertEquals(15.0, bus1_dep1_stop3.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
+        Assertions.assertEquals(15.0, bus1_dep1_stop3.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).departureDelay(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAtArrival(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAlighting(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop3.get(0).passengersBoarding(), MatsimTestUtils.EPSILON);
 
-        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route2) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId2) && entry.stopSequence == 1).collect(Collectors.toList());
+        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId().equals(transitLineId_bus1) && entry.transitRouteId().equals(transitRouteId_bus1_route2) && entry.departureId().equals(departureId_bus1_dep1) && entry.stopId().equals(transitStopFacilityId2) && entry.stopSequence() == 1).toList();
         Assertions.assertEquals(1, bus1_dep1_stop4.size(), "Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route2 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId2 + ", 0");
-        Assertions.assertEquals(28.0, bus1_dep1_stop4.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
-        Assertions.assertEquals(0.0, bus1_dep1_stop4.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
-        Assertions.assertEquals(29.0, bus1_dep1_stop4.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, bus1_dep1_stop4.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(5.0, bus1_dep1_stop4.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(28.0, bus1_dep1_stop4.get(0).arrivalTimeScheduled(), MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
+        Assertions.assertEquals(0.0, bus1_dep1_stop4.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
+        Assertions.assertEquals(29.0, bus1_dep1_stop4.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, bus1_dep1_stop4.get(0).departureDelay(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(5.0, bus1_dep1_stop4.get(0).passengersAtArrival(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersAlighting(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersBoarding(), MatsimTestUtils.EPSILON);
 
-        List<PtStop2StopAnalysis.Stop2StopEntry> train1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_train1) && entry.transitRouteId.equals(transitRouteId_train1_route1) && entry.departureId.equals(departureId_train1_dep1) && entry.stopId.equals(transitStopFacilityId6) && entry.stopSequence == 3).collect(Collectors.toList());
+        List<PtStop2StopAnalysis.Stop2StopEntry> train1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId().equals(transitLineId_train1) && entry.transitRouteId().equals(transitRouteId_train1_route1) && entry.departureId().equals(departureId_train1_dep1) && entry.stopId().equals(transitStopFacilityId6) && entry.stopSequence() == 3).toList();
         Assertions.assertEquals(1, train1_dep1_stop4.size(), "Either no entry or more than entry for " + transitLineId_train1 + ", " + transitRouteId_train1_route1 + ", " + departureId_train1_dep1 + ", "  + transitStopFacilityId6 + ", 0");
-        Assertions.assertEquals(19.0, train1_dep1_stop4.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
-        Assertions.assertEquals(0.0, train1_dep1_stop4.get(0).arrivalDelay, MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
-        Assertions.assertEquals(21.0, train1_dep1_stop4.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(0.0, train1_dep1_stop4.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(6.0, train1_dep1_stop4.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(4.0, train1_dep1_stop4.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assertions.assertEquals(1.0, train1_dep1_stop4.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(19.0, train1_dep1_stop4.get(0).arrivalTimeScheduled(), MatsimTestUtils.EPSILON, "Wrong arrivalTimeScheduled");
+        Assertions.assertEquals(0.0, train1_dep1_stop4.get(0).arrivalDelay(), MatsimTestUtils.EPSILON, "Wrong arrivalDelay");
+        Assertions.assertEquals(21.0, train1_dep1_stop4.get(0).departureTimeScheduled(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(0.0, train1_dep1_stop4.get(0).departureDelay(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(6.0, train1_dep1_stop4.get(0).passengersAtArrival(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(4.0, train1_dep1_stop4.get(0).passengersAlighting(), MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(1.0, train1_dep1_stop4.get(0).passengersBoarding(), MatsimTestUtils.EPSILON);
 
     }
 }

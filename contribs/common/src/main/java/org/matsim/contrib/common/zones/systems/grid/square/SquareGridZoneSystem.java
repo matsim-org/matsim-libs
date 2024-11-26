@@ -36,6 +36,7 @@ import org.matsim.core.utils.geometry.GeometryUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SquareGridZoneSystem implements GridZoneSystem {
 
@@ -55,6 +56,7 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 	private final IdMap<Zone, Zone> zones = new IdMap<>(Zone.class);
 
 	private final IdMap<Zone, List<Link>> zoneToLinksMap = new IdMap<>(Zone.class);
+	private final Map<Integer, List<Link>> index2Links;
 	private final Network network;
 
 
@@ -76,6 +78,7 @@ public class SquareGridZoneSystem implements GridZoneSystem {
         this.rows = Math.max(1, (int) Math.ceil((maxY - minY) / cellSize));
 		this.cols = Math.max(1, (int)Math.ceil((maxX - minX) / cellSize));
 		this.internalZones = new Zone[rows * cols +1];
+		this.index2Links = getIndexToLink(network);
 
 		if(filterByNetwork) {
 			network.getLinks().values().forEach(l -> getOrCreateZone(l.getToNode().getCoord()));
@@ -126,18 +129,22 @@ public class SquareGridZoneSystem implements GridZoneSystem {
 			if(zoneFilter.test(zone)) {
 				internalZones[index] = zone;
 				zones.put(zone.getId(), zone);
-
-				for (Link link : network.getLinks().values()) {
-					if (getIndex(link.getToNode().getCoord()) == index) {
-						List<Link> links = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId -> new ArrayList<>());
-						links.add(link);
-					}
+				List<Link> linkList = zoneToLinksMap.computeIfAbsent(zone.getId(), zoneId -> new ArrayList<>());
+				List<Link> links = index2Links.get(index);
+				if(links!=null)
+				{
+					linkList.addAll(links);
 				}
 			} else {
 				return Optional.empty();
 			}
 		}
 		return Optional.of(zone);
+	}
+
+	private Map<Integer, List<Link>> getIndexToLink(Network network) {
+		return network.getLinks().values().stream()
+			.collect(Collectors.groupingBy(link -> getIndex(link.getToNode().getCoord())));
 	}
 
 	private PreparedPolygon getGeometry(int r, int c) {

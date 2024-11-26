@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
@@ -53,6 +54,7 @@ public class CarrierVehicleTypeTest {
 			VehicleCapacity vehicleCapacity = mediumType.getCapacity();
 			vehicleCapacity.setWeightInTons( 30 );
 			mediumType.setDescription( "Medium Vehicle" ).setMaximumVelocity( 13.89 );
+			mediumType.setNetworkMode(TransportMode.truck);
 			types = new CarrierVehicleTypes();
 			types.getVehicleTypes().put( mediumType.getId(), mediumType );
 		}
@@ -77,6 +79,7 @@ public class CarrierVehicleTypeTest {
 			capacity.setWeightInTons( 16 ) ;
 //			VehicleType smallType = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( smallTypeId, mediumType )
 			smallType.setDescription( "Small Vehicle" ).setMaximumVelocity( 10.0 ) ;
+			smallType.setNetworkMode(TransportMode.car);
 			types.getVehicleTypes().put( smallType.getId(), smallType);
 		}
 	}

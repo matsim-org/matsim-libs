@@ -268,19 +268,32 @@ final class Grid {
 		counter.printCounter();
 
 		counter = new Counter("compute nearest receiver-points #");
+		Counter otherCounter = new Counter("activities outside grid #");
 		for (Coord coord : consideredActivityCoordsForSpatialFunctionality) {
 
 			// TODO maybe add a check here so we consider only the rp in the 9 surrounding cells?
-			ReceiverPoint rp = qTree.getClosest(coord.getX(), coord.getY());
-			if(rp != null) {
-				if(activityCoord2receiverPointId.put(coord, rp.getId()) != null){
-					log.warn("this must not happen");
-				}
-			}
+			// ts, nov' 24:  ---> might be done by the following filtering (by grid) ??
 
-			counter.incCounter();
+			// Filter activity coords that are within the quadTree.
+			// I do not know, why whe put a buffer around the grid when instantiating the QuadTree, above, but I'll keep it for now
+			// tschlenther, nov '24
+			if (coord.getX() >= xCoordMin && coord.getX() <= xCoordMax &&
+					coord.getY() >= yCoordMin && coord.getY() <= yCoordMax){
+
+				ReceiverPoint rp = qTree.getClosest(coord.getX(), coord.getY());
+				if(rp != null) {
+					if(activityCoord2receiverPointId.put(coord, rp.getId()) != null){
+						log.warn("this must not happen");
+					}
+				}
+
+				counter.incCounter();
+			} else {
+				otherCounter.incCounter();
+			}
 		}
 		counter.printCounter();
+		otherCounter.printCounter();
 	}
 
 	private void readReceiverPoints(String file, CoordinateTransformation ct) throws IOException {
