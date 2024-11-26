@@ -103,10 +103,6 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					@Inject
 					private EventsManager events;
 
-					@Inject
-					// note: this could be modal now! /sh, nov'24
-					private ChargingStrategy.Factory chargingStrategyFactory;
-
 					@Override
 					public ETaxiScheduler get() {
 						var travelTime = getModalInstance(TravelTime.class);
@@ -118,6 +114,7 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						var speedyALTFactory = new SpeedyALTFactory();
 						Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(
 								network, travelDisutility, travelTime);
+						ChargingStrategy.Factory chargingStrategyFactory = getModalInstance(ChargingStrategy.Factory.class);
 						return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator,
 								events, timer, chargingStrategyFactory);
 					}

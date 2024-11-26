@@ -113,14 +113,11 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					@Inject
 					private MobsimTimer timer;
 
-					@Inject
-					// note: this could also become modal now! /sh, nov'24
-					private ChargingStrategy.Factory chargingStrategyFactory;
-
 					@Override
 					public EmptyVehicleChargingScheduler get() {
 						var taskFactory = getModalInstance(DrtTaskFactory.class);
 						var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
+						ChargingStrategy.Factory chargingStrategyFactory = getModalInstance(ChargingStrategy.Factory.class);
 						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure, chargingStrategyFactory);
 					}
 				}).asEagerSingleton();
