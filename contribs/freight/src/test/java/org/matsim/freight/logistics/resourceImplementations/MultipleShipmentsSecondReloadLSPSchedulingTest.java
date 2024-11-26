@@ -38,6 +38,8 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -67,7 +69,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "logistics-2regions" ), "2regions-network.xml" ).getFile());
 		Network network = scenario.getNetwork();
 
 
@@ -251,14 +253,14 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 
 	@Test
 	public void testSecondReloadLSPScheduling() {
-		
+
 		/*for(LSPShipment shipment : lsp.getShipments()) {
 			ArrayList<AbstractShipmentPlanElement> elementList = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
 			Collections.sort(elementList, new AbstractShipmentPlanElementComparator());
 			System.out.println();
 			for(AbstractShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());	
-			}			
+				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());
+			}
 			System.out.println();
 		}*/
 

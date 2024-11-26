@@ -39,6 +39,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
@@ -112,7 +114,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     log.warn("solutionType= {}", solutionType);
 
-    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+    config.network().setInputFile(IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "logistics-2regions" ), "2regions-network.xml" ).getFile());
 
     log.info("Starting ...");
     log.info("Set up required MATSim classes");

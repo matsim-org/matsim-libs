@@ -42,6 +42,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -62,7 +64,7 @@ public class CollectionLSPScoringTest {
 	@BeforeEach
 	public void initialize() {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.network().setInputFile(IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "logistics-2regions" ), "2regions-network.xml" ).getFile());
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
