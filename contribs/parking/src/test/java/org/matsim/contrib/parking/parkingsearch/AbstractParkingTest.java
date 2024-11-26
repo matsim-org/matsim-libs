@@ -1,0 +1,71 @@
+package org.matsim.contrib.parking.parkingsearch;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
+import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+
+public abstract class AbstractParkingTest {
+	@RegisterExtension
+	MatsimTestUtils utils = new MatsimTestUtils();
+
+	abstract ParkingSearchStrategy getParkingSearchStrategy();
+
+	@Test
+	void testParking100() {
+		ParkingSearchConfigGroup parkingSearchConfigGroup = prepare();
+		run(parkingSearchConfigGroup);
+		validate();
+	}
+
+	private ParkingSearchConfigGroup prepare() {
+		ParkingSearchConfigGroup parkingSearchConfigGroup = new ParkingSearchConfigGroup();
+		parkingSearchConfigGroup.setParkingSearchStrategy(getParkingSearchStrategy());
+		return parkingSearchConfigGroup;
+	}
+
+	void run(ParkingSearchConfigGroup parkingSearchConfigGroup) {
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", parkingSearchConfigGroup);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Controller controller = ControllerUtils.createController(scenario);
+		SetupParking.installParkingModules(controller);
+		controller.run();
+	}
+
+	void validate() {
+		Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
+
+		Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
+
+		for (Id<Person> personId : expected.getPersons().keySet()) {
+			double scoreReference = expected.getPersons().get(personId).getSelectedPlan().getScore();
+			double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
+			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
+		}
+
+		String expectedEventsFile = utils.getInputDirectory() + "/output_events.xml.gz";
+		String actualEventsFile = utils.getOutputDirectory() + "/output_events.xml.gz";
+		ComparisonResult result = EventsUtils.compareEventsFiles(expectedEventsFile, actualEventsFile);
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+	}
+}
