@@ -118,7 +118,8 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 			}
 			outGoingLinks.remove(nextLink);
 		}
-		logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a " +
+		logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a" +
+			" " +
 			"random next link");
 		return outGoingLinksCopy.get(random.nextInt(outGoingLinksCopy.size())).getId();
 
@@ -140,7 +141,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		double distToDest = NetworkUtils.getEuclideanDistance(
 			network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getToNode().getCoord());
 		double expectedFreeSlots = (pUnoccupied * distToDest / configGroup.getAvgparkingslotlength());
-		double rnd = Math.random();
+		double rnd = random.nextDouble();
 		if (logForDebug) {
 			logger.error("\n current link: " + currentLinkId + "\n expected slots: " + expectedFreeSlots + "\n probabilty to continue driving: " + getProbabilityOfContinuingToDrive(expectedFreeSlots) + "\n rnd: " + rnd);
 		}

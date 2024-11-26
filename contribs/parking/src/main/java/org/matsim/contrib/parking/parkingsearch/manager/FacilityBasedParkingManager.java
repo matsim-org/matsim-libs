@@ -76,12 +76,12 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		canParkOnlyAtFacilities = psConfigGroup.getCanParkOnlyAtFacilities();
 		this.network = scenario.getNetwork();
 		parkingFacilities = scenario.getActivityFacilities()
-			.getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
+									.getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
 		LogManager.getLogger(getClass()).info(parkingFacilities.toString());
 		this.timeBinSize = 15 * 60;
 		this.maxTime = 24 * 3600 - 1;
 		this.maxSlotIndex = (this.maxTime / this.timeBinSize) + 1;
-		this.startTime = 9 * 3600;
+		this.startTime = 9 * 3600; //TODO yyyy? this is a magic variable and should either be deleted or configurable, paul nov '24
 
 		for (ActivityFacility fac : this.parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
@@ -138,17 +138,23 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			double totalNeededParkingDuration = getOffDuration + stopDuration + pickUpDuration;
 			for (Id<ActivityFacility> facility : facilities) {
 				double maxParkingDurationAtFacilityInHours = Double.MAX_VALUE;
-				if (this.parkingFacilities.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours"))
+				if (this.parkingFacilities.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) {
 					maxParkingDurationAtFacilityInHours = 3600 * (double) this.parkingFacilities.get(facility).getAttributes().getAsMap().get(
 						"maxParkingDurationInHours");
+				}
 				if (maxParkingDurationAtFacilityInHours > totalNeededParkingDuration) {
 					ActivityOption parkingOptions = this.parkingFacilities.get(facility).getActivityOptions().get("parking");
 					if (!parkingOptions.getOpeningTimes().isEmpty()) {
-						if ((parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first().getEndTime() == 24 * 3600))
-							if (parkingOptions.getOpeningTimes().first().getStartTime() <= now && parkingOptions.getOpeningTimes().first().getEndTime() >= now + totalNeededParkingDuration)
+						if ((parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first()
+																										   .getEndTime() == 24 * 3600)) {
+							if (parkingOptions.getOpeningTimes().first().getStartTime() <= now && parkingOptions.getOpeningTimes().first()
+																												.getEndTime() >= now + totalNeededParkingDuration) {
 								return true;
-					} else
+							}
+						}
+					} else {
 						return true;
+					}
 				}
 			}
 		}
@@ -172,7 +178,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
 			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
-				.getCapacity();
+											   .getCapacity();
 			this.reservationsRequests.get(fac).increment();
 			if (this.occupation.get(fac).doubleValue() < cap) {
 				// LogManager.getLogger(getClass()).info("occ:
@@ -191,7 +197,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	public Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId) {
 		if (this.parkingLocations.containsKey(vehicleId)) {
 			return this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getLinkId();
-		} else return this.parkingLocationsOutsideFacilities.getOrDefault(vehicleId, null);
+		} else {
+			return this.parkingLocationsOutsideFacilities.getOrDefault(vehicleId, null);
+		}
 	}
 
 	@Override
@@ -209,7 +217,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			if (fac != null) {
 				this.parkingLocations.put(vehicleId, fac);
 				this.numberOfParkedVehicles.get(fac).increment();
-				foundParkingByTime.get(getTimeSlotIndex(time) * timeBinSize).increment();
+				int timeSlot = getTimeSlotIndex(time) * timeBinSize;
+				foundParkingByTime.putIfAbsent(timeSlot, new MutableLong(0));
+				foundParkingByTime.get(timeSlot).increment();
 				return true;
 			} else {
 				throw new RuntimeException("no parking reservation found for vehicle " + vehicleId.toString()
@@ -228,7 +238,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
 			this.occupation.get(fac).decrement();
-			unparkByTime.get(getTimeSlotIndex(time) * timeBinSize).increment();
+			int timeSlot = getTimeSlotIndex(time) * timeBinSize;
+			unparkByTime.putIfAbsent(timeSlot, new MutableLong(0));
+			unparkByTime.get(timeSlot).increment();
 			return true;
 		}
 	}
@@ -239,14 +251,17 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		for (Entry<Id<ActivityFacility>, MutableLong> e : this.occupation.entrySet()) {
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
-				.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+													.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 			double x = this.parkingFacilities.get(e.getKey()).getCoord().getX();
 			double y = this.parkingFacilities.get(e.getKey()).getCoord().getY();
 
-			String s = linkId.toString() + ";" + x + ";" + y + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue().toString() + ";" + this.reservationsRequests.get(
+			String s = linkId.toString() + ";" + x + ";" + y + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue()
+																													 .toString() + ";" + this.reservationsRequests.get(
 				e.getKey()).toString() + ";" + this.numberOfParkedVehicles.get(e.getKey()).toString() + ";" + this.rejectedParkingRequest.get(
 				e.getKey()).toString() + ";" + this.numberOfWaitingActivities.get(
-				e.getKey()).toString() + ";" + this.numberOfStaysFromGetOffUntilGetIn.get(e.getKey()).intValue() + ";" + this.numberOfParkingBeforeGetIn.get(e.getKey()).intValue();
+				e.getKey()).toString() + ";" + this.numberOfStaysFromGetOffUntilGetIn.get(e.getKey())
+																					 .intValue() + ";" + this.numberOfParkingBeforeGetIn.get(e.getKey())
+																																		.intValue();
 			stats.add(s);
 		}
 		return stats;
@@ -360,8 +375,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 					int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 					while (this.occupation.get(fac).intValue() < cap && !waitingVehicles.get(linkId).isEmpty()) {
 						double startWaitingTime = waitingVehicles.get(linkId).firstKey();
-						if (startWaitingTime > now)
+						if (startWaitingTime > now) {
 							break;
+						}
 						Id<Vehicle> vehcileId = waitingVehicles.get(linkId).remove(startWaitingTime);
 						DynAgent agent = (DynAgent) qSim.getAgents().get(Id.createPersonId(vehcileId.toString()));
 						reserveSpaceIfVehicleCanParkHere(vehcileId, linkId);
