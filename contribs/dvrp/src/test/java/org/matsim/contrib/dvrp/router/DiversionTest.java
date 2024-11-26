@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -247,6 +248,7 @@ public class DiversionTest {
 
 			DvrpModes.registerDvrpMode(binder(), getMode());
 			install(new DvrpModeRoutingNetworkModule(getMode(), false));
+			install(new DvrpLoadModule(getMode()));
 
 			/*
 			 * Add handler to track the actual arrival time in simulation

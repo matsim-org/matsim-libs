@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
@@ -71,7 +70,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
 		//     i.e. VehiclesSource.fromVehiclesData)
 		// - vehicle specifications provided via a custom binding for FleetSpecification
-		bindModal(IntegerLoadType.class).to(DefaultIntegerLoadType.class).asEagerSingleton();
+
+		install(new DvrpLoadModule(getMode()));
 
 		bindModal(DvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
 			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
