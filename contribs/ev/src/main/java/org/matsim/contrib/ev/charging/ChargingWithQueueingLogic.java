@@ -19,15 +19,23 @@
 
 package org.matsim.contrib.ev.charging;
 
-import com.google.common.base.Preconditions;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+import com.google.common.base.Preconditions;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	protected final ChargerSpecification charger;
@@ -142,5 +150,21 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public ChargingStrategy getChargingStrategy() {
 		return chargingStrategy;
+	}
+
+	static public class Factory implements ChargingLogic.Factory {
+		private final ChargingStrategy.Factory strategyFactory;
+		private final EventsManager eventsManager;
+
+		public Factory(ChargingStrategy.Factory strategyFactory, EventsManager eventsManager) {
+			this.strategyFactory = strategyFactory;
+			this.eventsManager = eventsManager;
+		}
+
+		@Override
+		public ChargingLogic create(ChargerSpecification charger) {
+			ChargingStrategy startegy = strategyFactory.createStrategy(charger);
+			return new ChargingWithQueueingLogic(charger, startegy, eventsManager);
+		}
 	}
 }

@@ -23,16 +23,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
 		implements ChargingWithAssignmentLogic {
@@ -65,20 +61,19 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		return unmodifiableAssignedVehicles;
 	}
 
-	public static class FactoryProvider implements Provider<ChargingLogic.Factory> {
-		@Inject
-		private EventsManager eventsManager;
+	static public class Factory implements ChargingLogic.Factory {
+		private final ChargingStrategy.Factory strategyFactory;
+		private final EventsManager eventsManager;
 
-		private final Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator;
-
-		public FactoryProvider(Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator) {
-			this.chargingStrategyCreator = chargingStrategyCreator;
+		public Factory(ChargingStrategy.Factory strategyFactory, EventsManager eventsManager) {
+			this.strategyFactory = strategyFactory;
+			this.eventsManager = eventsManager;
 		}
 
 		@Override
-		public ChargingLogic.Factory get() {
-			return charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-					chargingStrategyCreator.apply(charger), eventsManager);
+		public ChargingLogic create(ChargerSpecification charger) {
+			ChargingStrategy startegy = strategyFactory.createStrategy(charger);
+			return new ChargingWithQueueingAndAssignmentLogic(charger, startegy, eventsManager);
 		}
 	}
 }

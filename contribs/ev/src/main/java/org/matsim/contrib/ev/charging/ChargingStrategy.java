@@ -19,6 +19,7 @@
 package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author michalm
@@ -30,4 +31,8 @@ public interface ChargingStrategy {
 
 	//XXX should include potentially longer charging if AUX remains turned on
 	double calcRemainingTimeToCharge(ElectricVehicle ev);
+
+	static public interface Factory {
+		ChargingStrategy createStrategy(ChargerSpecification charger);
+	}
 }

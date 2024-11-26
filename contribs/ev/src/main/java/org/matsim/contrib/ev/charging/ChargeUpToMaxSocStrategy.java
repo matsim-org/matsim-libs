@@ -54,4 +54,11 @@ public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
 	public boolean isChargingCompleted(ElectricVehicle ev) {
 		return calcRemainingEnergyToCharge(ev) <= 0;
 	}
+
+	static public class Factory implements ChargingStrategy.Factory {
+		@Override
+		public ChargingStrategy createStrategy(ChargerSpecification charger) {
+			return new ChargeUpToMaxSocStrategy(charger, 1.0);
+		}
+	}
 }

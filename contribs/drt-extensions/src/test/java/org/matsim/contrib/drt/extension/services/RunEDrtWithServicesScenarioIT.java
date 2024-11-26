@@ -77,7 +77,8 @@ public class RunEDrtWithServicesScenarioIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+				bind(ChargingStrategy.Factory.class).toInstance(charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, RELATIVE_SPEED));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
