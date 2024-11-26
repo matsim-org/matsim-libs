@@ -39,8 +39,10 @@ public class PHEMTest {
 
 	//TODO Check if the used hbefa files are correct
 	private final static String HBEFA_4_1_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-	private final static String HBEFA_HOT = HBEFA_4_1_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
-	private final static String HBEFA_COLD = HBEFA_4_1_PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc";
+	private final static String HBEFA_HOT_AVERAGE = HBEFA_4_1_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
+	private final static String HBEFA_COLD_AVERAGE = HBEFA_4_1_PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc";
+	private final static String HBEFA_HOT_TECHAVG = HBEFA_4_1_PATH + "f5b276f41a0531ed740a81f4615ec00f4ff7a28d.enc";
+	private final static String HBEFA_COLD_TECHAVG = HBEFA_4_1_PATH + "b63f949211b7c93776cdce8a7600eff4e36460c8.enc";
 
 	// TODO DEBUG ONLY
 	static CSVPrinter csvPrinter = null;
@@ -243,9 +245,11 @@ public class PHEMTest {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
-		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable ); //TODO Check that this is correct
-		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT);
-		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD);
+		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //TODO Check that this is correct
+		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVERAGE);
+		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVERAGE);
+		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_TECHAVG);
+		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_TECHAVG);
 
 		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
@@ -262,9 +266,11 @@ public class PHEMTest {
 		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
 
 		// Define vehicle
+		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
+		vehicleAttributes.setHbefaEmConcept("petrol (4S)");
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
-			new HbefaVehicleAttributes()); // TODO: Input the actual vehicle data here, currently just "average"
+			vehicleAttributes);
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
