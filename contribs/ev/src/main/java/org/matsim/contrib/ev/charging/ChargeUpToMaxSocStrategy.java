@@ -23,12 +23,15 @@ package org.matsim.contrib.ev.charging;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
+	static public final String MAXIMUM_SOC_VEHICLE_ATTRIBUTE = "maximumSoc";
+
 	private final ElectricVehicle ev;
 	private final ChargerSpecification charger;
 	private final double maxSoc;
@@ -67,7 +70,18 @@ public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
 
 		@Override
 		public ChargingStrategy createStrategy(ChargerSpecification charger, ElectricVehicle ev) {
-			return new ChargeUpToMaxSocStrategy(charger, ev, maxSoc);
+			double vehicleMaximumSoc = maxSoc;
+
+			Vehicle vehicle = ev.getVehicleSpecification().getMatsimVehicle();
+			if (vehicle != null) {
+				Double value = (Double) vehicle.getAttributes().getAttribute(MAXIMUM_SOC_VEHICLE_ATTRIBUTE);
+				
+				if (value != null) {
+					vehicleMaximumSoc = value;
+				}
+			}
+			
+			return new ChargeUpToMaxSocStrategy(charger, ev, vehicleMaximumSoc);
 		}
 	}
 }
