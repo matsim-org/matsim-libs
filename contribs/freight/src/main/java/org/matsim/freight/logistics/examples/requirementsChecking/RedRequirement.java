@@ -43,7 +43,8 @@
 package org.matsim.freight.logistics.examples.requirementsChecking;
 
 import org.matsim.freight.logistics.LogisticChain;
-import logistics.shipment.LspShipmentRequirement;
+import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
+
 
 /*package-private*/ class RedRequirement implements LspShipmentRequirement {
 

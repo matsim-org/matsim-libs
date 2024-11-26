@@ -48,7 +48,7 @@ import org.matsim.freight.logistics.InitialShipmentAssigner;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.LspShipment;
-import logistics.shipment.LspShipmentRequirement;
+import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
 
 class RequirementsAssigner implements InitialShipmentAssigner {
 

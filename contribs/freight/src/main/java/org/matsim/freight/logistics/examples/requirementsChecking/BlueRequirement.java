@@ -45,7 +45,7 @@ package org.matsim.freight.logistics.examples.requirementsChecking;
 import static org.matsim.freight.logistics.examples.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
 
 import org.matsim.freight.logistics.LogisticChain;
-import logistics.shipment.LspShipmentRequirement;
+import org.matsim.freight.logistics.shipment.LspShipmentRequirement;
 
 /*package-private*/ class BlueRequirement implements LspShipmentRequirement {
 
