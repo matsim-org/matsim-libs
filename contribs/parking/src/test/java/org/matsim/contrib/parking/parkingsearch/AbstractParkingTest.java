@@ -26,23 +26,34 @@ public abstract class AbstractParkingTest {
 	abstract ParkingSearchStrategy getParkingSearchStrategy();
 
 	@Test
-	void testParking100() {
-		ParkingSearchConfigGroup parkingSearchConfigGroup = prepare();
-		run(parkingSearchConfigGroup);
+	void testParking1() {
+		Config config = getConfig(getParkingConfig());
+		config.plans().setInputFile("population1.xml");
+		run(config);
 		validate();
 	}
 
-	private ParkingSearchConfigGroup prepare() {
+	@Test
+	void testParking100() {
+		Config config = getConfig(getParkingConfig());
+		run(config);
+		validate();
+	}
+
+	private ParkingSearchConfigGroup getParkingConfig() {
 		ParkingSearchConfigGroup parkingSearchConfigGroup = new ParkingSearchConfigGroup();
 		parkingSearchConfigGroup.setParkingSearchStrategy(getParkingSearchStrategy());
 		return parkingSearchConfigGroup;
 	}
 
-	void run(ParkingSearchConfigGroup parkingSearchConfigGroup) {
+	private Config getConfig(ParkingSearchConfigGroup parkingSearchConfigGroup) {
 		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", parkingSearchConfigGroup);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
+		return config;
+	}
 
+	private void run(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controller controller = ControllerUtils.createController(scenario);
@@ -50,7 +61,7 @@ public abstract class AbstractParkingTest {
 		controller.run();
 	}
 
-	void validate() {
+	private void validate() {
 		Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
 
