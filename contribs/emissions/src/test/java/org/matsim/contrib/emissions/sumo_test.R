@@ -6,7 +6,7 @@ typeof(sumo_output$NOx)
 
 bla <- sumo_output %>%
   mutate(NOx = as.numeric(NOx), velocity = as.numeric(velocity)) %>%
-  mutate(avg_nox = (NOx / 1000) / (velocity / 1000)) %>%
+  mutate(avg_nox = (NOx / 1000) / (velocity / 3600)) %>%
   filter(!is.infinite(avg_nox))
 
 mean(bla$avg_nox)
