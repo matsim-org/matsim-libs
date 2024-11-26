@@ -295,7 +295,7 @@ public class PHEMTest {
 				var matsim_em = link_pollutant2grams.get(i);
 				var sumo_em = sumoSegments.get(i).NOx();
 				var matsim_em_g_km = matsim_em.get(Pollutant.NOx) / ((double) length_m / 1000);
-				var sumo_em_g_km = sumo_em / ((double) length_m / 1000);
+				var sumo_em_g_km = (sumo_em/1000) / ((double) length_m / 1000);
 				System.out.println("Link " + i + ": MATSim NOx=" + matsim_em_g_km + " g/km, SUMO NOx=" + sumo_em_g_km + " g/km");
 			}
 		}
