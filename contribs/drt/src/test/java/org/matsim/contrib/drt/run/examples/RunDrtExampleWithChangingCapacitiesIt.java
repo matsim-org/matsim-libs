@@ -185,6 +185,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			public void install() {
 				// All vehicles start with a compatibility with persons
 				bindModal(DvrpLoadFromFleet.class).toInstance((capacity, vehicleId) -> PERSONS_LOAD_FACTORY.fromInt(capacity));
+				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(PERSONS_LOAD_FACTORY, GOODS_LOAD_FACTORY));
 			}
 		});
 
@@ -251,6 +252,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			public void install() {
 				// All vehicles start with a compatibility with persons
 				bindModal(DvrpLoadFromFleet.class).toInstance((capacity, vehicleId) -> PERSONS_LOAD_FACTORY.fromInt(capacity));
+				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(PERSONS_LOAD_FACTORY, GOODS_LOAD_FACTORY));
 			}
 		});
 

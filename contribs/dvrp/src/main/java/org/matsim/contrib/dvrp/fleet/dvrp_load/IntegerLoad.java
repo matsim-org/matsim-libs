@@ -90,4 +90,13 @@ public class IntegerLoad extends ScalarLoad {
 	public Number[] asArray() {
 		return new Number[]{this.getLoad()};
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(!o.getClass().equals(this.getClass())) {
+			return false;
+		}
+		IntegerLoad otherLoad = (IntegerLoad) o;
+		return this.getType().equals(otherLoad.getType()) && this.getLoad() == otherLoad.getLoad();
+	}
 }

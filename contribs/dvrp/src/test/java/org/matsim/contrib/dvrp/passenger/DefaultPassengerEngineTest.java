@@ -168,6 +168,7 @@ public class DefaultPassengerEngineTest {
 	private QSim createQSim(PassengerRequestValidator requestValidator, Class<? extends VrpOptimizer> optimizerClass) {
 		return new QSimBuilder(fixture.config).useDefaults()
 				.addOverridingModule(new MobsimScopeEventHandlingModule())
+				.addOverridingModule(new DvrpLoadModule(MODE))
 				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.DEFAULT))
 				.addQSimModule(new VrpAgentSourceQSimModule(MODE))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {

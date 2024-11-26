@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
@@ -48,14 +49,18 @@ public final class VrpAgentLogic implements DynAgentLogic {
 	private final String dvrpMode;
 	private final EventsManager eventsManager;
 	private DynAgent agent;
+	private final DvrpLoadSerializer dvrpLoadSerializer;
+	private boolean firstTaskStarted;
 
 	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle,
-			String dvrpMode, EventsManager eventsManager) {
+						 String dvrpMode, EventsManager eventsManager, DvrpLoadSerializer dvrpLoadSerializer) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
 		this.vehicle = vehicle;
 		this.dvrpMode = dvrpMode;
 		this.eventsManager = eventsManager;
+		this.dvrpLoadSerializer = dvrpLoadSerializer;
+		this.firstTaskStarted = false;
 	}
 
 	@Override
@@ -78,6 +83,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 		// Additionally, the effect of task initialisation (DynActionCreator) should be visible to other threads
 		// calling the optimiser/scheduler
 
+
 		synchronized (optimizer) {
 			Schedule schedule = vehicle.getSchedule();
 			switch (schedule.getStatus()) {
@@ -86,10 +92,10 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 				case STARTED:
 					Task task = schedule.getCurrentTask();
-					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					if(task instanceof CapacityChangeTask capacityChangeTask) {
-						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, vehicle.getId(), capacityChangeTask.getNewVehicleCapacity()));
+						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, vehicle.getId(), capacityChangeTask.getNewVehicleCapacity(), dvrpLoadSerializer.serialize(capacityChangeTask.getNewVehicleCapacity())));
 					}
+					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					break;
 
 				case PLANNED:
@@ -107,6 +113,10 @@ public final class VrpAgentLogic implements DynAgentLogic {
 					Task task = schedule.getCurrentTask();
 					eventsManager.processEvent(
 							new TaskStartedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
+					if(!firstTaskStarted) {
+						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, vehicle.getId(), vehicle.getCapacity(), dvrpLoadSerializer.serialize(vehicle.getCapacity())));
+					}
+					firstTaskStarted = true;
 					return dynActionCreator.createAction(agent, vehicle, now);
 
 				case COMPLETED:
