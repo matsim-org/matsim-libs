@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.parking.parkingsearch.sim;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
@@ -38,16 +40,13 @@ import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogi
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author jbischoff
@@ -56,27 +55,27 @@ import com.google.inject.name.Names;
 public class SetupParking {
 	// TODO: create config group and make this all configurable?
 
-	static public void installParkingModules(Controler controler) {
+	static public void installParkingModules(Controller controller) {
 		// No need to route car routes in Routing module in advance, as they are
 		// calculated on the fly
-		if (!controler.getConfig().getModules().containsKey(DvrpConfigGroup.GROUP_NAME)) {
-			controler.getConfig().addModule(new DvrpConfigGroup());
+		if (!controller.getConfig().getModules().containsKey(DvrpConfigGroup.GROUP_NAME)) {
+			controller.getConfig().addModule(new DvrpConfigGroup());
 		}
 
-		controler.addOverridingModule(new DvrpTravelTimeModule());
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new DvrpTravelTimeModule());
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(TravelTime.class).annotatedWith(DvrpModes.mode(TransportMode.car))
-						.to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
+									  .to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 				bind(TravelDisutilityFactory.class).annotatedWith(DvrpModes.mode(TransportMode.car))
-						.toInstance(TimeAsTravelDisutility::new);
+												   .toInstance(TimeAsTravelDisutility::new);
 				bind(Network.class).annotatedWith(DvrpModes.mode(TransportMode.car))
-						.to(Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
+								   .to(Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
 				install(new DvrpModeRoutingModule(TransportMode.car, new SpeedyALTFactory()));
 				bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
-						.to(Network.class)
-						.asEagerSingleton();
+								   .to(Network.class)
+								   .asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				this.install(new ParkingSearchQSimModule());
 				addControlerListenerBinding().to(ParkingListener.class);
@@ -85,12 +84,12 @@ public class SetupParking {
 			}
 		});
 
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				QSimComponentsConfig components = new QSimComponentsConfig();
 
-				new StandardQSimComponentConfigurator(controler.getConfig()).configure(components);
+				new StandardQSimComponentConfigurator(controller.getConfig()).configure(components);
 				components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
 				components.addNamedComponent(ParkingSearchPopulationModule.COMPONENT_NAME);
 
