@@ -26,39 +26,48 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
+	private final ElectricVehicle ev;
 	private final ChargerSpecification charger;
 	private final double maxSoc;
 
-	public ChargeUpToMaxSocStrategy(ChargerSpecification charger, double maxSoc) {
+	public ChargeUpToMaxSocStrategy(ChargerSpecification charger, ElectricVehicle ev, double maxSoc) {
 		if (maxSoc < 0 || maxSoc > 1) {
 			throw new IllegalArgumentException();
 		}
 		this.charger = charger;
 		this.maxSoc = maxSoc;
+		this.ev = ev;
 	}
 
 	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+	public double calcRemainingEnergyToCharge() {
 		Battery battery = ev.getBattery();
 		return maxSoc * battery.getCapacity() - battery.getCharge();
 	}
 
 	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
+	public double calcRemainingTimeToCharge() {
+		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge());
 	}
 
 	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
+	public boolean isChargingCompleted() {
+		return calcRemainingEnergyToCharge() <= 0;
 	}
 
 	static public class Factory implements ChargingStrategy.Factory {
+		private final double maxSoc;
+
+		public Factory(double maxSoc) {
+			this.maxSoc = maxSoc;
+		}		
+
 		@Override
-		public ChargingStrategy createStrategy(ChargerSpecification charger) {
-			return new ChargeUpToMaxSocStrategy(charger, 1.0);
+		public ChargingStrategy createStrategy(ChargerSpecification charger, ElectricVehicle ev) {
+			return new ChargeUpToMaxSocStrategy(charger, ev, maxSoc);
 		}
 	}
 }

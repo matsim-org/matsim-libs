@@ -32,16 +32,16 @@ import org.matsim.vehicles.Vehicle;
 
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
 		implements ChargingWithAssignmentLogic {
-	private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ChargingVehicle> assignedVehicles = new LinkedHashMap<>();
 
-	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
-			EventsManager eventsManager) {
-		super(charger, chargingStrategy, eventsManager);
+	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, EventsManager eventsManager) {
+		super(charger, eventsManager);
 	}
 
 	@Override
-	public void assignVehicle(ElectricVehicle ev) {
-		if (assignedVehicles.put(ev.getId(), ev) != null) {
+	public void assignVehicle(ElectricVehicle ev, ChargingStrategy strategy) {
+		ChargingVehicle cv = new ChargingVehicle(ev, strategy);
+		if (assignedVehicles.put(ev.getId(), cv) != null) {
 			throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
 		}
 	}
@@ -53,27 +53,29 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		}
 	}
 
-	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
+	@Override
+	public boolean isAssigned(ElectricVehicle ev) {
+		return assignedVehicles.containsKey(ev.getId());
+	}
+
+	private final Collection<ChargingVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
 			assignedVehicles.values());
 
 	@Override
-	public Collection<ElectricVehicle> getAssignedVehicles() {
+	public Collection<ChargingVehicle> getAssignedVehicles() {
 		return unmodifiableAssignedVehicles;
 	}
 
 	static public class Factory implements ChargingLogic.Factory {
-		private final ChargingStrategy.Factory strategyFactory;
 		private final EventsManager eventsManager;
 
-		public Factory(ChargingStrategy.Factory strategyFactory, EventsManager eventsManager) {
-			this.strategyFactory = strategyFactory;
+		public Factory(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
 		}
 
 		@Override
 		public ChargingLogic create(ChargerSpecification charger) {
-			ChargingStrategy startegy = strategyFactory.createStrategy(charger);
-			return new ChargingWithQueueingAndAssignmentLogic(charger, startegy, eventsManager);
+			return new ChargingWithQueueingAndAssignmentLogic(charger, eventsManager);
 		}
 	}
 }

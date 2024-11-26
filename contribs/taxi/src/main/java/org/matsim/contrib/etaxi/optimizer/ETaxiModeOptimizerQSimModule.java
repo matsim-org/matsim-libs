@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
@@ -102,6 +103,10 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					@Inject
 					private EventsManager events;
 
+					@Inject
+					// note: this could be modal now! /sh, nov'24
+					private ChargingStrategy.Factory chargingStrategyFactory;
+
 					@Override
 					public ETaxiScheduler get() {
 						var travelTime = getModalInstance(TravelTime.class);
@@ -114,7 +119,7 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(
 								network, travelDisutility, travelTime);
 						return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator,
-								events, timer);
+								events, timer, chargingStrategyFactory);
 					}
 				});
 

@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -63,6 +64,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> null)
 		).asEagerSingleton();
 
+		// note: the ChargingStrategy.Factory could also become modal! // sh, nov'24
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new EDrtShiftDispatcherImpl(((EShiftTaskScheduler) getter.getModal(ShiftTaskScheduler.class)),
 						getter.getModal(ChargingInfrastructure.class), drtShiftParams, getter.getModal(OperationFacilities.class),
@@ -72,7 +74,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 								drtShiftParams, new EDrtShiftStartLogic(new DefaultShiftStartLogic()),
 								new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams),
 								getter.getModal(ShiftScheduler.class)),
-						getter.getModal(Fleet.class)))
+						getter.getModal(Fleet.class), getter.get(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
@@ -83,11 +85,13 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class)))).in(Singleton.class);
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
+		// note: the ChargingStrategy.Factory could also become modal! // sh, nov'24
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
 						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams, getter.getModal(ChargingInfrastructure.class),
-						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class))
+						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class),
+						getter.get(ChargingStrategy.Factory.class))
 		)).asEagerSingleton();
 
 		// See EDrtModeOptimizerQSimModule

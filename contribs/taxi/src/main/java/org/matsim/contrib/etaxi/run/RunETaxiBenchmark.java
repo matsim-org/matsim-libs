@@ -113,7 +113,7 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
-				bind(ChargingStrategy.Factory.class).toInstance(charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC));
+				bind(ChargingStrategy.Factory.class).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				//TODO switch to VariableSpeedCharging for Nissan
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);

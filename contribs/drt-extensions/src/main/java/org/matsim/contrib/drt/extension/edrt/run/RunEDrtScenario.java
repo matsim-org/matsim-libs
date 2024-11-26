@@ -72,7 +72,7 @@ public class RunEDrtScenario {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
-				bind(ChargingStrategy.Factory.class).toInstance(charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC));
+				bind(ChargingStrategy.Factory.class).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

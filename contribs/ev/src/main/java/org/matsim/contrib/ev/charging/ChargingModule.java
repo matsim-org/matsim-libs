@@ -25,8 +25,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
@@ -40,7 +38,7 @@ public class ChargingModule extends AbstractModule {
 		bind(ChargingLogic.Factory.class).to(ChargingWithQueueingLogic.Factory.class);
 
 		// By default, charging strategy that chargers to 100% is used
-		bind(ChargingStrategy.Factory.class).to(ChargeUpToMaxSocStrategy.Factory.class);
+		bind(ChargingStrategy.Factory.class).toInstance(new ChargeUpToMaxSocStrategy.Factory(1.0));
 
 		// The following returns the charging power/speed for a vehicle:
 		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
@@ -59,12 +57,12 @@ public class ChargingModule extends AbstractModule {
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingStrategy.Factory strategyFactory) {
-		return new ChargingWithQueueingLogic.Factory(strategyFactory, eventsManager);
+	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager) {
+		return new ChargingWithQueueingLogic.Factory(eventsManager);
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingStrategy.Factory strategyFactory) {
-		return new ChargingWithQueueingAndAssignmentLogic.Factory(strategyFactory, eventsManager);
+	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager) {
+		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager);
 	}
 }

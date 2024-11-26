@@ -23,16 +23,17 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author michalm
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public interface ChargingStrategy {
-	boolean isChargingCompleted(ElectricVehicle ev);
+	boolean isChargingCompleted();
 
-	double calcRemainingEnergyToCharge(ElectricVehicle ev);
+	double calcRemainingEnergyToCharge();
 
 	//XXX should include potentially longer charging if AUX remains turned on
-	double calcRemainingTimeToCharge(ElectricVehicle ev);
+	double calcRemainingTimeToCharge();
 
 	static public interface Factory {
-		ChargingStrategy createStrategy(ChargerSpecification charger);
+		ChargingStrategy createStrategy(ChargerSpecification charger, ElectricVehicle ev);
 	}
 }
