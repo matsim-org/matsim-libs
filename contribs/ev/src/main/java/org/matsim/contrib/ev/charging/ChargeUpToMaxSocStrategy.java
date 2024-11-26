@@ -49,4 +49,9 @@ public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
 	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
 		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
 	}
+
+	@Override
+	public boolean isChargingCompleted(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) <= 0;
+	}
 }
