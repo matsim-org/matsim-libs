@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  * @author sschroeder
  *
  */
-public final class CarrierShipment implements Attributable {
+public final class CarrierShipment implements CarrierJob {
 
 	/**
 	 * A builder that builds shipments.
