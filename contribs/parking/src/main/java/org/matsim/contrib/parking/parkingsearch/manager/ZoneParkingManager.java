@@ -23,9 +23,9 @@ import java.util.Set;
  */
 public class ZoneParkingManager extends FacilityBasedParkingManager {
 
-	private HashMap<String, HashSet<Id<Link>>> linksOfZone;
-	private HashMap<String, Double> totalCapOfZone;
-	private HashMap<String, Double> occupationOfZone;
+	private final HashMap<String, HashSet<Id<Link>>> linksByZone;
+	private final HashMap<String, Double> totalCapByZone;
+	private final HashMap<String, Double> occupationByZone;
 
 	/**
 	 * @param scenario
@@ -34,17 +34,17 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	public ZoneParkingManager(Scenario scenario, String[] pathToZoneTxtFiles) {
 		super(scenario);
 
-		this.linksOfZone = new HashMap<String, HashSet<Id<Link>>>();
-		this.totalCapOfZone = new HashMap<String, Double>();
-		this.occupationOfZone = new HashMap<String, Double>();
+		this.linksByZone = new HashMap<String, HashSet<Id<Link>>>();
+		this.totalCapByZone = new HashMap<String, Double>();
+		this.occupationByZone = new HashMap<String, Double>();
 
 		for (String zone : pathToZoneTxtFiles) {
 			readZone(zone);
 		}
 
-		for (String zone : this.linksOfZone.keySet()) {
+		for (String zone : this.linksByZone.keySet()) {
 			calculateTotalZoneParkCapacity(zone);
-			this.occupationOfZone.put(zone, 0.0);
+			this.occupationByZone.put(zone, 0.0);
 		}
 	}
 
@@ -73,35 +73,37 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 
 		});
 
-		this.linksOfZone.put(zone, links);
+		this.linksByZone.put(zone, links);
 	}
 
 	private void calculateTotalZoneParkCapacity(String zoneName) {
 		double cap = 0.0;
-		for (Id<Link> link : this.linksOfZone.get(zoneName)) {
+		for (Id<Link> link : this.linksByZone.get(zoneName)) {
 			cap += getNrOfAllParkingSpacesOnLink(link);
 		}
-		this.totalCapOfZone.put(zoneName, cap);
+		this.totalCapByZone.put(zoneName, cap);
 	}
 
 
 	@Override
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (parkVehicleAtLink(vehicleId, linkId, time)) {
-			for (String zone : this.linksOfZone.keySet()) {
-				if (linksOfZone.get(zone).contains(linkId) && this.parkingFacilitiesByLink.containsKey(linkId)) {
-					double newOcc = this.occupationOfZone.get(zone) + 1;
-					if (this.totalCapOfZone.get(zone) < newOcc) {
-						String s = "FacilityID: " + this.parkingLocations.get(vehicleId);
-						String t = "Occupied: " + this.infoByFacilityId.get(this.parkingLocations.get(vehicleId)).occupation;
-						String u = "Capacity: " + this.parkingFacilitiesById.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(
-							ParkingUtils.ParkingStageInteractionType).getCapacity();
+			for (String zone : this.linksByZone.keySet()) {
+				if (linksByZone.get(zone).contains(linkId) && this.parkingFacilitiesByLink.containsKey(linkId)) {
+					double newOcc = this.occupationByZone.get(zone) + 1;
+					if (this.totalCapByZone.get(zone) < newOcc) {
+						String s = "FacilityID: " + this.parkingFacilityLocationByVehicleId.get(vehicleId);
+						String t = "Occupied: " + this.infoByFacilityId.get(this.parkingFacilityLocationByVehicleId.get(vehicleId)).occupation;
+						String u =
+							"Capacity: " + this.parkingFacilitiesById.get(this.parkingFacilityLocationByVehicleId.get(vehicleId)).getActivityOptions()
+																	 .get(
+																		 ParkingUtils.ParkingStageInteractionType).getCapacity();
 						String v = "TotalCapacityOnLink: " + getNrOfAllParkingSpacesOnLink(linkId);
-						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapOfZone.get(
+						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapByZone.get(
 							zone) + "  occupancy=" + newOcc + "time = " + time
 							+ "\n" + s + "\n" + t + "\n" + u + "\n" + v);
 					}
-					this.occupationOfZone.put(zone, newOcc);
+					this.occupationByZone.put(zone, newOcc);
 					return true;                                // assumes: link is only part of exactly 1 zone
 				}
 			}
@@ -113,22 +115,22 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 
 	@Override
 	public boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		if (!this.parkingLocations.containsKey(vehicleId)) {
+		if (!this.parkingFacilityLocationByVehicleId.containsKey(vehicleId)) {
 			return true;
 			// we assume the person parks somewhere else
 		} else {
-			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
+			Id<ActivityFacility> fac = this.parkingFacilityLocationByVehicleId.remove(vehicleId);
 			this.infoByFacilityId.get(fac).occupation--;
 
 			Id<Link> parkingLink = this.parkingFacilitiesById.get(fac).getLinkId();
-			for (String zone : this.linksOfZone.keySet()) {
-				if (linksOfZone.get(zone).contains(parkingLink)) {
-					double newOcc = this.occupationOfZone.get(zone) - 1;
+			for (String zone : this.linksByZone.keySet()) {
+				if (linksByZone.get(zone).contains(parkingLink)) {
+					double newOcc = this.occupationByZone.get(zone) - 1;
 					if (newOcc < 0) {
 						//in iteration 0 agents can "leave parking spaces" (get into traffic), but the manager didn't record them to be parked
 						newOcc = 0;
 					}
-					this.occupationOfZone.put(zone, newOcc);
+					this.occupationByZone.put(zone, newOcc);
 				}
 			}
 			return true;
@@ -137,19 +139,19 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 
 
 	public double getOccupancyRatioOfZone(String zone) {
-		if (!(this.linksOfZone.keySet().contains(zone))) {
+		if (!(this.linksByZone.keySet().contains(zone))) {
 			throw new RuntimeException("zone " + zone + " was not defined. thus, could'nt calculate occupancy ratio.");
 		}
 
-		return (this.occupationOfZone.get(zone) / this.totalCapOfZone.get(zone));
+		return (this.occupationByZone.get(zone) / this.totalCapByZone.get(zone));
 	}
 
 	public Set<String> getZones() {
-		return this.linksOfZone.keySet();
+		return this.linksByZone.keySet();
 	}
 
 	public double getTotalCapacityOfZone(String zone) {
-		return this.totalCapOfZone.get(zone);
+		return this.totalCapByZone.get(zone);
 	}
 
 }
