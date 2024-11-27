@@ -22,10 +22,10 @@ package org.matsim.contrib.parking.parkingsearch.manager;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
@@ -42,64 +42,56 @@ import java.util.Map.Entry;
  * @author jbischoff, schlenther, Ricardo Ewert
  */
 public class FacilityBasedParkingManager implements ParkingSearchManager {
+	private static final Logger logger = LogManager.getLogger(FacilityBasedParkingManager.class);
 
 	protected Map<Id<Link>, Integer> capacity = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> occupation = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> reservationsRequests = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> rejectedParkingRequest = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> numberOfParkedVehicles = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> numberOfWaitingActivities = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> numberOfStaysFromGetOffUntilGetIn = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> numberOfParkingBeforeGetIn = new HashMap<>();
-	protected Map<Id<Link>, TreeMap<Double, Id<Vehicle>>> waitingVehicles = new HashMap<>();
+	protected Map<Id<ActivityFacility>, ParkingFacilityInfo> infoByFacilityId = new HashMap<>();
+
+	protected Map<Id<Link>, TreeMap<Double, Id<Vehicle>>> waitingVehiclesByLinkId = new HashMap<>();
 	protected TreeMap<Integer, MutableLong> rejectedReservationsByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> foundParkingByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> unparkByTime = new TreeMap<>();
-	protected Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities;
+	protected Map<Id<ActivityFacility>, ActivityFacility> parkingFacilitiesById;
 	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
 	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
-	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
-	protected Network network;
+	protected Map<Id<Link>, Set<Id<ActivityFacility>>> parkingFacilitiesByLink = new HashMap<>();
 	protected ParkingSearchConfigGroup psConfigGroup;
-	protected boolean canParkOnlyAtFacilities;
 	private QSim qsim;
 	private final int maxSlotIndex;
 	private final int maxTime;
 	private final int timeBinSize;
 	private final int startTime;
 
+	protected static class ParkingFacilityInfo {
+		protected long occupation = 0;
+		protected long reservationRequests = 0;
+		protected long rejectedParkingRequests = 0;
+		protected long parkedVehiclesCount = 0;
+		protected long waitingActivitiesCount = 0;
+		protected long staysFromGetOffUntilGetIn = 0;
+		protected long parkingBeforeGetInCount = 0;
+	}
+
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
-		psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(
-			ParkingSearchConfigGroup.GROUP_NAME);
-		canParkOnlyAtFacilities = psConfigGroup.getCanParkOnlyAtFacilities();
-		this.network = scenario.getNetwork();
-		parkingFacilities = scenario.getActivityFacilities()
-									.getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
-		LogManager.getLogger(getClass()).info(parkingFacilities.toString());
+		psConfigGroup = (ParkingSearchConfigGroup) scenario.getConfig().getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+		parkingFacilitiesById = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
+
+		logger.info(parkingFacilitiesById.toString());
+
 		this.timeBinSize = 15 * 60;
 		this.maxTime = 24 * 3600 - 1;
 		this.maxSlotIndex = (this.maxTime / this.timeBinSize) + 1;
 		this.startTime = 9 * 3600; //TODO yyyy? this is a magic variable and should either be deleted or configurable, paul nov '24
 
-		for (ActivityFacility fac : this.parkingFacilities.values()) {
-			Id<Link> linkId = fac.getLinkId();
-			Set<Id<ActivityFacility>> parkingOnLink = new HashSet<>();
-			if (this.facilitiesPerLink.containsKey(linkId)) {
-				parkingOnLink = this.facilitiesPerLink.get(linkId);
-			}
-			parkingOnLink.add(fac.getId());
-			this.facilitiesPerLink.put(linkId, parkingOnLink);
-			this.waitingVehicles.computeIfAbsent(linkId, (k) -> new TreeMap<>());
-			this.occupation.put(fac.getId(), new MutableLong(0));
-			this.reservationsRequests.put(fac.getId(), new MutableLong(0));
-			this.rejectedParkingRequest.put(fac.getId(), new MutableLong(0));
-			this.numberOfParkedVehicles.put(fac.getId(), new MutableLong(0));
-			this.numberOfWaitingActivities.put(fac.getId(), new MutableLong(0));
-			this.numberOfStaysFromGetOffUntilGetIn.put(fac.getId(), new MutableLong(0));
-			this.numberOfParkingBeforeGetIn.put(fac.getId(), new MutableLong(0));
+		for (ActivityFacility fac : this.parkingFacilitiesById.values()) {
+			initParkingFacility(fac);
 		}
+		initReporting();
+	}
+
+	private void initReporting() {
 		int slotIndex = getTimeSlotIndex(startTime);
 		while (slotIndex <= maxSlotIndex) {
 			rejectedReservationsByTime.put(slotIndex * timeBinSize, new MutableLong(0));
@@ -109,17 +101,22 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 	}
 
+	private void initParkingFacility(ActivityFacility fac) {
+		Id<Link> linkId = fac.getLinkId();
+		Set<Id<ActivityFacility>> parkingOnLink = new HashSet<>();
+		if (this.parkingFacilitiesByLink.containsKey(linkId)) {
+			parkingOnLink = this.parkingFacilitiesByLink.get(linkId);
+		}
+		parkingOnLink.add(fac.getId());
+		this.parkingFacilitiesByLink.put(linkId, parkingOnLink);
+		this.waitingVehiclesByLinkId.computeIfAbsent(linkId, (k) -> new TreeMap<>());
+
+		this.infoByFacilityId.put(fac.getId(), new ParkingFacilityInfo());
+	}
+
 	@Override
 	public boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
-		boolean canPark = false;
-
-		if (linkIdHasAvailableParkingForVehicle(linkId, vehicleId)) {
-			canPark = true;
-			// LogManager.getLogger(getClass()).info("veh: "+vehicleId+" link
-			// "+linkId + " can park "+canPark);
-		}
-
-		return canPark;
+		return linkIdHasAvailableParkingForVehicle(linkId, vehicleId);
 	}
 
 	/**
@@ -133,17 +130,17 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	 * @return
 	 */
 	public boolean canParkAtThisFacilityUntilEnd(Id<Link> linkId, double stopDuration, double getOffDuration, double pickUpDuration, double now) {
-		Set<Id<ActivityFacility>> facilities = this.facilitiesPerLink.get(linkId);
+		Set<Id<ActivityFacility>> facilities = this.parkingFacilitiesByLink.get(linkId);
 		if (facilities != null) {
 			double totalNeededParkingDuration = getOffDuration + stopDuration + pickUpDuration;
 			for (Id<ActivityFacility> facility : facilities) {
 				double maxParkingDurationAtFacilityInHours = Double.MAX_VALUE;
-				if (this.parkingFacilities.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) {
-					maxParkingDurationAtFacilityInHours = 3600 * (double) this.parkingFacilities.get(facility).getAttributes().getAsMap().get(
+				if (this.parkingFacilitiesById.get(facility).getAttributes().getAsMap().containsKey("maxParkingDurationInHours")) {
+					maxParkingDurationAtFacilityInHours = 3600 * (double) this.parkingFacilitiesById.get(facility).getAttributes().getAsMap().get(
 						"maxParkingDurationInHours");
 				}
 				if (maxParkingDurationAtFacilityInHours > totalNeededParkingDuration) {
-					ActivityOption parkingOptions = this.parkingFacilities.get(facility).getActivityOptions().get("parking");
+					ActivityOption parkingOptions = this.parkingFacilitiesById.get(facility).getActivityOptions().get("parking");
 					if (!parkingOptions.getOpeningTimes().isEmpty()) {
 						if ((parkingOptions.getOpeningTimes().first().getStartTime() == 0 && parkingOptions.getOpeningTimes().first()
 																										   .getEndTime() == 24 * 3600)) {
@@ -163,7 +160,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	private boolean linkIdHasAvailableParkingForVehicle(Id<Link> linkId, Id<Vehicle> vid) {
 		// LogManager.getLogger(getClass()).info("link "+linkId+" vehicle "+vid);
-		if (!this.facilitiesPerLink.containsKey(linkId) && !canParkOnlyAtFacilities) {
+		if (!this.parkingFacilitiesByLink.containsKey(linkId) && !psConfigGroup.getCanParkOnlyAtFacilities()) {
 			// this implies: If no parking facility is present, we suppose that
 			// we can park freely (i.e. the matsim standard approach)
 			// it also means: a link without any parking spaces should have a
@@ -172,23 +169,23 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// space, we will say yes "+linkId);
 
 			return true;
-		} else if (!this.facilitiesPerLink.containsKey(linkId)) {
+		} else if (!this.parkingFacilitiesByLink.containsKey(linkId)) {
 			return false;
 		}
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.parkingFacilitiesByLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
-											   .getCapacity();
-			this.reservationsRequests.get(fac).increment();
-			if (this.occupation.get(fac).doubleValue() < cap) {
+			double cap = this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
+												   .getCapacity();
+			this.infoByFacilityId.get(fac).reservationRequests++;
+			if (this.infoByFacilityId.get(fac).occupation < cap) {
 				// LogManager.getLogger(getClass()).info("occ:
 				// "+this.occupation.get(fac).toString()+" cap: "+cap);
-				this.occupation.get(fac).increment();
+				this.infoByFacilityId.get(fac).occupation++;
 				this.parkingReservation.put(vid, fac);
 
 				return true;
 			}
-			this.rejectedParkingRequest.get(fac).increment();
+			this.infoByFacilityId.get(fac).rejectedParkingRequests++;
 		}
 		return false;
 	}
@@ -196,7 +193,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Override
 	public Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId) {
 		if (this.parkingLocations.containsKey(vehicleId)) {
-			return this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getLinkId();
+			return this.parkingFacilitiesById.get(this.parkingLocations.get(vehicleId)).getLinkId();
 		} else {
 			return this.parkingLocationsOutsideFacilities.getOrDefault(vehicleId, null);
 		}
@@ -208,7 +205,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.parkingFacilitiesByLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);
 			return true;
@@ -216,7 +213,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			Id<ActivityFacility> fac = this.parkingReservation.remove(vehicleId);
 			if (fac != null) {
 				this.parkingLocations.put(vehicleId, fac);
-				this.numberOfParkedVehicles.get(fac).increment();
+				this.infoByFacilityId.get(fac).parkedVehiclesCount++;
 				int timeSlot = getTimeSlotIndex(time) * timeBinSize;
 				foundParkingByTime.putIfAbsent(timeSlot, new MutableLong(0));
 				foundParkingByTime.get(timeSlot).increment();
@@ -237,7 +234,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
-			this.occupation.get(fac).decrement();
+			this.infoByFacilityId.get(fac).occupation--;
 			int timeSlot = getTimeSlotIndex(time) * timeBinSize;
 			unparkByTime.putIfAbsent(timeSlot, new MutableLong(0));
 			unparkByTime.get(timeSlot).increment();
@@ -248,20 +245,19 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Override
 	public List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
-		for (Entry<Id<ActivityFacility>, MutableLong> e : this.occupation.entrySet()) {
-			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
-			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
-													.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
-			double x = this.parkingFacilities.get(e.getKey()).getCoord().getX();
-			double y = this.parkingFacilities.get(e.getKey()).getCoord().getY();
+		for (Entry<Id<ActivityFacility>, ParkingFacilityInfo> e : this.infoByFacilityId.entrySet()) {
+			Id<Link> linkId = this.parkingFacilitiesById.get(e.getKey()).getLinkId();
+			double capacity = this.parkingFacilitiesById.get(e.getKey()).getActivityOptions()
+														.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+			double x = this.parkingFacilitiesById.get(e.getKey()).getCoord().getX();
+			double y = this.parkingFacilitiesById.get(e.getKey()).getCoord().getY();
 
-			String s = linkId.toString() + ";" + x + ";" + y + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue()
-																													 .toString() + ";" + this.reservationsRequests.get(
-				e.getKey()).toString() + ";" + this.numberOfParkedVehicles.get(e.getKey()).toString() + ";" + this.rejectedParkingRequest.get(
-				e.getKey()).toString() + ";" + this.numberOfWaitingActivities.get(
-				e.getKey()).toString() + ";" + this.numberOfStaysFromGetOffUntilGetIn.get(e.getKey())
-																					 .intValue() + ";" + this.numberOfParkingBeforeGetIn.get(e.getKey())
-																																		.intValue();
+			String facilityId = e.getKey().toString();
+			ParkingFacilityInfo info = e.getValue();
+			String s =
+				linkId.toString() + ";" + x + ";" + y + ";" + facilityId + ";" + capacity + ";" + info.occupation + ";" + info.reservationRequests +
+					";" + info.parkedVehiclesCount + ";" + info.rejectedParkingRequests + ";" + info.waitingActivitiesCount + ";" +
+					info.staysFromGetOffUntilGetIn + ";" + info.parkingBeforeGetInCount;
 			stats.add(s);
 		}
 		return stats;
@@ -281,10 +277,10 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	public double getNrOfAllParkingSpacesOnLink(Id<Link> linkId) {
 		double allSpaces = 0;
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.parkingFacilitiesByLink.get(linkId);
 		if (!(parkingFacilitiesAtLink == null)) {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+				allSpaces += this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 			}
 		}
 		return allSpaces;
@@ -292,20 +288,20 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	public double getNrOfFreeParkingSpacesOnLink(Id<Link> linkId) {
 		double allFreeSpaces = 0;
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.parkingFacilitiesByLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			return 0;
 		} else {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
-				allFreeSpaces += (cap - this.occupation.get(fac).intValue());
+				int cap = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+				allFreeSpaces += (cap - this.infoByFacilityId.get(fac).occupation);
 			}
 		}
 		return allFreeSpaces;
 	}
 
-	public Map<Id<ActivityFacility>, ActivityFacility> getParkingFacilities() {
-		return this.parkingFacilities;
+	public Map<Id<ActivityFacility>, ActivityFacility> getParkingFacilitiesById() {
+		return this.parkingFacilitiesById;
 	}
 
 	public void registerRejectedReservation(double now) {
@@ -349,36 +345,32 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	@Override
 	public void reset(int iteration) {
-		for (Id<ActivityFacility> fac : this.rejectedParkingRequest.keySet()) {
-			this.rejectedParkingRequest.get(fac).setValue(0);
-			this.reservationsRequests.get(fac).setValue(0);
-			this.numberOfParkedVehicles.get(fac).setValue(0);
-			this.numberOfWaitingActivities.get(fac).setValue(0);
-		}
-		waitingVehicles.clear();
+		infoByFacilityId.replaceAll((k, v) -> new ParkingFacilityInfo());
+		waitingVehiclesByLinkId.clear();
 	}
 
 	public void addVehicleForWaitingForParking(Id<Link> linkId, Id<Vehicle> vehicleId, double now) {
 //		System.out.println(now + ": vehicle " +vehicleId.toString() + " starts waiting here: " + linkId.toString());
-		waitingVehicles.get(linkId).put(now + getParkStageActivityDuration() + 1, vehicleId);
-		for (Id<ActivityFacility> fac : this.facilitiesPerLink.get(linkId)) {
-			this.numberOfWaitingActivities.get(fac).increment();
+		waitingVehiclesByLinkId.get(linkId).put(now + getParkStageActivityDuration() + 1, vehicleId);
+		for (Id<ActivityFacility> fac : this.parkingFacilitiesByLink.get(linkId)) {
+			this.infoByFacilityId.get(fac).waitingActivitiesCount++;
 			break;
 		}
 
 	}
 
 	public void checkFreeCapacitiesForWaitingVehicles(QSim qSim, double now) {
-		for (Id<Link> linkId : waitingVehicles.keySet()) {
-			if (!waitingVehicles.get(linkId).isEmpty()) {
-				for (Id<ActivityFacility> fac : this.facilitiesPerLink.get(linkId)) {
-					int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
-					while (this.occupation.get(fac).intValue() < cap && !waitingVehicles.get(linkId).isEmpty()) {
-						double startWaitingTime = waitingVehicles.get(linkId).firstKey();
+		for (Id<Link> linkId : waitingVehiclesByLinkId.keySet()) {
+			if (!waitingVehiclesByLinkId.get(linkId).isEmpty()) {
+				for (Id<ActivityFacility> fac : this.parkingFacilitiesByLink.get(linkId)) {
+					int cap = (int) this.parkingFacilitiesById.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
+															  .getCapacity();
+					while (this.infoByFacilityId.get(fac).occupation < cap && !waitingVehiclesByLinkId.get(linkId).isEmpty()) {
+						double startWaitingTime = waitingVehiclesByLinkId.get(linkId).firstKey();
 						if (startWaitingTime > now) {
 							break;
 						}
-						Id<Vehicle> vehcileId = waitingVehicles.get(linkId).remove(startWaitingTime);
+						Id<Vehicle> vehcileId = waitingVehiclesByLinkId.get(linkId).remove(startWaitingTime);
 						DynAgent agent = (DynAgent) qSim.getAgents().get(Id.createPersonId(vehcileId.toString()));
 						reserveSpaceIfVehicleCanParkHere(vehcileId, linkId);
 						agent.endActivityAndComputeNextState(now);
@@ -394,10 +386,10 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	public void registerStayFromGetOffUntilGetIn(Id<Vehicle> vehcileId) {
-		this.numberOfStaysFromGetOffUntilGetIn.get(parkingLocations.get(vehcileId)).increment();
+		this.infoByFacilityId.get(parkingLocations.get(vehcileId)).staysFromGetOffUntilGetIn++;
 	}
 
 	public void registerParkingBeforeGetIn(Id<Vehicle> vehcileId) {
-		this.numberOfParkingBeforeGetIn.get(parkingLocations.get(vehcileId)).increment();
+		this.infoByFacilityId.get(parkingLocations.get(vehcileId)).parkingBeforeGetInCount++;
 	}
 }

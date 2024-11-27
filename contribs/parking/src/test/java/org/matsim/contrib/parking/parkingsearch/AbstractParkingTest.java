@@ -34,6 +34,14 @@ public abstract class AbstractParkingTest {
 	}
 
 	@Test
+	void testParking10() {
+		Config config = getConfig(getParkingConfig());
+		config.plans().setInputFile("population10.xml");
+		run(config);
+		validate();
+	}
+
+	@Test
 	void testParking100() {
 		Config config = getConfig(getParkingConfig());
 		run(config);
@@ -62,6 +70,26 @@ public abstract class AbstractParkingTest {
 	}
 
 	private void validate() {
+		comparePopulation();
+		compareEvents();
+		compareCsv("0.parkingStats.csv");
+		compareCsv("0.parkingStatsPerTimeSteps.csv");
+	}
+
+	private void compareCsv(String fileName) {
+		String parkingStatsOut = utils.getOutputDirectory() + "/ITERS/it.0/" + fileName;
+		String parkingStatsIn = utils.getInputDirectory() + "/" + fileName;
+		MatsimTestUtils.assertEqualFilesLineByLine(parkingStatsIn, parkingStatsOut);
+	}
+
+	private void compareEvents() {
+		String expectedEventsFile = utils.getInputDirectory() + "/output_events.xml.gz";
+		String actualEventsFile = utils.getOutputDirectory() + "/output_events.xml.gz";
+		ComparisonResult result = EventsUtils.compareEventsFiles(expectedEventsFile, actualEventsFile);
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+	}
+
+	private void comparePopulation() {
 		Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
 
@@ -73,10 +101,5 @@ public abstract class AbstractParkingTest {
 			double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
 			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
 		}
-
-		String expectedEventsFile = utils.getInputDirectory() + "/output_events.xml.gz";
-		String actualEventsFile = utils.getOutputDirectory() + "/output_events.xml.gz";
-		ComparisonResult result = EventsUtils.compareEventsFiles(expectedEventsFile, actualEventsFile);
-		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 	}
 }
