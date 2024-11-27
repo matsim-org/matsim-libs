@@ -9,11 +9,12 @@ on:
 
 jobs:
   rsync-dtds:
-    if: github.event.pull_request.merged == true  // only if PR closed by merging
+    if: github.event.pull_request.merged == true  # only if PR closed by merging
     name: sync DTDs to website
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: rsync dtds
         uses: burnett01/rsync-deployments@7.0.1
         with:
