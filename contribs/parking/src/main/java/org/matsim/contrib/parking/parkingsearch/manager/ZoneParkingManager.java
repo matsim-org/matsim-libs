@@ -52,6 +52,7 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	/**
 	 * reads in a tabular file that declares which link id's are in the monitored zone
 	 * the part between the last '/' and the file type extension in the given path is considered to be the zone name
+	 *
 	 * @param pathToZoneFile
 	 */
 	void readZone(String pathToZoneFile) {
@@ -88,12 +89,12 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (parkVehicleAtLink(vehicleId, linkId, time)) {
 			for (String zone : this.linksOfZone.keySet()) {
-				if (linksOfZone.get(zone).contains(linkId) && this.facilitiesPerLink.containsKey(linkId)) {
+				if (linksOfZone.get(zone).contains(linkId) && this.parkingFacilitiesByLink.containsKey(linkId)) {
 					double newOcc = this.occupationOfZone.get(zone) + 1;
 					if (this.totalCapOfZone.get(zone) < newOcc) {
 						String s = "FacilityID: " + this.parkingLocations.get(vehicleId);
-						String t = "Occupied: " + this.occupation.get(this.parkingLocations.get(vehicleId));
-						String u = "Capacity: " + this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(
+						String t = "Occupied: " + this.infoByFacilityId.get(this.parkingLocations.get(vehicleId)).occupation;
+						String u = "Capacity: " + this.parkingFacilitiesById.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(
 							ParkingUtils.ParkingStageInteractionType).getCapacity();
 						String v = "TotalCapacityOnLink: " + getNrOfAllParkingSpacesOnLink(linkId);
 						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapOfZone.get(
@@ -105,8 +106,9 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 				}
 			}
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	@Override
@@ -116,9 +118,9 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
-			this.occupation.get(fac).decrement();
+			this.infoByFacilityId.get(fac).occupation--;
 
-			Id<Link> parkingLink = this.parkingFacilities.get(fac).getLinkId();
+			Id<Link> parkingLink = this.parkingFacilitiesById.get(fac).getLinkId();
 			for (String zone : this.linksOfZone.keySet()) {
 				if (linksOfZone.get(zone).contains(parkingLink)) {
 					double newOcc = this.occupationOfZone.get(zone) - 1;
@@ -135,8 +137,9 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 
 
 	public double getOccupancyRatioOfZone(String zone) {
-		if (!(this.linksOfZone.keySet().contains(zone)))
+		if (!(this.linksOfZone.keySet().contains(zone))) {
 			throw new RuntimeException("zone " + zone + " was not defined. thus, could'nt calculate occupancy ratio.");
+		}
 
 		return (this.occupationOfZone.get(zone) / this.totalCapOfZone.get(zone));
 	}

@@ -28,7 +28,9 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 
 	private static final Logger logger = LogManager.getLogger(DistanceMemoryParkingSearchLogic.class);
 
-	private static final boolean doLogging = false;
+//	static {
+//		Configurator.setRootLevel(org.apache.logging.log4j.Level.DEBUG);
+//	}
 
 	private Network network;
 	private HashSet<Id<Link>> knownLinks;
@@ -48,9 +50,7 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 		int nrKnownLinks = 0;
 		Id<Link> nextLink = null;
 
-		if (doLogging) {
-			logger.info("number of outlinks of link " + currentLinkId + ": " + outLinks.size());
-		}
+		logger.debug("number of outlinks of link {}: {}", currentLinkId, outLinks.size());
 
 		for (Link outLink : outLinks) {
 			Id<Link> outLinkId = outLink.getId();
@@ -61,31 +61,22 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 				if (distToDest < shortestDistance) {
 					nextLink = outLinkId;
 					shortestDistance = distToDest;
-					if (doLogging) {
-						logger.info("currently chosen link: " + nextLink + " distToDest: " + shortestDistance);
-					}
+					logger.debug("currently chosen link: {} distToDest: {}", nextLink, shortestDistance);
 				} else if (distToDest == shortestDistance) {
 					String message = "link " + nextLink + " and link " + outLinkId + " both are " + distToDest + "m away from destination.";
 					if (MatsimRandom.getRandom().nextBoolean()) {
 						nextLink = outLinkId;
 					}
-					if (doLogging) {
-						logger.info(message + " link " + nextLink + " is chosen.");
-					}
+					logger.debug("{} link {} is chosen.", message, nextLink);
 				} else {
-					if (doLogging) {
-						logger.info("link " + outLinkId + " was not chosen because it is " + distToDest + "m away whereas shortest distance is " + shortestDistance);
-					}
+					logger.debug("link {} was not chosen because it is {}m away whereas shortest distance is {}", outLinkId, distToDest,
+						shortestDistance);
 				}
 			}
 		}
-		if (doLogging) {
-			logger.error("vehicle " + vehicleId + " knew " + nrKnownLinks + " out of " + outLinks.size() + " outlinks of link " + currentLinkId);
-		}
+		logger.debug("vehicle {} knew {} out of {} outlinks of link {}", vehicleId, nrKnownLinks, outLinks.size(), currentLinkId);
 		if (outLinks.size() == nrKnownLinks) {
-			if (doLogging) {
-				logger.error("vehicle " + vehicleId + " knows all outlinks of link " + currentLinkId);
-			}
+			logger.debug("vehicle {} knows all outlinks of link {}", vehicleId, currentLinkId);
 
 			//return random Link
 			int index = MatsimRandom.getRandom().nextInt(outLinks.size());
@@ -97,12 +88,11 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 		}
 
 		if (nextLink == null) {
-			throw new RuntimeException("the next Link Id for vehicle " + vehicleId + " on current link " + currentLinkId + " couldn't be calculated" +
+			throw new RuntimeException("the next Link Id for vehicle " + vehicleId + " on current link " + currentLinkId + " couldn't be " +
+				"calculated" +
 				".");
 		}
-		if (doLogging) {
-			logger.error("vehicle " + vehicleId + " takes link " + nextLink + " as next link");
-		}
+		logger.debug("vehicle {} takes link {} as next link", vehicleId, nextLink);
 		this.knownLinks.add(nextLink);
 		return nextLink;
 	}
