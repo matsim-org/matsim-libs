@@ -31,8 +31,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,6 +41,8 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -60,12 +62,16 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	 */
 	public static final double EPSILON = 1e-10;
 
-	/** The default output directory, where files of this test should be written to.
-	 * Includes the trailing '/' to denote a directory. */
+	/**
+	 * The default output directory, where files of this test should be written to.
+	 * Includes the trailing '/' to denote a directory.
+	 */
 	private String outputDirectory = null;
 
-	/** The default input directory, where files of this test should be read from.
-	 * Includes the trailing '/' to denote a directory. */
+	/**
+	 * The default input directory, where files of this test should be read from.
+	 * Includes the trailing '/' to denote a directory.
+	 */
 	private String inputDirectory = null;
 
 	/**
@@ -144,7 +150,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	private URL getResourceNotNull(String pathString) {
 		URL resource = this.testClass.getResource(pathString);
 		if (resource == null) {
-			throw new UncheckedIOException(new IOException("Not found: "+pathString));
+			throw new UncheckedIOException(new IOException("Not found: " + pathString));
 		}
 		return resource;
 	}
@@ -171,7 +177,8 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	/**
 	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>)
-	 * and sets the output directory to {classPath}/{methodName}/. For parameterized tests, the output directory is {classPath}/{methodName}/{parameters}/.
+	 * and sets the output directory to {classPath}/{methodName}/. For parameterized tests, the output directory is {classPath}/{methodName}/{
+	 * parameters}/.
 	 *
 	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
 	 * @return The loaded configuration.
@@ -181,7 +188,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 		if (configfile != null) {
 			config = ConfigUtils.loadConfig(configfile, customGroups);
 		} else {
-			config = ConfigUtils.createConfig( customGroups );
+			config = ConfigUtils.createConfig(customGroups);
 		}
 		return setOutputDirectory(config, testMethodType);
 	}
@@ -195,7 +202,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 		if (configfile != null) {
 			config = ConfigUtils.loadConfig(configfile, customGroups);
 		} else {
-			config = ConfigUtils.createConfig( customGroups );
+			config = ConfigUtils.createConfig(customGroups);
 		}
 		return setOutputDirectory(config, testMethodType);
 	}
@@ -226,7 +233,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	}
 
 	public Config createConfig(final ConfigGroup... customGroups) {
-		Config config = ConfigUtils.createConfig( customGroups );
+		Config config = ConfigUtils.createConfig(customGroups);
 		this.outputDirectory = getOutputDirectory();
 		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
@@ -254,7 +261,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	public String getOutputDirectory(String subDir) {
 		if (this.outputDirectory == null) {
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/" + subDir;
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/" + subDir;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -271,18 +278,20 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 		}
 		return this.inputDirectory;
 	}
+
 	/**
-	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory delimiter.
+	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory
+	 * delimiter.
 	 *
 	 * @return path to the input directory for this test
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
 
-			LogManager.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
+			LogManager.getLogger(this.getClass()).info("user.dir = " + System.getProperty("user.dir"));
 
 			this.classInputDirectory = "test/input/" +
-											   this.testClass.getCanonicalName().replace('.', '/') + "/";
+				this.testClass.getCanonicalName().replace('.', '/') + "/";
 //			this.classInputDirectory = System.getProperty("user.dir") + "/test/input/" +
 //											   this.testClass.getCanonicalName().replace('.', '/') + "/";
 			// (this used to be relative, i.e. ... = "test/input/" + ... .  Started failing when
@@ -292,8 +301,10 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 		}
 		return this.classInputDirectory;
 	}
+
 	/**
-	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory delimiter.
+	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory
+	 * delimiter.
 	 *
 	 * @return path to the input directory for this test
 	 */
@@ -321,7 +332,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	 * This should be used for "fixtures" only that provide a scenario common to several
 	 * test cases.
 	 */
-	public void initWithoutJUnitForFixture(Class fixture, Method method){
+	public void initWithoutJUnitForFixture(Class fixture, Method method) {
 		this.testClass = fixture;
 		this.testMethodName = method.getName();
 	}
@@ -333,27 +344,50 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 			String lineInput;
 			String lineOutput;
 
-			while( ((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null) ){
-				if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ){
-					log.info( "Reading line...  " );
-					log.info( lineInput );
-					log.info( lineOutput );
-					log.info( "" );
+			while (((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null)) {
+				if (!Objects.equals(lineInput.trim(), lineOutput.trim())) {
+					log.info("Reading line...  ");
+					log.info(lineInput);
+					log.info(lineOutput);
+					log.info("");
 				}
-				Assertions.assertEquals(lineInput.trim(), lineOutput.trim(), "Lines have different content: " );
+				Assertions.assertEquals(lineInput.trim(), lineOutput.trim(), "Lines have different content: ");
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-  public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+	public static void assertEqualEventsFiles(String filename1, String filename2) {
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, EventsFileComparator.compare(filename1, filename2));
 	}
 
-  public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
-	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
-	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
-	  Assertions.assertEquals( checksum1, checksum2, "different file checksums" );
-  }
+	public static void assertEqualFilesBasedOnCRC(String filename1, String filename2) {
+		long checksum1 = CRCChecksum.getCRCFromFile(filename1);
+		long checksum2 = CRCChecksum.getCRCFromFile(filename2);
+		Assertions.assertEquals(checksum1, checksum2, "different file checksums");
+	}
+
+	/**
+	 * Creates the input directory for this test.
+	 */
+	public void createInputDirectory() throws IOException {
+		Files.createDirectories(Path.of(getInputDirectory()));
+	}
+
+	/**
+	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
+	 * manually.
+	 */
+	public void copyFileFromOutputToInput(String fileName) throws IOException {
+		copyFileFromOutputToInput(fileName, fileName);
+	}
+
+	/**
+	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
+	 * manually.
+	 */
+	public void copyFileFromOutputToInput(String outputFile, String inputFile) throws IOException {
+		Files.copy(Path.of(getOutputDirectory() + outputFile), Path.of(getInputDirectory() + inputFile));
+	}
 }
