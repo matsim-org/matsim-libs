@@ -23,7 +23,6 @@ package org.matsim.contrib.dvrp.fleet;
 import java.net.URL;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -73,21 +72,18 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 		install(new DvrpLoadModule(getMode()));
 
-		bindModal(DvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
-			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
-			return (capacity, vehicleId) -> scalarVehicleLoadFactory.fromInt(capacity);
-		})).asEagerSingleton();
-
 		bindModal(DvrpLoadFromVehicle.class).toProvider(modalProvider(getter -> {
 			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
-			return new DefaultDvrpLoadFromVehicle(integerLoadType);
+			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
+			return new DefaultDvrpLoadFromVehicle(dvrpLoadSerializer, integerLoadType);
 		}));
 
 		if (fleetSpecificationUrl != null) {
 			bindModal(FleetSpecification.class).toProvider(modalProvider((getter) -> {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-				DvrpLoadFromFleet dvrpLoadFromFleet = getter.getModal(DvrpLoadFromFleet.class);
-				new FleetReader(fleetSpecification, dvrpLoadFromFleet).parse(fleetSpecificationUrl);
+				DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
+				IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
+				new FleetReader(fleetSpecification, dvrpLoadSerializer, integerLoadType).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			})).asEagerSingleton();
 		} else {
@@ -116,7 +112,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 		bindModal(FleetControlerListener.class).toProvider(modalProvider(
 				getter -> new FleetControlerListener(getMode(), getter.get(OutputDirectoryHierarchy.class),
-						getter.getModal(FleetSpecification.class)))).in(Singleton.class);
+						getter.getModal(FleetSpecification.class), getter.getModal(DvrpLoadSerializer.class)))).in(Singleton.class);
 		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
 
 		bindModal(VehicleType.class).toInstance(vehicleType);

@@ -33,9 +33,11 @@ import java.util.stream.Stream;
  */
 public class FleetWriter extends MatsimXmlWriter {
 	private final Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
+	private final DvrpLoadSerializer dvrpLoadSerializer;
 
-	public FleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications) {
+	public FleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications, DvrpLoadSerializer dvrpLoadSerializer) {
 		this.vehicleSpecifications = vehicleSpecifications;
+		this.dvrpLoadSerializer = dvrpLoadSerializer;
 	}
 
 	public void write(String file) {
@@ -50,7 +52,7 @@ public class FleetWriter extends MatsimXmlWriter {
 	private synchronized void writeVehicle(DvrpVehicleSpecification vehicle) {
 		List<Tuple<String, String>> attributes = Arrays.asList(Tuple.of("id", vehicle.getId().toString()),
 				Tuple.of("start_link", vehicle.getStartLinkId() + ""), Tuple.of("t_0", vehicle.getServiceBeginTime() + ""),
-				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", vehicle.getCapacity() + ""));
+				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", dvrpLoadSerializer.serialize(vehicle.getCapacity()) + ""), Tuple.of("capacityType", vehicle.getCapacity().getType().getName()));
 		writeStartTag("vehicle", attributes, true);
 	}
 }
