@@ -1,7 +1,10 @@
 package org.matsim.contrib.drt.passenger;
 
+import org.matsim.core.mobsim.dsim.NodeSingleton;
+
 import java.util.Optional;
 
+@NodeSingleton
 public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 	private final double maxAllowedPickupDelay;
 
@@ -14,7 +17,7 @@ public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 	}
 
 	/**
-	 * Generate Default offer acceptor. 
+	 * Generate Default offer acceptor.
 	 */
 	public DefaultOfferAcceptor() {
 		this.maxAllowedPickupDelay = Double.POSITIVE_INFINITY;

@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LP;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -57,6 +58,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
+
+	/**
+	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
+	 * This map does not contain the full set of agents in the simulation.
+	 */
+	private IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
 
 	SimProcess(NetworkPartition partition, SimStepMessaging messaging,
 			   QSimCompatibility qsim, QSimCompatibility singletons,
@@ -252,13 +259,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		// This method is for visualization purposes only and not supported
+		agents.put(agent.getId(), agent);
 	}
 
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		// This method is for visualization purposes only and not supported
-		return null;
+		return agents.remove(agentId);
 	}
 
 	@Override

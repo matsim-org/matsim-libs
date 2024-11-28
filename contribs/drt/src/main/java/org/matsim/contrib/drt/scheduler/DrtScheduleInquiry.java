@@ -18,8 +18,7 @@
 
 package org.matsim.contrib.drt.scheduler;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-
+import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -27,7 +26,7 @@ import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 /**
  * @author michalm

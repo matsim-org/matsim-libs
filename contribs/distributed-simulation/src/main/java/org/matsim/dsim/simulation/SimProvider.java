@@ -74,7 +74,8 @@ public class SimProvider implements LPProvider {
 		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
 
 		// The first created partition will hold the singletons
-		if (singletons == null)
+		// TODO: the injection logic needs to be reworked to solve this better
+		if (part == 0)
 			singletons = compat;
 
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, compat, neighbors, part);
