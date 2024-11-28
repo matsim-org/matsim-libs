@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import java.net.URL;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -72,6 +73,11 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 		install(new DvrpLoadModule(getMode()));
 
+		bindModal(DvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
+			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
+			return (capacity, vehicleId) -> scalarVehicleLoadFactory.fromInt(capacity);
+		})).asEagerSingleton();
+
 		bindModal(DvrpLoadFromVehicle.class).toProvider(modalProvider(getter -> {
 			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
 			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
@@ -81,10 +87,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 		if (fleetSpecificationUrl != null) {
 			bindModal(FleetSpecification.class).toProvider(modalProvider((getter) -> {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-				DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
-				IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
-				System.out.println("Reading " + fleetSpecificationUrl.getPath());
-				new FleetReader(fleetSpecification, dvrpLoadSerializer, integerLoadType).parse(fleetSpecificationUrl);
+				DvrpLoadFromFleet dvrpLoadFromFleet = getter.getModal(DvrpLoadFromFleet.class);
+				new FleetReader(fleetSpecification, dvrpLoadFromFleet).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			})).asEagerSingleton();
 		} else {
