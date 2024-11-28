@@ -52,16 +52,6 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	}
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		return transitQSimEngine.handleDeparture(now, agent, linkId);
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		transitQSimEngine.setInternalInterface(internalInterface);
-	}
-
-	@Override
 	public void doSimStep(double now) {
 		for (var entry : activeStops.entrySet()) {
 			while (!entry.getValue().isEmpty() && entry.getValue().peek().vehicle().getEarliestLinkExitTime() <= now) {
@@ -73,9 +63,78 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	}
 
 	@Override
+	public boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+		if (!(vehicle.getDriver() instanceof TransitDriverAgent)) {
+			return false;
+		}
+		waitingVehicles
+			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
+			.add(new DefaultWait2Link.Waiting(vehicle, link));
+		return true;
+	}
+
+	@Override
+	public void moveWaiting(double now) {
+		var it = waitingVehicles.values().iterator();
+		while (it.hasNext()) {
+			var entry = it.next();
+			while (!entry.isEmpty()) {
+				var veh = entry.peek().vehicle();
+				var link = entry.peek().link();
+				if (moveVehicle(veh, link, now)) {
+					entry.remove();
+				} else {
+					break;
+				}
+			}
+			if (entry.isEmpty()) {
+				it.remove();
+			}
+		}
+	}
+
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+		return transitQSimEngine.handleDeparture(now, agent, linkId);
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		transitQSimEngine.setInternalInterface(internalInterface);
+	}
+
+	@Override
 	public void afterSim() {
 		transitQSimEngine.afterSim();
 	}
+
+	private boolean moveVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+
+		if (!link.isAccepting(SimLink.LinkPosition.Buffer, now)) {
+			return false;
+		}
+
+		var tda = (TransitDriverAgent) vehicle.getDriver();
+		var result = handleTransitStop(tda, vehicle, link, now);
+		em.processEvent(new VehicleEntersTrafficEvent(
+			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
+			vehicle.getDriver().getMode(), 1.0)
+		);
+		switch (result) {
+			case BlockQueue -> {
+				link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
+				activateLink.accept(link.getId());
+			}
+			case MoveToBuffer -> {
+				link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
+				activateLink.accept(link.getId());
+			}
+			case RemoveVehicle -> { // nothing to do. The vehicle should be in vehicles at stop
+			}
+		}
+		return true;
+	}
+
 
 	private SimLink.OnLeaveQueueInstruction onLeaveQueue(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
@@ -113,64 +172,6 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 				.add(new VehicleAtStop(vehicle, link));
 			return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 		}
-	}
-
-	@Override
-	public boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-		if (!(vehicle.getDriver() instanceof TransitDriverAgent)) {
-			return false;
-		}
-		waitingVehicles
-			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
-			.add(new DefaultWait2Link.Waiting(vehicle, link));
-		return true;
-	}
-
-	@Override
-	public void moveWaiting(double now) {
-		var it = waitingVehicles.values().iterator();
-		while (it.hasNext()) {
-			var entry = it.next();
-			while (!entry.isEmpty()) {
-				var veh = entry.peek().vehicle();
-				var link = entry.peek().link();
-				if (moveVehicle(veh, link, now)) {
-					entry.remove();
-				} else {
-					break;
-				}
-			}
-			if (entry.isEmpty()) {
-				it.remove();
-			}
-		}
-	}
-
-	private boolean moveVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-
-		if (!link.isAccepting(SimLink.LinkPosition.Buffer, now)) {
-			return false;
-		}
-
-		var tda = (TransitDriverAgent) vehicle.getDriver();
-		var result = handleTransitStop(tda, vehicle, link, now);
-		em.processEvent(new VehicleEntersTrafficEvent(
-			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
-			vehicle.getDriver().getMode(), 1.0)
-		);
-		switch (result) {
-			case BlockQueue -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
-				activateLink.accept(link.getId());
-			}
-			case MoveToBuffer -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
-				activateLink.accept(link.getId());
-			}
-			case RemoveVehicle -> { // nothing to do. The vehicle should be in vehicles at stop
-			}
-		}
-		return true;
 	}
 
 	private record VehicleAtStop(DistributedMobsimVehicle vehicle, SimLink link) {

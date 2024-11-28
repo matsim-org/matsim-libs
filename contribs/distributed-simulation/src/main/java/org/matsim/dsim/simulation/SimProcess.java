@@ -43,10 +43,9 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	// The Qsim has flexible engines. However, Activity, Teleportation and Netsim Engine are treated
 	// in a special way. I'll have them as explicit members here, until we need more flexibility.
-	private final Collection<? extends DistributedMobsimEngine> engines;
+	private final Collection<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final DistributedTeleportationEngine teleportationEngine;
 	private final NetworkTrafficEngine networkTrafficEngine;
-	private final DistributedPtEngine ptEngine;
 
 	private final SimStepMessaging messaging;
 	private final NetworkPartition partition;
@@ -58,6 +57,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
+
+	private DistributedPtEngine ptEngine;
 
 	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, DistributedTeleportationEngine teleportationEngine,
 			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
@@ -74,22 +75,29 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			networkTrafficEngine.getSimNetwork().getLinks().size(),
 			networkTrafficEngine.getSimNetwork().getNodes().size());
 
+
 		// There can be components that register additional event handler
 		// These must be created the simulation starts running
 		this.qsim.init(this);
 
 		// TODO this is a little hacky and should be done differently. But we need the sim network which is created with constructor injection and
 		// the transitqSimEngine, which is bound via injector, but only after qsim.init(this) was called
-		var qsimTransitEngine = qsim.getQsimInjector().getInstance(TransitQSimEngine.class);
-		ptEngine = new DistributedPtEngine(getScenario(), qsimTransitEngine, networkTrafficEngine, em);
-		this.engines = List.of(ptEngine, networkTrafficEngine, teleportationEngine);
-		qsim.getDepartureHandlers().remove(qsimTransitEngine);
-		qsim.getEngines().remove(qsimTransitEngine);
+		if (qsim.getQsimInjector() != null) {
+			var qsimTransitEngine = qsim.getQsimInjector().getInstance(TransitQSimEngine.class);
+			ptEngine = new DistributedPtEngine(getScenario(), qsimTransitEngine, networkTrafficEngine, em);
+			engines.add(ptEngine);
+			//this.engines = List.of(ptEngine, networkTrafficEngine, teleportationEngine);
+			qsim.getDepartureHandlers().remove(qsimTransitEngine);
+			qsim.getEngines().remove(qsimTransitEngine);
 
-		// TODO do this properly in a structured way too: wire up wait to link into the network engine
-		networkTrafficEngine.getWait2Link().add(ptEngine);
-		var defaultWait2Link = new DefaultWait2Link(em, networkTrafficEngine::activateLink);
-		networkTrafficEngine.getWait2Link().add(defaultWait2Link);
+			// TODO do this properly in a structured way too: wire up wait to link into the network engine
+			networkTrafficEngine.getWait2Link().add(ptEngine);
+			var defaultWait2Link = new DefaultWait2Link(em, networkTrafficEngine::activateLink);
+			networkTrafficEngine.getWait2Link().add(defaultWait2Link);
+		}
+
+		engines.add(networkTrafficEngine);
+		engines.add(teleportationEngine);
 	}
 
 	@Override

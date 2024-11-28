@@ -77,10 +77,11 @@ class ActiveNodesTest {
 		inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
+		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
 		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(link -> assertEquals(nextLink, link));
+		activeNodes.setActivateLink(link -> assertEquals(nextLink.getId(), link));
 		activeNodes.activate(node);
 
 		// move the vehicle into the buffer
@@ -114,9 +115,10 @@ class ActiveNodesTest {
 		inLink.doSimStep(null, 99);
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(l -> assertEquals(nextLink, l));
+		activeNodes.setActivateLink(l -> assertEquals(nextLink.getId(), l));
 		activeNodes.activate(node);
 
 		// make sure that one vehicle is released every other second.
@@ -144,10 +146,11 @@ class ActiveNodesTest {
 
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
+		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
 		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(l -> assertEquals(nextLink, l));
+		activeNodes.setActivateLink(l -> assertEquals(nextLink.getId(), l));
 		activeNodes.activate(node);
 
 		for (var now = 100; now < 100 + stuckThreshold; now++) {
