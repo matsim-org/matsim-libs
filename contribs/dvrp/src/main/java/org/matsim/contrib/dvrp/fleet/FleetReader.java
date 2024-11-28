@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -37,14 +36,12 @@ public class FleetReader extends MatsimXmlParser {
 	private static final int DEFAULT_CAPACITY = 1;
 
 	private final FleetSpecification fleet;
-	private final DvrpLoadSerializer dvrpLoadSerializer;
-	private final IntegerLoadType fallBackIntegerLoadType;
+	private final DvrpLoadFromFleet dvrpVehicleLoadCreator;
 
-	public FleetReader(FleetSpecification fleet, DvrpLoadSerializer dvrpLoadSerializer, IntegerLoadType fallBackIntegerLoadType) {
+	public FleetReader(FleetSpecification fleet, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
 		super(ValidationType.DTD_ONLY);
 		this.fleet = fleet;
-		this.dvrpLoadSerializer = dvrpLoadSerializer;
-		this.fallBackIntegerLoadType = fallBackIntegerLoadType;
+		this.dvrpVehicleLoadCreator = dvrpVehicleLoadCreator;
 	}
 
 	@Override
@@ -63,30 +60,18 @@ public class FleetReader extends MatsimXmlParser {
 		return ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(vehicleId)
 				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(getCapacity(atts, vehicleId, this.dvrpLoadSerializer, this.fallBackIntegerLoadType))
+				.capacity(getCapacity(atts.getValue("capacity"), vehicleId, this.dvrpVehicleLoadCreator))
 				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
 				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
 				.build();
 	}
 
-	private static DvrpLoad getCapacity(Attributes attributes, Id<DvrpVehicle> vehicleId, DvrpLoadSerializer dvrpLoadSerializer, IntegerLoadType fallBackIntegerLoadType) {
-		String capacityTypeString = attributes.getValue("capacity_type");
-		Id<DvrpLoadType> capacityType =  capacityTypeString == null ? null : Id.create(capacityTypeString, DvrpLoadType.class);
-		String capacityString = attributes.getValue("capacity");
-		if(capacityType != null) {
-			if(capacityString == null) {
-				throw new IllegalArgumentException("capacity attribute must be provided alongside capacity_type");
-			}
-			return dvrpLoadSerializer.deSerialize(capacityString, capacityType);
-		}
-		double capacity = Double.parseDouble(Optional.ofNullable(capacityString).orElse(DEFAULT_CAPACITY + ""));
+	private static DvrpLoad getCapacity(String capacityAttribute, Id<DvrpVehicle> vehicleId, DvrpLoadFromFleet dvrpVehicleLoadCreator) {
+		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
 		if ((int)capacity != capacity) {
 			//for backwards compatibility: use double when reading files (capacity used to be double)
 			throw new IllegalArgumentException("capacity must be an integer value");
 		}
-		if(fallBackIntegerLoadType == null) {
-			throw new IllegalArgumentException("capacity_type must be provided when an IntegerLoadType is not bound for the DvrpMode");
-		}
-		return fallBackIntegerLoadType.fromInt((int)capacity);
+		return dvrpVehicleLoadCreator.getDvrpVehicleLoad((int)capacity, vehicleId);
 	}
 }
