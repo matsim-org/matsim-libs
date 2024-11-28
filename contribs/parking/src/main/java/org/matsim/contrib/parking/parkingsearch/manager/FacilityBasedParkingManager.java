@@ -44,6 +44,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
+ * Manages vehicles parking actions at facilities or freely on the street. I.e. keeps track of the capacity of the facilities. This class has
+ * additional functionality:
+ * - It can handle parking reservations.
+ * - It triggers reporting of parking statistics.
+ * - It can handle vehicles waiting for a parking space. *
+ *
  * @author jbischoff, schlenther, Ricardo Ewert
  */
 public class FacilityBasedParkingManager implements ParkingSearchManager {

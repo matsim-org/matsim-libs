@@ -56,10 +56,6 @@ public abstract class AbstractParkingTest {
 		Config config = getConfig(parkingConfig);
 		config.plans().setInputFile("population1.xml");
 		run(config);
-		utils.copyFileFromOutputToInput("output_plans.xml.gz");
-		utils.copyFileFromOutputToInput("output_events.xml.gz");
-		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStats.csv", "0.parkingStats.csv");
-		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStatsPerTimeSteps.csv", "0.parkingStatsPerTimeSteps.csv");
 		validate();
 	}
 
@@ -74,10 +70,6 @@ public abstract class AbstractParkingTest {
 		Config config = getConfig(parkingConfig);
 		config.plans().setInputFile("population10.xml");
 		run(config);
-		utils.copyFileFromOutputToInput("output_plans.xml.gz");
-		utils.copyFileFromOutputToInput("output_events.xml.gz");
-		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStats.csv", "0.parkingStats.csv");
-		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStatsPerTimeSteps.csv", "0.parkingStatsPerTimeSteps.csv");
 		validate();
 	}
 

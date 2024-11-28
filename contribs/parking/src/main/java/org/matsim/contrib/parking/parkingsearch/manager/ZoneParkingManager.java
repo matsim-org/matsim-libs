@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Extends the facility based manager, thus parks vehicles at facilities but also keeps track of the occupancy of zones. A zone is defined by a set
+ * of links.
+ *
  * @author tschlenther
  */
 public class ZoneParkingManager extends FacilityBasedParkingManager {
