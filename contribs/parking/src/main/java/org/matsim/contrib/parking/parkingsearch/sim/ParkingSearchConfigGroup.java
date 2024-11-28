@@ -75,6 +75,7 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		return parkDuration;
 	}
 
+	//yyyy shouldn't this parameter be facility specific? paul, nov'24
 	@StringGetter(AVGPARKINGSLOTLENGTH)
 	public double getAvgparkingslotlength() {
 		return avgParkingSlotLength;
@@ -170,7 +171,8 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency(config);
 
 		if (getFractionCanCheckFreeCapacitiesInAdvanced() != 0. && !getParkingSearchManagerType().equals(ParkingSearchManagerType.FacilityBasedParkingManager)) {
-			log.warn("Fraction of agents who can check free capacities in advanced has no impact on your selected ParkingSearchManagerType, because" +
+			log.warn("Fraction of agents who can check free capacities in advanced has no impact on your selected ParkingSearchManagerType, " +
+				"because" +
 				" " +
 				"it is only implemented for the FacilityBasedParkingManager.");
 		}
