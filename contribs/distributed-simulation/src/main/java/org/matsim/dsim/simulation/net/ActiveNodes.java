@@ -31,7 +31,7 @@ public class ActiveNodes implements Steppable {
 	private final EventsManager em;
 	private final Random rnd = new Random();
 	@Setter
-	private Consumer<SimLink> activateLink;
+	private Consumer<Id<Link>> activateLink;
 
 	int size() {
 		return activeNodes.size();
@@ -121,6 +121,6 @@ public class ActiveNodes implements Steppable {
 
 		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), nextLinkId));
 		nextLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
-		activateLink.accept(nextLink);
+		activateLink.accept(nextLink.getId());
 	}
 }

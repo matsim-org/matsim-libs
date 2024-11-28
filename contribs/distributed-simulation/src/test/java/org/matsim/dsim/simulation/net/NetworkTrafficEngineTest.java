@@ -54,7 +54,7 @@ class NetworkTrafficEngineTest {
 		vehicle.setDriver(agent);
 		agent.setVehicle(vehicle);
 
-		engine.addParkedVehicle(vehicle, agent.getCurrentLinkId());
+		engine.addParkedVehicle(vehicle);
 
 		AtomicInteger i = new AtomicInteger(0);
 
