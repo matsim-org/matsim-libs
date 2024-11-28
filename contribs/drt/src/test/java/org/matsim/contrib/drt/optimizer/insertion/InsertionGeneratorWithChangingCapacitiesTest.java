@@ -68,7 +68,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private static class TestIntegerLoadTypeA extends IntegerLoadType {
 		public TestIntegerLoadTypeA() {
-			super("loadA", "A");
+			super(Id.create("loadA", DvrpLoadType.class), "A");
 		}
 
 		@Override
@@ -84,7 +84,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	private static class TestIntegerLoadTypeB extends IntegerLoadType {
 
 		public TestIntegerLoadTypeB() {
-			super("loadB", "B");
+			super(Id.create("loadB", DvrpLoadType.class), "B");
 		}
 
 		@Override

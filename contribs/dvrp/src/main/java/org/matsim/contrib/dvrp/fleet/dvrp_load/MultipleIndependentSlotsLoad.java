@@ -1,30 +1,32 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
 import org.apache.commons.collections4.SetUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.IdSet;
 import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 public class MultipleIndependentSlotsLoad implements DvrpLoad {
 
 	private final MultipleIndependentSlotsLoadType loadType;
 
-	private final Map<String, ScalarLoad> loadPerSlot;
+	private final IdMap<DvrpLoadType, ScalarLoad> loadPerSlot;
 
-	public MultipleIndependentSlotsLoad(Map<String, ScalarLoad> loadPerSlot, MultipleIndependentSlotsLoadType loadType) {
+	public MultipleIndependentSlotsLoad(IdMap<DvrpLoadType, ScalarLoad> loadPerSlot, MultipleIndependentSlotsLoadType loadType) {
 		this(loadPerSlot, loadType, true);
 	}
 
-	MultipleIndependentSlotsLoad(Map<String, ScalarLoad> loadPerSlot, MultipleIndependentSlotsLoadType loadType, boolean checkConsistency) {
-		this.loadPerSlot = new HashMap<>(loadPerSlot);
+	MultipleIndependentSlotsLoad(IdMap<DvrpLoadType, ScalarLoad> loadPerSlot, MultipleIndependentSlotsLoadType loadType, boolean checkConsistency) {
+		this.loadPerSlot = new IdMap<>(DvrpLoadType.class);
+		loadPerSlot.forEach(this.loadPerSlot::put);
 		this.loadType = loadType;
 		if(checkConsistency) {
-			Set<String> typeSlots = Arrays.stream(loadType.getSlotNames()).collect(Collectors.toSet());
-			if(SetUtils.disjunction(typeSlots, loadPerSlot.keySet()).size() > 0) {
+			IdSet<DvrpLoadType> slotTypesIds = loadType.getSlotTypesIdSet();
+			if(SetUtils.disjunction(slotTypesIds, loadPerSlot.keySet()).size() > 0) {
 				throw new IllegalStateException("Provided slots do not match the ones required by the given DvrpLoadType");
 			}
 		}
@@ -41,8 +43,8 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 			return this;
 		}
 		if(other instanceof MultipleIndependentSlotsLoad multipleIndependentSlotsLoad) {
-			Map<String, ScalarLoad> resultLoadPerSlot = new HashMap<>();
-			for(Map.Entry<String, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
+			IdMap<DvrpLoadType, ScalarLoad> resultLoadPerSlot = new IdMap<>(DvrpLoadType.class);
+			for(Map.Entry<Id<DvrpLoadType>, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
 				resultLoadPerSlot.put(loadEntry.getKey(), loadEntry.getValue().addTo(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey())));
 			}
 			return new MultipleIndependentSlotsLoad(resultLoadPerSlot, this.loadType, false);
@@ -56,8 +58,8 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 			return this;
 		}
 		if(other instanceof MultipleIndependentSlotsLoad multipleIndependentSlotsLoad) {
-			Map<String, ScalarLoad> resultLoadPerSlot = new HashMap<>();
-			for(Map.Entry<String, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
+			IdMap<DvrpLoadType, ScalarLoad> resultLoadPerSlot = new IdMap<>(DvrpLoadType.class);
+			for(Map.Entry<Id<DvrpLoadType>, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
 				resultLoadPerSlot.put(loadEntry.getKey(), loadEntry.getValue().subtract(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey())));
 			}
 			return new MultipleIndependentSlotsLoad(resultLoadPerSlot, this.loadType, false);
@@ -74,7 +76,7 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 			return false;
 		}
 		MultipleIndependentSlotsLoad multipleIndependentSlotsLoad = (MultipleIndependentSlotsLoad) other;
-		for(Map.Entry<String, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
+		for(Map.Entry<Id<DvrpLoadType>, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
 			if(!loadEntry.getValue().fitsIn(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey()))) {
 				return false;
 			}
@@ -99,10 +101,10 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 
 	@Override
 	public Number[] asArray() {
-		String[] slotNames = this.loadType.getSlotNames();
-		Number[] numbers = new Number[slotNames.length];
+		Id[] slotIds = this.getType().getOrderedSlotTypesIds();
+		Number[] numbers = new Number[slotIds.length];
 		for(int i=0; i<numbers.length; i++) {
-			numbers[i] = this.loadPerSlot.get(slotNames[i]).asArray()[0];
+			numbers[i] = this.loadPerSlot.get(slotIds[i]).asArray()[0];
 		}
 		return numbers;
 	}
@@ -116,7 +118,7 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 		if(!this.loadType.equals(multipleIndependentSlotsLoad.getType())) {
 			return false;
 		}
-		for(Map.Entry<String, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
+		for(Map.Entry<Id<DvrpLoadType>, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
 			if(!loadEntry.getValue().equals(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey()))) {
 				return false;
 			}

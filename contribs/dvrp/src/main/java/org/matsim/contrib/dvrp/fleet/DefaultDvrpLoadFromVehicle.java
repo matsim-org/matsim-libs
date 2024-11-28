@@ -1,5 +1,6 @@
 package org.matsim.contrib.dvrp.fleet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.vehicles.Vehicle;
 
@@ -28,7 +29,8 @@ public class DefaultDvrpLoadFromVehicle implements DvrpLoadFromVehicle {
 		Map<String, Object> attributes = new HashMap<>(vehicle.getAttributes().getAsMap());
 		attributes.putAll(vehicle.getAttributes().getAsMap());
 		if(attributes.containsKey(VEHICLES_ATTR_CAPACITY_TYPE) && attributes.containsKey(VEHICLES_ATTR_CAPACITY_VALUE)) {
-			return this.dvrpLoadSerializer.deSerialize((String) attributes.get(VEHICLES_ATTR_CAPACITY_VALUE), (String) attributes.get(VEHICLES_ATTR_CAPACITY_TYPE));
+			Id<DvrpLoadType> dvrpLoadTypeId = Id.create((String) attributes.get(VEHICLES_ATTR_CAPACITY_TYPE), DvrpLoadType.class);
+			return this.dvrpLoadSerializer.deSerialize((String) attributes.get(VEHICLES_ATTR_CAPACITY_VALUE), dvrpLoadTypeId);
 		} else {
 			if(this.fallBackIntegerLoadType != null) {
 				return this.fallBackIntegerLoadType.fromInt(vehicle.getType().getCapacity().getSeats());

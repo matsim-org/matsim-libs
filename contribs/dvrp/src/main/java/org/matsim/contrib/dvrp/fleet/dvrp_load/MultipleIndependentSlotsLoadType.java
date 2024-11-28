@@ -1,43 +1,51 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
 import org.apache.commons.collections4.SetUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.IdSet;
 import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 
-	private final Map<String, ScalarLoadType> slotTypeByName;
-	private final String[] slotNames;
-	private final String name;
+	private final IdMap<DvrpLoadType, ScalarLoadType> slotTypeById;
+	private final IdSet<DvrpLoadType> slotTypesIdSet;
+	private final Id[] orderedSlotTypesIds;
+	private final Id<DvrpLoadType> id;
 
-	public MultipleIndependentSlotsLoadType(List<ScalarLoadType> scalarLoadTypes, String name) {
-		this.name = name;
-		slotTypeByName = scalarLoadTypes.stream().collect(Collectors.toMap(ScalarLoadType::getName, loadType -> loadType));
+	public MultipleIndependentSlotsLoadType(List<ScalarLoadType> scalarLoadTypes, Id<DvrpLoadType> id) {
+		this.id = id;
+		slotTypeById = scalarLoadTypes.stream().collect(Collectors.toMap(ScalarLoadType::getId, loadType -> loadType, (a, b) -> {
+			throw new IllegalStateException();
+		}, () -> new IdMap<>(DvrpLoadType.class)));
 		// It is important that slotNames follows the same order as the scalarLoadTypes list
-		slotNames = scalarLoadTypes.stream().map(ScalarLoadType::getName).toArray(String[]::new);
+		orderedSlotTypesIds = scalarLoadTypes.stream().map(ScalarLoadType::getId).toArray(Id[]::new);
+		slotTypesIdSet = new IdSet<>(DvrpLoadType.class);
+		slotTypesIdSet.addAll(slotTypeById.keySet());
 	}
 
 	@Override
 	public DvrpLoad fromArray(Number[] array) {
-		Map<String, ScalarLoad> loadPerSlot = new HashMap<>();
-		if(array.length != slotNames.length) {
+		IdMap<DvrpLoadType, ScalarLoad> loadPerSlot = new IdMap<>(DvrpLoadType.class);
+		if(array.length != orderedSlotTypesIds.length) {
 			throw new IllegalStateException();
 		}
-		for(int i=0; i<slotNames.length; i++) {
-			loadPerSlot.put(slotNames[i], slotTypeByName.get(slotNames[i]).fromNumber(array[i]));
+		for(int i = 0; i< orderedSlotTypesIds.length; i++) {
+			loadPerSlot.put(orderedSlotTypesIds[i], slotTypeById.get(orderedSlotTypesIds[i]).fromNumber(array[i]));
 		}
 		return new MultipleIndependentSlotsLoad(loadPerSlot, this, false);
 	}
 
 	@Override
 	public MultipleIndependentSlotsLoad getEmptyLoad() {
-		Map<String, ScalarLoad> loadPerSlot = new HashMap<>();
-		for(Map.Entry<String, ScalarLoadType> loadTypeEntry: slotTypeByName.entrySet()) {
+		IdMap<DvrpLoadType, ScalarLoad> loadPerSlot = new IdMap<>(DvrpLoadType.class);
+		for(Map.Entry<Id<DvrpLoadType>, ScalarLoadType> loadTypeEntry: slotTypeById.entrySet()) {
 			loadPerSlot.put(loadTypeEntry.getKey(), loadTypeEntry.getValue().getEmptyLoad());
 		}
 		return new MultipleIndependentSlotsLoad(loadPerSlot, this, false);
@@ -45,17 +53,25 @@ public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 
 	@Override
 	public int numberOfDimensions() {
-		return this.slotNames.length;
+		return this.orderedSlotTypesIds.length;
+	}
+
+	public IdSet<DvrpLoadType> getSlotTypesIdSet() {
+		return this.slotTypesIdSet;
 	}
 
 	@Override
 	public String[] getSlotNames() {
-		return this.slotNames;
+		return Arrays.stream(this.orderedSlotTypesIds).map(Object::toString).toArray(String[]::new);
+	}
+
+	public Id[] getOrderedSlotTypesIds() {
+		return this.orderedSlotTypesIds;
 	}
 
 	@Override
-	public String getName() {
-		return this.name;
+	public Id<DvrpLoadType> getId() {
+		return this.id;
 	}
 
 	@Override
@@ -67,14 +83,14 @@ public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 			return false;
 		}
 		MultipleIndependentSlotsLoadType other = (MultipleIndependentSlotsLoadType) obj;
-		if(!this.name.equals(other.name)) {
+		if(!this.id.equals(other.id)) {
 			return false;
 		}
-		if(SetUtils.disjunction(this.slotTypeByName.keySet(), other.slotTypeByName.keySet()).size() > 0) {
+		if(SetUtils.disjunction(this.slotTypeById.keySet(), other.slotTypeById.keySet()).size() > 0) {
 			return false;
 		}
-		for(String slot: this.slotNames) {
-			if(!this.slotTypeByName.get(slot).equals(other.slotTypeByName.get(slot))) {
+		for(Id<DvrpLoadType> slot: this.slotTypeById.keySet()) {
+			if(!this.slotTypeById.get(slot).equals(other.slotTypeById.get(slot))) {
 				return false;
 			}
 		}

@@ -83,6 +83,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
 				DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
 				IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
+				System.out.println("Reading " + fleetSpecificationUrl.getPath());
 				new FleetReader(fleetSpecification, dvrpLoadSerializer, integerLoadType).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			})).asEagerSingleton();

@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.Map;
@@ -22,18 +23,18 @@ public class VehicleCapacityChangedEvent extends Event {
 	private final Id<DvrpVehicle> vehicleId;
 	private final DvrpLoad newVehicleCapacity;
 	private final String serializedNewCapacity;
-	private final String capacityTypeName;
+	private final Id<DvrpLoadType> capacityTypeId;
 
 	public VehicleCapacityChangedEvent(double time, Id<DvrpVehicle> vehicleId, DvrpLoad newVehicleCapacity, String serializedNewCapacity) {
-		this(time, vehicleId, newVehicleCapacity, serializedNewCapacity, newVehicleCapacity.getType().getName());
+		this(time, vehicleId, newVehicleCapacity, serializedNewCapacity, newVehicleCapacity.getType().getId());
 	}
 
-	public VehicleCapacityChangedEvent(double time, Id<DvrpVehicle> vehicleId, DvrpLoad newVehicleCapacity, String serializedNewCapacity, String capacityTypeName) {
+	public VehicleCapacityChangedEvent(double time, Id<DvrpVehicle> vehicleId, DvrpLoad newVehicleCapacity, String serializedNewCapacity, Id<DvrpLoadType> capacityTypeId) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.newVehicleCapacity = newVehicleCapacity;
 		this.serializedNewCapacity = serializedNewCapacity;
-		this.capacityTypeName = capacityTypeName;
+		this.capacityTypeId = capacityTypeId;
 	}
 
 	public Id<DvrpVehicle> getVehicleId() {
@@ -48,8 +49,8 @@ public class VehicleCapacityChangedEvent extends Event {
 		return serializedNewCapacity;
 	}
 
-	public String getCapacityTypeName() {
-		return capacityTypeName;
+	public Id<DvrpLoadType> getCapacityTypeId() {
+		return capacityTypeId;
 	}
 
 
@@ -58,7 +59,7 @@ public class VehicleCapacityChangedEvent extends Event {
 		Map<String, String> atts = super.getAttributes();
 		atts.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
 		atts.put(ATTRIBUTE_NEW_CAPACITY, this.serializedNewCapacity);
-		atts.put(ATTRIBUTE_CAPACITY_TYPE, this.capacityTypeName);
+		atts.put(ATTRIBUTE_CAPACITY_TYPE, this.capacityTypeId.toString());
 		return atts;
 	}
 
@@ -74,12 +75,12 @@ public class VehicleCapacityChangedEvent extends Event {
 	public static VehicleCapacityChangedEvent convert(GenericEvent event, DvrpLoadSerializer dvrpLoadSerializer) {
 		Map<String, String> attributes = event.getAttributes();
 		Id<DvrpVehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE_ID), DvrpVehicle.class);
-		String capacityTypeName = attributes.get(ATTRIBUTE_CAPACITY_TYPE);
+		Id<DvrpLoadType> capacityTypeId = Id.create(attributes.get(ATTRIBUTE_CAPACITY_TYPE), DvrpLoadType.class);
 		String serializedCapacity = attributes.get(ATTRIBUTE_NEW_CAPACITY);
 		DvrpLoad dvrpLoad = null;
 		if(dvrpLoadSerializer != null) {
-			dvrpLoad = dvrpLoadSerializer.deSerialize(serializedCapacity, capacityTypeName);
+			dvrpLoad = dvrpLoadSerializer.deSerialize(serializedCapacity, capacityTypeId);
 		}
-		return new VehicleCapacityChangedEvent(event.getTime(), vehicleId, dvrpLoad, serializedCapacity, capacityTypeName);
+		return new VehicleCapacityChangedEvent(event.getTime(), vehicleId, dvrpLoad, serializedCapacity, capacityTypeId);
 	}
 }

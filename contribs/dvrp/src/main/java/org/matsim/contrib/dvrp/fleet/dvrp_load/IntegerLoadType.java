@@ -2,11 +2,14 @@ package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
 public abstract class IntegerLoadType extends ScalarLoadType {
 	private static final Logger LOGGER = LogManager.getLogger(IntegerLoadType.class);
-	public IntegerLoadType(String name, String slotName) {
-		super(name, slotName);
+
+	public IntegerLoadType(Id<DvrpLoadType> id, String slotName) {
+		super(id, slotName);
 	}
 
 	@Override
