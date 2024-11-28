@@ -1,4 +1,6 @@
-package org.matsim.contrib.parking.parkingsearch;
+package org.matsim.contrib.parking.parkingsearch.facilityBasedParking;
+
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchStrategy;
 
 public class RandomParkingTest extends AbstractParkingTest {
 	@Override
