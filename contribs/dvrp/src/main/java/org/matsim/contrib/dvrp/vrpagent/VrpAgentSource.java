@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentMessage;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
@@ -121,10 +122,23 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 		return Set.of(DynAgent.class);
 	}
 
-
 	@Override
 	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
-		throw new UnsupportedOperationException("Not implemented");
+
+		if (!(message instanceof DynAgentMessage m)) {
+			throw new IllegalArgumentException("Message must be of type DynAgentMessage");
+		}
+
+		DvrpVehicle dvrpVehicle = fleet.getVehicles().get(m.vehicleId());
+
+		// If the vehicle is not found, it belongs to a different provider
+		if (dvrpVehicle == null)
+			return null;
+
+		VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
+			qSim.getEventsManager());
+
+		return new DynAgent(m, qSim.getEventsManager(), vrpAgentLogic);
 	}
 
 

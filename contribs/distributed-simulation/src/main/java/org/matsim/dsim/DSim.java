@@ -147,7 +147,7 @@ public final class DSim implements Mobsim {
                 executor.doSimStep(time);
             } catch (Throwable e) {
                 log.error("Error in simulation step: %.2fs".formatted(time), e);
-                break;
+                throw e;
             }
 
             try {
