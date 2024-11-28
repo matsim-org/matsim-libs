@@ -53,7 +53,7 @@ class ActiveNodesTest {
 
 		var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(nextLinkId, nextLink));
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a.getId()));
+		activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a));
 		activeNodes.activate(node);
 
 		activeNodes.doSimStep(0);

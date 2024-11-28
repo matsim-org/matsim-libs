@@ -73,7 +73,6 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(DSim.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);
 		bindMobsim().toProvider(DSimProvider.class);
-		//installOverridingQSimModule(new DistributedPtEngineModule());
 
 		bind(QSimCompatibility.class);
 
