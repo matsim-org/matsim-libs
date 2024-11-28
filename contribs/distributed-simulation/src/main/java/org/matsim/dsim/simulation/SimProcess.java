@@ -58,7 +58,9 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 
-	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, DistributedTeleportationEngine teleportationEngine,
+	SimProcess(NetworkPartition partition, SimStepMessaging messaging,
+			   QSimCompatibility qsim, QSimCompatibility singletons,
+			   DistributedTeleportationEngine teleportationEngine,
 			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
 		this.partition = partition;
 		this.qsim = qsim;
@@ -75,7 +77,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		// There can be components that register additional event handler
 		// These must be created the simulation starts running
-		this.qsim.init(this);
+		this.qsim.init(this, singletons);
 
 		// TODO this is a little hacky and should be done differently. But we need the sim network which is created with constructor injection and
 		// the transitqSimEngine, which is bound via injector, but only after qsim.init(this) was called

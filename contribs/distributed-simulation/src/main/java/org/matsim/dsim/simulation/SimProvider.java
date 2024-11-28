@@ -47,6 +47,9 @@ public class SimProvider implements LPProvider {
 	@Inject
 	private Injector injector;
 
+
+	private QSimCompatibility singletons;
+
 	private static boolean isSplit(Link link) {
 		var fromRank = (int) link.getFromNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
 		var toRank = (int) link.getToNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
@@ -70,6 +73,10 @@ public class SimProvider implements LPProvider {
 
 		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
 
+		// The first created partition will hold the singletons
+		if (singletons == null)
+			singletons = compat;
+
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, compat, neighbors, part);
 		//ActivityEngineReimplementation activityEngine = createActivityEngine(part);
 		DistributedTeleportationEngine teleportationEngine = new DistributedTeleportationEngine(eventsManager, messaging, compat);
@@ -80,8 +87,8 @@ public class SimProvider implements LPProvider {
 		//var ptEngine = new DistributedPtEngine(scenario, qsimPtEngine, simNetwork);
 
 		return new SimProcess(
-			partition, messaging, compat, teleportationEngine, networkTrafficEngine,
-			eventsManager,
-			config);
+			partition, messaging, compat, singletons == compat ? null : singletons,
+			teleportationEngine, networkTrafficEngine,
+			eventsManager, config);
 	}
 }

@@ -1,7 +1,9 @@
 package org.matsim.dsim;
 
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.name.Named;
+import com.google.inject.util.Modules;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Message;
@@ -18,8 +20,10 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.dsim.utils.NodeSingletonModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -80,8 +84,10 @@ public final class QSimCompatibility {
 
 	/**
 	 * Initialize module with underlying netsim.
+	 * @param netsim netsim instance
+	 * @param singletons instance holding the global singletons
 	 */
-	public void init(Netsim netsim) {
+	public void init(Netsim netsim, @Nullable QSimCompatibility singletons) {
 		if (qsimInjector != null) {
 			return;
 		}
@@ -112,7 +118,7 @@ public final class QSimCompatibility {
 
 		final AbstractQSimModule finalQsimModule = qsimModule;
 
-		AbstractModule module = new AbstractModule() {
+		Module module = new AbstractModule() {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
@@ -120,10 +126,19 @@ public final class QSimCompatibility {
 			}
 		};
 
+		if (singletons != null) {
+			module = Modules.override(module).with(new NodeSingletonModule(singletons.getQsimInjector()));
+		}
+
 		qsimInjector = injector.createChildInjector(module);
 
 		// Retrieve all mobsim listeners
-		 listeners.addAll(qsimInjector.getInstance(Key.get(new TypeLiteral<Set<MobsimListener>>() {})));
+		Set<MobsimListener> listener = qsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+
+		// Add all listener that are not node singletons, or this is the first instance
+		listener.stream()
+				.filter(l -> !l.getClass().isAnnotationPresent(NodeSingleton.class) || singletons == null)
+				.forEach(listeners::add);
 
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
@@ -189,6 +204,7 @@ public final class QSimCompatibility {
 		// Order engines by priority
 		activityHandlers.sort(Comparator.comparingDouble(DistributedActivityHandler::priority).reversed());
 	}
+
 
 	/**
 	 * Create a vehicle container, which includes all the occupants.
