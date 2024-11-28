@@ -70,7 +70,8 @@ public class FleetReader extends MatsimXmlParser {
 	}
 
 	private static DvrpLoad getCapacity(Attributes attributes, Id<DvrpVehicle> vehicleId, DvrpLoadSerializer dvrpLoadSerializer, IntegerLoadType fallBackIntegerLoadType) {
-		String capacityType = attributes.getType("capacity_type");
+		String capacityTypeString = attributes.getValue("capacity_type");
+		Id<DvrpLoadType> capacityType =  capacityTypeString == null ? null : Id.create(capacityTypeString, DvrpLoadType.class);
 		String capacityString = attributes.getValue("capacity");
 		if(capacityType != null) {
 			if(capacityString == null) {

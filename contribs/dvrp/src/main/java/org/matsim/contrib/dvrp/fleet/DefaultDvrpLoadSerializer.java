@@ -1,36 +1,53 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DefaultDvrpLoadSerializer implements DvrpLoadSerializer {
 
-	private final Map<String, DvrpLoadType> loadTypeByName;
+	private static IdMap<DvrpLoadType, DvrpLoadType> dvrpLoadTypeStreamToIdMap(Stream<DvrpLoadType> stream) {
+		IdMap<DvrpLoadType, DvrpLoadType> idMap = new IdMap<>(DvrpLoadType.class);
+		stream.forEach(dvrpLoadType -> idMap.put(dvrpLoadType.getId(), dvrpLoadType));
+		return idMap;
+	}
+
+	private final IdMap<DvrpLoadType, DvrpLoadType> loadTypeById;
+
+	private DefaultDvrpLoadSerializer(Stream<DvrpLoadType> loadTypeStream) {
+		this(loadTypeStream.collect(Collectors.toMap(DvrpLoadType::getId, dvrpLoadType -> dvrpLoadType, (a, b) -> {
+			throw new IllegalStateException();
+		}, () -> new IdMap<>(DvrpLoadType.class))));
+	}
+
 	public DefaultDvrpLoadSerializer(Collection<DvrpLoadType> loadTypes) {
-		this(loadTypes.stream().collect(Collectors.toMap(DvrpLoadType::getName, loadType -> loadType)));
+		this(loadTypes.stream());
 	}
 
 	public DefaultDvrpLoadSerializer(DvrpLoadType... loadTypes) {
-		this(Arrays.stream(loadTypes).collect(Collectors.toMap(DvrpLoadType::getName, loadType -> loadType)));
+		this(Arrays.stream(loadTypes));
 	}
 
-	public DefaultDvrpLoadSerializer(Map<String, DvrpLoadType> loadTypeByName) {
+	public DefaultDvrpLoadSerializer(IdMap<DvrpLoadType, DvrpLoadType> loadTypeById) {
 		//TODO should we do some quality checks here ? like checking that type and slot names fit in [a-zA-Z] ?
-		this.loadTypeByName = new HashMap<>(loadTypeByName);
+		this.loadTypeById = new IdMap<>(DvrpLoadType.class);
+		loadTypeById.forEach(this.loadTypeById::put);
 
-		if(loadTypeByName.size() == 0) {
+		if(loadTypeById.size() == 0) {
 			throw new IllegalStateException("At least one DvrpLoadType must be provided");
 		}
 
 		Map<Integer, List<DvrpLoadType>> loadTypesPerNumberOfSlots = new HashMap<>();
 		Map<String, List<DvrpLoadType>> loadTypesPerSlotName = new HashMap<>();
-		for(Map.Entry<String, DvrpLoadType> dvrpLoadTypeEntry: loadTypeByName.entrySet()) {
-			String loadTypeName = dvrpLoadTypeEntry.getKey();
+		for(Map.Entry<Id<DvrpLoadType>, DvrpLoadType> dvrpLoadTypeEntry: loadTypeById.entrySet()) {
+			Id<DvrpLoadType> loadTypeId = dvrpLoadTypeEntry.getKey();
 			DvrpLoadType dvrpLoadType = dvrpLoadTypeEntry.getValue();
-			if(!loadTypeName.equals(dvrpLoadType.getName())) {
-				throw new IllegalStateException(String.format("Attempting to register DvrpLoadType with name %s with a different name %s", dvrpLoadType.getName(), loadTypeName));
+			if(!loadTypeId.equals(dvrpLoadType.getId())) {
+				throw new IllegalStateException(String.format("Attempting to register DvrpLoadType with name %s with a different name %s", dvrpLoadType.getId(), loadTypeId));
 			}
 			String[] slotNames = dvrpLoadType.getSlotNames();
 			loadTypesPerNumberOfSlots.computeIfAbsent(slotNames.length, i -> new ArrayList<>()).add(dvrpLoadType);
@@ -41,10 +58,10 @@ public class DefaultDvrpLoadSerializer implements DvrpLoadSerializer {
 	}
 
 	@Override
-	public DvrpLoad deSerialize(String loadRepr, String loadTypeName) {
-		DvrpLoadType loadType = this.loadTypeByName.get(loadTypeName);
+	public DvrpLoad deSerialize(String loadRepr, Id<DvrpLoadType> dvrpLoadTypeId) {
+		DvrpLoadType loadType = this.loadTypeById.get(dvrpLoadTypeId);
 		if(loadType == null) {
-			throw new IllegalStateException(String.format("Unkown load type %s", loadTypeName));
+			throw new IllegalStateException(String.format("Unkown load type %s", dvrpLoadTypeId));
 		}
 		return deSerialize(loadRepr, loadType);
 	}
@@ -66,7 +83,7 @@ public class DefaultDvrpLoadSerializer implements DvrpLoadSerializer {
 				throw new IllegalStateException();
 			}
 			if (!ArrayUtils.contains(slotNames, slotAndValue[0])) {
-				throw new IllegalStateException(String.format("Load type %s does not contain slot %s", loadType.getName(), slotAndValue[0]));
+				throw new IllegalStateException(String.format("Load type %s does not contain slot %s", loadType.getId(), slotAndValue[0]));
 			}
 			valuePerSlot.put(slotAndValue[0], stringToNumber(slotAndValue[1]));
 		}
@@ -86,11 +103,11 @@ public class DefaultDvrpLoadSerializer implements DvrpLoadSerializer {
 
 	@Override
 	public String serialize(DvrpLoad dvrpLoad) {
-		String loadTypeName = dvrpLoad.getType().getName();
-		if(!this.loadTypeByName.containsKey(loadTypeName)) {
+		Id<DvrpLoadType> loadTypeName = dvrpLoad.getType().getId();
+		if(!this.loadTypeById.containsKey(loadTypeName)) {
 			throw new IllegalStateException(String.format("Unknown DvrpLoadType: %s ", loadTypeName));
 		}
-		if(!this.loadTypeByName.get(loadTypeName).equals(dvrpLoad.getType())) {
+		if(!this.loadTypeById.get(loadTypeName).equals(dvrpLoad.getType())) {
 			throw new IllegalStateException(String.format("Different DvrpLoadType registered with the same name %s", loadTypeName));
 		}
 		List<String> components = new ArrayList<>();

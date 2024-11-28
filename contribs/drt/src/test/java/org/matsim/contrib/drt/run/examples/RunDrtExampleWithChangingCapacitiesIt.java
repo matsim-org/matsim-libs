@@ -46,7 +46,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 	static class PersonsDvrpLoadType extends IntegerLoadType {
 		public PersonsDvrpLoadType() {
-			super("personsLoad", "persons");
+			super(Id.create("personsLoad", DvrpLoadType.class), "persons");
 		}
 
 		@Override
@@ -64,7 +64,7 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 	static class GoodsDvrpLoadType extends IntegerLoadType {
 		public GoodsDvrpLoadType() {
-			super("goodsLoad", "goods");
+			super(Id.create("goodsLoad", DvrpLoadType.class), "goods");
 		}
 
 		@Override
@@ -79,9 +79,6 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			super(capacity, factory);
 		}
 	}
-
-	private static final PersonsDvrpLoadType PERSONS_LOAD_FACTORY = new PersonsDvrpLoadType();
-	private static final GoodsDvrpLoadType GOODS_LOAD_FACTORY = new GoodsDvrpLoadType();
 
 	static class CapacityChangeSchedulerEngine implements MobsimEngine {
 		private final Fleet fleet;
@@ -110,9 +107,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 				// To be more generic in case other pats of the code change, we just switch the capacity type
 				if(dvrpVehicle.getCapacity() instanceof PersonsDvrpLoad personsDvrpVehicleLoad) {
-					newVehicleLoad = GOODS_LOAD_FACTORY.fromInt(personsDvrpVehicleLoad.getLoad());
+					newVehicleLoad = new GoodsDvrpLoadType().fromInt(personsDvrpVehicleLoad.getLoad());
 				} else if(dvrpVehicle.getCapacity() instanceof GoodsDvrpLoad goodsDvrpVehicleLoad) {
-					newVehicleLoad = PERSONS_LOAD_FACTORY.fromInt(goodsDvrpVehicleLoad.getLoad());
+					newVehicleLoad = new PersonsDvrpLoadType().fromInt(goodsDvrpVehicleLoad.getLoad());
 				} else {
 					throw new IllegalStateException();
 				}
@@ -163,6 +160,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 	void testRunDrtWithHeterogeneousVehicleCapacitiesWithoutRejections() {
 		Id.resetCaches();
 
+		PersonsDvrpLoadType PersonsLoadType = new PersonsDvrpLoadType();
+		GoodsDvrpLoadType GoodsLoadType = new GoodsDvrpLoadType();
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -184,8 +184,8 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			@Override
 			public void install() {
 				// All vehicles start with a compatibility with persons
-				bindModal(IntegerLoadType.class).toInstance(PERSONS_LOAD_FACTORY);
-				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(PERSONS_LOAD_FACTORY, GOODS_LOAD_FACTORY));
+				bindModal(IntegerLoadType.class).toInstance(PersonsLoadType);
+				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(PersonsLoadType, GoodsLoadType));
 			}
 		});
 
@@ -202,9 +202,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 					}
 					if(personParity%2 == 0) {
-						return PERSONS_LOAD_FACTORY.fromInt(personIds.size());
+						return PersonsLoadType.fromInt(personIds.size());
 					} else {
-						return GOODS_LOAD_FACTORY.fromInt(personIds.size());
+						return GoodsLoadType.fromInt(personIds.size());
 					}
 				});
 
@@ -237,6 +237,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 	void testRunDrtWithHeterogeneousVehicleCapacitiesWithRejections() {
 		Id.resetCaches();
 
+		PersonsDvrpLoadType personsLoadType = new PersonsDvrpLoadType();
+		GoodsDvrpLoadType goodsLoadType = new GoodsDvrpLoadType();
+
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -251,8 +254,8 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 			@Override
 			public void install() {
 				// All vehicles start with a compatibility with persons
-				bindModal(IntegerLoadType.class).toInstance(PERSONS_LOAD_FACTORY);
-				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(PERSONS_LOAD_FACTORY, GOODS_LOAD_FACTORY));
+				bindModal(IntegerLoadType.class).toInstance(personsLoadType);
+				bindModal(DvrpLoadSerializer.class).toInstance(new DefaultDvrpLoadSerializer(personsLoadType, goodsLoadType));
 			}
 		});
 
@@ -269,9 +272,9 @@ public class RunDrtExampleWithChangingCapacitiesIt {
 
 					}
 					if(personParity%2 == 0) {
-						return PERSONS_LOAD_FACTORY.fromInt(personIds.size());
+						return personsLoadType.fromInt(personIds.size());
 					} else {
-						return GOODS_LOAD_FACTORY.fromInt(personIds.size());
+						return goodsLoadType.fromInt(personIds.size());
 					}
 				});
 

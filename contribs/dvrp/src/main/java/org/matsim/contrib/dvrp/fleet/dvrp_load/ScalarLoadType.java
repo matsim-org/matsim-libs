@@ -1,5 +1,6 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
 /**
@@ -9,11 +10,11 @@ import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
  */
 public abstract class ScalarLoadType implements DvrpLoadType {
 
-	private final String name;
+	private final Id<DvrpLoadType> id;
 	private final String slotName;
 
-	public ScalarLoadType(String name, String slotName) {
-		this.name = name;
+	public ScalarLoadType(Id<DvrpLoadType> id, String slotName) {
+		this.id = id;
 		this.slotName = slotName;
 	}
 
@@ -23,8 +24,8 @@ public abstract class ScalarLoadType implements DvrpLoadType {
 	}
 
 	@Override
-	public final String getName() {
-		return this.name;
+	public final Id<DvrpLoadType> getId() {
+		return this.id;
 	}
 
 	@Override
@@ -54,6 +55,6 @@ public abstract class ScalarLoadType implements DvrpLoadType {
 			return false;
 		}
 		ScalarLoadType scalarLoadType = (ScalarLoadType) other;
-		return this.slotName.equals(scalarLoadType.slotName) && this.name.equals(scalarLoadType.name);
+		return this.slotName.equals(scalarLoadType.slotName) && this.id.equals(scalarLoadType.id);
 	}
 }

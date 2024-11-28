@@ -56,7 +56,7 @@ public class VrpAgentLogicTest {
 	private static class MockupDvrpLoadSerializer implements DvrpLoadSerializer {
 
 		@Override
-		public DvrpLoad deSerialize(String loadRepr, String loadTypeName) {
+		public DvrpLoad deSerialize(String loadRepr, Id<DvrpLoadType> loadTypeId) {
 			return null;
 		}
 

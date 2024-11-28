@@ -52,7 +52,7 @@ public class FleetWriter extends MatsimXmlWriter {
 	private synchronized void writeVehicle(DvrpVehicleSpecification vehicle) {
 		List<Tuple<String, String>> attributes = Arrays.asList(Tuple.of("id", vehicle.getId().toString()),
 				Tuple.of("start_link", vehicle.getStartLinkId() + ""), Tuple.of("t_0", vehicle.getServiceBeginTime() + ""),
-				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", dvrpLoadSerializer.serialize(vehicle.getCapacity()) + ""), Tuple.of("capacityType", vehicle.getCapacity().getType().getName()));
+				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", dvrpLoadSerializer.serialize(vehicle.getCapacity()) + ""), Tuple.of("capacityType", vehicle.getCapacity().getType().getId().toString()));
 		writeStartTag("vehicle", attributes, true);
 	}
 }
