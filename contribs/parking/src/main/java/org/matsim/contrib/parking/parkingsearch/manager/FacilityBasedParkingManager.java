@@ -29,7 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -45,6 +48,7 @@ import java.util.Map.Entry;
  */
 public class FacilityBasedParkingManager implements ParkingSearchManager {
 	private static final Logger logger = LogManager.getLogger(FacilityBasedParkingManager.class);
+	private static final int REPORTING_TIME_BIN_SIZE = 15 * 60;
 
 	protected Map<Id<ActivityFacility>, ParkingFacilityInfo> infoByFacilityId = new HashMap<>();
 
@@ -60,39 +64,13 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	private QSim qsim;
 
 	//The following maps are used for reporting
+	@Inject
+	private ParkingStatsWriter writer;
 	protected TreeMap<Integer, MutableLong> rejectedReservationsByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> foundParkingByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> unparkByTime = new TreeMap<>();
-	private final int maxSlotIndex;
-	private final int maxTime;
-	private final int timeBinSize;
-	private final int startTime;
-
-	protected static class ParkingFacilityInfo {
-		protected long occupation = 0;
-		protected final ActivityOption activityOption;
-		protected long reservationRequests = 0;
-		protected long rejectedParkingRequests = 0;
-		protected long parkedVehiclesCount = 0;
-		protected long waitingActivitiesCount = 0;
-		protected long staysFromGetOffUntilGetIn = 0;
-		protected long parkingBeforeGetInCount = 0;
-
-		ParkingFacilityInfo(ActivityOption activityOption) {
-			this.activityOption = activityOption;
-		}
-
-		protected boolean park() {
-			reservationRequests++;
-			//TODO check double vs long
-			if (occupation >= activityOption.getCapacity()) {
-				rejectedParkingRequests++;
-				return false;
-			}
-			occupation++;
-			return true;
-		}
-	}
+	private int reportingMaxSlotIndex;
+	private int reportingMaxTime;
 
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
@@ -101,36 +79,24 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 		logger.info(parkingFacilitiesById.toString());
 
-		this.timeBinSize = 15 * 60;
-		this.maxTime = 24 * 3600 - 1;
-		this.maxSlotIndex = (this.maxTime / this.timeBinSize) + 1;
-		this.startTime = 9 * 3600; //TODO yyyy? this is a magic variable and should either be deleted or configurable, paul nov '24
-
 		for (ActivityFacility fac : this.parkingFacilitiesById.values()) {
 			initParkingFacility(fac);
 		}
-		initReporting();
+
+		initReporting(scenario);
 	}
 
-	private void initReporting() {
-		int slotIndex = getTimeSlotIndex(startTime);
-		while (slotIndex <= maxSlotIndex) {
-			rejectedReservationsByTime.put(slotIndex * timeBinSize, new MutableLong(0));
-			foundParkingByTime.put(slotIndex * timeBinSize, new MutableLong(0));
-			unparkByTime.put(slotIndex * timeBinSize, new MutableLong(0));
-			slotIndex++;
-		}
+	private void initReporting(Scenario scenario) {
+		this.reportingMaxTime = (int) scenario.getConfig().qsim().getEndTime().seconds();
+		this.reportingMaxSlotIndex = (this.reportingMaxTime / REPORTING_TIME_BIN_SIZE) + 1;
 	}
 
 	private void initParkingFacility(ActivityFacility fac) {
 		Id<Link> linkId = fac.getLinkId();
-		Set<Id<ActivityFacility>> parkingOnLink = new HashSet<>();
-		if (this.parkingFacilitiesByLink.containsKey(linkId)) {
-			parkingOnLink = this.parkingFacilitiesByLink.get(linkId);
-		}
+		Set<Id<ActivityFacility>> parkingOnLink = parkingFacilitiesByLink.getOrDefault(linkId, new HashSet<>());
 		parkingOnLink.add(fac.getId());
 		this.parkingFacilitiesByLink.put(linkId, parkingOnLink);
-		this.waitingVehiclesByLinkId.computeIfAbsent(linkId, (k) -> new TreeMap<>());
+		this.waitingVehiclesByLinkId.put(linkId, new TreeMap<>());
 
 		ActivityOption activityOption = fac.getActivityOptions().get(ParkingUtils.ParkingStageInteractionType);
 		this.infoByFacilityId.put(fac.getId(), new ParkingFacilityInfo(activityOption));
@@ -243,7 +209,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		this.parkingFacilityLocationByVehicleId.put(vehicleId, fac);
 		reportParking(time, fac);
 		return true;
-
 	}
 
 	/**
@@ -262,8 +227,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return true;
 	}
 
-	@Override
-	public List<String> produceStatistics() {
+	private List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
 		for (Entry<Id<ActivityFacility>, ParkingFacilityInfo> e : this.infoByFacilityId.entrySet()) {
 			Id<Link> linkId = this.parkingFacilitiesById.get(e.getKey()).getLinkId();
@@ -325,30 +289,19 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	public void registerRejectedReservation(double now) {
-		rejectedReservationsByTime.get(getTimeSlotIndex(now) * timeBinSize).increment();
-	}
-
-	public TreeSet<Integer> getTimeSteps() {
-		TreeSet<Integer> timeSteps = new TreeSet<>();
-		int slotIndex = 0;
-		while (slotIndex <= maxSlotIndex) {
-			timeSteps.add(slotIndex * timeBinSize);
-			slotIndex++;
-		}
-		return timeSteps;
+		rejectedReservationsByTime.putIfAbsent(getTimeSlotIndex(now) * REPORTING_TIME_BIN_SIZE, new MutableLong(0));
+		rejectedReservationsByTime.get(getTimeSlotIndex(now) * REPORTING_TIME_BIN_SIZE).increment();
 	}
 
 	private int getTimeSlotIndex(final double time) {
-		if (time > this.maxTime) {
-			return this.maxSlotIndex;
+		if (time > this.reportingMaxTime) {
+			return this.reportingMaxSlotIndex;
 		}
-		return ((int) time / this.timeBinSize);
+		return ((int) time / REPORTING_TIME_BIN_SIZE);
 	}
 
 	/**
-	 * Gives the duration of the staging activity of parking
-	 *
-	 * @return
+	 * Returns the duration of the staging activity of parking
 	 */
 	public double getParkStageActivityDuration() {
 		return psConfigGroup.getParkduration();
@@ -412,7 +365,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	public void registerStayFromGetOffUntilGetIn(Id<Vehicle> vehcileId) {
-		this.infoByFacilityId.get(parkingFacilityLocationByVehicleId.get(vehcileId)).staysFromGetOffUntilGetIn++;
+		infoByFacilityId.get(parkingFacilityLocationByVehicleId.get(vehcileId)).staysFromGetOffUntilGetIn++;
 	}
 
 	public void registerParkingBeforeGetIn(Id<Vehicle> vehcileId) {
@@ -421,15 +374,60 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	private void reportParking(double time, Id<ActivityFacility> fac) {
 		this.infoByFacilityId.get(fac).parkedVehiclesCount++;
-		int timeSlot = getTimeSlotIndex(time) * timeBinSize;
+		int timeSlot = getTimeSlotIndex(time) * REPORTING_TIME_BIN_SIZE;
 		foundParkingByTime.putIfAbsent(timeSlot, new MutableLong(0));
 		foundParkingByTime.get(timeSlot).increment();
 	}
 
 	private void reportUnParking(double time, Id<ActivityFacility> fac) {
 		this.infoByFacilityId.get(fac).occupation--;
-		int timeSlot = getTimeSlotIndex(time) * timeBinSize;
+		int timeSlot = getTimeSlotIndex(time) * REPORTING_TIME_BIN_SIZE;
 		unparkByTime.putIfAbsent(timeSlot, new MutableLong(0));
 		unparkByTime.get(timeSlot).increment();
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		writer.writeStatsByFacility(produceStatistics(), event.getIteration());
+		writer.writeStatsByTimesteps(produceTimestepsStatistics(), event.getIteration());
+		reset(event.getIteration());
+	}
+
+
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
+		checkFreeCapacitiesForWaitingVehicles((QSim) event.getQueueSimulation(), event.getSimulationTime());
+	}
+
+	@Override
+	public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
+		QSim qSim = (QSim) e.getQueueSimulation();
+		setQSim(qSim);
+	}
+
+	protected static class ParkingFacilityInfo {
+		protected long occupation = 0;
+		protected final ActivityOption activityOption;
+		protected long reservationRequests = 0;
+		protected long rejectedParkingRequests = 0;
+		protected long parkedVehiclesCount = 0;
+		protected long waitingActivitiesCount = 0;
+		protected long staysFromGetOffUntilGetIn = 0;
+		protected long parkingBeforeGetInCount = 0;
+
+		ParkingFacilityInfo(ActivityOption activityOption) {
+			this.activityOption = activityOption;
+		}
+
+		protected boolean park() {
+			reservationRequests++;
+			//TODO check double vs long
+			if (occupation >= activityOption.getCapacity()) {
+				rejectedParkingRequests++;
+				return false;
+			}
+			occupation++;
+			return true;
+		}
 	}
 }

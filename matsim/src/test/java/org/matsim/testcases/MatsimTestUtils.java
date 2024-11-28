@@ -43,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 /**
@@ -52,6 +53,11 @@ import java.util.Objects;
  */
 public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallback {
 	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
+
+	//used for copying files from output to input. Don't delete even if they are unused in production
+	public static final String FILE_NAME_PLANS = "output_plans.xml.gz";
+	public static final String FILE_NAME_NETWORK = "output_network.xml.gz";
+	public static final String FILE_NAME_EVENTS = "output_events.xml.gz";
 
 	public enum TestMethodType {
 		Normal, Parameterized
@@ -371,15 +377,21 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	/**
 	 * Creates the input directory for this test.
 	 */
-	public void createInputDirectory() throws IOException {
-		Files.createDirectories(Path.of(getInputDirectory()));
+	public void createInputDirectory() {
+		try {
+			Files.createDirectories(Path.of(getInputDirectory()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assertions.fail();
+		}
 	}
 
 	/**
 	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
 	 * manually.
 	 */
-	public void copyFileFromOutputToInput(String fileName) throws IOException {
+	public void copyFileFromOutputToInput(String fileName) {
+		createInputDirectory();
 		copyFileFromOutputToInput(fileName, fileName);
 	}
 
@@ -387,7 +399,13 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
 	 * manually.
 	 */
-	public void copyFileFromOutputToInput(String outputFile, String inputFile) throws IOException {
-		Files.copy(Path.of(getOutputDirectory() + outputFile), Path.of(getInputDirectory() + inputFile));
+	public void copyFileFromOutputToInput(String outputFile, String inputFile) {
+		createInputDirectory();
+		try {
+			Files.copy(Path.of(getOutputDirectory() + outputFile), Path.of(getInputDirectory() + inputFile), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assertions.fail();
+		}
 	}
 }

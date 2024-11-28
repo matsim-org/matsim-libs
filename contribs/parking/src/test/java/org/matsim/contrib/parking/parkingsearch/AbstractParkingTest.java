@@ -48,6 +48,38 @@ public abstract class AbstractParkingTest {
 		validate();
 	}
 
+	@Test
+	void testParking1_onlyFacilityParking() {
+		ParkingSearchConfigGroup parkingConfig = getParkingConfig();
+		parkingConfig.setCanParkOnlyAtFacilities(true);
+		Config config = getConfig(parkingConfig);
+		config.plans().setInputFile("population1.xml");
+		run(config);
+		utils.copyFileFromOutputToInput("output_plans.xml.gz");
+		utils.copyFileFromOutputToInput("output_events.xml.gz");
+		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStats.csv", "0.parkingStats.csv");
+		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStatsPerTimeSteps.csv", "0.parkingStatsPerTimeSteps.csv");
+		validate();
+	}
+
+	/**
+	 * Tests the behaviour of the parking search when only parking at facilities is allowed.
+	 * Result: Agents are trying to park at facilities and are searching so long for a parking space until they found one.
+	 */
+	@Test
+	void testParking10_onlyFacilityParking() {
+		ParkingSearchConfigGroup parkingConfig = getParkingConfig();
+		parkingConfig.setCanParkOnlyAtFacilities(true);
+		Config config = getConfig(parkingConfig);
+		config.plans().setInputFile("population10.xml");
+		run(config);
+		utils.copyFileFromOutputToInput("output_plans.xml.gz");
+		utils.copyFileFromOutputToInput("output_events.xml.gz");
+		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStats.csv", "0.parkingStats.csv");
+		utils.copyFileFromOutputToInput("ITERS/it.0/0.parkingStatsPerTimeSteps.csv", "0.parkingStatsPerTimeSteps.csv");
+		validate();
+	}
+
 	private ParkingSearchConfigGroup getParkingConfig() {
 		ParkingSearchConfigGroup parkingSearchConfigGroup = new ParkingSearchConfigGroup();
 		parkingSearchConfigGroup.setParkingSearchStrategy(getParkingSearchStrategy());

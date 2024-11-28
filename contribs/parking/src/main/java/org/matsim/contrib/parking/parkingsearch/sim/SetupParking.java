@@ -32,9 +32,9 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingStatsWriter;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
@@ -77,8 +77,9 @@ public class SetupParking {
 								   .to(Network.class)
 								   .asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
+				bind(ParkingStatsWriter.class);
 				this.install(new ParkingSearchQSimModule());
-				addControlerListenerBinding().to(ParkingListener.class);
+				addControlerListenerBinding().to(ParkingSearchManager.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
 			}
