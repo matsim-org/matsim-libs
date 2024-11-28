@@ -159,7 +159,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		networkTrafficEngine.addParkedVehicle(veh, startLinkId);
+		networkTrafficEngine.addParkedVehicle(veh);
 	}
 
 	@Override

@@ -32,8 +32,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	private final ActiveNodes activeNodes;
 	private final ActiveLinks activeLinks;
 
-	private final boolean wait2LinkFirst;
-
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final QSimCompatibility qSimCompatibility;
 
@@ -51,7 +49,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		activeLinks = new ActiveLinks(simStepMessaging);
 		activeLinks.setActivateNode(this::activateNode);
 		activeNodes.setActivateLink(this::activateLink);
-		wait2LinkFirst = scenario.getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles();
 	}
 
 	public void activateLink(Id<Link> id) {
@@ -72,7 +69,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		// place person into vehicle
 		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
 			parkedVehicles.remove(driver.getPlannedVehicleId()),
-			() -> "Vehicle not found: " + driver.getPlannedVehicleId()
+			() -> "Vehicle not found: " + driver.getPlannedVehicleId() + " on part " + this.getSimNetwork().getPart()
 		);
 		driver.setVehicle(vehicle);
 		vehicle.setDriver(driver);
@@ -161,7 +158,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id<Link> _startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh) {
 		if (veh instanceof DistributedMobsimVehicle dv) {
 			parkedVehicles.put(veh.getId(), dv);
 		} else {
