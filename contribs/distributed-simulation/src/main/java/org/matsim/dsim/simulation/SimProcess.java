@@ -47,6 +47,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final Collection<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final DistributedTeleportationEngine teleportationEngine;
 	private final NetworkTrafficEngine networkTrafficEngine;
+	private final DistributedPtEngine ptEngine;
 
 	private final SimStepMessaging messaging;
 	private final NetworkPartition partition;
@@ -54,7 +55,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final QSimCompatibility qsim;
 
 	private final EventsManager em;
-	//private final Config config;
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
@@ -101,6 +101,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			networkTrafficEngine.getWait2Link().add(ptEngine);
 			var defaultWait2Link = new DefaultWait2Link(em, networkTrafficEngine::activateLink);
 			networkTrafficEngine.getWait2Link().add(defaultWait2Link);
+		} else {
+			ptEngine = null;
 		}
 
 		engines.add(networkTrafficEngine);
