@@ -57,4 +57,9 @@ public abstract class ScalarLoadType implements DvrpLoadType {
 		ScalarLoadType scalarLoadType = (ScalarLoadType) other;
 		return this.slotName.equals(scalarLoadType.slotName) && this.id.equals(scalarLoadType.id);
 	}
+
+	@Override
+	public int hashCode() {
+		return this.getClass().hashCode() + this.getId().hashCode() + this.slotName.hashCode();
+	}
 }

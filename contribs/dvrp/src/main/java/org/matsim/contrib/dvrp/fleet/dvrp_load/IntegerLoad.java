@@ -12,16 +12,16 @@ import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 public class IntegerLoad extends ScalarLoad {
 
 	private final IntegerLoadType loadType;
-	private final int capacity;
+	private final int load;
 
-	public IntegerLoad(int capacity, IntegerLoadType loadType) {
+	public IntegerLoad(int load, IntegerLoadType loadType) {
 		super(loadType);
-		this.capacity = capacity;
+		this.load = load;
 		this.loadType = loadType;
 	}
 
 	public int getLoad() {
-		return this.capacity;
+		return this.load;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class IntegerLoad extends ScalarLoad {
 		if(!this.getType().equals(integerLoad.getType())) {
 			throw new UnsupportedVehicleLoadException(other, this.getClass());
 		}
-		return getType().fromInt(integerLoad.capacity + this.capacity);
+		return getType().fromInt(integerLoad.load + this.load);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class IntegerLoad extends ScalarLoad {
 		if(!this.getType().equals(integerLoad.getType())) {
 			throw new UnsupportedVehicleLoadException(other, this.getClass());
 		}
-		return getType().fromInt(this.capacity - integerLoad.capacity);
+		return getType().fromInt(this.load - integerLoad.load);
 	}
 
 	@Override
@@ -70,12 +70,12 @@ public class IntegerLoad extends ScalarLoad {
 		if(!integerLoad.getType().equals(this.getType())) {
 			return false;
 		}
-		return this.capacity <= integerLoad.capacity;
+		return this.load <= integerLoad.load;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.capacity == 0;
+		return this.load == 0;
 	}
 
 	@Override
@@ -98,5 +98,10 @@ public class IntegerLoad extends ScalarLoad {
 		}
 		IntegerLoad otherLoad = (IntegerLoad) o;
 		return this.getType().equals(otherLoad.getType()) && this.getLoad() == otherLoad.getLoad();
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getClass().hashCode() + this.loadType.hashCode() + this.getLoad();
 	}
 }

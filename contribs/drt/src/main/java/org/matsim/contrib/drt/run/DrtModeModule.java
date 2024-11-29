@@ -29,11 +29,13 @@ import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.*;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -111,6 +113,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
 			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
 		}
+
+		bindModal(DvrpLoadFromPassengers.class).toProvider(modalProvider(getter -> {
+			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
+			return passengerIds -> scalarVehicleLoadFactory.fromInt(passengerIds.size());
+		})).asEagerSingleton();
 
 	}
 }
