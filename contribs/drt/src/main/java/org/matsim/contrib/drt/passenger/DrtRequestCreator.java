@@ -40,12 +40,12 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private static final Logger log = LogManager.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
-	private final DvrpLoadFromPassengers dvrpLoadFromPassengers;
+	private final DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers;
 
-	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadFromPassengers dvrpLoadFromPassengers) {
+	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
-		this.dvrpLoadFromPassengers = dvrpLoadFromPassengers;
+		this.dvrpLoadFromDrtPassengers = dvrpLoadFromDrtPassengers;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.latestArrivalTime(latestArrivalTime)
 				.maxRideDuration(maxRideDuration)
 				.submissionTime(submissionTime)
-				.scalarDvrpVehicleLoadGetter(this.dvrpLoadFromPassengers::getLoad)
+				.scalarDvrpVehicleLoadGetter(this.dvrpLoadFromDrtPassengers::getLoad)
 				.build();
 
 		log.debug(route);

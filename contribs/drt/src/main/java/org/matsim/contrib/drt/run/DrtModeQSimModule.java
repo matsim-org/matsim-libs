@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -93,8 +93,8 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);
-			DvrpLoadFromPassengers dvrpLoadFromPassengers = getter.getModal(DvrpLoadFromPassengers.class);
-			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadFromPassengers);
+			DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers = getter.getModal(DvrpLoadFromDrtPassengers.class);
+			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadFromDrtPassengers);
 		})).asEagerSingleton();
 
 		// this is not the actual selection which DynActionCreator is used, see

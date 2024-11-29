@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.fleet.DvrpLoad;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class DefaultCapacityConfigurationLogic implements CapacityReconfigurationLogic, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 
 	public enum CapacityChangeLinkSelection {RANDOM, ClosestToVehicleStartLocation}
-	private final DvrpLoadFromPassengers dvrpLoadFromPassengers;
+	private final DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers;
 	private final FleetSpecification fleetSpecification;
 	private final List<DvrpLoad> possibleCapacities;
 	private final int reconfigurationInterval;
@@ -46,12 +46,12 @@ public class DefaultCapacityConfigurationLogic implements CapacityReconfiguratio
 	private final QuadTree<Link> linkQuadTree;
 	private final IdMap<DvrpVehicle, Link> vehicleCapacityChangeLocations;
 
-	public DefaultCapacityConfigurationLogic(FleetSpecification fleetSpecification, Set<DvrpLoad> possibleCapacities, DvrpLoadFromPassengers dvrpLoadFromPassengers, Network network, Collection<? extends Link> links, int reconfigurationInterval) {
-		this(fleetSpecification, possibleCapacities, dvrpLoadFromPassengers, network, links, reconfigurationInterval, true, CapacityChangeLinkSelection.RANDOM);
+	public DefaultCapacityConfigurationLogic(FleetSpecification fleetSpecification, Set<DvrpLoad> possibleCapacities, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers, Network network, Collection<? extends Link> links, int reconfigurationInterval) {
+		this(fleetSpecification, possibleCapacities, dvrpLoadFromDrtPassengers, network, links, reconfigurationInterval, true, CapacityChangeLinkSelection.RANDOM);
 	}
 
 	@SuppressWarnings("unchecked")
-	public DefaultCapacityConfigurationLogic(FleetSpecification fleetSpecification, Set<DvrpLoad> possibleCapacities, DvrpLoadFromPassengers dvrpLoadFromPassengers, Network network, Collection<? extends Link> links, int reconfigurationInterval, boolean allowCapacityChangeBeforeDayStarts, CapacityChangeLinkSelection capacityChangeLinkSelection) {
+	public DefaultCapacityConfigurationLogic(FleetSpecification fleetSpecification, Set<DvrpLoad> possibleCapacities, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers, Network network, Collection<? extends Link> links, int reconfigurationInterval, boolean allowCapacityChangeBeforeDayStarts, CapacityChangeLinkSelection capacityChangeLinkSelection) {
 		this.allowCapacityChangeBeforeDayStarts = allowCapacityChangeBeforeDayStarts;
 		this.fleetSpecification = fleetSpecification;
 		this.reconfigurationInterval = reconfigurationInterval;
@@ -95,7 +95,7 @@ public class DefaultCapacityConfigurationLogic implements CapacityReconfiguratio
 			defaultStartingCapacities.put(vehicleSpecification.getId(), vehicleSpecification.getCapacity());
 		}
 		this.possibleCapacities.addAll(possibleCapacities);
-		this.dvrpLoadFromPassengers = dvrpLoadFromPassengers;
+		this.dvrpLoadFromDrtPassengers = dvrpLoadFromDrtPassengers;
 
 		int maxSlot = timeToSlotIndex(maxServiceEndTime);
 		requestsPerTimeSlotPerDvrpLoad = new Map[maxSlot+1];
@@ -127,7 +127,7 @@ public class DefaultCapacityConfigurationLogic implements CapacityReconfiguratio
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
 		this.requestsSubmissionTimes.put(event.getRequestId(), event.getTime());
-		DvrpLoad load = this.getFittingCapacity(this.dvrpLoadFromPassengers.getLoad(event.getPersonIds()));
+		DvrpLoad load = this.getFittingCapacity(this.dvrpLoadFromDrtPassengers.getLoad(event.getPersonIds()));
 		int timeSlot = this.timeToSlotIndex(event.getTime());
 		if(timeSlot < this.totalRequestsPerTimeSlot.length) {
 			// Only requests that happened during vehicle service are considered
