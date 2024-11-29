@@ -11,12 +11,14 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
@@ -38,12 +40,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	@Setter
 	private InternalInterface internalInterface;
-	// TODO don't expose this. Fix it when fixing how we are injecting engines into disim
-	@Getter
-	private final List<Wait2Link> wait2Link = new ArrayList<>();
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc, SimStepMessaging simStepMessaging, EventsManager em) {
+	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc,
+								SimStepMessaging simStepMessaging, EventsManager em) {
 		this.asc = asc;
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
@@ -76,11 +76,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
-		for (Wait2Link w2l : wait2Link) {
-			if (w2l.accept(vehicle, link, now)) {
-				break;
-			}
-		}
+		wait2Link.accept(vehicle, link, now);
 		return true;
 	}
 
@@ -123,9 +119,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	public void doSimStep(double now) {
 		// this inserts waiting vehicles, then moves vehicles over intersections, and then updates bookkeeping.
 		// if the config flag is false, we move vehicles, insert waiting vehicles and then update bookkeeping.
-		for (var wait2Link : wait2Link) {
-			wait2Link.moveWaiting(now);
-		}
+		wait2Link.moveWaiting(now);
 		activeNodes.doSimStep(now);
 		activeLinks.doSimStep(now);
 	}

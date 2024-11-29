@@ -34,6 +34,12 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
     default void beforeExecution() {
     }
 
+
+	/**
+	 * Perform cleanup after the simulation has finished.
+	 */
+	default void cleanup() {}
+
     /**
      * Add a message to the task.
      */

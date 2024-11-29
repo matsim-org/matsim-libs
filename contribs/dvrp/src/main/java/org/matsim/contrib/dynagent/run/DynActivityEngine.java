@@ -127,10 +127,6 @@ public class DynActivityEngine implements DistributedMobsimEngine, DistributedAc
 	}
 
 	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 	}
 }

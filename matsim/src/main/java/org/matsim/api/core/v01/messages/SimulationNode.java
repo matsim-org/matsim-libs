@@ -12,7 +12,7 @@ public class SimulationNode implements Message {
 	/**
 	 * A instance of a node that is used for single instance simulations.
 	 */
-	public static final SimulationNode SINGLE_INSTANCE = SimulationNode.builder().parts(IntList.of()).rank(0).cores(1).hostname("localhost").build();
+	public static final SimulationNode SINGLE_INSTANCE = SimulationNode.builder().parts(IntList.of(0)).rank(0).cores(1).hostname("localhost").build();
 
 	private final int rank;
 	private final int cores;
@@ -37,6 +37,13 @@ public class SimulationNode implements Message {
 	 */
 	public boolean isHeadNode() {
 		return this.rank == 0;
+	}
+
+	/**
+	 * Return whether a certain part is the first within the node.
+	 */
+	public boolean isFirstPartition(int part) {
+		return this.parts.isEmpty() || this.parts.getInt(0) == part;
 	}
 
 	/**
