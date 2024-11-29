@@ -11,14 +11,12 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
@@ -47,20 +45,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	@Inject
 	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc, SimStepMessaging simStepMessaging, EventsManager em) {
 		this.asc = asc;
-		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, partition.getIndex());
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
-		activeLinks.setActivateNode(this::activateNode);
-		activeNodes.setActivateLink(this::activateLink);
-	}
-
-	public void activateLink(Id<Link> id) {
-		activeLinks.activate(simNetwork.getLinks().get(id));
-	}
-
-	public void activateNode(Id<Node> id) {
-		activeNodes.activate(simNetwork.getNodes().get(id));
+		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), partition.getIndex(), this::handleVehicleIsFinished, activeLinks::activate, activeNodes::activate);
 	}
 
 	@Override

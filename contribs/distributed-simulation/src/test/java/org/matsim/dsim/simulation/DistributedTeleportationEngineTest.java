@@ -17,7 +17,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.QSimCompatibility;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +53,7 @@ class DistributedTeleportationEngineTest {
 		var simPerson = createPerson("some", em);
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(QSimCompatibility.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
 		var internalInterface = mock(InternalInterface.class);
 		engine.setInternalInterface(internalInterface);
 
@@ -85,7 +84,7 @@ class DistributedTeleportationEngineTest {
 		var messaging = Mockito.mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var internalInterface = mock(InternalInterface.class);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(QSimCompatibility.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
 		engine.setInternalInterface(internalInterface);
 
 		engine.handleDeparture(10, agent1, agent1.getCurrentLinkId());
@@ -109,7 +108,7 @@ class DistributedTeleportationEngineTest {
 		var agent = createPerson("some", em);
 		var messaging = Mockito.mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(false);
-		var engine = new DistributedTeleportationEngine(em, messaging, mock(QSimCompatibility.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class));
 
 		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
 		verify(messaging).collectTeleportation(eq(agent), eq(11 + 42.));
@@ -122,9 +121,9 @@ class DistributedTeleportationEngineTest {
 		var agent = createPerson("some", em);
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var qsimCompatibility = mock(QSimCompatibility.class);
-		when(qsimCompatibility.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, qsimCompatibility);
+		var asc = mock(AgentSourcesContainer.class);
+		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
+		var engine = new DistributedTeleportationEngine(em, messaging, asc);
 
 		engine.setInternalInterface(mock(InternalInterface.class));
 
@@ -152,9 +151,9 @@ class DistributedTeleportationEngineTest {
 		var agent = createPerson("some", em);
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
-		var qsimCompatibility = mock(QSimCompatibility.class);
-		when(qsimCompatibility.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, qsimCompatibility);
+		var asc = mock(AgentSourcesContainer.class);
+		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
+		var engine = new DistributedTeleportationEngine(em, messaging, asc);
 		var message = SimStepMessage.builder()
 			.addTeleportation(new Teleportation(
 				agent.getClass(), agent.toMessage(), 42

@@ -6,6 +6,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 class SimBuffer {
 
@@ -14,6 +15,8 @@ class SimBuffer {
 
 	private final FlowCapacity flowCap;
 	private final double stuckThreshold;
+	private final Consumer<SimNode> activateToNode;
+	private final SimNode toNode;
 
 	@Getter
 	private double pceInBuffer = 0;
@@ -22,11 +25,13 @@ class SimBuffer {
 		return flowCap.getMax();
 	}
 
-	SimBuffer(FlowCapacity outflowCapacity, double stuckThreshold) {
+	SimBuffer(FlowCapacity outflowCapacity, double stuckThreshold, SimNode toNode, Consumer<SimNode> activateToNode) {
 		this.stuckThreshold = stuckThreshold;
 		double minCapacity = Math.max(1, outflowCapacity.getMax());
 		this.internalBuffer = new ArrayDeque<>((int) minCapacity);
 		this.flowCap = outflowCapacity;
+		this.toNode = toNode;
+		this.activateToNode = activateToNode;
 	}
 
 	void add(DistributedMobsimVehicle vehicle, double now) {
@@ -35,6 +40,7 @@ class SimBuffer {
 		this.pceInBuffer += vehicle.getSizeInEquivalents();
 		this.internalBuffer.add(vehicle);
 		this.arrivalTimes.enqueue(now);
+		this.activateToNode.accept(toNode);
 	}
 
 	DistributedMobsimVehicle pollFirst() {

@@ -6,19 +6,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-class SimNode {
+public class SimNode {
 
 	@Getter
 	private final Id<Node> id;
 	@Getter
-	private final List<SimLink> inLinks;
+	private final List<SimLink> inLinks = new ArrayList<>();
 	@Getter
-	private final Map<Id<Link>, SimLink> outLinks;
+	private final Map<Id<Link>, SimLink> outLinks = new HashMap<>();
 
 	// We have had problems with the order of vehicles being switched, when the number of processes changes. One source of error is the
 	// sequence of random numbers being different for varying number of processes. For example: An ActiveNodes object in a single
@@ -54,14 +55,11 @@ class SimNode {
 		return randomSeed;
 	}
 
-	static SimNode create(Node node, Map<Id<Link>, SimLink> links) {
+	void addInLink(SimLink link) {
+		inLinks.add(link);
+	}
 
-		var inLinks = node.getInLinks().keySet().stream()
-			.map(links::get)
-			.toList();
-		var outLinks = node.getOutLinks().keySet().stream()
-			.map(links::get)
-			.collect(Collectors.toMap(SimLink::getId, link -> link));
-		return new SimNode(node.getId(), inLinks, outLinks);
+	void addOutLink(SimLink link) {
+		outLinks.put(link.getId(), link);
 	}
 }

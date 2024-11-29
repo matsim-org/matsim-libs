@@ -1,18 +1,16 @@
 package org.matsim.dsim.simulation;
 
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.messages.Empty;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.dsim.MessageBroker;
-import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.TestUtils;
 import org.mockito.ArgumentCaptor;
 
@@ -28,17 +26,13 @@ class SimStepMessagingTest {
 	@Test
 	public void init() {
 
-		Network network = TestUtils.createDistributedThreeLinkNetwork();
+		var simNode = SimulationNode.builder().build();
+		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		MessageBroker messageBroker = mock(MessageBroker.class);
-		QSimCompatibility qsim = mock(QSimCompatibility.class);
-		IntOpenHashSet neighbors = new IntOpenHashSet(new int[]{0, 2});
-		int part = 1;
 
-		var messaging = new SimStepMessaging(
-			network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(1), messageBroker);
 
-		assertEquals(neighbors, messaging.getNeighbors());
-		assertEquals(part, messaging.getPart());
 		assertFalse(messaging.isLocal(Id.createLinkId("l1")));
 		assertTrue(messaging.isLocal(Id.createLinkId("l2")));
 		assertFalse(messaging.isLocal(Id.createLinkId("l3")));
@@ -47,14 +41,13 @@ class SimStepMessagingTest {
 	@Test
 	public void sendNullMessage() {
 
+		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
-		var qsim = mock(QSimCompatibility.class);
-		var neighbors = new IntOpenHashSet(new int[]{1});
 		var part = 0;
 
-		var messaging = new SimStepMessaging(
-			network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
 		messaging.sendMessages(0);
 		ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
 		ArgumentCaptor<Integer> targetPartCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -71,13 +64,13 @@ class SimStepMessagingTest {
 
 	@Test
 	public void collectTeleportation() {
+		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
-		var qsim = mock(QSimCompatibility.class);
-		var neighbors = new IntOpenHashSet(new int[]{1});
 		var part = 0;
 
-		var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
 
 		var remotePerson = mock(DistributedMobsimAgent.class);
 		when(remotePerson.getDestinationLinkId()).thenReturn(Id.createLinkId("l3"));
@@ -106,16 +99,15 @@ class SimStepMessagingTest {
 
 	@Test
 	public void collectVehicle() {
+
+		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
-		var qsim = mock(QSimCompatibility.class);
-		var neighbors = new IntOpenHashSet(new int[]{1});
 		var part = 0;
 
-		var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
 		var vehicle = mock(DistributedMobsimVehicle.class);
-
-		when(qsim.vehicleToContainer(any())).thenReturn(new VehicleContainer(DistributedMobsimVehicle.class, Empty.INSTANCE, null, null));
 		when(vehicle.getCurrentLinkId()).thenReturn(Id.createLinkId("l2"));
 		when(vehicle.toMessage()).thenReturn(Empty.INSTANCE);
 
@@ -134,13 +126,13 @@ class SimStepMessagingTest {
 	@Test
 	public void collectStorageCapacityUpdates() {
 
+		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
-		var qsim = mock(QSimCompatibility.class);
-		var neighbors = new IntOpenHashSet(new int[]{0, 2});
 		var part = 1;
 
-		var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
 
 		messaging.collectStorageCapacityUpdate(Id.createLinkId("l1"), 10, 5, 0);
 		verify(messageBroker, times(0)).send(any(), anyInt());
@@ -164,13 +156,13 @@ class SimStepMessagingTest {
 	@Test
 	public void clearMessages() {
 
+		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
+		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
-		var qsim = mock(QSimCompatibility.class);
-		var neighbors = new IntOpenHashSet(new int[]{1});
 		var part = 2;
 
-		var messaging = SimStepMessaging.create(network, messageBroker, qsim, neighbors, part);
+		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
 		messaging.collectStorageCapacityUpdate(Id.createLinkId("l2"), 10, 5, 1);
 		verify(messageBroker, times(0)).send(any(), anyInt());
 

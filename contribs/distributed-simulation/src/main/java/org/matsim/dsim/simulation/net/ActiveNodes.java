@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Implement the move node logic in the engine. The intersection update touches in and out links
@@ -30,8 +28,6 @@ public class ActiveNodes implements Steppable {
 	private final Set<SimNode> activeNodes = new HashSet<>();
 	private final EventsManager em;
 	private final Random rnd = new Random();
-	@Setter
-	private Consumer<Id<Link>> activateLink;
 
 	int size() {
 		return activeNodes.size();
@@ -121,6 +117,5 @@ public class ActiveNodes implements Steppable {
 
 		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), nextLinkId));
 		nextLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
-		activateLink.accept(nextLink.getId());
 	}
 }

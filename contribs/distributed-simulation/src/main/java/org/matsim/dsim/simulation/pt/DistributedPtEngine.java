@@ -20,7 +20,6 @@ import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class DistributedPtEngine implements DistributedMobsimEngine, DistributedDepartureHandler, Wait2Link {
@@ -28,14 +27,12 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	private final TransitQSimEngine transitQSimEngine;
 	private final Map<Id<Link>, Queue<VehicleAtStop>> activeStops = new HashMap<>();
 	private final Map<Id<Link>, Queue<DefaultWait2Link.Waiting>> waitingVehicles = new HashMap<>();
-	private final Consumer<Id<Link>> activateLink;
 	private final EventsManager em;
 
 
 	@Inject
 	public DistributedPtEngine(Scenario scenario, TransitQSimEngine transitQSimEngine, NetworkTrafficEngine networkTrafficEngine, EventsManager em) {
 		this.transitQSimEngine = transitQSimEngine;
-		this.activateLink = networkTrafficEngine::activateLink;
 		this.em = em;
 
 		// find out which links are pt links and hook into the leaveQ handler.
@@ -121,14 +118,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			vehicle.getDriver().getMode(), 1.0)
 		);
 		switch (result) {
-			case BlockQueue -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
-				activateLink.accept(link.getId());
-			}
-			case MoveToBuffer -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
-				activateLink.accept(link.getId());
-			}
+			case BlockQueue -> link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
+			case MoveToBuffer -> link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
 			case RemoveVehicle -> { // nothing to do. The vehicle should be in vehicles at stop
 			}
 		}

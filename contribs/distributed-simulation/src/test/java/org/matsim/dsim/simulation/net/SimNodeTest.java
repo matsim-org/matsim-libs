@@ -18,7 +18,9 @@ class SimNodeTest {
 			.map(link -> TestUtils.createLink(link, 0, 30))
 			.collect(Collectors.toMap(SimLink::getId, link -> link));
 		var node = network.getNodes().get(Id.createNodeId("n3"));
-		var simNode = SimNode.create(node, simLinks);
+		var simNode = new SimNode(node.getId());
+		simNode.addInLink(simLinks.get(Id.createLinkId("l2")));
+		simNode.addOutLink(simLinks.get(Id.createLinkId("l3")));
 
 		assertEquals(node.getId(), simNode.getId());
 		assertEquals(1, simNode.getInLinks().size());

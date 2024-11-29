@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -18,8 +19,8 @@ import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.TestUtils;
+import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.vehicles.VehicleType;
@@ -41,8 +42,8 @@ class NetworkTrafficEngineTest {
 		var eventsManager = TestUtils.mockExpectingEventsManager(expectedEvents);
 		var timeInterpretation = TimeInterpretation.create(scenario.getConfig());
 
-		var engine = new NetworkTrafficEngine(scenario, mock(QSimCompatibility.class),
-			mock(SimStepMessaging.class), eventsManager, 0);
+		var engine = new NetworkTrafficEngine(scenario, mock(NetworkPartition.class), mock(AgentSourcesContainer.class),
+			mock(SimStepMessaging.class), eventsManager);
 
 		var timer = mock(MobsimTimer.class);
 

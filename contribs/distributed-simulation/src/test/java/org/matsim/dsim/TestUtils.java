@@ -11,6 +11,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.dsim.simulation.SimpleAgent;
 import org.matsim.dsim.simulation.SimpleVehicle;
 import org.matsim.dsim.simulation.net.SimLink;
+import org.matsim.dsim.simulation.net.SimNode;
 
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class TestUtils {
 	public static SimLink createLink(Link link, int part, double stuckTime) {
 		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
 		defaultQsimConfig.setStuckTime(stuckTime);
-		return SimLink.create(link, (_, _, _) -> SimLink.OnLeaveQueueInstruction.MoveToBuffer, defaultQsimConfig, 7.5, part);
+		var simNode = new SimNode(link.getToNode().getId());
+		return SimLink.create(link, simNode, defaultQsimConfig, 7.5, part, (_, _, _) -> SimLink.OnLeaveQueueInstruction.MoveToBuffer,
+			_ -> {}, _ -> {});
 	}
 
 	public static Link createSingleLink() {
