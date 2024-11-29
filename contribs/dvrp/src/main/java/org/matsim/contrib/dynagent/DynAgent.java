@@ -75,6 +75,19 @@ public final class DynAgent implements DistributedMobsimAgent, MobsimDriverPasse
 		state = MobsimAgent.State.ACTIVITY;
 	}
 
+	public DynAgent(DynAgentMessage message, EventsManager events, DynAgentLogic agentLogic) {
+		this.id = message.id();
+		this.currentLinkId = message.currentLinkId();
+		this.agentLogic = agentLogic;
+		this.events = events;
+		this.state = message.state();
+
+		// Needed for initialization
+		this.agentLogic.computeInitialActivity(this);
+		this.dynLeg = message.dynLeg();
+		this.dynActivity = message.dynActivity();
+	}
+
 	private void computeNextAction(DynAction oldDynAction, double now) {
 		oldDynAction.finalizeAction(now);
 
@@ -268,6 +281,6 @@ public final class DynAgent implements DistributedMobsimAgent, MobsimDriverPasse
 
 	@Override
 	public Message toMessage() {
-		throw new UnsupportedOperationException("Not yet supported");
+		return new DynAgentMessage(id, currentLinkId, veh.getId(), state, dynLeg, dynActivity);
 	}
 }

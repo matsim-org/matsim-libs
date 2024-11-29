@@ -95,6 +95,11 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	private boolean beforeFirstSimStep = true;
 
 	@Override
+	public double priority() {
+		return Double.NEGATIVE_INFINITY;
+	}
+
+	@Override
 	public void onPrepareSim() {
 		// Nothing to do here
 	}

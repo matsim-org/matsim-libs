@@ -1,7 +1,10 @@
 package org.matsim.dsim;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.communication.NullCommunicator;
@@ -62,7 +65,7 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Disabled
+		//@Disabled
 	void runDistributed() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
 		Path output = Path.of(utils.getOutputDirectory());

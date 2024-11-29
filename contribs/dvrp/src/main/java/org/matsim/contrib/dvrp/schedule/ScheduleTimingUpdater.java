@@ -25,8 +25,10 @@ import java.util.List;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+@NodeSingleton
 public class ScheduleTimingUpdater {
 	public interface StayTaskEndTimeCalculator {
 		double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime);

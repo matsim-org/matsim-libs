@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -39,6 +40,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
+@NodeSingleton
 public class EmptyVehicleRelocator {
 	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
 	public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE = new DrtTaskType("RELOCATE_TO_DEPOT", DRIVE);

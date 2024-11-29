@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class Wait2LinkTest {
+class VehicleDepartingOnLinkTest {
 
 	@Test
 	void vehicleIntoBuffer() {
@@ -27,7 +27,8 @@ class Wait2LinkTest {
 		var em = mock(EventsManager.class);
 		var messaging = mock(SimStepMessaging.class);
 		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new Wait2Link(em, activeLinks);
+		var wait2link = new DefaultWait2Link(em, _ -> {
+		});
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
 		var simLink = TestUtils.createLink(link, 0, 10);
@@ -50,11 +51,11 @@ class Wait2LinkTest {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 		assertTrue(simLink.isOffering());
 
-		wait2link.accept(simVehicle1, simLink);
+		wait2link.accept(simVehicle1, simLink, 0);
 		// add a second vehicle to assert the correct order.
-		wait2link.accept(simVehicle2, simLink);
+		wait2link.accept(simVehicle2, simLink, 0);
 		// the vehicle can't go onto the link, as the buffer is blocked by another vehicle
-		wait2link.doSimStep(0);
+		wait2link.moveWaiting(0);
 		verify(em, times(0)).processEvent(any());
 
 		// free the link
@@ -64,14 +65,14 @@ class Wait2LinkTest {
 		assertFalse(simLink.isOffering());
 
 		// try again
-		wait2link.doSimStep(2);
+		wait2link.moveWaiting(2);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
 		assertTrue(simLink.isOffering());
 		assertEquals(simVehicle1.getId(), simLink.popVehicle().getId());
 		verify(em, times(1)).processEvent(any());
 
 		simLink.doSimStep(null, 4);
-		wait2link.doSimStep(4);
+		wait2link.moveWaiting(4);
 		assertEquals(simVehicle2.getId(), simLink.popVehicle().getId());
 		verify(em, times(2)).processEvent(any());
 	}
@@ -82,7 +83,8 @@ class Wait2LinkTest {
 		var em = mock(EventsManager.class);
 		var messaging = mock(SimStepMessaging.class);
 		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new Wait2Link(em, activeLinks);
+		var wait2link = new DefaultWait2Link(em, _ -> {
+		});
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
 		var simLink = TestUtils.createLink(link, 0, 1);
@@ -104,11 +106,11 @@ class Wait2LinkTest {
 
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 
-		wait2link.accept(simVehicle1, simLink);
+		wait2link.accept(simVehicle1, simLink, 0);
 		// add a second vehicle to assert the correct order.
-		wait2link.accept(simVehicle2, simLink);
+		wait2link.accept(simVehicle2, simLink, 0);
 		// the vehicle can't go onto the link, as the queue is blocked by another vehicle
-		wait2link.doSimStep(0);
+		wait2link.moveWaiting(0);
 		verify(em, times(0)).processEvent(any());
 
 		// free the link
@@ -116,7 +118,7 @@ class Wait2LinkTest {
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		assertTrue(simLink.isOffering());
 		// this should put both vehicles onto the link
-		wait2link.doSimStep(0);
+		wait2link.moveWaiting(0);
 		verify(em, times(2)).processEvent(any());
 
 		var expectedIt = List.of(Id.createVehicleId("veh-2"), Id.createVehicleId("veh-1")).iterator();
@@ -133,7 +135,8 @@ class Wait2LinkTest {
 		var em = mock(EventsManager.class);
 		var messaging = mock(SimStepMessaging.class);
 		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new Wait2Link(em, activeLinks);
+		var wait2link = new DefaultWait2Link(em, _ -> {
+		});
 		var link1 = TestUtils.createSingleLink(0, 0);
 		link1.setCapacity(3600);
 		var link2 = TestUtils.createSingleLink(0, 0);
@@ -153,9 +156,9 @@ class Wait2LinkTest {
 		assertFalse(simLink1.isOffering());
 		assertFalse(simLink2.isOffering());
 
-		wait2link.accept(simVehicle1, simLink1);
-		wait2link.accept(simVehicle2, simLink2);
-		wait2link.doSimStep(0);
+		wait2link.accept(simVehicle1, simLink1, 0);
+		wait2link.accept(simVehicle2, simLink2, 0);
+		wait2link.moveWaiting(0);
 
 		assertEquals(simVehicle1.getId(), simLink1.popVehicle().getId());
 		assertEquals(simVehicle2.getId(), simLink2.popVehicle().getId());

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -19,9 +20,7 @@ import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Log4j2
 public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
@@ -32,14 +31,15 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	private final ActiveNodes activeNodes;
 	private final ActiveLinks activeLinks;
-	private final Wait2Link wait2Link;
-	private final boolean wait2LinkFirst;
 
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final QSimCompatibility qSimCompatibility;
 
 	@Setter
 	private InternalInterface internalInterface;
+	// TODO don't expose this. Fix it when fixing how we are injecting engines into disim
+	@Getter
+	private final List<Wait2Link> wait2Link = new ArrayList<>();
 
 	public NetworkTrafficEngine(Scenario scenario, QSimCompatibility qSimCompatibility, SimStepMessaging simStepMessaging, EventsManager em, int part) {
 		this.qSimCompatibility = qSimCompatibility;
@@ -47,12 +47,17 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
-		activeLinks.setActivateNode(id -> this.activeNodes.activate(this.simNetwork.getNodes().get(id)));
-		activeNodes.setActivateLink(activeLinks::activate);
-		wait2Link = new Wait2Link(em, activeLinks);
-		wait2LinkFirst = scenario.getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles();
+		activeLinks.setActivateNode(this::activateNode);
+		activeNodes.setActivateLink(this::activateLink);
 	}
 
+	public void activateLink(Id<Link> id) {
+		activeLinks.activate(simNetwork.getLinks().get(id));
+	}
+
+	public void activateNode(Id<Node> id) {
+		activeNodes.activate(simNetwork.getNodes().get(id));
+	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
@@ -64,7 +69,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		// place person into vehicle
 		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
 			parkedVehicles.remove(driver.getPlannedVehicleId()),
-			() -> "Vehicle not found: " + driver.getPlannedVehicleId()
+			() -> "Vehicle not found: %s for agent %s on part %d".formatted(
+				driver.getPlannedVehicleId(),
+				driver.getId(),
+				this.getSimNetwork().getPart())
 		);
 		driver.setVehicle(vehicle);
 		vehicle.setDriver(driver);
@@ -76,7 +84,11 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
-		wait2Link.accept(vehicle, link);
+		for (Wait2Link w2l : wait2Link) {
+			if (w2l.accept(vehicle, link, now)) {
+				break;
+			}
+		}
 		return true;
 	}
 
@@ -119,13 +131,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	public void doSimStep(double now) {
 		// this inserts waiting vehicles, then moves vehicles over intersections, and then updates bookkeeping.
 		// if the config flag is false, we move vehicles, insert waiting vehicles and then update bookkeeping.
-		if (wait2LinkFirst) {
-			wait2Link.doSimStep(now);
+		for (var wait2Link : wait2Link) {
+			wait2Link.moveWaiting(now);
 		}
 		activeNodes.doSimStep(now);
-		if (!wait2LinkFirst) {
-			wait2Link.doSimStep(now);
-		}
 		activeLinks.doSimStep(now);
 	}
 
@@ -152,7 +161,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id<Link> _startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh) {
 		if (veh instanceof DistributedMobsimVehicle dv) {
 			parkedVehicles.put(veh.getId(), dv);
 		} else {

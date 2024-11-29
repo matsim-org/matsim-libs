@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LP;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -13,6 +14,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
@@ -25,10 +27,13 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
+import org.matsim.dsim.simulation.net.DefaultWait2Link;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
+import org.matsim.dsim.simulation.pt.DistributedPtEngine;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -39,9 +44,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	// The Qsim has flexible engines. However, Activity, Teleportation and Netsim Engine are treated
 	// in a special way. I'll have them as explicit members here, until we need more flexibility.
-	private final Collection<? extends DistributedMobsimEngine> engines;
+	private final Collection<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final DistributedTeleportationEngine teleportationEngine;
 	private final NetworkTrafficEngine networkTrafficEngine;
+	private final DistributedPtEngine ptEngine;
 
 	private final SimStepMessaging messaging;
 	private final NetworkPartition partition;
@@ -49,12 +55,19 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final QSimCompatibility qsim;
 
 	private final EventsManager em;
-	//private final Config config;
 	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 
-	SimProcess(NetworkPartition partition, SimStepMessaging messaging, QSimCompatibility qsim, DistributedTeleportationEngine teleportationEngine,
+	/**
+	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
+	 * This map does not contain the full set of agents in the simulation.
+	 */
+	private IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
+
+	SimProcess(NetworkPartition partition, SimStepMessaging messaging,
+			   QSimCompatibility qsim, QSimCompatibility singletons,
+			   DistributedTeleportationEngine teleportationEngine,
 			   NetworkTrafficEngine networkTrafficEngine, EventsManager em, Config config) {
 		this.partition = partition;
 		this.qsim = qsim;
@@ -62,7 +75,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		this.messaging = messaging;
 		this.teleportationEngine = teleportationEngine;
 		this.networkTrafficEngine = networkTrafficEngine;
-		this.engines = List.of(teleportationEngine, networkTrafficEngine);
 		this.currentTime = new MobsimTimer();
 		this.mainModes = new HashSet<>(config.qsim().getMainModes());
 		log.info("#{} has {} links, and {} nodes",
@@ -70,9 +82,31 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			networkTrafficEngine.getSimNetwork().getLinks().size(),
 			networkTrafficEngine.getSimNetwork().getNodes().size());
 
+
 		// There can be components that register additional event handler
 		// These must be created the simulation starts running
-		this.qsim.init(this);
+		this.qsim.init(this, singletons);
+
+		// TODO this is a little hacky and should be done differently. But we need the sim network which is created with constructor injection and
+		// the transitqSimEngine, which is bound via injector, but only after qsim.init(this) was called
+		if (qsim.getQsimInjector() != null) {
+			var qsimTransitEngine = qsim.getQsimInjector().getInstance(TransitQSimEngine.class);
+			ptEngine = new DistributedPtEngine(getScenario(), qsimTransitEngine, networkTrafficEngine, em);
+			engines.add(ptEngine);
+			//this.engines = List.of(ptEngine, networkTrafficEngine, teleportationEngine);
+			qsim.getDepartureHandlers().remove(qsimTransitEngine);
+			qsim.getEngines().remove(qsimTransitEngine);
+
+			// TODO do this properly in a structured way too: wire up wait to link into the network engine
+			networkTrafficEngine.getWait2Link().add(ptEngine);
+			var defaultWait2Link = new DefaultWait2Link(em, networkTrafficEngine::activateLink);
+			networkTrafficEngine.getWait2Link().add(defaultWait2Link);
+		} else {
+			ptEngine = null;
+		}
+
+		engines.add(networkTrafficEngine);
+		engines.add(teleportationEngine);
 	}
 
 	@Override
@@ -93,12 +127,27 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		}
 	}
 
+	/**
+	 * Return the local mobsim listeners.
+	 */
+	public Set<MobsimListener> getListeners() {
+		return qsim.getListeners();
+	}
+
 	@Override
 	public void doSimStep(double time) {
 
 		this.currentTime.setTime(time);
 
+		// Within day engine must be processed first
+		if (this.qsim.getWithinDayEngine() != null)
+			this.qsim.getWithinDayEngine().doSimStep(time);
+
 		for (MobsimEngine engine : qsim.getEngines()) {
+
+			if (engine == this.qsim.getWithinDayEngine())
+				continue;
+
 			engine.doSimStep(time);
 		}
 
@@ -126,7 +175,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		networkTrafficEngine.addParkedVehicle(veh, startLinkId);
+		networkTrafficEngine.addParkedVehicle(veh);
 	}
 
 	@Override
@@ -171,7 +220,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public Map<Id<Person>, MobsimAgent> getAgents() {
-		// TODO: probably needed
+		// TODO: Few engines night this, but did not occurred yet
 		throw new UnsupportedOperationException();
 	}
 
@@ -187,7 +236,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		throw new UnsupportedOperationException();
+		for (ActivityHandler activityHandler : qsim.getActivityHandlers()) {
+			Gbl.assertNotNull(activityHandler);
+			activityHandler.rescheduleActivityEnd(agent);
+		}
 	}
 
 	@Override
@@ -212,7 +264,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
-		for (ActivityHandler activityHandler : this.qsim.getActivityEngines()) {
+		for (ActivityHandler activityHandler : this.qsim.getActivityHandlers()) {
 			if (activityHandler.handleActivity(agent)) {
 				return;
 			}
@@ -221,12 +273,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		// don't do anything.
+		agents.put(agent.getId(), agent);
 	}
 
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		return null;
+		return agents.remove(agentId);
 	}
 
 	@Override
@@ -247,6 +299,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		));
 
 		Id<Link> linkId = agent.getCurrentLinkId();
+
+		// TODO move the logic into the engines
+		if (getScenario().getConfig().transit().getTransitModes().contains(agent.getMode())) {
+			ptEngine.handleDeparture(now, agent, linkId);
+			return;
+		}
 
 		// TODO: network traffic engine must check for itself if it is responsible for the agent
 		if (mainModes.contains(agent.getMode())) {

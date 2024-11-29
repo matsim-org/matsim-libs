@@ -1,8 +1,10 @@
 package org.matsim.dsim;
 
+import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Message;
 
 import java.lang.invoke.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -13,16 +15,24 @@ import java.util.function.Function;
 /**
  * Used from https://gist.github.com/alexengrig/df1797d4d07c9f5d521d8c33c2a56563
  */
+@Log4j2
 public class LambdaUtils {
 
     public static Consumer<? extends Message> createConsumer(Object lp, Class<?> msgType, String target) throws LambdaConversionException, ReflectiveOperationException {
 
         Class<?> clazz = lp.getClass();
         if (clazz.isSynthetic() && !clazz.isLocalClass() && !clazz.isAnonymousClass() && clazz.getDeclaredMethods().length == 1) {
-            // TODO: lambda classes are not yet supported and need to be handled different
-            return message -> {
-                throw new UnsupportedOperationException("Lambda classes are not yet supported");
-            };
+
+			log.warn("Lambda functions as event handler currently only supported via reflection (slow): {}", clazz);
+
+			Method method = clazz.getDeclaredMethods()[0];
+			return message -> {
+				try {
+					method.invoke(lp, message);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			};
         }
 
         Method consumerMethod = clazz.getMethod(target, msgType);

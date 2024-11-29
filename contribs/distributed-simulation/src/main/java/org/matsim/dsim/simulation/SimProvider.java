@@ -47,6 +47,9 @@ public class SimProvider implements LPProvider {
 	@Inject
 	private Injector injector;
 
+
+	private QSimCompatibility singletons;
+
 	private static boolean isSplit(Link link) {
 		var fromRank = (int) link.getFromNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
 		var toRank = (int) link.getToNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
@@ -70,14 +73,23 @@ public class SimProvider implements LPProvider {
 
 		QSimCompatibility compat = injector.getInstance(QSimCompatibility.class);
 
+		// The first created partition will hold the singletons
+		// TODO: the injection logic needs to be reworked to solve this better
+		if (part == 0)
+			singletons = compat;
+
 		SimStepMessaging messaging = SimStepMessaging.create(network, messageBroker, compat, neighbors, part);
 		//ActivityEngineReimplementation activityEngine = createActivityEngine(part);
 		DistributedTeleportationEngine teleportationEngine = new DistributedTeleportationEngine(eventsManager, messaging, compat);
+		//var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, part);
 		NetworkTrafficEngine networkTrafficEngine = new NetworkTrafficEngine(scenario, compat, messaging, eventsManager, part);
+		var simNetwork = networkTrafficEngine.getSimNetwork();
+		//var qsimPtEngine = injector.getInstance(TransitQSimEngine.class);
+		//var ptEngine = new DistributedPtEngine(scenario, qsimPtEngine, simNetwork);
 
 		return new SimProcess(
-			partition, messaging, compat, teleportationEngine, networkTrafficEngine,
-			eventsManager,
-			config);
+			partition, messaging, compat, singletons == compat ? null : singletons,
+			teleportationEngine, networkTrafficEngine,
+			eventsManager, config);
 	}
 }

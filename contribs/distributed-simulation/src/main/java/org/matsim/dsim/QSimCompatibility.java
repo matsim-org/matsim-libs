@@ -1,7 +1,9 @@
 package org.matsim.dsim;
 
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.name.Named;
+import com.google.inject.util.Modules;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Message;
@@ -10,15 +12,18 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.dsim.utils.NodeSingletonModule;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -35,8 +40,8 @@ public final class QSimCompatibility {
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
 
-	private final Map<Class<? extends DistributedMobsimAgent>, DistributedAgentSource> agentTypes = new HashMap<>();
-	private final Map<Class<? extends DistributedMobsimVehicle>, DistributedAgentSource> vehicleTypes = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimAgent>, List<DistributedAgentSource>> agentTypes = new HashMap<>();
+	private final Map<Class<? extends DistributedMobsimVehicle>, List<DistributedAgentSource>> vehicleTypes = new HashMap<>();
 
 	@Getter
 	private final Injector injector;
@@ -48,14 +53,19 @@ public final class QSimCompatibility {
 	private final List<MobsimEngine> engines = new ArrayList<>();
 
 	@Getter
-	private final List<ActivityEngine> activityEngines = new ArrayList<>();
+	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
 
 	@Getter
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 
-	private Injector qsimInjector;
+	@Getter
+	private final Set<MobsimListener> listeners = new HashSet<>();
 
-	private Netsim netsim;
+	@Getter
+	private WithinDayEngine withinDayEngine;
+
+	@Getter
+	private Injector qsimInjector;
 
 	@Inject
 	QSimCompatibility(Injector injector, Config config, IterationCounter iterationCounter,
@@ -74,18 +84,19 @@ public final class QSimCompatibility {
 
 	/**
 	 * Initialize module with underlying netsim.
+	 * @param netsim netsim instance
+	 * @param singletons instance holding the global singletons
 	 */
-	public void init(Netsim netsim) {
+	public void init(Netsim netsim, @Nullable QSimCompatibility singletons) {
 		if (qsimInjector != null) {
 			return;
 		}
-
-		this.netsim = netsim;
 
 		modules.forEach(m -> m.setConfig(config));
 
 		// Remove modules that are known to be incompatible and are not needed
 		modules.removeIf(m -> m instanceof QNetsimEngineModule);
+		//modules.removeIf(m -> m instanceof TransitEngineModule);
 
 		overridingModules.forEach(m -> m.setConfig(config));
 
@@ -96,16 +107,18 @@ public final class QSimCompatibility {
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.emptyList());
 
 		for (AbstractQSimModule override : overridingModulesFromAbstractModule) {
+			override.setConfig(config);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
 		for (AbstractQSimModule override : overridingModules) {
+			override.setConfig(config);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
 		final AbstractQSimModule finalQsimModule = qsimModule;
 
-		AbstractModule module = new AbstractModule() {
+		Module module = new AbstractModule() {
 			@Override
 			protected void configure() {
 				install(finalQsimModule);
@@ -113,7 +126,19 @@ public final class QSimCompatibility {
 			}
 		};
 
+		if (singletons != null) {
+			module = Modules.override(module).with(new NodeSingletonModule(singletons.getQsimInjector()));
+		}
+
 		qsimInjector = injector.createChildInjector(module);
+
+		// Retrieve all mobsim listeners
+		Set<MobsimListener> listener = qsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+
+		// Add all listener that are not node singletons, or this is the first instance
+		listener.stream()
+				.filter(l -> !l.getClass().isAnnotationPresent(NodeSingleton.class) || singletons == null)
+				.forEach(listeners::add);
 
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
@@ -136,14 +161,14 @@ public final class QSimCompatibility {
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
 
-				int n = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+				int n = engines.size() + activityHandlers.size() + departureHandlers.size() + agentSources.size();
 
 				if (qSimComponent instanceof DistributedMobsimEngine m) {
 					engines.add(m);
 				}
 
-				if (qSimComponent instanceof DistributedActivityEngine ah) {
-					activityEngines.add(ah);
+				if (qSimComponent instanceof DistributedActivityHandler ah) {
+					activityHandlers.add(ah);
 				}
 
 				if (qSimComponent instanceof DistributedDepartureHandler dh) {
@@ -153,29 +178,33 @@ public final class QSimCompatibility {
 				if (qSimComponent instanceof DistributedAgentSource as) {
 					agentSources.add(as);
 					for (Class<? extends DistributedMobsimAgent> agentClass : as.getAgentClasses()) {
-						// TODO: Need other type system
-						if (agentTypes.containsKey(agentClass))
-							throw new IllegalStateException("Duplicate agent provider found for %s".formatted(agentClass));
-
-						agentTypes.put(agentClass, as);
+						agentTypes.computeIfAbsent(agentClass, (_) -> new ArrayList<>()).add(as);
 					}
 
 					for (Class<? extends DistributedMobsimVehicle> vehicleClass : as.getVehicleClasses()) {
-						if (vehicleTypes.containsKey(vehicleClass))
-							throw new IllegalStateException("Duplicate vehicle provider found for %s".formatted(vehicleClass));
-
-						vehicleTypes.put(vehicleClass, as);
+						vehicleTypes.computeIfAbsent(vehicleClass, (_) -> new ArrayList<>()).add(as);
 					}
 				}
 
-				int m = engines.size() + activityEngines.size() + departureHandlers.size() + agentSources.size();
+				if (qSimComponent instanceof WithinDayEngine wde) {
+					withinDayEngine = wde;
+				}
+
+				int m = engines.size() + activityHandlers.size() + departureHandlers.size() + agentSources.size();
 				if (n == m) {
 					log.warn("Ignored component not compatible with distributed simulation: {}", qSimComponent);
 				}
 
+				if (qSimComponent instanceof MobsimListener l) {
+					listeners.add(l);
+				}
 			}
 		}
+
+		// Order engines by priority
+		activityHandlers.sort(Comparator.comparingDouble(DistributedActivityHandler::priority).reversed());
 	}
+
 
 	/**
 	 * Create a vehicle container, which includes all the occupants.
@@ -217,12 +246,19 @@ public final class QSimCompatibility {
 	 * @see #vehicleFromContainer(VehicleContainer)
 	 */
 	private DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message m) {
-		DistributedAgentSource source = vehicleTypes.get(type);
-		if (source == null) {
+		List<DistributedAgentSource> sources = vehicleTypes.get(type);
+		if (sources == null) {
 			throw new RuntimeException("No vehicle provider found for %s".formatted(type));
 		}
 
-		return source.vehicleFromMessage(type, m);
+		for (DistributedAgentSource source : sources) {
+			DistributedMobsimVehicle vehicle = source.vehicleFromMessage(type, m);
+			if (vehicle != null) {
+				return vehicle;
+			}
+		}
+
+		throw new IllegalStateException("No vehicle provider found for type %s with message %s".formatted(type, m));
 	}
 
 	/**
@@ -230,12 +266,19 @@ public final class QSimCompatibility {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends DistributedMobsimAgent> T agentFromMessage(Class<T> type, Message m) {
-		DistributedAgentSource source = agentTypes.get(type);
-		if (source == null) {
-			throw new RuntimeException("No agent provider found for %s".formatted(type));
+		List<DistributedAgentSource> sources = agentTypes.get(type);
+		if (sources == null) {
+			throw new RuntimeException("No agent provider found for type %s".formatted(type));
 		}
 
-		return (T) source.agentFromMessage(type, m);
+		for (DistributedAgentSource source : sources) {
+			T agent = (T) source.agentFromMessage(type, m);
+			if (agent != null) {
+				return agent;
+			}
+		}
+
+		throw new IllegalStateException("No agent provider found for type %s with message %s".formatted(type, m));
 	}
 
 }

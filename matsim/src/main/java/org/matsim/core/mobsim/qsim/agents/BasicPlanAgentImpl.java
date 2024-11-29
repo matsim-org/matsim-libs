@@ -388,7 +388,12 @@ public final class BasicPlanAgentImpl implements DistributedMobsimAgent, PlanAge
 	}
 
 	Leg getCurrentLeg() {
-		return (Leg) this.getCurrentPlanElement();
+		try {
+			return (Leg) this.getCurrentPlanElement();
+		} catch (ClassCastException e) {
+			log.error("Oh no!");
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

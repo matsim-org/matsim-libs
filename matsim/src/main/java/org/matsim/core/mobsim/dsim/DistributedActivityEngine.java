@@ -8,5 +8,6 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
  *
  * @see ActivityEngine
  */
-public interface DistributedActivityEngine extends ActivityEngine, DistributedMobsimEngine {
+public interface DistributedActivityEngine extends ActivityEngine, DistributedActivityHandler, DistributedMobsimEngine {
+
 }
