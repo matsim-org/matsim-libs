@@ -69,7 +69,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		// place person into vehicle
 		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
 			parkedVehicles.remove(driver.getPlannedVehicleId()),
-			() -> "Vehicle not found: " + driver.getPlannedVehicleId() + " on part " + this.getSimNetwork().getPart()
+			() -> "Vehicle not found: %s for agent %s on part %d".formatted(
+				driver.getPlannedVehicleId(),
+				driver.getId(),
+				this.getSimNetwork().getPart())
 		);
 		driver.setVehicle(vehicle);
 		vehicle.setDriver(driver);
