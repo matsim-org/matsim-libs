@@ -6,7 +6,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpLoad;
 
 import java.util.Collection;
 
-public interface DvrpLoadFromPassengers {
+public interface DvrpLoadFromDrtPassengers {
 
 	DvrpLoad getLoad(Collection<Id<Person>> personIds);
 }

@@ -7,9 +7,11 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.passenger.DefaultDvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.taas.capacities.CapacityChangeSchedulerEngine;
 import org.matsim.contrib.drt.taas.capacities.CapacityReconfigurationLogic;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.taas.capacities.DefaultCapacityConfigurationLogic;
@@ -34,6 +36,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class RunDrtExampleWithChangingCapacitiesTest {
@@ -64,8 +67,11 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 
 
 	static class PersonsDvrpLoadType extends IntegerLoadType {
+
+		public static final String TYPE_NAME = "personsLoad";
+
 		public PersonsDvrpLoadType() {
-			super(Id.create("personsLoad", DvrpLoadType.class), "persons");
+			super(Id.create(TYPE_NAME, DvrpLoadType.class), "persons");
 		}
 
 		@Override
@@ -82,8 +88,11 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 	}
 
 	static class GoodsDvrpLoadType extends IntegerLoadType {
+
+		public static final String TYPE_NAME = "goodsLoad";
+
 		public GoodsDvrpLoadType() {
-			super(Id.create("goodsLoad", DvrpLoadType.class), "goods");
+			super(Id.create(TYPE_NAME, DvrpLoadType.class), "goods");
 		}
 
 		@Override
@@ -99,11 +108,11 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 	}
 
-	static class ParityBasedDvrpLoadFromPassengers implements DvrpLoadFromPassengers {
+	static class ParityBasedDvrpLoadFromDrtPassengers implements DvrpLoadFromDrtPassengers {
 
 		private final IntegerLoadType first;
 		private final IntegerLoadType second;
-		public ParityBasedDvrpLoadFromPassengers(IntegerLoadType first, IntegerLoadType second) {
+		public ParityBasedDvrpLoadFromDrtPassengers(IntegerLoadType first, IntegerLoadType second) {
 			this.first = first;
 			this.second = second;
 		}
@@ -146,7 +155,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 				return new DefaultDvrpLoadSerializer(personsDvrpLoadType, goodsDvrpLoadType);
 			})).asEagerSingleton();
 
-			bindModal(DvrpLoadFromPassengers.class).toProvider(modalProvider(getter -> new ParityBasedDvrpLoadFromPassengers(getter.getModal(PersonsDvrpLoadType.class), getter.getModal(GoodsDvrpLoadType.class))));
+			//bindModal(DvrpLoadFromDrtPassengers.class).toProvider(modalProvider(getter -> new ParityBasedDvrpLoadFromDrtPassengers(getter.getModal(PersonsDvrpLoadType.class), getter.getModal(GoodsDvrpLoadType.class))));
 
 			if(useSimpleCapacityConfigurationLogic) {
 				bindModal(CapacityReconfigurationLogic.class).toProvider(modalProvider(getter -> {
@@ -161,10 +170,10 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 					PersonsDvrpLoadType personsDvrpLoadType = getter.getModal(PersonsDvrpLoadType.class);
 					GoodsDvrpLoadType goodsDvrpLoadType = getter.getModal(GoodsDvrpLoadType.class);
 					Set<DvrpLoad> possibleCapacities = Set.of(personsDvrpLoadType.fromInt(4), goodsDvrpLoadType.fromInt(4));
-					DvrpLoadFromPassengers dvrpLoadFromPassengers = getter.getModal(DvrpLoadFromPassengers.class);
+					DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers = getter.getModal(DvrpLoadFromDrtPassengers.class);
 					Network network = getter.getModal(Network.class);
 					return new DefaultCapacityConfigurationLogic(fleetSpecification,
-						possibleCapacities, dvrpLoadFromPassengers, network, network.getLinks().values(), 7200, true,
+						possibleCapacities, dvrpLoadFromDrtPassengers, network, network.getLinks().values(), 7200, true,
 						DefaultCapacityConfigurationLogic.CapacityChangeLinkSelection.RANDOM);
 				}));
 			}
@@ -194,6 +203,24 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 	}
 
+	private static void preparePopulationLoads(Population population) {
+		for(Map.Entry<Id<Person>, ? extends Person> personEntry: population.getPersons().entrySet()) {
+			Id<Person> personId = personEntry.getKey();
+			Person person = personEntry.getValue();
+			int personParity=0;
+			try {
+				personParity = Integer.parseInt(personId.toString());
+			} catch (NumberFormatException ignored) {
+
+			}
+			if(personParity % 2 == 0) {
+				person.getAttributes().putAttribute(DefaultDvrpLoadFromDrtPassengers.ATTRIBUTE_LOAD_TYPE, PersonsDvrpLoadType.TYPE_NAME);
+			} else {
+				person.getAttributes().putAttribute(DefaultDvrpLoadFromDrtPassengers.ATTRIBUTE_LOAD_TYPE, GoodsDvrpLoadType.TYPE_NAME);
+			}
+		}
+	}
+
 	@Test
 	void testRunDrtWithHeterogeneousVehicleCapacitiesWithoutRejections() {
 		Id.resetCaches();
@@ -214,6 +241,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
+		preparePopulationLoads(controller.getScenario().getPopulation());
 		controller.addOverridingModule(new CustomLoadsModule(true));
 		controller.run();
 	}
@@ -240,6 +268,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
+		preparePopulationLoads(controller.getScenario().getPopulation());
 		controller.addOverridingModule(new CustomLoadsModule(false));
 		controller.run();
 	}
@@ -265,6 +294,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
+		preparePopulationLoads(controller.getScenario().getPopulation());
 		controller.addOverridingModule(new CustomLoadsModule(false));
 
 		controller.run();
@@ -284,7 +314,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
-
+		preparePopulationLoads(controller.getScenario().getPopulation());
 		controller.addOverridingModule(new CustomLoadsModule(true));
 
 		controller.run();

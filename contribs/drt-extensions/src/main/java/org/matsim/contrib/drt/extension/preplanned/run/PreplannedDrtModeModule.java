@@ -20,12 +20,15 @@
 
 package org.matsim.contrib.drt.extension.preplanned.run;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromPassengers;
+import org.matsim.contrib.drt.passenger.DefaultDvrpLoadFromDrtPassengers;
+import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
@@ -60,9 +63,12 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
-		bindModal(DvrpLoadFromPassengers.class).toProvider(modalProvider(getter -> {
-			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
-			return passengerIds -> scalarVehicleLoadFactory.fromInt(passengerIds.size());
+
+		bindModal(DvrpLoadFromDrtPassengers.class).toProvider(modalProvider(getter -> {
+			Population population = getter.get(Population.class);
+			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
+			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
+			return new DefaultDvrpLoadFromDrtPassengers(population, dvrpLoadSerializer, integerLoadType);
 		})).asEagerSingleton();
 
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
