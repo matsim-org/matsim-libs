@@ -41,8 +41,9 @@ class NetworkTrafficEngineTest {
 		var expectedEvents = createExpectedEvents();
 		var eventsManager = TestUtils.mockExpectingEventsManager(expectedEvents);
 		var timeInterpretation = TimeInterpretation.create(scenario.getConfig());
+		var wait2link = new DefaultWait2Link(eventsManager);
 
-		var engine = new NetworkTrafficEngine(scenario, mock(NetworkPartition.class), mock(AgentSourcesContainer.class),
+		var engine = new NetworkTrafficEngine(scenario, mock(NetworkPartition.class), mock(AgentSourcesContainer.class), wait2link,
 			mock(SimStepMessaging.class), eventsManager);
 
 		var timer = mock(MobsimTimer.class);

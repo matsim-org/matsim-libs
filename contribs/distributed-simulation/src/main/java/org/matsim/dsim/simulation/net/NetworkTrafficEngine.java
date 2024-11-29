@@ -11,14 +11,12 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.QSimCompatibility;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
@@ -37,25 +35,29 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final AgentSourcesContainer asc;
+	private final Wait2Link wait2Link;
+	private final Set<String> modes;
 
 	@Setter
 	private InternalInterface internalInterface;
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc,
+	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc, Wait2Link wait2Link,
 								SimStepMessaging simStepMessaging, EventsManager em) {
 		this.asc = asc;
 		this.em = em;
+		this.wait2Link = wait2Link;
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
 		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), partition.getIndex(), this::handleVehicleIsFinished, activeLinks::activate, activeNodes::activate);
+		this.modes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 
-		if (!(agent instanceof MobsimDriverAgent driver)) {
-			throw new RuntimeException("Only driver agents are supported");
+		if (!modes.contains(agent.getMode()) || !(agent instanceof MobsimDriverAgent driver)) {
+			return false; // someone else should take care of this.
 		}
 
 		// place person into vehicle
