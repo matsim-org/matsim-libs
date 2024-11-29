@@ -66,7 +66,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		this.currentTime = new MobsimTimer();
 
 		// TODO: needs to be removed and handled by the engines themselves
-		this.mainModes = Set.of("car", "bike", "walk");
+		this.mainModes = Set.of("car");
 	}
 
 	/**
@@ -107,15 +107,15 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			source.createAgentsAndVehicles(partition, this);
 		}
 
-		this.listenerManager.fireQueueSimulationInitializedEvent();
+		listenerManager.fireQueueSimulationInitializedEvent();
 	}
 
 	@Override
 	public void doSimStep(double time) {
 
-		this.currentTime.setTime(time);
+		currentTime.setTime(time);
 
-		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
+		listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 
 		for (MobsimEngine engine : engines) {
 			engine.doSimStep(time);
@@ -123,13 +123,13 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		messaging.sendMessages(time);
 
-		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+		listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 	}
 
 	@Override
 	public void onCleanupSim() {
 
-		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
+		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		for (DistributedMobsimEngine engine : engines) {
 			engine.afterSim();
