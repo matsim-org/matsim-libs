@@ -170,7 +170,12 @@ public final class LPTask implements SimTask {
         runtimes.add(rt);
     }
 
-    private void process(Message msg) {
+	@Override
+	public void cleanup() {
+		lp.onCleanupSim();
+	}
+
+	private void process(Message msg) {
         Consumer<Message> consumer = consumers.get(msg.getType());
         if (consumer == null) {
             throw new IllegalArgumentException("No processor found for message: " + msg);

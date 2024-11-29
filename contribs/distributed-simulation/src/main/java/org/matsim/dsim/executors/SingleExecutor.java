@@ -71,6 +71,11 @@ public final class SingleExecutor implements LPExecutor {
     }
 
 	@Override
+	public void afterSim() {
+		tasks.forEach(SimTask::cleanup);
+	}
+
+	@Override
 	public void runEventHandler() {
 		for (SimTask task : tasks) {
 			if (task instanceof EventHandlerTask) {

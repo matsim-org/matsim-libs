@@ -102,8 +102,7 @@ public final class DSim implements Mobsim {
 			}
         }
 
-		// TODO: some listener could be executed on the partition, some are probably global (but might be also executed within partition)
-		// TODO: needs to be decided on case by case, via Annotation or similar
+		// Manager for node singletons listeners
 		MobsimListenerManager listenerManager = new MobsimListenerManager(this);
 
 		// Incompatible, they do unsupported cast
@@ -165,6 +164,8 @@ public final class DSim implements Mobsim {
         }
 
 		manager.finishProcessing();
+
+		executor.afterSim();
 
         double mu = histogram.getMean() / 1000;
 

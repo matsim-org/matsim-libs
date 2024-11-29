@@ -23,6 +23,7 @@ import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
@@ -39,6 +40,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final List<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();
 	private final List<DistributedActivityHandler> activityHandlers = new ArrayList<>();
+	private final MobsimListenerManager listenerManager = new MobsimListenerManager(this);
 	private final SimStepMessaging messaging;
 	private final Scenario scenario;
 	private final NetworkPartition partition;
@@ -73,7 +75,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	public void addMobsimComponent(QSimComponent component) {
 		if (component instanceof DistributedMobsimEngine d) {
 			this.engines.add(d);
-
 			d.setInternalInterface(this);
 		}
 
@@ -105,6 +106,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		for (DistributedAgentSource source : asc.getAgentSources()) {
 			source.createAgentsAndVehicles(partition, this);
 		}
+
+		this.listenerManager.fireQueueSimulationInitializedEvent();
 	}
 
 	@Override
@@ -112,11 +115,26 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 		this.currentTime.setTime(time);
 
+		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
+
 		for (MobsimEngine engine : engines) {
 			engine.doSimStep(time);
 		}
 
 		messaging.sendMessages(time);
+
+		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+	}
+
+	@Override
+	public void onCleanupSim() {
+
+		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
+
+		for (DistributedMobsimEngine engine : engines) {
+			engine.afterSim();
+		}
+
 	}
 
 	@Override
@@ -192,7 +210,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void addQueueSimulationListeners(MobsimListener listener) {
-		throw new UnsupportedOperationException();
+		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
 	@Override

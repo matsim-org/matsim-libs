@@ -24,6 +24,7 @@ import org.matsim.dsim.utils.NodeSingletonModule;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class SimProvider implements LPProvider {
@@ -123,9 +124,9 @@ public class SimProvider implements LPProvider {
 		Set<MobsimListener> listener = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
 
 		// Add all listener that are not node singletons, or this is the first instance
-		listener.stream()
+		listener = listener.stream()
 			.filter(l -> !l.getClass().isAnnotationPresent(NodeSingleton.class) || nodeSingletonInjector == null)
-			.forEach(listeners::add);
+			.collect(Collectors.toSet());
 
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
@@ -141,7 +142,7 @@ public class SimProvider implements LPProvider {
 			try {
 				providers = dsimInjector.getInstance(activeComponentKey);
 			} catch (ProvisionException | ConfigurationException e) {
-				log.warn("Failed to load component %s".formatted(activeComponent), e);
+				log.warn("Failed to load component %s: ".formatted(activeComponent), e.getMessage());
 				continue;
 			}
 
@@ -157,6 +158,14 @@ public class SimProvider implements LPProvider {
 					listeners.add(l);
 				}
 			}
+		}
+
+		// Separate singleton listeners and partition specific ones
+		for (MobsimListener l : listener) {
+			if (l.getClass().isAnnotationPresent(NodeSingleton.class))
+				listeners.add(l);
+			else
+				simProcess.addQueueSimulationListeners(l);
 		}
 
 		if (nodeSingletonInjector == null) {
