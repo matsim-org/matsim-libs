@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LP;
 import org.matsim.api.LPProvider;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.config.Config;
@@ -31,6 +32,7 @@ public class SimProvider implements LPProvider {
 
 	private final Network network;
 	private final Config config;
+	private final SimulationNode node;
 	private final IterationCounter iterationCounter;
 	private final Collection<AbstractQSimModule> modules;
 	private final List<AbstractQSimModule> overridingModules;
@@ -57,6 +59,7 @@ public class SimProvider implements LPProvider {
 		// (these are the implementations)
 		this.config = injector.getInstance(Config.class);
 		this.network = injector.getInstance(Network.class);
+		this.node = injector.getInstance(SimulationNode.class);
 		this.iterationCounter = injector.getInstance(IterationCounter.class);
 		this.components = injector.getInstance(QSimComponentsConfig.class);
 		this.overridingModules = overridingModules;
@@ -110,7 +113,7 @@ public class SimProvider implements LPProvider {
 			}
 		};
 
-		if (nodeSingletonInjector != null) {
+		if (nodeSingletonInjector != null && !node.isFirstPartition(partition.getIndex())) {
 			module = Modules.override(module).with(new NodeSingletonModule(nodeSingletonInjector));
 		}
 
@@ -168,7 +171,7 @@ public class SimProvider implements LPProvider {
 				simProcess.addQueueSimulationListeners(l);
 		}
 
-		if (nodeSingletonInjector == null) {
+		if (node.isFirstPartition(partition.getIndex())) {
 			nodeSingletonInjector = dsimInjector;
 		}
 

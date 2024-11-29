@@ -46,7 +46,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final NetworkPartition partition;
 	private final AgentSourcesContainer asc;
 	private final EventsManager em;
-	private final Set<String> mainModes;
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
@@ -64,9 +63,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		this.asc = asc;
 		this.em = em;
 		this.currentTime = new MobsimTimer();
-
-		// TODO: needs to be removed and handled by the engines themselves
-		this.mainModes = Set.of("car");
 	}
 
 	/**
@@ -278,19 +274,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		));
 
 		Id<Link> linkId = agent.getCurrentLinkId();
-
-		// TODO move the logic into the engines
-		if (getScenario().getConfig().transit().getTransitModes().contains(agent.getMode())) {
-			// TODO
-//			ptEngine.handleDeparture(now, agent, linkId);
-			return;
-		}
-
-		// TODO: network traffic engine must check for itself if it is responsible for the agent
-		if (mainModes.contains(agent.getMode())) {
-			networkTrafficEngine.handleDeparture(now, agent, linkId);
-			return;
-		}
 
 		// Try to handle departure with standard qsim handlers
 		for (DepartureHandler departureHandler : this.departureHandlers) {

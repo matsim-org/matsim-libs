@@ -37,22 +37,26 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final AgentSourcesContainer asc;
+	private final Set<String> transportModes;
+
+	private final Wait2Link wait2Link;
 
 	@Setter
 	private InternalInterface internalInterface;
-	// TODO don't expose this. Fix it when fixing how we are injecting engines into disim
-	@Getter
-	private final List<Wait2Link> wait2Link = new ArrayList<>();
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc, SimStepMessaging simStepMessaging, EventsManager em) {
+	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc,
+								SimStepMessaging simStepMessaging, EventsManager em) {
 		this.asc = asc;
-		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, partition.getIndex());
 		this.em = em;
+		// TODO: need to be replaced by injection, currently the pt variant has problems with circular dependencies
+		this.wait2Link = new DefaultWait2Link(em);
+		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, partition.getIndex());
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
 		activeLinks.setActivateNode(this::activateNode);
 		activeNodes.setActivateLink(this::activateLink);
+		transportModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 	}
 
 	public void activateLink(Id<Link> id) {
@@ -65,6 +69,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+
+		if (!transportModes.contains(agent.getMode())) {
+			return false;
+		}
 
 		if (!(agent instanceof MobsimDriverAgent driver)) {
 			throw new RuntimeException("Only driver agents are supported");
@@ -88,11 +96,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		SimLink link = simNetwork.getLinks().get(currentRouteElement);
 		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
 
-		for (Wait2Link w2l : wait2Link) {
-			if (w2l.accept(vehicle, link, now)) {
-				break;
-			}
-		}
+		wait2Link.accept(vehicle, link, now);
 		return true;
 	}
 
@@ -135,9 +139,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	public void doSimStep(double now) {
 		// this inserts waiting vehicles, then moves vehicles over intersections, and then updates bookkeeping.
 		// if the config flag is false, we move vehicles, insert waiting vehicles and then update bookkeeping.
-		for (var wait2Link : wait2Link) {
-			wait2Link.moveWaiting(now);
-		}
+		wait2Link.moveWaiting(now);
 		activeNodes.doSimStep(now);
 		activeLinks.doSimStep(now);
 	}
