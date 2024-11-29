@@ -31,6 +31,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.nio.file.Path;
+
 public class CarrierVehicleTypeLoaderTest {
 
 	@RegisterExtension
@@ -42,14 +44,14 @@ public class CarrierVehicleTypeLoaderTest {
 	@BeforeEach
 	public void setUp() {
 		types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory() + "vehicleTypes.xml");
+		new CarrierVehicleTypeReader(types).readFile(Path.of(utils.getClassInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString());
 		carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, types ).readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 	}
 
 	@Test
 	void test_whenLoadingTypes_allAssignmentsInLightVehicleAreCorrectly(){
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("lightVehicle"));
 
@@ -62,13 +64,13 @@ public class CarrierVehicleTypeLoaderTest {
 		Assertions.assertEquals(0.35, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
+		Assertions.assertEquals("gasoline", VehicleUtils.getHbefaTechnology(vehicleTypeLoaded.getEngineInformation()));
 		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
 	void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("mediumVehicle"));
 
@@ -81,7 +83,7 @@ public class CarrierVehicleTypeLoaderTest {
 		Assertions.assertEquals(0.4, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
+		Assertions.assertEquals("gasoline", VehicleUtils.getHbefaTechnology(vehicleTypeLoaded.getEngineInformation()));
 		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
 
 	}

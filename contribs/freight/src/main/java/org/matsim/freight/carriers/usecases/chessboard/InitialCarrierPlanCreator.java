@@ -166,8 +166,6 @@ final class InitialCarrierPlanCreator {
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReader(carriers, types ).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml" );
 
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-
         for(Carrier carrier : carriers.getCarriers().values()){
             CarrierPlan plan = new InitialCarrierPlanCreator(scenario.getNetwork()).createPlan(carrier);
             carrier.addPlan(plan);

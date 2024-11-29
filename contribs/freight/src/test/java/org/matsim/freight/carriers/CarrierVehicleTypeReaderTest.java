@@ -29,6 +29,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -83,8 +86,8 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	void test_whenReadingTypeMedium_itReadsEngineInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(0.02, medium.getEngineInformation().getFuelConsumption(),0.01);
-		assertEquals("gasoline", medium.getEngineInformation().getFuelType().toString());
+		assertEquals(0.02, VehicleUtils.getFuelConsumption(medium), 0.01);
+		assertEquals("gasoline", VehicleUtils.getHbefaTechnology(medium.getEngineInformation()));
 	}
 
 	@Test
