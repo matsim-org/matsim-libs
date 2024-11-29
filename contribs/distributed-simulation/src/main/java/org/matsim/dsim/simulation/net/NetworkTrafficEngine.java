@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -9,6 +10,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
@@ -17,6 +19,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.QSimCompatibility;
+import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.vehicles.Vehicle;
 
@@ -33,7 +36,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	private final ActiveLinks activeLinks;
 
 	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
-	private final QSimCompatibility qSimCompatibility;
+	private final AgentSourcesContainer asc;
 
 	@Setter
 	private InternalInterface internalInterface;
@@ -41,9 +44,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	@Getter
 	private final List<Wait2Link> wait2Link = new ArrayList<>();
 
-	public NetworkTrafficEngine(Scenario scenario, QSimCompatibility qSimCompatibility, SimStepMessaging simStepMessaging, EventsManager em, int part) {
-		this.qSimCompatibility = qSimCompatibility;
-		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, part);
+	@Inject
+	public NetworkTrafficEngine(Scenario scenario, NetworkPartition partition, AgentSourcesContainer asc, SimStepMessaging simStepMessaging, EventsManager em) {
+		this.asc = asc;
+		simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), this::handleVehicleIsFinished, partition.getIndex());
 		this.em = em;
 		activeNodes = new ActiveNodes(em);
 		activeLinks = new ActiveLinks(simStepMessaging);
@@ -104,7 +108,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	}
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
-		DistributedMobsimVehicle vehicle = qSimCompatibility.vehicleFromContainer(vehicleContainer);
+		DistributedMobsimVehicle vehicle = asc.vehicleFromContainer(vehicleContainer);
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);

@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -15,12 +15,15 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 @Log4j2
-@RequiredArgsConstructor
 public class DefaultWait2Link implements Wait2Link {
 
 	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
-	private final Consumer<Id<Link>> activateLink;
+
+	@Inject
+	public DefaultWait2Link(EventsManager em) {
+		this.em = em;
+	}
 
 	@Override
 	public boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now) {
@@ -61,7 +64,8 @@ public class DefaultWait2Link implements Wait2Link {
 				vehicle.getDriver().getMode(), 1.0)
 			);
 			link.pushVehicle(vehicle, position, now);
-			activateLink.accept(link.getId());
+			// TODO replace
+			//activateLink.accept(link.getId());
 			return true;
 		} else {
 			return false;

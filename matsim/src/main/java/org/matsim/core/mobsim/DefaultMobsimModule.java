@@ -46,7 +46,9 @@ public class DefaultMobsimModule extends AbstractModule {
 			// Install qsim components, but without the default qsim
 			// This has to be installed here, because of the shenanigans with the qsim components
 			// Installed qsim components might depend on the order of modules
-			install(new QSimModule(true, false));
+			install(new QSimModule(false, false));
+
+
 		} else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
                 && ((ExternalMobimConfigGroup)getConfig().getModule(
                 ExternalMobimConfigGroup.GROUP_NAME)).getExternalExe() != null) {

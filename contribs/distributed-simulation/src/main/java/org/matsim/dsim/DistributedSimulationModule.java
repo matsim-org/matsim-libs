@@ -1,6 +1,8 @@
 package org.matsim.dsim;
 
+import com.google.inject.Binder;
 import com.google.inject.Singleton;
+import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.SneakyThrows;
@@ -15,7 +17,6 @@ import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
-import org.matsim.dsim.simulation.SimProvider;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -70,11 +71,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(SimulationNode.class).toInstance(node);
 		bind(Topology.class).toInstance(topology);
 		bind(MessageBroker.class).in(Singleton.class);
-		bind(DSim.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);
-		bindMobsim().toProvider(DSimProvider.class);
-
-		bind(QSimCompatibility.class);
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
@@ -87,8 +84,18 @@ public class DistributedSimulationModule extends AbstractModule {
 			bind(LPExecutor.class).to(SingleExecutor.class).in(Singleton.class);
 		}
 
-		Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder(), LPProvider.class);
-		lps.addBinding().to(SimProvider.class);
+		// Need to define the set binder, in case no other module uses it
+		Multibinder.newSetBinder(binder(), LPProvider.class);
+
+		install(new DSimModule());
+	}
+
+	/**
+	 * Helper method to define bindings for {@link LPProvider} in other modules.
+	 */
+	public static LinkedBindingBuilder<LPProvider> bindSimulationProcess(Binder binder) {
+		Multibinder<LPProvider> lps = Multibinder.newSetBinder(binder, LPProvider.class);
+		return lps.addBinding();
 	}
 
 	private Topology createTopology(SerializationProvider serializer) {

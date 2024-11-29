@@ -2,6 +2,8 @@ package org.matsim.api.core.v01.network;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.messages.SimulationNode;
@@ -14,8 +16,12 @@ public final class NetworkPartitioning {
 	public final static NetworkPartitioning SINGLE_INSTANCE = new NetworkPartitioning();
 	public final static String ATTRIBUTE = "partition";
 
-	private final IdSet<Link> byNode;
+
+	private final IdSet<Link> linksOnNode;
+	private final Object2IntMap<Id<Link>> link2partition;
+
 	private final Int2ObjectMap<NetworkPartition> partitions = new Int2ObjectOpenHashMap<>();
+
 
 	private final SimulationNode node;
 
@@ -24,7 +30,8 @@ public final class NetworkPartitioning {
 	 */
 	public NetworkPartitioning() {
 		node = null;
-		byNode = null;
+		linksOnNode = null;
+		link2partition = null;
 	}
 
 	/**
@@ -32,22 +39,24 @@ public final class NetworkPartitioning {
 	 */
 	public NetworkPartitioning(SimulationNode node, Network network) {
 		this.node = node;
-		this.byNode = new IdSet<>(Link.class);
+		this.linksOnNode = new IdSet<>(Link.class);
+		this.link2partition = new Object2IntOpenHashMap<>();
 		for (Link link : network.getLinks().values()) {
 			Integer partition = (Integer) link.getAttributes().getAttribute(ATTRIBUTE);
 
 			if (partition != null) {
-				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).links.add(link.getId());
+				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).addLink(link);
+				link2partition.put(link.getId(), (int) partition);
 
 				if (node.getParts().contains((int) partition))
-					byNode.add(link.getId());
+					linksOnNode.add(link.getId());
 			}
 		}
 
 		for (Node n : network.getNodes().values()) {
 			Integer partition = (Integer) n.getAttributes().getAttribute(ATTRIBUTE);
 			if (partition != null) {
-				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).nodes.add(n.getId());
+				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).addNode(n);
 			}
 		}
 	}
@@ -64,14 +73,24 @@ public final class NetworkPartitioning {
 	}
 
 	/**
+	 * Return the partition index of a link.
+	 */
+	public int getPartition(Id<Link> linkId) {
+		if (link2partition == null) {
+			return 0;
+		}
+
+		return link2partition.getInt(linkId);
+	}
+
+	/**
 	 * Check whether link id is on the current node.
 	 */
 	public boolean isLinkOnCurrentNode(Id<Link> linkId) {
-		if (node == null || byNode == null) {
+		if (node == null || linksOnNode == null) {
 			return true;
 		}
 
-		return byNode.contains(linkId);
+		return linksOnNode.contains(linkId);
 	}
-
 }

@@ -20,7 +20,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.dsim.executors.LPExecutor;
-import org.matsim.dsim.simulation.SimProcess;
+import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 import java.io.BufferedWriter;
@@ -88,10 +88,6 @@ public final class DSim implements Mobsim {
                 if (lp == null)
                     continue;
 
-				if (lp instanceof SimProcess p) {
-					listeners.addAll(p.getListeners());
-				}
-
                 log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), node.getRank(), part);
 
                 LPTask task = executor.register(lp, manager, part);
@@ -100,6 +96,10 @@ public final class DSim implements Mobsim {
                 tasks.add(task);
                 injector.injectMembers(lp);
             }
+
+			if (lpp instanceof SimProvider p) {
+				listeners.addAll(p.getListeners());
+			}
         }
 
 		// TODO: some listener could be executed on the partition, some are probably global (but might be also executed within partition)
