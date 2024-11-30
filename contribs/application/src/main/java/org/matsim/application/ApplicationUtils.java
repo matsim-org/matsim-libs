@@ -446,11 +446,11 @@ public class ApplicationUtils {
 			return path.get();
 
 		// Even more permissive pattern
-		path = matchPattern(".+\\.[a-zA-Z0-9_.\\-]*(_|\\.)" + name + "\\..+", dir);
+		path = matchPattern(".+[a-zA-Z0-9_.\\-]*(_|\\.)" + name + ".+", dir);
 		if (path.isPresent())
 			return path.get();
 
-		throw new IllegalArgumentException("Could not match input file: " + name);
+		throw new IllegalArgumentException("Could not match input file: %s (in %s)".formatted(name, dir));
 	}
 
 	private static Optional<Path> matchSuffix(String suffix, Path dir) {

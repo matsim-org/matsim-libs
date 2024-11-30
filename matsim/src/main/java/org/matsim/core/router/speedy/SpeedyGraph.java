@@ -54,14 +54,16 @@ public class SpeedyGraph {
     private final int[] linkData;
     private final Link[] links;
     private final Node[] nodes;
+		private final boolean hasTurnRestrictions;
 
-	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links) {
+	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links, boolean hasTurnRestrictions) {
 		this.nodeData = nodeData;
 		this.linkData = linkData;
 		this.nodes = nodes;
 		this.links = links;
 		this.nodeCount = this.nodes.length;
 		this.linkCount = this.links.length;
+		this.hasTurnRestrictions = hasTurnRestrictions;
 	}
 
     public LinkIterator getOutLinkIterator() {
@@ -79,6 +81,10 @@ public class SpeedyGraph {
     Node getNode(int index) {
         return this.nodes[index];
     }
+
+		boolean hasTurnRestrictions() {
+			return this.hasTurnRestrictions;
+		}
 
     public interface LinkIterator {
 

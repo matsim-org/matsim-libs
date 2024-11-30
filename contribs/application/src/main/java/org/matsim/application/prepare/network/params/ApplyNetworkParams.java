@@ -257,7 +257,10 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			return false;
 
 		link.setFreespeed(freeSpeed);
-		link.getAttributes().putAttribute("speed_factor", freeSpeed);
+		link.getAttributes().putAttribute(
+			"speed_factor",
+			BigDecimal.valueOf(freeSpeed).setScale(5, RoundingMode.HALF_EVEN).doubleValue()
+		);
 
 		return modified;
 	}

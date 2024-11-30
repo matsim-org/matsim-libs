@@ -9,7 +9,7 @@
 
 <!ELEMENT chargers (charger)*>
 
-<!ELEMENT charger EMPTY>
+<!ELEMENT charger (attributes?)>
 
 <!-- link - id of the link where the charger is located -->
 <!-- plug_power - in kWh -->
@@ -21,3 +21,10 @@
 	plug_power CDATA #REQUIRED
 	plug_count CDATA #IMPLIED
 	type CDATA #IMPLIED >
+
+<!ELEMENT attributes (attribute*)>
+
+<!ELEMENT attribute ANY>
+<!ATTLIST attribute
+	name CDATA #REQUIRED
+	class CDATA #REQUIRED >
