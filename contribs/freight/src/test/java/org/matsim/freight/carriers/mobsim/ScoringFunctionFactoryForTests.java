@@ -39,7 +39,7 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.CarrierVehicle;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashSet;

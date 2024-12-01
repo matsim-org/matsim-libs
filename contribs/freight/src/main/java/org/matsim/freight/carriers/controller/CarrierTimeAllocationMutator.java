@@ -18,7 +18,7 @@
  *   ***********************************************************************
  *
  */
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;

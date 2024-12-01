@@ -36,9 +36,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
-import org.matsim.freight.carriers.controler.CarrierReRouteVehicles;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.carriers.controller.CarrierReRouteVehicles;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -83,7 +83,7 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
         GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan = new GenericPlanStrategyImpl<>( new BestPlanSelector<>() );
         planStrat_reRoutePlan.addStrategyModule(new CarrierReRouteVehicles.Factory(router, network, travelTimes.get(TransportMode.car )).build() );
 
-        CarrierStrategyManager stratManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+        CarrierStrategyManager stratManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
 
         stratManager.addStrategy(planStrat_reRoutePlan, null, 1.0);
 

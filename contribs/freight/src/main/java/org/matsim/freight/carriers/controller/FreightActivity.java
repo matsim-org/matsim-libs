@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

@@ -34,6 +34,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
@@ -177,18 +179,18 @@ import org.matsim.vehicles.VehicleUtils;
     }
   }
 
-  static Controler prepareControler(Scenario scenario) {
+  static Controller prepareControler(Scenario scenario) {
     // Start the Mobsim one iteration is sufficient for scoring
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(new LSPModule());
-    controler.addOverridingModule(
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(new LSPModule());
+    controller.addOverridingModule(
         new AbstractModule() {
           @Override
           public void install() {
             bind(LSPScorerFactory.class).toInstance(TipScorer::new);
           }
         });
-    return controler;
+    return controller;
   }
 
   static Scenario prepareScenario(Config config) {

@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
@@ -45,7 +45,6 @@ import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
-import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
 
 import java.util.Collection;
 

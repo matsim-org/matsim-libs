@@ -42,6 +42,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -426,7 +428,7 @@ public class CarrierControllerUtilsTest{
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario );
-		Controler controler = new Controler(scenario);
+		Controller controller = ControllerUtils.createController(scenario);
 
 		try {
 			CarriersUtils.runJsprit(scenario);
@@ -435,7 +437,7 @@ public class CarrierControllerUtilsTest{
 			Assertions.fail();
 		}
 
-		Assertions.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
+		Assertions.assertEquals(vraFile, ConfigUtils.addOrGetModule( controller.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
 	}
 
 	/**

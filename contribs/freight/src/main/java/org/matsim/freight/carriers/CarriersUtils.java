@@ -338,7 +338,7 @@ public class CarriersUtils {
 
 	public static Carriers addOrGetCarriers(Scenario scenario) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controler is started, it is better to fail if the carriers are not found.
+		// controller is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {

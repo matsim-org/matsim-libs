@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;

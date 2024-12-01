@@ -37,8 +37,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.CarrierModule;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierModule;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import picocli.CommandLine;
 

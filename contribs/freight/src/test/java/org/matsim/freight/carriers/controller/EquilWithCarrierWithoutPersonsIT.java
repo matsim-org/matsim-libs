@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

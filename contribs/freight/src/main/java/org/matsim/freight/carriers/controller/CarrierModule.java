@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -49,8 +49,8 @@ public final class CarrierModule extends AbstractModule {
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
-		bind(CarrierControlerListener.class).in( Singleton.class );
-		addControlerListenerBinding().to(CarrierControlerListener.class);
+		bind(CarrierControllerListener.class).in( Singleton.class );
+		addControlerListenerBinding().to(CarrierControllerListener.class);
 
 		bind(CarrierAgentTracker.class).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );

@@ -43,6 +43,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -182,10 +184,10 @@ public class CollectionLSPMobsimTest {
 			lspList.add(collectionLSP);
 			lsps = new LSPs(lspList);
 		}
-		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
+		Controller controller = ControllerUtils.createController(scenario);
+		controller.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
 
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				install(new LSPModule());
@@ -194,8 +196,8 @@ public class CollectionLSPMobsimTest {
 
 		LSPUtils.addLSPs(scenario, lsps);
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-		controler.run();
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.run();
 	}
 
 	@Test

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -44,11 +45,11 @@ public class ExampleLSPScoringTest {
 
 		Scenario scenario = ExampleLSPScoring.prepareScenario(config);
 
-		Controler controler = ExampleLSPScoring.prepareControler(scenario);
+		Controller controller = ExampleLSPScoring.prepareControler(scenario);
 
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-		controler.run();
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
 			Assertions.assertEquals(13.245734044444207, lsp.getSelectedPlan().getScore(), Double.MIN_VALUE);

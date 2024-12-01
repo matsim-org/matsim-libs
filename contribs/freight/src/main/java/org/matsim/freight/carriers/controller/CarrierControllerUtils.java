@@ -19,13 +19,17 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.Carrier;
+/**
+ * Utils class for (package-private) content of freight.carriers.controler - package;
+ *
+ * @author kturner
+ *
+ */
+public class CarrierControllerUtils {
 
-public interface CarrierScoringFunctionFactory {
-
-	ScoringFunction createScoringFunction(Carrier carrier);
-
+	public static CarrierStrategyManager createDefaultCarrierStrategyManager() {
+		return new CarrierStrategyManagerImpl();
+	}
 }
