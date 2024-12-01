@@ -33,7 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -164,22 +163,22 @@ import org.matsim.vehicles.VehicleUtils;
 
     Scenario scenario = prepareScenario(config);
 
-    Controler controler = prepareControler(scenario);
+    Controller controller = prepareController(scenario);
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controler
+    controller
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
+    controller.run();
 
     for (LSP lsp2 : LSPUtils.getLSPs(scenario).getLSPs().values()) {
       System.out.println("The tip of all customers was: " + lsp2.getSelectedPlan().getScore());
     }
   }
 
-  static Controller prepareControler(Scenario scenario) {
+  static Controller prepareController(Scenario scenario) {
     // Start the Mobsim one iteration is sufficient for scoring
     Controller controller = ControllerUtils.createController(scenario);
     controller.addOverridingModule(new LSPModule());
