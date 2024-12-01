@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers.controller;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,8 +38,6 @@ import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierEventCreator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
 
 /**
  * This keeps track of the carrier during simulation.

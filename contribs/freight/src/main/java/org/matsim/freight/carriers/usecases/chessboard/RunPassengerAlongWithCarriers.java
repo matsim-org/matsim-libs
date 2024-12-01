@@ -23,6 +23,8 @@ package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
+import java.net.URL;
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -47,9 +49,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
-
-import java.net.URL;
-import java.util.Map;
 
 final class RunPassengerAlongWithCarriers {
 

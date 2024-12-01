@@ -21,6 +21,10 @@
 
 package org.matsim.freight.carriers.jsprit;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -39,17 +43,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  *

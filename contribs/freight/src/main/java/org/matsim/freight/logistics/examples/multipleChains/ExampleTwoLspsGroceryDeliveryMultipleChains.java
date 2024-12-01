@@ -44,7 +44,6 @@ package org.matsim.freight.logistics.examples.multipleChains;
 
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -72,7 +71,6 @@ import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtil
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
-
 
 /**
  * This bases on {@link ExampleGroceryDeliveryMultipleChains}.

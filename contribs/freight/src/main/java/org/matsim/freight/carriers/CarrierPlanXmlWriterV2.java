@@ -22,6 +22,9 @@
 package org.matsim.freight.carriers;
 
 import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,10 +40,6 @@ import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.VehicleType;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.

@@ -21,13 +21,12 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;

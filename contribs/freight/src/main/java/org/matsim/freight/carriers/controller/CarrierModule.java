@@ -24,6 +24,7 @@ package org.matsim.freight.carriers.controller;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,8 +38,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.freight.carriers.*;
-
-import java.util.List;
 
 public final class CarrierModule extends AbstractModule {
 

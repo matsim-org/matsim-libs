@@ -23,9 +23,6 @@ package org.matsim.freight.carriers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.freight.carriers.CarrierVehicleTypeReader;
-import org.matsim.freight.carriers.CarrierVehicleTypeWriter;
-import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CarrierVehicleTypeWriterTest {

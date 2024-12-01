@@ -21,12 +21,11 @@
 
 package org.matsim.freight.logistics.examples.lspScoring;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPUtils;

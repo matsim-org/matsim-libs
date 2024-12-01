@@ -28,6 +28,10 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.management.InvalidAttributeValueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,11 +47,6 @@ import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import javax.management.InvalidAttributeValueException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CarriersUtils {
 

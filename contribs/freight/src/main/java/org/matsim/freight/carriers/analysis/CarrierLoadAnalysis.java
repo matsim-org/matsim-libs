@@ -21,6 +21,16 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,17 +43,6 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentPickupStar
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
 
 /**
  * @author Kai Martins-Turner (kturner)

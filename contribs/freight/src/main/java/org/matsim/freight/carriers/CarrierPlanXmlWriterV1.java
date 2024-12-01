@@ -22,6 +22,11 @@
 package org.matsim.freight.carriers;
 
 import com.graphhopper.jsprit.core.problem.job.Shipment;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,12 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.

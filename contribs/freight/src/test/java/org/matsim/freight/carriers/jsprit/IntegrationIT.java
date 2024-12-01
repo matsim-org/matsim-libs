@@ -27,6 +27,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -40,8 +41,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.concurrent.ExecutionException;
 
 public class IntegrationIT {
 

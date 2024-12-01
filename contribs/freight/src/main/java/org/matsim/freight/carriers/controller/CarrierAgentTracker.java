@@ -22,6 +22,7 @@
 package org.matsim.freight.carriers.controller;
 
 import com.google.inject.Inject;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +35,6 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.events.CarrierEventCreator;
 import org.matsim.freight.carriers.events.CarrierEventCreatorUtils;
-
-import java.util.*;
 
 /**
  * This keeps track of all carrierAgents during simulation.

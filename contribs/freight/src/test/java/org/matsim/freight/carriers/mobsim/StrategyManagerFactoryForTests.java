@@ -23,6 +23,7 @@ package org.matsim.freight.carriers.mobsim;
 
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
+import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,12 +37,10 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierReRouteVehicles;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
-import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
 
 @Disabled
 public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyManager>{

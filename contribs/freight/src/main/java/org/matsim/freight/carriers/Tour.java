@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,8 +30,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import java.util.*;
 
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.

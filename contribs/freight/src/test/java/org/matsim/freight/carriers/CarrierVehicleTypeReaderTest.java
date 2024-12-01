@@ -21,6 +21,9 @@
 
 package org.matsim.freight.carriers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +32,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CarrierVehicleTypeReaderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;

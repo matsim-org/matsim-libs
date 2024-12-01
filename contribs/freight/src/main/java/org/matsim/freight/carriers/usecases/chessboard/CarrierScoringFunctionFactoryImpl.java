@@ -22,6 +22,8 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,9 +42,6 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.FreightActivity;
 import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Defines example carrier scoring function (factory).

@@ -29,10 +29,10 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
+import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
-import org.matsim.freight.logistics.shipment.LspShipment;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 

@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers.events;
 
+import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -31,8 +32,6 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.TreeMap;
 
 /*package-private*/  final class CarrierTourStartEventCreator implements CarrierEventCreator {
 

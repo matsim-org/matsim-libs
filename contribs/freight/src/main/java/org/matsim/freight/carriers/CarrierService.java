@@ -27,7 +27,6 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-
 public final class CarrierService implements Attributable {
 
 	public static class Builder {

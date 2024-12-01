@@ -21,8 +21,8 @@
 
 package org.matsim.freight.carriers.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;

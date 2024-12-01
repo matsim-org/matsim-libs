@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,7 +37,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
