@@ -183,18 +183,9 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
 		}
 
-		double arrivalTime = now + travelTime;
-		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
-
-		// === below here is only visualization, no dynamics ===
 		Id<Person> agentId = agent.getId();
 		Link currLink = this.scenario.getNetwork().getLinks().get(linkId);
-		Link destLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId());
-		Coord fromCoord = currLink.getToNode().getCoord();
-		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
-		this.teleportationData.put(agentId, agentInfo);
-
+		double arrivalTime = now + travelTime;
 		if (generateLinkEvents && linkEventModes.contains(agent.getMode())) {
 
 			if (!(agent instanceof MobsimDriverAgent driver))
@@ -206,10 +197,20 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(driver.getPlannedVehicleId());
 
 			double linkTT = tt.getLinkTravelTime(currLink, now, person, vehicle);
-			LinkTeleport entry = new LinkTeleport(driver, person, vehicle, currLink, now + linkTT);
+			LinkTeleport entry = new LinkTeleport(driver, person, vehicle, currLink, now + linkTT, arrivalTime);
 
 			linkEventList.add(entry);
+		} else {
+			// Teleportation without link events
+			this.teleportationList.add(new Tuple<>(arrivalTime, agent));
 		}
+
+		// === below here is only visualization, no dynamics ===
+		Link destLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId());
+		Coord fromCoord = currLink.getToNode().getCoord();
+		Coord toCoord = destLink.getToNode().getCoord();
+		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
+		this.teleportationData.put(agentId, agentInfo);
 
 		return true;
 	}
@@ -258,9 +259,15 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		while (!linkEventList.isEmpty() && linkEventList.peek().arrivalTime <= now) {
 			LinkTeleport entry = linkEventList.poll();
 
-			// TODO: check if this logic is correct
+			// TODO: check if this logic is correct, it should probably rather contain the next link
+			entry.agent.notifyMoveOverNode(entry.link.getId());
+
+
 			// TODO: ensure agents don't arrive before link sequence is finished
 			if (entry.agent.isWantingToArriveOnCurrentLink()) {
+
+				// TODO: handle teleportation arrivals, same as without link events
+
 				continue;
 			}
 
@@ -269,8 +276,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 			TravelTime tt = travelTimes.get(entry.agent.getMode());
 			double linkTT = tt.getLinkTravelTime(nextLink, now, entry.person, entry.vehicle);
-			LinkTeleport e = new LinkTeleport(entry.agent, entry.person, entry.vehicle, nextLink, entry.arrivalTime + linkTT);
+			LinkTeleport e = new LinkTeleport(entry.agent, entry.person, entry.vehicle, nextLink,
+				entry.arrivalTime + linkTT, entry.arrivalTime);
 
+			// TODO: estimates arrival time and computed can differ, needs to be handled
 
 			linkEventList.add(e);
 		}
@@ -296,7 +305,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	private record LinkTeleport(MobsimDriverAgent agent, Person person, Vehicle vehicle, Link link, double arrivalTime) {
+	private record LinkTeleport(MobsimDriverAgent agent, Person person, Vehicle vehicle, Link link, double nextLink, double arrivalTime) {
 	}
 
 }
