@@ -18,11 +18,7 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
-import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -91,6 +87,7 @@ public class TestPositionEmissionModule {
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
         emissionConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
         emissionConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
@@ -204,7 +201,7 @@ public class TestPositionEmissionModule {
     }
 
     private VehicleType createVehicleType() {
-        VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
+        VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class), TransportMode.car);
         EngineInformation engineInformation = vehicleType.getEngineInformation();
         VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
         VehicleUtils.setHbefaTechnology(engineInformation, "diesel");

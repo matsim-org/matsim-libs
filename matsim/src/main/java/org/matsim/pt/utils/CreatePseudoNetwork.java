@@ -50,6 +50,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * stop facility can only be connected to at most one link, the algorithm is forced
  * to duplicated transit stop facilities in certain cases to build the network.
  *
+ * See {@link CreatePseudoNetworkWithLoopLinks} for a version that uses loop links instead of duplicating stop facilities.
+ *
  * @author mrieser
  */
 public class CreatePseudoNetwork {
@@ -59,7 +61,7 @@ public class CreatePseudoNetwork {
 	private final String prefix;
 	private final double linkFreeSpeed;
 	private final double linkCapacity;
-	
+
 
 	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
 	private final Map<Tuple<Node, Node>, TransitStopFacility> stopFacilities = new HashMap<Tuple<Node, Node>, TransitStopFacility>();
@@ -77,8 +79,8 @@ public class CreatePseudoNetwork {
 		this.linkFreeSpeed = 100.0 / 3.6;
 		this.linkCapacity = 100000.0;
 	}
-	
-	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix, 
+
+	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix,
 			final double linkFreeSpeed, final double linkCapacity) {
 		this.schedule = schedule;
 		this.network = network;
@@ -150,7 +152,14 @@ public class CreatePseudoNetwork {
 				}
 				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
+				Id<TransitStopArea> transitStopAreaId;
+				if (toFacility.getStopAreaId() == null) {
+					transitStopAreaId = Id.create(toFacility.getId(), TransitStopArea.class);
+					toFacility.setStopAreaId(transitStopAreaId);
+				} else {
+					transitStopAreaId = toFacility.getStopAreaId();
+				}
+				newFacility.setStopAreaId(transitStopAreaId);
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);

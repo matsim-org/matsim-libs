@@ -77,11 +77,13 @@ public final class EmissionModule {
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
 	}
 
+	@SuppressWarnings("ClassEscapesDefinedScope")
 	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
 		return this.warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
+	@SuppressWarnings("ClassEscapesDefinedScope")
 	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
 		return this.coldEmissionHandler.getColdEmissionAnalysisModule();
@@ -103,27 +105,19 @@ public final class EmissionModule {
 	}
 
 	public void writeEmissionInformation() {
-		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+		logger.info("Warm emissions were not calculated for {} of {} link leave events (no corresponding link enter event).", warmEmissionHandler.getLinkLeaveWarnCnt(), warmEmissionHandler.getLinkLeaveCnt());
 		int noVehicleLeavesTrafficEmissions = warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt() + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
-		logger.info("Warm emissions were not calculated for " + noVehicleLeavesTrafficEmissions + " of " + warmEmissionHandler.getTrafficLeaveCnt() +
-				" vehicle leaves traffic events (no corresponding link enter event).");
+		logger.info("Warm emissions were not calculated for {} of {} vehicle leaves traffic events (no corresponding link enter event).", noVehicleLeavesTrafficEmissions, warmEmissionHandler.getTrafficLeaveCnt());
 		if ( warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0 ) {
-			logger.info(warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() + " events occurred where the vehicle left traffic without entering ANY link " +
-					"(no warm emissions calculated). These events might need to be investigated."); }
+			logger.info("{} events occurred where the vehicle left traffic without entering ANY link (no warm emissions calculated). These events might need to be investigated.", warmEmissionHandler.getUnusualTrafficLeaveWarnCnt()); }
 
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
-		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
+		logger.info("Emission calculation based on `Free flow only' occurred for {} of {} warm emission events.", wam.getFreeFlowOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Stop&Go only' occurred for {} of {} warm emission events.", wam.getStopGoOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Emission calculation based on `Fractions' occurred for {} of {} warm emission events.", wam.getFractionOccurences(), wam.getWarmEmissionEventCounter());
+		logger.info("Free flow occurred on {} km of total {} km, where emissions were calculated.", wam.getFreeFlowKmCounter(), wam.getKmCounter());
+		logger.info("Stop&Go occurred on {} km of total {} km, where emissions were calculated.", wam.getStopGoKmCounter(), wam.getKmCounter());
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 
@@ -171,9 +165,10 @@ public final class EmissionModule {
 		if (shouldCreateAverageTables()) {
 			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
-			// yy The naming and signature of the above should presumably be changed: (1) addPollutantsToX implies signature (pollutants,
-			// X).  But it is actually the other way round (even if it does not read that way.  (2) "coldPollutants" is not a Map.  Since
-			// this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
+			// yy The naming and signature of the above should presumably be changed:
+			// (1) addPollutantsToX implies signature (pollutants,X). But it is actually the other way round (even if it does not read that way.)
+			// (2) "coldPollutants" is not a Map.
+			// Since this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
 			// field. kai, dec'22
 
 			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
@@ -205,24 +200,17 @@ public final class EmissionModule {
 	}
 
 	private boolean shouldCreateAverageTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-			case directlyTryAverageTable:
-				return true;
-			default:
-				return false;
-		}
+		return switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case tryDetailedThenTechnologyAverageThenAverageTable, directlyTryAverageTable -> true;
+			default -> false;
+		};
 	}
 
 	private boolean shouldCreateDetailedTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case onlyTryDetailedElseAbort:
-			case tryDetailedThenTechnologyAverageElseAbort:
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-				return true;
-			default:
-				return false;
-		}
+		return switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case onlyTryDetailedElseAbort, tryDetailedThenTechnologyAverageElseAbort, tryDetailedThenTechnologyAverageThenAverageTable -> true;
+			default -> false;
+		};
 	}
 
 	private void createEmissionHandlers() {

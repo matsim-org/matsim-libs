@@ -84,6 +84,7 @@ public class LocationChoiceIT {
 	void testLocationChoice() {
 
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 

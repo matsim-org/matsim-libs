@@ -2,13 +2,13 @@ package org.matsim.contrib.drt.extension.operations.shifts.scheduler;
 
 import com.google.inject.Inject;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
@@ -42,7 +42,7 @@ public class ShiftDrtScheduleInquiry extends DrtScheduleInquiry implements Sched
             }
         }
         Task currentTask = schedule.getCurrentTask();
-        if(currentTask instanceof WaitForShiftStayTask) {
+        if(currentTask instanceof WaitForShiftTask) {
             return false;
         }
         return currentTask.getTaskIdx() == schedule.getTaskCount() - 1

@@ -43,6 +43,7 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
@@ -79,7 +80,7 @@ public class SmallScaleCommercialTrafficUtils {
 	public static Index getIndexZones(Path shapeFileZonePath, String shapeCRS, String shapeFileZoneNameColumn) {
 
 		ShpOptions shpZones = new ShpOptions(shapeFileZonePath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpZones.readFeatures().iterator().next().getAttribute(shapeFileZoneNameColumn) == null)
+		if (shpZones.readFeatures().getFirst().getAttribute(shapeFileZoneNameColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileZoneNameColumn + "' does not exist in the zones shape file. Please check the input.");
 		return shpZones.createIndex(shapeCRS, shapeFileZoneNameColumn);
 	}
@@ -94,7 +95,7 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	 public static Index getIndexLanduse(Path shapeFileLandusePath, String shapeCRS, String shapeFileLanduseTypeColumn) {
 		ShpOptions shpLanduse = new ShpOptions(shapeFileLandusePath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpLanduse.readFeatures().iterator().next().getAttribute(shapeFileLanduseTypeColumn) == null)
+		if (shpLanduse.readFeatures().getFirst().getAttribute(shapeFileLanduseTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileLanduseTypeColumn + "' does not exist in the landuse shape file. Please check the input.");
 		return shpLanduse.createIndex(shapeCRS, shapeFileLanduseTypeColumn);
 	}
@@ -109,14 +110,14 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	public static Index getIndexBuildings(Path shapeFileBuildingsPath, String shapeCRS, String shapeFileBuildingTypeColumn) {
 		ShpOptions shpBuildings = new ShpOptions(shapeFileBuildingsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpBuildings.readFeatures().iterator().next().getAttribute(shapeFileBuildingTypeColumn) == null)
+		if (shpBuildings.readFeatures().getFirst().getAttribute(shapeFileBuildingTypeColumn) == null)
 			throw new NullPointerException("The column '" + shapeFileBuildingTypeColumn + "' does not exist in the building shape file. Please check the input.");
 
 		return shpBuildings.createIndex(shapeCRS, shapeFileBuildingTypeColumn);
 	}
 
 	/**
-	 * Creates and return the Index of the regions shape.
+	 * Creates and return the Index of the regions shapes.
 	 *
 	 * @param shapeFileRegionsPath     Path to the shape file of the regions
 	 * @param shapeCRS                 CRS of the shape file
@@ -125,19 +126,19 @@ public class SmallScaleCommercialTrafficUtils {
 	 */
 	public static Index getIndexRegions(Path shapeFileRegionsPath, String shapeCRS, String regionsShapeRegionColumn) {
 		ShpOptions shpRegions = new ShpOptions(shapeFileRegionsPath, shapeCRS, StandardCharsets.UTF_8);
-		if (shpRegions.readFeatures().iterator().next().getAttribute(regionsShapeRegionColumn) == null)
+		if (shpRegions.readFeatures().getFirst().getAttribute(regionsShapeRegionColumn) == null)
 			throw new NullPointerException("The column '" + regionsShapeRegionColumn + "' does not exist in the region shape file. Please check the input.");
 		return shpRegions.createIndex(shapeCRS, regionsShapeRegionColumn);
 	}
 
 	/** Finds the nearest possible link for the building polygon.
-	 * @param zone
-	 * @param noPossibleLinks
-	 * @param linksPerZone
-	 * @param newLink
-	 * @param centroidPointOfBuildingPolygon
-	 * @param numberOfPossibleLinks
-	 * @return
+	 * @param zone  							zone of the building
+	 * @param noPossibleLinks 					list of links that are not possible
+	 * @param linksPerZone 						map of links per zone
+	 * @param newLink 							new link
+	 * @param centroidPointOfBuildingPolygon 	centroid point of the building polygon
+	 * @param numberOfPossibleLinks 			number of possible links
+	 * @return 									new possible Link
 	 */
 	static Id<Link> findNearestPossibleLink(String zone, List<String> noPossibleLinks, Map<String, Map<Id<Link>, Link>> linksPerZone,
 											Id<Link> newLink, Coord centroidPointOfBuildingPolygon, int numberOfPossibleLinks) {
@@ -195,34 +196,27 @@ public class SmallScaleCommercialTrafficUtils {
 			Carrier relatedCarrier = CarriersUtils.addOrGetCarriers(scenario).getCarriers()
 				.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
-			final String mode;
-			if (subpopulation.contains("commercialPersonTraffic"))
-				mode = "car";
-			else if (subpopulation.contains("goodsTraffic"))
-				mode = "freight";
-			else
-				mode = relatedCarrier.getAttributes().getAttribute("networkMode").toString();
+			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
+			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
+
 			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
-			double tourStartTime = 0;
 			for (PlanElement tourElement : tourElements) {
 
 				if (tourElement instanceof Activity activity) {
-					activity.setCoord(
+					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
 						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
+					if (activity.getMaximumDuration() != OptionalTime.undefined())
+						newActivity.setMaximumDuration(activity.getMaximumDuration().seconds());
 					if (activity.getType().equals("start")) {
-						tourStartTime = activity.getEndTime().seconds();
-						activity.setType("commercial_start");
-					} else
-						activity.setEndTimeUndefined();
-					if (activity.getType().equals("end")) {
-						activity.setStartTime(tourStartTime + 8 * 3600);
-						activity.setType("commercial_end");
+						newActivity.setEndTime(activity.getEndTime().seconds());
+						newActivity.setType("commercial_start");
 					}
-					plan.addActivity(activity);
+					if (activity.getType().equals("end"))
+						newActivity.setType("commercial_end");
+					plan.addActivity(newActivity);
 				}
 				if (tourElement instanceof Leg) {
-					Leg legActivity = popFactory.createLeg(mode);
-					plan.addLeg(legActivity);
+					PopulationUtils.createAndAddLeg(plan, mode);
 				}
 			}
 
@@ -240,8 +234,6 @@ public class SmallScaleCommercialTrafficUtils {
 			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 				newPerson.getAttributes().putAttribute("tourStartArea",
 					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
-
-			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
 
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
 			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
@@ -291,9 +283,9 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 	/** Reads the data distribution of the zones.
-	 * @param pathToDataDistributionToZones
-	 * @return
-	 * @throws IOException
+	 * @param pathToDataDistributionToZones Path to the data distribution of the zones
+	 * @return 								resultingDataPerZone
+	 * @throws IOException 					if the file is not found
 	 */
 	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {

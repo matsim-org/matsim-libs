@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.shift;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	private final double end;
 	private final DrtShiftBreakSpecification shiftBreak;
 	private final Id<OperationFacility> operationFacilityId;
+	private final Id<DvrpVehicle> designatedVehicleId;
 
 	private DrtShiftSpecificationImpl(Builder builder) {
 		this.id = builder.id;
@@ -22,6 +24,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		this.end = builder.end;
 		this.shiftBreak = builder.shiftBreak;
 		this.operationFacilityId = builder.operationFacilityId;
+		this.designatedVehicleId = builder.designatedVehicleId;
 	}
 
 	@Override
@@ -42,6 +45,11 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	@Override
 	public Optional<Id<OperationFacility>> getOperationFacilityId() {
 		return Optional.ofNullable(operationFacilityId);
+	}
+
+	@Override
+	public Optional<Id<DvrpVehicle>> getDesignatedVehicleId() {
+		return Optional.ofNullable(designatedVehicleId);
 	}
 
 	@Override
@@ -69,6 +77,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		private double end;
 		private DrtShiftBreakSpecification shiftBreak;
 		private Id<OperationFacility> operationFacilityId;
+		public Id<DvrpVehicle> designatedVehicleId;
 
 		private Builder() {
 		}
@@ -95,6 +104,10 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 
 		public Builder operationFacility(Id<OperationFacility> operationFacilityId) {
 			this.operationFacilityId = operationFacilityId;
+			return this;
+		}
+		public Builder designatedVehicle(Id<DvrpVehicle> designatedVehicleId) {
+			this.designatedVehicleId = designatedVehicleId;
 			return this;
 		}
 

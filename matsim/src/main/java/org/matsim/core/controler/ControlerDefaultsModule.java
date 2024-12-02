@@ -51,6 +51,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 public final class ControlerDefaultsModule extends AbstractModule {
+
     @Override
     public void install() {
         install(new EventsManagerModule());
@@ -85,10 +86,10 @@ public final class ControlerDefaultsModule extends AbstractModule {
 		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
 		//  the cache needs to be always set correctly.
 		addControlerListenerBinding().toInstance(new StartupListener() {
-			@Inject
-			private OutputDirectoryHierarchy outputDirectoryHierarchy;
-			@Override   public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(outputDirectoryHierarchy.getTempPath()));
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				ImageIO.setCacheDirectory(new File(event.getServices().getControlerIO().getTempPath()));
 			}
 		});
 

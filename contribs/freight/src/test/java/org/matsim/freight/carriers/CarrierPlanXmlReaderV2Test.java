@@ -50,7 +50,7 @@ public class CarrierPlanXmlReaderV2Test {
 	private Carrier testCarrier;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
 
@@ -132,7 +132,7 @@ public class CarrierPlanXmlReaderV2Test {
 	@Test
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
-		CarrierPlan plan1 = plans.get(0);
+		CarrierPlan plan1 = plans.getFirst();
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		Assertions.assertEquals(5,tour1.getTour().getTourElements().size());
 	}

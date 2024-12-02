@@ -20,17 +20,7 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -148,7 +138,8 @@ public class SwissRailRaptorData {
         // enumerate TransitStopFacilities along their usage in transit routes to (hopefully) achieve a better memory locality
         // well, I'm not even sure how often we'll need the transit stop facilities, likely we'll use RouteStops more often
         Map<TransitStopFacility, Integer> stopFacilityIndices = new HashMap<>((int) (schedule.getFacilities().size() * 1.5));
-        Map<TransitStopFacility, int[]> routeStopsPerStopFacility = new HashMap<>();
+        // Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+		Map<TransitStopFacility, int[]> routeStopsPerStopFacility = new LinkedHashMap<>();
 
         boolean useModeMapping = staticConfig.isUseModeMappingForPassengers();
         for (TransitLine line : schedule.getTransitLines().values()) {
@@ -245,15 +236,17 @@ public class SwissRailRaptorData {
             }
         }
 
-        // if cached transfer calculation is used, build a map for quick lookup of minimal transfer times
+        // if adaptive transfer calculation is used, build a map for quick lookup of and collection of minimal transfer times
 		IdMap<TransitStopFacility, Map<TransitStopFacility, Double>> staticTransferTimes = null;
-		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Cached)) {
+		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive)) {
 			staticTransferTimes = new IdMap<>(TransitStopFacility.class);
 
 			MinimalTransferTimes.MinimalTransferTimesIterator iterator = schedule.getMinimalTransferTimes().iterator();
 			while (iterator.hasNext()) {
 				iterator.next();
 
+				// we only put the predefined transfer times here, the location-based ones will be calculated
+				// adaptively during routing
 				staticTransferTimes.computeIfAbsent(iterator.getFromStopId(), id -> new HashMap<>())
 						.put(schedule.getFacilities().get(iterator.getToStopId()), iterator.getSeconds());
 			}
@@ -649,10 +642,6 @@ public class SwissRailRaptorData {
   }
 
 	RTransfer[] calculateTransfers(RRouteStop fromRouteStop) {
-		if (config.getTransferCalculation().equals(RaptorTransferCalculation.Initial)) {
-			return null;
-		}
-
 		// We tested this in a parallel set-up and things seem to work as they are
 		// implemented. The routing threads will access the cache as read-only an
 		// retrieve the cached stop connections. It can happen that two of them try to

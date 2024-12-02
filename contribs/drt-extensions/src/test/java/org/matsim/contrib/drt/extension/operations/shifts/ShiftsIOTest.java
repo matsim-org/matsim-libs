@@ -15,6 +15,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -34,6 +35,9 @@ public class ShiftsIOTest {
 	private final Id<DrtShift> sid33 = Id.create("33", DrtShift.class);
 	private final Id<OperationFacility> oid1 = Id.create("op1", OperationFacility.class);
 	private final Id<OperationFacility> oid2 = Id.create("op2", OperationFacility.class);
+
+	private final Id<DvrpVehicle> vehId1 = Id.create("drt1", DvrpVehicle.class);
+	private final Id<DvrpVehicle> vehId2 = Id.create("drt2", DvrpVehicle.class);
 
 
 	@Test
@@ -69,6 +73,7 @@ public class ShiftsIOTest {
 		assertEquals(45000., shiftSpecification1.getEndTime(), 0);
 		assertTrue(shiftSpecification1.getOperationFacilityId().isPresent());
 		assertEquals(oid1, shiftSpecification1.getOperationFacilityId().get());
+		assertEquals(vehId1, shiftSpecification1.getDesignatedVehicleId().get());
 		assertEquals(1800., shiftSpecification1.getBreak().orElseThrow().getDuration(), 0);
 		assertEquals(28800., shiftSpecification1.getBreak().orElseThrow().getEarliestBreakStartTime(), 0);
 		assertEquals(32400., shiftSpecification1.getBreak().orElseThrow().getLatestBreakEndTime(), 0);
@@ -80,6 +85,7 @@ public class ShiftsIOTest {
 		assertEquals(49000., shiftSpecification2.getEndTime(), 0);
 		assertTrue(shiftSpecification2.getOperationFacilityId().isPresent());
 		assertEquals(oid2, shiftSpecification2.getOperationFacilityId().get());
+		assertEquals(vehId2, shiftSpecification2.getDesignatedVehicleId().get());
 		assertEquals(3600., shiftSpecification2.getBreak().orElseThrow().getDuration(), 0);
 		assertEquals(29200., shiftSpecification2.getBreak().orElseThrow().getEarliestBreakStartTime(), 0);
 		assertEquals(32800., shiftSpecification2.getBreak().orElseThrow().getLatestBreakEndTime(), 0);
@@ -91,6 +97,7 @@ public class ShiftsIOTest {
 		assertEquals(53000., shiftSpecification3.getEndTime(), 0);
 		assertFalse(shiftSpecification3.getOperationFacilityId().isPresent());
 		assertEquals(Optional.empty(), shiftSpecification3.getOperationFacilityId());
+		assertEquals(Optional.empty(), shiftSpecification3.getDesignatedVehicleId());
 		assertTrue(shiftSpecification3.getBreak().isEmpty());
 	}
 }

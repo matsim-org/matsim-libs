@@ -61,6 +61,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -719,6 +720,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		private Config defineConfig() {
 			Config config = ConfigUtils.createConfig();
 			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 			// set number of iterations
 			config.controller().setLastIteration(0);

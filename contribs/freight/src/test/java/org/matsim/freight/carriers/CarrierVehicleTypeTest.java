@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
@@ -39,7 +40,7 @@ public class CarrierVehicleTypeTest {
 	CarrierVehicleTypes types;
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	public void setUp() {
 		final Id<VehicleType> vehicleTypeId = Id.create( "medium", VehicleType.class );
 		VehicleType mediumType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		{
@@ -53,20 +54,19 @@ public class CarrierVehicleTypeTest {
 			VehicleCapacity vehicleCapacity = mediumType.getCapacity();
 			vehicleCapacity.setWeightInTons( 30 );
 			mediumType.setDescription( "Medium Vehicle" ).setMaximumVelocity( 13.89 );
+			mediumType.setNetworkMode(TransportMode.truck);
 			types = new CarrierVehicleTypes();
 			types.getVehicleTypes().put( mediumType.getId(), mediumType );
 		}
 		//Setting up a copy of the one above
 		VehicleType newVehicleType1 = VehicleUtils.getFactory().createVehicleType( Id.create("medium2", VehicleType.class ) );
 		VehicleUtils.copyFromTo( mediumType, newVehicleType1 );
-		VehicleType mediumType2 = newVehicleType1;
-		types.getVehicleTypes().put(mediumType2.getId(), mediumType2);
+		types.getVehicleTypes().put(newVehicleType1.getId(), newVehicleType1);
 
 		//Setting up a smaller one based of the one above and changing all values.
 		final Id<VehicleType> smallTypeId = Id.create( "small", VehicleType.class );
-		VehicleType newVehicleType = VehicleUtils.getFactory().createVehicleType( smallTypeId );
-		VehicleUtils.copyFromTo( mediumType, newVehicleType );
-		VehicleType smallType = newVehicleType ;
+		VehicleType smallType = VehicleUtils.getFactory().createVehicleType( smallTypeId );
+		VehicleUtils.copyFromTo( mediumType, smallType );
 		{
 			CostInformation costInformation = smallType.getCostInformation() ;
 			costInformation.setFixedCost( 25. );
@@ -79,7 +79,8 @@ public class CarrierVehicleTypeTest {
 			capacity.setWeightInTons( 16 ) ;
 //			VehicleType smallType = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( smallTypeId, mediumType )
 			smallType.setDescription( "Small Vehicle" ).setMaximumVelocity( 10.0 ) ;
-			types.getVehicleTypes().put( smallType.getId(), smallType );
+			smallType.setNetworkMode(TransportMode.car);
+			types.getVehicleTypes().put( smallType.getId(), smallType);
 		}
 	}
 

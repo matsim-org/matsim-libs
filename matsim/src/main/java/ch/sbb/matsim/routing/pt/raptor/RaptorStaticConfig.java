@@ -61,11 +61,11 @@ public class RaptorStaticConfig {
 		Initial,
 
 		/**
-		 * Use this option if you want the algorithm to calculate transfers on demand,
+		 * Use this option if you want the algorithm to calculate transfers adaptively on demand,
 		 * which avoids any simulation start-up time but may increase the routing time
 		 * itself.
 		 */
-		Cached
+		Adaptive
 	}
 
 

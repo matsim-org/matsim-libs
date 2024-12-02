@@ -152,7 +152,7 @@ public class FreightDemandGenerationUtils {
 			writer.flush();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Could not write job locations file under " + "/outputLocationFile.xml.gz");
 		}
 		log.info("Wrote job locations file under " + "/outputLocationFile.xml.gz");
 	}

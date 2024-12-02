@@ -22,6 +22,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
+import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig.RaptorTransferCalculation;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.RaptorObserver;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.CachingTransferProvider;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
@@ -37,15 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * The actual RAPTOR implementation, based on Delling et al, Round-Based Public Transit Routing.
@@ -70,6 +63,7 @@ public class SwissRailRaptorCore {
     private final PathElement[] tmpArrivalPathPerStop; // only used to ensure parallel update
     private final BitSet tmpImprovedStops; // only used to ensure parallel update
     private final boolean useCapacityConstraints;
+    private final boolean useAdaptiveTransferCalculation;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
     private final RaptorTransferCostCalculator transferCostCalculator;
     private final RouteSegmentIteratorImpl routeSegmentIterator;
@@ -90,6 +84,7 @@ public class SwissRailRaptorCore {
         this.tmpArrivalPathPerStop = new PathElement[this.data.countStops];
         this.tmpImprovedStops = new BitSet(this.data.countStops);
         this.useCapacityConstraints = this.data.config.isUseCapacityConstraints();
+        this.useAdaptiveTransferCalculation = this.data.config.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive);
         this.inVehicleCostCalculator = inVehicleCostCalculator;
         this.transferCostCalculator = transferCostCalculator;
         this.routeSegmentIterator = new RouteSegmentIteratorImpl(this.data);
@@ -115,7 +110,8 @@ public class SwissRailRaptorCore {
         reset();
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
-        Map<TransitStopFacility, InitialStop> destinationStops = new HashMap<>();
+		// Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+        Map<TransitStopFacility, InitialStop> destinationStops = new LinkedHashMap<>();
 
         // go through all egressStops; check if already in destinationStops; if so, check if current cost is smaller; if so, then replace.  This can
         // presumably happen when the same stop can be reached at lower cost by a different egress mode. (*)
@@ -138,7 +134,8 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
-        Map<TransitStopFacility, InitialStop> initialStops = new HashMap<>();
+		// Also, using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+        Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);
             if (alternative == null || accessStop.accessCost < alternative.accessCost) {
@@ -827,12 +824,21 @@ public class SwissRailRaptorCore {
             }
             RRouteStop fromRouteStop = fromPE.toRouteStop; // this is the route stop we arrive with least cost at stop
 
-            // obtain on-demand transfers if applicable (will return null if transfers are calculated initially)
-            RTransfer[] transfers = this.data.calculateTransfers(fromRouteStop);
+            final int firstTransferIndex;
+            final int lastTransferIndex;
+            final RTransfer[] transfers;
 
-            int firstTransferIndex = transfers == null ? fromRouteStop.indexFirstTransfer : 0;
-            int lastTransferIndex = transfers == null ? firstTransferIndex + fromRouteStop.countTransfers : transfers.length;
-            transfers = transfers == null ? this.data.transfers : transfers;
+            if (!useAdaptiveTransferCalculation) {
+            	// efficient lookup from the precomputed transfer candidates
+            	transfers = this.data.transfers;
+            	firstTransferIndex = fromRouteStop.indexFirstTransfer;
+            	lastTransferIndex = firstTransferIndex + fromRouteStop.countTransfers;
+            } else {
+            	// more costly calculation and caching of transfer canddiates
+            	transfers = this.data.calculateTransfers(fromRouteStop);
+            	firstTransferIndex = 0;
+            	lastTransferIndex = transfers.length;
+            }
 
             for (int transferIndex = firstTransferIndex; transferIndex < lastTransferIndex; transferIndex++) {
                 RTransfer transfer = transfers[transferIndex];

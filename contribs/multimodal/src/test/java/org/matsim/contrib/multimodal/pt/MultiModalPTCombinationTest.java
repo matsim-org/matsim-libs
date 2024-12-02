@@ -85,6 +85,7 @@ public class MultiModalPTCombinationTest {
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);

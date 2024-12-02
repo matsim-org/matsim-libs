@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -37,6 +38,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -65,9 +67,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	private final StopTimeCalculator stopTimeCalculator;
 	private final boolean scheduleWaitBeforeDrive;
 
-	public DefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer,
-			TravelTime travelTime, ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory,
-			StopTimeCalculator stopTimeCalculator, boolean scheduleWaitBeforeDrive) {
+	public DefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer, TravelTime travelTime,
+											ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory,
+											StopTimeCalculator stopTimeCalculator, boolean scheduleWaitBeforeDrive) {
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
@@ -128,8 +130,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			Schedule schedule = insertion.insertion.vehicleEntry.vehicle.getSchedule();
 
 			for (Task task : schedule.getTasks()) {
-				if (task instanceof DrtStopTask) {
-					DrtStopTask stopTask = (DrtStopTask) task;
+				if (task instanceof DrtStopTask stopTask) {
 
 					for (AcceptedDrtRequest request : stopTask.getPickupRequests().values()) {
 						Verify.verify(stopTask.getEndTime() <= request.getLatestStartTime());
@@ -144,7 +145,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private void verifyStructure(Schedule schedule) {
-		boolean previousDrive = false;
+		DriveTask previousDrive = null;
 
 		int startIndex = schedule.getStatus().equals(ScheduleStatus.STARTED) ? schedule.getCurrentTask().getTaskIdx()
 				: 0;
@@ -152,11 +153,18 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		for (int index = startIndex; index < schedule.getTaskCount(); index++) {
 			Task task = schedule.getTasks().get(index);
 
-			if (task instanceof DriveTask) {
-				Verify.verify(!previousDrive);
-				previousDrive = true;
+			if (task instanceof DriveTask driveTask) {
+				if(previousDrive != null) {
+					Verify.verify(previousDrive.getPath() instanceof DivertedVrpPath,
+							"The first of two subsequent drive tasks has to be a diverted path.");
+					Id<Link> firstEnd = previousDrive.getPath().getToLink().getId();
+					Id<Link> secondStart = driveTask.getPath().getFromLink().getId();
+					Verify.verify(firstEnd.equals(secondStart),
+							String.format("Subsequent drive tasks are not connected link %s !=> %s", firstEnd.toString(), secondStart.toString()));
+				}
+				previousDrive = driveTask;
 			} else {
-				previousDrive = false;
+				previousDrive = null;
 			}
 		}
 	}
@@ -211,12 +219,16 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					beforePickupTask = insertWait(vehicleEntry.vehicle, currentTask, dropoffIdx);
 				}
 			}
+			if(!stops.isEmpty() && stops.size() + 1 > pickupIdx) {
+				//there is an existing stop which was scheduled earlier and was not the destination of the already diverted drive task
+				removeBetween(schedule, beforePickupTask, stops.get(pickupIdx).task);
+			}
 		} else { // insert pickup after an existing stop/stay task
 			StayTask stayTask = null;
 			DrtStopTask stopTask = null;
 			if (pickupIdx == 0) {
 				if (scheduleStatus == ScheduleStatus.PLANNED) {// PLANNED schedule
-					stayTask = (StayTask)schedule.getTasks().get(0);
+					stayTask = (StayTask)schedule.getTasks().getFirst();
 					stayTask.setEndTime(stayTask.getBeginTime());// could get later removed with ScheduleTimingUpdater
 				} else if (STAY.isBaseTypeOf(currentTask)) {
 					stayTask = (StayTask)currentTask; // ongoing stay task
@@ -307,7 +319,11 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 		double nextBeginTime = pickupIdx == dropoffIdx ? //
 				pickupStopTask.getEndTime() : // asap
-				stops.get(pickupIdx).task.getBeginTime(); // as planned
+				stops.get(pickupIdx).task.getPickupRequests().values()
+						.stream()
+						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
+						.min()
+						.orElse(pickupStopTask.getEndTime());
 
 		if (request.getFromLink() == toLink) {
 			// prebooking case when we are already at the stop location, but next stop task happens in the future
@@ -340,7 +356,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private DrtStopTask insertDropoff(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData,
-			DrtStopTask pickupTask) {
+									  DrtStopTask pickupTask) {
 		final double now = timer.getTimeOfDay();
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
@@ -422,8 +438,13 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 						afterDropoffTask.getTaskIdx() + 1, afterDropoffTask.getEndTime());
 			} else {
 				// may want to wait here or after driving before starting next stop
+				double earliestArrivalTime = stops.get(dropoffIdx).task.getPickupRequests().values()
+						.stream()
+						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
+						.min()
+						.orElse(dropoffStopTask.getEndTime());
 				Task afterDropoffTask = insertDriveWithWait(vehicleEntry.vehicle, dropoffStopTask, vrpPath,
-						stops.get(dropoffIdx).task.getBeginTime());
+						earliestArrivalTime);
 
 				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 						afterDropoffTask.getTaskIdx() + 1, afterDropoffTask.getEndTime());
@@ -506,7 +527,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		Task driveTask = taskFactory.createDriveTask(vehicle, path, DrtDriveTask.TYPE);
 		schedule.addTask(leadingTask.getTaskIdx() + 1, driveTask);
 
-		if (driveTask.getEndTime() < latestArrivalTime) {
+		if (driveTask.getEndTime() < latestArrivalTime && !scheduleWaitBeforeDrive) {
 			DrtStayTask waitTask = taskFactory.createStayTask(vehicle, driveTask.getEndTime(), latestArrivalTime,
 					path.getToLink());
 			schedule.addTask(driveTask.getTaskIdx() + 1, waitTask);

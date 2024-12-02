@@ -28,5 +28,5 @@
 			<artifactId>h3</artifactId>
 			<version>4.1.1</version>
 		</dependency>
-    </dependencies>
+	</dependencies>
 </project>

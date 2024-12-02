@@ -75,7 +75,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 		pendingBackward.add(startNode);
 
 		// step through the network in forward mode
-		while (pendingForward.size() > 0) {
+		while (!pendingForward.isEmpty()) {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
@@ -89,7 +89,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 		}
 
 		// now step through the network in backward mode
-		while (pendingBackward.size() > 0) {
+		while (!pendingBackward.isEmpty()) {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {
@@ -112,7 +112,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 	/**
 	 * Searches the biggest cluster in the given Network. The Network is not modified.
 	 */
-	public Map<Id<Node>, Node> searchBiggestCluster(Network network) {
+	private Map<Id<Node>, Node> searchBiggestCluster(Network network) {
 		final Map<Id<Node>, Node> visitedNodes = new TreeMap<>();
 		Map<Id<Node>, Node> biggestCluster = new TreeMap<>();
 
@@ -142,11 +142,11 @@ public final class NetworkCleaner implements NetworkRunnable {
 		return biggestCluster;
 	}
 
-	/** 
+	/**
 	 * Reducing the network so it only contains nodes included in the biggest Cluster.
 	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 	 */
-	public static void reduceToBiggestCluster(Network network, Map<Id<Node>, Node> biggestCluster) {
+	private static void reduceToBiggestCluster(Network network, Map<Id<Node>, Node> biggestCluster) {
 		List<Node> allNodes2 = new ArrayList<>(network.getNodes().values());
 		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
@@ -157,7 +157,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 				network.getLinks().size() + " links.");
 		log.info("done.");
 	}
-	
+
 	@Override
 	public void run(final Network network) {
 		Map<Id<Node>, Node> biggestCluster = this.searchBiggestCluster(network);
