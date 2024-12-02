@@ -73,7 +73,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String sample = "0.1";
 		String jspritIterations = "2";
 		String creationOption = "createNewCarrierFile";
-		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
+		String smallScaleCommercialTrafficType = "completeSmallScaleCommercialTraffic";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
 		String shapeCRS = "EPSG:4326";

@@ -68,7 +68,7 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
-        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
+        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup, "_testWithReattempts");
 
         Multiset<Id<Person>> submittedPersons = HashMultiset.create();
         Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
@@ -122,7 +122,7 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
-        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup);
+        final Controler run = prepare(drtWithShiftsConfigGroup, multiModeDrtConfigGroup, "_testWithoutReattempts");
 
         Multiset<Id<Person>> submittedPersons = HashMultiset.create();
         Multiset<Id<Person>> scheduledPersons = HashMultiset.create();
@@ -172,7 +172,7 @@ public class RunPrebookingShiftDrtScenarioIT {
     }
 
     @NotNull
-    private Controler prepare(DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup, MultiModeDrtConfigGroup multiModeDrtConfigGroup) {
+    private Controler prepare(DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup, MultiModeDrtConfigGroup multiModeDrtConfigGroup, String outputSuffix) {
         drtWithShiftsConfigGroup.mode = TransportMode.drt;
         DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
                 (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
@@ -242,7 +242,7 @@ public class RunPrebookingShiftDrtScenarioIT {
         config.controller().setWriteEventsInterval(1);
 
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controller().setOutputDirectory("test/output/prebooking_shifts");
+        config.controller().setOutputDirectory("test/output/prebooking_shifts"+outputSuffix);
 
         DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
         ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);

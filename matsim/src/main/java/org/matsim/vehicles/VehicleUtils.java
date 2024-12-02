@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -64,6 +65,10 @@ public final class VehicleUtils {
 		return new VehicleType( typeId );
 	}
 
+	public static VehicleType createVehicleType( Id<VehicleType> typeId, String networkMode){
+		return new VehicleType( typeId, networkMode );
+	}
+
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
 	}
@@ -75,9 +80,9 @@ public final class VehicleUtils {
 	public static VehicleType createDefaultVehicleType() {
 		VehicleType defaultVehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
-		
+
 		defaultVehicleType.getCapacity().setSeats(4);
-		
+		defaultVehicleType.setNetworkMode(TransportMode.car);
 		return defaultVehicleType;
 	}
 
@@ -434,7 +439,7 @@ public final class VehicleUtils {
 		new MatsimVehicleWriter( vehicles ).writeFile( filename );
 
 	}
-	
+
 	public static Id<Link> getInitialLinkId(Vehicle vehicle) {
 		String attribute = (String) vehicle.getAttributes().getAttribute(INITIAL_LINK_ID);
 		return attribute == null ? null : Id.createLinkId(attribute);

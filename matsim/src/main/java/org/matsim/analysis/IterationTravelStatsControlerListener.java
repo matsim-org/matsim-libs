@@ -94,15 +94,17 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		return config.controller().getCreateGraphsInterval() > 0 && event.getIteration() % config.controller().getCreateGraphsInterval() == 0;
 	}
 
-	private boolean isWriteTripsAndLegs(IterationEndsEvent event){
-		if (config.controller().getWriteTripsInterval() <= 0) {
+	private boolean isWriteTripsAndLegs(IterationEndsEvent event) {
+
+		// This uses the same logic as in PlansDumpingImpl
+		int writeTripsInterval = config.controller().getWriteTripsInterval();
+		final boolean writingTripsAtAll = writeTripsInterval > 0;
+		final boolean earlyIteration = event.getIteration() <= config.controller().getWritePlansInterval() ;
+
+		if (!writingTripsAtAll) {
 			return false;
 		}
 
-		if (event.getIteration() == 0 || event.isLastIteration()){
-			return true;
-		}
-
-		return event.getIteration() % config.controller().getWriteTripsInterval() == 0;
+		return earlyIteration || event.isLastIteration() || event.getIteration() % writeTripsInterval == 0;
 	}
 }

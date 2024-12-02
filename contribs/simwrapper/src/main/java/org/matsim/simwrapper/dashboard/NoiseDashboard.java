@@ -1,11 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.noise.NoiseAnalysis;
-import org.matsim.application.analysis.population.StuckAgentAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
@@ -19,13 +16,14 @@ public class NoiseDashboard implements Dashboard {
 	private double minDb = 40;
 	private double maxDb = 80;
 
+	private final String coordinateSystem;
+
 	/**
-	 * Set the min and max values for the noise map.
+	 * Best provide the crs from {@link org.matsim.core.config.groups.GlobalConfigGroup}
+	 * @param coordinateSystem for the {@link GridMap}
 	 */
-	public NoiseDashboard withMinMaxDb(double minDb, double maxDb) {
-		this.minDb = minDb;
-		this.maxDb = maxDb;
-		return this;
+	public NoiseDashboard(String coordinateSystem) {
+		this.coordinateSystem = coordinateSystem;
 	}
 
 	@Override
@@ -64,52 +62,30 @@ public class NoiseDashboard implements Dashboard {
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Noise Immissions (Grid)";
 				viz.description = "Total Noise Immissions per day";
-				viz.height = 12.0;
-				viz.cellSize = 250;
-				viz.opacity = 0.1;
-				viz.maxHeight = 40;
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp(new double[]{30, 40, 50, 60, 70}, new String[]{"#1175b3", "#95c7df", "#dfdb95", "#dfb095", "#f4a986", "#cc0c27"});
+				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro");
 			})
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Hourly Noise Immissions (Grid)";
 				viz.description = "Noise Immissions per hour";
-				viz.height = 12.0;
-				viz.cellSize = 250;
-				viz.opacity = 0.1;
-				viz.maxHeight = 40;
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp(new double[]{30, 40, 50, 60, 70}, new String[]{"#1175b3", "#95c7df", "#dfdb95", "#dfb095", "#f4a986", "#cc0c27"});
+				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
 			});
 		layout.row("damages")
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Daily Noise Damages (Grid)";
 				viz.description = "Total Noise Damages per day [€]";
-				viz.height = 12.0;
-				viz.cellSize = 250;
-				viz.opacity = 0.1;
-				viz.maxHeight = 40;
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
-				viz.setColorRamp(ColorScheme.Oranges);
+				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_day.%s", "avro");
 			})
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Hourly Noise Damages (Grid)";
 				viz.description = "Noise Damages per hour [€]";
-				viz.height = 12.0;
-				viz.cellSize = 250;
-				viz.opacity = 0.2;
-				viz.maxHeight = 40;
-				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
-//				viz.setColorRamp(new double[]{30, 40, 50, 60, 70}, new String[]{"#1175b3", "#95c7df", "#dfdb95", "#dfb095", "#f4a986", "#cc0c27"});
-				viz.setColorRamp(ColorScheme.Oranges);
+				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_hour.%s", "avro");
 			});
+
+
 	}
+
 }

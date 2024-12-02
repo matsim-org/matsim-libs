@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkUtils;
@@ -86,9 +88,16 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 						DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 						ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
 							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
-						return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem,
-							matrixParams, globalConfigGroup.getNumberOfThreads(),
-                                qSimConfigGroup.getTimeStepSize());
+						
+						
+						if (matrixParams.cachePath == null) {
+							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
+								qSimConfigGroup.getTimeStepSize());
+						} else {
+							File cachePath = new File(ConfigGroup.getInputFileURL(getConfig().getContext(), matrixParams.cachePath).getPath());
+							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
+								qSimConfigGroup.getTimeStepSize(), cachePath);
+						}
                     })).in(Singleton.class);
 		} else {
 			//use DVRP-routing (dvrp-global) network
