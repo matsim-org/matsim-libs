@@ -35,7 +35,7 @@ import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.*;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;

@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadFromFleet;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

@@ -23,8 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import java.net.URL;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -74,8 +73,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 		install(new DvrpLoadModule(getMode()));
 
 		bindModal(DvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
-			IntegerLoadType scalarVehicleLoadFactory = getter.getModal(IntegerLoadType.class);
-			return (capacity, vehicleId) -> scalarVehicleLoadFactory.fromInt(capacity);
+			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
+			return (capacity, vehicleId) -> integerLoadType.fromInt(capacity);
 		})).asEagerSingleton();
 
 		bindModal(DvrpLoadFromVehicle.class).toProvider(modalProvider(getter -> {

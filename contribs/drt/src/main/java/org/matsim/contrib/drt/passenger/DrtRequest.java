@@ -24,13 +24,11 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +47,7 @@ public class DrtRequest implements PassengerRequest {
 
 	private final Link fromLink;
 	private final Link toLink;
-	private final Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter;
+	private final DvrpLoad load;
 
 	private DrtRequest(Builder builder) {
 		id = builder.id;
@@ -62,7 +60,7 @@ public class DrtRequest implements PassengerRequest {
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
-		scalarVehicleLoadGetter = builder.scalarVehicleLoadGetter;
+		this.load = builder.load;
 	}
 
 	public static Builder newBuilder() {
@@ -81,7 +79,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
-		builder.scalarVehicleLoadGetter = copy.scalarVehicleLoadGetter;
+		builder.load = copy.load;
 		return builder;
 	}
 
@@ -135,7 +133,7 @@ public class DrtRequest implements PassengerRequest {
 
 	@Override
 	public DvrpLoad getLoad() {
-		return this.scalarVehicleLoadGetter.apply(passengerIds);
+		return this.load;
 	}
 
 	@Override
@@ -165,7 +163,7 @@ public class DrtRequest implements PassengerRequest {
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
-		private Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter = passengerIds -> new DefaultIntegerLoadType().fromInt(passengerIds.size());
+		private DvrpLoad load;
 
 		private Builder() {
 		}
@@ -220,8 +218,8 @@ public class DrtRequest implements PassengerRequest {
 			return this;
 		}
 
-		public Builder scalarDvrpVehicleLoadGetter(Function<Collection<Id<Person>>, DvrpLoad> scalarVehicleLoadGetter) {
-			this.scalarVehicleLoadGetter = scalarVehicleLoadGetter;
+		public Builder load(DvrpLoad load) {
+			this.load = load;
 			return this;
 		}
 

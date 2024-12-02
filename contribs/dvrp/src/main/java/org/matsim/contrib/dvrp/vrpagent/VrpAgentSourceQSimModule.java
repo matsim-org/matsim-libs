@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;

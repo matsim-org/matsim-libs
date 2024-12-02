@@ -4,15 +4,26 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadSerializer;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+/**
+ * This class offers a default implementation of the {@link DvrpLoadFromDrtPassengers} interface.
+ * The logic implemented here works on the person level, determining the load of each person and summing them to retrieve the overall {@link DvrpLoad} of a request.
+ * To determine the load/occupancy of a person, the following process is followed:
+ * - Attributes {@value ATTRIBUTE_LOAD_TYPE} and {@value ATTRIBUTE_LOAD_VALUE} are looked for in the person's attribute.
+ * - If both are found, the {@link DvrpLoadSerializer} is used to interpret the attributes into a load object
+ * - If only the {@value ATTRIBUTE_LOAD_TYPE} attribute is found, the string "1" is deserialized using that type.
+ * - If only the {@value ATTRIBUTE_LOAD_VALUE} is provided, the fallback {@link IntegerLoadType} (usually the one that is bound for that Drt mode)  is used.
+ * - if neither of those attributes is provided, the fallback {@link IntegerLoadType} is used to build the DvrpLoad from the integer 1.
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class DefaultDvrpLoadFromDrtPassengers implements DvrpLoadFromDrtPassengers {
 
 	public static final String ATTRIBUTE_LOAD_TYPE = "drt:loadType";
@@ -57,10 +68,10 @@ public class DefaultDvrpLoadFromDrtPassengers implements DvrpLoadFromDrtPassenge
 	@SuppressWarnings("")
 	public DvrpLoad getLoad(Collection<Id<Person>> personIds) {
 		try {
-			return personIds.stream().map(this::getPersonLoad).reduce(DvrpLoad::addTo).orElseThrow();
+			return personIds.stream().map(this::getPersonLoad).reduce(DvrpLoad::add).orElseThrow();
 		} catch (NoSuchElementException e) {
 			throw new IllegalStateException("At least one person should be behind a request", e);
-		} catch (DvrpLoad.UnsupportedVehicleLoadException e) {
+		} catch (DvrpLoad.IncompatibleLoadsException e) {
 			throw new IllegalStateException("Persons with incompatible loads behind the same request", e);
 		}
 	}

@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,11 +43,13 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers;
+	private final DvrpLoadSerializer dvrpLoadSerializer;
 
-	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers) {
+	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers, DvrpLoadSerializer dvrpLoadSerializer) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.dvrpLoadFromDrtPassengers = dvrpLoadFromDrtPassengers;
+		this.dvrpLoadSerializer = dvrpLoadSerializer;
 	}
 
 	@Override
@@ -56,9 +60,12 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
 		double maxRideDuration = drtRoute.getMaxRideTime();
 
+		DvrpLoad load = this.dvrpLoadFromDrtPassengers.getLoad(passengerIds);
+		String serializedLoad = this.dvrpLoadSerializer.serialize(load);
+
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
-						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration));
+						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration, load, serializedLoad, load.getType().getId()));
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
@@ -71,7 +78,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.latestArrivalTime(latestArrivalTime)
 				.maxRideDuration(maxRideDuration)
 				.submissionTime(submissionTime)
-				.scalarDvrpVehicleLoadGetter(this.dvrpLoadFromDrtPassengers::getLoad)
+				.load(load)
 				.build();
 
 		log.debug(route);

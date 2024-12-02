@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
@@ -185,7 +185,7 @@ public class InsertionGenerator {
 
 			// (1) only not fully loaded arcs
 			// This is different than using allowed &= ... which causes the right hand expression to be always evaluated even if left variable is already false
-			allowed = allowed && occupancy.addTo(drtRequest.getLoad()).fitsIn(vehicleCapacity);
+			allowed = allowed && occupancy.add(drtRequest.getLoad()).fitsIn(vehicleCapacity);
 
 			// (2) check if the request wants to depart after the departure time of the next
 			// stop. We can early on filter out the current insertion, because we will
@@ -302,7 +302,7 @@ public class InsertionGenerator {
 			if(currentStop instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange) {
 				capacity = stopWithCapacityChange.getNewVehicleCapacity();
 			}
-			if (!request.getLoad().fitsIn(capacity) || !currentStop.outgoingOccupancy.addTo(request.getLoad()).fitsIn(capacity)) {
+			if (!request.getLoad().fitsIn(capacity) || !currentStop.outgoingOccupancy.add(request.getLoad()).fitsIn(capacity)) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,

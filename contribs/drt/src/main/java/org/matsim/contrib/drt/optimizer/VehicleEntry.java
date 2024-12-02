@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 
 /**
  * @author Michal Maciejewski (michalm)

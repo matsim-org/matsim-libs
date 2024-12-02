@@ -2,15 +2,14 @@ package org.matsim.contrib.dvrp.fleet;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.MultipleIndependentSlotsLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.*;
 
 import java.util.List;
 
+/**
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class DefaultDvrpLoadSerializerTest {
-
 	@Test
 	public void testOneScalarLoadType() {
 		DefaultIntegerLoadType dvrpLoadType = new DefaultIntegerLoadType();

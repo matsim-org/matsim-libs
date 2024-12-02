@@ -14,8 +14,14 @@ import org.matsim.contrib.drt.taas.capacities.CapacityReconfigurationLogic;
 import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.taas.capacities.DefaultCapacityConfigurationLogic;
-import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.drt.taas.capacities.DefaultCapacityReconfigurationLogic;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultDvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -34,11 +40,13 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class RunDrtExampleWithChangingCapacitiesTest {
 
 	@RegisterExtension
@@ -108,32 +116,6 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 		}
 	}
 
-	static class ParityBasedDvrpLoadFromDrtPassengers implements DvrpLoadFromDrtPassengers {
-
-		private final IntegerLoadType first;
-		private final IntegerLoadType second;
-		public ParityBasedDvrpLoadFromDrtPassengers(IntegerLoadType first, IntegerLoadType second) {
-			this.first = first;
-			this.second = second;
-		}
-		@Override
-		public DvrpLoad getLoad(Collection<Id<Person>> personIds) {
-			assert personIds.size() > 0;
-			Id<Person> personId = personIds.stream().findFirst().get();
-			int personParity=0;
-			try {
-				personParity = Integer.parseInt(personId.toString());
-			} catch (NumberFormatException ignored) {
-
-			}
-			if(personParity%2 == 0) {
-				return first.fromInt(personIds.size());
-			} else {
-				return second.fromInt(personIds.size());
-			}
-		}
-	}
-
 	static class CustomLoadsModule extends AbstractDvrpModeModule {
 
 		private final boolean useSimpleCapacityConfigurationLogic;
@@ -172,21 +154,15 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 					Set<DvrpLoad> possibleCapacities = Set.of(personsDvrpLoadType.fromInt(4), goodsDvrpLoadType.fromInt(4));
 					DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers = getter.getModal(DvrpLoadFromDrtPassengers.class);
 					Network network = getter.getModal(Network.class);
-					return new DefaultCapacityConfigurationLogic(fleetSpecification,
+					return new DefaultCapacityReconfigurationLogic(fleetSpecification,
 						possibleCapacities, dvrpLoadFromDrtPassengers, network, network.getLinks().values(), 7200, true,
-						DefaultCapacityConfigurationLogic.CapacityChangeLinkSelection.RANDOM);
+						DefaultCapacityReconfigurationLogic.CapacityChangeLinkSelection.RANDOM);
 				}));
 			}
 
 			installOverridingQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 				@Override
 				protected void configureQSim() {
-					bindModal(Fleet.class).toProvider(modalProvider(
-						getter -> {
-							Network network = getter.getModal(Network.class);
-							return Fleets.createCustomFleet(getter.getModal(FleetSpecification.class),
-								dvrpVehicleSpecification -> new DvrpVehicleWithChangeableCapacityImpl(dvrpVehicleSpecification, network.getLinks().get(dvrpVehicleSpecification.getStartLinkId())));
-						})).asEagerSingleton();
 
 					// This engine will plan the vehicles to change their capacities during the simulation
 					addModalComponent(CapacityChangeSchedulerEngine.class, modalProvider(getter -> {
@@ -196,7 +172,7 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 						TravelDisutility travelDisutility = getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 						CapacityReconfigurationLogic capacityReconfigurationLogic = getter.getModal(CapacityReconfigurationLogic.class);
 						return new CapacityChangeSchedulerEngine(fleet, network,
-							travelDisutility, travelTime, capacityReconfigurationLogic);
+							travelDisutility, travelTime, capacityReconfigurationLogic, 300);
 					}));
 				}
 			});
@@ -238,6 +214,8 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet()
 				.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+
+			drtCfg.loadCapacityAnalysisInterval = 1;
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -265,6 +243,8 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet()
 				.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+
+			drtCfg.loadCapacityAnalysisInterval = 1;
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -291,6 +271,8 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet()
 				.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+
+			drtCfg.loadCapacityAnalysisInterval = 1;
 		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -312,6 +294,10 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			drtCfg.loadCapacityAnalysisInterval = 1;
+		}
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		preparePopulationLoads(controller.getScenario().getPopulation());

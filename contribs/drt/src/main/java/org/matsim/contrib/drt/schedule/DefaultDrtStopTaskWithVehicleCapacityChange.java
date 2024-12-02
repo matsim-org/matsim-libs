@@ -4,10 +4,18 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 
+/**
+ * Represents a {@link DefaultDrtStopTask} where no person is picked-up or dropped-off and the vehicle's capacity is changed (by implementing the {@link DrtStopTaskWithVehicleCapacityChange} interface).
+ * Calling the methods below will throw an {@link UnsupportedOperationException}:
+ * - {@link DefaultDrtStopTaskWithVehicleCapacityChange#addPickupRequest(AcceptedDrtRequest)}
+ * - {@link DefaultDrtStopTaskWithVehicleCapacityChange#addDropoffRequest(AcceptedDrtRequest)}
+ * - {@link DefaultDrtStopTaskWithVehicleCapacityChange#removePickupRequest(Id)}
+ * - {@link DefaultDrtStopTaskWithVehicleCapacityChange#removeDropoffRequest(Id)}
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopTask implements DrtStopTaskWithVehicleCapacityChange {
 
 	private final DvrpLoad newVehicleCapacity;
@@ -35,7 +43,6 @@ public class DefaultDrtStopTaskWithVehicleCapacityChange extends DefaultDrtStopT
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
-			.add("dropoffRequests", newVehicleCapacity)
 			.add("super", super.toString())
 			.toString();
 	}
