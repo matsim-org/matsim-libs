@@ -40,7 +40,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
@@ -70,13 +70,13 @@ public class InsertionGeneratorTest {
 
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)).build();
 
 	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
 			List.of(
 					Id.createPersonId("person1"),
 					Id.createPersonId("person2")
-			)).build();
+			)).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(2)).build();
 
 	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
 			List.of(
@@ -85,8 +85,8 @@ public class InsertionGeneratorTest {
 					Id.createPersonId("person3"),
 					Id.createPersonId("person4"),
 					Id.createPersonId("person5")
-			)).build();
-	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).build();
+			)).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(5)).build();
+	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).load(SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()).build();
 
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
@@ -459,20 +459,20 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop2 = stop(0, link("stop2"), occupancy);
 		//dropoff 5 pax
 		stop2.task.addDropoffRequest(acceptedReq5Pax);
-		occupancy = (IntegerLoad) occupancy.subtract(stop2.getOccupancyChange());
+		occupancy = occupancy.subtract(stop2.getOccupancyChange());
 		Assertions.assertEquals(5, occupancy.getLoad());
 
 		Waypoint.Stop stop1 = stop(0, link("stop1"), occupancy);
 		//dropoff 2 pax, pickup 5
 		stop1.task.addDropoffRequest(acceptedReq2Pax);
 		stop1.task.addPickupRequest(acceptedReq5Pax);
-		occupancy = (IntegerLoad) occupancy.subtract(stop1.getOccupancyChange());
+		occupancy = occupancy.subtract(stop1.getOccupancyChange());
 		Assertions.assertEquals(2, occupancy.getLoad());
 
 
 		Waypoint.Stop stop0 = stop(0, link("stop0"), occupancy);
 		stop0.task.addPickupRequest(acceptedReq2Pax);
-		occupancy = (IntegerLoad) occupancy.subtract(stop0.getOccupancyChange());
+		occupancy = occupancy.subtract(stop0.getOccupancyChange());
 		Assertions.assertEquals(0, occupancy.getLoad());
 	}
 

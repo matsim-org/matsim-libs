@@ -3,8 +3,11 @@ package org.matsim.contrib.dvrp.fleet.dvrp_load;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
+/**
+ * This {@link ScalarLoadType} extension defines {@link DvrpLoadType} that can build new {@link DvrpLoad} instances from one integer.
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public abstract class IntegerLoadType extends ScalarLoadType {
 	private static final Logger LOGGER = LogManager.getLogger(IntegerLoadType.class);
 

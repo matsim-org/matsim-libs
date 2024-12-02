@@ -4,18 +4,21 @@ import org.apache.commons.collections4.SetUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
 import java.util.Map;
 
-
+/**
+ * This implementation of {@link DvrpLoad} defines generic loads with N-slots of {@link ScalarLoad}.
+ * Since we rely on maps everytime we perform an operation, this is typically not as efficient as implementing your custom multidimensional loads with an attribute for each dimension
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class MultipleIndependentSlotsLoad implements DvrpLoad {
 
 	private final MultipleIndependentSlotsLoadType loadType;
 
 	private final IdMap<DvrpLoadType, ScalarLoad> loadPerSlot;
 
+	@SuppressWarnings("unused")
 	public MultipleIndependentSlotsLoad(IdMap<DvrpLoadType, ScalarLoad> loadPerSlot, MultipleIndependentSlotsLoadType loadType) {
 		this(loadPerSlot, loadType, true);
 	}
@@ -38,18 +41,18 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 	}
 
 	@Override
-	public MultipleIndependentSlotsLoad addTo(DvrpLoad other) {
+	public MultipleIndependentSlotsLoad add(DvrpLoad other) {
 		if(other == null) {
 			return this;
 		}
 		if(other instanceof MultipleIndependentSlotsLoad multipleIndependentSlotsLoad) {
 			IdMap<DvrpLoadType, ScalarLoad> resultLoadPerSlot = new IdMap<>(DvrpLoadType.class);
 			for(Map.Entry<Id<DvrpLoadType>, ScalarLoad> loadEntry: this.loadPerSlot.entrySet()) {
-				resultLoadPerSlot.put(loadEntry.getKey(), loadEntry.getValue().addTo(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey())));
+				resultLoadPerSlot.put(loadEntry.getKey(), loadEntry.getValue().add(multipleIndependentSlotsLoad.loadPerSlot.get(loadEntry.getKey())));
 			}
 			return new MultipleIndependentSlotsLoad(resultLoadPerSlot, this.loadType, false);
 		}
-		throw new UnsupportedVehicleLoadException(this, other.getClass());
+		throw new IncompatibleLoadsException(this, other);
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 			}
 			return new MultipleIndependentSlotsLoad(resultLoadPerSlot, this.loadType, false);
 		}
-		throw new UnsupportedVehicleLoadException(this, other.getClass());
+		throw new IncompatibleLoadsException(this, other);
 	}
 
 	@Override
@@ -96,10 +99,11 @@ public class MultipleIndependentSlotsLoad implements DvrpLoad {
 
 	@Override
 	public Number getElement(int i) {
-		return this.loadPerSlot.get(this.loadType.getSlotNames()[i]).asArray()[0];
+		return this.loadPerSlot.get(Id.create(this.loadType.getSlotNames()[i], DvrpLoadType.class)).asArray()[0];
 	}
 
 	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Number[] asArray() {
 		Id[] slotIds = this.getType().getOrderedSlotTypesIds();
 		Number[] numbers = new Number[slotIds.length];

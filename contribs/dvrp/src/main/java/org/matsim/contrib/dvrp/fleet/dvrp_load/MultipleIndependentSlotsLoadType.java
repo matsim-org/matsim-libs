@@ -4,18 +4,21 @@ import org.apache.commons.collections4.SetUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Defines types of {@link MultipleIndependentSlotsLoad}
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 
 	private final IdMap<DvrpLoadType, ScalarLoadType> slotTypeById;
 	private final IdSet<DvrpLoadType> slotTypesIdSet;
+	@SuppressWarnings("rawtypes")
 	private final Id[] orderedSlotTypesIds;
 	private final Id<DvrpLoadType> id;
 
@@ -31,6 +34,7 @@ public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public DvrpLoad fromArray(Number[] array) {
 		IdMap<DvrpLoadType, ScalarLoad> loadPerSlot = new IdMap<>(DvrpLoadType.class);
 		if(array.length != orderedSlotTypesIds.length) {
@@ -51,11 +55,6 @@ public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 		return new MultipleIndependentSlotsLoad(loadPerSlot, this, false);
 	}
 
-	@Override
-	public int numberOfDimensions() {
-		return this.orderedSlotTypesIds.length;
-	}
-
 	public IdSet<DvrpLoadType> getSlotTypesIdSet() {
 		return this.slotTypesIdSet;
 	}
@@ -65,6 +64,7 @@ public class MultipleIndependentSlotsLoadType implements DvrpLoadType {
 		return Arrays.stream(this.orderedSlotTypesIds).map(Object::toString).toArray(String[]::new);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Id[] getOrderedSlotTypesIds() {
 		return this.orderedSlotTypesIds;
 	}

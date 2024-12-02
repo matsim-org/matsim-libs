@@ -37,11 +37,10 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.*;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.ScalarLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.ScalarLoadType;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.*;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
@@ -94,7 +93,7 @@ public class VehicleOccupancyProfileCalculator
 	private final double analysisEndTime;
 	private final int maxCapacity;
 	//We create one ScalarVehicleLoadFactory here to avoid creating one each time we need a ScalarVehicleLoad
-	private final ScalarLoadType scalarVehicleLoadFactory = new DefaultIntegerLoadType();
+	private final IntegerLoadType scalarVehicleLoadFactory = new DefaultIntegerLoadType();
 
 	private final String dvrpMode;
 
@@ -267,7 +266,7 @@ public class VehicleOccupancyProfileCalculator
 		VehicleState state = vehicleStates.get(Id.create(vehicleId, DvrpVehicle.class));
 		if (state != null && !isDriver(event.getPersonId(), vehicleId)) {
 			increment(state, event.getTime());
-			state.occupancy = state.occupancy.addTo(state.occupancy.getType().fromNumber(change));
+			state.occupancy = state.occupancy.add(state.occupancy.getType().fromNumber(change));
 			state.beginTime = event.getTime();
 		}
 	}

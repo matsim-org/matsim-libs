@@ -1,12 +1,12 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
 /**
  * This abstract class serves as a basis for writing {@link DvrpLoadType} implementations that are scalar, i.e. comprising one slot/dimension.
- * New instances of the related {@link org.matsim.contrib.dvrp.fleet.DvrpLoad} implementations must be buildable from one Number only. For this, the {@link ScalarLoadType#fromArray(Number[])} checks whether the passed array consists of only one number and delegates the instance creation to {@link ScalarLoadType#fromNumber(Number)} defined in subclasses.
- * Moreover, the equals method is defined here. It supposes that two {@link ScalarLoadType} objects represent the same type if they are of the same class and have the same name and slot name.
+ * New instances of the related {@link DvrpLoad} implementations must be buildable from one Number only. For this, the {@link ScalarLoadType#fromArray(Number[])} checks whether the passed array consists of only one number and delegates the instance creation to {@link ScalarLoadType#fromNumber(Number)} defined in subclasses.
+ * Moreover, the equals method is defined here. It supposes that two {@link ScalarLoadType} objects represent the same type if they are of the same class and have the same id and slot name.
+ * @author Tarek Chouaki (tkchouaki)
  */
 public abstract class ScalarLoadType implements DvrpLoadType {
 
@@ -16,11 +16,6 @@ public abstract class ScalarLoadType implements DvrpLoadType {
 	public ScalarLoadType(Id<DvrpLoadType> id, String slotName) {
 		this.id = id;
 		this.slotName = slotName;
-	}
-
-	@Override
-	public final int numberOfDimensions() {
-		return 1;
 	}
 
 	@Override

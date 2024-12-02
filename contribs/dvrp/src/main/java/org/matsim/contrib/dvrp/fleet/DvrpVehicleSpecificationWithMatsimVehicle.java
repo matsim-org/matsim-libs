@@ -25,6 +25,8 @@ import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadFromVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 

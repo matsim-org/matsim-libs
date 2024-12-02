@@ -1,13 +1,12 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
-
 /**
- * This class represents a one-dimensional Dvrp vehicle load (and capacity).
+ * This class represents a one-dimensional {@link DvrpLoad} where that unique dimension is the set of integers
  * If used directly, this class allows to simulate a dvrp fleet with regular homogeneous transported (typically persons).
- * However, if using this class through sub-classes, one must be careful:
- * 	- A scalar load of class A will not be compatible with a vehicle with a capacity represented by a scalar load of class B (the fitsIn method will return false)
- * 	- Addition and subtraction methods will not work if performed with on an an instance of a different sub-class (an exception will be thrown)
+ * However, if using this class through sub-classes, one can already have heterogeneous capacities and loads:
+ * 	- An integerLoad A will not be compatible with another only if they are of the exact same class and if their types are the same (firstType.equals(secondType) returns true)
+ * 	- Addition and subtraction methods will not work if performed with on an instance of a different sub-class or that does not have the same type (an exception will be thrown)
+ * @author Tarek Chouaki (tkchouaki)
  */
 public class IntegerLoad extends ScalarLoad {
 
@@ -29,48 +28,39 @@ public class IntegerLoad extends ScalarLoad {
 		return this.loadType;
 	}
 
-	@Override
-	public IntegerLoad addTo(DvrpLoad other) {
+	protected IntegerLoad checkCompatibility(DvrpLoad other) {
 		if(other == null) {
 			return this;
 		}
 		Class<? extends DvrpLoad> currentClass = other.getClass();
 		if(!(currentClass.isInstance(other))) {
-			throw new UnsupportedVehicleLoadException(other, currentClass);
+			throw new IncompatibleLoadsException(this, other);
 		}
 		IntegerLoad integerLoad = (IntegerLoad) other;
 		if(!this.getType().equals(integerLoad.getType())) {
-			throw new UnsupportedVehicleLoadException(other, this.getClass());
+			throw new IncompatibleLoadsException(this, other);
 		}
-		return getType().fromInt(integerLoad.load + this.load);
+		return integerLoad;
+	}
+
+	@Override
+	public IntegerLoad add(DvrpLoad other) {
+		return getType().fromInt(checkCompatibility(other).load + this.load);
 	}
 
 	@Override
 	public IntegerLoad subtract(DvrpLoad other) {
-		if(other == null) {
-			return this;
-		}
-		Class<? extends DvrpLoad> currentClass = other.getClass();
-		if(!(currentClass.isInstance(other))) {
-			throw new UnsupportedVehicleLoadException(other, currentClass);
-		}
-		IntegerLoad integerLoad = (IntegerLoad) other;
-		if(!this.getType().equals(integerLoad.getType())) {
-			throw new UnsupportedVehicleLoadException(other, this.getClass());
-		}
-		return getType().fromInt(this.load - integerLoad.load);
+		return getType().fromInt(this.load - checkCompatibility(other).load);
 	}
 
 	@Override
 	public boolean fitsIn(DvrpLoad other) {
-		if(!this.getClass().equals(other.getClass())) {
+		try {
+			IntegerLoad integerLoad = checkCompatibility(other);
+			return this.load <= integerLoad.load;
+		} catch (IncompatibleLoadsException e) {
 			return false;
 		}
-		IntegerLoad integerLoad = (IntegerLoad) other;
-		if(!integerLoad.getType().equals(this.getType())) {
-			return false;
-		}
-		return this.load <= integerLoad.load;
 	}
 
 	@Override

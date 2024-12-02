@@ -1,8 +1,12 @@
 package org.matsim.contrib.dvrp.fleet.dvrp_load;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.fleet.DvrpLoadType;
 
+/**
+ * This is the default implementation of {@link IntegerLoadType} that is bound by default for every DVRP mode.
+ * It allows to keep the compatibility with simple integer representation of homogeneous vehicle capacities and loads
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class DefaultIntegerLoadType extends IntegerLoadType {
 
 	public static final String TYPE_NAME = "defaultLoadType";

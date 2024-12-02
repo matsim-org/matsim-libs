@@ -5,25 +5,31 @@ import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Tarek Chouaki (tkchouaki)
+ */
 public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private static final int STOP_DURATION = 10;
@@ -47,10 +53,12 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private Waypoint.Stop stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
 		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
 		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, newCapacity));
 	}
@@ -75,10 +83,6 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		public IntegerLoad fromInt(int load) {
 			return new IntegerLoad(load, this);
 		}
-
-		public IntegerLoad fromPersonIds(Collection<Id<Person>> personIds) {
-			return fromInt(personIds.size());
-		}
 	}
 
 	private static class TestIntegerLoadTypeB extends IntegerLoadType {
@@ -91,9 +95,6 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		public IntegerLoad fromInt(int load) {
 			return new IntegerLoad(load, this);
 		}
-		public IntegerLoad fromPersonIds(Collection<Id<Person>> personIds) {
-			return fromInt(personIds.size());
-		}
 	}
 
 	private static final TestIntegerLoadTypeA FACTORY_A = new TestIntegerLoadTypeA();
@@ -101,8 +102,8 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = FACTORY_A.fromInt(4);
 	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = FACTORY_B.fromInt(4);
-	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).scalarDvrpVehicleLoadGetter(FACTORY_A::fromPersonIds).build();
-	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).scalarDvrpVehicleLoadGetter(FACTORY_B::fromPersonIds).build();
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).load(FACTORY_A.fromInt(1)).build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).load(FACTORY_B.fromInt(1)).build();
 
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {

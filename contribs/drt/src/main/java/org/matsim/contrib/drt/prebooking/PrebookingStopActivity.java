@@ -15,7 +15,7 @@ import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
@@ -181,7 +181,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 					// let agent enter now
 					Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.id, now));
 					enteredRequests.add(entry.id);
-					onboard = onboard.addTo(requiredCapacity);
+					onboard = onboard.add(requiredCapacity);
 					enterIterator.remove();
 				}
 			} else {

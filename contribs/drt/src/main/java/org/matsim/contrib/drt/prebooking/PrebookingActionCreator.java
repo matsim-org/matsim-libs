@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -73,11 +73,11 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 			if (task instanceof DrtStopTask) {
 				DrtStopTask stopTask = (DrtStopTask) task;
 
-				incomingOccupancy = incomingOccupancy.addTo(stopTask.getDropoffRequests().values().stream()
-					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
+				incomingOccupancy = incomingOccupancy.add(stopTask.getDropoffRequests().values().stream()
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
 				incomingOccupancy = incomingOccupancy.subtract(stopTask.getPickupRequests().values().stream()
-					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::addTo).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
 				if (task == referenceTask) {
 					return incomingOccupancy;

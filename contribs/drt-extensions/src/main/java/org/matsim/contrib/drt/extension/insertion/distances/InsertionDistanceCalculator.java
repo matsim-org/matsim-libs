@@ -13,7 +13,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -37,7 +37,7 @@ public class InsertionDistanceCalculator {
 
 			for (Task task : schedule.getTasks()) {
 				if (task instanceof DrtStopTask) {
-					occupancy = occupancy.addTo(Objects.requireNonNullElse(getPassengers(((DrtStopTask) task).getPickupRequests().values()), vehicleEntry.vehicle.getCapacity().getType().getEmptyLoad()));
+					occupancy = occupancy.add(Objects.requireNonNullElse(getPassengers(((DrtStopTask) task).getPickupRequests().values()), vehicleEntry.vehicle.getCapacity().getType().getEmptyLoad()));
 					occupancy = occupancy.subtract(Objects.requireNonNullElse(getPassengers(((DrtStopTask) task).getDropoffRequests().values()), vehicleEntry.vehicle.getCapacity()));
 				}
 
@@ -63,7 +63,7 @@ public class InsertionDistanceCalculator {
 			if(load == null) {
 				load = acceptedDrtRequest.getLoad();
 			} else {
-				load = load.addTo(acceptedDrtRequest.getLoad());
+				load = load.add(acceptedDrtRequest.getLoad());
 			}
 		}
 		return load;
@@ -88,7 +88,7 @@ public class InsertionDistanceCalculator {
 				pickupNewLink, pickupToLink);
 
 		addedDistances.add(new DistanceEntry(beforePickupDistance, beforePickupOccupancy));
-		addedDistances.add(new DistanceEntry(afterPickupDistance, beforePickupOccupancy.addTo(insertion.insertedLoad)));
+		addedDistances.add(new DistanceEntry(afterPickupDistance, beforePickupOccupancy.add(insertion.insertedLoad)));
 
 		if (insertion.pickup.previousWaypoint instanceof Waypoint.Start) {
 			Task currentTask = insertion.vehicleEntry.vehicle.getSchedule().getCurrentTask();
@@ -122,8 +122,8 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy = occupancy.addTo(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
-					occupancy = occupancy.addTo(getPassengers(((DrtStopTask) task).getDropoffRequests().values()));
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getDropoffRequests().values()));
 				}
 
 				if (task instanceof DriveTask) {
@@ -141,13 +141,13 @@ public class InsertionDistanceCalculator {
 
 		final DvrpLoad beforeDropoffOccupancy;
 		if (insertion.dropoff.index > insertion.pickup.index) {
-			beforeDropoffOccupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy().addTo(insertion.insertedLoad);
+			beforeDropoffOccupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy().add(insertion.insertedLoad);
 			double beforeDropoffDistance = distanceEstimator.calculateDistance(
 					insertion.dropoff.previousWaypoint.getDepartureTime(), dropoffFromLink, dropoffNewLink);
 
 			addedDistances.add(new DistanceEntry(beforeDropoffDistance, beforeDropoffOccupancy));
 		} else {
-			beforeDropoffOccupancy = beforePickupOccupancy.addTo(insertion.insertedLoad);
+			beforeDropoffOccupancy = beforePickupOccupancy.add(insertion.insertedLoad);
 		}
 
 		double afterDropoffDistance = distanceEstimator.calculateDistance(detourTimeInfo.dropoffDetourInfo.arrivalTime,
@@ -169,7 +169,7 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy = occupancy.addTo(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
 					occupancy = occupancy.subtract(getPassengers(((DrtStopTask) task).getDropoffRequests().values()));
 				}
 

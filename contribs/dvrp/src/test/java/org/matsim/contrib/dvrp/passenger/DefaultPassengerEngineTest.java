@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiActionCreator;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest;
 import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadModule;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
