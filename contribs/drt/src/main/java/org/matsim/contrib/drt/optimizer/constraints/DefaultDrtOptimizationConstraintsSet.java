@@ -1,7 +1,9 @@
 package org.matsim.contrib.drt.optimizer.constraints;
 
+import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.Config;
 
 public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstraintsSet {
 
@@ -45,4 +47,11 @@ public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstra
             "Defines the minimum allowed absolute detour in seconds. By default, this bound is disabled (i.e. set to 0.)")
     @PositiveOrZero
     public double minimumAllowedDetour = 0;
+
+    @Override
+    protected void checkConsistency(Config config) {
+        super.checkConsistency(config);
+        Verify.verify(maxAbsoluteDetour > minimumAllowedDetour, "The minimum allowed detour must" +
+                "be lower than the maximum allowed detour.");
+    }
 }
