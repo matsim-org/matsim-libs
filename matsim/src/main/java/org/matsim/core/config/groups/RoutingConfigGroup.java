@@ -519,7 +519,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		} else if (NETWORK_MODES.equals(key)) {
 			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (TELEPORTED_ROUTED_MODES.equals(key)) {
-			setTeleportedModeSpeeds(Arrays.asList(CollectionUtils.stringToArray(value)));
+			setTeleportedRoutedModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (UNCONGESTED_MODES.equals(key)) {
 			setUncongestedModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
@@ -582,6 +582,10 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 	public Collection<String> getTeleportedRoutedModes() {
 		return this.teleportedRoutedModes;
+	}
+
+	public void setTeleportedRoutedModes(Collection<String> teleportedRoutedModes) {
+		this.teleportedRoutedModes = teleportedRoutedModes;
 	}
 
 	public void setUncongestedModes(Collection<String> uncongestedModes) {

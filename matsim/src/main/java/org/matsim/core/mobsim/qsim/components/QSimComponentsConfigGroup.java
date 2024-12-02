@@ -39,7 +39,7 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 	private static final String ACTIVE_COMPONENTS = "activeComponents";
 
 	public static final List<String> DEFAULT_COMPONENTS = Arrays.asList(ActivityEngineModule.COMPONENT_NAME,
-		QNetsimEngineModule.COMPONENT_NAME, TeleportationModule.COMPONENT_NAME, TeleportationModule.COMPONENT_LINK_EVENTS_NAME,
+		QNetsimEngineModule.COMPONENT_NAME, TeleportationModule.COMPONENT_NAME,
 		PopulationModule.COMPONENT_NAME, MessageQueueModule.COMPONENT_NAME);
 
 	private List<String> activeComponents = new LinkedList<>(DEFAULT_COMPONENTS);

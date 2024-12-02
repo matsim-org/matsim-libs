@@ -41,7 +41,9 @@ import java.util.*;
 
 /**
  * Teleportation engine that uses the network route of an agent to teleport it to its destination and generate link events accordingly.
+ * TODO: remove, because it was integrated into default teleportation
  */
+@Deprecated
 public final class TeleportationWithLinkEventsEngine implements TeleportationEngine {
 	private static final Logger log = LogManager.getLogger(TeleportationWithLinkEventsEngine.class);
 
