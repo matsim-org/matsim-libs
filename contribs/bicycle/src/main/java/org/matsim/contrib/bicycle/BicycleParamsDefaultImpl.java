@@ -1,9 +1,6 @@
 package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.bicycle.surface.Surface;
-
-import static org.matsim.contrib.bicycle.BicycleUtils.hasNoCycleway;
 
 public class BicycleParamsDefaultImpl implements BicycleParams {
 
@@ -64,7 +61,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 	}
 
 	@Override
-	public double getGradient(Link link ) {
+	public double getGradient(Link link) {
 
 		if (!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()) return 0.;
 

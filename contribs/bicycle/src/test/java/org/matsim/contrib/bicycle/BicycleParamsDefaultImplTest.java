@@ -1,0 +1,114 @@
+package org.matsim.contrib.bicycle;
+
+import it.unimi.dsi.fastutil.objects.ObjectDoublePair;
+import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.osm.networkReader.OsmTags;
+import org.matsim.core.network.NetworkUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class BicycleParamsDefaultImplTest {
+
+	BicycleParamsDefaultImpl params = new BicycleParamsDefaultImpl();
+
+//	################################## Test Gradients ##################################################
+
+	@Test
+	void getGradientNoFromZ() {
+		Link link = createLink(new Coord(0, 0), new Coord(100, 0, 100));
+		assertEquals(0., params.getGradient(link ), 0.00001 );
+	}
+
+	@Test
+	void getGradientNoToZ() {
+		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0));
+		assertEquals(0., params.getGradient(link ), 0.00001 );
+	}
+
+	@Test
+	void getGradientFlat() {
+		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 100));
+		assertEquals(0., params.getGradient(link ), 0.00001 );
+	}
+
+	@Test
+	void getGradientUphill() {
+		Link link = createLink(new Coord(0, 0, 0), new Coord(100, 0, 100));
+		assertEquals(1., params.getGradient(link ), 0.00001 );
+	}
+
+	@Test
+	void getGradientDownhill() {
+		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 0));
+		assertEquals(0., params.getGradient(link ), 0.00001 );
+	}
+
+//		################################## Test comfort factors ##################################################
+
+	@Test
+	void testComfortFactors() {
+		List<ObjectDoublePair<String>> surfaces = List.of(ObjectDoublePair.of("paved", 1.0), ObjectDoublePair.of("asphalt", 1.0),
+			ObjectDoublePair.of("concrete:lanes", .95), ObjectDoublePair.of("concrete_plates", .9), ObjectDoublePair.of("concrete:plates", .9),
+			ObjectDoublePair.of("fine_gravel", .9), ObjectDoublePair.of("paving_stones", .8), ObjectDoublePair.of("paving_stones:35", .8),
+			ObjectDoublePair.of("paving_stones:30", .8), ObjectDoublePair.of("compacted", .7), ObjectDoublePair.of("unpaved", .6),
+			ObjectDoublePair.of("asphalt;paving_stones:35", .6), ObjectDoublePair.of("bricks", .6), ObjectDoublePair.of("gravel", .6),
+			ObjectDoublePair.of("ground", .6), ObjectDoublePair.of("sett", .5), ObjectDoublePair.of("cobblestone;flattened", .5),
+			ObjectDoublePair.of("cobblestone:flattened", .5), ObjectDoublePair.of("cobblestone", .4), ObjectDoublePair.of("stone", .4),
+			ObjectDoublePair.of("grass", .4), ObjectDoublePair.of("compressed", .4), ObjectDoublePair.of("paving_stones:3", .4),
+			ObjectDoublePair.of("cobblestone (bad)", .3), ObjectDoublePair.of("dirt", .3), ObjectDoublePair.of("earth", .3),
+			ObjectDoublePair.of("wood", .3), ObjectDoublePair.of("pebblestone", .3), ObjectDoublePair.of("sand", .3), ObjectDoublePair.of("concrete", .1),
+			ObjectDoublePair.of(null, 1.), ObjectDoublePair.of("test:default", .85));
+
+		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
+
+		for (ObjectDoublePair<String> pair : surfaces) {
+			link.getAttributes().putAttribute(OsmTags.SURFACE, pair.left());
+			assertEquals(pair.rightDouble(), params.getComfortFactor((String) link.getAttributes().getAttribute(OsmTags.SURFACE)), 0.00001);
+		}
+	}
+
+// ############################################# Test infrastructure factors ##################################################
+
+	@Test
+	void testInfrastructureFactors() {
+		List<ObjectDoublePair<String>> noCycleWay = List.of(
+			ObjectDoublePair.of("trunk", 0.05),
+			ObjectDoublePair.of("primary", 0.1),
+			ObjectDoublePair.of("primary_link", 0.1),
+			ObjectDoublePair.of("secondary", 0.3),
+			ObjectDoublePair.of("secondary_link", 0.3),
+			ObjectDoublePair.of("tertiary", 0.4),
+			ObjectDoublePair.of("tertiary_link", 0.4),
+			ObjectDoublePair.of("unclassified", 0.9),
+			ObjectDoublePair.of("default", 0.95)
+		);
+
+//		TODO: finish test
+		List<ObjectDoublePair<String>> cycleWay = List.of();
+
+		Map<String, List<ObjectDoublePair<String>>> cycleWays = new HashMap<>();
+
+		cycleWays.put("noCycleWay", noCycleWay);
+		cycleWays.put("cycleWay", cycleWay);
+
+	}
+
+	private static Link createLink(Coord from, Coord to) {
+
+		Network net = NetworkUtils.createNetwork();
+		Node fromNode = net.getFactory().createNode(Id.createNodeId("from"), from);
+		Node toNode = net.getFactory().createNode(Id.createNodeId("to"), to);
+		Link link = net.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+		link.setLength(100);
+		return link;
+	}
+}
