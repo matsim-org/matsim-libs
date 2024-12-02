@@ -22,9 +22,8 @@
 package org.matsim.freight.carriers;
 
 import com.google.inject.Inject;
-import org.matsim.utils.objectattributes.AttributeConverter;
-
 import java.util.Map;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**
  * @author mrieser / Simunto

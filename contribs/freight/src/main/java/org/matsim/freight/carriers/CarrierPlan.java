@@ -21,12 +21,11 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.Collection;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-
-import java.util.Collection;
 
 /**
  *

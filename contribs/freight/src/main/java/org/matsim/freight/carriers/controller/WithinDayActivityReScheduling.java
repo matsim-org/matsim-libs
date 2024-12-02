@@ -19,9 +19,12 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.google.inject.Inject;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,10 +40,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.freight.carriers.Tour.Start;
 import org.matsim.freight.carriers.Tour.TourActivity;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents

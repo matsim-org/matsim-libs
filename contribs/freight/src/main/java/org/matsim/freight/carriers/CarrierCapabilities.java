@@ -21,11 +21,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 /**
  * This contains the capabilities/resources a carrier has/can deploy.

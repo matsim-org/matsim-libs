@@ -20,14 +20,13 @@
  */
 package org.matsim.freight.carriers.events.eventhandler;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Basic event handler that collects the relation between vehicles and carrier.

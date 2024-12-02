@@ -23,11 +23,10 @@ package org.matsim.freight.logistics.events;
 
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.matsim.freight.logistics.LSP;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.freight.carriers.events.CarrierEventsReaders;
+import org.matsim.freight.logistics.LSP;
 
 /**
  * Creates an {@link MatsimEventsReader} that also handles the {@link

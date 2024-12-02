@@ -21,17 +21,16 @@
 
 package org.matsim.freight.carriers;
 
+import static org.matsim.testcases.MatsimTestUtils.EPSILON;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
 /**
  */
@@ -43,7 +42,7 @@ public class CarriersUtilsTest {
 	@Test
 	void testAddAndGetVehicleToCarrier() {
 		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
-		
+
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),vehicleType);

@@ -28,10 +28,12 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.net.URL;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +43,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,9 +58,6 @@ import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-
-import java.net.URL;
-import java.util.Collection;
 
 public class CarrierControllerUtilsTest{
 
@@ -426,7 +426,7 @@ public class CarrierControllerUtilsTest{
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario );
-		Controler controler = new Controler(scenario);
+		Controller controller = ControllerUtils.createController(scenario);
 
 		try {
 			CarriersUtils.runJsprit(scenario);
@@ -435,7 +435,7 @@ public class CarrierControllerUtilsTest{
 			Assertions.fail();
 		}
 
-		Assertions.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
+		Assertions.assertEquals(vraFile, ConfigUtils.addOrGetModule( controller.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
 	}
 
 	/**

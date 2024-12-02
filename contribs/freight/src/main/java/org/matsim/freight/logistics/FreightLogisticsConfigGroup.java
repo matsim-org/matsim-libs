@@ -22,7 +22,6 @@
 package org.matsim.freight.logistics;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Map;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
