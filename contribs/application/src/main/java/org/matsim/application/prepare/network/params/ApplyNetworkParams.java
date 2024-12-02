@@ -53,7 +53,8 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 	@CommandLine.Option(names = "--model", description = "Reference to the network model class", required = true)
 	private Class<? extends NetworkModel> modelClazz;
 
-	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower, upper bound). " +
+		"Can be negative to indicate absolute speed bounds (in km/h)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
 	private double[] speedFactorBounds;
 
 	@CommandLine.Option(names = "--capacity-bounds", split = ",", defaultValue = "0.4,0.6,0.8",
@@ -234,23 +235,40 @@ public class ApplyNetworkParams implements MATSimAppCommand {
 			return false;
 		}
 
+		double allowedSpeed = (double) link.getAttributes().getAttribute("allowed_speed");
+		double freeSpeed = allowedSpeed * speedFactor;
+
 		boolean modified = false;
 
-		if (speedFactor > speedFactorBounds[1]) {
+		if (speedFactor > speedFactorBounds[1] && speedFactorBounds[1] >= 0) {
 			log.warn("Reducing speed factor on {} from {} to {}", link.getId(), speedFactor, speedFactorBounds[1]);
 			speedFactor = speedFactorBounds[1];
 			modified = true;
 		}
 
+		// Use absolute bound for speed
+		if (freeSpeed > -speedFactorBounds[1]/3.6 && speedFactorBounds[1] < 0) {
+			log.warn("Reducing speed on {} from {} to {}", link.getId(), freeSpeed, -speedFactorBounds[1]/3.6);
+			speedFactor = (-speedFactorBounds[1] / 3.6) / allowedSpeed;
+			modified = true;
+		}
+
 		// Threshold for very low speed factors
-		if (speedFactor < speedFactorBounds[0]) {
+		if (speedFactor < speedFactorBounds[0] && speedFactorBounds[0] >= 0) {
 			log.warn("Increasing speed factor on {} from {} to {}", link, speedFactor, speedFactorBounds[0]);
 			speedFactor = speedFactorBounds[0];
 			modified = true;
 		}
 
-		double freeSpeed = (double) link.getAttributes().getAttribute("allowed_speed") * speedFactor;
+		// Absolute negative speed factor
+		if (freeSpeed < -speedFactorBounds[0]/3.6 && speedFactorBounds[0] < 0) {
+			log.warn("Increasing speed on {} from {} to {}", link, freeSpeed, -speedFactorBounds[0]/3.6);
+			speedFactor = (-speedFactorBounds[0] / 3.6) / allowedSpeed;
+			modified = true;
+		}
 
+		// Recalculate with updated speed factor
+		freeSpeed = allowedSpeed * speedFactor;
 		freeSpeed = BigDecimal.valueOf(freeSpeed).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
 
 		if (decrease && freeSpeed > link.getFreespeed())
