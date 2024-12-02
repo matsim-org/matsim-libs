@@ -22,6 +22,7 @@ package org.matsim.core.replanning.strategies;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
@@ -33,17 +34,22 @@ import org.matsim.facilities.ActivityFacilities;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
+import java.util.HashSet;
+
 public class ReRoute implements Provider<PlanStrategy> {
 
 	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private RoutingConfigGroup routingConfigGroup;
 	@Inject private ActivityFacilities facilities;
 	@Inject private Provider<TripRouter> tripRouterProvider;
 	@Inject private TimeInterpretation timeInterpretation;
 
 	@Override
 	public PlanStrategy get() {
-		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan,Person>()) ;
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>()) ;
+		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(
+			facilities, tripRouterProvider, globalConfigGroup, timeInterpretation,
+			new HashSet<>(routingConfigGroup.getUncongestedModes())));
 		return builder.build() ;
 	}
 
