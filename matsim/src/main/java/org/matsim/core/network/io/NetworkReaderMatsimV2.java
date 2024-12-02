@@ -91,7 +91,8 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 			case NETWORK -> startNetwork( atts );
 			case LINKS -> startLinks( atts );
 			case TAG_ATTRIBUTES, TAG_ATTRIBUTE -> attributesDelegate.startTag( name, atts, context, currentAttributes );
-			default -> throw new IllegalStateException( "Unexpected value: " + name );
+//			default -> throw new IllegalStateException( "Unexpected value: " + name );
+			// (there is at least "nodes" which just passes through.  I found it that way.  kai, dec'24)
 		}
 	}
 
