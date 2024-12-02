@@ -20,12 +20,16 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 import com.google.inject.Inject;
 import com.google.inject.Key;
@@ -55,11 +59,20 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 	public void install() {
 		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
-		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
-			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationDefaultImpl();
-			new ChargerReader(chargingInfrastructureSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
-			return chargingInfrastructureSpecification;
+		bind(ChargingInfrastructureSpecification.class).toProvider(new Provider<>() {
+			@Inject
+			private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();
+
+			public ChargingInfrastructureSpecification get() {
+				ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationDefaultImpl();
+				
+				ChargerReader reader = new ChargerReader(chargingInfrastructureSpecification);
+				reader.putAttributeConverters(attributeConverters);
+				reader.parse(
+						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
+						
+				return chargingInfrastructureSpecification;
+			}
 		}).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
