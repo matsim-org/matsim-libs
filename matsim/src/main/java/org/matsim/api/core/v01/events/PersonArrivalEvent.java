@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeKeyValue;
+
 public class PersonArrivalEvent extends Event implements HasPersonId, HasLinkId {
 
 	public static final String EVENT_TYPE = "arrival";
@@ -70,5 +72,15 @@ public class PersonArrivalEvent extends Event implements HasPersonId, HasLinkId 
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes all common attributes
+		writeXMLStart(out);
+		if (this.legMode != null) {
+			writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);
+		}
+		writeXMLEnd(out);
 	}
 }

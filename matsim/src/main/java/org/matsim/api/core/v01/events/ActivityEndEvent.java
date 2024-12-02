@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
 
+import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeKeyValue;
+
 public final class ActivityEndEvent extends Event implements HasPersonId, HasLinkId, HasFacilityId, BasicLocation {
 
 	public static final String EVENT_TYPE = "actend";
@@ -49,7 +51,7 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 		this( time, agentId, linkId, facilityId, acttype, null);
 	}
 	// this is the new constructor:
-	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
+	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId,
 			final Id<ActivityFacility> facilityId, final String acttype, final Coord coord) {
 		super(time);
 		this.linkId = linkId;
@@ -79,7 +81,7 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 	@Override public Id<Person> getPersonId() {
 		return this.personId;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -94,5 +96,13 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 	public void setCoord( Coord coord ) {
 		// yy  this is to retrofit the coordinate into existing events that don't have it.
 		this.coord = coord;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes common attributes
+		writeXMLStart(out);
+		writeEncodedAttributeKeyValue(out, ATTRIBUTE_ACTTYPE, this.acttype);
+		writeXMLEnd(out);
 	}
 }

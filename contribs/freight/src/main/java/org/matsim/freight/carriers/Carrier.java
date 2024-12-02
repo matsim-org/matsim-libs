@@ -76,7 +76,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributab
 	/**
 	 * Sets a {@link CarrierPlan} as selected.
 	 *
-	 * <p>If selectedPlan in not in plan-collection, it adds it.
+	 * <p>The selected plan should be added to the list of plans before.</p>
 	 *
 	 * @param selectedPlan to be set
 	 */
