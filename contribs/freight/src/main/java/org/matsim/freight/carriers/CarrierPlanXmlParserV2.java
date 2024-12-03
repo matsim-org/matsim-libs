@@ -233,7 +233,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				currentVehicle = vehicles.get(vehicleId);
 				if (currentVehicle == null)
 					throw new IllegalStateException("vehicle to vehicleId " + vehicleId + " is missing.");
-				currentTourBuilder = Tour.Builder.newInstance();
+				currentTourBuilder = Tour.Builder.newInstance(Id.create("unknown", Tour.class));
 				break;
 			case "leg":
 				String depTime = atts.getValue("expected_dep_time");

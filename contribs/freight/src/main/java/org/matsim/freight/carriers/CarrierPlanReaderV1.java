@@ -187,7 +187,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			{
 				String vehicleId = attributes.getValue("vehicleId");
 				currentVehicle = vehicles.get(vehicleId);
-				currentTourBuilder = Tour.Builder.newInstance();
+				currentTourBuilder = Tour.Builder.newInstance(Id.create("unknown", Tour.class));
 				break ;
 			}
 			case "leg":
