@@ -221,7 +221,7 @@ public class CollectionTrackerTest {
 			if (handler instanceof TourStartHandler startHandler) {
 				double scheduledCosts = 0;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFixedCosts();
+					scheduledCosts += scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
 					totalScheduledCosts += scheduledCosts;
 				}
 				double trackedCosts = startHandler.getVehicleFixedCosts();
@@ -236,7 +236,7 @@ public class CollectionTrackerTest {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
 						if (element instanceof ServiceActivity activity) {
-							scheduledCosts += activity.getService().getServiceDuration() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
+							scheduledCosts += activity.getService().getServiceDuration() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 							totalScheduledCosts += scheduledCosts;
 							totalScheduledWeight += activity.getService().getCapacityDemand();
 							totalNumberOfScheduledShipments++;
@@ -255,7 +255,7 @@ public class CollectionTrackerTest {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
 						if (element instanceof Leg leg) {
-							scheduledTimeCosts += leg.getExpectedTransportTime() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
+							scheduledTimeCosts += leg.getExpectedTransportTime() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 						}
 					}
 				}
@@ -266,17 +266,17 @@ public class CollectionTrackerTest {
 				double trackedDistanceCosts = distanceHandler.getDistanceCosts();
 				totalTrackedCosts += trackedDistanceCosts;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 					for (TourElement element : scheduledTour.getTour().getTourElements()) {
 						System.out.println(element);
 						if (element instanceof Leg leg) {
 							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
 							for (Id<Link> linkId : linkRoute.getLinkIds()) {
-								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 							}
 						}
 						if (element instanceof ServiceActivity activity) {
-							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 							// (I think that we need this since the last link is not in the route.  Or is it?  kai, jul'22)
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}

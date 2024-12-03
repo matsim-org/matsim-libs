@@ -135,7 +135,7 @@ public class RunFreightAnalysisEventBased {
 		//freight settings
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(carriersPath);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(carriersVehicleTypesPath.toString());
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(carriersVehicleTypesPath);
 
 		scenario = ScenarioUtils.loadScenario(config);
 

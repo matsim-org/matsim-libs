@@ -117,8 +117,8 @@ public class DistanceConstraintFromVehiclesFileTest {
 		VehicleType vehicleType_SmallV1 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V1", VehicleType.class));
 		VehicleType vehicleType_LargeV1 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V1", VehicleType.class));
 
-		Assertions.assertEquals(vehicleType_SmallV1.getId(), ((Vehicle) carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
-				.getVehicle()).getType().getId());
+		Assertions.assertEquals(vehicleType_SmallV1.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
+				.getVehicle().getType().getId());
 		double maxDistance_vehicleType_LargeV1 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV1.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV1.getEngineInformation());
 		double maxDistance_vehicleType_SmallV1 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV1.getEngineInformation())

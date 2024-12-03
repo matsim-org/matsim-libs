@@ -92,9 +92,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
-					if(!employedVehicles.contains(vehicle)){
-						employedVehicles.add(vehicle);
-					}
+					employedVehicles.add(vehicle);
 					double distance = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
