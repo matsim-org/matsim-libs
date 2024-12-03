@@ -47,7 +47,7 @@ public class CarrierVehicleTypeReaderTest {
 	@BeforeEach
 	public void setUp() {
 		types = new CarrierVehicleTypes();
-		inFilename = utils.getClassInputDirectory() + "vehicleTypes.xml";
+		inFilename = utils.getClassInputDirectory() + "vehicleTypes_deprecated_v1.xml";
 		new CarrierVehicleTypeReader(types).readFile( inFilename );
 	}
 
