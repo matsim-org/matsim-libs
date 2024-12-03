@@ -371,7 +371,7 @@ public class DistanceConstraintTest {
 		VehicleType vehicleType_Diesel = VehicleUtils.createVehicleType(Id.create("DieselVehicle", VehicleType.class));
 		vehicleType_Diesel.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(400.);
 		VehicleUtils.setHbefaTechnology(vehicleType_Diesel.getEngineInformation(), "diesel");
-		VehicleUtils.setFuelConsumption(vehicleType_Diesel, 0.0001625);
+		VehicleUtils.setFuelConsumptionLitersPerMeter(vehicleType_Diesel.getEngineInformation(), 0.0001625);
 		vehicleType_Diesel.setDescription("Carrier_Version4");
 		vehicleType_Diesel.getCapacity().setOther(40.);
 

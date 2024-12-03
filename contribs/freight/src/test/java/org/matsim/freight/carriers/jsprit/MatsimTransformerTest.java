@@ -377,18 +377,13 @@ public class MatsimTransformerTest {
 	}
 
 	private VehicleType getMatsimVehicleType() {
-//		EngineInformation engineInformation = new EngineInformation();
-//		engineInformation.setFuelType( FuelType.diesel );
-//		engineInformation.setFuelConsumption( (double) 15 );
-//		CarriersUtils.CarrierVehicleTypeBuilder builder = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "matsimType", VehicleType.class ) )
 		VehicleType vehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create("matsimType", VehicleType.class)).setMaximumVelocity(13.8);
 		vehicleType.getCapacity().setOther(50);
 		vehicleType.getCostInformation().setCostsPerMeter(10.0).setCostsPerSecond(5.0).setFixedCost(100.);
 		VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), "diesel");
-		VehicleUtils.setFuelConsumption(vehicleType, 15.);
-//		vehicleType.getEngineInformation().setFuelType( FuelType.diesel ) ;
-//		vehicleType.getEngineInformation().setFuelConsumption( 15. );
+		VehicleUtils.setFuelConsumptionLitersPerMeter(vehicleType.getEngineInformation(), 0.015);
+
 		return vehicleType;
 	}
 
@@ -421,8 +416,8 @@ public class MatsimTransformerTest {
 		assertEquals(10.0, vehicle.getType().getVehicleCostParams().perDistanceUnit, 0.0);
 		assertEquals(5.0, vehicle.getType().getVehicleCostParams().perTransportTimeUnit, 0.0);
 		assertEquals(100.0, vehicle.getType().getVehicleCostParams().fix, 0.0);
-		// assertEquals(FuelType.diesel, vehicle. ...); //TODO
-		// assertEquals(15, FuelConsumption ...); //TODO
+		assertEquals("diesel", VehicleUtils.getHbefaTechnology(((VehicleType)vehicle.getType().getUserData()).getEngineInformation()));
+		assertEquals(0.015, VehicleUtils.getFuelConsumptionLitersPerMeter(((VehicleType)vehicle.getType().getUserData()).getEngineInformation()));
 		assertEquals(13.8, vehicle.getType().getMaxVelocity(), 0.0);
 
 		// check service data

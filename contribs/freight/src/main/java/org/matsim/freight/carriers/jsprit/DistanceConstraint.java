@@ -94,7 +94,7 @@ import org.matsim.vehicles.VehicleUtils;
 				consumptionPerMeter = VehicleUtils
 						.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
 			else
-				consumptionPerMeter = VehicleUtils.getFuelConsumption(vehicleTypeOfNewVehicle);
+				consumptionPerMeter = VehicleUtils.getFuelConsumptionLitersPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
 
 			double routeDistance = calculateRouteDistance(context, newVehicle);
 			double routeConsumption = routeDistance * (consumptionPerMeter);
