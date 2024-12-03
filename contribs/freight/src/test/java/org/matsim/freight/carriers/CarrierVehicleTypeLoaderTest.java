@@ -37,15 +37,14 @@ public class CarrierVehicleTypeLoaderTest {
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	private CarrierVehicleTypes types;
 	private Carriers carriers;
 
 	@BeforeEach
 	public void setUp() {
-		types = new CarrierVehicleTypes();
+		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(Path.of(utils.getClassInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString());
 		carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers, types ).readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader(carriers, types).readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 	}
 
 	@Test

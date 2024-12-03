@@ -54,9 +54,8 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			private final Carrier carrier;
 			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
-			private double currentLegStartTime;
 
-			public DriverLegScoring(Carrier carrier, Network network) {
+		 public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
 				this.carrier = carrier;
@@ -65,9 +64,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 
 			@Override
-			public void finish() {
-
-			}
+			public void finish() {}
 
 
 			@Override
@@ -86,7 +83,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			@Override
 			public void startLeg(double time, Leg leg) {
 				currentLeg = leg;
-				currentLegStartTime = time;
 			}
 
 

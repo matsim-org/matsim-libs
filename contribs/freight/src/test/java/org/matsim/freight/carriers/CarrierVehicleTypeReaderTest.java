@@ -40,13 +40,12 @@ public class CarrierVehicleTypeReaderTest {
 	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReaderTest.class) ;
 
 	private CarrierVehicleTypes types;
-	private String inFilename;
 
 	@BeforeEach
 	public void setUp() {
 		types = new CarrierVehicleTypes();
-		inFilename = utils.getClassInputDirectory() + "vehicleTypes_deprecated_v1.xml";
-		new CarrierVehicleTypeReader(types).readFile( inFilename );
+		String inFilename = utils.getClassInputDirectory() + "vehicleTypes_deprecated_v1.xml";
+		new CarrierVehicleTypeReader(types).readFile(inFilename);
 	}
 
 	@Test

@@ -84,8 +84,6 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
-	private final RoadPricingScheme roadPricingScheme;
-
 	public interface InternalLeastCostPathCalculatorListener {
 
 		void startCalculation(long routerId);
@@ -577,7 +575,6 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		this.travelTime = builder.travelTime;
 		this.network = builder.network;
 		this.leastCostPathCalculatorFactory = builder.leastCostPathCalculatorFactory;
-		this.roadPricingScheme = builder.roadPricingScheme;
 		this.timeSliceWidth = builder.timeSliceWidth;
 		this.defaultTypeId = builder.defaultTypeId;
 		this.ttMemorizedCounter = new Counter("#TransportCostValues cached ");
