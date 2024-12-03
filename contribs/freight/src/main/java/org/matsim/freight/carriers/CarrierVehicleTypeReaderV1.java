@@ -72,9 +72,8 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 		}
 		if(name.equals("engineInformation")){
 			EngineInformation engineInfo = this.currentType.getEngineInformation() ;
-			VehicleUtils.setFuelConsumption(this.currentType, Double.parseDouble(attributes.getValue( "gasConsumption" )));
-			engineInfo.setFuelConsumption( Double.parseDouble( attributes.getValue( "gasConsumption" ) ) );
-			engineInfo.setFuelType( EngineInformation.FuelType.valueOf( attributes.getValue( "fuelType" ) ) );
+			VehicleUtils.setHbefaTechnology(engineInfo, attributes.getValue( "fuelType"));
+			VehicleUtils.setFuelConsumptionLitersPerMeter(engineInfo, Double.parseDouble(attributes.getValue( "gasConsumption" )));
 		}
 
 		if(name.equals("costInformation")){

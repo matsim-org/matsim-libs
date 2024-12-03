@@ -85,7 +85,7 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	void test_whenReadingTypeMedium_itReadsEngineInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(0.02, VehicleUtils.getFuelConsumption(medium), 0.01);
+		assertEquals(0.02, VehicleUtils.getFuelConsumptionLitersPerMeter(medium.getEngineInformation()), 0.01);
 		assertEquals("gasoline", VehicleUtils.getHbefaTechnology(medium.getEngineInformation()));
 	}
 
