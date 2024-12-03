@@ -1,6 +1,7 @@
 package org.matsim.dsim;
 
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.communication.LocalCommunicator;
@@ -8,9 +9,11 @@ import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
@@ -30,11 +33,26 @@ public class ThreeLinkIntegrationTest {
 	MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	@Order(1)
+	void qsim() {
+		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
+		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var outputDir = utils.getOutputDirectory();
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setMobsim("qsim");
+		var scenario = ScenarioUtils.loadScenario(config);
+		var controller = new Controler(scenario);
+		controller.run();
+	}
+
+	@Test
+	@Order(2)
 	void oneAgentOneThread() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
-		var outputDir = utils.getOutputDirectory();
+		var outputDir = Paths.get(utils.getOutputDirectory());
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 
 		// remove the partition information from the network
@@ -46,18 +64,18 @@ public class ThreeLinkIntegrationTest {
 		for (var node : net.getNodes().values()) {
 			node.getAttributes().putAttribute(NetworkDecomposition.PARTITION_ATTR_KEY, 0);
 		}
-		var netPath = Paths.get(outputDir + "single-partition-network.xml").toAbsolutePath().toString();
-		NetworkUtils.writeNetwork(net, netPath);
+		var netPath = outputDir.resolve("single-partition-network.xml").toAbsolutePath();
+		NetworkUtils.writeNetwork(net, netPath.toString());
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory() + "output");
-		config.network().setInputFile(netPath);
+		config.controller().setOutputDirectory(outputDir.resolve("output").toString());
+		config.network().setInputFile(netPath.toString());
 		var controller = new DistributedController(new NullCommunicator(), config, 1, 1);
 		controller.run();
 
-		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
+		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");
 		var actualEventsPath = utils.getOutputDirectory() + "output/three-links.output_events.xml";
 
-		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
 
@@ -66,6 +84,7 @@ public class ThreeLinkIntegrationTest {
 	 * passing, including when processes should synchronize and when simulation times should be updated.
 	 */
 	@Test
+	@Order(2)
 	void oneAgentThreeThreads() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -74,10 +93,11 @@ public class ThreeLinkIntegrationTest {
 		var controller = new DistributedController(new NullCommunicator(), config, 3, 1);
 		controller.run();
 
-		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
+		var outputDir = Paths.get(utils.getOutputDirectory());
+		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");
 		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
 
-		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
 
@@ -88,6 +108,7 @@ public class ThreeLinkIntegrationTest {
 	 * capacities are propagated between partitions
 	 */
 	@Test
+	@Order(2)
 	void twoAgentsThreeThreads() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -105,6 +126,7 @@ public class ThreeLinkIntegrationTest {
 	}
 
 	@Test
+	@Order(2)
 	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
@@ -132,14 +154,16 @@ public class ThreeLinkIntegrationTest {
 			f.get(2, TimeUnit.MINUTES);
 		}
 
-		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
+		var outputDir = Paths.get(utils.getOutputDirectory());
+		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");
 		var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
 
-		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath, actualEventsPath))
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
 
 	@Test
+	@Order(2)
 	void storageCapacityThreeNodes() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
