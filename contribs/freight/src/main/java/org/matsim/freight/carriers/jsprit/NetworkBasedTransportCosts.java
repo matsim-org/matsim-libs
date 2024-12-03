@@ -26,6 +26,8 @@ import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,9 +46,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This calculates transport-times, transport-costs and the distance to cover
@@ -658,12 +657,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	private void informEndCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.endCalculation(Thread.currentThread().getId());
+			l.endCalculation(Thread.currentThread().threadId());
 	}
 
 	private void informStartCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.startCalculation(Thread.currentThread().getId());
+			l.startCalculation(Thread.currentThread().threadId());
 	}
 
 	/**
@@ -853,11 +852,11 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	}
 
 	private LeastCostPathCalculator createLeastCostPathCalculator() {
-		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().getId());
+		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().threadId());
 		if (router == null) {
 			LeastCostPathCalculator newRouter = leastCostPathCalculatorFactory.createPathCalculator(network,
 					travelDisutility, travelTime);
-			router = routerCache.putIfAbsent(Thread.currentThread().getId(), newRouter);
+			router = routerCache.putIfAbsent(Thread.currentThread().threadId(), newRouter);
 			if (router == null) {
 				router = newRouter;
 			}

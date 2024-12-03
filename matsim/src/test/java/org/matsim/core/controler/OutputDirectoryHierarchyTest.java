@@ -21,14 +21,26 @@ package org.matsim.core.controler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -146,4 +158,29 @@ public class OutputDirectoryHierarchyTest {
 				"Directory was not cleared" );
 
 	}
+
+	@Test
+	void testTmpDir() {
+
+		String javaTempDir = System.getProperty("java.io.tmpdir");
+		System.setProperty(OutputDirectoryHierarchy.MATSIM_TEMP_DIR_PROPERTY, javaTempDir);
+		Assertions.assertNotNull(javaTempDir);
+
+		System.setProperty("matsim.preferLocalDtds", "true");
+
+		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
+
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Controler controller = new Controler(scenario);
+		controller.run();
+
+		String matsimTempDir = controller.getControlerIO().getTempPath();
+		Assertions.assertEquals(javaTempDir, matsimTempDir);
+	}
+
 }

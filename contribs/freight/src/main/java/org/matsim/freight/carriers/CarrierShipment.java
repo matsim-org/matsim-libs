@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  * @author sschroeder
  *
  */
-public final class CarrierShipment implements Attributable {
+public final class CarrierShipment implements CarrierJob {
 
 	/**
 	 * A builder that builds shipments.
@@ -54,10 +54,10 @@ public final class CarrierShipment implements Attributable {
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
-		 * @param from
-		 * @param to
-		 * @param size
-		 * @return the builder
+		 * @param from 	the origin
+		 * @param to 	the destination
+		 * @param size 	size of the shipment
+		 * @return 		the builder
 		 */
 		@Deprecated
 		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
@@ -70,11 +70,11 @@ public final class CarrierShipment implements Attributable {
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
-		 * @param id
-		 * @param from
-		 * @param to
-		 * @param size
-		 * @return the builder
+		 * @param id 	the id of the shipment
+		 * @param from 	the origin
+		 * @param to 	the destination
+		 * @param size 	size of the shipment
+		 * @return 		the builder
 		 */
 		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size){
 			return new Builder(id, from,to,size);

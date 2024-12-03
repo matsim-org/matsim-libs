@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="carrier1">
+		<attributes>
+			<attribute name="jspritComputationTime" class="java.lang.Double">0.12</attribute>
+			<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="freight_carrier1_veh_heavyVehicle_1" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="1" from="j(0,1)R" to="j(9,7)" size="1" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+			<shipment id="11" from="j(0,1)R" to="j(6,1)R" size="3" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+			<shipment id="12" from="j(0,1)R" to="i(5,6)" size="5" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+			<shipment id="13" from="j(0,1)R" to="j(4,2)R" size="7" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+			<shipment id="14" from="j(0,1)R" to="j(9,2)" size="10" startPickup="00:00:00" endPickup="22:00:00" startDelivery="04:00:00" endDelivery="22:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:05:00"/>
+		</shipments>
+		<plans>
+			<plan score="-INF" selected="true">
+				<attributes>
+					<attribute name="jspritScore" class="java.lang.Double">-215.4666666666667</attribute>
+				</attributes>
+				<tour tourId="1" vehicleId="freight_carrier1_veh_heavyVehicle_1">
+					<act type="start" end_time="06:00:00"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="11"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="12"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="14"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="13"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="pickup" shipmentId="1"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:22:13">
+						<route>i(1,0) i(2,0) i(3,0) j(3,1) j(3,2) i(4,2) i(5,2) i(6,2) j(6,2)R</route>
+					</leg>
+					<act type="delivery" shipmentId="11"/>
+					<leg expected_dep_time="06:27:13" expected_transp_time="00:11:06">
+						<route>i(7,0) i(8,0) i(9,0) j(9,1)</route>
+					</leg>
+					<act type="delivery" shipmentId="14"/>
+					<leg expected_dep_time="06:43:19" expected_transp_time="00:11:06">
+						<route>j(9,3) j(9,4) j(9,5) j(9,6)</route>
+					</leg>
+					<act type="delivery" shipmentId="1"/>
+					<leg expected_dep_time="06:59:26" expected_transp_time="00:15:33">
+						<route>i(9,7)R i(8,7)R i(7,7)R i(6,7)R i(5,7)R j(4,7)R</route>
+					</leg>
+					<act type="delivery" shipmentId="12"/>
+					<leg expected_dep_time="07:19:59" expected_transp_time="00:17:46">
+						<route>i(6,6) j(6,6)R i(6,5)R i(5,5)R j(4,5)R j(4,4)R j(4,3)R</route>
+					</leg>
+					<act type="delivery" shipmentId="13"/>
+					<leg expected_dep_time="07:42:46" expected_transp_time="00:11:06">
+						<route>i(4,1)R i(3,1)R i(2,1)R i(1,1)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</plans>
+	</carrier>
+</carriers>

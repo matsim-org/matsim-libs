@@ -274,6 +274,10 @@ class SumoNetworkFeatureExtractor {
 		out.print(numConnections.getInt('r'));
 		out.print(numConnections.getInt('s'));
 
+		for (String attribute : handler.attributes) {
+			out.print(edge.attributes.getOrDefault(attribute, ""));
+		}
+
 		out.println();
 	}
 

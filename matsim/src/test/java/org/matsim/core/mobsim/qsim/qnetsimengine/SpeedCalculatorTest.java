@@ -40,7 +40,7 @@ public class SpeedCalculatorTest{
 	@Test
 	void limitedByVehicleSpeed() {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
-        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ), TransportMode.car );
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
 
@@ -55,7 +55,7 @@ public class SpeedCalculatorTest{
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
-        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ), TransportMode.car );
         type.setMaximumVelocity(link.getFreespeed() * 2); // _more_ than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
 
