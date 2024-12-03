@@ -148,7 +148,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
    */
   class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
-    final Logger log = LogManager.getLogger(EventBasedScoring.class);
+    final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
 
     private final double toll;
     private final List<String> vehicleTypesToBeTolled;
