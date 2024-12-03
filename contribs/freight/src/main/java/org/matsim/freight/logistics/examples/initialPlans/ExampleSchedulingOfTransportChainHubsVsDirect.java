@@ -428,7 +428,7 @@ import org.matsim.vehicles.VehicleUtils;
         log.error(
             "This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
 
-        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffekte
+        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffects
         // hatte -> Die dürften hier auch sein!!!! (KMT may22)
         // Die createLSPPlan_reloading(..) Methoden sind nicht unabhängig voneinander.
         // Das liegt wohl am statischen und das dann dort wieder Verknüpfungen gesetzt werden -->

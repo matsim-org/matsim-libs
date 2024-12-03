@@ -112,7 +112,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(1,
 				carrierV1.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV1 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V1", VehicleType.class));
 		VehicleType vehicleType_LargeV1 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V1", VehicleType.class));
@@ -143,7 +143,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(1,
 				carrierV2.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV2 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V2", VehicleType.class));
 		VehicleType vehicleType_LargeV2 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V2", VehicleType.class));
@@ -220,7 +220,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 
 	}
 
@@ -266,7 +266,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(2,
 				carrierV3.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV3 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V3", VehicleType.class));
 		VehicleType vehicleType_LargeV3 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V3", VehicleType.class));
@@ -300,16 +300,16 @@ public class DistanceConstraintFromVehiclesFileTest {
 			if (distanceTour == 12000)
 				Assertions.assertEquals(12000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.assertEquals(20000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 		}
 	}
 
 	/**
-	 * Option 4: An additional shipment outside the range of both BEVtypes.
+	 * Option 4: An additional shipment outside the range of both BEV types.
 	 * Therefore, one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
@@ -385,11 +385,11 @@ public class DistanceConstraintFromVehiclesFileTest {
 			if (thisTypeId.equals("SmallBattery_V4"))
 				Assertions.assertEquals(24000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else if (thisTypeId.equals("DieselVehicle"))
 				Assertions.assertEquals(36000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.fail("Wrong vehicleType used");
 		}

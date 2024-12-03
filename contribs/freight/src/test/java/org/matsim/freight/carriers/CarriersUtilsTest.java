@@ -111,7 +111,7 @@ public class CarriersUtilsTest {
 	@Test
 	void testGetSetJspritIteration(){
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
-		//jspirtIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
+		//jspritIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
 		Assertions.assertEquals(Integer.MIN_VALUE, CarriersUtils.getJspritIterations(carrier) );
 
 		CarriersUtils.setJspritIterations(carrier, 125);

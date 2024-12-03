@@ -69,7 +69,7 @@ public class CarrierControllerUtilsIT{
 	public void setUp() {
 
 		//Create carrier with services and shipments
-		Carriers carriersWithServicesAndShpiments = new Carriers();
+		Carriers carriersWithServicesAndShipments = new Carriers();
 		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarriersUtils.addService(carrierWServices, service1);
@@ -110,8 +110,8 @@ public class CarrierControllerUtilsIT{
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
 		// Add both carriers
-		carriersWithServicesAndShpiments.addCarrier(carrierWServices);
-		carriersWithServicesAndShpiments.addCarrier(carrierWShipments);
+		carriersWithServicesAndShipments.addCarrier(carrierWServices);
+		carriersWithServicesAndShipments.addCarrier(carrierWShipments);
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
@@ -120,7 +120,7 @@ public class CarrierControllerUtilsIT{
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
 
-		for (Carrier carrier : carriersWithServicesAndShpiments.getCarriers().values()) {
+		for (Carrier carrier : carriersWithServicesAndShipments.getCarriers().values()) {
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
@@ -143,7 +143,7 @@ public class CarrierControllerUtilsIT{
 
 		//Convert to jsprit VRP
 		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(
-				carriersWithServicesAndShpiments );
+				carriersWithServicesAndShipments );
 
 		for (Carrier carrier : carriersWithShipmentsOnly.getCarriers().values()) {
 			//Build VRP

@@ -188,7 +188,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	}
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShutdownEvent) {
 		try {
 			this.out.close();
 			for (ScoreHist data : this.perLsp.values()) {

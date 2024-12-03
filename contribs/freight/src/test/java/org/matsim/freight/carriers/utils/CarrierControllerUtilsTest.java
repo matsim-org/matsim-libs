@@ -82,7 +82,7 @@ public class CarrierControllerUtilsTest{
 	public void setUp() {
 
 		//Create carrier with services and shipments
-		Carriers carriersWithServicesAndShpiments = new Carriers();
+		Carriers carriersWithServicesAndShipments = new Carriers();
 		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarriersUtils.addService(carrierWServices, service1);
@@ -121,8 +121,8 @@ public class CarrierControllerUtilsTest{
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
 		// Add both carriers
-		carriersWithServicesAndShpiments.addCarrier(carrierWServices);
-		carriersWithServicesAndShpiments.addCarrier(carrierWShipments);
+		carriersWithServicesAndShipments.addCarrier(carrierWServices);
+		carriersWithServicesAndShipments.addCarrier(carrierWShipments);
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
@@ -152,7 +152,7 @@ public class CarrierControllerUtilsTest{
 		 */
 
 		//Convert to jsprit VRP
-		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShipments);
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 	}
@@ -160,7 +160,7 @@ public class CarrierControllerUtilsTest{
 
 	//Should only have Services
 	@Test
-	void numberOfInitalServicesIsCorrect() {
+	void numberOfInitialServicesIsCorrect() {
 		Assertions.assertEquals(2, carrierWServices.getServices().size());
 
 		int demandServices = 0;
@@ -236,7 +236,7 @@ public class CarrierControllerUtilsTest{
 	}
 
 	@Test
-	void copiingOfShipmentsIsDoneCorrectly() {
+	void copyingOfShipmentsIsDoneCorrectly() {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
@@ -269,19 +269,19 @@ public class CarrierControllerUtilsTest{
 				Assertions.assertEquals(0.0, carrierShipment2.getPickupTimeWindow().getStart(), 0);
 				Assertions.assertEquals(7200.0, carrierShipment2.getPickupTimeWindow().getEnd(), 0);
 			}
-		Assertions.assertTrue(foundShipment1, "Not found Shipment1 after copiing");
-		Assertions.assertTrue(foundShipment2, "Not found Shipment2 after copiing");
+		Assertions.assertTrue(foundShipment1, "Not found Shipment1 after copying");
+		Assertions.assertTrue(foundShipment2, "Not found Shipment2 after copying");
 	}
 
 
 	@Test
 	void convertionOfServicesIsDoneCorrectly() {
-		boolean foundSercice1 = false;
+		boolean foundService1 = false;
 		boolean foundService2 = false;
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
-				foundSercice1 = true;
+				foundService1 = true;
 				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
 				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getTo());
 				Assertions.assertEquals(2, carrierShipment1.getSize());
@@ -306,7 +306,7 @@ public class CarrierControllerUtilsTest{
 				Assertions.assertEquals(0.0, carrierShipment2.getPickupTimeWindow().getStart(), 0);
 				Assertions.assertEquals(36001.0, carrierShipment2.getPickupTimeWindow().getEnd(), 0);
 			}
-		Assertions.assertTrue(foundSercice1, "Not found converted Service1 after converting");
+		Assertions.assertTrue(foundService1, "Not found converted Service1 after converting");
 		Assertions.assertTrue(foundService2, "Not found converted Service2 after converting");
 	}
 
@@ -454,10 +454,10 @@ public class CarrierControllerUtilsTest{
 	}
 
 	/**
-	 * Don't crash even if there is no algortihm file specified.
+	 * Don't crash even if there is no algorithm file specified.
 	 */
 	@Test
-	void testRunJsprit_NoAlgortihmFileGiven(){
+	void testRunJsprit_NoAlgorithmFileGiven(){
 		Config config = prepareConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -476,7 +476,7 @@ public class CarrierControllerUtilsTest{
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
 		config.controller().setLastIteration(0);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
-		//freight configstuff
+		//freight config stuff
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).toString() );
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );

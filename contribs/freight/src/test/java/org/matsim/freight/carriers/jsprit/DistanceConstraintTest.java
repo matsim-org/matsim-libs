@@ -122,7 +122,7 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(1,
 				carrierV1.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		Assertions.assertEquals(vehicleType_SmallV1.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
@@ -150,7 +150,7 @@ public class DistanceConstraintTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(1,
 				carrierV2.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		Assertions.assertEquals(vehicleType_LargeV2.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
@@ -233,7 +233,7 @@ public class DistanceConstraintTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 
 	}
 
@@ -291,7 +291,7 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(2,
 				carrierV3.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		double maxDistance_vehicleType_LargeV3 =  VehicleUtils.getEnergyCapacity(vehicleType_LargeV3.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV3.getEngineInformation());
@@ -322,11 +322,11 @@ public class DistanceConstraintTest {
 			if (distanceTour == 12000)
 				Assertions.assertEquals(12000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.assertEquals(20000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 		}
 	}
 
@@ -390,7 +390,7 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(2,
 				carrierV4.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		double maxDistance_vehicleType_Large4 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV4.getEngineInformation())
 				/ VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV4.getEngineInformation());
@@ -420,11 +420,11 @@ public class DistanceConstraintTest {
 			if (thisTypeId.equals("SmallBattery_V4"))
 				Assertions.assertEquals(24000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else if (thisTypeId.equals("DieselVehicle"))
 				Assertions.assertEquals(36000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.fail("Wrong vehicleType used");
 		}
@@ -478,7 +478,7 @@ public class DistanceConstraintTest {
 		//We need two tours, due to reloading both shipments must be transported one after the other
 		Assertions.assertEquals(2,
 				carrierV5.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		Assertions.assertEquals(vehicleType_MidSizeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
@@ -505,9 +505,9 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(2, distancesOfTours.size(), "There must be two entry for tour distances");
 		//One tour has distance of 12000m
-		Assertions.assertTrue(distancesOfTours.contains(12000.0), "The schedulded tour has a non expected distance");
+		Assertions.assertTrue(distancesOfTours.contains(12000.0), "The scheduled tour has a non expected distance");
 		//The other tour has distance of 20000m
-		Assertions.assertTrue(distancesOfTours.contains(20000.0), "The schedulded tour has a non expected distance");
+		Assertions.assertTrue(distancesOfTours.contains(20000.0), "The scheduled tour has a non expected distance");
 	}
 
 	/**
@@ -559,7 +559,7 @@ public class DistanceConstraintTest {
 		//We need two tours, due to reloading both shipments must be transported one after the other
 		Assertions.assertEquals(1,
 				carrierV5.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		Assertions.assertEquals(vehicleType_LargeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getType().getId());
@@ -586,7 +586,7 @@ public class DistanceConstraintTest {
 
 		Assertions.assertEquals(1, distancesOfTours.size(), "There must be one entry for tour distances");
 		//This tour has distance of 24000m
-		Assertions.assertTrue(distancesOfTours.contains(24000.0), "The schedulded tour has a non expected distance");
+		Assertions.assertTrue(distancesOfTours.contains(24000.0), "The scheduled tour has a non expected distance");
 	}
 
 	/**
