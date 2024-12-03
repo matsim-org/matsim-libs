@@ -657,12 +657,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	private void informEndCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.endCalculation(Thread.currentThread().getId());
+			l.endCalculation(Thread.currentThread().threadId());
 	}
 
 	private void informStartCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.startCalculation(Thread.currentThread().getId());
+			l.startCalculation(Thread.currentThread().threadId());
 	}
 
 	/**
@@ -852,11 +852,11 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	}
 
 	private LeastCostPathCalculator createLeastCostPathCalculator() {
-		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().getId());
+		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().threadId());
 		if (router == null) {
 			LeastCostPathCalculator newRouter = leastCostPathCalculatorFactory.createPathCalculator(network,
 					travelDisutility, travelTime);
-			router = routerCache.putIfAbsent(Thread.currentThread().getId(), newRouter);
+			router = routerCache.putIfAbsent(Thread.currentThread().threadId(), newRouter);
 			if (router == null) {
 				router = newRouter;
 			}
