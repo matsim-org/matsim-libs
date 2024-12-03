@@ -56,7 +56,7 @@ import org.matsim.vehicles.VehicleUtils;
  *
  * <p>
  * It can be used with multiple threads. Note that each thread gets its own
- * leastCostPathCalculator. It is created only once and cached afterwards. Thus,
+ * leastCostPathCalculator. It is created only once and cached afterward. Thus,
  * it requires a threadSafe leastCostPathCalculatorFactory (the calculator
  * itself does not need to be thread-safe).
  *
@@ -494,7 +494,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * </p>
 		 * Comments:
 		 * <ul>
-		 * <li>By default this will take free speed travel times.
+		 * <li>By default, this will take free speed travel times.
 		 * <li>yyyy These free speed travel times do <i>not</i> take the time-dependent
 		 * network into account. kai, jan'14
 		 * <li>Either can be changed with builder.setTravelTime(...) or with

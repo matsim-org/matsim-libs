@@ -61,7 +61,7 @@ import org.matsim.vehicles.VehicleUtils;
  * Part is removed, Chain is now starting at the CollectionHub
  *
  * <p>Scheduler = Macht die Pläne für die Fahrzeuge für die nächste MATSim-Iteration. Er plant es
- * für jede Ressource. --> jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
+ * für jede Ressource. → jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
  * mitgegebene Reihenfolge. 2.)
  */
 /*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {

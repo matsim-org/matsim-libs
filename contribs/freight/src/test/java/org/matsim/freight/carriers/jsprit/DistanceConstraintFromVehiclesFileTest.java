@@ -147,8 +147,8 @@ public class DistanceConstraintFromVehiclesFileTest {
 	}
 
 	/**
-	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
-	 * why one vehicle with a large battery is used.
+	 * Option 2: Tour is not possible with the vehicle with the small battery.
+	 * That's why one vehicle with a large battery is used.
 	 *
 	 */
 	@Test
@@ -310,7 +310,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 	/**
 	 * Option 4: An additional shipment outside the range of both BEVtypes.
-	 * Therefore one diesel vehicle must be used and one vehicle with a small
+	 * Therefore, one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
 	 */

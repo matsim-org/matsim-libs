@@ -139,7 +139,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 //				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
 //					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
 //				}
-//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//				log.error("Vehicle with Id does not exist", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
 //				return null;
 //			}
 		}

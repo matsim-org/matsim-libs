@@ -148,7 +148,7 @@ public class CarrierControllerUtilsTest{
 		carrierWServices.addPlan(carrierPlanServicesAndShipments) ;
 
 		/*
-		 * Now convert it to a only shipment-based VRP.
+		 * Now convert it to an only shipment-based VRP.
 		 */
 
 		//Convert to jsprit VRP
@@ -311,7 +311,7 @@ public class CarrierControllerUtilsTest{
 	}
 
 	/*Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP.
-	* Currently the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
+	* Currently, the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
 	* Maybe it is because of the misunderstanding, that a Service is modeled as "Pickup" and not as thought before as "Delivery". KMT sep18
 	*/
 	@Test
