@@ -381,8 +381,6 @@ public class CarriersUtils {
 		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
 		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
 			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
-
-//		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**
