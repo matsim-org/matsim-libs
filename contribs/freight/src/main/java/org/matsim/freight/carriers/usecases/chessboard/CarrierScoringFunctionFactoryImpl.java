@@ -186,9 +186,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
-				if(!employedVehicles.contains(vehicle)){
-					employedVehicles.add(vehicle);
-				}
+				employedVehicles.add(vehicle);
 				double distance = 0.0;
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());

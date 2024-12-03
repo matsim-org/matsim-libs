@@ -108,7 +108,7 @@ public class MainRunResourceTest {
 			assertTrue(carrier.getServices().isEmpty());
 			assertTrue(carrier.getShipments().isEmpty());
 			if (carrier.getCarrierCapabilities() == capabilities) {
-				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
+				assertSame(FleetSize.INFINITE, capabilities.getFleetSize());
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {

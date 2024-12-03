@@ -193,7 +193,7 @@ public class CarrierEventsReadersTest {
 		handledEvents.addAll(eventHandlerServices.handledEvents);
 		handledEvents.addAll(eventHandlerShipments.handledEvents);
 
-		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the resukts of the handler...
+		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the results of the handler...
 		Assertions.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
 	}
 

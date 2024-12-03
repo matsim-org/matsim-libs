@@ -47,7 +47,7 @@ public final class CarrierShipment implements CarrierJob {
 	public static class Builder {
 
 		/**
-		 * @Deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
+		 * @deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 * <p>
 		 * Returns a new shipment builder.
 		 *
@@ -90,7 +90,7 @@ public final class CarrierShipment implements CarrierJob {
 		double delServiceTime = 0.0;
 
 		/**
-		 * @Deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
+		 * @deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 */
 		@Deprecated
 		public Builder(Id<Link> from, Id<Link> to, int size) {

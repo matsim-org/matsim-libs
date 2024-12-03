@@ -203,7 +203,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	void testEventFilessAreEqual(){
+	void testEventFilesAreEqual(){
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {

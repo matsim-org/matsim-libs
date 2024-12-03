@@ -80,7 +80,6 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	 *
 	 * @param filename including the path, excluding the file type extension
 	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
-	 * @throws UncheckedIOException
 	 */
 	public CarrierScoreStats(Carriers carriers, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.carriers = carriers;

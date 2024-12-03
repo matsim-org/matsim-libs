@@ -139,7 +139,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     // scores tolls for vehicles driving on tolled links
     private void handleEvent(PersonMoneyEvent event) {
-      double tollValue = 0;
+      double tollValue;
 
       if (event.getPurpose().equals("toll")) {
         Id<Vehicle> vehicleId = d2v.getVehicleOfDriver(event.getPersonId());

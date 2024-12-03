@@ -25,12 +25,12 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 /**
  * Takes an {@link LspShipment} and normally assigns it to something that belongs to an {@link LSP}.
  * <br>
- * After changes in fall 2023 (see master thesis of nrichter), the assingment is
+ * After changes in fall 2023 (see master thesis of nrichter), the assignment is
  * there to be done one time initially.
  * <br>
  * If there are several {@link LogisticChain}s in a {@link LSPPlan}, the {@link LSP} has to assign each {@link
  * LspShipment} to the suitable {@link LogisticChain}. For this purpose, each {@link LSPPlan}
- * (or only the LSP? - kmt'jan'24), contains a pluggable strategy
+ * (or only the LSP? - kmt jan'24), contains a pluggable strategy
  * that is contained in classes implementing the interface {@link InitialShipmentAssigner}. <br>
  * <br>
  * During iterations, it can happen that the {@link LspShipment} should be moved to another

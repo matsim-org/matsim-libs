@@ -57,6 +57,7 @@ public class CarriersUtilsTest {
 
 		//get Vehicle
 		CarrierVehicle carrierVehicle1 = CarriersUtils.getCarrierVehicle(carrier, testVehicleId );
+		assert carrierVehicle1 != null;
 		Assertions.assertEquals(testVehicleId, carrierVehicle1.getId());
 		Assertions.assertEquals(vehicleType, carrierVehicle1.getType());
 		Assertions.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLinkId() );
@@ -78,6 +79,7 @@ public class CarriersUtilsTest {
 
 		//get Service
 		CarrierService cs1b  = CarriersUtils.getService(carrier, serviceId );
+		assert cs1b != null;
 		Assertions.assertEquals(serviceId, cs1b.getId());
 		Assertions.assertEquals(service1.getId(), cs1b.getId());
 		Assertions.assertEquals(Id.createLinkId("link0"), cs1b.getLocationLinkId());
@@ -99,6 +101,7 @@ public class CarriersUtilsTest {
 
 		//get Shipment
 		CarrierShipment carrierShipment1b  = CarriersUtils.getShipment(carrier, shipmentId );
+		assert carrierShipment1b != null;
 		Assertions.assertEquals(shipmentId, carrierShipment1b.getId());
 		Assertions.assertEquals(service1.getId(), carrierShipment1b.getId());
 		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getFrom());
@@ -108,7 +111,7 @@ public class CarriersUtilsTest {
 	@Test
 	void testGetSetJspritIteration(){
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
-		//jspirtIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
+		//jspritIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
 		Assertions.assertEquals(Integer.MIN_VALUE, CarriersUtils.getJspritIterations(carrier) );
 
 		CarriersUtils.setJspritIterations(carrier, 125);

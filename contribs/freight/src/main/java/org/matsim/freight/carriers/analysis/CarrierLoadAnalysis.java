@@ -51,7 +51,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
-	Carriers carriers;
+	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 
@@ -104,7 +104,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
 			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
-			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).get();
+			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();

@@ -44,7 +44,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
  */
 /*package-private*/ class CollectionCarrierScheduler extends LSPResourceScheduler {
 
-  Logger log = LogManager.getLogger(CollectionCarrierScheduler.class);
+  private static final Logger log = LogManager.getLogger(CollectionCarrierScheduler.class);
 
   private Carrier carrier;
   private CollectionCarrierResource resource;

@@ -226,7 +226,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
-		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
+		//----- All VehicleTypes in CarrierVehicleTypes container. Used so that even unused vehTypes appear in the output
 		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
 		//For the case that there are additional vehicle types found in the events.
 		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {

@@ -10,7 +10,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * In the next steps it will be extended, as follows
  * 1) existing common methods of {@link CarrierShipment} and {@link
  * CarrierService} where moved up here
- * 2) some similiar, but differently named methods of {@link
+ * 2) some similar, but differently named methods of {@link
  * CarrierShipment} and {@link CarrierService} were renamed to the same name and moved up here
  * ...
  * future) It maybe gets generalized in way, that we only have one job definition with 1 or 2
