@@ -60,8 +60,34 @@ ggplot(diff_out) +
 
 #------------------- Tinker with hbefa data
 hbefa_per_tech_avg <- read_delim(
-  "/Users/janek/repos/shared-svn/projects/matsim-germany/hbefa/hbefa-files/v4.1/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
+  "D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
 
-filter <- hbefa_per_tech_avg %>%
-  filter(VehCat == "pass. car" & Component == "NOx" & EmConcept == "diesel")
-max
+hbefa_filtered <- hbefa_per_tech_avg %>%
+  filter(VehCat == "pass. car" & Component == "NOx" & EmConcept == "petrol (4S)")
+
+hbefa_NOX_max <- max(hbefa_filtered$EFA)
+hbefa_NOX_min <- min(hbefa_filtered$EFA)
+
+lengths <- tibble(
+  segment = c(0,1,2,3),
+  length = c(3095, 4756, 7158, 8254)
+)
+
+diff_out_NOx <- diff_out %>%
+  select(segment, "NOx-SUMO", "NOx-MATSIM") %>%
+  pivot_longer(cols = c("NOx-SUMO", "NOx-MATSIM"), names_to="model", values_to="value") %>%
+  left_join(lengths, by="segment") %>%
+  mutate(value = value/(length/1000))
+
+diff_out_NOx_t <- tibble(
+  segment = c(0,1,2,3,0,1,2,3),
+  model = c("NOX_min","NOX_min","NOX_min","NOX_min","NOX_max","NOX_max","NOX_max","NOX_max"),
+  value = c(hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_max,hbefa_NOX_max,hbefa_NOX_max,hbefa_NOX_max),
+  )
+
+a <- diff_out_NOx %>%
+  bind_rows(diff_out_NOx_t)
+
+ggplot(a, aes(x=segment, y=value, color=model)) +
+  geom_line() +
+  geom_point()
