@@ -212,9 +212,9 @@ import org.matsim.vehicles.VehicleUtils;
 	 * directly behind the new pickup. This method gives back the minimal distance
 	 * of this three options.
 	 *
-	 * @param context
-	 * @param newInvestigatedPickup
-	 * @param nextAct
+	 * @param context					the context of the job insertion
+	 * @param newInvestigatedPickup		the new pickup which should be added to the tour
+	 * @param nextAct					the next activity after the new pickup
 	 * @return minimal distance of the associated delivery
 	 */
 	private double findMinimalAdditionalDistance(JobInsertionContext context, TourActivity newInvestigatedPickup,
@@ -283,8 +283,8 @@ import org.matsim.vehicles.VehicleUtils;
 	/**
 	 * Checks if the find possible distance is the minimal one.
 	 *
-	 * @param minimalAdditionalDistance
-	 * @param possibleAdditionalDistance
+	 * @param minimalAdditionalDistance		the minimal additional distance
+	 * @param possibleAdditionalDistance	the possible additional distance
 	 * @return the minimal transport distance
 	 */
 	private double findMinimalDistance(double minimalAdditionalDistance, double possibleAdditionalDistance) {

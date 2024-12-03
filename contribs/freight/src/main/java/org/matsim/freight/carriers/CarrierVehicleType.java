@@ -57,7 +57,7 @@ public class CarrierVehicleType {
 		 * <p>
 		 * The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
 		 *
-		 * @param typeId
+		 * @param typeId the type id
 		 * @return a type builder
 		 */
 		public static Builder newInstance(Id<VehicleType> typeId){
@@ -72,8 +72,8 @@ public class CarrierVehicleType {
 		 * Sets fixed costs of vehicle.
 		 *
 		 * <p>By default it is 0.
-		 * @param fix
-		 * @return
+		 * @param fix 	fixed costs
+		 * @return 		this builder
 		 */
 		public Builder setFixCost(double fix){
 			this.delegate.getCostInformation().setFixedCost( fix ) ;
@@ -85,8 +85,8 @@ public class CarrierVehicleType {
 		 *
 		 * <p>By default it is 1.
 		 *
-		 * @param perDistanceUnit
-		 * @return
+		 * @param perDistanceUnit 	costs per distance-unit
+		 * @return 					this builder
 		 */
 		public Builder setCostPerDistanceUnit(double perDistanceUnit){
 			this.delegate.getCostInformation().setCostsPerMeter( perDistanceUnit ) ;
@@ -98,8 +98,8 @@ public class CarrierVehicleType {
 		 *
 		 * <p>By default it is 0.
 		 *
-		 * @param perTimeUnit
-		 * @return
+		 * @param perTimeUnit 	costs per time-unit
+		 * @return 				this builder
 		 */
 		public Builder setCostPerTimeUnit(double perTimeUnit){
 			this.delegate.getCostInformation().setCostsPerSecond( perTimeUnit ) ;
@@ -109,8 +109,8 @@ public class CarrierVehicleType {
 		/**
 		 * Sets description.
 		 *
-		 * @param description
-		 * @return this builder
+		 * @param description 	the description
+		 * @return 				this builder
 		 */
 		public Builder setDescription(String description){
 			this.delegate.setDescription( description ) ;
@@ -122,8 +122,8 @@ public class CarrierVehicleType {
 		 *
 		 * <p>By default, the capacity is 0.
 		 *
-		 * @param capacity
-		 * @return this builder
+		 * @param capacity 		the capacity of the vehicle-type
+		 * @return 				this builder
 		 */
 		public Builder setCapacity(int capacity){
 			this.delegate.getCapacity().setOther( capacity );

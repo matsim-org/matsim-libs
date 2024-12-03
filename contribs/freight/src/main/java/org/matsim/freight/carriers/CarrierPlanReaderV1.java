@@ -81,7 +81,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
-	 * @param carrierVehicleTypes
+	 * @param carrierVehicleTypes which is a map that stores carrierVehicleTypes
 	 */
 	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super(ValidationType.DTD_OR_XSD);

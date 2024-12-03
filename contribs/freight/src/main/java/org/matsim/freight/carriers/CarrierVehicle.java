@@ -46,8 +46,8 @@ public final class CarrierVehicle implements Vehicle {
 	 * <p>
 	 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
 	 *
-	 * @param vehicleId
-	 * @param locationId
+	 * @param vehicleId 	the vehicle id
+	 * @param locationId 	the location id
 	 * @return CarrierVehicle
 	 * @see CarrierVehicle
 	 */
@@ -68,9 +68,9 @@ public final class CarrierVehicle implements Vehicle {
 		 * <p>
 		 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
 		 *
-		 * @param vehicleId
-		 * @param locationId
-		 * @param vehicleType
+		 * @param vehicleId		the vehicle id
+		 * @param locationId 	the location id
+		 * @param vehicleType 	the vehicle type
 		 * @return a new vehicle builder
 		 */
 		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
