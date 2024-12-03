@@ -64,7 +64,7 @@ public class CarrierVehicleTypeLoaderTest {
 		Assertions.assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
 		Assertions.assertEquals("gasoline", VehicleUtils.getHbefaTechnology(vehicleTypeLoaded.getEngineInformation()));
-		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumptionLitersPerMeter(vehicleTypeLoaded.getEngineInformation()), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class CarrierVehicleTypeLoaderTest {
 		Assertions.assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), MatsimTestUtils.EPSILON);
 
 		Assertions.assertEquals("gasoline", VehicleUtils.getHbefaTechnology(vehicleTypeLoaded.getEngineInformation()));
-		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumptionLitersPerMeter(vehicleTypeLoaded.getEngineInformation()), MatsimTestUtils.EPSILON);
 
 	}
 

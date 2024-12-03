@@ -89,7 +89,7 @@ public class FixedCostsTest  {
 		VehicleType carrierVehType_A = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		{
 			EngineInformation engineInformation1 = carrierVehType_A.getEngineInformation();
-			VehicleUtils.setFuelConsumption(carrierVehType_A, 0.015);
+			VehicleUtils.setFuelConsumptionLitersPerMeter(carrierVehType_A.getEngineInformation(), 0.015);
 			VehicleUtils.setHbefaTechnology(engineInformation1, "diesel");
 			carrierVehType_A.getCapacity().setOther( 1. );
 			carrierVehType_A.getCostInformation().setFixedCost( 0. ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.0 );
@@ -104,7 +104,7 @@ public class FixedCostsTest  {
 		VehicleType carrierVehType_B = VehicleUtils.getFactory().createVehicleType( vehicleTypeId1 );
 		{
 			EngineInformation engineInformation = carrierVehType_B.getEngineInformation();
-			VehicleUtils.setFuelConsumption(carrierVehType_A, 0.015);
+			VehicleUtils.setFuelConsumptionLitersPerMeter(carrierVehType_A.getEngineInformation(), 0.015);
 			VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
 			carrierVehType_B.getCapacity().setOther( 1. );
 			carrierVehType_B.getCostInformation().setFixedCost( 10. ).setCostsPerMeter( 0.00001 ).setCostsPerSecond( 0. ) ;

@@ -88,7 +88,7 @@ public class CarrierControllerUtilsIT{
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );
         EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
 		VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
-		VehicleUtils.setFuelConsumption(carrierVehType, 0.015);
+		VehicleUtils.setFuelConsumptionLitersPerMeter(engineInformation, 0.015);
 		VehicleCapacity capacity = carrierVehType.getCapacity() ;
 		capacity.setOther( 3. ) ;
 		CostInformation costInfo = carrierVehType.getCostInformation();
