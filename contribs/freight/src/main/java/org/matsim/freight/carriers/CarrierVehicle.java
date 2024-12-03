@@ -91,29 +91,6 @@ public final class CarrierVehicle implements Vehicle {
 			this.type = vehicleType;
 		}
 
-		/**
-		 * @param type
-		 * @deprecated The vehicleType need now to be set in the constructor kai/kai jan'22
-		 */
-		@Deprecated
-		public Builder setType( VehicleType type ){
-			log.warn(".setType has no functionality anymore and is deprecated");
-//			this.type=type;
-			return this;
-		}
-
-		/**
-		 * @param typeId
-		 * @deprecated The vehicleTypeId is no longer needed and was confusing -> Use getType().getId kai/kai jan'22
-		 */
-		@Deprecated
-		public Builder setTypeId(Id<VehicleType> typeId ){
-			log.warn(".setTypeId has no functionality anymore and is deprecated");
-//			this.typeId = typeId;
-			return this;
-		}
-
-
 		public Builder setEarliestStart(double earliestStart){
 			this.earliestStart=earliestStart;
 			return this;
