@@ -33,7 +33,7 @@ public class CarrierVehicleTypeWriterTest {
 	@Test
 	void testTypeWriter(){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory()+ "vehicleTypes.xml");
+		new CarrierVehicleTypeReader(types).readFile(utils.getPackageInputDirectory()+ "vehicleTypes_v2.xml");
 		final String outputVehTypeFile = utils.getOutputDirectory()+ "vehicleTypesWritten.xml";
 		new CarrierVehicleTypeWriter(types).write(outputVehTypeFile);
 		types.getVehicleTypes().clear();

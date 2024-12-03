@@ -685,9 +685,6 @@ public final class MatsimJspritFactory {
 			capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 		} else
 			capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-		for (com.graphhopper.jsprit.core.problem.vehicle.VehicleType type : vrp.getTypes()) {
-			capabilityBuilder.addType(createMatsimVehicleType(type));
-		}
 		for (Vehicle vehicle : vrp.getVehicles()) {
 			capabilityBuilder.addVehicle(createCarrierVehicle(vehicle));
 		}

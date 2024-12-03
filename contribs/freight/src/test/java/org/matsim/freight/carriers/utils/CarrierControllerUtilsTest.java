@@ -100,7 +100,7 @@ public class CarrierControllerUtilsTest{
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		VehicleUtils.setHbefaTechnology(carrierVehType.getEngineInformation(), "diesel");
-		VehicleUtils.setFuelConsumption(carrierVehType, 0.015);
+		VehicleUtils.setFuelConsumptionLitersPerMeter(carrierVehType.getEngineInformation(), 0.015);
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
 		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -115,7 +115,6 @@ public class CarrierControllerUtilsTest{
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
 				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
-				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
 				.setFleetSize(FleetSize.INFINITE);
 		carrierWServices.setCarrierCapabilities(ccBuilder.build());
@@ -124,9 +123,6 @@ public class CarrierControllerUtilsTest{
 		// Add both carriers
 		carriersWithServicesAndShpiments.addCarrier(carrierWServices);
 		carriersWithServicesAndShpiments.addCarrier(carrierWShipments);
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
@@ -159,9 +155,6 @@ public class CarrierControllerUtilsTest{
 		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;
 	}
 
 
@@ -227,7 +220,7 @@ public class CarrierControllerUtilsTest{
 			Assertions.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assertions.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assertions.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
-			Assertions.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);
+			Assertions.assertEquals(0.015, VehicleUtils.getFuelConsumptionLitersPerMeter(carrierVehicleType.getEngineInformation()), 0.0);
 		}
 
 		Assertions.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
@@ -239,7 +232,7 @@ public class CarrierControllerUtilsTest{
 			Assertions.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assertions.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assertions.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
-			Assertions.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);		}
+			Assertions.assertEquals(0.015, VehicleUtils.getFuelConsumptionLitersPerMeter(carrierVehicleType.getEngineInformation()), 0.0);		}
 	}
 
 	@Test

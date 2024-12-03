@@ -40,6 +40,8 @@ import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.nio.file.Path;
+
 public class EquilWithCarrierWithPersonsIT {
 
 	private Controler controler;
@@ -81,7 +83,7 @@ public class EquilWithCarrierWithPersonsIT {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile(Path.of(testUtils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString());
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario );
 		new CarrierPlanXmlReader( carriers, carrierVehicleTypes ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
