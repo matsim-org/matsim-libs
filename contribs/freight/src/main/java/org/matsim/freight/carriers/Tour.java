@@ -63,21 +63,6 @@ public class Tour {
 
 		/**
 		 * Returns a new tour builder.
-		 *
-		 * @deprecated
-		 * Please use {@link #newInstance(Id)} instead. kmt sep'22
-		 * <p>
-		 *
-		 *
-		 * @return the builder including "unknown" as tourId
-		 */
-		@Deprecated
-		public static Builder newInstance(){
-			return new Builder(Id.create("unknown", Tour.class));
-		}
-
-		/**
-		 * Returns a new tour builder.
 		 * This now also includes an Id for this tour.
 		 *
 		 * @param tourId Id of this tour

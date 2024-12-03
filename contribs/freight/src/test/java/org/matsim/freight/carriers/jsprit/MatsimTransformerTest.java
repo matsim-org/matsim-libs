@@ -339,7 +339,7 @@ public class MatsimTransformerTest {
 				.setCapacityDemand(10).build();
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", getMatsimVehicleType());
 		double startTime = 15.0;
-		Tour.Builder sTourBuilder = Tour.Builder.newInstance();
+		Tour.Builder sTourBuilder = Tour.Builder.newInstance(Id.create("testTour", Tour.class));
 		sTourBuilder.scheduleStart(matsimVehicle.getLinkId() );
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
 		sTourBuilder.scheduleService(s1);
@@ -355,7 +355,7 @@ public class MatsimTransformerTest {
 		CarrierShipment s2 = getMatsimShipment("s2", "from", "to2", 20);
 		CarrierVehicle matsimVehicle = getMatsimVehicle(vehicleId, "loc", getMatsimVehicleType());
 		double startTime = 15.0;
-		Tour.Builder sTourBuilder = Tour.Builder.newInstance();
+		Tour.Builder sTourBuilder = Tour.Builder.newInstance(Id.create("testTour", Tour.class));
 		sTourBuilder.scheduleStart(matsimVehicle.getLinkId() );
 		sTourBuilder.addLeg(sTourBuilder.createLeg(null, 15.0, 0.0));
 		sTourBuilder.schedulePickup(s1);
