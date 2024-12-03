@@ -26,7 +26,9 @@ public class TestLocalLink {
 
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setFreespeed(20);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var activated = new AtomicInteger(0);
+		var node = new SimNode(link.getToNode().getId());
+		var simLink = SimLink.create(link, node, ConfigUtils.createConfig().qsim(), 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -39,6 +41,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		// buffer is independent of queue
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
+		assertEquals(2, activated.get());
 
 		assertEquals(vehicle1.getId(), simLink.peekFirstVehicle().getId());
 		assertEquals(link.getLength() / vehicle1.getMaximumVelocity(), vehicle1.getEarliestLinkExitTime());
@@ -52,8 +55,8 @@ public class TestLocalLink {
 		var config = ConfigUtils.createConfig();
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		var node = new SimNode(link.getToNode().getId());
-		var wasActivated = new AtomicInteger(0);
-		var simLink = SimLink.create(link, node, config.qsim(), 7.5, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
+		var activated = new AtomicInteger(0);
+		var simLink = SimLink.create(link, node, config.qsim(), 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -66,7 +69,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		// buffer is independent of queue
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
-		assertEquals(2, wasActivated.get());
+		assertEquals(2, activated.get());
 
 		assertEquals(vehicle2.getId(), simLink.peekFirstVehicle().getId());
 		assertEquals(link.getLength() / vehicle1.getMaximumVelocity(), vehicle1.getEarliestLinkExitTime());

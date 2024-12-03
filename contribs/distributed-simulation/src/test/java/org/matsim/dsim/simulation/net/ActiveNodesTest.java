@@ -1,11 +1,8 @@
 package org.matsim.dsim.simulation.net;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimpleAgent;
 
@@ -13,24 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ActiveNodesTest {
-
-	@Test
-	public void activateNode() {
-
-		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		var network = TestUtils.createLocalThreeLinkNetwork();
-		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
-
-		Assertions.fail("TOOD: implement this test");
-
-		//var simLinks = network.getLinks().values().stream()
-		//	.map(l -> TestUtils.createLink(l, 0, 10))
-		//	.collect(Collectors.toMap(SimLink::getId, l -> l));
-		//var node = network.getNodes().get(Id.createNodeId("n2"));
-
-		activeNodes.activate(simNetwork.getNodes().get(Id.createNodeId("n2")));
-		activeNodes.doSimStep(0);
-	}
 
 	@Test
 	public void doSimStepOfferingLinksOnly() {

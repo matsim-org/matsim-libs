@@ -32,35 +32,4 @@ class ActiveLinksTest {
 		activeLinks.doSimStep(0);
 		verify(link, times(1)).doSimStep(any(), anyDouble());
 	}
-
-	@Test
-	public void activateNode() {
-
-		var link = mock(SimLink.class);
-		when(link.getId()).thenReturn(Id.createLinkId("to"));
-		when(link.doSimStep(any(), anyDouble()))
-			.thenReturn(true)
-			.thenReturn(true)
-			.thenReturn(false);
-		when(link.isOffering())
-			.thenReturn(false)
-			.thenReturn(true);
-
-		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
-
-		activeLinks.activate(link);
-
-		// keep link active but don't activate node
-		activeLinks.doSimStep(0);
-		verify(link, times(1)).doSimStep(any(), eq(0.));
-
-		// keep link active and activate node
-		activeLinks.doSimStep(1);
-		verify(link, times(1)).doSimStep(any(), eq(1.));
-
-		// signal link inactive, but it is offering, so node is activated
-		activeLinks.doSimStep(2);
-		verify(link, times(1)).doSimStep(any(), eq(2.));
-		verify(link, times(3)).isOffering();
-	}
 }

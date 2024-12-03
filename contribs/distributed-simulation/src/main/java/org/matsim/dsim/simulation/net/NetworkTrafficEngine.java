@@ -38,7 +38,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	private InternalInterface internalInterface;
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario,AgentSourcesContainer asc,
+	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,
 								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
 								Wait2Link wait2Link, EventsManager em) {
 		this.asc = asc;
@@ -132,10 +132,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	@Override
 	public void doSimStep(double now) {
-		// this inserts waiting vehicles, then moves vehicles over intersections, and then updates bookkeeping.
-		// if the config flag is false, we move vehicles, insert waiting vehicles and then update bookkeeping.
-		wait2Link.moveWaiting(now);
+		// Move vehicles over nodes, then add waiting vehicles onto links and then move vehicles from the queue into link buffers
+		// This mimiks the order in which the QSim does it.
 		activeNodes.doSimStep(now);
+		wait2Link.moveWaiting(now);
 		activeLinks.doSimStep(now);
 	}
 
