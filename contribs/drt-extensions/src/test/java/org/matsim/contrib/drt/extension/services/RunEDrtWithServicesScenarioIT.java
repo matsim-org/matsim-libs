@@ -14,6 +14,7 @@ import org.matsim.contrib.drt.extension.services.trackers.ServiceTracker;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
@@ -21,6 +22,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Key;
 
 public class RunEDrtWithServicesScenarioIT {
 	public static final double MINIMUM_RELATIVE_SOC = 0.2;
@@ -77,7 +80,8 @@ public class RunEDrtWithServicesScenarioIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, RELATIVE_SPEED));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
