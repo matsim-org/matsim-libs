@@ -710,7 +710,5 @@ public class DistanceConstraintTest {
 			CarriersUtils.addCarrierVehicle(singleCarrier, carrierVehicle);
 		}
 		singleCarrier.getCarrierCapabilities().getVehicleTypes().addAll(vehicleTypes.getVehicleTypes().values());
-
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 	}
 }
