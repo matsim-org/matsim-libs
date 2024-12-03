@@ -95,6 +95,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 		//Write headline:
 		bw1.write(String.join(delimiter,"vehicleId",
+			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
 			"load state during tour"));
@@ -109,6 +110,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			bw1.write(vehicleId.toString());
+			bw1.write(delimiter + vehicleType.getId().toString());
 			bw1.write(delimiter + capacity);
 			bw1.write(delimiter + maxLoad);
 			bw1.write(delimiter + load);
