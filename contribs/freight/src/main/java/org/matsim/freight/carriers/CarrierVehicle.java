@@ -128,10 +128,7 @@ public final class CarrierVehicle implements Vehicle {
 	public Id<Link> getLinkId() {
 		return locationId;
 	}
-	/**
-	 * @deprecated -- please inline.  kai, jul'22
-	 */
-	@Deprecated public Id<Link> getLocation() { return getLinkId(); }
+
 	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
