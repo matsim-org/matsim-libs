@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation;
 
+import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -10,10 +11,12 @@ import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.dsim.MessageBroker;
 import org.matsim.dsim.TestUtils;
 import org.mockito.ArgumentCaptor;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,9 +29,8 @@ class SimStepMessagingTest {
 	@Test
 	public void init() {
 
-		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
-		network.setPartitioning(new NetworkPartitioning(simNode, network));
+		network.setPartitioning(new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network));
 		MessageBroker messageBroker = mock(MessageBroker.class);
 
 		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(1), messageBroker);
@@ -41,9 +43,8 @@ class SimStepMessagingTest {
 	@Test
 	public void sendNullMessage() {
 
-		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
-		network.setPartitioning(new NetworkPartitioning(simNode, network));
+		network.setPartitioning(new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network));
 		var messageBroker = mock(MessageBroker.class);
 		var part = 0;
 
@@ -64,9 +65,8 @@ class SimStepMessagingTest {
 
 	@Test
 	public void collectTeleportation() {
-		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
-		network.setPartitioning(new NetworkPartitioning(simNode, network));
+		network.setPartitioning(new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network));
 		var messageBroker = mock(MessageBroker.class);
 		var part = 0;
 
@@ -100,16 +100,17 @@ class SimStepMessagingTest {
 	@Test
 	public void collectVehicle() {
 
-		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
-		network.setPartitioning(new NetworkPartitioning(simNode, network));
+		network.setPartitioning(new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network));
 		var messageBroker = mock(MessageBroker.class);
 		var part = 0;
 
 		var messaging = new SimStepMessaging(network, network.getPartitioning().getPartition(part), messageBroker);
-		var vehicle = mock(DistributedMobsimVehicle.class);
+		var vehicle = mock(DistributedMobsimVehicle.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
 		when(vehicle.getCurrentLinkId()).thenReturn(Id.createLinkId("l2"));
 		when(vehicle.toMessage()).thenReturn(Empty.INSTANCE);
+		when(vehicle.getDriver()).thenReturn(mock(MobsimDriverAgent.class, withSettings().extraInterfaces(DistributedMobsimAgent.class)));
+		when(vehicle.getPassengers()).thenReturn(List.of());
 
 		messaging.collectVehicle(vehicle);
 		verify(messageBroker, times(0)).send(any(), anyInt());
@@ -126,7 +127,7 @@ class SimStepMessagingTest {
 	@Test
 	public void collectStorageCapacityUpdates() {
 
-		var simNode = SimulationNode.builder().build();
+		var simNode = SimulationNode.builder().parts(IntList.of(0, 1, 2)).build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
 		network.setPartitioning(new NetworkPartitioning(simNode, network));
 		var messageBroker = mock(MessageBroker.class);
@@ -156,9 +157,8 @@ class SimStepMessagingTest {
 	@Test
 	public void clearMessages() {
 
-		var simNode = SimulationNode.builder().build();
 		var network = TestUtils.createDistributedThreeLinkNetwork();
-		network.setPartitioning(new NetworkPartitioning(simNode, network));
+		network.setPartitioning(new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network));
 		var messageBroker = mock(MessageBroker.class);
 		var part = 2;
 

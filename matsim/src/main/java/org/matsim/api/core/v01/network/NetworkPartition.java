@@ -41,22 +41,20 @@ public final class NetworkPartition {
 
 	void addLink(Link link) {
 		links.add(link.getId());
-
-		if (isSplit(link)) {
-			int fromPart = (int) link.getFromNode().getAttributes().getAttribute(ATTRIBUTE);
-			if (fromPart != partition) {
-				neighbors.add(fromPart);
-			}
-
-			int toPart = (int) link.getToNode().getAttributes().getAttribute(ATTRIBUTE);
-			if (toPart != partition) {
-				neighbors.add(toPart);
-			}
-		}
 	}
 
 	void addNode(Node node) {
 		nodes.add(node.getId());
+
+		node.getInLinks().values().stream()
+			.mapToInt(l -> (int) l.getFromNode().getAttributes().getAttribute(ATTRIBUTE))
+			.filter(p -> p != partition)
+			.forEach(neighbors::add);
+
+		node.getOutLinks().values().stream()
+			.mapToInt(l -> (int) l.getToNode().getAttributes().getAttribute(ATTRIBUTE))
+			.filter(p -> p != partition)
+			.forEach(neighbors::add);
 	}
 
 	/**
