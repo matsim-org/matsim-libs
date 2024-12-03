@@ -1,8 +1,10 @@
 package org.matsim.dsim;
 
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.communication.NullCommunicator;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Log4j2
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ThreeLinkIntegrationTest {
 
 	@RegisterExtension
