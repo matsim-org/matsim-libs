@@ -64,7 +64,7 @@ public class CarrierCapabilities {
 		/**
 		 * @deprecated Since the vehicle type is in the {@link CarrierVehicleTypes}
 		 * container, it should not be duplicated here. It is also not written
-		 * to file when writing {@link CarrierPlanXmlWriterV2}.
+		 * to file when writing.
 		 */
 		@Deprecated
 		public Builder addType( VehicleType type ){
