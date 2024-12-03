@@ -82,11 +82,12 @@ public class RunFreightAnalysisEventBased {
 
 		// the better version with the globFile method is not available since there is a circular dependency between the modules application and freight
 
-		this.EVENTS_PATH = Path.of(simOutputPath).resolve("output_events.xml.gz").toString();
-		String vehiclesPath = Path.of(simOutputPath).resolve("output_allVehicles.xml.gz").toString();
-		String networkPath = Path.of(simOutputPath).resolve("output_network.xml.gz").toString();
-		String carriersPath = Path.of(simOutputPath).resolve("output_carriers.xml.gz").toString();
-		String carriersVehicleTypesPath = Path.of(simOutputPath).resolve("output_carriersVehicleTypes.xml.gz").toString();
+		final Path path = Path.of(simOutputPath);
+		this.EVENTS_PATH = path.resolve("output_events.xml.gz").toString();
+		String vehiclesPath = path.resolve("output_allVehicles.xml.gz").toString();
+		String networkPath = path.resolve("output_network.xml.gz").toString();
+		String carriersPath = path.resolve("output_carriers.xml.gz").toString();
+		String carriersVehicleTypesPath = path.resolve("output_carriersVehicleTypes.xml.gz").toString();
 
 		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
