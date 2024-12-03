@@ -51,7 +51,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
-	Carriers carriers;
+	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 

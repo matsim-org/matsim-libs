@@ -48,7 +48,7 @@ import org.matsim.vehicles.VehicleType;
  */
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
-  Logger log = LogManager.getLogger(DistributionCarrierScheduler.class);
+  private static final Logger log = LogManager.getLogger(DistributionCarrierScheduler.class);
 
   private Carrier carrier;
   private DistributionCarrierResource resource;
