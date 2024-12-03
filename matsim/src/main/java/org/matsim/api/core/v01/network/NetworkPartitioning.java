@@ -47,7 +47,6 @@ public final class NetworkPartitioning {
 			if (partition != null) {
 				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).addLink(link);
 				link2partition.put(link.getId(), (int) partition);
-
 				if (node.getParts().contains((int) partition))
 					linksOnNode.add(link.getId());
 			}
