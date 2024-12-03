@@ -64,23 +64,6 @@ public class CarrierVehicleType {
 			return new Builder(typeId);
 		}
 
-		/**
-		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
-		 * <p>
-		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
-		 * Values can be changed within the builder afterwards.
-		 *
-		 * @param carrierVehicleType
-		 * @param typeId
-		 * @return a type builder
-		 *
-		 * @deprecated Use {@link #newInstance(Id<VehicleType>)} instead
-		 */
-		@Deprecated(since = "sep'19", forRemoval = true)
-		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
-			throw new RuntimeException("not implemented") ;
-		}
-
 		private Builder(Id<VehicleType> typeId){
 			this.delegate = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
