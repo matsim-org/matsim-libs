@@ -34,8 +34,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.nio.file.Path;
-
 public class CarrierVehicleTypeReaderTest {
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -53,14 +51,15 @@ public class CarrierVehicleTypeReaderTest {
 
 	@Test
 	void test_whenReadingTypes_nuOfTypesIsReadCorrectly(){
-		assertEquals(2, types.getVehicleTypes().size());
+		assertEquals(3, types.getVehicleTypes().size());
 	}
 
 	@Test
 	void test_whenReadingTypes_itReadyExactlyTheTypesFromFile(){
 		assertTrue(types.getVehicleTypes().containsKey(Id.create("medium", org.matsim.vehicles.VehicleType.class ) ) );
 		assertTrue(types.getVehicleTypes().containsKey(Id.create("light", org.matsim.vehicles.VehicleType.class ) ) );
-		assertEquals(2, types.getVehicleTypes().size());
+		assertTrue(types.getVehicleTypes().containsKey(Id.create("heavy", org.matsim.vehicles.VehicleType.class ) ) );
+		assertEquals(3, types.getVehicleTypes().size());
 	}
 
 	@Test
@@ -94,7 +93,7 @@ public class CarrierVehicleTypeReaderTest {
 	void readV1andWriteV2(){
 		final String outFilename = utils.getOutputDirectory() + "/vehicleTypes_v2.xml";
 		new CarrierVehicleTypeWriter( types ).write( outFilename ) ;
-		final String referenceFilename = utils.getClassInputDirectory() + "/vehicleTypes_v2.xml" ;
+		final String referenceFilename = utils.getPackageInputDirectory() + "/vehicleTypes_v2.xml" ;
 		MatsimTestUtils.assertEqualFilesLineByLine( referenceFilename, outFilename );
 	}
 
@@ -107,7 +106,7 @@ public class CarrierVehicleTypeReaderTest {
 		log.info("") ;
 		log.info("now starting for real") ;
 		log.info("") ;
-		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";
+		String inFilename1 = utils.getPackageInputDirectory() + "vehicleTypes_v2.xml";
 		CarrierVehicleTypes types1 = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( types1 ).readFile( inFilename1 );
 

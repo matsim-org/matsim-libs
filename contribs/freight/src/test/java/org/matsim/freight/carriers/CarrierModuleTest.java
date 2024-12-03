@@ -70,7 +70,7 @@ public class CarrierModuleTest {
         config.controller().setCreateGraphsInterval(0);
         freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
         freightCarriersConfigGroup.setCarriersFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
-        freightCarriersConfigGroup.setCarriersVehicleTypesFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
 
         Scenario scenario = ScenarioUtils.loadScenario( config );
 
