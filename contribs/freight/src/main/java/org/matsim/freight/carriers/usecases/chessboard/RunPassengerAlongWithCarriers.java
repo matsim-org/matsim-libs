@@ -23,16 +23,15 @@ package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
+import java.net.URL;
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -47,12 +46,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.*;
+import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
-
-import java.net.URL;
-import java.util.Map;
 
 final class RunPassengerAlongWithCarriers {
 
@@ -67,7 +63,7 @@ final class RunPassengerAlongWithCarriers {
 
 		Scenario scenario = prepareScenario(config);
 
-		Controler controler = new Controler(scenario);
+		Controller controller = ControllerUtils.createController(scenario);
 
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
@@ -75,9 +71,9 @@ final class RunPassengerAlongWithCarriers {
 		final Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
-		controler.addOverridingModule( new CarrierModule() );
+		controller.addOverridingModule( new CarrierModule() );
 
-		controler.addOverridingModule( new AbstractModule(){
+		controller.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				this.bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory(types) );
 				this.bind( CarrierScoringFunctionFactory.class ).toInstance(carrier -> {
@@ -91,9 +87,9 @@ final class RunPassengerAlongWithCarriers {
 		} );
 
 
-		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
+		prepareFreightOutputDataAndStats(scenario, controller.getEvents(), controller, carriers);
 
-		controler.run();
+		controller.run();
 	}
 
 
@@ -154,7 +150,7 @@ final class RunPassengerAlongWithCarriers {
 			final TravelDisutility travelDisutility = CarrierTravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car ) );
 			final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network, travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-			final CarrierStrategyManager carrierStrategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+			final CarrierStrategyManager carrierStrategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
 			carrierStrategyManager.setMaxPlansPerAgent(5);
 
 			carrierStrategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);
