@@ -104,7 +104,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
 			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
-			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).get();
+			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();

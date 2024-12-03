@@ -53,6 +53,7 @@ public class CarrierVehicleTypeLoaderTest {
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("lightVehicle"));
 
+		assert v != null;
 		VehicleType vehicleTypeLoaded = v.getType();
 		Assertions.assertNotNull(vehicleTypeLoaded);
 
@@ -72,6 +73,7 @@ public class CarrierVehicleTypeLoaderTest {
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarriersUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("mediumVehicle"));
 
+		assert v != null;
 		VehicleType vehicleTypeLoaded = v.getType();
 		Assertions.assertNotNull(vehicleTypeLoaded);
 
