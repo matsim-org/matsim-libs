@@ -1,17 +1,21 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@RequiredArgsConstructor
 public class ActiveLinks implements Steppable {
 
 	private final Set<SimLink> activeLinks = new HashSet<>();
 	private final SimStepMessaging simStepMessaging;
+
+	@Inject
+	public ActiveLinks(SimStepMessaging simStepMessaging) {
+		this.simStepMessaging = simStepMessaging;
+	}
 
 	void activate(SimLink link) {
 		activeLinks.add(link);

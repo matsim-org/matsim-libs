@@ -1,16 +1,17 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.common.collect.Streams;
+import com.google.inject.Inject;
 import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
@@ -20,9 +21,9 @@ public class SimNetwork {
 	private final Map<Id<Node>, SimNode> nodes;
 	private final int part;
 
-	SimNetwork(Network network, Config config, int part, SimLink.OnLeaveQueue vehicleEndsRouteHandler, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
-
-		var networkPartition = network.getPartitioning().getPartition(part);
+	@Inject
+	SimNetwork(Network network, Config config, NetworkPartition networkPartition,
+			   ActiveLinks activeLinks, ActiveNodes activeNodes) {
 
 		// collect node ids, which belong to this partition
 		var localNodes = network.getNodes().values().stream()
@@ -50,7 +51,7 @@ public class SimNetwork {
 			var simLink = SimLink.create(
 				link, toNode,
 				config.qsim(), network.getEffectiveCellSize(),
-				part, vehicleEndsRouteHandler, activateLink, activateNode
+				networkPartition.getIndex(), activeLinks::activate, activeNodes::activate
 			);
 			if (fromNode != null) {
 				fromNode.addOutLink(simLink);
@@ -60,6 +61,6 @@ public class SimNetwork {
 			}
 			links.put(linkId, simLink);
 		}
-		this.part = part;
+		this.part = networkPartition.getIndex();
 	}
 }

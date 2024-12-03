@@ -13,10 +13,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.dsim.simulation.net.DefaultWait2Link;
-import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
-import org.matsim.dsim.simulation.net.SimLink;
-import org.matsim.dsim.simulation.net.Wait2Link;
+import org.matsim.dsim.simulation.net.*;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.*;
@@ -24,19 +21,25 @@ import java.util.stream.Stream;
 
 public class DistributedPtEngine implements DistributedMobsimEngine, DistributedDepartureHandler, Wait2Link {
 
+	private final Scenario scenario;
+	private final SimNetwork simNetwork;
 	private final TransitQSimEngine transitQSimEngine;
 	private final Map<Id<Link>, Queue<VehicleAtStop>> activeStops = new HashMap<>();
 	private final Map<Id<Link>, Queue<DefaultWait2Link.Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
 
-
 	@Inject
-	public DistributedPtEngine(Scenario scenario, TransitQSimEngine transitQSimEngine, NetworkTrafficEngine networkTrafficEngine, EventsManager em) {
+	public DistributedPtEngine(Scenario scenario, SimNetwork simNetwork, TransitQSimEngine transitQSimEngine, EventsManager em) {
+		this.scenario = scenario;
+		this.simNetwork = simNetwork;
 		this.transitQSimEngine = transitQSimEngine;
 		this.em = em;
+	}
+
+	@Override
+	public void onPrepareSim() {
 
 		// find out which links are pt links and hook into the leaveQ handler.
-		var simNetwork = networkTrafficEngine.getSimNetwork();
 		scenario.getTransitSchedule().getTransitLines().values().stream()
 			.flatMap(line -> line.getRoutes().values().stream())
 			.map(TransitRoute::getRoute)
@@ -46,6 +49,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			.map(id -> simNetwork.getLinks().get(id))
 			.filter(link -> link instanceof SimLink.LocalLink || link instanceof SimLink.SplitInLink)
 			.forEach(link -> link.addLeaveHandler(this::onLeaveQueue));
+
+		transitQSimEngine.onPrepareSim();
 	}
 
 	@Override

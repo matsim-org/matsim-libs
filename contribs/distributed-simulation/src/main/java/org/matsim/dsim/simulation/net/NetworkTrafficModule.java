@@ -11,6 +11,9 @@ public class NetworkTrafficModule extends AbstractQSimModule {
 	protected void configureQSim() {
 
 		bind(NetworkTrafficEngine.class).in(Singleton.class);
+		bind(SimNetwork.class).in(Singleton.class);
+		bind(ActiveLinks.class).in(Singleton.class);
+		bind(ActiveNodes.class).in(Singleton.class);
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkTrafficEngine.class );
 	}

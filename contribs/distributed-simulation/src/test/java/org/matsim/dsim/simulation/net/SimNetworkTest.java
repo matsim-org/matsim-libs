@@ -3,11 +3,15 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.network.NetworkPartition;
+import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
+import static org.mockito.Mockito.mock;
 
 class SimNetworkTest {
 
@@ -36,8 +40,11 @@ class SimNetworkTest {
 		network.addLink(l2);
 		network.addLink(l3);
 
+		NetworkPartitioning partitioning = new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network);
+
 		// TODO, do we want to pass that handler here?
-		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), part, SimLink.OnLeaveQueue.defaultHandler(), _ -> {}, _ -> {});
+		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), partitioning.getPartition(part),
+			mock(ActiveLinks.class), mock(ActiveNodes.class));
 
 		assertInstanceOf(SimLink.SplitInLink.class, simNetwork.getLinks().get(l1.getId()));
 		assertInstanceOf(SimLink.LocalLink.class, simNetwork.getLinks().get(l2.getId()));

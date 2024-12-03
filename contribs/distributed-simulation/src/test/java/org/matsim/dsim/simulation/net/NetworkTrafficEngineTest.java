@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,8 +44,10 @@ class NetworkTrafficEngineTest {
 		var timeInterpretation = TimeInterpretation.create(scenario.getConfig());
 		var wait2link = new DefaultWait2Link(eventsManager);
 
-		var engine = new NetworkTrafficEngine(scenario, mock(NetworkPartition.class), mock(AgentSourcesContainer.class), wait2link,
-			mock(SimStepMessaging.class), eventsManager);
+		var engine = new NetworkTrafficEngine(scenario, mock(AgentSourcesContainer.class), mock(SimNetwork.class),
+			mock(ActiveNodes.class), mock(ActiveLinks.class), wait2link, eventsManager);
+
+		Assertions.fail("Needs real simnetwork");
 
 		var timer = mock(MobsimTimer.class);
 

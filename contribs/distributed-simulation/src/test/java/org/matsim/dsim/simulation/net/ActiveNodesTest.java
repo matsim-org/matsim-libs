@@ -1,7 +1,9 @@
 package org.matsim.dsim.simulation.net;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.dsim.TestUtils;
@@ -17,8 +19,9 @@ class ActiveNodesTest {
 
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
 		var network = TestUtils.createLocalThreeLinkNetwork();
-		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), 0, SimLink.OnLeaveQueue.defaultHandler(), _ -> fail(), _ -> fail());
+		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
 
+		Assertions.fail("TOOD: implement this test");
 
 		//var simLinks = network.getLinks().values().stream()
 		//	.map(l -> TestUtils.createLink(l, 0, 10))

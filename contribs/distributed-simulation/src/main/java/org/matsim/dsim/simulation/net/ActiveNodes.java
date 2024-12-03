@@ -1,6 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.RequiredArgsConstructor;
+import com.google.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -22,12 +22,16 @@ import java.util.Set;
  * links.
  */
 @Log4j2
-@RequiredArgsConstructor
 public class ActiveNodes implements Steppable {
 
 	private final Set<SimNode> activeNodes = new HashSet<>();
 	private final EventsManager em;
 	private final Random rnd = new Random();
+
+	@Inject
+	public ActiveNodes(EventsManager em) {
+		this.em = em;
+	}
 
 	int size() {
 		return activeNodes.size();

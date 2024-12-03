@@ -72,6 +72,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		if (component instanceof DistributedMobsimEngine d) {
 			this.engines.add(d);
 			d.setInternalInterface(this);
+			engines.sort(Comparator.comparingDouble(DistributedMobsimEngine::getEnginePriority).reversed());
 		}
 
 		if (component instanceof DistributedActivityHandler d) {
@@ -87,8 +88,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		if (component instanceof NetworkTrafficEngine n) {
 			this.networkTrafficEngine = n;
 		}
-
-
 	}
 
 	@Override

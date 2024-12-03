@@ -13,4 +13,11 @@ public interface DistributedMobsimEngine extends MobsimEngine {
 	default void process(SimStepMessage stepMessage, double now) {
 	}
 
+	/**
+	 * Determine the order in which engines are executed in a distributed simulation.
+	 */
+	default double getEnginePriority() {
+		return 0.0;
+	}
+
 }

@@ -28,8 +28,7 @@ public class TestUtils {
 		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
 		defaultQsimConfig.setStuckTime(stuckTime);
 		var simNode = new SimNode(link.getToNode().getId());
-		return SimLink.create(link, simNode, defaultQsimConfig, 7.5, part, (_, _, _) -> SimLink.OnLeaveQueueInstruction.MoveToBuffer,
-			_ -> {}, _ -> {});
+		return SimLink.create(link, simNode, defaultQsimConfig, 7.5, part, _ -> {}, _ -> {});
 	}
 
 	public static Link createSingleLink() {

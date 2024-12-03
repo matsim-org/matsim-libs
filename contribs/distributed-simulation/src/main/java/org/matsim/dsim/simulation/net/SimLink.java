@@ -60,16 +60,16 @@ public interface SimLink {
 		}
 	}
 
-	static SimLink create(Link link, SimNode toNode, QSimConfigGroup config, double effectiveCellSize, int part, OnLeaveQueue onLeaveQueue, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
+	static SimLink create(Link link, SimNode toNode, QSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
 		var fromPart = getPartition(link.getFromNode());
 		var toPart = getPartition(link.getToNode());
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
 		if (fromPart == toPart) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			return new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), onLeaveQueue, activateLink, activateNode);
+			return new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
 		} else if (toPart == part) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), onLeaveQueue, activateLink, activateNode);
+			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
 			return new SplitInLink(localLink, fromPart);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
