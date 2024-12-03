@@ -26,7 +26,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Design thoughts:<ul>
@@ -44,5 +44,5 @@ public interface InternalInterface {
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
 
-	List<DepartureHandler> getDepartureHandlers();
+	Collection<? extends DepartureHandler> getDepartureHandlers();
 }

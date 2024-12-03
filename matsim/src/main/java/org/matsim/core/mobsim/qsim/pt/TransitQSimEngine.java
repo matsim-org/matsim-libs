@@ -28,14 +28,18 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.dsim.*;
+import org.matsim.core.mobsim.dsim.DistributedAgentSource;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -54,7 +58,7 @@ import java.util.Map.Entry;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements DistributedDepartureHandler, DistributedMobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
+public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;

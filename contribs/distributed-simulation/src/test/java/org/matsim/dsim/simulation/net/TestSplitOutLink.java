@@ -6,54 +6,60 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TestSplitOutLink {
 
-    @Test
-    public void init() {
-        var toPart = 42;
-        var link = TestUtils.createSingleLink(0, toPart);
-        var simLink = TestUtils.createLink(link, 0, 10);
+	@Test
+	public void init() {
+		var toPart = 42;
+		var link = TestUtils.createSingleLink(0, toPart);
+		var simLink = TestUtils.createLink(link, 0, 10);
 
-        assertInstanceOf(SimLink.SplitOutLink.class, simLink);
-        assertEquals(link.getId(), simLink.getId());
-        assertEquals(toPart, ((SimLink.SplitOutLink) simLink).getToPart());
-    }
+		assertInstanceOf(SimLink.SplitOutLink.class, simLink);
+		assertEquals(link.getId(), simLink.getId());
+		assertEquals(toPart, ((SimLink.SplitOutLink) simLink).getToPart());
+	}
 
-    @Test
-    public void storageCapacityWhenUpdated() {
+	@Test
+	public void storageCapacityWhenUpdated() {
 
-        var link = TestUtils.createSingleLink(0, 42);
+		var link = TestUtils.createSingleLink(0, 42);
 		var config = ConfigUtils.createConfig();
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 50, 0);
+		var node = new SimNode(link.getToNode().getId());
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> {}, _ -> {});
 
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.applyCapacityUpdate(0, 2);
+		simLink.applyCapacityUpdate(0, 2);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 
-        simLink.applyCapacityUpdate(1, 0);
+		simLink.applyCapacityUpdate(1, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.applyCapacityUpdate(1, 2);
+		simLink.applyCapacityUpdate(1, 2);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.applyCapacityUpdate(2, 0);
+		simLink.applyCapacityUpdate(2, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-    }
+	}
 
-    @Test
+	@Test
 	public void storageCapacityWhenPushedQueue() {
 
-        var link = TestUtils.createSingleLink(0, 42);
+		var link = TestUtils.createSingleLink(0, 42);
 		var config = ConfigUtils.createConfig();
-		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 50, 0);
+		var node = new SimNode(link.getToNode().getId());
+		var activated = new AtomicInteger(0);
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> activated.incrementAndGet(), _ -> {});
 
-        // the link can take 2 vehicles. Push two and test whether there is space left.
+		// the link can take 2 vehicles. Push two and test whether there is space left.
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertEquals(2, activated.get());
 	}
 
 	@Test
@@ -65,7 +71,9 @@ public class TestSplitOutLink {
 		link.setLength(20);
 		var config = ConfigUtils.createConfig();
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
-		var simLink = SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 10, 0);
+		var activated = new AtomicInteger(0);
+		var node = new SimNode(link.getToNode().getId());
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 10, 0, _ -> activated.incrementAndGet(), _ -> {});
 
 		// push one vehicle which consumes inflow capacity
 		var now = 0;
@@ -82,23 +90,27 @@ public class TestSplitOutLink {
 		// inflow is restored after 4 seconds, but storage capacity is exhausted
 		now = 8;
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
-    }
+		assertEquals(2, activated.get());
+	}
 
-    @Test
-    public void sendVehicles() {
-        var link = TestUtils.createSingleLink(0, 42);
+	@Test
+	public void sendVehicles() {
+		var link = TestUtils.createSingleLink(0, 42);
 		var config = ConfigUtils.createConfig();
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, SimLink.OnLeaveQueue.defaultHandler(), config.qsim(), 50, 0);
+		var activated = new AtomicInteger(0);
+		var node = new SimNode(link.getToNode().getId());
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> activated.incrementAndGet(), _ -> {});
 
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
-        simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
 
-        // call do sim step, which should pass vehicles to the messagin
-        var messaging = mock(SimStepMessaging.class);
-        simLink.doSimStep(messaging, 0);
-        verify(messaging, times(2)).collectVehicle(any());
+		// call do sim step, which should pass vehicles to the messagin
+		var messaging = mock(SimStepMessaging.class);
+		simLink.doSimStep(messaging, 0);
+		verify(messaging, times(2)).collectVehicle(any());
 
-        // make sure that the consumed capacity was not released
+		// make sure that the consumed capacity was not released
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
-    }
+		assertEquals(2, activated.get());
+	}
 }

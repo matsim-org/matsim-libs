@@ -25,6 +25,12 @@ public interface LP {
     default void onPrepareSim() {
     }
 
+	/**
+	 * Called after all simulation processes are finished.
+	 */
+	default void onCleanupSim() {
+	}
+
     /**
      * This method is used to determine when the LP should wait for neighboring messages.
      */

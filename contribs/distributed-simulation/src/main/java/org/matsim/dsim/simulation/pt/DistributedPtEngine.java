@@ -13,33 +13,33 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.dsim.simulation.net.DefaultWait2Link;
-import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
-import org.matsim.dsim.simulation.net.SimLink;
-import org.matsim.dsim.simulation.net.Wait2Link;
+import org.matsim.dsim.simulation.net.*;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class DistributedPtEngine implements DistributedMobsimEngine, DistributedDepartureHandler, Wait2Link {
 
+	private final Scenario scenario;
+	private final SimNetwork simNetwork;
 	private final TransitQSimEngine transitQSimEngine;
 	private final Map<Id<Link>, Queue<VehicleAtStop>> activeStops = new HashMap<>();
 	private final Map<Id<Link>, Queue<DefaultWait2Link.Waiting>> waitingVehicles = new HashMap<>();
-	private final Consumer<Id<Link>> activateLink;
 	private final EventsManager em;
 
-
 	@Inject
-	public DistributedPtEngine(Scenario scenario, TransitQSimEngine transitQSimEngine, NetworkTrafficEngine networkTrafficEngine, EventsManager em) {
+	public DistributedPtEngine(Scenario scenario, SimNetwork simNetwork, TransitQSimEngine transitQSimEngine, EventsManager em) {
+		this.scenario = scenario;
+		this.simNetwork = simNetwork;
 		this.transitQSimEngine = transitQSimEngine;
-		this.activateLink = networkTrafficEngine::activateLink;
 		this.em = em;
+	}
+
+	@Override
+	public void onPrepareSim() {
 
 		// find out which links are pt links and hook into the leaveQ handler.
-		var simNetwork = networkTrafficEngine.getSimNetwork();
 		scenario.getTransitSchedule().getTransitLines().values().stream()
 			.flatMap(line -> line.getRoutes().values().stream())
 			.map(TransitRoute::getRoute)
@@ -49,6 +49,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			.map(id -> simNetwork.getLinks().get(id))
 			.filter(link -> link instanceof SimLink.LocalLink || link instanceof SimLink.SplitInLink)
 			.forEach(link -> link.addLeaveHandler(this::onLeaveQueue));
+
+		transitQSimEngine.onPrepareSim();
 	}
 
 	@Override
@@ -121,14 +123,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			vehicle.getDriver().getMode(), 1.0)
 		);
 		switch (result) {
-			case BlockQueue -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
-				activateLink.accept(link.getId());
-			}
-			case MoveToBuffer -> {
-				link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
-				activateLink.accept(link.getId());
-			}
+			case BlockQueue -> link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
+			case MoveToBuffer -> link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
 			case RemoveVehicle -> { // nothing to do. The vehicle should be in vehicles at stop
 			}
 		}

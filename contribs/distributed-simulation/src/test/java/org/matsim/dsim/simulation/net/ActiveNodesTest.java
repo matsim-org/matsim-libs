@@ -6,30 +6,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimpleAgent;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ActiveNodesTest {
-
-	@Test
-	public void activateNode() {
-
-		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(_ -> fail());
-		var network = TestUtils.createLocalThreeLinkNetwork();
-		var simLinks = network.getLinks().values().stream()
-			.map(l -> TestUtils.createLink(l, 0, 10))
-			.collect(Collectors.toMap(SimLink::getId, l -> l));
-		var node = network.getNodes().get(Id.createNodeId("n2"));
-		var simNode = SimNode.create(node, simLinks);
-
-		activeNodes.activate(simNode);
-		activeNodes.doSimStep(0);
-	}
 
 	@Test
 	public void doSimStepOfferingLinksOnly() {
@@ -50,13 +30,19 @@ class ActiveNodesTest {
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
 		var nextLinkId = Id.createLinkId("next-link");
 		when(nextLink.getId()).thenReturn(nextLinkId);
+		var node = new SimNode(Id.createNodeId("test"));
+		node.addInLink(offeringLink);
+		node.addInLink(emptyInLink);
+		node.addOutLink(nextLink);
 
-		var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(nextLinkId, nextLink));
+		//var node = new SimNode(Id.createNodeId("test"), List.of(offeringLink, emptyInLink), Map.of(nextLinkId, nextLink));
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a));
+		//activeNodes.setActivateLink(a -> assertEquals(nextLinkId, a));
 		activeNodes.activate(node);
 
 		activeNodes.doSimStep(0);
+
+		verify(nextLink, times(1)).pushVehicle(any(), any(), anyDouble());
 
 		// verify if peek method of link was called. This relies on the internal functioning of the
 		// method, but I think it is quite simple to test it this way
@@ -79,9 +65,10 @@ class ActiveNodesTest {
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
-		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
+		var node = new SimNode(Id.createNodeId("test"));
+		node.addInLink(inLink);
+		node.addOutLink(nextLink);
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(link -> assertEquals(nextLink.getId(), link));
 		activeNodes.activate(node);
 
 		// move the vehicle into the buffer
@@ -116,9 +103,10 @@ class ActiveNodesTest {
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
-		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
+		var node = new SimNode(Id.createNodeId("test"));
+		node.addInLink(inLink);
+		node.addOutLink(nextLink);
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(l -> assertEquals(nextLink.getId(), l));
 		activeNodes.activate(node);
 
 		// make sure that one vehicle is released every other second.
@@ -148,9 +136,11 @@ class ActiveNodesTest {
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
-		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of(Id.createLinkId("next-link"), nextLink));
+		var node = new SimNode(Id.createNodeId("test"));
+		node.addInLink(inLink);
+		node.addOutLink(nextLink);
+
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
-		activeNodes.setActivateLink(l -> assertEquals(nextLink.getId(), l));
 		activeNodes.activate(node);
 
 		for (var now = 100; now < 100 + stuckThreshold; now++) {
@@ -168,7 +158,8 @@ class ActiveNodesTest {
 		var inLink = mock(SimLink.class);
 		when(inLink.isOffering()).thenReturn(false);
 
-		var node = new SimNode(Id.createNodeId("test"), List.of(inLink), Map.of());
+		var node = new SimNode(Id.createNodeId("test"));
+		node.addInLink(inLink);
 		var activeNodes = new ActiveNodes(mock(EventsManager.class));
 
 		activeNodes.activate(node);

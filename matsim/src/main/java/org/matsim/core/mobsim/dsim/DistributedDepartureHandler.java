@@ -11,4 +11,11 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
  */
 public interface DistributedDepartureHandler extends DepartureHandler {
 
+	/**
+	 * Engines are sorted by their priority in descending order.
+	 */
+	default double priority() {
+		return 0.0;
+	}
+
 }

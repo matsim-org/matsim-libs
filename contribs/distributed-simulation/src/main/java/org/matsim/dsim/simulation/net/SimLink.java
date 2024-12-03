@@ -11,6 +11,7 @@ import org.matsim.dsim.simulation.SimStepMessaging;
 import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
 
@@ -19,8 +20,6 @@ public interface SimLink {
 	enum LinkPosition {QStart, QEnd, Buffer}
 
 	Id<Link> getId();
-
-	Id<Node> getToNode();
 
 	double getMaxFlowCapacity();
 
@@ -61,21 +60,21 @@ public interface SimLink {
 		}
 	}
 
-	static SimLink create(Link link, OnLeaveQueue onLeaveQueue, QSimConfigGroup config, double effectiveCellSize, int part) {
+	static SimLink create(Link link, SimNode toNode, QSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
 		var fromPart = getPartition(link.getFromNode());
 		var toPart = getPartition(link.getToNode());
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
 		if (fromPart == toPart) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			return new LocalLink(link, q, outflowCapacity, onLeaveQueue, config.getStuckTime());
+			return new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
 		} else if (toPart == part) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			var localLink = new LocalLink(link, q, outflowCapacity, onLeaveQueue, config.getStuckTime());
+			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
 			return new SplitInLink(localLink, fromPart);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
 			var storageCapacity = new SimpleStorageCapacity(link, effectiveCellSize);
-			return new SplitOutLink(link, storageCapacity, inflowCapacity);
+			return new SplitOutLink(link, storageCapacity, inflowCapacity, activateLink);
 		}
 	}
 
@@ -97,25 +96,22 @@ public interface SimLink {
 
 		@Getter
 		private final Id<Link> id;
-		@Getter
-		private final Id<Node> toNode;
+		private final Consumer<SimLink> activateLink;
 
 		private OnLeaveQueue onLeaveQueue;
-
 		private final SimQueue q;
 		private final SimBuffer buffer;
 		private final double length;
 		private final double freespeed;
 
-
-		LocalLink(Link link, SimQueue q, FlowCapacity outflowCapacity, OnLeaveQueue defaultOnLeaveQueue, double stuckTime) {
+		LocalLink(Link link, SimNode toNode, SimQueue q, FlowCapacity outflowCapacity, double stuckTime, OnLeaveQueue defaultOnLeaveQueue, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
 			id = link.getId();
 			this.q = q;
 			length = link.getLength();
 			freespeed = link.getFreespeed();
-			buffer = new SimBuffer(outflowCapacity, stuckTime);
-			toNode = link.getToNode().getId();
+			buffer = new SimBuffer(outflowCapacity, stuckTime, toNode, activateNode);
 			this.onLeaveQueue = defaultOnLeaveQueue;
+			this.activateLink = activateLink;
 		}
 
 		@Override
@@ -171,7 +167,10 @@ public interface SimLink {
 			vehicle.setCurrentLinkId(id);
 
 			switch (position) {
-				case QStart, QEnd -> q.add(vehicle, position);
+				case QStart, QEnd -> {
+					q.add(vehicle, position);
+					activateLink.accept(this);
+				}
 				case Buffer -> buffer.add(vehicle, now);
 			}
 		}
@@ -230,17 +229,14 @@ public interface SimLink {
 		// capacity. This is done best with the SimpleStorageCapacity implementation
 		private final SimpleStorageCapacity storageCapacity;
 		private final FlowCapacity inflowCapacity;
+		private final Consumer<SimLink> activateLink;
 
-		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity) {
+		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink) {
 			id = link.getId();
 			this.toPart = (int) link.getToNode().getAttributes().getAttribute(PARTITION_ATTR_KEY);
 			this.storageCapacity = storageCapacity;
 			this.inflowCapacity = inflowCapacity;
-		}
-
-		@Override
-		public Id<Node> getToNode() {
-			throw new RuntimeException("Split out links don't which node they are pointing to.");
+			this.activateLink = activateLink;
 		}
 
 		@Override
@@ -285,6 +281,7 @@ public interface SimLink {
 			inflowCapacity.consume(vehicle.getSizeInEquivalents());
 			vehicle.setCurrentLinkId(id);
 			q.add(vehicle);
+			activateLink.accept(this);
 		}
 
 		@Override
@@ -330,11 +327,6 @@ public interface SimLink {
 		@Override
 		public Id<Link> getId() {
 			return localLink.getId();
-		}
-
-		@Override
-		public Id<Node> getToNode() {
-			return localLink.getToNode();
 		}
 
 		@Override

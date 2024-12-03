@@ -1,9 +1,13 @@
 package org.matsim.api.core.v01.network;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
 
 import java.util.Set;
+
+import static org.matsim.api.core.v01.network.NetworkPartitioning.ATTRIBUTE;
 
 /**
  * Data class describing a single network partition.
@@ -15,14 +19,16 @@ public final class NetworkPartition {
 	 */
 	public static final NetworkPartition SINGLE_INSTANCE = new NetworkPartition();
 
-	final Set<Id<Link>> links;
-	final Set<Id<Node>> nodes;
+	private final Set<Id<Link>> links;
+	private final IntSet neighbors;
+	private final Set<Id<Node>> nodes;
 
 	private final int partition;
 
 	NetworkPartition() {
 		links = null;
 		nodes = null;
+		neighbors = null;
 		partition = 0;
 	}
 
@@ -30,6 +36,25 @@ public final class NetworkPartition {
 		this.partition = partition;
 		this.links = new IdSet<>(Link.class);
 		this.nodes = new IdSet<>(Node.class);
+		this.neighbors = new IntOpenHashSet();
+	}
+
+	void addLink(Link link) {
+		links.add(link.getId());
+	}
+
+	void addNode(Node node) {
+		nodes.add(node.getId());
+
+		node.getInLinks().values().stream()
+			.mapToInt(l -> (int) l.getFromNode().getAttributes().getAttribute(ATTRIBUTE))
+			.filter(p -> p != partition)
+			.forEach(neighbors::add);
+
+		node.getOutLinks().values().stream()
+			.mapToInt(l -> (int) l.getToNode().getAttributes().getAttribute(ATTRIBUTE))
+			.filter(p -> p != partition)
+			.forEach(neighbors::add);
 	}
 
 	/**
@@ -76,5 +101,19 @@ public final class NetworkPartition {
 
 		return nodes.contains(nodeId);
 	}
+
+	/**
+	 * Return neighbors of this partition.
+	 */
+	public IntSet getNeighbors() {
+		return neighbors;
+	}
+
+	static boolean isSplit(Link link) {
+		var fromRank = (int) link.getFromNode().getAttributes().getAttribute(ATTRIBUTE);
+		var toRank = (int) link.getToNode().getAttributes().getAttribute(ATTRIBUTE);
+		return fromRank != toRank;
+	}
+
 
 }

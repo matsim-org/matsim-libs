@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation;
 
+import com.google.inject.Inject;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
@@ -25,15 +26,21 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final SimStepMessaging simStepMessaging;
-	private final QSimCompatibility qsimCompatibility;
+	private final AgentSourcesContainer asc;
 
 	@Setter
 	private InternalInterface internalInterface;
 
-	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, QSimCompatibility qsimCompatibility) {
+	@Inject
+	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc) {
 		this.simStepMessaging = simStepMessaging;
 		this.em = em;
-		this.qsimCompatibility = qsimCompatibility;
+		this.asc = asc;
+	}
+
+	@Override
+	public double priority() {
+		return Double.NEGATIVE_INFINITY;
 	}
 
 	@Override
@@ -69,7 +76,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 					" error might be an indicator, that the speed of the teleported leg is too fast.");
 			}
 
-			DistributedMobsimAgent agent = qsimCompatibility.agentFromMessage(teleportation.type(), teleportation.agent());
+			DistributedMobsimAgent agent = asc.agentFromMessage(teleportation.type(), teleportation.agent());
 			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
 		}
 	}

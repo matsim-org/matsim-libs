@@ -11,7 +11,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.TestUtils;
-import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.List;
 
@@ -25,10 +24,7 @@ class VehicleDepartingOnLinkTest {
 	void vehicleIntoBuffer() {
 
 		var em = mock(EventsManager.class);
-		var messaging = mock(SimStepMessaging.class);
-		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new DefaultWait2Link(em, _ -> {
-		});
+		var wait2link = new DefaultWait2Link(em);
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
 		var simLink = TestUtils.createLink(link, 0, 10);
@@ -81,10 +77,7 @@ class VehicleDepartingOnLinkTest {
 	void vehicleIntoQueue() {
 
 		var em = mock(EventsManager.class);
-		var messaging = mock(SimStepMessaging.class);
-		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new DefaultWait2Link(em, _ -> {
-		});
+		var wait2link = new DefaultWait2Link(em);
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
 		var simLink = TestUtils.createLink(link, 0, 1);
@@ -133,10 +126,7 @@ class VehicleDepartingOnLinkTest {
 	@Test
 	void vehiclesOntoMultipleLinks() {
 		var em = mock(EventsManager.class);
-		var messaging = mock(SimStepMessaging.class);
-		var activeLinks = new ActiveLinks(messaging);
-		var wait2link = new DefaultWait2Link(em, _ -> {
-		});
+		var wait2link = new DefaultWait2Link(em);
 		var link1 = TestUtils.createSingleLink(0, 0);
 		link1.setCapacity(3600);
 		var link2 = TestUtils.createSingleLink(0, 0);

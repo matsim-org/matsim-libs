@@ -33,6 +33,11 @@ public interface LPExecutor extends Steppable {
 	 */
 	void runEventHandler();
 
+	/**
+	 * Executed after the simulation has run.
+	 */
+	void afterSim();
+
     /**
      * Remove a task from the execution loop.
      */
@@ -42,6 +47,7 @@ public interface LPExecutor extends Steppable {
      * Process the runtimes of all tasks.
      */
     void processRuntimes(Consumer<SimTask.Info> f);
+
 
     void shutdown();
 }

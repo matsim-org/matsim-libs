@@ -104,6 +104,12 @@ public final class PoolExecutor implements LPExecutor {
     }
 
 	@Override
+	public void afterSim() {
+		// Execute sequentially
+		tasks.forEach(SimTask::cleanup);
+	}
+
+	@Override
 	public void runEventHandler() {
 		for (SimTask task : tasks) {
 			if (task instanceof EventHandlerTask) {
