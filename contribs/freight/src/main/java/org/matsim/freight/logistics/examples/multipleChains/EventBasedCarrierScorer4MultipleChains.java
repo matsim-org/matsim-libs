@@ -153,7 +153,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
     private final double toll;
     private final List<String> vehicleTypesToBeTolled;
       private double score;
-    private List<String> tolledLinkList;
+    private final List<String> tolledLinkList;
     private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
 
     public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {

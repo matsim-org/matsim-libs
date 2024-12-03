@@ -100,8 +100,8 @@ import org.matsim.vehicles.VehicleType;
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         var vrpLogic = CarrierSchedulerUtils.getVrpLogic(carrier);
         switch (vrpLogic) {
-          case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
-          case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments()); }
+          case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
+          case shipmentBased -> carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
           default -> throw new IllegalStateException("Unexpected value: " + vrpLogic);
         }
 
@@ -122,12 +122,11 @@ import org.matsim.vehicles.VehicleType;
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 
       switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
-        case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
-        case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
-          //TODO: When using shipmentbased, only ONE Vrp should be created and solved. -> No need for the auxiliary carrier(s). KMT'Aug 24
-          //Then we can also just pass all the vehicles over :)
-          //And need the TimeWindows for the Shipments...
-        }
+        case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
+        case shipmentBased -> //TODO: When using shipmentbased, only ONE Vrp should be created and solved. -> No need for the auxiliary carrier(s). KMT'Aug 24
+			//Then we can also just pass all the vehicles over :)
+			//And need the TimeWindows for the Shipments...
+			carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
         default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
       }
       shipmentsInCurrentTour.clear();
@@ -436,12 +435,8 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         DistributionServiceStartEventHandler handler;
         switch (tourActivity) {
-          case Tour.ServiceActivity serviceActivity-> {
-            handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
-          }
-          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
-            handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
-          }
+          case Tour.ServiceActivity serviceActivity-> handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
           default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
         }
 
@@ -461,12 +456,8 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LSPTourStartEventHandler handler;
         switch (tourActivity) {
-          case Tour.ServiceActivity serviceActivity-> {
-            handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
-          }
-          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
-            handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
-          }
+          case Tour.ServiceActivity serviceActivity-> handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
           default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
         }
 
