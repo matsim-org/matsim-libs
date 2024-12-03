@@ -19,9 +19,11 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,8 +37,6 @@ import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 /**
  * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
  * this template use File | Settings | File Templates.

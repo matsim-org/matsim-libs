@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -41,11 +40,11 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.controler.CarrierAgentTracker;
+import org.matsim.freight.carriers.controller.CarrierAgentTracker;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
-class LSPControlerListener
+class LSPControllerListener
     implements StartupListener,
         BeforeMobsimListener,
         AfterMobsimListener,
@@ -54,7 +53,7 @@ class LSPControlerListener
         IterationStartsListener,
         IterationEndsListener,
         ShutdownListener {
-  private static final Logger log = LogManager.getLogger(LSPControlerListener.class);
+  private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
   private final Scenario scenario;
   private final List<EventHandler> registeredHandlers = new ArrayList<>();
 
@@ -70,7 +69,7 @@ class LSPControlerListener
 
 
   @Inject
-  LSPControlerListener(Scenario scenario) {
+  LSPControllerListener(Scenario scenario) {
     this.scenario = scenario;
   }
 

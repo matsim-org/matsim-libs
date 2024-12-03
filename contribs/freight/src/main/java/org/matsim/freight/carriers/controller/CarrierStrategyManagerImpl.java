@@ -19,8 +19,9 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
+import java.util.List;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -29,8 +30,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlan;
-
-import java.util.List;
 
 class CarrierStrategyManagerImpl implements CarrierStrategyManager{
 	final GenericStrategyManager<CarrierPlan, Carrier> delegate = new GenericStrategyManagerImpl<>();

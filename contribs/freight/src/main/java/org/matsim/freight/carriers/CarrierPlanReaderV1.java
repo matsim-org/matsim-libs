@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +34,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
-
-import java.util.*;
 
 /**
  * A reader that reads carriers and their plans.

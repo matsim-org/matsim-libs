@@ -19,9 +19,10 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import jakarta.inject.Inject;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -30,8 +31,6 @@ import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.freight.carriers.CarriersUtils;
-
-import javax.annotation.Nullable;
 
 /**
  * Controls the workflow of the simulation.
@@ -46,13 +45,13 @@ import javax.annotation.Nullable;
  * // not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
  */
 
-public class CarrierControlerListener implements ScoringListener, ReplanningListener {
+public class CarrierControllerListener implements ScoringListener, ReplanningListener {
 	// not sure if this _should_ be public, but current LSP design makes this necessary.
 	// It is done analogue to CarrierAgentTracker. kmt oct'22
 
 
 	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger( CarrierControlerListener.class ) ;
+	private static final Logger log = LogManager.getLogger( CarrierControllerListener.class ) ;
 
 	private final CarrierStrategyManager strategyManager;
 	private final CarrierAgentTracker carrierAgentTracker;
@@ -62,7 +61,8 @@ public class CarrierControlerListener implements ScoringListener, ReplanningList
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierAgentTracker carrierAgentTracker ) {
+	@Inject
+	CarrierControllerListener(@Nullable CarrierStrategyManager strategyManager, CarrierAgentTracker carrierAgentTracker ) {
 		// The current default is bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		this.strategyManager = strategyManager;
 		this.carrierAgentTracker = carrierAgentTracker;
