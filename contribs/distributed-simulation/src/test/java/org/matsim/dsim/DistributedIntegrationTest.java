@@ -7,19 +7,25 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DistributedIntegrationTest {
@@ -35,8 +41,8 @@ public class DistributedIntegrationTest {
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controller().setLastIteration(2);
-		config.controller().setMobsim("dsim");
+		config.controller().setLastIteration(1);
+		config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 
 		config.routing().setRoutingRandomness(0);
 
@@ -48,7 +54,27 @@ public class DistributedIntegrationTest {
 
 	@Test
 	@Order(1)
-	@Disabled
+	void qsim() {
+
+		Config local = createScenario();
+
+		local.controller().setMobsim(ControllerConfigGroup.MobsimType.qsim.name());
+
+		Scenario scenario = ScenarioUtils.loadScenario(local);
+
+		// Need to prepare network for freight
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
+
+		Controler controler = new Controler(scenario);
+
+		controler.run();
+	}
+
+	@Test
+	@Order(2)
 	void runLocal() {
 
 		Config local = createScenario();
@@ -66,6 +92,16 @@ public class DistributedIntegrationTest {
 
 		controler.addOverridingModule(new DistributedSimulationModule(4));
 		controler.run();
+
+		Path outputPath = Path.of(utils.getOutputDirectory());
+
+		var expectedEventsPath = outputPath.resolve("..").
+			resolve("qsim").resolve("kelheim-mini.output_events.xml");
+		var actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
+
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+
 	}
 
 	@Test

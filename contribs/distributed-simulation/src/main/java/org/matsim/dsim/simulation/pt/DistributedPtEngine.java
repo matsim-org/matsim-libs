@@ -27,12 +27,14 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 	private final Map<Id<Link>, Queue<VehicleAtStop>> activeStops = new HashMap<>();
 	private final Map<Id<Link>, Queue<DefaultWait2Link.Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
+	private final Wait2Link vehicleWait2Link;
 
 	@Inject
 	public DistributedPtEngine(Scenario scenario, SimNetwork simNetwork, TransitQSimEngine transitQSimEngine, EventsManager em) {
 		this.scenario = scenario;
 		this.simNetwork = simNetwork;
 		this.transitQSimEngine = transitQSimEngine;
+		this.vehicleWait2Link = new DefaultWait2Link(em);
 		this.em = em;
 	}
 
@@ -66,9 +68,13 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	@Override
 	public boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+
+		// TODO: Check if this is correct
+
 		if (!(vehicle.getDriver() instanceof TransitDriverAgent)) {
-			return false;
+			return vehicleWait2Link.accept(vehicle, link, now);
 		}
+
 		waitingVehicles
 			.computeIfAbsent(link.getId(), _ -> new ArrayDeque<>())
 			.add(new DefaultWait2Link.Waiting(vehicle, link));
@@ -77,6 +83,8 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	@Override
 	public void moveWaiting(double now) {
+		vehicleWait2Link.moveWaiting(now);
+
 		var it = waitingVehicles.values().iterator();
 		while (it.hasNext()) {
 			var entry = it.next();
