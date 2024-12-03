@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,9 +33,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;

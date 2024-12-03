@@ -21,6 +21,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Map;
+import java.util.Stack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +36,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * Reader reading carrierVehicleTypes from a xml-file.

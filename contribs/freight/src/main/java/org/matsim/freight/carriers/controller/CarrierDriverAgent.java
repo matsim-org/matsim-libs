@@ -19,8 +19,13 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,12 +45,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.events.CarrierEventCreator;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.

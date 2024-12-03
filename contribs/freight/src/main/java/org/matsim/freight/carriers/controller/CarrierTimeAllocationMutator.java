@@ -18,16 +18,15 @@
  *   ***********************************************************************
  *
  */
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.ScheduledTour;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author nagel

@@ -24,7 +24,6 @@ package org.matsim.freight.carriers;
 
 import org.matsim.core.utils.misc.Time;
 
-
 /**
  * Q: What happens/should happen if the time window is not sufficient to unload, or
  * the vehicle arrives after the time window?

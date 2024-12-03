@@ -21,12 +21,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.Collections;
 
 public class CarrierReadWriteV2_1Test {
 

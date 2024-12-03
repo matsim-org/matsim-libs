@@ -21,17 +21,16 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.freight.carriers.*;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.TreeMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.freight.carriers.*;
 
 /**
  * Some basic analysis / data collection for {@link Carriers}(files)

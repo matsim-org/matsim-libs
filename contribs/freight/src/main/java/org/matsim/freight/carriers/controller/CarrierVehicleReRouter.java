@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.controler;
+package org.matsim.freight.carriers.controller;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
@@ -35,6 +35,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import java.util.Collection;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.replanning.ReplanningContext;
@@ -45,9 +46,6 @@ import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
-import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
-
-import java.util.Collection;
 
 class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 

@@ -21,6 +21,9 @@
 
 package org.matsim.freight.carriers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -29,10 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CarrierPlanXmlWriterV2_1Test {
 
