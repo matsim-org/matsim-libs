@@ -53,7 +53,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  *
  *  @author rewert, kturner
- *
+ * <p>
  * 	Test for the distance constraint. 4 different setups are used to control the
  * 	correct working of the constraint
  *
@@ -452,8 +452,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Creates the vehicle at the depot, ads this vehicle to the carriers and sets
 	 * the capabilities. Sets TimeWindow for the carriers.
-	 *
-	 * @param
 	 */
 	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   CarrierVehicleTypes vehicleTypes) {
@@ -473,8 +471,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Method for creating a new carrierVehicle
 	 *
-	 * @param
-	 *
 	 * @return new carrierVehicle at the depot
 	 */
 	static CarrierVehicle createGarbageTruck(String vehicleName, double earliestStartingTime,
@@ -487,9 +483,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Defines and sets the Capabilities of the Carrier, including the vehicleTypes
 	 * for the carriers
-	 *
-	 * @param
-	 *
 	 */
 	private static void defineCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {

@@ -41,7 +41,7 @@ public abstract class AbstractLogisticEvent extends Event implements HasLinkId, 
   }
 
   /**
-   * Adds the {@link Id< LspShipment >} to the list of attributes. {@link Id<Link>} is handled by
+   * Adds the {@link Id<LspShipment>} to the list of attributes. {@link Id<Link>} is handled by
    * superclass {@link Event}
    *
    * @return The map of attributes

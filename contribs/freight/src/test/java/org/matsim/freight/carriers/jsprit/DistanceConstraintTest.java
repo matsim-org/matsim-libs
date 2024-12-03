@@ -53,10 +53,10 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  *
  *  @author rewert, kturner
- *
+ * <p>
  * 	Test for the distance constraint. 4 different setups are used to control the
  * 	correct working of the constraint for services
- *
+ * <p>
  * 	2 additional setups are defined when using shipments instead of service.
  * 	Shipments allow reloading of good during the tour.
  *
@@ -435,7 +435,7 @@ public class DistanceConstraintTest {
 	 * This test uses shipments instead of service .
 	 * As a consequence the vehicles can return to the depot, load more goods and run another subtour.
 	 * Distance is set to a value that, due to distance restrictions, two tours are necessary.
-	 *
+	 * <p>
 	 * This option (5) is designed similar to option 2
 	 *
 	 */
@@ -515,7 +515,7 @@ public class DistanceConstraintTest {
 	 * This test uses shipments instead of service .
 	 * As a consequence the vehicles can return to the depot, load more goods and run another subtour.
 	 * Distance is set to a value that one tour can be run with loading once.
-	 *
+	 * <p>
 	 * This option (6) is designed similar to option 5
 	 *
 	 */
@@ -663,8 +663,6 @@ public class DistanceConstraintTest {
 	/**
 	 * Creates the vehicle at the depot, ads this vehicle to the carriers and sets
 	 * the capabilities. Sets TimeWindow for the carriers.
-	 *
-	 * @param
 	 */
 	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   CarrierVehicleTypes vehicleTypes) {
@@ -683,9 +681,6 @@ public class DistanceConstraintTest {
 
 	/**
 	 * Method for creating a new carrierVehicle
-	 *
-	 * @param
-	 *
 	 * @return new carrierVehicle at the depot
 	 */
 	static CarrierVehicle createCarrierVehicle(String vehicleName, double earliestStartingTime,
@@ -698,9 +693,6 @@ public class DistanceConstraintTest {
 	/**
 	 * Defines and sets the Capabilities of the Carrier, including the vehicleTypes
 	 * for the carriers
-	 *
-	 * @param
-	 *
 	 */
 	private static void defineCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {

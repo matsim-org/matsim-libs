@@ -69,7 +69,6 @@ public class CarrierPlan implements BasicPlan, Attributable {
 	/**
 	 * In future (starting in May'23) this is the score from the MATSim scoring function.
 	 * The jsprit score is saved in attribute. Please use the method setJspritScore() to store it.
-	 * @return the (MATSim) score
 	 */
 	@Override
 	public void setScore(Double score) {
