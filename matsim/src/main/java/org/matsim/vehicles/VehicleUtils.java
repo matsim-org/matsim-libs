@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -64,6 +65,10 @@ public final class VehicleUtils {
 		return new VehicleType( typeId );
 	}
 
+	public static VehicleType createVehicleType( Id<VehicleType> typeId, String networkMode){
+		return new VehicleType( typeId, networkMode );
+	}
+
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
 	}
@@ -75,9 +80,9 @@ public final class VehicleUtils {
 	public static VehicleType createDefaultVehicleType() {
 		VehicleType defaultVehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create(DEFAULT_VEHICLE_TYPE_ID, VehicleType.class));
-		
+
 		defaultVehicleType.getCapacity().setSeats(4);
-		
+		defaultVehicleType.setNetworkMode(TransportMode.car);
 		return defaultVehicleType;
 	}
 
@@ -294,16 +299,24 @@ public final class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(ACCESSTIME, accessTime);
 	}
 
+	/**
+	 * @deprecated use getFuelConsumptionPerMeter instead
+	 */
+	@Deprecated
 	public static Double getFuelConsumption(VehicleType vehicleType) {
-		return getFuelConsumption(vehicleType.getEngineInformation());
+		return getFuelConsumptionLitersPerMeter(vehicleType.getEngineInformation());
 	}
 
+	/**
+	 * @deprecated use setFuelConsumptionPerMeter instead
+	 */
+	@Deprecated
 	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
-		setFuelConsumption(vehicleType.getEngineInformation(), literPerMeter);
+		setFuelConsumptionLitersPerMeter(vehicleType.getEngineInformation(), literPerMeter);
 	}
 
 	//******** EngineInformation attributes ************
-
+	//TODO create enum for fuel type
 	public static String getHbefaTechnology( EngineInformation ei ){
 		return (String) ei.getAttributes().getAttribute( HBEFA_TECHNOLOGY ) ;
 	}
@@ -340,6 +353,14 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute(ENERGYCONSUMPTION, energyConsumptionKWhPerMeter);
 	}
 
+	public static Double getFuelConsumptionLitersPerMeter(EngineInformation engineInformation) {
+		return (Double) engineInformation.getAttributes().getAttribute(FUELCONSUMPTION);
+	}
+
+	public static void setFuelConsumptionLitersPerMeter(EngineInformation engineInformation, double fuelConsumptionLitersPerMeter) {
+		engineInformation.getAttributes().putAttribute(FUELCONSUMPTION, fuelConsumptionLitersPerMeter);
+	}
+
 	public static Double getEnergyCapacity(EngineInformation engineInformation) {
 		return (Double) engineInformation.getAttributes().getAttribute(ENERGYCAPACITY);
 	}
@@ -372,21 +393,33 @@ public final class VehicleUtils {
 		return new VehicleImpl( id , type );
 	}
 
+	/**
+	 * @deprecated use getHbefaTechnology instead
+	 */
 	@Deprecated
 	static EngineInformation.FuelType getFuelType(EngineInformation engineInformation ){
 		return (EngineInformation.FuelType) engineInformation.getAttributes().getAttribute( FUEL_TYPE );
 	}
 
+	/**
+	 * @deprecated use setHbefaTechnology instead
+	 */
 	@Deprecated
 	static void setFuelType(EngineInformation engineInformation, EngineInformation.FuelType fuelType ){
 		engineInformation.getAttributes().putAttribute( FUEL_TYPE,  fuelType);
 	}
 
+	/**
+	 * @Deprecated use getFuelConsumptionPerMeter instead
+	 */
 	@Deprecated
 	static Double getFuelConsumption(EngineInformation engineInformation ){
 		return (Double) engineInformation.getAttributes().getAttribute( FUELCONSUMPTION );
 	}
 
+	/**
+	 * @Deprecated use setFuelConsumptionPerMeter instead
+	 */
 	@Deprecated
 	static void setFuelConsumption(EngineInformation engineInformation, double fuelConsumption ){
 		engineInformation.getAttributes().putAttribute( FUELCONSUMPTION,  fuelConsumption);
@@ -434,7 +467,7 @@ public final class VehicleUtils {
 		new MatsimVehicleWriter( vehicles ).writeFile( filename );
 
 	}
-	
+
 	public static Id<Link> getInitialLinkId(Vehicle vehicle) {
 		String attribute = (String) vehicle.getAttributes().getAttribute(INITIAL_LINK_ID);
 		return attribute == null ? null : Id.createLinkId(attribute);

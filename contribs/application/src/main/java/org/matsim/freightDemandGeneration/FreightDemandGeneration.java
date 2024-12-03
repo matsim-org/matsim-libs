@@ -37,8 +37,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.CarrierModule;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierModule;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import picocli.CommandLine;
 
@@ -61,6 +61,8 @@ import java.util.concurrent.ExecutionException;
 		+ " *          column titles of the input csv should not be changed. The format of"
 		+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class FreightDemandGeneration implements MATSimAppCommand {
+
+	private final JobDurationCalculator jobDurationCalculator;
 
 	private enum CarrierInputOptions {
 		readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData
@@ -153,6 +155,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--defaultJspritIterations", description = "Set the default number of jsprit iterations.")
 	private int defaultJspritIterations;
+
+	public FreightDemandGeneration() {
+		this.jobDurationCalculator = new DefaultJobDurationCalculator();
+		log.info("Using default {} for job duration calculation", jobDurationCalculator.getClass().getSimpleName());
+	}
+
+	public FreightDemandGeneration(JobDurationCalculator jobDurationCalculator) {
+		this.jobDurationCalculator = jobDurationCalculator;
+		log.info("Using {} for job duration calculation", jobDurationCalculator.getClass().getSimpleName());
+	}
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new FreightDemandGeneration()).execute(args));
@@ -353,7 +365,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
 					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
-							crsTransformationNetworkAndShape, null, shapeCategory);
+							crsTransformationNetworkAndShape, null, shapeCategory, jobDurationCalculator);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
 				 * Option creates the demand by using the information given in the read csv file
@@ -374,13 +386,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 */
 							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
 									upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
-					case increaseDemandOnLocation ->
+					case increaseDemandOnLocation -> {
 						/*
 						 * If the demand sample is higher than the population sample, the demand per
 						 * person will be increased.
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-									upSamplePopulationTo, "changeDemandOnLocation");
+						log.warn("You have selected the option to increase the demand on the location. "
+							+ "Because the simulation always uses the given demand the results are similar to the option with the same sample size.");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeDemandOnLocation");
+					}
 					case noPopulationSampling ->
 						/*
 						 * If the demand sample is equal to the population sample, the demand is created
@@ -396,14 +411,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					case useHolePopulation:
 						// uses the hole population as possible demand locations
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, jobDurationCalculator);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
 								shp.createIndex(populationCRS, "_"));
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, jobDurationCalculator);
 						break;
 					default:
 						throw new RuntimeException("No valid population option selected!");

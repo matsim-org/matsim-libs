@@ -1,6 +1,9 @@
 package org.matsim.contrib.sumo;
 
 import com.google.common.io.Resources;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -8,6 +11,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -42,9 +47,16 @@ public class SumoNetworkConverterTest {
 
 		assert Files.exists(geometry) : "Geometries must exist";
 
-		Path fts = Path.of(output.toString().replace(".xml", "-ft.csv"));
+		String csv = output.toString().replace(".xml", "-ft.csv");
+		Path fts = Path.of(csv);
 
 		assert Files.exists(fts) : "Features must exists";
+
+		CSVParser parser = CSVParser.parse(new File(csv), StandardCharsets.UTF_8, CSVFormat.DEFAULT.builder().setHeader().setHeader().build());
+
+		List<String> header = parser.getHeaderNames();
+		Assertions.assertEquals("linkId", header.get(0));
+		Assertions.assertEquals("highway_type", header.get(1));
 
 	}
 }

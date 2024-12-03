@@ -79,7 +79,7 @@ import java.io.UncheckedIOException;
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
                 loadCoreListeners();
                 controlerListenerManagerImpl.fireControlerStartupEvent();
-                ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
+                ControllerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" );
                 prepareForSim();
                 doIterations(config);
             }
