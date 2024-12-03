@@ -78,7 +78,7 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 			reader.readURL(url);
 		}  catch (Exception e) {
 			log.warn("### Exception: Message={}", e.getMessage());
-			log.warn("### Exception: Cause={}", e.getCause());
+			log.warn("### Exception: Cause={}", e.getCause().toString());
 			log.warn("### Exception: Class={}", e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());
