@@ -28,7 +28,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * The carrier vehicle type.
  * <p>
- * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus physical and
+ * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus, physical and
  * non-physical attributes are used. This is likely to be changed in the future.
  *
  * @author sschroeder
@@ -57,28 +57,11 @@ public class CarrierVehicleType {
 		 * <p>
 		 * The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
 		 *
-		 * @param typeId
+		 * @param typeId the type id
 		 * @return a type builder
 		 */
 		public static Builder newInstance(Id<VehicleType> typeId){
 			return new Builder(typeId);
-		}
-
-		/**
-		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
-		 * <p>
-		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
-		 * Values can be changed within the builder afterwards.
-		 *
-		 * @param carrierVehicleType
-		 * @param typeId
-		 * @return a type builder
-		 *
-		 * @deprecated Use {@link #newInstance(Id<VehicleType>)} instead
-		 */
-		@Deprecated(since = "sep'19", forRemoval = true)
-		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
-			throw new RuntimeException("not implemented") ;
 		}
 
 		private Builder(Id<VehicleType> typeId){
@@ -88,9 +71,9 @@ public class CarrierVehicleType {
 		/**
 		 * Sets fixed costs of vehicle.
 		 *
-		 * <p>By default it is 0.
-		 * @param fix
-		 * @return
+		 * <p>By default, it is 0.
+		 * @param fix 	fixed costs
+		 * @return 		this builder
 		 */
 		public Builder setFixCost(double fix){
 			this.delegate.getCostInformation().setFixedCost( fix ) ;
@@ -100,10 +83,10 @@ public class CarrierVehicleType {
 		/**
 		 * Sets costs per distance-unit.
 		 *
-		 * <p>By default it is 1.
+		 * <p>By default, it is 1.
 		 *
-		 * @param perDistanceUnit
-		 * @return
+		 * @param perDistanceUnit 	costs per distance-unit
+		 * @return 					this builder
 		 */
 		public Builder setCostPerDistanceUnit(double perDistanceUnit){
 			this.delegate.getCostInformation().setCostsPerMeter( perDistanceUnit ) ;
@@ -113,10 +96,10 @@ public class CarrierVehicleType {
 		/**
 		 * Sets costs per time-unit.
 		 *
-		 * <p>By default it is 0.
+		 * <p>By default, it is 0.
 		 *
-		 * @param perTimeUnit
-		 * @return
+		 * @param perTimeUnit 	costs per time-unit
+		 * @return 				this builder
 		 */
 		public Builder setCostPerTimeUnit(double perTimeUnit){
 			this.delegate.getCostInformation().setCostsPerSecond( perTimeUnit ) ;
@@ -126,8 +109,8 @@ public class CarrierVehicleType {
 		/**
 		 * Sets description.
 		 *
-		 * @param description
-		 * @return this builder
+		 * @param description 	the description
+		 * @return 				this builder
 		 */
 		public Builder setDescription(String description){
 			this.delegate.setDescription( description ) ;
@@ -139,8 +122,8 @@ public class CarrierVehicleType {
 		 *
 		 * <p>By default, the capacity is 0.
 		 *
-		 * @param capacity
-		 * @return this builder
+		 * @param capacity 		the capacity of the vehicle-type
+		 * @return 				this builder
 		 */
 		public Builder setCapacity(int capacity){
 			this.delegate.getCapacity().setOther( capacity );

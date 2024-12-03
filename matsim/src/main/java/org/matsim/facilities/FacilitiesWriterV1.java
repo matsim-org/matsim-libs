@@ -99,7 +99,6 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
             }
             this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes(), false);
             this.endFacility();
-            this.writer.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

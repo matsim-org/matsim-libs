@@ -132,7 +132,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, true);
 	}
 
 	private ColoredLink applyTurnRestriction(TurnRestrictionsContext context, Collection<List<Id<Link>>> restrictions, Link startingLink) {
@@ -314,7 +314,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, false);
 	}
 
 	private void addLink(Link link) {

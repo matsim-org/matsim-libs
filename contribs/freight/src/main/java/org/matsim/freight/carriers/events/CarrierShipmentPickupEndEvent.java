@@ -21,16 +21,15 @@
 
 package org.matsim.freight.carriers.events;
 
+import static org.matsim.freight.carriers.events.CarrierEventAttributes.*;
+
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
-
-import static org.matsim.freight.carriers.events.CarrierEventAttributes.*;
 
 /**
  *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has ended.

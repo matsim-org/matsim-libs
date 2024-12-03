@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasLinkId;
@@ -28,8 +29,6 @@ import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
 
 /**
  * A general freight event contains the information (= {@link Id}) of the

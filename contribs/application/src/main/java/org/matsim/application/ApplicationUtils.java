@@ -440,12 +440,17 @@ public class ApplicationUtils {
 		if (path.isPresent())
 			return path.get();
 
-		// Match more general pattern at last
-		path = matchPattern(".+\\.[a-zA-Z0-9]*_" + name + "\\..+", dir);
+		// Match more general pattern
+		path = matchPattern(".+\\.[a-zA-Z0-9\\-]*_" + name + "\\..+", dir);
 		if (path.isPresent())
 			return path.get();
 
-		throw new IllegalArgumentException("Could not match input file: " + name);
+		// Even more permissive pattern
+		path = matchPattern(".+[a-zA-Z0-9_.\\-]*(_|\\.)" + name + ".+", dir);
+		if (path.isPresent())
+			return path.get();
+
+		throw new IllegalArgumentException("Could not match input file: %s (in %s)".formatted(name, dir));
 	}
 
 	private static Optional<Path> matchSuffix(String suffix, Path dir) {

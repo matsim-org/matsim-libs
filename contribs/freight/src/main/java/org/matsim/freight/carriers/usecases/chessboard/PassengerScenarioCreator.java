@@ -21,6 +21,8 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,9 +37,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 final class PassengerScenarioCreator {
 

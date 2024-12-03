@@ -2,10 +2,7 @@ package org.matsim.application.prepare.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +27,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -212,6 +210,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			return 2;
 		}
 
+		if (eventPath != null && outputEvents == null) {
+			log.error("Events were given as input, that means --output-network-change-events must be set.");
+			return 2;
+		}
+
 		// Prepare required input-data
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem(crs.getInputCRS());
@@ -223,7 +226,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 
-		geom = shp.getGeometry();
+		geom = shp.getGeometry(crs.getInputCRS());
 		geomBuffer = geom.buffer(buffer);
 
 		for (String mode : modes)
@@ -240,7 +243,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			manager.addHandler(tt);
 
 			manager.initProcessing();
-			EventsUtils.readEvents(manager, eventPath.toString());
+			EventsUtils.readEvents(manager, eventPath);
 			manager.finishProcessing();
 		}
 
@@ -257,18 +260,32 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 		}
 
+		log.info("Links in shape: {} out of {}", linksToKeep.size(), scenario.getNetwork().getLinks().size());
+
+		if (linksToKeep.isEmpty()) {
+			log.error("No links are in the resulting network. Check your input shape file and coordinate system");
+			log.error("If using EPSG:4326 (WGS84), -Dorg.geotools.referencing.forceXY=true might help");
+			return 1;
+		}
+
 		// Cut out the population and mark needed network parts
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), this);
 
 		//Population
+		log.info("Persons in the original population: {}", scenario.getPopulation().getPersons().size());
 		log.info("Persons to delete: {}", personsToDelete.size());
 		for (Id<Person> personId : personsToDelete) {
 			scenario.getPopulation().removePerson(personId);
 		}
 
-		//Network
-		log.info("Links to add: {}", linksToKeep.size());
+		log.info("Persons in the resulting scenario: {}", scenario.getPopulation().getPersons().size());
 
+		if (scenario.getPopulation().getPersons().isEmpty()) {
+			log.error("No persons are in the resulting population. Check if your input shape file and coordinate system is correct. Exiting ...");
+			return 1;
+		}
+
+		// Network
 		log.info("Additional links from routes to include: {}", linksToInclude.size());
 
 		log.info("number of links in original network: {}", scenario.getNetwork().getLinks().size());
@@ -295,8 +312,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new CleanPersonLinkIds());
 
-		log.info("Persons in the scenario: {}", scenario.getPopulation().getPersons().size());
-		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation.toString());
+		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
 		if (facilityPath != null) {
 
@@ -310,10 +326,10 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		if (eventPath != null) {
 			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
-			new NetworkChangeEventsWriter().write(outputEvents.toString(), events);
+			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
 
-		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork.toString());
+		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork);
 
 		return 0;
 	}
@@ -346,7 +362,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			}
 
 			// Expensive check last
-			if (f.getCoord() != null &&  geom.contains(MGC.coord2Point(f.getCoord())))
+			if (f.getCoord() != null && geom.contains(MGC.coord2Point(f.getCoord())))
 				facilitiesToInclude.add(f.getId());
 		}
 
@@ -435,7 +451,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		if (scenario.getActivityFacilities() != null && activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId()))
 			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
 
-		return activity.getCoord();
+		if (activity.getCoord() != null)
+			return activity.getCoord();
+
+		if (activity.getLinkId() != null && scenario.getNetwork().getLinks().containsKey(activity.getLinkId()))
+			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+
+		return null;
 	}
 
 	/**
@@ -483,34 +505,44 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		boolean keepPerson = false;
 
 		List<Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan());
-
+		List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 		Set<Id<Link>> linkIds = new HashSet<>();
 		Set<Id<ActivityFacility>> facilityIds = new HashSet<>();
+
+		// Check activities first, some agent might be stationary
+		for (Activity act : activities) {
+			Coord coord = getActivityCoord(act);
+
+			if (coord == null && noActCoordsWarnings++ < 10) {
+				log.info("Activity coords for agent {} are null. Skipping Trip...", person.getId());
+			}
+
+			if (coord != null && geom.contains(MGC.coord2Point(coord))) {
+				keepPerson = true;
+			}
+
+			if (act.getFacilityId() != null)
+				facilityIds.add(act.getFacilityId());
+
+			if (act.getLinkId() != null)
+				linkIds.add(act.getLinkId());
+
+		}
 
 		for (Trip trip : trips) {
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
-			if (originCoord == null || destinationCoord == null) {
-				if (noActCoordsWarnings++ < 10)
-					log.info("Activity coords of trip is null. Skipping Trip...");
+			if (originCoord != null && destinationCoord != null) {
+				LineString line = geoFactory.createLineString(new Coordinate[]{
+					MGC.coord2Coordinate(originCoord),
+					MGC.coord2Coordinate(destinationCoord)
+				});
 
-				continue;
-			}
-
-			// keep all agents starting or ending in area
-			if (geom.contains(MGC.coord2Point(originCoord)) || geom.contains(MGC.coord2Point(destinationCoord))) {
-				keepPerson = true;
-			}
-
-			LineString line = geoFactory.createLineString(new Coordinate[]{
-				MGC.coord2Coordinate(originCoord),
-				MGC.coord2Coordinate(destinationCoord)
-			});
-
-			// also keep persons traveling through or close to area (beeline)
-			if (line.intersects(geom)) {
-				keepPerson = true;
+				// also keep persons traveling through or close to area (beeline)
+				if (line.intersects(geom)) {
+					keepPerson = true;
+				}
 			}
 
 			//Save route links
@@ -545,20 +577,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 						}
 					}
 					// There is no additional link freespeed information, that we could save. So we are finished here
-				}
-
-				if (trip.getOriginActivity().getFacilityId() != null)
-					facilityIds.add(trip.getOriginActivity().getFacilityId());
-
-				if (trip.getDestinationActivity().getFacilityId() != null)
-					facilityIds.add(trip.getDestinationActivity().getFacilityId());
-
-				if (trip.getOriginActivity().getLinkId() != null) {
-					linkIds.add(trip.getOriginActivity().getLinkId());
-				}
-
-				if (trip.getDestinationActivity().getLinkId() != null) {
-					linkIds.add(trip.getDestinationActivity().getLinkId());
 				}
 			}
 		}

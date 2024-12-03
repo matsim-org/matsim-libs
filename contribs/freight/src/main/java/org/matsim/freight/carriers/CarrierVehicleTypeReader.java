@@ -21,6 +21,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Map;
+import java.util.Stack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +36,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * Reader reading carrierVehicleTypes from a xml-file.
@@ -79,7 +78,7 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 			reader.readURL(url);
 		}  catch (Exception e) {
 			log.warn("### Exception: Message={}", e.getMessage());
-			log.warn("### Exception: Cause={}", e.getCause());
+			log.warn("### Exception: Cause={}", e.getCause().toString());
 			log.warn("### Exception: Class={}", e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());

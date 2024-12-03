@@ -57,7 +57,7 @@ public class EmissionsDashboardTest {
 		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 		SimWrapper sw = SimWrapper.create()
-			.addDashboard(new EmissionsDashboard());
+			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 

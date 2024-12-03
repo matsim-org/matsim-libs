@@ -21,12 +21,11 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 final class InnerOuterCityScenarioCreator {
 
