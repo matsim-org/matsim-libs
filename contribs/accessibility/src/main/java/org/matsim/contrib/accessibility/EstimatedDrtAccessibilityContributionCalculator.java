@@ -1,6 +1,5 @@
 package org.matsim.contrib.accessibility;
 
-import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -18,7 +17,6 @@ import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.*;
@@ -31,19 +29,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author thibautd, dziemke
+ * @author jakobrehmann
  */
 final class EstimatedDrtAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = LogManager.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
-
+	private static final Logger LOG = LogManager.getLogger(EstimatedDrtAccessibilityContributionCalculator.class);
 	private final String mode;
 	private final Scenario scenario;
-
-
 	private final ScoringConfigGroup scoringConfigGroup;
-
 	private Network subNetwork;
-
 	private final double betaDrtTT_h;
 	private final double betaDrtDist_m;
 	private final double walkSpeed_m_h;
@@ -54,9 +47,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
-//	private final LeastCostPathCalculator router;
 	TripRouter tripRouter ;
-
 
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
@@ -97,6 +88,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		Gbl.assertNotNull(measuringPoints.getFacilities());
 
 		// todo: should I aggregate the measuring points to the nearest drt stop. Or do we in the near future want to compare the drt routes between multiple access/egress drt stops?
+		// right now, this doesn't aggregate the measuring points at all.
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> facilityId = measuringPoint.getId();
 			if(!aggregatedMeasurePoints.containsKey(facilityId)) {
@@ -120,6 +112,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 
 		// todo: same question as above...
+		// while this aggregates to the nearest drt stop
 		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, scenario.getConfig());
 
 
@@ -166,7 +159,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 			// attempt to replace hard coded calculation w/ DRT Estimator
 			DrtRoute drtRoute = new DrtRoute(Id.createLinkId("dummyFrom"), Id.createLinkId("dummyTo"));
-			drtRoute.setDistance(directRideDistance_m);
+			drtRoute.setDistance(directRideDistance_m); // todo: since this is based on the distance and not the time of the direct car trips, congestion effects are not yet included.
 			drtRoute.setDirectRideTime(mainLeg.getRoute().getTravelTime().seconds());
 
 			DrtEstimator.Estimate estimate = drtEstimator.estimate(drtRoute, OptionalTime.defined(departureTime));
@@ -179,7 +172,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //			}
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
-			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours
+			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours. Only time does.
 
 
 			// Pre-computed effect of all opportunities reachable from destination network node

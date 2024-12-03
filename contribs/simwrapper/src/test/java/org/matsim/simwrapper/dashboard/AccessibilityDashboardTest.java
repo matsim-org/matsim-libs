@@ -82,7 +82,6 @@ public class AccessibilityDashboardTest {
 		double mapCenterX = 712144.17;
 		double mapCenterY = 5422153.87;
 
-		//accessibility
 		double tileSize = 100;
 		double num_rows = 45;
 

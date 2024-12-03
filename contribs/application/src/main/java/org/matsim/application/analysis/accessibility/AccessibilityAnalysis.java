@@ -79,7 +79,7 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 		config.global().setNumberOfThreads(1);
 
 		for (DrtConfigGroup drtConfig : ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class).getModalElements()) {
-			drtConfig.transitStopFile = "/Users/jakob/git/matsim-libs/examples/scenarios/kelheim/drt-stops.xml";
+			drtConfig.transitStopFile = "/Users/jakob/git/matsim-libs/examples/scenarios/kelheim/drt-stops.xml"; // todo!!!
 			drtConfig.removeParameterSet(drtConfig.getZonalSystemParams().get());
 			drtConfig.plotDetailedCustomerStats = false;
 		}
