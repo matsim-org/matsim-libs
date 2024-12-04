@@ -89,8 +89,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--transform-schedule", description = "Fully qualified class name to a Consumer<TransitSchedule> to be executed after the schedule was created", arity = "0..*", split = ",")
 	private List<Class<?>> transformSchedule;
 
-	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate")
-	private boolean mergeStops;
+	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate", defaultValue = "doNotMerge")
+	private GtfsConverter.MergeGtfsStops mergeStops;
 
 	@CommandLine.Option(names = "--prefix", description = "Prefixes to add to the gtfs ids. Required if multiple inputs are used and ids are not unique.", split = ",")
 	private List<String> prefixes = new ArrayList<>();
