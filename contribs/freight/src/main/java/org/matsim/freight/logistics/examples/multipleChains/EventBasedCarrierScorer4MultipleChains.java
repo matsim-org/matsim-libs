@@ -33,7 +33,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
@@ -148,12 +148,12 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
    */
   class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
 
-    final Logger log = LogManager.getLogger(EventBasedScoring.class);
+    final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
 
     private final double toll;
     private final List<String> vehicleTypesToBeTolled;
       private double score;
-    private List<String> tolledLinkList;
+    private final List<String> tolledLinkList;
     private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
 
     public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {

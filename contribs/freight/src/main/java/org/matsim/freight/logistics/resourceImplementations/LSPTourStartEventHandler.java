@@ -21,6 +21,7 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
+import java.util.Objects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
@@ -39,8 +40,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
-
-import java.util.Objects;
 
 /*package-private*/ class LSPTourStartEventHandler
         implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {

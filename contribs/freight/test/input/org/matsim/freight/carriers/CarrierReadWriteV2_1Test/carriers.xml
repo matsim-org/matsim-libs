@@ -8,8 +8,8 @@
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="lightVehicle" depotLinkId="1" typeId="small05" earliestStart="06:05:00" latestEnd="23:59:59"/>
-				<vehicle id="heavyVehicle" depotLinkId="2" typeId="large50" earliestStart="06:05:00" latestEnd="23:59:59"/>
+				<vehicle id="lightVehicle" depotLinkId="1" typeId="light" earliestStart="06:05:00" latestEnd="23:59:59"/>
+				<vehicle id="heavyVehicle" depotLinkId="2" typeId="heavy" earliestStart="06:05:00" latestEnd="23:59:59"/>
 			</vehicles>
 		</capabilities>
 		<services>
@@ -115,8 +115,8 @@
 		</attributes>
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="lightVehicle" depotLinkId="1" typeId="small05" earliestStart="06:05:00" latestEnd="23:59:59"/>
-				<vehicle id="mediumVehicle" depotLinkId="1" typeId="medium20" earliestStart="06:05:00" latestEnd="23:59:59"/>
+				<vehicle id="lightVehicle" depotLinkId="1" typeId="light" earliestStart="06:05:00" latestEnd="23:59:59"/>
+				<vehicle id="mediumVehicle" depotLinkId="1" typeId="medium" earliestStart="06:05:00" latestEnd="23:59:59"/>
 			</vehicles>
 		</capabilities>
 		<services>

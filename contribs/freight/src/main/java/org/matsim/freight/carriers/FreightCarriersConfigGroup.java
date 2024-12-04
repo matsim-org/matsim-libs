@@ -22,11 +22,10 @@
 package org.matsim.freight.carriers;
 
 import jakarta.validation.constraints.Positive;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.net.URL;
 import java.util.Map;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
 

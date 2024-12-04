@@ -21,7 +21,10 @@
 
 package org.matsim.freight.carriers;
 
+import static org.matsim.freight.carriers.CarrierConstants.*;
+
 import com.google.inject.Inject;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,10 +42,6 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegat
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
-
-import java.util.*;
-
-import static org.matsim.freight.carriers.CarrierConstants.*;
 
 class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 
@@ -77,7 +76,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
-	 * @param carrierVehicleTypes
+	 * @param carrierVehicleTypes which is a map that stores vehicle types
 	 */
 	CarrierPlanXmlParserV2_1(Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super(ValidationType.XSD_ONLY);
