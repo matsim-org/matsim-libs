@@ -219,7 +219,7 @@ public class DashboardTests {
 
 	@Test
 	void activityBerlinGrid() {
-		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster_4.shp");
+		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster.shp");
 
 		ad.addActivityType(
 			"work",
