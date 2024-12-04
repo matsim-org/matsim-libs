@@ -13,6 +13,12 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Dashboard to show activity related statistics aggregated by type and location.
+ *
+ * Note that {@link #addActivityType(String, List, List, boolean, String)} needs to be called for each activity type.
+ * There is no default configuration.
+ */
 public class ActivityDashboard implements Dashboard {
 
 	private static final String ID_COLUMN = "id";
@@ -28,11 +34,24 @@ public class ActivityDashboard implements Dashboard {
 		this.shpFile = Objects.requireNonNull(shpFile, "Shapefile can not be null!");
 	}
 
+	/**
+	 * Convenience method to add an activity type with default configuration.
+	 */
 	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators) {
 		return addActivityType(name, activities, indicators, true, null);
 	}
 
-	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators, boolean countMultipleOccurrences, @Nullable String refCsv) {
+	/**
+	 * Add an activity type to the dashboard.
+	 * @param name name to show in the dashboard
+	 * @param activities List of activity names to include in this type
+	 * @param indicators List of indicators to show
+	 * @param countMultipleOccurrences Whether multiple occurrences of the same activity for one person should be counted.
+	 *                                 Can be used to count home or workplaces only once.
+	 * @param refCsv Reference CSV file to compare the activities to. Can be null.
+	 */
+	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators,
+											 boolean countMultipleOccurrences, @Nullable String refCsv) {
 		activityMapping.put(name, String.join(",", activities));
 		refCsvs.put(name, refCsv);
 
@@ -121,6 +140,9 @@ public class ActivityDashboard implements Dashboard {
 		}
 	}
 
+	/**
+	 * Metric to show in the dashboard.
+	 */
 	public enum Indicator {
 		COUNTS("count", "Counts"),
 		DENSITY("density", "Density"),
