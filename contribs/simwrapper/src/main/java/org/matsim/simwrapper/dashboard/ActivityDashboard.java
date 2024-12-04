@@ -105,6 +105,7 @@ public class ActivityDashboard implements Dashboard {
 							viz.addDataset("transit-trips", data.resource(refCsvs.get(activity.getKey())));
 
 							viz.display.fill.dataset = "transit-trips";
+							viz.display.fill.join = REF_JOIN;
 
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.columnName = "relative_density";
