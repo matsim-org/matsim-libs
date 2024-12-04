@@ -34,6 +34,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultDvrpLoadSerializer;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -77,7 +79,7 @@ public class CreateTaxiVehicles {
 					.build());
 
 		}
-		new FleetWriter(vehicles.stream()).write(taxisFile);
+		new FleetWriter(vehicles.stream(), new DefaultDvrpLoadSerializer(new DefaultIntegerLoadType())).write(taxisFile);
 	}
 
 }

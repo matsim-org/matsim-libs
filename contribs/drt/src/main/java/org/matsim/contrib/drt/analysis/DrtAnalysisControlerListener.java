@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.analysis;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,6 +54,8 @@ import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -943,7 +946,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	 * @return
 	 */
 	static int findMaxVehicleCapacity(FleetSpecification fleet) {
-		return fleet.getVehicleSpecifications().values().stream().mapToInt(DvrpVehicleSpecification::getCapacity).max().getAsInt();
+		DvrpLoad dvrpLoad = fleet.getVehicleSpecifications().values().stream().map(DvrpVehicleSpecification::getCapacity).reduce((a, b) -> a.fitsIn(b) ? b : a).orElse(null);
+		Verify.verify(dvrpLoad != null);
+		Verify.verify(dvrpLoad instanceof IntegerLoad);
+		IntegerLoad scalarVehicleLoad = (IntegerLoad) dvrpLoad;
+		return scalarVehicleLoad.getLoad();
 	}
 
 	private static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del,

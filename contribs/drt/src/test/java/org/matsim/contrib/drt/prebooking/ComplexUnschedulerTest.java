@@ -31,6 +31,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -600,6 +602,7 @@ public class ComplexUnschedulerTest {
 		private final DvrpVehicleLookup lookup;
 
 		private int requestIndex = 0;
+		private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
 
 		Fixture() {
 			this.network = createNetwork();
@@ -636,6 +639,7 @@ public class ComplexUnschedulerTest {
 		AcceptedDrtRequest createRequest() {
 			AcceptedDrtRequest request = Mockito.mock(AcceptedDrtRequest.class);
 			Mockito.when(request.getId()).thenReturn(Id.create("req_" + requestIndex++, Request.class));
+			Mockito.when(request.getLoad()).thenReturn(integerLoadType.getEmptyLoad());
 			return request;
 		}
 
