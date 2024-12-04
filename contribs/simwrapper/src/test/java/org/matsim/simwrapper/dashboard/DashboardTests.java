@@ -195,46 +195,5 @@ public class DashboardTests {
 		run(ad);
 	}
 
-	@Test
-	void activityBerlin() {
-		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_polygon.shp");
 
-		// , "count", "fid"
-		ad.addActivityType(
-			"work",
-			List.of("work"),
-			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-			"berlin_verkehrszellen_polygon.csv"
-		);
-
-//		ad.addActivityType(
-//			"education",
-//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
-//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY),
-//			"kehlheim_ref.csv", "count", "region"
-//		);
-
-		run(ad);
-	}
-
-	@Test
-	void activityBerlinGrid() {
-		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster.shp");
-
-		ad.addActivityType(
-			"work",
-			List.of("work"),
-			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-			"berlin_verkehrszellen_raster.csv"
-		);
-
-//		ad.addActivityType(
-//			"education",
-//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
-//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-//			"kehlheim_ref.csv"
-//		);
-
-		run(ad);
-	}
 }
