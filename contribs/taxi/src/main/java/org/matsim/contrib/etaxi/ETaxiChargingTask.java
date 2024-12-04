@@ -20,6 +20,7 @@
 package org.matsim.contrib.etaxi;
 
 import org.matsim.contrib.evrp.ChargingTaskImpl;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
@@ -28,7 +29,7 @@ public class ETaxiChargingTask extends ChargingTaskImpl {
 	public static final TaxiTaskType TYPE = new TaxiTaskType("CHARGING");
 
 	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,
-			double totalEnergy) {
-		super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
+			double totalEnergy, ChargingStrategy chargingStrategy) {
+		super(TYPE, beginTime, endTime, charger, ev, totalEnergy, chargingStrategy);
 	}
 }

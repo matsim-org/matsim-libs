@@ -24,7 +24,6 @@ package org.matsim.freight.carriers.events.eventhandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 
-
 public interface CarrierServiceStartEventHandler extends EventHandler {
 
 	void handleEvent( CarrierServiceStartEvent event );

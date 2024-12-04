@@ -24,8 +24,9 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface Charger extends BasicLocation, Identifiable<Charger> {
+public interface Charger extends BasicLocation, Identifiable<Charger>, Attributable {
 	ChargerSpecification getSpecification();
 
 	ChargingLogic getLogic();

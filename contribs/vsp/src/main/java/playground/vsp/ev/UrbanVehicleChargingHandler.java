@@ -61,13 +61,16 @@ class UrbanVehicleChargingHandler
 	private final ElectricFleet electricFleet;
 	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 
+	private final ChargingStrategy.Factory chargingStrategyFactory;
+
 	private Map<Id<Link>, Map<Id<Person>, Tuple<Id<Vehicle>, Id<Charger>>>> chargingProcedures = new HashMap<>();
 
 	@Inject
-	UrbanVehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
+	UrbanVehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, ChargingStrategy.Factory chargingStrategyFactory) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
 		this.chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
+		this.chargingStrategyFactory = chargingStrategyFactory;
 	}
 
 	/**
@@ -89,7 +92,8 @@ class UrbanVehicleChargingHandler
 
 							.findAny()
 							.get();
-					charger.getLogic().addVehicle(ev, event.getTime());
+					ChargingStrategy strategy = chargingStrategyFactory.createStrategy(charger.getSpecification(), ev);
+					charger.getLogic().addVehicle(ev, strategy, event.getTime());
 					Map<Id<Person>, Tuple<Id<Vehicle>, Id<Charger>>> proceduresOnLink = this.chargingProcedures.get(event.getLinkId());
 					if(proceduresOnLink != null && proceduresOnLink.containsKey(event.getPersonId())){
 						throw new RuntimeException("person " + event.getPersonId() + " tries to charge 2 vehicles at the same time on link " + event.getLinkId() +

@@ -76,4 +76,11 @@ public class LinkLeaveEvent extends Event implements HasLinkId, HasVehicleId {
 		// linkId, vehicleId handled by superclass
 		return atts;
 	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes all common attributes
+		writeXMLStart(out);
+		writeXMLEnd(out);
+	}
 }

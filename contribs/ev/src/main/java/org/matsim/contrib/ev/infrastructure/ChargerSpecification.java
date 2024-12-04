@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.infrastructure;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * ChargerSpecification is assumed to be immutable.
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author Michal Maciejewski (michalm)
  */
-public interface ChargerSpecification extends Identifiable<Charger> {
+public interface ChargerSpecification extends Identifiable<Charger>, Attributable {
 	String DEFAULT_CHARGER_TYPE = "default";
 	int DEFAULT_PLUG_COUNT = 1;
 
