@@ -22,7 +22,6 @@ public class ActivityDashboard implements Dashboard {
 	private final Map<String, String> activityMapping = new LinkedHashMap<>();
 	private final Map<String, String> refCsvs = new LinkedHashMap<>();
 	private final Set<String> countMultipleOccurrencesSet = new HashSet<>();
-	private final String refColumn = "count";
 	private List<Indicator> indicators = new ArrayList<>();
 
 	public ActivityDashboard(String shpFile) {
@@ -48,7 +47,7 @@ public class ActivityDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Activity Analysis";
+		header.title = "Activities";
 		header.description = "Displays the activities by type and location.";
 
 		List<String> args = new ArrayList<>(List.of("--id-column", ID_COLUMN, "--shp", shpFile));
@@ -65,9 +64,11 @@ public class ActivityDashboard implements Dashboard {
 
 		for (Map.Entry<String, String> activity : activityMapping.entrySet()) {
 
+			String activityName = StringUtils.capitalize(activity.getKey());
+
 			layout.row("category_header_" + activity.getKey())
 				.el(TextBlock.class, (viz, data) -> {
-					viz.content = "## **" + StringUtils.capitalize(activity.getKey()) + "**";
+					viz.content = "## **" + activityName + "**";
 					viz.backgroundColor = "transparent";
 				});
 
@@ -77,7 +78,7 @@ public class ActivityDashboard implements Dashboard {
 
 					Layout.Row row = layout.row(activity.getKey() + "_" + ind.name)
 						.el(MapPlot.class, (viz, data) -> {
-							viz.title = "MATSim " + activity.getKey() + " Count (" + ind.name + ")";
+							viz.title = "Simulated %s Activities (%s)".formatted(activityName, ind.displayName);
 							viz.height = 8.;
 							String shp = data.resource(shpFile);
 							viz.setShape(shp, ID_COLUMN);
@@ -87,16 +88,13 @@ public class ActivityDashboard implements Dashboard {
 							viz.display.fill.join = REF_JOIN;
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "-80,-75,-67,-50,-33,50,100,200,300,400,500");
-							} else if (ind == Indicator.COUNTS) {
-								viz.display.fill.normalize = "transit-trips:area";
 							}
 						});
 
 					if (refCsvs.get(activity.getKey()) != null) {
 						row.el(MapPlot.class, (viz, data) -> {
 
-							viz.title = "Reference " + activity.getKey() + " Count (" + ind.name + ")";
-							viz.description = "Polygon Reference Description";
+							viz.title = "Reference %s Activities (%s)".formatted(activityName, ind.displayName);
 							viz.height = 8.;
 
 							String shp = data.resource(shpFile);
@@ -124,18 +122,16 @@ public class ActivityDashboard implements Dashboard {
 	}
 
 	public enum Indicator {
-		COUNTS("count"),
-		DENSITY("density"),
-		RELATIVE_DENSITY("relative_density");
+		COUNTS("count", "Counts"),
+		DENSITY("density", "Density"),
+		RELATIVE_DENSITY("relative_density", "Relative Density");
 
 		private final String name;
+		private final String displayName;
 
-		Indicator(String name) {
+		Indicator(String name, String displayName) {
 			this.name = name;
-		}
-
-		public String getName() {
-			return name;
+			this.displayName = displayName;
 		}
 	}
 }
