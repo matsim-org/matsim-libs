@@ -219,21 +219,21 @@ public class DashboardTests {
 
 	@Test
 	void activityBerlinGrid() {
-		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster.shp");
+		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster_4.shp");
 
 		ad.addActivityType(
 			"work",
 			List.of("work"),
 			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-			"kehlheim_ref.csv"
+			"berlin_verkehrszellen_raster.csv"
 		);
 
-		ad.addActivityType(
-			"education",
-			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
-			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-			"kehlheim_ref.csv"
-		);
+//		ad.addActivityType(
+//			"education",
+//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
+//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+//			"kehlheim_ref.csv"
+//		);
 
 		run(ad);
 	}
