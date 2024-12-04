@@ -127,7 +127,6 @@ public class SkillsIT {
 //				typeOne.setCapacity(vehicleCapacity);
 				typeOne.getCapacity().setOther( 2.0 );
 				CarriersUtils.addSkill(typeOne, "skill 1");
-				capabilitiesBuilder.addType(typeOne);
 				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
@@ -141,7 +140,6 @@ public class SkillsIT {
 //				typeTwo.setCapacity(vehicleCapacity);
 				typeTwo.getCapacity().setOther( 2.0 );
 				CarriersUtils.addSkill(typeTwo, "skill 2");
-				capabilitiesBuilder.addType(typeTwo);
 				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))

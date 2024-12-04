@@ -20,7 +20,7 @@ package org.matsim.contrib.ev.charging;
 
 import java.util.stream.Stream;
 
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
@@ -38,20 +38,18 @@ public class ChargingEstimations {
 	}
 
 	public static double estimateTotalTimeToCharge(ChargingLogic logic) {
-		return estimateTotalTimeToCharge(logic.getChargingStrategy(),
-				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+		return estimateTotalTimeToCharge(Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
 	}
 
 	public static double estimateTotalEnergyToCharge(ChargingLogic logic) {
-		return estimateTotalEnergyToCharge(logic.getChargingStrategy(),
-				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+		return estimateTotalEnergyToCharge(Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
 	}
 
-	public static double estimateTotalTimeToCharge(ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
-		return vehicles.mapToDouble(strategy::calcRemainingTimeToCharge).sum();
+	public static double estimateTotalTimeToCharge(Stream<ChargingVehicle> vehicles) {
+		return vehicles.map(ChargingVehicle::strategy).mapToDouble(ChargingStrategy::calcRemainingTimeToCharge).sum();
 	}
 
-	public static double estimateTotalEnergyToCharge(ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
-		return vehicles.mapToDouble(strategy::calcRemainingEnergyToCharge).sum();
+	public static double estimateTotalEnergyToCharge(Stream<ChargingVehicle> vehicles) {
+		return vehicles.map(ChargingVehicle::strategy).mapToDouble(ChargingStrategy::calcRemainingEnergyToCharge).sum();
 	}
 }

@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.extension.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.evrp.ChargingTaskImpl;
@@ -27,7 +28,7 @@ import org.matsim.contrib.evrp.ChargingTaskImpl;
 public class EDrtChargingTask extends ChargingTaskImpl {
 	public static final DrtTaskType TYPE = new DrtTaskType("CHARGING");
 
-	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
-		super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
+	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy, ChargingStrategy chargingStrategy) {
+		super(TYPE, beginTime, endTime, charger, ev, totalEnergy, chargingStrategy);
 	}
 }

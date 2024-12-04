@@ -24,6 +24,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -33,18 +34,20 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  */
 public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
 	private final ChargingWithAssignmentLogic chargingLogic;
+	private final ChargingStrategy chargingStrategy;
 	private final ElectricVehicle ev;
 	private Double chargingStartedTime;
 	private final double totalEnergy;
 
 	public ChargingTaskImpl(TaskType taskType, double beginTime, double endTime, Charger charger, ElectricVehicle ev,
-			double totalEnergy) {
+			double totalEnergy, ChargingStrategy chargingStrategy) {
 		super(taskType, beginTime, endTime, charger.getLink());
 		Preconditions.checkArgument(totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
 
 		this.chargingLogic = (ChargingWithAssignmentLogic)charger.getLogic();
 		this.ev = ev;
 		this.totalEnergy = totalEnergy;
+		this.chargingStrategy = chargingStrategy;
 	}
 
 	@Override
@@ -55,6 +58,11 @@ public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
 	@Override
 	public ChargingWithAssignmentLogic getChargingLogic() {
 		return chargingLogic;
+	}
+
+	@Override
+	public ChargingStrategy getChargingStrategy() {
+		return chargingStrategy;
 	}
 
 	@Override
@@ -76,6 +84,7 @@ public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("chargingLogic", chargingLogic)
+				.add("chargingStrategy", chargingStrategy)
 				.add("ev", ev)
 				.add("chargingStartedTime", chargingStartedTime)
 				.add("totalEnergy", totalEnergy)

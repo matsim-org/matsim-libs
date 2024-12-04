@@ -22,7 +22,7 @@ package org.matsim.freight.carriers.jsprit;
 
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.ScheduledTour;
-import org.matsim.freight.carriers.controler.CarrierTimeAndSpaceTourRouter;
+import org.matsim.freight.carriers.controller.CarrierTimeAndSpaceTourRouter;
 
 /**
  * Router that routes {@link CarrierPlan}.

@@ -21,10 +21,9 @@
 
 package org.matsim.freight.carriers.events;
 
+import java.util.Map;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
-
-import java.util.Map;
 
 /**
  *  Creates an {@link MatsimEventsReader} that also handles the carrier specific events.

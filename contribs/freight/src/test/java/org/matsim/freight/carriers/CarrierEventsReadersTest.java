@@ -20,6 +20,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -35,12 +39,6 @@ import org.matsim.freight.carriers.events.eventhandler.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -195,7 +193,7 @@ public class CarrierEventsReadersTest {
 		handledEvents.addAll(eventHandlerServices.handledEvents);
 		handledEvents.addAll(eventHandlerShipments.handledEvents);
 
-		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the resukts of the handler...
+		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the results of the handler...
 		Assertions.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
 	}
 

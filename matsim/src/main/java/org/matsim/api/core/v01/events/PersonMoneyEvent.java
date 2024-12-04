@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.population.Person;
 
 import java.util.Map;
 
+import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeKeyValue;
+
 /**
  * This event specifies that an agent has gained (or paid) some money.
  * Scoring functions should handle these Events by adding the amount somehow
@@ -133,5 +135,24 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 			attr.put(ATTRIBUTE_REFERENCE, this.reference);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes all common attributes
+		writeXMLStart(out);
+
+		out.append("amount=\"").append(this.amount).append("\" ");
+		if (this.purpose != null) {
+			writeEncodedAttributeKeyValue(out, ATTRIBUTE_PURPOSE, this.purpose);
+		}
+		if (this.transactionPartner != null) {
+			writeEncodedAttributeKeyValue(out, ATTRIBUTE_TRANSACTION_PARTNER, this.transactionPartner);
+		}
+		if (this.reference != null) {
+			writeEncodedAttributeKeyValue(out, ATTRIBUTE_REFERENCE, this.reference);
+		}
+
+		writeXMLEnd(out);
 	}
 }

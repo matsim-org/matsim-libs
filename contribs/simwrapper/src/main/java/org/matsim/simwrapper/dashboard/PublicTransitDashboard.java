@@ -1,5 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.application.analysis.pt.PublicTransitAnalysis;
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -34,8 +36,13 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.title = "Transit Viewer";
 			viz.height = 12d;
 			viz.description = "Visualize the transit schedule.";
-			viz.network = "(*.)?output_network.xml.gz";
+
+			// Include a network that has not been filtered
+			viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+				"--mode-filter", "", "--shp", "none");
+
 			viz.transitSchedule = data.output("(*.)?output_transitSchedule.xml.gz");
+			viz.ptStop2stopFile = data.compute(PublicTransitAnalysis.class, "pt_pax_volumes.csv.gz");
 
 			if (!customRouteTypes.isEmpty())
 				viz.customRouteTypes = customRouteTypes;
