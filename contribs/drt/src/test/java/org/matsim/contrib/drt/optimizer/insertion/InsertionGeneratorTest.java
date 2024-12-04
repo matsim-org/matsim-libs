@@ -40,6 +40,10 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
 import java.util.ArrayList;
@@ -53,7 +57,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Michal Maciejewski (michalm)
  */
 public class InsertionGeneratorTest {
-	private static final int CAPACITY = 4;
+	private static final IntegerLoadType SCALAR_VEHICLE_LOAD_FACTORY = new DefaultIntegerLoadType();
+	private static final DvrpLoad CAPACITY = SCALAR_VEHICLE_LOAD_FACTORY.fromInt(4);
 
 	private static final int STOP_DURATION = 10;
 
@@ -65,13 +70,13 @@ public class InsertionGeneratorTest {
 
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)).build();
 
 	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
 			List.of(
 					Id.createPersonId("person1"),
 					Id.createPersonId("person2")
-			)).build();
+			)).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(2)).build();
 
 	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
 			List.of(
@@ -80,8 +85,8 @@ public class InsertionGeneratorTest {
 					Id.createPersonId("person3"),
 					Id.createPersonId("person4"),
 					Id.createPersonId("person5")
-			)).build();
-	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).build();
+			)).load(SCALAR_VEHICLE_LOAD_FACTORY.fromInt(5)).build();
+	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).load(SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()).build();
 
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
@@ -95,7 +100,7 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_noStops() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //no stops => must be empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //no stops => must be empty
 		VehicleEntry entry = entry(start);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
@@ -111,8 +116,8 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startNotFull_oneStop() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax aboard
-		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)); // 1 pax aboard
+		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
@@ -145,7 +150,7 @@ public class InsertionGeneratorTest {
 	@Test
 	void startFull_oneStop() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
-		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 4 pax
+		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
@@ -161,9 +166,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_twoStops_notFullBetweenStops() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
-		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 1);//pick up 1 pax
-		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), 0);//drop off 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
+		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1));//pick up 1 pax
+		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
@@ -220,9 +225,9 @@ public class InsertionGeneratorTest {
 	@Test
 	void startEmpty_twoStops_notFullBetweenStops_tightSlackTimes() {
 		//same as startEmpty_twoStops_notFullBetweenStops() but with different slack times
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
-		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 1);//pick up 1 pax
-		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), 0);//drop off 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
+		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1));//pick up 1 pax
+		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 1 pax
 
 		double[] slackTimes = { 0, 0, // impossible insertions: 00, 01, 02 (pickup at 0 is not possible)
 				500, // additional impossible insertions: 11 (too long total detour); however 12 is possible
@@ -253,9 +258,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_twoStops_fullBetweenStops() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stop(0, link("stop0"), CAPACITY);//pick up 4 pax (full)
-		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 4 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 				//pickup after start
@@ -268,8 +273,8 @@ public class InsertionGeneratorTest {
 	@Test
 	void startFull_twoStops_notFullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
-		Waypoint.Stop stop0 = stop(0, link("stop0"), 2);//drop off 2 pax
-		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 2 pax
+		Waypoint.Stop stop0 = stop(0, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.fromInt(2));//drop off 2 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 2 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 				//no pickup after start
@@ -284,7 +289,7 @@ public class InsertionGeneratorTest {
 	void startFull_twoStops_fullBetweenStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(0, link("stop0"), CAPACITY);//drop off 1 pax, pickup 1 pax (full)
-		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//drop off 4 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 				//no pickup after start
@@ -295,10 +300,10 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startNotFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); //empty
-		Waypoint.Stop stop0 = stop(0, link("stop0"), 0);// dropoff 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)); //empty
+		Waypoint.Stop stop0 = stop(0, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());// dropoff 1 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), CAPACITY);// pickup 4 pax
-		Waypoint.Stop stop2 = stop(0, link("stop2"), 0);// dropoff 4 pax
+		Waypoint.Stop stop2 = stop(0, link("stop2"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());// dropoff 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 		assertInsertionsOnly(drtRequest, entry,
 				//pickup after start
@@ -314,9 +319,9 @@ public class InsertionGeneratorTest {
 	@Test
 	void startFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
-		Waypoint.Stop stop0 = stop(0, link("stop0"), 0);// dropoff 4 pax
+		Waypoint.Stop stop0 = stop(0, link("stop0"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());// dropoff 4 pax
 		Waypoint.Stop stop1 = stop(0, link("stop1"), CAPACITY);// pickup 4 pax
-		Waypoint.Stop stop2 = stop(0, link("stop2"), 0);// dropoff 4 pax
+		Waypoint.Stop stop2 = stop(0, link("stop2"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());// dropoff 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 		assertInsertionsOnly(drtRequest, entry,
 				//no pickup after start
@@ -329,8 +334,8 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void noDetourForPickup_noDuplicatedInsertions() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
-		Waypoint.Stop stop0 = stop(0, fromLink, 0);//dropoff 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)); // 1 pax
+		Waypoint.Stop stop0 = stop(0, fromLink, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequest, entry,
 				//no pickup after start (pickup is exactly at stop0)
@@ -340,8 +345,8 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void noDetourForDropoff_noDuplicatedInsertions() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
-		Waypoint.Stop stop0 = stop(0, toLink, 0);//dropoff 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)); // 1 pax
+		Waypoint.Stop stop0 = stop(0, toLink, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
@@ -354,9 +359,9 @@ public class InsertionGeneratorTest {
 	void noDetourForDropoff_vehicleOutgoingFullAfterDropoff_insertionPossible() {
 		// a special case where we allow inserting the dropoff after a stop despite outgoingOccupancy == maxCapacity
 		// this is only because the the dropoff happens exactly at (not after) the stop
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1)); // 1 pax
 		Waypoint.Stop stop0 = stop(0, toLink, CAPACITY);//dropoff 1 pax
-		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//dropoff 1 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
@@ -367,7 +372,7 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_prebookedRequest() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(prebookedRequest, entry,
 			new Insertion(prebookedRequest, entry, 0, 0));
@@ -375,9 +380,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_onlineRequest_beforeAlreadyPrebookedOtherRequest() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
-		Waypoint.Stop stop0 = stop(200, fromLink, 1);
-		Waypoint.Stop stop1 = stop(400, link("stop"), 0);
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
+		Waypoint.Stop stop0 = stop(200, fromLink, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1));
+		Waypoint.Stop stop1 = stop(400, link("stop"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
 		List<Double> precedingStayTimes = Arrays.asList(100.0, 0.0);
 		VehicleEntry entry = entry(start, precedingStayTimes, stop0, stop1);
 		assertInsertionsOnly(drtRequest, entry,
@@ -392,9 +397,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_prebookedRequest_inMiddleOfAlreadyPrebookedOtherRequest() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
-		Waypoint.Stop stop0 = stop(50, fromLink, 1);
-		Waypoint.Stop stop1 = stop(300, link("stop"), 0);
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
+		Waypoint.Stop stop0 = stop(50, fromLink, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1));
+		Waypoint.Stop stop1 = stop(300, link("stop"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(prebookedRequest, entry,
 			new Insertion(prebookedRequest, entry, 1, 1),
@@ -404,9 +409,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_prebookedRequest_afterAlreadyPrebookedOtherRequest() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
-		Waypoint.Stop stop0 = stop(20, fromLink, 1);
-		Waypoint.Stop stop1 = stop(70, link("stop"), 0);
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
+		Waypoint.Stop stop0 = stop(20, fromLink, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(1));
+		Waypoint.Stop stop1 = stop(70, link("stop"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(prebookedRequest, entry,
 			new Insertion(prebookedRequest, entry, 2, 2));
@@ -415,7 +420,7 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_smallGroup() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(drtRequest2Pax, entry,
 				//pickup after start
@@ -424,7 +429,7 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_groupExceedsCapacity() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(drtRequest5Pax, entry
 				//no insertion possible
@@ -433,9 +438,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void startEmpty_twoStops_groupExceedsCapacityAtFirstStop() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //empty
-		Waypoint.Stop stop0 = stop(0, toLink, 3);//dropoff 1 pax
-		Waypoint.Stop stop1 = stop(0, link("stop1"), 0);//dropoff 1 pax
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad()); //empty
+		Waypoint.Stop stop0 = stop(0, toLink, SCALAR_VEHICLE_LOAD_FACTORY.fromInt(3));//dropoff 1 pax
+		Waypoint.Stop stop1 = stop(0, link("stop1"), SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad());//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(drtRequest2Pax, entry,
 				//pickup after start:
@@ -447,28 +452,28 @@ public class InsertionGeneratorTest {
 
 	@Test
 	void testWaypointOccupancyChange() {
-		int occupancy = 0;
+		IntegerLoad occupancy = SCALAR_VEHICLE_LOAD_FACTORY.getEmptyLoad();
 		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax);
 		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax);
 
 		Waypoint.Stop stop2 = stop(0, link("stop2"), occupancy);
 		//dropoff 5 pax
 		stop2.task.addDropoffRequest(acceptedReq5Pax);
-		occupancy -= stop2.getOccupancyChange();
-		Assertions.assertEquals(5, occupancy);
+		occupancy = occupancy.subtract(stop2.getOccupancyChange());
+		Assertions.assertEquals(5, occupancy.getLoad());
 
 		Waypoint.Stop stop1 = stop(0, link("stop1"), occupancy);
 		//dropoff 2 pax, pickup 5
 		stop1.task.addDropoffRequest(acceptedReq2Pax);
 		stop1.task.addPickupRequest(acceptedReq5Pax);
-		occupancy -= stop1.getOccupancyChange();
-		Assertions.assertEquals(2, occupancy);
+		occupancy = occupancy.subtract(stop1.getOccupancyChange());
+		Assertions.assertEquals(2, occupancy.getLoad());
 
 
 		Waypoint.Stop stop0 = stop(0, link("stop0"), occupancy);
 		stop0.task.addPickupRequest(acceptedReq2Pax);
-		occupancy -= stop0.getOccupancyChange();
-		Assertions.assertEquals(0, occupancy);
+		occupancy = occupancy.subtract(stop0.getOccupancyChange());
+		Assertions.assertEquals(0, occupancy.getLoad());
 	}
 
 	private Link link(String id) {
@@ -483,8 +488,8 @@ public class InsertionGeneratorTest {
 	private void assertInsertionsWithDetour(DrtRequest drtRequest, VehicleEntry entry,
 			List<InsertionWithDetourData> expectedInsertions) {
 		int stopCount = entry.stops.size();
-		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
-		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
+		DvrpLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
+		Preconditions.checkArgument(endOccupancy.isEmpty());//make sure the input is valid
 
 		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> {
 			if (from == to) {
@@ -509,8 +514,8 @@ public class InsertionGeneratorTest {
 
 	private void assertInsertionsOnly(DrtRequest drtRequest, VehicleEntry entry, Insertion... expectedInsertions) {
 		int stopCount = entry.stops.size();
-		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
-		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
+		DvrpLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
+		Preconditions.checkArgument(endOccupancy.isEmpty());//make sure the input is valid
 
 		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;
 
@@ -520,15 +525,15 @@ public class InsertionGeneratorTest {
 				.containsExactly(expectedInsertions);
 	}
 
-	private Waypoint.Stop stop(double beginTime, Link link, int outgoingOccupancy) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
+	private Waypoint.Stop stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
+		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
 		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
 		return entry(start, precedingStayTimes, stops);
 	}
-	
+
 	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, Waypoint.Stop... stops) {
 		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);

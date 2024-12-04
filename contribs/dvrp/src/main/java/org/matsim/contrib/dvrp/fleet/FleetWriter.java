@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -32,25 +35,41 @@ import java.util.stream.Stream;
  * @author michalm
  */
 public class FleetWriter extends MatsimXmlWriter {
-	private final Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
 
-	public FleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications) {
+	private final static Logger LOGGER = LogManager.getLogger(FleetWriter.class);
+
+	private final Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
+	private final DvrpLoadSerializer dvrpLoadSerializer;
+	private boolean encounteredNonIntegerLoad;
+
+	public FleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications, DvrpLoadSerializer dvrpLoadSerializer) {
 		this.vehicleSpecifications = vehicleSpecifications;
+		this.dvrpLoadSerializer = dvrpLoadSerializer;
 	}
 
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd");
 		writeStartTag("vehicles", Collections.emptyList());
+		this.encounteredNonIntegerLoad = false;
 		this.vehicleSpecifications.forEach(this::writeVehicle);
 		writeEndTag("vehicles");
 		close();
+		if(encounteredNonIntegerLoad) {
+			LOGGER.warn("Encountered a non-integer vehicle capacity. The resulting will not be compatible with the standard FleetReader");
+		}
 	}
 
 	private synchronized void writeVehicle(DvrpVehicleSpecification vehicle) {
+		String serializedCapacity = this.dvrpLoadSerializer.serialize(vehicle.getCapacity());
+		try {
+			Integer.parseInt(serializedCapacity);
+		} catch(NumberFormatException e) {
+			this.encounteredNonIntegerLoad = true;
+		}
 		List<Tuple<String, String>> attributes = Arrays.asList(Tuple.of("id", vehicle.getId().toString()),
 				Tuple.of("start_link", vehicle.getStartLinkId() + ""), Tuple.of("t_0", vehicle.getServiceBeginTime() + ""),
-				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", vehicle.getCapacity() + ""));
+				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", serializedCapacity));
 		writeStartTag("vehicle", attributes, true);
 	}
 }

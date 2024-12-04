@@ -35,6 +35,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.sharingmetrics.SharingMetricsModule;
+import org.matsim.contrib.dvrp.analysis.CapacityLoadAnalysisHandler;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -44,9 +45,11 @@ import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -139,5 +142,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				.asEagerSingleton();
 
 		install(new SharingMetricsModule(drtCfg));
+
+		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+			return new CapacityLoadAnalysisHandler(getMode(), getter.get(OutputDirectoryHierarchy.class), getter.get(EventsManager.class), drtCfg.loadCapacityAnalysisInterval);
+		}));
 	}
 }

@@ -38,10 +38,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiActionCreator;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadModule;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
@@ -171,6 +169,7 @@ public class DefaultPassengerEngineTest {
 	private QSim createQSim(PassengerRequestValidator requestValidator, Class<? extends VrpOptimizer> optimizerClass) {
 		return new QSimBuilder(fixture.config).useDefaults()
 				.addOverridingModule(new MobsimScopeEventHandlingModule())
+				.addOverridingModule(new DvrpLoadModule(MODE))
 				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.DEFAULT))
 				.addQSimModule(new VrpAgentSourceQSimModule(MODE))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {

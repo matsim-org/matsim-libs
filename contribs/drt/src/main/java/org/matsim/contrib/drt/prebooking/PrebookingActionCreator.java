@@ -11,6 +11,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -20,11 +21,11 @@ import org.matsim.contrib.dynagent.DynAgent;
 /**
  * For prebooking, we implement an alternative DynActivity that handles entering
  * / exiting passengers more flexibly than the standard DrtStopActivity.
- * 
+ *
  * Specifically, we track when a person is ready for departure and then add the
  * expected duration of the interaction into a queue. The agent only actually
  * enters the vehicle after this time has elapsed.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
@@ -50,7 +51,7 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 
 		if (getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STOP)) {
 			DrtStopTask stopTask = (DrtStopTask) task;
-			int incomingCapacity = getIncomingOccupancy(vehicle, stopTask);
+			DvrpLoad incomingCapacity = getIncomingOccupancy(vehicle, stopTask);
 
 			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
@@ -60,8 +61,8 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 		return delegate.createAction(dynAgent, vehicle, now);
 	}
 
-	private int getIncomingOccupancy(DvrpVehicle vehicle, DrtStopTask referenceTask) {
-		int incomingOccupancy = 0;
+	private DvrpLoad getIncomingOccupancy(DvrpVehicle vehicle, DrtStopTask referenceTask) {
+		DvrpLoad incomingOccupancy = vehicle.getCapacity().getType().getEmptyLoad();
 
 		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 
@@ -72,17 +73,17 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 			if (task instanceof DrtStopTask) {
 				DrtStopTask stopTask = (DrtStopTask) task;
 
-				incomingOccupancy += stopTask.getDropoffRequests().values().stream()
-						.mapToInt(AcceptedDrtRequest::getPassengerCount).sum();
+				incomingOccupancy = incomingOccupancy.add(stopTask.getDropoffRequests().values().stream()
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
-				incomingOccupancy -= stopTask.getPickupRequests().values().stream()
-						.mapToInt(AcceptedDrtRequest::getPassengerCount).sum();
+				incomingOccupancy = incomingOccupancy.subtract(stopTask.getPickupRequests().values().stream()
+					.map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(vehicle.getCapacity().getType().getEmptyLoad()));
 
 				if (task == referenceTask) {
 					return incomingOccupancy;
 				}
 			}
-			
+
 			index--;
 		}
 

@@ -26,6 +26,9 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -62,7 +65,8 @@ public class PrebookingTestEnvironment {
 	private final double edgeLength = 200.0;
 	private final double speed = 10.0;
 
-	private int vehicleCapacity = 4;
+	private IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private DvrpLoad vehicleCapacity = integerLoadType.fromInt(4);
 
 	private double maximumWaitTime = 3600.0;
 	private double detourRelative = 1.3;
@@ -141,8 +145,13 @@ public class PrebookingTestEnvironment {
 		return this;
 	}
 
-	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+	public PrebookingTestEnvironment setVehicleCapacity(DvrpLoad vehicleCapacity) {
 		this.vehicleCapacity = vehicleCapacity;
+		return this;
+	}
+
+	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+		this.vehicleCapacity = integerLoadType.fromInt(vehicleCapacity);
 		return this;
 	}
 

@@ -47,6 +47,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -268,11 +269,6 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					Task driveFromPickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath,
 							DrtDriveTask.TYPE); // immediate drive to dropoff
 					schedule.addTask(stopTask.getTaskIdx() + 1, driveFromPickupTask);
-
-					// update timings
-					// TODO should be enough to update the timeline only till dropoffIdx...
-					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
-							stopTask.getTaskIdx() + 2, driveFromPickupTask.getEndTime());
 					///////
 				} else {
 					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
@@ -319,6 +315,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 		double nextBeginTime = pickupIdx == dropoffIdx ? //
 				pickupStopTask.getEndTime() : // asap
+				stops.get(pickupIdx).task instanceof CapacityChangeTask capacityChangeTask ?
+					capacityChangeTask.getBeginTime() :
 				stops.get(pickupIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
@@ -438,7 +436,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 						afterDropoffTask.getTaskIdx() + 1, afterDropoffTask.getEndTime());
 			} else {
 				// may want to wait here or after driving before starting next stop
-				double earliestArrivalTime = stops.get(dropoffIdx).task.getPickupRequests().values()
+				double earliestArrivalTime = stops.get(dropoffIdx) instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange ?
+					stopWithCapacityChange.getArrivalTime()
+						: stops.get(dropoffIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
 						.min()

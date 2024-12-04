@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -30,16 +31,18 @@ class FleetControlerListener implements ShutdownListener {
 	private final OutputDirectoryHierarchy controlerIO;
 	private FleetSpecification fleetSpecification;
 	private final String mode;
+	private final DvrpLoadSerializer dvrpLoadSerializer;
 
-	FleetControlerListener(String mode, OutputDirectoryHierarchy controlerIO, FleetSpecification fleetSpecification) {
+	FleetControlerListener(String mode, OutputDirectoryHierarchy controlerIO, FleetSpecification fleetSpecification, DvrpLoadSerializer dvrpLoadSerializer) {
 		this.mode = mode;
 		this.controlerIO = controlerIO;
 		this.fleetSpecification = fleetSpecification;
+		this.dvrpLoadSerializer = dvrpLoadSerializer;
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		FleetWriter writer = new FleetWriter(fleetSpecification.getVehicleSpecifications().values().stream());
+		FleetWriter writer = new FleetWriter(fleetSpecification.getVehicleSpecifications().values().stream(), this.dvrpLoadSerializer);
 		writer.write(controlerIO.getOutputFilename(mode + "_" +  OUTPUT_FILE_NAME));
 	}
 }
