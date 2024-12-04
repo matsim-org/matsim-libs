@@ -48,8 +48,8 @@ public class CarrierVehicleTypeTest {
 			costInformation1.setCostsPerMeter( 1.0 );
 			costInformation1.setCostsPerSecond( 0.5 );
 			EngineInformation engineInformation1 = mediumType.getEngineInformation();
-			engineInformation1.setFuelType( FuelType.diesel );
-			engineInformation1.setFuelConsumption( 0.02 );
+			VehicleUtils.setHbefaTechnology( engineInformation1, "diesel" );
+			VehicleUtils.setFuelConsumptionLitersPerMeter( engineInformation1, 0.02 );
 			VehicleCapacity vehicleCapacity = mediumType.getCapacity();
 			vehicleCapacity.setWeightInTons( 30 );
 			mediumType.setDescription( "Medium Vehicle" ).setMaximumVelocity( 13.89 );
@@ -72,8 +72,8 @@ public class CarrierVehicleTypeTest {
 			costInformation.setCostsPerMeter( 0.75 );
 			costInformation.setCostsPerSecond( 0.25 );
 			EngineInformation engineInformation = smallType.getEngineInformation() ;
-			engineInformation.setFuelType( FuelType.gasoline );
-			engineInformation.setFuelConsumption( 0.015 );
+			VehicleUtils.setHbefaTechnology( engineInformation, "gasoline" );
+			VehicleUtils.setFuelConsumptionLitersPerMeter( engineInformation, 0.015 );
 			VehicleCapacity capacity = smallType.getCapacity() ;
 			capacity.setWeightInTons( 16 ) ;
 //			VehicleType smallType = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( smallTypeId, mediumType )
@@ -106,8 +106,8 @@ public class CarrierVehicleTypeTest {
 	@Test
 	void test_whenCreatingTypeMedium_itCreatesEngineInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		Assertions.assertEquals(0.02, medium.getEngineInformation().getFuelConsumption(),0.001);
-		Assertions.assertEquals(FuelType.diesel, medium.getEngineInformation().getFuelType());
+		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumptionLitersPerMeter(medium.getEngineInformation()));
+		Assertions.assertEquals("diesel", VehicleUtils.getHbefaTechnology(medium.getEngineInformation()));
 	}
 
 	@Test
@@ -140,8 +140,8 @@ public class CarrierVehicleTypeTest {
 	@Test
 	void test_whenCopyingTypeMedium_itCopiesEngineInfoCorrectly(){
 		VehicleType medium2 = types.getVehicleTypes().get(Id.create("medium2", org.matsim.vehicles.VehicleType.class ) );
-		Assertions.assertEquals(0.02, medium2.getEngineInformation().getFuelConsumption(),0.001);
-		Assertions.assertEquals(FuelType.diesel, medium2.getEngineInformation().getFuelType());
+		Assertions.assertEquals(0.02, VehicleUtils.getFuelConsumptionLitersPerMeter(medium2.getEngineInformation()));
+		Assertions.assertEquals("diesel", VehicleUtils.getHbefaTechnology(medium2.getEngineInformation()));
 	}
 
 	@Test
@@ -174,8 +174,8 @@ public class CarrierVehicleTypeTest {
 	@Test
 	void test_whenModifyingTypeSmall_itModifiesEngineInfoCorrectly(){
 		VehicleType small = types.getVehicleTypes().get(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
-		Assertions.assertEquals(0.015, small.getEngineInformation().getFuelConsumption(),0.001);
-		Assertions.assertEquals(FuelType.gasoline, small.getEngineInformation().getFuelType());
+		Assertions.assertEquals(0.015, VehicleUtils.getFuelConsumptionLitersPerMeter(small.getEngineInformation()));
+		Assertions.assertEquals("gasoline", VehicleUtils.getHbefaTechnology(small.getEngineInformation()));
 	}
 
 	@Test

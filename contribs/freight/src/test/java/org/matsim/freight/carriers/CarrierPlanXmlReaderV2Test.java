@@ -190,7 +190,7 @@ public class CarrierPlanXmlReaderV2Test {
 				    </attributes>
 				    <capabilities fleetSize="INFINITE">
 				      <vehicles>
-				        <vehicle id="carrier_1_heavyVehicle" depotLinkId="12" typeId="heavy-20t" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				        <vehicle id="carrier_1_heavyVehicle" depotLinkId="12" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
 				      </vehicles>
 				    </capabilities>
 				    <services>

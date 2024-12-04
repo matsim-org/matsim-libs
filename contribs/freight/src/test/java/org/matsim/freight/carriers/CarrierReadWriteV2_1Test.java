@@ -41,7 +41,7 @@ public class CarrierReadWriteV2_1Test {
 		String outputFilename = utils.getOutputDirectory() + "outputCarriers.xml";
 
 		CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(carrierVehicleTypes);
-		vehicleTypeReader.readFile(utils.getClassInputDirectory() + "vehicles.xml");
+		vehicleTypeReader.readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
 
 		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, carrierVehicleTypes);
 		carrierReader.readFile(inputFilename);
@@ -63,7 +63,7 @@ public class CarrierReadWriteV2_1Test {
 		String outputFilename2 = utils.getOutputDirectory() + "/outputCarriers2.xml";
 
 		CarrierVehicleTypeReader vehicleTypeReader = new CarrierVehicleTypeReader(carrierVehicleTypes);
-		vehicleTypeReader.readFile(utils.getClassInputDirectory() + "vehicles.xml");
+		vehicleTypeReader.readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
 
 		CarrierPlanXmlReader reader1 = new CarrierPlanXmlReader(carriers, carrierVehicleTypes);
 		reader1.readFile(utils.getClassInputDirectory() + "carriers.xml");

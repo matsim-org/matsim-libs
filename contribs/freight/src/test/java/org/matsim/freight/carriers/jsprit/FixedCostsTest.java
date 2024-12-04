@@ -89,8 +89,8 @@ public class FixedCostsTest  {
 		VehicleType carrierVehType_A = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		{
 			EngineInformation engineInformation1 = carrierVehType_A.getEngineInformation();
-			engineInformation1.setFuelType( EngineInformation.FuelType.diesel );
-			engineInformation1.setFuelConsumption( 0.015 );
+			VehicleUtils.setFuelConsumptionLitersPerMeter(carrierVehType_A.getEngineInformation(), 0.015);
+			VehicleUtils.setHbefaTechnology(engineInformation1, "diesel");
 			carrierVehType_A.getCapacity().setOther( 1. );
 			carrierVehType_A.getCostInformation().setFixedCost( 0. ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.0 );
 			carrierVehType_A.setMaximumVelocity( 10 );
@@ -104,8 +104,8 @@ public class FixedCostsTest  {
 		VehicleType carrierVehType_B = VehicleUtils.getFactory().createVehicleType( vehicleTypeId1 );
 		{
 			EngineInformation engineInformation = carrierVehType_B.getEngineInformation();
-			engineInformation.setFuelType( EngineInformation.FuelType.diesel );
-			engineInformation.setFuelConsumption( 0.015 );
+			VehicleUtils.setFuelConsumptionLitersPerMeter(carrierVehType_A.getEngineInformation(), 0.015);
+			VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
 			carrierVehType_B.getCapacity().setOther( 1. );
 			carrierVehType_B.getCostInformation().setFixedCost( 10. ).setCostsPerMeter( 0.00001 ).setCostsPerSecond( 0. ) ;
 			carrierVehType_B.setMaximumVelocity( 10. );
@@ -116,7 +116,6 @@ public class FixedCostsTest  {
 
 		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
 		CarrierCapabilities cc1 = CarrierCapabilities.Builder.newInstance()
-										     .addType(carrierVehType_A)
 										     .addVehicle(carrierVehicle_A)
 										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
 										     .build();
@@ -125,7 +124,6 @@ public class FixedCostsTest  {
 
 		//carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc2 = CarrierCapabilities.Builder.newInstance()
-										     .addType(carrierVehType_B)
 										     .addVehicle(carrierVehicle_B)
 										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
 										     .build();
@@ -134,18 +132,12 @@ public class FixedCostsTest  {
 
 		//carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc3 = CarrierCapabilities.Builder.newInstance()
-										     .addType(carrierVehType_A)
-										     .addType(carrierVehType_B)
 										     .addVehicle(carrierVehicle_A)
 										     .addVehicle(carrierVehicle_B)
 										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
 										     .build();
 		carrier3.setCarrierCapabilities(cc3);
 		carriers.addCarrier(carrier3);
-
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
 
 		//load Network and build netbasedCosts for jsprit
 

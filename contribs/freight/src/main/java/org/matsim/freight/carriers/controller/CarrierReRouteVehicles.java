@@ -77,8 +77,8 @@ public class CarrierReRouteVehicles implements GenericPlanStrategyModule<Carrier
 	/**
 	 * Routes the carrierPlan in time and space.
 	 *
-	 * @param carrierPlan
-	 * @throws IllegalStateException if carrierPlan is null.
+	 * @param carrierPlan				the carrierPlan to be routed.
+	 * @throws IllegalStateException 	if carrierPlan is null.
 	 * @see CarrierTimeAndSpaceTourRouter
 	 */
 	@Override

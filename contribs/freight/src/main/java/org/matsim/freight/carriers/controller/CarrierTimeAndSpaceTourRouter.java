@@ -93,9 +93,9 @@ public class CarrierTimeAndSpaceTourRouter{
 
 	/**
 	 * Constructs the timeAndSpaceRouter with a leastCostPathCalculator, network and travelTime.
-	 * @param router
-	 * @param network
-	 * @param travelTime
+	 * @param router				the leastCostPathCalculator
+	 * @param network				the network
+	 * @param travelTime			the travelTime
 	 * @see LeastCostPathCalculator, Network, TravelTime
 	 */
 	public CarrierTimeAndSpaceTourRouter( LeastCostPathCalculator router, Network network, TravelTime travelTime ) {
@@ -110,7 +110,7 @@ public class CarrierTimeAndSpaceTourRouter{
 	 *
 	 * <p>Uses a leastCostPathCalculator to calculate a route/path from one activity to another. It starts at the departureTime of
 	 * the scheduledTour and determines activity arrival and departure times considering activities time-windows.
-	 * @param tour
+	 * @param tour	the scheduledTour to be routed.
 	 */
 	public void route(ScheduledTour tour) {
 		MatsimVehicleAdapter matsimVehicle = new MatsimVehicleAdapter(tour.getVehicle());

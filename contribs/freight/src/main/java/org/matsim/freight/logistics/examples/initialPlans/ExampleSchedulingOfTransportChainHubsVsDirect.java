@@ -61,7 +61,7 @@ import org.matsim.vehicles.VehicleUtils;
  * Part is removed, Chain is now starting at the CollectionHub
  *
  * <p>Scheduler = Macht die Pläne für die Fahrzeuge für die nächste MATSim-Iteration. Er plant es
- * für jede Ressource. --> jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
+ * für jede Ressource. → jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
  * mitgegebene Reihenfolge. 2.)
  */
 /*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
@@ -428,7 +428,7 @@ import org.matsim.vehicles.VehicleUtils;
         log.error(
             "This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
 
-        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffekte
+        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffects
         // hatte -> Die dürften hier auch sein!!!! (KMT may22)
         // Die createLSPPlan_reloading(..) Methoden sind nicht unabhängig voneinander.
         // Das liegt wohl am statischen und das dann dort wieder Verknüpfungen gesetzt werden -->

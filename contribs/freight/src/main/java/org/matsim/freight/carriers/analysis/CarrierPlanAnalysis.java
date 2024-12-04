@@ -54,7 +54,7 @@ public class CarrierPlanAnalysis {
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
 	public final String delimiter;
 
-	Carriers carriers;
+	final Carriers carriers;
 
 	public CarrierPlanAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;

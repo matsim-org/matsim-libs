@@ -56,7 +56,7 @@ import org.matsim.vehicles.VehicleUtils;
  *
  * <p>
  * It can be used with multiple threads. Note that each thread gets its own
- * leastCostPathCalculator. It is created only once and cached afterwards. Thus,
+ * leastCostPathCalculator. It is created only once and cached afterward. Thus,
  * it requires a threadSafe leastCostPathCalculatorFactory (the calculator
  * itself does not need to be thread-safe).
  *
@@ -83,8 +83,6 @@ import org.matsim.vehicles.VehicleUtils;
  *
  */
 public class NetworkBasedTransportCosts implements VRPTransportCosts {
-
-	private final RoadPricingScheme roadPricingScheme;
 
 	public interface InternalLeastCostPathCalculatorListener {
 
@@ -496,7 +494,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * </p>
 		 * Comments:
 		 * <ul>
-		 * <li>By default this will take free speed travel times.
+		 * <li>By default, this will take free speed travel times.
 		 * <li>yyyy These free speed travel times do <i>not</i> take the time-dependent
 		 * network into account. kai, jan'14
 		 * <li>Either can be changed with builder.setTravelTime(...) or with
@@ -577,7 +575,6 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		this.travelTime = builder.travelTime;
 		this.network = builder.network;
 		this.leastCostPathCalculatorFactory = builder.leastCostPathCalculatorFactory;
-		this.roadPricingScheme = builder.roadPricingScheme;
 		this.timeSliceWidth = builder.timeSliceWidth;
 		this.defaultTypeId = builder.defaultTypeId;
 		this.ttMemorizedCounter = new Counter("#TransportCostValues cached ");
@@ -657,12 +654,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	private void informEndCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.endCalculation(Thread.currentThread().getId());
+			l.endCalculation(Thread.currentThread().threadId());
 	}
 
 	private void informStartCalc() {
 		for (InternalLeastCostPathCalculatorListener l : listeners)
-			l.startCalculation(Thread.currentThread().getId());
+			l.startCalculation(Thread.currentThread().threadId());
 	}
 
 	/**
@@ -852,11 +849,11 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	}
 
 	private LeastCostPathCalculator createLeastCostPathCalculator() {
-		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().getId());
+		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().threadId());
 		if (router == null) {
 			LeastCostPathCalculator newRouter = leastCostPathCalculatorFactory.createPathCalculator(network,
 					travelDisutility, travelTime);
-			router = routerCache.putIfAbsent(Thread.currentThread().getId(), newRouter);
+			router = routerCache.putIfAbsent(Thread.currentThread().threadId(), newRouter);
 			if (router == null) {
 				router = newRouter;
 			}

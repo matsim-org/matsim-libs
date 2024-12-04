@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * Basic event handler that collects the relation between vehicles and drivers.
  * Necessary since link enter and leave events do not contain the driver anymore.
  * <p>
- * This is the vice-versa implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
+ * This is the vice versa implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
  * <p>
  * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
  *

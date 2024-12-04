@@ -234,7 +234,7 @@ public class CarriersUtils {
 						continue;
 					}
 				}
-				case solveForAllCarriersAndAddPLans -> {carrier.setSelectedPlan(null);} // Keep existing plan(s), but make them not selected.
+				case solveForAllCarriersAndAddPLans -> carrier.setSelectedPlan(null); // Keep existing plan(s), but make them not selected.
 				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
 			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
@@ -381,8 +381,6 @@ public class CarriersUtils {
 		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
 		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
 			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
-
-//		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**
