@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.pt.PtSupplyStatistics;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -107,6 +108,45 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
 				.x("departureHour")
 				.y("share")
+				.name("transportMode", ColorScheme.Spectral)
+			);
+		});
+
+		layout.row("ptHeadwaysByHour").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Median Headway per line by hour";
+//			viz.description = "by hour and purpose";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Hour").build())
+				.yAxis(Axis.builder().title("Count").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+//			viz.interactive = Plotly.Interactive.dropdown;
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_headway_group_per_mode_and_hour.csv")).mapping()
+					.name("headwayGroup", ColorScheme.Spectral)
+					.x("departureHour")
+					.y("count")
+			);
+
+		}).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Share of active transit stop areas per mode and hour";
+			viz.description = "Stop areas with >= 1 departure in hour / stop areas in shape file with >= 1 departure per day.";
+
+			Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_headway_per_mode_and_hour.csv"));
+
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.yAxis(Axis.builder().title("Share").build())
+				.xAxis(Axis.builder().title("Hour").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
+				.build();
+
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+				.x("departureHour")
+				.y("medianPerModeOfMedianPerLineOfMedianHeadwayPerStopPair")
 				.name("transportMode", ColorScheme.Spectral)
 			);
 		});

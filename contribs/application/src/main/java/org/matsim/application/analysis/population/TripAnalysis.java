@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.AnalysisUtils;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -89,17 +90,6 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	public static void main(String[] args) {
 		new TripAnalysis().execute(args);
-	}
-
-	private static String cut(long dist, List<Long> distGroups, List<String> labels) {
-
-		int idx = Collections.binarySearch(distGroups, dist);
-
-		if (idx >= 0)
-			return labels.get(idx);
-
-		int ins = -(idx + 1);
-		return labels.get(ins - 1);
 	}
 
 	private static int[] durationToHour(String d) {
@@ -279,7 +269,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		distGroups.add(Long.MAX_VALUE);
 
 		StringColumn dist_group = joined.longColumn("traveled_distance")
-			.map(dist -> cut(dist, distGroups, labels), ColumnType.STRING::create).setName("dist_group");
+			.map(dist -> AnalysisUtils.cut(dist, distGroups, labels), ColumnType.STRING::create).setName("dist_group");
 
 		joined.addColumns(dist_group);
 

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.AnalysisUtils;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
@@ -37,9 +38,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.*;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
+import tech.tablesaw.columns.numbers.DoubleColumnType;
 import tech.tablesaw.table.TableSliceGroup;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.*;
 
@@ -50,7 +54,9 @@ import static tech.tablesaw.aggregate.AggregateFunctions.*;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"pt_departures_at_stops_per_hour_per_mode.csv", "pt_count_unique_ids_per_mode.csv",
-		"pt_active_transit_lines_per_hour_per_mode_per_area.csv","pt_active_transit_stops_per_hour_per_mode_per_area.csv"
+		"pt_active_transit_lines_per_hour_per_mode_per_area.csv", "pt_active_transit_stops_per_hour_per_mode_per_area.csv",
+		"pt_headway_per_stop_area_pair_and_hour.csv", "pt_headway_per_line_stop_area_pair_and_hour.csv",
+		"pt_headway_per_line_and_hour.csv", "pt_headway_per_mode_and_hour.csv", "pt_headway_group_per_mode_and_hour.csv"
 	}
 )
 public class PtSupplyStatistics implements MATSimAppCommand {
@@ -176,12 +182,12 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 			}
 		}
 
-		Table countsAllModes = departuresFromStops.
-			summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).apply().
-			addColumns(StringColumn.create("transportMode","allModes"));
-		Table countsPerMode = departuresFromStops.
-			summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).
-			by("transportMode").sortOn("transportMode");
+		Table countsAllModes = departuresFromStops
+		.summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique).apply()
+		.addColumns(StringColumn.create("transportMode","allModes"));
+		Table countsPerMode = departuresFromStops
+			.summarize(List.of("transitLine", "transitRoute", "departure", "stop", "stopAreaOrStop"), countUnique)
+			.by("transportMode").sortOn("transportMode");
 		countsPerMode = countsAllModes.append(countsPerMode);
 		// rename column names to Matsim TransitSchedule class names
 		countsPerMode.column("transportMode").setName("TransportMode");
@@ -195,8 +201,8 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 		countsPerMode.write().csv(output.getPath("pt_count_unique_ids_per_mode.csv").toString());
 
 		// Count number of departures per hour and mode (summing up over all stops)
-		Table departuresPerHourAndMode = departuresFromStops.countBy("departureHour", "transportMode").
-			sortOn("departureHour", "transportMode");
+		Table departuresPerHourAndMode = departuresFromStops.countBy("departureHour", "transportMode")
+			.sortOn("departureHour", "transportMode");
 		departuresPerHourAndMode.write().csv(output.getPath("pt_departures_at_stops_per_hour_per_mode.csv").toString());
 
 		// Share of active transit lines (at least one departure) per hour and mode
@@ -206,65 +212,196 @@ public class PtSupplyStatistics implements MATSimAppCommand {
 		 * stopSequence == 0 will make it appear as if it was not operating inside the area.
 		 * where(t -> t.intColumn("stopSequence").isEqualTo(0)).
 		 */
-		Table activeTransitLinesPerHourAndArea = departuresFromStops.
-			summarize("transitLine", countUnique).
-			by("shpFilter", "departureHour", "transportMode").
-			sortOn("shpFilter", "departureHour", "transportMode");
+		Table activeTransitLinesPerHourAndArea = departuresFromStops
+			.summarize("transitLine", countUnique)
+			.by("shpFilter", "departureHour", "transportMode")
+			.sortOn("shpFilter", "departureHour", "transportMode");
 
-		activeTransitLinesPerHourAndArea.
-			column(TableSliceGroup.aggregateColumnName("transitLine", countUnique.functionName())).
-			setName("activeTransitLinesInHourAndArea");
+		activeTransitLinesPerHourAndArea
+			.column(TableSliceGroup.aggregateColumnName("transitLine", countUnique.functionName()))
+			.setName("activeTransitLinesInHourAndArea");
 
-		Table transitLinesPerArea = departuresFromStops.
-			summarize("transitLine", countUnique).
-			by("shpFilter", "transportMode").
-			sortOn("shpFilter", "transportMode");
-		transitLinesPerArea.
-			column(TableSliceGroup.aggregateColumnName("transitLine", countUnique.functionName())).
-			setName("totalNumberOfTransitLinesInArea");
+		Table transitLinesPerArea = departuresFromStops
+			.summarize("transitLine", countUnique)
+			.by("shpFilter", "transportMode")
+			.sortOn("shpFilter", "transportMode");
+		transitLinesPerArea
+			.column(TableSliceGroup.aggregateColumnName("transitLine", countUnique.functionName()))
+			.setName("totalNumberOfTransitLinesInArea");
 
-		activeTransitLinesPerHourAndArea = activeTransitLinesPerHourAndArea.
-			joinOn("shpFilter", "transportMode").
-			leftOuter(transitLinesPerArea);
-		DoubleColumn shareActiveTransitLinesPerHour = activeTransitLinesPerHourAndArea.doubleColumn("activeTransitLinesInHourAndArea").
-			divide(activeTransitLinesPerHourAndArea.doubleColumn("totalNumberOfTransitLinesInArea")).
-			setName("share");
+		activeTransitLinesPerHourAndArea = activeTransitLinesPerHourAndArea
+			.joinOn("shpFilter", "transportMode")
+			.leftOuter(transitLinesPerArea);
+		DoubleColumn shareActiveTransitLinesPerHour = activeTransitLinesPerHourAndArea.doubleColumn("activeTransitLinesInHourAndArea")
+			.divide(activeTransitLinesPerHourAndArea.doubleColumn("totalNumberOfTransitLinesInArea"))
+			.setName("share");
 
 		activeTransitLinesPerHourAndArea.addColumns(shareActiveTransitLinesPerHour);
 		// TODO: for the time being there seems to be no way to filter or display by column shpFilter in PublicTransitDashboard, so temporarily filter here
-		activeTransitLinesPerHourAndArea = activeTransitLinesPerHourAndArea.
-			where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"));
+		activeTransitLinesPerHourAndArea = activeTransitLinesPerHourAndArea
+			.where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"));
 		activeTransitLinesPerHourAndArea.write().csv(output.getPath("pt_active_transit_lines_per_hour_per_mode_per_area.csv").toString());
 
 		// Share of active TransitStopAreas (at least one departure) per hour and mode
-		Table activeTransitStopsPerHourAndArea = departuresFromStops.
-			summarize("stopAreaOrStop", countUnique).
-			by("shpFilter", "departureHour", "transportMode").
-			sortOn("shpFilter", "departureHour", "transportMode");
+		Table activeTransitStopsPerHourAndArea = departuresFromStops
+			.summarize("stopAreaOrStop", countUnique)
+			.by("shpFilter", "departureHour", "transportMode")
+			.sortOn("shpFilter", "departureHour", "transportMode");
 
-		activeTransitStopsPerHourAndArea.
-			column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName())).
-			setName("activeTransitStopsInHourAndArea");
+		activeTransitStopsPerHourAndArea
+			.column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName()))
+			.setName("activeTransitStopsInHourAndArea");
 
-		Table transitStopsPerArea = departuresFromStops.
-			summarize("stopAreaOrStop", countUnique).
-			by("shpFilter", "transportMode").
-			sortOn("shpFilter", "transportMode");
-		transitStopsPerArea.
-			column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName())).
-			setName("totalNumberOfTransitStopsInArea");
+		Table transitStopsPerArea = departuresFromStops
+			.summarize("stopAreaOrStop", countUnique)
+			.by("shpFilter", "transportMode")
+			.sortOn("shpFilter", "transportMode");
+		transitStopsPerArea
+			.column(TableSliceGroup.aggregateColumnName("stopAreaOrStop", countUnique.functionName()))
+			.setName("totalNumberOfTransitStopsInArea");
 
-		activeTransitStopsPerHourAndArea = activeTransitStopsPerHourAndArea.
-			joinOn("shpFilter", "transportMode").
-			leftOuter(transitStopsPerArea);
-		DoubleColumn shareActiveTransitStopsPerHour = activeTransitStopsPerHourAndArea.doubleColumn("activeTransitStopsInHourAndArea").
-			divide(activeTransitStopsPerHourAndArea.doubleColumn("totalNumberOfTransitStopsInArea")).
-			setName("share");
+		activeTransitStopsPerHourAndArea = activeTransitStopsPerHourAndArea
+			.joinOn("shpFilter", "transportMode")
+			.leftOuter(transitStopsPerArea);
+		DoubleColumn shareActiveTransitStopsPerHour = activeTransitStopsPerHourAndArea.doubleColumn("activeTransitStopsInHourAndArea")
+			.divide(activeTransitStopsPerHourAndArea.doubleColumn("totalNumberOfTransitStopsInArea"))
+			.setName("share");
 
 		activeTransitStopsPerHourAndArea.addColumns(shareActiveTransitStopsPerHour);
 		// TODO: for the time being there seems to be no way to filter or display by column shpFilter in PublicTransitDashboard, so temporarily filter here
-		activeTransitStopsPerHourAndArea = activeTransitStopsPerHourAndArea.
-			where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"));
+		activeTransitStopsPerHourAndArea = activeTransitStopsPerHourAndArea
+			.where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"));
 		activeTransitStopsPerHourAndArea.write().csv(output.getPath("pt_active_transit_stops_per_hour_per_mode_per_area.csv").toString());
+
+		// calculate headway/longestGap/frequency per departureHour and stop pair (where direct non-stop service exists) (based on departure time at from stop)
+		Table nextStopTmp = departuresFromStops
+			.selectColumns("transitLine", "transitRoute", "departure", "stopSequence", "stopAreaOrStop");
+		nextStopTmp.replaceColumn("stopSequence", nextStopTmp.intColumn("stopSequence").map(i -> i - 1)); // rename to join on. Would be better if joining on different column names would be possible
+		nextStopTmp.column("stopAreaOrStop").setName("stopAreaOrStopNext");
+
+		Table stopAreaToNextStopAreaIgnoringLine = departuresFromStops
+			.joinOn("transitLine", "transitRoute", "departure", "stopSequence")
+			.inner(nextStopTmp)
+			.sortOn("stopAreaOrStop", "stopAreaOrStopNext", "departureTimeScheduled");
+		// sorting is essential to find last departure times in same stop pair using lag()
+		stopAreaToNextStopAreaIgnoringLine.addColumns(stopAreaToNextStopAreaIgnoringLine
+			.doubleColumn("departureTimeScheduled")
+			.lag(1)
+			.setName("lastDepartureTimeScheduled"));
+		// set lastDepartureTimeScheduled missing where stop->stopNext pair changes
+		stopAreaToNextStopAreaIgnoringLine.doubleColumn("lastDepartureTimeScheduled")
+			.set(stopAreaToNextStopAreaIgnoringLine.stringColumn("stopAreaOrStop").lag(1)
+					.isNotEqualTo(stopAreaToNextStopAreaIgnoringLine.stringColumn("stopAreaOrStop"))
+					.or(stopAreaToNextStopAreaIgnoringLine.stringColumn("stopAreaOrStopNext").lag(1)
+						.isNotEqualTo(stopAreaToNextStopAreaIgnoringLine.stringColumn("stopAreaOrStopNext"))),
+				DoubleColumnType.missingValueIndicator());
+
+		stopAreaToNextStopAreaIgnoringLine.write().csv("keks.csv");
+
+		stopAreaToNextStopAreaIgnoringLine.addColumns(stopAreaToNextStopAreaIgnoringLine
+			.doubleColumn("departureTimeScheduled")
+			.subtract(stopAreaToNextStopAreaIgnoringLine.doubleColumn("lastDepartureTimeScheduled"))
+			.setName("timeSinceLastDeparture"));
+
+		Table headwayStopAreaToNextStopAreaIgnoringLine = stopAreaToNextStopAreaIgnoringLine
+			.summarize("timeSinceLastDeparture", min, mean, median, max, countWithMissing)
+			.by("stopAreaOrStop", "stopAreaOrStopNext", "departureHour", "transportMode", "shpFilter")
+			.sortOn("stopAreaOrStop", "stopAreaOrStopNext", "departureHour", "transportMode");
+		headwayStopAreaToNextStopAreaIgnoringLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", min.functionName())).setName("minHeadway");
+		headwayStopAreaToNextStopAreaIgnoringLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", mean.functionName())).setName("meanHeadway");
+		headwayStopAreaToNextStopAreaIgnoringLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", median.functionName())).setName("medianHeadway");
+		headwayStopAreaToNextStopAreaIgnoringLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", max.functionName())).setName("maxHeadway");
+		headwayStopAreaToNextStopAreaIgnoringLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", countWithMissing.functionName())).setName("departures");
+
+		headwayStopAreaToNextStopAreaIgnoringLine.write().csv(output.getPath("pt_headway_per_stop_area_pair_and_hour.csv").toString()); // can be used for visualisation on map
+
+		// Similar headway statistics divided per transit line
+		Table stopAreaToNextStopAreaPerLine = departuresFromStops
+			.joinOn("transitLine", "transitRoute", "departure", "stopSequence")
+			.inner(nextStopTmp)
+			.sortOn("transitLine", "stopAreaOrStop", "stopAreaOrStopNext", "departureTimeScheduled");
+		// sorting is essential to find last departure times in same stop pair using lag()
+		stopAreaToNextStopAreaPerLine.addColumns(stopAreaToNextStopAreaPerLine
+			.doubleColumn("departureTimeScheduled")
+			.lag(1)
+			.setName("lastDepartureTimeScheduled"));
+		// set lastDepartureTimeScheduled missing where stop->stopNext pair changes
+		stopAreaToNextStopAreaPerLine.doubleColumn("lastDepartureTimeScheduled").
+			set(
+				stopAreaToNextStopAreaPerLine.stringColumn("stopAreaOrStop").lag(1)
+					.isNotEqualTo(stopAreaToNextStopAreaPerLine.stringColumn("stopAreaOrStop"))
+					.or(stopAreaToNextStopAreaPerLine.stringColumn("stopAreaOrStopNext").lag(1)
+						.isNotEqualTo(stopAreaToNextStopAreaPerLine.stringColumn("stopAreaOrStopNext"))),
+				DoubleColumnType.missingValueIndicator());
+
+		stopAreaToNextStopAreaPerLine.addColumns(stopAreaToNextStopAreaPerLine
+			.doubleColumn("departureTimeScheduled")
+			.subtract(stopAreaToNextStopAreaPerLine.doubleColumn("lastDepartureTimeScheduled"))
+			.setName("timeSinceLastDeparture"));
+
+		Table headwayStopAreaToNextStopAreaPerLine = stopAreaToNextStopAreaPerLine
+			.summarize("timeSinceLastDeparture", min, mean, median, max, countWithMissing)
+			.by("transitLine", "stopAreaOrStop", "stopAreaOrStopNext", "departureHour", "transportMode", "shpFilter")
+			.sortOn("transitLine", "stopAreaOrStop", "stopAreaOrStopNext", "departureHour", "transportMode");
+		headwayStopAreaToNextStopAreaPerLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", min.functionName())).setName("minHeadway");
+		headwayStopAreaToNextStopAreaPerLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", mean.functionName())).setName("meanHeadway");
+		headwayStopAreaToNextStopAreaPerLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", median.functionName())).setName("medianHeadway");
+		headwayStopAreaToNextStopAreaPerLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", max.functionName())).setName("maxHeadway");
+		headwayStopAreaToNextStopAreaPerLine.column(TableSliceGroup.aggregateColumnName("timeSinceLastDeparture", countWithMissing.functionName())).setName("departures");
+
+		headwayStopAreaToNextStopAreaPerLine.write().csv(output.getPath("pt_headway_per_line_stop_area_pair_and_hour.csv").toString()); // can be used for visualisation on map
+
+		Table headwayPerLineAndHour = headwayStopAreaToNextStopAreaPerLine
+			.summarize("medianHeadway", "maxHeadway", "departures", median, max)
+			.by("transitLine", "departureHour", "transportMode", "shpFilter");
+		headwayPerLineAndHour.column(TableSliceGroup.aggregateColumnName("medianHeadway", median.functionName())).setName("medianPerLineOfMedianHeadwayPerStopPair");
+		headwayPerLineAndHour.column(TableSliceGroup.aggregateColumnName("medianHeadway", max.functionName())).setName("maxPerLineOfMedianHeadwayPerStopPair");
+		headwayPerLineAndHour.column(TableSliceGroup.aggregateColumnName("maxHeadway", median.functionName())).setName("medianPerLineOfMaxHeadwayPerStopPair");
+		headwayPerLineAndHour.column(TableSliceGroup.aggregateColumnName("maxHeadway", max.functionName())).setName("maxPerLineOfMaxHeadwayPerStopPair");
+		headwayPerLineAndHour.column(TableSliceGroup.aggregateColumnName("departures", median.functionName())).setName("medianDepartures");
+		headwayPerLineAndHour = headwayPerLineAndHour.selectColumns("transitLine", "departureHour", "transportMode", "shpFilter",
+			"medianPerLineOfMedianHeadwayPerStopPair", "maxPerLineOfMedianHeadwayPerStopPair", "medianPerLineOfMaxHeadwayPerStopPair",
+			"maxPerLineOfMaxHeadwayPerStopPair", "medianDepartures");
+
+		headwayPerLineAndHour
+			.where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"))
+			.write().csv(output.getPath("pt_headway_per_line_and_hour.csv").toString());
+
+		Table headwayPerModeAndHour = headwayPerLineAndHour
+			.where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"))
+			.summarize("medianPerLineOfMedianHeadwayPerStopPair", "medianPerLineOfMaxHeadwayPerStopPair", "medianDepartures", median, max)
+			.by("transportMode", "departureHour")
+			.sortOn("transportMode", "departureHour");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianPerLineOfMedianHeadwayPerStopPair", median.functionName())).setName("medianPerModeOfMedianPerLineOfMedianHeadwayPerStopPair");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianPerLineOfMedianHeadwayPerStopPair", max.functionName())).setName("maxPerModeOfMedianPerLineOfMedianHeadwayPerStopPair");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianPerLineOfMaxHeadwayPerStopPair", median.functionName())).setName("medianPerModeOfMedianPerLineOfMaxHeadwayPerStopPair");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianPerLineOfMaxHeadwayPerStopPair", max.functionName())).setName("maxPerModeOfMedianPerLineOfMaxHeadwayPerStopPair");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianDepartures", median.functionName())).setName("medianPerModeOfMedianDepartures");
+		headwayPerModeAndHour.column(TableSliceGroup.aggregateColumnName("medianDepartures", max.functionName())).setName("maxPerModeOfMedianDepartures");
+
+		headwayPerModeAndHour.write().csv(output.getPath("pt_headway_per_mode_and_hour.csv").toString());
+
+		List<Integer> headwayGroups = List.of(0, 5, 10, 15, 20, 30, 40, 60, Integer.MAX_VALUE); //  min
+		List<String> headwayLabels = new ArrayList<>();
+		for (int i = 0; i < headwayGroups.size() - 2; i++) {
+			headwayLabels.add(headwayGroups.get(i) + "<X<=" + headwayGroups.get(i + 1));
+		}
+		headwayLabels.add(headwayGroups.get(headwayGroups.size() - 2) + "<X");
+		List<Double> finalHeadwayGroups = headwayGroups.stream().map(min -> min * 60.).collect(Collectors.toUnmodifiableList()); // sec
+
+		StringColumn medianHeadwayGroup = headwayPerLineAndHour.doubleColumn("medianPerLineOfMedianHeadwayPerStopPair")
+			.map(headway -> AnalysisUtils.cut(headway, finalHeadwayGroups, headwayLabels), ColumnType.STRING::create).setName("headwayGroup");
+		headwayPerLineAndHour.addColumns(medianHeadwayGroup);
+
+		Table headwayGroupPerModeAndHour = headwayPerLineAndHour
+			.where(t -> t.stringColumn("shpFilter").isIn("in area", "no area defined"))
+			.summarize("medianPerLineOfMedianHeadwayPerStopPair", count)
+			.by("transportMode", "departureHour", "headwayGroup")
+			.sortOn("transportMode", "departureHour", "headwayGroup");
+		headwayGroupPerModeAndHour
+			.column(TableSliceGroup.aggregateColumnName("medianPerLineOfMedianHeadwayPerStopPair", count.functionName()))
+			.setName("count");
+
+		headwayGroupPerModeAndHour.write().csv(output.getPath("pt_headway_group_per_mode_and_hour.csv").toString());
 	}
 }
