@@ -183,22 +183,14 @@ public class DashboardTests {
 
 	@Test
 	void activity() {
-		ActivityDashboard ad = new ActivityDashboard("kehlheim_shape_2.shp");
+		ActivityDashboard ad = new ActivityDashboard("kehlheim_shape.shp");
 
-		// "count", "region"
 		ad.addActivityType(
 			"work",
 			List.of("work"),
 			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
 			"kehlheim_ref.csv"
 		);
-
-//		ad.addActivityType(
-//			"education",
-//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
-//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY),
-//			"kehlheim_ref.csv", "count", "region"
-//		);
 
 		run(ad);
 	}
@@ -228,14 +220,6 @@ public class DashboardTests {
 	@Test
 	void activityBerlinGrid() {
 		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster.shp");
-
-		// , "count", "fid"
-//		ad.addActivityType(
-//			"work",
-//			List.of("work"),
-//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
-//			"berlin_verkehrszellen_raster.csv"
-//		);
 
 		ad.addActivityType(
 			"work",

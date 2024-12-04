@@ -29,7 +29,6 @@ public class ActivityDashboard implements Dashboard {
 		this.shpFile = Objects.requireNonNull(shpFile, "Shapefile can not be null!");
 	}
 
-
 	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators) {
 		return addActivityType(name, activities, indicators, true, null);
 	}
@@ -87,7 +86,7 @@ public class ActivityDashboard implements Dashboard {
 							viz.display.fill.dataset = "transit-trips";
 							viz.display.fill.join = REF_JOIN;
 							if (ind == Indicator.RELATIVE_DENSITY) {
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 13, false, "-80,-75,-67,-50,-33,0,50,100,200,300,400,500");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "-80,-75,-67,-50,-33,50,100,200,300,400,500");
 							} else if (ind == Indicator.COUNTS) {
 								viz.display.fill.normalize = "transit-trips:area";
 							}
@@ -109,7 +108,7 @@ public class ActivityDashboard implements Dashboard {
 
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.columnName = "relative_density";
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 13, false, "-80,-75,-67,-50,-33,0,50,100,200,300,400,500");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "-80,-75,-67,-50,-33,50,100,200,300,400,500");
 							} else if (ind == Indicator.DENSITY) {
 								viz.display.fill.columnName = "density";
 							} else {
@@ -126,8 +125,6 @@ public class ActivityDashboard implements Dashboard {
 	public enum Indicator {
 		COUNTS("count"),
 		DENSITY("density"),
-
-		// TODO: change in csv
 		RELATIVE_DENSITY("relative_density");
 
 		private final String name;
