@@ -1,12 +1,13 @@
 package org.matsim.application.analysis.activity;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.api.feature.Feature;
 import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
@@ -36,20 +37,44 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 	private ShpOptions shp;
 	@CommandLine.Mixin
 	private SampleOptions sample;
+	@CommandLine.Mixin
+	private CrsOptions crs;
+
+	/**
+	 * Specifies the column in the shapefile used as the region ID.
+	 */
 	@CommandLine.Option(names = "--id-column", description = "Column to use as ID for the shapefile", required = true)
 	private String idColumn;
 
+	/**
+	 * Maps patterns to merge activity types into a single category.
+	 * Example: `home;work` can merge activities "home1" and "work1" into categories "home" and "work".
+	 */
 	@CommandLine.Option(names = "--activity-mapping", description = "Map of patterns to merge activity types", split = ";")
 	private Map<String, String> activityMapping;
+
+	/**
+	 * Specifies activity types that should be counted only once per agent per region.
+	 */
+	@CommandLine.Option(names = "--single-occurrence", description = "Activity types that are only counted once per agent")
+	private Set<String> singleOccurrence;
 
 	public static void main(String[] args) {
 		new ActivityCountAnalysis().execute(args);
 	}
 
+	/**
+	 * Executes the activity count analysis.
+	 *
+	 * @return Exit code (0 for success).
+	 * @throws Exception if errors occur during execution.
+	 */
 	@Override
 	public Integer call() throws Exception {
 
+		// Prepares the activity mappings and reads input data
 		HashMap<String, Set<String>> formattedActivityMapping = new HashMap<>();
+		Map<String, Double> regionAreaMap = new HashMap<>();
 
 		if (this.activityMapping == null) this.activityMapping = new HashMap<>();
 
@@ -70,8 +95,7 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 		TextColumn activityType = activities.textColumn("activity_type");
 		activityType.set(Selection.withRange(0, activityType.size()), activityType.replaceAll("_[0-9]{2,}$", ""));
 
-		ShpOptions.Index index = shp.createIndex(idColumn);
-
+		ShpOptions.Index index = crs.getInputCRS() == null ? shp.createIndex(idColumn) : shp.createIndex(crs.getInputCRS(), idColumn);
 
 		// stores the counts of activities per region
 		Object2ObjectOpenHashMap<Object, Object2IntMap<String>> regionActivityCounts = new Object2ObjectOpenHashMap<>();
@@ -97,11 +121,13 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 			Coord coord = new Coord(row.getDouble("coord_x"), row.getDouble("coord_y"));
 
 			// get the region for the current coordinate
-			Feature feature = index.queryFeature(coord);
+			SimpleFeature feature = index.queryFeature(coord);
 
 			if (feature == null) {
 				continue;
 			}
+
+			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 
 			Property prop = feature.getProperty(idColumn);
 			if (prop == null)
@@ -109,6 +135,9 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 
 			Object region = prop.getValue();
 			if (region != null && region.toString().length() > 0) {
+
+				double area = geometry.getArea();
+				regionAreaMap.put(region.toString(), area);
 
 				// Add region to the activity counts and person activity tracker if not already present
 				regionActivityCounts.computeIfAbsent(region, k -> new Object2IntOpenHashMap<>());
@@ -118,7 +147,7 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 				String personActivityKey = person + "_" + activity;
 
 				// adding activity only if it has not been counted for the person in the region
-				if (!trackedActivities.contains(personActivityKey)) {
+				if (singleOccurrence == null || !singleOccurrence.contains(activity) || !trackedActivities.contains(personActivityKey)) {
 					Object2IntMap<String> activityCounts = regionActivityCounts.get(region);
 					activityCounts.mergeInt(activity, 1, Integer::sum);
 
@@ -136,9 +165,13 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 
 		for (String activity : uniqueActivities) {
 			Table resultTable = Table.create();
-			TextColumn regionColumn = TextColumn.create("region");
+			TextColumn regionColumn = TextColumn.create("id");
 			DoubleColumn activityColumn = DoubleColumn.create("count");
-			resultTable.addColumns(regionColumn, activityColumn);
+			DoubleColumn distributionColumn = DoubleColumn.create("relative_density");
+			DoubleColumn countRatioColumn = DoubleColumn.create("density");
+			DoubleColumn areaColumn = DoubleColumn.create("area");
+
+			resultTable.addColumns(regionColumn, activityColumn, distributionColumn, countRatioColumn, areaColumn);
 			for (Map.Entry<Object, Object2IntMap<String>> entry : regionActivityCounts.entrySet()) {
 				Object region = entry.getKey();
 				double value = 0;
@@ -149,11 +182,31 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 						break;
 					}
 				}
+
+
 				Row row = resultTable.appendRow();
-				row.setString("region", region.toString());
+				row.setString("id", region.toString());
 				row.setDouble("count", value);
 			}
-			resultTable.addColumns(activityColumn.divide(activityColumn.sum()).setName("count_normalized"));
+
+			for (Row row : resultTable) {
+				Double area = regionAreaMap.get(row.getString("id"));
+				if (area != null) {
+					row.setDouble("area", area);
+					row.setDouble("density", row.getDouble("count") / area);
+				} else {
+					log.warn("Area for region {} is not found", row.getString("id"));
+				}
+			}
+
+			Double averageDensity = countRatioColumn.mean();
+
+			for (Row row : resultTable) {
+				Double value = row.getDouble("density");
+				row.setDouble("relative_density", (((value - averageDensity) / (averageDensity)) * 100));
+			}
+
+
 			resultTable.write().csv(output.getPath("activities_%s_per_region.csv", activity).toFile());
 			log.info("Wrote activity counts for {} to {}", activity, output.getPath("activities_%s_per_region.csv", activity));
 		}

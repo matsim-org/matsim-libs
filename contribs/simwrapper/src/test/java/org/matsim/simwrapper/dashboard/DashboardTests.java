@@ -20,11 +20,12 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 public class DashboardTests {
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void run(Dashboard... dashboards) {
 
@@ -182,7 +183,73 @@ public class DashboardTests {
 
 	@Test
 	void activity() {
-		ActivityDashboard ad = new ActivityDashboard();
+		ActivityDashboard ad = new ActivityDashboard("kehlheim_shape_2.shp");
+
+		// "count", "region"
+		ad.addActivityType(
+			"work",
+			List.of("work"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"kehlheim_ref.csv"
+		);
+
+//		ad.addActivityType(
+//			"education",
+//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
+//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY),
+//			"kehlheim_ref.csv", "count", "region"
+//		);
+
+		run(ad);
+	}
+
+	@Test
+	void activityBerlin() {
+		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_polygon.shp");
+
+		// , "count", "fid"
+		ad.addActivityType(
+			"work",
+			List.of("work"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"berlin_verkehrszellen_polygon.csv"
+		);
+
+//		ad.addActivityType(
+//			"education",
+//			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
+//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY),
+//			"kehlheim_ref.csv", "count", "region"
+//		);
+
+		run(ad);
+	}
+
+	@Test
+	void activityBerlinGrid() {
+		ActivityDashboard ad = new ActivityDashboard("berlin_verkehrszellen_raster.shp");
+
+		// , "count", "fid"
+//		ad.addActivityType(
+//			"work",
+//			List.of("work"),
+//			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+//			"berlin_verkehrszellen_raster.csv"
+//		);
+
+		ad.addActivityType(
+			"work",
+			List.of("work"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"kehlheim_ref.csv"
+		);
+
+		ad.addActivityType(
+			"education",
+			List.of("educ_kiga", "educ_primary", "educ_secondary", "educ_tertiary"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"kehlheim_ref.csv"
+		);
 
 		run(ad);
 	}
