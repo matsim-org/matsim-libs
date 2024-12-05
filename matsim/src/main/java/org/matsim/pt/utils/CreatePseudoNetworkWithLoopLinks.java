@@ -20,7 +20,6 @@
 
 package org.matsim.pt.utils;
 
-import com.google.common.annotations.Beta;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,11 +39,8 @@ import java.util.*;
  * is assigned to a loop link, located in a node with the same coordinates as the stop.
  * The stop facility ID is used for node and link IDs.
  *
- * @author mrieser, davibicudo
- *
- * @implNote THis functionality might be merged with {@link CreatePseudoNetwork}.
+ * @author mrieser, davibicudo, rakow
  */
-@Beta
 public class CreatePseudoNetworkWithLoopLinks {
 
 	private final TransitSchedule schedule;
@@ -82,23 +78,29 @@ public class CreatePseudoNetworkWithLoopLinks {
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<>();
 		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Id<Link>> routeLinks = new ArrayList<>();
+
+				if (tRoute.getStops().size() < 2) {
+					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
+					toBeRemoved.add(new Tuple<>(tLine, tRoute));
+					continue;
+				}
+
+				List<Id<Link>> routeLinks = new ArrayList<>();
 				TransitRouteStop prevStop = null;
+
 				for (TransitRouteStop stop : tRoute.getStops()) {
 					if (prevStop != null) {
 						Link link = getNetworkLink(prevStop, stop);
 						routeLinks.add(link.getId());
 					}
+
+					// Add the loop links of all stops to the route
+					routeLinks.add(getLoopLink(stop.getStopFacility()).getId());
 					prevStop = stop;
 				}
 
-				if (!routeLinks.isEmpty()) {
-					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks);
-					tRoute.setRoute(route);
-				} else {
-					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
-					toBeRemoved.add(new Tuple<>(tLine, tRoute));
-				}
+				NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks);
+				tRoute.setRoute(route);
 			}
 		}
 
@@ -114,11 +116,28 @@ public class CreatePseudoNetworkWithLoopLinks {
 			this.nodes.put(stop, node);
 
 			Link loopLink = this.network.getFactory().createLink(Id.createLinkId (this.prefix + stop.getId()), node, node);
+			// Loop links needs to have a length so that the travel time is not zero
+			loopLink.setLength(1);
+			loopLink.setFreespeed(linkFreeSpeed);
+			loopLink.setCapacity(linkCapacity);
+			// Ensure enough vehicles can be placed on the loop link
+			loopLink.setNumberOfLanes(linkCapacity);
+			loopLink.setAllowedModes(transitModes);
+
 			stop.setLinkId(loopLink.getId());
 			this.network.addLink(loopLink);
 			Tuple<Node, Node> connection = new Tuple<>(node, node);
 			this.links.put(connection, loopLink);
 		}
+	}
+
+	/**
+	 * Get the loop link for a stop facility.
+	 */
+	private Link getLoopLink(final TransitStopFacility stop) {
+		Node node = this.nodes.get(stop);
+		Tuple<Node, Node> connection = new Tuple<>(node, node);
+		return this.links.get(connection);
 	}
 
 	private Link getNetworkLink(final TransitRouteStop fromStop, final TransitRouteStop toStop) {
@@ -137,13 +156,15 @@ public class CreatePseudoNetworkWithLoopLinks {
 		Node fromNode = connection.getFirst();
 		Node toNode = connection.getSecond();
 		Link link;
-		link = this.network.getFactory().createLink(Id.createLinkId(this.prefix + fromNode.getId() + "-" + toNode.getId()), fromNode,
-			toNode);
-		link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
+		link = this.network.getFactory().createLink(Id.createLinkId(fromNode.getId() + "-" + toNode.getId()),
+			fromNode, toNode);
 
+		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord());
+		link.setLength(dist);
 		link.setFreespeed(linkFreeSpeed);
 		link.setCapacity(linkCapacity);
 		link.setNumberOfLanes(1);
+
 		this.network.addLink(link);
 		link.setAllowedModes(this.transitModes);
 		this.links.put(connection, link);
