@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking.logic;
 
 import java.util.Optional;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.prebooking.logic.helpers.PopulationIterator;
@@ -61,6 +62,14 @@ public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimIni
 
 	static public void setPlannedDepartureTime(String mode, Trip trip, double plannedDepartureTime) {
 		trip.getTripAttributes().putAttribute(getPlannedDepartureTimeAttribute(mode), plannedDepartureTime);
+	}
+
+	static public void setSubmissionTime(String mode, Activity originActivity, double submissionTime) {
+		originActivity.getAttributes().putAttribute(getSubmissionTimeAttribute(mode), submissionTime);
+	}
+
+	static public void setPlannedDepartureTime(String mode, Activity originActivity, double plannedDepartureTime) {
+		originActivity.getAttributes().putAttribute(getPlannedDepartureTimeAttribute(mode), plannedDepartureTime);
 	}
 
 	private final PrebookingQueue prebookingQueue;
