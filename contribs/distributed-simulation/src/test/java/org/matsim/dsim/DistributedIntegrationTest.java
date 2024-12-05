@@ -43,6 +43,7 @@ public class DistributedIntegrationTest {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(1);
 		config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+		config.controller().setWriteEventsInterval(1);
 
 		config.routing().setRoutingRandomness(0);
 
