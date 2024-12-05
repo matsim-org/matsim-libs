@@ -16,9 +16,9 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
-import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Log4j2
 public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
@@ -28,8 +28,9 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	private final ActiveNodes activeNodes;
 	private final ActiveLinks activeLinks;
+	private final ParkedVehicles parkedVehicles;
 
-	private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
+	//private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
 	private final Set<String> modes;
@@ -39,13 +40,14 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	@Inject
 	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,
-								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
+								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks, ParkedVehicles parkedVehicles,
 								Wait2Link wait2Link, EventsManager em) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
 		this.activeNodes = activeNodes;
 		this.activeLinks = activeLinks;
+		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
 		this.modes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 	}
@@ -73,14 +75,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 			throw new RuntimeException("Only driver agents are supported");
 		}
 
-		// place person into vehicle
-		DistributedMobsimVehicle vehicle = Objects.requireNonNull(
-			parkedVehicles.remove(driver.getPlannedVehicleId()),
-			() -> "Vehicle not found: %s for agent %s on part %d".formatted(
-				driver.getPlannedVehicleId(),
-				driver.getId(),
-				this.simNetwork.getPart())
-		);
+		var vehicle = parkedVehicles.unpark(driver.getPlannedVehicleId(), linkId);
 		driver.setVehicle(vehicle);
 		vehicle.setDriver(driver);
 		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
@@ -154,7 +149,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 			1.0
 		));
 
-		this.parkedVehicles.put(vehicle.getId(), vehicle);
+		this.parkedVehicles.park(vehicle, link);
 		em.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), vehicle.getId()));
 
 		driver.endLegAndComputeNextState(now);
@@ -162,9 +157,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh) {
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (veh instanceof DistributedMobsimVehicle dv) {
-			parkedVehicles.put(veh.getId(), dv);
+			var link = simNetwork.getLinks().get(startLinkId);
+			parkedVehicles.park(dv, link);
 		} else {
 			throw new RuntimeException("Only QVehicles are supported");
 		}

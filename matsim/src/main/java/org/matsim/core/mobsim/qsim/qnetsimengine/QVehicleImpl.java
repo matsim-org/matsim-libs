@@ -67,10 +67,27 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 	private Id<Link> currentLinkId = null;
 	private final Vehicle vehicle;
 	private final int passengerCapacity;
+	private final double scaledPce;
 
+	/**
+	 * Creates a new QVehicle and takes the pce of the supplied vehicle type as is.
+	 *
+	 * @param basicVehicle the material for the QVehicle
+	 */
 	public QVehicleImpl(final Vehicle basicVehicle) {
+		this(basicVehicle, 1.0);
+	}
+
+	/**
+	 * Creates a new QVehicle
+	 *
+	 * @param basicVehicle     material for the QVehicle
+	 * @param pceScalingFactor scales the pce of the vehicle type. The scaled pce = vehicleType.pce * pceScalingFactor
+	 */
+	public QVehicleImpl(final Vehicle basicVehicle, double pceScalingFactor) {
 		this.id = basicVehicle.getId();
 		this.vehicle = basicVehicle;
+		this.scaledPce = basicVehicle.getType().getPcuEquivalents() * pceScalingFactor;
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
@@ -93,6 +110,11 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 		}
 	}
 
+	/**
+	 * Creates a QVehicle from a message. This is used in the DSim implementation
+	 * The constructor re-creates the vehicle as well as the state it had, when it was
+	 * converted into a message.
+	 */
 	public QVehicleImpl(QVehicleMessage message) {
 		this.id = message.vehicle().getId();
 		this.vehicle = message.vehicle();
@@ -100,6 +122,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 		this.linkEnterTime = message.linkEnterTime();
 		this.earliestLinkExitTime = message.earliestLinkExitTime();
 		this.currentLinkId = message.currentLinkId();
+		this.scaledPce = message.scaledPce();
 	}
 
 	@Override
@@ -158,7 +181,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public double getSizeInEquivalents() {
-		return vehicle.getType().getPcuEquivalents();
+		return scaledPce;
 	}
 
 	@Override
@@ -223,6 +246,13 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public Message toMessage() {
-		return new QVehicleMessage(this.linkEnterTime, this.earliestLinkExitTime, this.currentLinkId, this.vehicle, this.passengerCapacity);
+		return new QVehicleMessage(
+			this.linkEnterTime,
+			this.earliestLinkExitTime,
+			this.currentLinkId,
+			this.vehicle,
+			this.passengerCapacity,
+			this.scaledPce
+		);
 	}
 }

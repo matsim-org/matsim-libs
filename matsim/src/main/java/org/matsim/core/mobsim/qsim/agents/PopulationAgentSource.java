@@ -77,7 +77,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 		// insert vehicles first, as this modifies plans by setting vehicle ids. When MobsimAgents are created from Persons, they might make
 		// a copy of the person's plan so that changes to the plan after that point are not reflected in the MobsimAgent's plan. Janek nov' 24
 		for (Person p : population.getPersons().values()) {
-			insertVehicles(p, qsim::addParkedVehicle);
+			insertVehicles(p, NetworkPartition.SINGLE_INSTANCE, qsim::addParkedVehicle);
 		}
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
@@ -87,7 +87,13 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 	private static int cnt = 5;
 
-	private void insertVehicles(Person person, BiConsumer<MobsimVehicle, Id<Link>> vehicleInsertion) {
+	/**
+	 * Inserts vehicles into the simulation. As a side effect, this method adds vehicle ids to legs in the
+	 * selected plan of the supplied person. This method is aware of network partitions. It will set vehicle
+	 * ids on selected plans of all supplied persons, but it will only insert vehicles which have their first
+	 * starting link on the supplied network partition.
+	 */
+	private void insertVehicles(Person person, NetworkPartition partition, BiConsumer<MobsimVehicle, Id<Link>> vehicleInsertion) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
 
@@ -170,6 +176,12 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person, vehicle);
 
+			// We only want to insert vehicles into the mobsim if the vehicle starts on our partition.
+			// otherwise some other partition should insert this vehicle on its own partition.
+			if (!partition.containsLink(vehicleLinkId)) {
+				return;
+			}
+
 			// Checking if the vehicle has been seen before:
 			Id<Link> result = this.seenVehicleIds.get(vehicleId);
 			if (result != null) {
@@ -192,7 +204,6 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 			} else {
 				this.seenVehicleIds.put(vehicleId, vehicleLinkId);
-//				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
 				vehicleInsertion.accept(this.qVehicleFactory.createQVehicle(vehicle), vehicleLinkId);
 			}
 		}
@@ -244,12 +255,14 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 				case Leg l -> l.getRoute().getStartLinkId();
 				default -> throw new IllegalStateException("Unexpected class: " + p.getSelectedPlan().getPlanElements().getFirst().getClass());
 			};
+			// insert vehicles checks whether vehicles start on this partition. We have to execute this method for each person regardless of its starting
+			// partition, for the case that the starting link of a vehicle is not the same as the starting partition of an agent.
+			insertVehicles(p, partition, mobsim::addParkedVehicle);
 
 			if (partition.containsLink(start)) {
 				// first create vehicles, then create persons, as the 'insertVehicles' method sets vehicle ids on the plan
 				// create mobsim agent might copy the plan so that changes to the original plan must be set before the mobsim
 				// agent is created.
-				insertVehicles(p, mobsim::addParkedVehicle);
 				var agent = this.agentFactory.createMobsimAgentFromPerson(p);
 				mobsim.insertAgentIntoMobsim(agent);
 			}
