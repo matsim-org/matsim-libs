@@ -3,7 +3,6 @@ package org.matsim.dsim;
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 import org.matsim.dsim.simulation.DSimComponentsModule;
 import org.matsim.dsim.simulation.SimProvider;
@@ -23,7 +22,6 @@ public class DSimModule extends AbstractModule {
 
 		// Install default Qsim which are reused by DSim
 		installQSimModule(new ActivityEngineModule());
-		installQSimModule(new PopulationModule());
 		installQSimModule(new TransitEngineModule());
 
 		// DSim specific QSim modules

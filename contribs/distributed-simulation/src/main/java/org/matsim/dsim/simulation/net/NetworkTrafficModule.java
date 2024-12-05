@@ -15,6 +15,14 @@ public class NetworkTrafficModule extends AbstractQSimModule {
 		bind(ActiveLinks.class).in(Singleton.class);
 		bind(ActiveNodes.class).in(Singleton.class);
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkTrafficEngine.class );
+		addQSimComponentBinding(COMPONENT_NAME).to(NetworkTrafficEngine.class);
+
+		var parkedClass = switch (getConfig().qsim().getVehicleBehavior()) {
+			case teleport -> TeleportedParking.class;
+			case wait ->
+				throw new IllegalArgumentException("Dsim only supports config:qsim.vehicleBehavior='teleport' and 'exception'. " + getConfig().qsim().getVehicleBehavior() + " is not supported.");
+			case exception -> MassConservingParking.class;
+		};
+		bind(ParkedVehicles.class).to(parkedClass);
 	}
 }

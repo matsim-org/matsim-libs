@@ -44,10 +44,11 @@ class NetworkTrafficEngineTest {
 		var wait2link = new DefaultWait2Link(eventsManager);
 		var activeNodes = new ActiveNodes(eventsManager);
 		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
+		var parkedVehicles = new MassConservingParking();
 		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
 
 		var engine = new NetworkTrafficEngine(scenario, mock(AgentSourcesContainer.class), simNetwork,
-			activeNodes, activeLinks, wait2link, eventsManager);
+			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager);
 
 		//Assertions.fail("Needs real simnetwork");
 
@@ -62,7 +63,7 @@ class NetworkTrafficEngineTest {
 		agent.setVehicle(vehicle);
 		engine.onPrepareSim();
 
-		engine.addParkedVehicle(vehicle);
+		engine.addParkedVehicle(vehicle, agent.getCurrentLinkId());
 
 		AtomicInteger i = new AtomicInteger(0);
 
