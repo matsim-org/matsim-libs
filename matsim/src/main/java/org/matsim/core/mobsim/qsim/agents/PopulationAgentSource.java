@@ -176,9 +176,10 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person, vehicle);
 
-			// We only want to insert vehicles into the mobsim if the vehicle starts on our partition.
-			// otherwise some other partition should insert this vehicle on its own partition.
-			if (!partition.containsLink(vehicleLinkId)) {
+			// If vehicle behavior is 'teleport' every partition should have all vehicles, so that they are available everywhere.
+			// Otherwise, only the partition the vehicle starts on, gets the vehicle, and another partition should generate the vehicle.
+			if (qsim.getScenario().getConfig().qsim().getVehicleBehavior() != QSimConfigGroup.VehicleBehavior.teleport &&
+				!partition.containsLink(vehicleLinkId)) {
 				return;
 			}
 
@@ -250,14 +251,16 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	@Override
 	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
 		for (Person p : population.getPersons().values()) {
+
+			// insert vehicles checks whether vehicles start on this partition. We have to execute this method for each person regardless of its starting
+			// partition, for the case that the starting link of a vehicle is not the same as the starting partition of an agent.
+			insertVehicles(p, partition, mobsim::addParkedVehicle);
+
 			var start = switch (p.getSelectedPlan().getPlanElements().getFirst()) {
 				case Activity a -> PopulationUtils.decideOnLinkIdForActivity(a, qsim.getScenario());
 				case Leg l -> l.getRoute().getStartLinkId();
 				default -> throw new IllegalStateException("Unexpected class: " + p.getSelectedPlan().getPlanElements().getFirst().getClass());
 			};
-			// insert vehicles checks whether vehicles start on this partition. We have to execute this method for each person regardless of its starting
-			// partition, for the case that the starting link of a vehicle is not the same as the starting partition of an agent.
-			insertVehicles(p, partition, mobsim::addParkedVehicle);
 
 			if (partition.containsLink(start)) {
 				// first create vehicles, then create persons, as the 'insertVehicles' method sets vehicle ids on the plan
