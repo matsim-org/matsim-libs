@@ -25,6 +25,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreatePseudoNetwork;
+import org.matsim.pt.utils.CreatePseudoNetworkWithLoopLinks;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.*;
 import picocli.CommandLine;
@@ -32,7 +33,10 @@ import picocli.CommandLine;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -85,8 +89,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--transform-schedule", description = "Fully qualified class name to a Consumer<TransitSchedule> to be executed after the schedule was created", arity = "0..*", split = ",")
 	private List<Class<?>> transformSchedule;
 
-	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate")
-	private boolean mergeStops;
+	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate", defaultValue = "doNotMerge")
+	private GtfsConverter.MergeGtfsStops mergeStops;
 
 	@CommandLine.Option(names = "--prefix", description = "Prefixes to add to the gtfs ids. Required if multiple inputs are used and ids are not unique.", split = ",")
 	private List<String> prefixes = new ArrayList<>();
@@ -100,8 +104,27 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--shp-crs", description = "Overwrite coordinate system of the shape file")
 	private String shpCrs;
 
+	@CommandLine.Option(names = "--pseudo-network", description = "Define how the pseudo network should be created", defaultValue = "singleLinkBetweenStops")
+	private PseudoNetwork pseudoNetwork;
+
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateTransitScheduleFromGtfs()).execute(args));
+	}
+
+	private static void addHbefaMapping(VehicleType vehicleType, HbefaVehicleCategory category) {
+		EngineInformation carEngineInformation = vehicleType.getEngineInformation();
+		VehicleUtils.setHbefaVehicleCategory(carEngineInformation, String.valueOf(category));
+		VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
+		VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
+		VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
+		vehicleType.setNetworkMode(TransportMode.pt);
+	}
+
+	private static void increaseLinkFreespeedIfLower(Link link, double newFreespeed) {
+		if (link.getFreespeed() < newFreespeed) {
+			link.setFreespeed(newFreespeed);
+		}
 	}
 
 	@Override
@@ -237,14 +260,19 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	/**
 	 * Creates the pt scenario and network.
 	 */
-	private static Scenario getScenarioWithPseudoPtNetworkAndTransitVehicles(Network network, TransitSchedule schedule, String ptNetworkIdentifier) {
+	private Scenario getScenarioWithPseudoPtNetworkAndTransitVehicles(Network network, TransitSchedule schedule, String ptNetworkIdentifier) {
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(ConfigUtils.createConfig());
 		builder.setNetwork(network);
 		builder.setTransitSchedule(schedule);
 		Scenario scenario = builder.build();
 
 		// add pseudo network for pt
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), ptNetworkIdentifier, 0.1, 100000.0).createNetwork();
+		switch (pseudoNetwork) {
+			case singleLinkBetweenStops ->
+				new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), ptNetworkIdentifier, 0.1, 100000.0).createNetwork();
+			case withLoopLinks ->
+				new CreatePseudoNetworkWithLoopLinks(scenario.getTransitSchedule(), scenario.getNetwork(), ptNetworkIdentifier, 0.1, 100000.0).createNetwork();
+		}
 
 		// create TransitVehicle types
 		// see https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-24/ for veh capacities
@@ -481,20 +509,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		return scenario;
 	}
 
-	private static void addHbefaMapping(VehicleType vehicleType, HbefaVehicleCategory category) {
-		EngineInformation carEngineInformation = vehicleType.getEngineInformation();
-		VehicleUtils.setHbefaVehicleCategory(carEngineInformation, String.valueOf(category));
-		VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
-		VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
-		VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
-		vehicleType.setNetworkMode(TransportMode.pt);
+	public enum PseudoNetwork {
+		/**
+		 * Create links between all stops and possibly duplicate stops.
+		 */
+		singleLinkBetweenStops,
+		/**
+		 * Create a pseudo network with loop links at each stop.
+		 */
+		withLoopLinks,
 	}
-
-	private static void increaseLinkFreespeedIfLower(Link link, double newFreespeed) {
-		if (link.getFreespeed() < newFreespeed) {
-			link.setFreespeed(newFreespeed);
-		}
-	}
-
 
 }
