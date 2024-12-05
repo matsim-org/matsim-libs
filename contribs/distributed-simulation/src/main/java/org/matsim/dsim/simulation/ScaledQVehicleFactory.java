@@ -1,5 +1,6 @@
 package org.matsim.dsim.simulation;
 
+import com.google.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
@@ -14,6 +15,7 @@ public class ScaledQVehicleFactory implements QVehicleFactory {
 
 	private final Config config;
 
+	@Inject
 	public ScaledQVehicleFactory(Config config) {this.config = config;}
 
 	@Override

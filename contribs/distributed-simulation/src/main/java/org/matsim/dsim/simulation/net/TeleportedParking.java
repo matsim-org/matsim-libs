@@ -1,45 +1,34 @@
 package org.matsim.dsim.simulation.net;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Parged vehicles logic for config:qsim.vehicleBehavior=teleport. The logic for parked vehicles diverts from that implemented in the
  * Qsim.
  * <p>
- * TeleportedParking does not keep track of vehicles, but generates new vehicles on the spot. This means there is no guarantee that a certain
+ * TeleportedParking does not keep track of vehicles, but hands out vehicle references. This means there is no guarantee that a certain
  * vehicle is only used once. Use config:qsim.vehicleBehavior=exception to ensure this behavior
  */
 class TeleportedParking implements ParkedVehicles {
 
-	private final QVehicleFactory vehicleFactory;
-	private final Scenario scenario;
-
-	@Inject
-	public TeleportedParking(QVehicleFactory vehicleFactory, Scenario scenario) {
-		this.vehicleFactory = vehicleFactory;
-		this.scenario = scenario;
-	}
+	private final Map<Id<Vehicle>, DistributedMobsimVehicle> vehicles = new HashMap<>();
 
 	@Override
 	public DistributedMobsimVehicle unpark(Id<Vehicle> vehicleId, Id<Link> linkId) {
 
-		var vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
-		var simVehicle = vehicleFactory.createQVehicle(vehicle);
-
-		assert simVehicle instanceof DistributedMobsimVehicle :
-			"Vehicle Factory must return an instance of 'DistributedMobsimVehicle' if used with 'DSim'.";
-
-		return (DistributedMobsimVehicle) simVehicle;
+		var vehicle = vehicles.get(vehicleId);
+		assert vehicle != null : "Could not find vehicle " + vehicleId + " vehicles must be added to the simulation on prepareSim";
+		return vehicle;
 	}
 
 	@Override
 	public void park(DistributedMobsimVehicle vehicle, SimLink link) {
-		// do nothing
+		vehicles.put(vehicle.getId(), vehicle);
 	}
 }
