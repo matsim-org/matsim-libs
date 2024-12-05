@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.*;
@@ -54,8 +55,9 @@ import java.util.function.BiConsumer;
 
 public final class PopulationAgentSource implements AgentSource, DistributedAgentSource {
 	private static final Logger log = LogManager.getLogger(PopulationAgentSource.class);
-
+	private static int cnt = 5;
 	private final Population population;
+	private final PopulationPartition partition;
 	private final AgentFactory agentFactory;
 	private final QVehicleFactory qVehicleFactory;
 	private final Netsim qsim;
@@ -64,12 +66,26 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	private int warnCnt = 0;
 
 	@Inject
-	PopulationAgentSource(Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim) {
+	PopulationAgentSource(Population population, PopulationPartition partition,
+						  AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim) {
 		this.population = population;
+		this.partition = partition;
 		this.agentFactory = agentFactory;
 		this.qVehicleFactory = qVehicleFactory;
 		this.qsim = qsim;
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+	}
+
+	public static Id<Link> getStartLink(Scenario scenario, Person person) {
+		Plan plan = person.getSelectedPlan();
+		if (plan == null)
+			plan = person.getPlans().getFirst();
+
+		return switch (plan.getPlanElements().getFirst()) {
+			case Activity a -> PopulationUtils.decideOnLinkIdForActivity(a, scenario);
+			case Leg l -> l.getRoute().getStartLinkId();
+			default -> throw new IllegalStateException("Unexpected class: " + plan.getPlanElements().getFirst().getClass());
+		};
 	}
 
 	@Override
@@ -84,8 +100,6 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			qsim.insertAgentIntoMobsim(agent);
 		}
 	}
-
-	private static int cnt = 5;
 
 	/**
 	 * Inserts vehicles into the simulation. As a side effect, this method adds vehicle ids to legs in the
@@ -256,13 +270,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			// partition, for the case that the starting link of a vehicle is not the same as the starting partition of an agent.
 			insertVehicles(p, partition, mobsim::addParkedVehicle);
 
-			var start = switch (p.getSelectedPlan().getPlanElements().getFirst()) {
-				case Activity a -> PopulationUtils.decideOnLinkIdForActivity(a, qsim.getScenario());
-				case Leg l -> l.getRoute().getStartLinkId();
-				default -> throw new IllegalStateException("Unexpected class: " + p.getSelectedPlan().getPlanElements().getFirst().getClass());
-			};
-
-			if (partition.containsLink(start)) {
+			if (this.partition.contains(p.getId())) {
 				// first create vehicles, then create persons, as the 'insertVehicles' method sets vehicle ids on the plan
 				// create mobsim agent might copy the plan so that changes to the original plan must be set before the mobsim
 				// agent is created.

@@ -222,6 +222,10 @@ public final class DistributedEventsManager implements EventsManager {
 		registry.eventTypes(new IntOpenHashSet(globalListener.keySet()));
 		registry.syncStep(remoteSyncStep);
 
+		// Clear all data structures
+		waitFor.clear();
+		remoteListener.clear();
+
 		EventRegistry self = registry.build();
 		List<EventRegistry> all = comm.allGather(self, 1, serializer);
 
