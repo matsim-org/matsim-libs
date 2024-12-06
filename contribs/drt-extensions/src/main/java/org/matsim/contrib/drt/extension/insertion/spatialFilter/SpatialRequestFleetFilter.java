@@ -1,6 +1,24 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 
-import com.google.common.base.Verify;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -54,16 +72,15 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
     private final double updateInterval;
 
     public SpatialRequestFleetFilter(Fleet fleet, MobsimTimer mobsimTimer,
-                                     SpatialFilterInsertionSearchQSimModule.SpatialInsertionFilterSettings settings) {
-        Verify.verify(settings.minExpansion() > 0, "Minimum expansion must be greater than 0");
+                                     DrtSpatialRequestFleetFilterParams params) {
         this.fleet = fleet;
         this.mobsimTimer = mobsimTimer;
-        this.expansionIncrementFactor = settings.expansionIncrement();
-        this.minExpansion = settings.minExpansion();
-        this.maxExpansion = settings.maxExpansion();
-        this.returnAllIfEmpty = settings.returnAllIfEmpty();
-        this.minCandidates = settings.minCandidates();
-        this.updateInterval = settings.updateInterval();
+        this.expansionIncrementFactor = params.expansionFactor;
+        this.minExpansion = params.minExpansion;
+        this.maxExpansion = params.maxExpansion;
+        this.returnAllIfEmpty = params.returnAllIfEmpty;
+        this.minCandidates = params.minCandidates;
+        this.updateInterval = params.updateInterval;
     }
 
     @Override

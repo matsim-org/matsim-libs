@@ -14,13 +14,13 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.testcases.fakes.FakeLink;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,28 +44,24 @@ public class SpatIalRequestFleetFilterTest {
     void test() {
 
         Link link = prepareNetworkAndLink();
-        FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
-        fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
-                .id(V_1_ID)
-                .startLinkId(link.getId())
-                .capacity(6)
-                .serviceBeginTime(0)
-                .serviceEndTime(1000)
-                .build()
-        );
 
-        Fleet fleet = Fleets.createDefaultFleet(fleetSpecification, dvrpVehicleSpecification -> link);
         MobsimTimer timer = new MobsimTimer(1);
-        timer.setTime(0);
+        timer.setTime(10);
 
-        // vehicle entry
-        Waypoint.Start start = start(null, 0, link, 1);//not a STOP -> pickup cannot be appended
-        DvrpVehicle vehicle = fleet.getVehicles().get(V_1_ID);
-        var vehicleEntry = entry(vehicle, start);
+        Fleet fleet = getFleet(link);
+        var vehicleEntry = getVehicleEntry(link, fleet);
 
         DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
 
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, new SpatialFilterInsertionSearchQSimModule.SpatialInsertionFilterSettings(2, 0, 0, true, 0, 100));
+        DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
+        params.updateInterval = 1;
+        params.expansionFactor = 2;
+
+        // mimic no finding of candidates by setting min higher by max (prevented by config consistency check in regular setup)
+        params.minExpansion = 1;
+        params.maxExpansion = 0;
+        params.returnAllIfEmpty = false;
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isEmpty();
     }
@@ -74,6 +70,45 @@ public class SpatIalRequestFleetFilterTest {
     void testReturnAllIfEmpty() {
 
         Link link = prepareNetworkAndLink();
+
+        MobsimTimer timer = new MobsimTimer(1);
+        timer.setTime(10);
+
+        // vehicle entry
+        Fleet fleet = getFleet(link);
+        var vehicleEntry = getVehicleEntry(link, fleet);
+
+        DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
+
+        DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
+        params.updateInterval = 1;
+        params.expansionFactor = 2;
+        params.minExpansion = 1;
+        params.maxExpansion = 0;
+        params.returnAllIfEmpty = true;
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
+        Assertions.assertThat(filtered).isNotEmpty();
+    }
+
+    @NotNull
+    private VehicleEntry getVehicleEntry(Link link, Fleet fleet) {
+        Waypoint.Start start = start(null, 0, link, 1);//not a STOP -> pickup cannot be appended
+        DvrpVehicle vehicle = fleet.getVehicles().get(V_1_ID);
+
+        vehicle.getSchedule()
+                .addTask(new DrtTaskFactoryImpl().createInitialTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+                        vehicle.getStartLink()));
+
+        Task task = vehicle.getSchedule().nextTask();
+
+        vehicle.getSchedule().getCurrentTask().setEndTime(0);
+        var vehicleEntry = entry(vehicle, start);
+        return vehicleEntry;
+    }
+
+    @NotNull
+    private static Fleet getFleet(Link link) {
         FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
         fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
                 .id(V_1_ID)
@@ -85,21 +120,7 @@ public class SpatIalRequestFleetFilterTest {
         );
 
         Fleet fleet = Fleets.createDefaultFleet(fleetSpecification, dvrpVehicleSpecification -> link);
-        MobsimTimer timer = new MobsimTimer(1);
-        timer.setTime(0);
-
-        // vehicle entry
-        Waypoint.Start start = start(null, 0, link, 1);//not a STOP -> pickup cannot be appended
-        DvrpVehicle vehicle = fleet.getVehicles().get(V_1_ID);
-        var vehicleEntry = entry(vehicle, start);
-
-        DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
-
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer,
-                new SpatialFilterInsertionSearchQSimModule.SpatialInsertionFilterSettings(2,
-                        1, 0, true, 1, 100));
-        Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
-        Assertions.assertThat(filtered).isNotEmpty();
+        return fleet;
     }
 
     @NotNull
