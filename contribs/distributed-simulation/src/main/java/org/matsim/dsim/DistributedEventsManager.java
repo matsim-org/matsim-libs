@@ -225,6 +225,7 @@ public final class DistributedEventsManager implements EventsManager {
 		// Clear all data structures
 		waitFor.clear();
 		remoteListener.clear();
+		lastSync = -1;
 
 		EventRegistry self = registry.build();
 		List<EventRegistry> all = comm.allGather(self, 1, serializer);
