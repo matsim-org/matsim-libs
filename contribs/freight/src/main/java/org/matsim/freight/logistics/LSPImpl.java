@@ -71,7 +71,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   /**
-   * This is used from {@link LSPControlerListener} and not meant to be used from user code. Users
+   * This is used from {@link LSPControllerListener} and not meant to be used from user code. Users
    * should bind {@link LSPScorerFactory}.
    */
   /* package-private */ void setScorer(LSPScorer scorer) {

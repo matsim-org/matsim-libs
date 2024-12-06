@@ -115,14 +115,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -133,7 +133,7 @@
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
 			<scope>test</scope>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<!-- needed to compile in IntelliJ with Eclipse compiler -->

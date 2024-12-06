@@ -20,7 +20,7 @@
 
 package org.matsim.freight.receiver.replanning;
 
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.receiver.Receiver;
 import org.matsim.freight.receiver.ReceiverPlan;
 import org.matsim.core.replanning.GenericStrategyManager;

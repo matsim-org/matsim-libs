@@ -26,8 +26,9 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Collection;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -44,9 +45,6 @@ import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
-
-import java.util.Collection;
-
 
 //TODO: length of routes (legs) AND end time of route are missing.
 /**
@@ -71,7 +69,7 @@ public class CarrierControllerUtilsIT{
 	public void setUp() {
 
 		//Create carrier with services and shipments
-		Carriers carriersWithServicesAndShpiments = new Carriers();
+		Carriers carriersWithServicesAndShipments = new Carriers();
 		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarriersUtils.addService(carrierWServices, service1);
@@ -89,8 +87,8 @@ public class CarrierControllerUtilsIT{
 		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );
         EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
-		engineInformation.setFuelType( FuelType.diesel );
-		engineInformation.setFuelConsumption( 0.015 );
+		VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
+		VehicleUtils.setFuelConsumptionLitersPerMeter(engineInformation, 0.015);
 		VehicleCapacity capacity = carrierVehType.getCapacity() ;
 		capacity.setOther( 3. ) ;
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -106,18 +104,14 @@ public class CarrierControllerUtilsIT{
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
 				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
-				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
 				.setFleetSize(FleetSize.INFINITE);
 		carrierWServices.setCarrierCapabilities(ccBuilder.build());
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
 		// Add both carriers
-		carriersWithServicesAndShpiments.addCarrier(carrierWServices);
-		carriersWithServicesAndShpiments.addCarrier(carrierWShipments);
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;
+		carriersWithServicesAndShipments.addCarrier(carrierWServices);
+		carriersWithServicesAndShipments.addCarrier(carrierWShipments);
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
@@ -126,7 +120,7 @@ public class CarrierControllerUtilsIT{
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
 
-		for (Carrier carrier : carriersWithServicesAndShpiments.getCarriers().values()) {
+		for (Carrier carrier : carriersWithServicesAndShipments.getCarriers().values()) {
 			//Build VRP
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
@@ -144,15 +138,12 @@ public class CarrierControllerUtilsIT{
 		}
 
 		/*
-		 * Now convert it to a only shipment-based VRP.
+		 * Now convert it to an only shipment-based VRP.
 		 */
 
 		//Convert to jsprit VRP
 		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(
-				carriersWithServicesAndShpiments );
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;
+				carriersWithServicesAndShipments );
 
 		for (Carrier carrier : carriersWithShipmentsOnly.getCarriers().values()) {
 			//Build VRP

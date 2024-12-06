@@ -154,10 +154,10 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		}
 
 
-		log.info("-- avg. score of the executed plan of each agent: " + (info.sumExecutedScores / info.nofExecutedScores));
-		log.info("-- avg. score of the worst plan of each agent: " + (info.sumScoreWorst / info.nofScoreWorst));
-		log.info("-- avg. of the avg. plan score per agent: " + (info.sumAvgScores / info.nofAvgScores));
-		log.info("-- avg. score of the best plan of each agent: " + (info.sumScoreBest / info.nofScoreBest));
+		log.info("-- avg. score of the executed plan of each agent: {}", info.sumExecutedScores / info.nofExecutedScores);
+		log.info("-- avg. score of the worst plan of each agent: {}", info.sumScoreWorst / info.nofScoreWorst);
+		log.info("-- avg. of the avg. plan score per agent: {}", info.sumAvgScores / info.nofAvgScores);
+		log.info("-- avg. score of the best plan of each agent: {}", info.sumScoreBest / info.nofScoreBest);
 
 		try {
 			info.write(event.getIteration(), this.out, this.delimiter);
@@ -188,7 +188,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	}
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShutdownEvent) {
 		try {
 			this.out.close();
 			for (ScoreHist data : this.perLsp.values()) {

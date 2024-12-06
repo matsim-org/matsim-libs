@@ -21,6 +21,8 @@
 
 package org.matsim.freight.logistics.analysis;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -29,14 +31,11 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Basic event handler that collects the relation between vehicles and drivers.
  * Necessary since link enter and leave events do not contain the driver anymore.
  * <p>
- * This is the vice-versa implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
+ * This is the vice versa implementation of {@link org.matsim.core.events.algorithms.Vehicle2DriverEventHandler}.
  * <p>
  * In a first step only used internally. When needed more often, I have nothing against putting it more central. -> matsim-libs
  *

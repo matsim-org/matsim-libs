@@ -27,7 +27,7 @@
  *  This class here is in contrast used as a Replanning strategy. This behavior is not wanted anymore.
  *  <p></p>
  *  Please use the new approach as shown in
- *  {@link org.matsim.freight.logistics.example.lsp.multipleChains} ExampleMultipleOneEchelonChainsReplanning instead.
+ *  {@link org.matsim.freight.logistics.examples.multipleChains} ExampleMultipleOneEchelonChainsReplanning instead.
  *  ((The old approach is still available in CollectionLSPReplanningTest but will get removed earlier or later)).
  *  <p></p>
  *  KMT, Jul'24

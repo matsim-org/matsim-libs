@@ -29,17 +29,17 @@ public interface ChargingLogic {
 		ChargingLogic create(ChargerSpecification charger);
 	}
 
-	void addVehicle(ElectricVehicle ev, double now);
+	void addVehicle(ElectricVehicle ev, ChargingStrategy strategy, double now);
 
-	void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now);
+	void addVehicle(ElectricVehicle ev, ChargingStrategy strategy, ChargingListener chargingListener, double now);
 
 	void removeVehicle(ElectricVehicle ev, double now);
 
 	void chargeVehicles(double chargePeriod, double now);
 
-	Collection<ElectricVehicle> getPluggedVehicles();
+	Collection<ChargingVehicle> getPluggedVehicles();
 
-	Collection<ElectricVehicle> getQueuedVehicles();
+	Collection<ChargingVehicle> getQueuedVehicles();
 
-	ChargingStrategy getChargingStrategy();
+	record ChargingVehicle(ElectricVehicle ev, ChargingStrategy strategy) {}
 }

@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +34,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
-
-import java.util.*;
 
 /**
  * A reader that reads carriers and their plans.
@@ -82,7 +81,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
-	 * @param carrierVehicleTypes
+	 * @param carrierVehicleTypes which is a map that stores carrierVehicleTypes
 	 */
 	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super(ValidationType.DTD_OR_XSD);
@@ -188,7 +187,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			{
 				String vehicleId = attributes.getValue("vehicleId");
 				currentVehicle = vehicles.get(vehicleId);
-				currentTourBuilder = Tour.Builder.newInstance();
+				currentTourBuilder = Tour.Builder.newInstance(Id.create("unknown", Tour.class));
 				break ;
 			}
 			case "leg":
