@@ -61,6 +61,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufImpl;
@@ -98,8 +99,9 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     private boolean createLinkEvents = false;
 
     @Inject
-    public SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TransitDriverAgentFactory networkDriverFactory) {
-        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, networkDriverFactory);
+    public SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker,
+								TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
+        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
         this.qSim = qSim;
         this.context = context;
         this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
