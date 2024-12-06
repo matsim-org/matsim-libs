@@ -113,6 +113,9 @@ public final class DSim implements Mobsim {
 		// Sync after all components have been added
 		manager.syncEventRegistry(comm);
 
+		// Event handler without partition may be executed within the context of the first one
+		manager.setContext(node.getParts().getFirst());
+
 		manager.initProcessing();
 
 		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
