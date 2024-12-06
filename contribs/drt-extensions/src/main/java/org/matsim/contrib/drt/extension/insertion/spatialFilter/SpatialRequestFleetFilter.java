@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 
+import com.google.common.base.Verify;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -24,6 +25,16 @@ import java.util.*;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 /**
+ * Filter that periodically updates a spatial search tree with current vehicle positions.
+ * For a given request, only returns "nearby" vehicles.
+ * Suitable for large scenarios with a certain degree of spatial coverage
+ * Reduces insertion generation downstream.
+ *
+ * The spatial filter will start with a minimum expansion around the request origin and will
+ * iteratively expand further by the increment factor until either the maximum expansion or
+ * a minimum number of candidates is found.
+ *
+ *
  * @author nuehnel / MOIA
  */
 public class SpatialRequestFleetFilter implements RequestFleetFilter {
@@ -44,6 +55,7 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 
     public SpatialRequestFleetFilter(Fleet fleet, MobsimTimer mobsimTimer,
                                      SpatialFilterInsertionSearchQSimModule.SpatialInsertionFilterSettings settings) {
+        Verify.verify(settings.minExpansion() > 0, "Minimum expansion must be greater than 0");
         this.fleet = fleet;
         this.mobsimTimer = mobsimTimer;
         this.expansionIncrementFactor = settings.expansionIncrement();
