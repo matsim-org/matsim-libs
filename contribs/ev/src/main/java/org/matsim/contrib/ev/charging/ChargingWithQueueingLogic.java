@@ -40,15 +40,17 @@ import com.google.common.base.Preconditions;
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	protected final ChargerSpecification charger;
 	private final EventsManager eventsManager;
+	private final ChargingPriority priority;
 
 	private final Map<Id<Vehicle>, ChargingVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ChargingVehicle> queuedVehicles = new LinkedList<>();
 	private final Queue<ChargingVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
 	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
-	public ChargingWithQueueingLogic(ChargerSpecification charger,  EventsManager eventsManager) {
+	public ChargingWithQueueingLogic(ChargerSpecification charger,  EventsManager eventsManager, ChargingPriority priority) {
 		this.charger = Objects.requireNonNull(charger);
 		this.eventsManager = Objects.requireNonNull(eventsManager);
+		this.priority = priority;
 	}
 
 	@Override
@@ -71,21 +73,22 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
-		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
-		for (int i = 0; i < queuedToPluggedCount; i++) {
-			plugVehicle(queuedVehicles.poll(), now);
+		var queuedVehiclesIter = queuedVehicles.iterator();
+		while (queuedVehiclesIter.hasNext() && pluggedVehicles.size() < charger.getPlugCount()) {
+			var cv = queuedVehiclesIter.next();
+			if (plugVehicle(cv, now)) {
+				queuedVehiclesIter.remove();
+			}
 		}
 
 		var arrivingVehiclesIter = arrivingVehicles.iterator();
 		while (arrivingVehiclesIter.hasNext()) {
 			var cv = arrivingVehiclesIter.next();
-			if (pluggedVehicles.size() < charger.getPlugCount()) {
-				plugVehicle(cv, now);
-			} else {
+			if (pluggedVehicles.size() >= charger.getPlugCount() || !plugVehicle(cv, now)) {
 				queueVehicle(cv, now);
 			}
-			arrivingVehiclesIter.remove();
 		}
+		arrivingVehicles.clear();
 	}
 
 	@Override
@@ -106,8 +109,13 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getCharge()));
 			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
-			if (!queuedVehicles.isEmpty()) {
-				plugVehicle(queuedVehicles.poll(), now);
+			var queuedVehiclesIter = queuedVehicles.iterator();
+			while (queuedVehiclesIter.hasNext()) {
+				var queuedVehicle = queuedVehiclesIter.next();
+				if (plugVehicle(queuedVehicle, now)) {
+					queuedVehiclesIter.remove();
+					break;
+				}
 			}
 		} else {
 			// make sure ev was in the queue
@@ -123,12 +131,20 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		listeners.get(cv.ev().getId()).notifyVehicleQueued(cv.ev(), now);
 	}
 
-	private void plugVehicle(ChargingVehicle cv, double now) {
+	private boolean plugVehicle(ChargingVehicle cv, double now) {
+		assert pluggedVehicles.size() < charger.getPlugCount();
+
+		if (!priority.requestPlugNext(cv, now)) {
+			return false;
+		}
+
 		if (pluggedVehicles.put(cv.ev().getId(), cv) != null) {
 			throw new IllegalArgumentException();
 		}
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), cv.ev().getId(), cv.ev().getBattery().getCharge()));
 		listeners.get(cv.ev().getId()).notifyChargingStarted(cv.ev(), now);
+
+		return true;
 	}
 
 	private final Collection<ChargingVehicle> unmodifiablePluggedVehicles = Collections.unmodifiableCollection(pluggedVehicles.values());
@@ -147,14 +163,16 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	static public class Factory implements ChargingLogic.Factory {
 		private final EventsManager eventsManager;
+		private final ChargingPriority.Factory chargingPriorityFactory;
 
-		public Factory(EventsManager eventsManager) {
+		public Factory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
 			this.eventsManager = eventsManager;
+			this.chargingPriorityFactory = chargingPriorityFactory;
 		}
 
 		@Override
 		public ChargingLogic create(ChargerSpecification charger) {
-			return new ChargingWithQueueingLogic(charger,  eventsManager);
+			return new ChargingWithQueueingLogic(charger,  eventsManager, chargingPriorityFactory.create(charger));
 		}
 	}
 }
