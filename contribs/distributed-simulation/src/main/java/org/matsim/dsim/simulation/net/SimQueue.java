@@ -64,6 +64,11 @@ class SimQueue {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "q=[" + internalQ.toString() + "], inflowCapacity=[" + inflowCapacity.toString() + "], storageCapacity=[" + storageCapacity.toString() + "]";
+	}
+
 	static SimQueue create(Link link, QSimConfigGroup config, double effectiveCellSize) {
 		var internalQueue = createInternalQueue(config);
 		var inflowCap = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);

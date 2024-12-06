@@ -30,7 +30,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	private final ActiveLinks activeLinks;
 	private final ParkedVehicles parkedVehicles;
 
-	//private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
 	private final Set<String> modes;
@@ -108,7 +107,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		SimLink link = simNetwork.getLinks().get(linkId);
 
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
-		activeLinks.activate(link);
 	}
 
 	private void processUpdateMessage(CapacityUpdate updateMessage) {

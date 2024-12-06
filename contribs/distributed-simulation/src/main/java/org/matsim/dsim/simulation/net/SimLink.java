@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
 
@@ -216,6 +217,12 @@ public interface SimLink {
 			var vehicle = q.poll(now);
 			buffer.add(vehicle, now);
 		}
+
+		@Override
+		public String toString() {
+			// supposed to be used for debugging
+			return "Local id=" + this.id + " q=[ " + this.q.toString() + "], buf=[ " + this.buffer.toString() + "]";
+		}
 	}
 
 	class SplitOutLink implements SimLink {
@@ -309,6 +316,12 @@ public interface SimLink {
 		public boolean isStuck(double now) {
 			return false;
 		}
+
+		@Override
+		public String toString() {
+			var vehicles = q.stream().map(v -> v.getId().toString()).collect(Collectors.joining(", "));
+			return "SplitOut: id=" + this.id + ", veh=[" + vehicles + "], storageCap=[" + storageCapacity + "], inflowCap=[" + inflowCapacity + "]";
+		}
 	}
 
 	class SplitInLink implements SimLink {
@@ -351,7 +364,10 @@ public interface SimLink {
 
 		@Override
 		public DistributedMobsimVehicle popVehicle() {
-			return localLink.popVehicle();
+
+			var result = localLink.popVehicle();
+			localLink.activateLink.accept(this);
+			return result;
 		}
 
 		@Override
@@ -363,6 +379,9 @@ public interface SimLink {
 			if (LinkPosition.QEnd == position) {
 				consumedStorageCap += vehicle.getSizeInEquivalents();
 			}
+
+			// we push ourselves into the active links, because the local link has only registered itself
+			localLink.activateLink.accept(this);
 		}
 
 		@Override
@@ -393,6 +412,11 @@ public interface SimLink {
 		@Override
 		public boolean isStuck(double now) {
 			return localLink.isStuck(now);
+		}
+
+		@Override
+		public String toString() {
+			return "SplitIn: " + localLink.toString();
 		}
 	}
 }
