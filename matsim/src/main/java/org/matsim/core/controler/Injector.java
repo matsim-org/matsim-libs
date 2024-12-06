@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.router.RoutingModule;
@@ -55,12 +56,16 @@ public final class Injector {
 
 	private static final  Logger logger = LogManager.getLogger(Injector.class);
 
-	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
+	public static com.google.inject.Injector createInjector(final Config config,  Module... modules) {
+		return createInjector(config, SimulationNode.SINGLE_INSTANCE, modules);
+	}
+	public static com.google.inject.Injector createInjector(final Config config, final SimulationNode simulationNode,  Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
 			@Override
 			public void configure(Binder binder) {
 				binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
 				binder.install(new ExplodedConfigModule(config));
+				binder.bind(SimulationNode.class).toInstance(simulationNode);
 			}
 		});
 		// A MATSim module needs the config at configuration time in order to decide what

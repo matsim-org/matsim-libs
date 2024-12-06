@@ -32,6 +32,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -129,6 +130,11 @@ class MatsimServicesImpl implements MatsimServices {
 	@Override
 	public OutputDirectoryHierarchy getControlerIO() {
 		return injector.getInstance(OutputDirectoryHierarchy.class);
+	}
+
+	@Override
+	public SimulationNode getSimulationNode() {
+		return injector.getInstance(SimulationNode.class);
 	}
 
 	@Override

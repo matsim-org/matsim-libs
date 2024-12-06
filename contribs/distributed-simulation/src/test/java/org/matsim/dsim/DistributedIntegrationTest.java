@@ -114,7 +114,7 @@ public class DistributedIntegrationTest {
 	@Order(2)
 	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
-		var size = 3;
+		int size = 3;
 		var pool = Executors.newFixedThreadPool(size);
 		var comms = LocalCommunicator.create(size);
 

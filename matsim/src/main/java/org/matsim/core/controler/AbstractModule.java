@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -81,6 +82,8 @@ public abstract class AbstractModule implements Module {
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
 
+	private SimulationNode node = SimulationNode.SINGLE_INSTANCE;
+
 	public AbstractModule() {
 		// config will be injected later
 	}
@@ -94,6 +97,9 @@ public abstract class AbstractModule implements Module {
 		if (this.config == null) {
 			this.config = bootstrapInjector.getInstance(Config.class);
 		}
+
+		this.node = bootstrapInjector.getInstance(SimulationNode.class);
+
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
@@ -119,6 +125,10 @@ public abstract class AbstractModule implements Module {
 
 	protected final Config getConfig() {
 		return config;
+	}
+
+	protected final SimulationNode getSimulationNode() {
+		return node;
 	}
 
 	protected final void install(Module module) {

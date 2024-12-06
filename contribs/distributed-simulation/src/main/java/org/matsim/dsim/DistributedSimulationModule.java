@@ -63,14 +63,17 @@ public class DistributedSimulationModule extends AbstractModule {
 		this(new NullCommunicator(), threads, 1);
 	}
 
+	public SimulationNode getNode() {
+		return topology.getNode(comm.getRank());
+	}
+
 	@SneakyThrows
 	@Override
 	public void install() {
 
-		SimulationNode node = topology.getNode(comm.getRank());
+		SimulationNode node = getNode();
 
 		bind(Communicator.class).toInstance(comm);
-		bind(SimulationNode.class).toInstance(node);
 		bind(Topology.class).toInstance(topology);
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);

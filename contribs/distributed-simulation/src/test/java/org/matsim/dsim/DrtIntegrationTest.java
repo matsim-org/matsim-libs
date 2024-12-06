@@ -1,8 +1,6 @@
 package org.matsim.dsim;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,13 +28,16 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrtIntegrationTest {
 
 	@RegisterExtension
@@ -105,6 +106,19 @@ public class DrtIntegrationTest {
 
 	@Test
 	@Order(1)
+	void qsim() {
+
+		Scenario scenario = createScenario();
+
+		scenario.getConfig().controller().setMobsim(ControllerConfigGroup.MobsimType.qsim.name());
+
+		Controler controler = new Controler(scenario);
+
+		controler.run();
+	}
+
+	@Test
+	@Order(1)
 	void runSingleThread() {
 
 		Scenario scenario = createScenario();
@@ -136,20 +150,38 @@ public class DrtIntegrationTest {
 	@Test
 	@Order(3)
 	@Disabled
-	void runDistributed() {
+	void runDistributed() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
-		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-			List<Communicator> comms = LocalCommunicator.create(4);
-			for (Communicator comm : comms) {
-				pool.submit(() -> {
-					Controler controler = new Controler(createScenario());
+		int size = 3;
+		var pool = Executors.newFixedThreadPool(size);
+		var comms = LocalCommunicator.create(size);
 
-					prepareController(controler);
+		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-					controler.run();
-				});
-			}
+		var futures = comms.stream()
+			.map(comm -> pool.submit(() -> {
+
+				Scenario scenario = createScenario();
+
+				DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+
+				Controler controler = new Controler(scenario, module.getNode());
+				prepareController(controler);
+
+				controler.addOverridingModule(module);
+				controler.run();
+
+				try {
+					comm.close();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}))
+			.toList();
+
+		for (var f : futures) {
+			f.get(2, TimeUnit.MINUTES);
 		}
+
 	}
 }

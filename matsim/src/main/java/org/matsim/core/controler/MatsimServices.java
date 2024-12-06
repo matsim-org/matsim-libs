@@ -27,6 +27,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -74,6 +75,8 @@ public interface MatsimServices extends IterationCounter {
 
 	OutputDirectoryHierarchy getControlerIO();
 
+	SimulationNode getSimulationNode();
+
 	void addControlerListener(ControlerListener controlerListener);
-	
+
 }
