@@ -110,7 +110,11 @@ public class DefaultCapacityReconfigurationLogic implements CapacityReconfigurat
 			}
 			defaultStartingCapacities.put(vehicleSpecification.getId(), vehicleSpecification.getCapacity());
 		}
-		this.possibleCapacities.addAll(possibleCapacities);
+		for(DvrpLoad capacity: possibleCapacities) {
+			if(!this.possibleCapacities.contains(capacity)) {
+				this.possibleCapacities.add(capacity);
+			}
+		}
 		this.dvrpLoadFromDrtPassengers = dvrpLoadFromDrtPassengers;
 
 		int maxSlot = timeToSlotIndex(maxServiceEndTime);
@@ -219,7 +223,7 @@ public class DefaultCapacityReconfigurationLogic implements CapacityReconfigurat
 								continue;
 							}
 							DvrpLoad currentVehicleCapacity = currentCapacities.get(vehicleId);
-							if(delta.get(currentVehicleCapacity) < 0 ) {
+							if(delta.getOrDefault(currentVehicleCapacity, 0) < 0 ) {
 								if(minTransferableVehicleCapacityChanges < 0 || capacityChangesPerVehicle.get(vehicleId) < minTransferableVehicleCapacityChanges) {
 									minTransferableVehicleCapacityChanges = capacityChangesPerVehicle.get(vehicleId);
 									vehicleToTransfer = vehicleId;
