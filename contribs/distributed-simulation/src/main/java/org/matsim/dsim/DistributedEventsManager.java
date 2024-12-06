@@ -212,7 +212,8 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
-	 * Communicates with all messages broker to synchronize
+	 * Communicates with all messages broker to synchronize.
+	 * This also resets the internal state to prepare for a new iteration.
 	 */
 	void syncEventRegistry(Communicator comm) {
 
@@ -221,6 +222,11 @@ public final class DistributedEventsManager implements EventsManager {
 		registry.rank(comm.getRank());
 		registry.eventTypes(new IntOpenHashSet(globalListener.keySet()));
 		registry.syncStep(remoteSyncStep);
+
+		// Clear all data structures
+		waitFor.clear();
+		remoteListener.clear();
+		lastSync = -1;
 
 		EventRegistry self = registry.build();
 		List<EventRegistry> all = comm.allGather(self, 1, serializer);
@@ -417,7 +423,6 @@ public final class DistributedEventsManager implements EventsManager {
 		beforeSimStep(time + 1);
 
 		executor.runEventHandler();
-
 
 	}
 }

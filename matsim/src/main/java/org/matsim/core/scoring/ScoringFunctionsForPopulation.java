@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -91,10 +92,18 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
 
 	private final Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
+	private final SimulationNode simNode;
+
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+								  Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
+		this(controlerListenerManager, SimulationNode.SINGLE_INSTANCE, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, config);
+	}
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-						 Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, SimulationNode simNode,
+								  EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+								   Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
+		this.simNode = simNode;
 		ControllerConfigGroup controllerConfigGroup = config.controller();
 
 		if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
@@ -116,6 +125,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	}
 
 	private void init() {
+
+		// Only the head node performs scoring in the current implementation
+		if (!simNode.isHeadNode())
+			return;
+
 		for (Person person : this.population.getPersons().values()) {
 			this.agentScorers.put(person.getId(), this.scoringFunctionFactory.createNewScoringFunction(person ) );
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
@@ -257,9 +271,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	/**
 	 * Returns the scoring function for the specified agent. If the agent
-	 * already has a scoring function, that one is returned. If the agent does
-	 * not yet have a scoring function, a new one is created and assigned to the
-	 * agent and returned.
+	 * already has a scoring function, that one is returned.
 	 *
 	 * @param agentId
 	 *            The id of the agent the scoring function is requested for.
@@ -267,6 +279,13 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	 */
 	ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
 		return this.agentScorers.get(agentId);
+	}
+
+	/***
+	 * Assign a scoring function to the agent. This can be used to customize the scoring process.
+	 */
+	void putScoringFunctionForAgent(final Id<Person> agentId, final ScoringFunction scoringFunction) {
+		this.agentScorers.put(agentId, scoringFunction);
 	}
 
 	void finishScoringFunctions() {

@@ -28,7 +28,7 @@ public final class NetworkPartition {
 	NetworkPartition() {
 		links = null;
 		nodes = null;
-		neighbors = null;
+		neighbors = IntSet.of();
 		partition = 0;
 	}
 
