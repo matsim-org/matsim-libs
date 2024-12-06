@@ -137,17 +137,15 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 				return new DefaultDvrpLoadSerializer(personsDvrpLoadType, goodsDvrpLoadType);
 			})).asEagerSingleton();
 
-			//bindModal(DvrpLoadFromDrtPassengers.class).toProvider(modalProvider(getter -> new ParityBasedDvrpLoadFromDrtPassengers(getter.getModal(PersonsDvrpLoadType.class), getter.getModal(GoodsDvrpLoadType.class))));
-
 			if(useSimpleCapacityConfigurationLogic) {
 				bindModal(CapacityReconfigurationLogic.class).toProvider(modalProvider(getter -> {
 					Set<Id<Link>> linkIds = getter.getModal(Network.class).getLinks().keySet();
-					assert linkIds.size() > 0;
+					assert !linkIds.isEmpty();
 					Id<Link> linkId = linkIds.stream().findFirst().get();
 					return new SimpleCapacityConfiguration(linkId);
 				}));
 			} else {
-				bindModal(CapacityReconfigurationLogic.class).toProvider(modalProvider(getter -> {
+				bindModal(DefaultCapacityReconfigurationLogic.class).toProvider(modalProvider(getter -> {
 					FleetSpecification fleetSpecification = getter.getModal(FleetSpecification.class);
 					PersonsDvrpLoadType personsDvrpLoadType = getter.getModal(PersonsDvrpLoadType.class);
 					GoodsDvrpLoadType goodsDvrpLoadType = getter.getModal(GoodsDvrpLoadType.class);
@@ -157,7 +155,10 @@ public class RunDrtExampleWithChangingCapacitiesTest {
 					return new DefaultCapacityReconfigurationLogic(fleetSpecification,
 						possibleCapacities, dvrpLoadFromDrtPassengers, network, network.getLinks().values(), 7200, true,
 						DefaultCapacityReconfigurationLogic.CapacityChangeLinkSelection.RANDOM);
-				}));
+				})).asEagerSingleton();
+
+				bindModal(CapacityReconfigurationLogic.class).to(modalKey(DefaultCapacityReconfigurationLogic.class));
+				addEventHandlerBinding().to(modalKey(DefaultCapacityReconfigurationLogic.class));
 			}
 
 			installOverridingQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
