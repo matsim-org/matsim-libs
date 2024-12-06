@@ -208,7 +208,7 @@ public final class EventHandlerTask implements SimTask {
 
     @Override
     public boolean needsExecution() {
-        return time % handler.getProcessInterval() == 0;
+        return time > 0 && time % handler.getProcessInterval() == 0;
     }
 
     @Override
@@ -235,8 +235,7 @@ public final class EventHandlerTask implements SimTask {
 
     public IntSet waitForOtherRanks(double time) {
 
-        boolean executed = needsExecution();
-        if (pattern != null && executed) {
+        if (pattern != null && needsExecution()) {
             return pattern.waitForOtherRanks(time);
         }
 

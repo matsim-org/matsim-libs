@@ -57,7 +57,6 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	private static final Logger log = LogManager.getLogger(PopulationAgentSource.class);
 	private static int cnt = 5;
 	private final Population population;
-	private final PopulationPartition partition;
 	private final AgentFactory agentFactory;
 	private final QVehicleFactory qVehicleFactory;
 	private final Netsim qsim;
@@ -66,10 +65,8 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	private int warnCnt = 0;
 
 	@Inject
-	PopulationAgentSource(Population population, PopulationPartition partition,
-						  AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim) {
+	PopulationAgentSource(Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, Netsim qsim) {
 		this.population = population;
-		this.partition = partition;
 		this.agentFactory = agentFactory;
 		this.qVehicleFactory = qVehicleFactory;
 		this.qsim = qsim;
@@ -270,7 +267,8 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			// partition, for the case that the starting link of a vehicle is not the same as the starting partition of an agent.
 			insertVehicles(p, partition, mobsim::addParkedVehicle);
 
-			if (this.partition.contains(p.getId())) {
+			Id<Link> startLink = getStartLink(qsim.getScenario(), p);
+			if (partition.containsLink(startLink)) {
 				// first create vehicles, then create persons, as the 'insertVehicles' method sets vehicle ids on the plan
 				// create mobsim agent might copy the plan so that changes to the original plan must be set before the mobsim
 				// agent is created.
