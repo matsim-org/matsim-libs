@@ -120,6 +120,14 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	}
 
 	@Test
+	void startEmpty_atCapacityChange_oneRequestPerCapacityType() {
+		Waypoint.Start start = new Waypoint.Start(new DefaultDrtStopTaskWithVehicleCapacityChange(0, 60, link("start"), CHANGED_VEHICLE_CAPACITY), link("start"), 0, FACTORY_B.getEmptyLoad());
+		VehicleEntry entry = entry(start);
+		assertInsertionsOnly(drtRequestA, entry);
+		assertInsertionsOnly(drtRequestB, entry, new InsertionGenerator.Insertion(drtRequestB, entry, 0, 0));
+	}
+
+	@Test
 	void startOccupied_capacityChange_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stop(0, link("stop0"), FACTORY_A.fromInt(1)); //pickup

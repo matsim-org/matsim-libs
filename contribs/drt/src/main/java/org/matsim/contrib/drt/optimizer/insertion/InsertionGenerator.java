@@ -32,6 +32,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.base.MoreObjects;
@@ -158,8 +159,15 @@ public class InsertionGenerator {
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
 
+		DvrpLoad vehicleCapacity = vEntry.vehicle.getCapacity();
+		// If the vehicle is currently at a CapacityChangeTask, it might not be already reflected in the vehicle's getCapacity().
+		// We then retrieve the capacity from the task
+		if(vEntry.start.task.isPresent() && vEntry.start.task.get() instanceof CapacityChangeTask capacityChangeTask) {
+			vehicleCapacity = capacityChangeTask.getNewVehicleCapacity();
+		}
+
 		// Since the vehicle capacity can change during the day. We need to check the load added by the request against all future capacities to be able to exit early.
-		boolean compatibleWithOneCapacity = drtRequest.getLoad().fitsIn(vEntry.vehicle.getCapacity());
+		boolean compatibleWithOneCapacity = drtRequest.getLoad().fitsIn(vehicleCapacity);
 		if (!compatibleWithOneCapacity) {
 			for(Waypoint.Stop stop: vEntry.stops) {
 				if(stop instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange) {
@@ -174,7 +182,6 @@ public class InsertionGenerator {
 			return Collections.EMPTY_LIST;
 		}
 
-		DvrpLoad vehicleCapacity = vEntry.vehicle.getCapacity();
 		DvrpLoad occupancy = vEntry.start.occupancy;
 
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
