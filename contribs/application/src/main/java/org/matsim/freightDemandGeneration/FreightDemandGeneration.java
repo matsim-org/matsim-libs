@@ -83,6 +83,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		createNoSolutionAndOnlyWriteCarrierFile
 	}
 
+	protected enum TotalDemandGenerationsOption {
+		demandPerPerson, demandForShape, NoSelection
+	}
+
+	protected enum DemandDistributionOption {
+		toRandomLinks, toRandomPersons, toPersonsByAge, NoSelection
+	}
+
 	private static final Logger log = LogManager.getLogger(FreightDemandGeneration.class);
 
 	@CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
@@ -154,7 +162,20 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	@CommandLine.Option(names = "--defaultJspritIterations", description = "Set the default number of jsprit iterations.")
 	private int defaultJspritIterations;
 
+	@CommandLine.Option(names= "--demandDistributionOption", defaultValue = "noSelection", description = "Select the option of using the population. Options: toRandomLinks, toRandomPersons, toPersonsByAge")
+	private DemandDistributionOption selectedDemandDistributionOption;
+
+	@CommandLine.Option(names= "--totalDemandGenerationOption", defaultValue = "noSelection", description = "Select the option of using the population. Options: DemandPerPerson, DemandForShape")
+	private TotalDemandGenerationsOption selectedTotalDemandGenerationOption;
+
+	@CommandLine.Option(names="--packagesPerPerson", defaultValue = "0.0", description = "Set the parameter for packages per person")
+	private double PACKAGES_PER_PERSON;
+
+	@CommandLine.Option(names="--packagesPerRecipient", defaultValue = "0.0", description = "Set the parameter for packages per recipent")
+	private double PACKAGES_PER_RECIPIENT;
+
 	public static void main(String[] args) {
+
 		System.exit(new CommandLine(new FreightDemandGeneration()).execute(args));
 	}
 
@@ -199,9 +220,11 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// create the demand
 		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
 		//fixed ERROR log.info(Boolean.getBoolean(combineSimilarJobs));
+		//more options
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
 			selectedPopulationSamplingOption, selectedPopulationOption, Boolean.valueOf(combineSimilarJobs),
-			crsTransformationFromNetworkToShape);
+			crsTransformationFromNetworkToShape,
+				selectedDemandDistributionOption, selectedTotalDemandGenerationOption,PACKAGES_PER_PERSON,PACKAGES_PER_RECIPIENT);
 
 		// prepare the VRP and get a solution
 		Controler controler = prepareControler(scenario);
@@ -350,13 +373,48 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private void createDemand(DemandGenerationOptions selectedDemandGenerationOption, Scenario scenario,
 							  Path csvLocationDemand, ShpOptions.Index indexShape, String populationFilePath,
 							  PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
-							  boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+							  boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape,
+							  DemandDistributionOption selectedDemandDistributionOption, TotalDemandGenerationsOption selectedTotalDemandGenerationOption,
+							  Double PACKAGES_PER_PERSON, Double PACKAGES_PER_RECIPIENT) throws IOException {
+
+		//NEW
+		switch(selectedTotalDemandGenerationOption) {
+			case demandPerPerson -> {
+				if(PACKAGES_PER_PERSON == 0.0 || selectedPopulationOption == PopulationOptions.useNoPopulation)
+					throw new RuntimeException(" The --totalDemandGenerationOption was set to DemandPerPerson but the parameter --packagesPerPerson is not set or selectedPopulationOption = useNoPopulation.");
+			}
+			case demandForShape -> {
+				if(!shp.isDefined() || selectedPopulationOption == PopulationOptions.useNoPopulation)
+					throw new RuntimeException(" The --totalDemandGenerationOption was set to DemandPerShape but no shp provided or selectedPopulationOption = useNoPopulation.");
+			}
+			case NoSelection ->
+				log.info("No total demand generation option was selected.");
+			default -> throw new RuntimeException("No valid total demand generation option selected!");
+		}
+
+		switch(selectedDemandDistributionOption){
+			case toRandomPersons,toPersonsByAge -> {
+				if (selectedPopulationOption == PopulationOptions.useNoPopulation){
+					throw new RuntimeException("Demand is supposed to be distributed using the population, but selectedPopulationOption = useNoPopulation");
+				} else if (PACKAGES_PER_RECIPIENT == 0.0) {
+					throw new RuntimeException("Demand is supposed to be distributed using the population, but packages per recipient is 0.");
+				}
+			}
+			case toRandomLinks -> {
+				if (selectedPopulationOption == PopulationOptions.useNoPopulation && selectedTotalDemandGenerationOption.toString().equals("NoSelection")){
+					throw new RuntimeException("If there is no population and no total demand generation is needed within the tool, this option is supposed to be empty.");
+				}
+			}
+			case NoSelection -> log.info("No demand distribution option was selected.");
+			default -> throw new RuntimeException("No valid demand distribution option selected!");
+		}
 
 		switch (selectedDemandGenerationOption) {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
-					crsTransformationNetworkAndShape, null, shapeCategory);
+					crsTransformationNetworkAndShape, null, shapeCategory,
+						selectedDemandDistributionOption.toString(), selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON,PACKAGES_PER_RECIPIENT);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
 				 * Option creates the demand by using the information given in the read csv file
@@ -402,14 +460,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						if(population != null && shapeCategory != null )
 							log.warn("Population isn't reduced to shapefile even though shapefile is defined. This might lead to errors when no areas or locations for pickup or delivery are defined.");
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory,
+								selectedDemandDistributionOption.toString(), selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON,PACKAGES_PER_RECIPIENT);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
 							shp.createIndex(populationCRS, "_"));
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory);
+							combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory,
+								selectedDemandDistributionOption.toString(), selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON,PACKAGES_PER_RECIPIENT);
 						break;
 					default:
 						throw new RuntimeException("No valid population option selected!");

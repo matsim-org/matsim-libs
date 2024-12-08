@@ -1,0 +1,2 @@
+carrierName	vehicleTypes	numberOfDepots	selectedVehicleDepots	areaOfAdditionalDepots	fixedNumberOfVehiclePerTypeAndLocation	fleetSize	vehicleStartTime	vehicleEndTime	jspritIterations
+dhl_Lausitz	dhl_vehicle	1	-13807094#0			infinite	28800	57600	3

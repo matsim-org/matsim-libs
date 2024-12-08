@@ -1,0 +1,2 @@
+carrierName	vehicleTypes	numberOfDepots	selectedVehicleDepots	areaOfAdditionalDepots	fixedNumberOfVehiclePerTypeAndLocation	fleetSize	vehicleStartTime	vehicleEndTime	jspritIterations
+testCarrier1	testVehicle1	2	124263300;404565187#0			infinite	27000	55800	5

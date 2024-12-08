@@ -28,6 +28,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
 import org.matsim.freightDemandGeneration.DemandReaderFromCSV.DemandInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.freightDemandGeneration.FreightDemandGeneration.TotalDemandGenerationsOption;
+import org.matsim.freightDemandGeneration.FreightDemandGeneration.DemandDistributionOption;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -86,6 +88,10 @@ public class DemandReaderFromCSVTest {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeNumberOfLocationsWithDemand");
+		DemandDistributionOption demandDistributionOption = DemandDistributionOption.NoSelection;
+		TotalDemandGenerationsOption totalDemandGenerationOption = TotalDemandGenerationsOption.NoSelection;
+		Double PACKAGES_PER_PERSON = null;
+		Double PACKAGES_PER_RECIPIENT = null;
 
 		// run methods
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
@@ -95,7 +101,7 @@ public class DemandReaderFromCSVTest {
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
 		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		DemandReaderFromCSV.createDemandForCarriers(scenario, indexShape, demandInformation, population, false,
-				null);
+				null,demandDistributionOption.toString(), totalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
 		Assertions.assertTrue(
 				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));

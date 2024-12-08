@@ -33,7 +33,7 @@ public class FreightAnalysisEventBasedTest {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	void runFreightAnalysisEventBasedTest() throws IOException {
+	void runFreightAnalysisEventBasedTest() throws Exception {
 
 		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(testUtils.getClassInputDirectory(), testUtils.getOutputDirectory(),null);
 		analysisEventBased.runAnalysis();

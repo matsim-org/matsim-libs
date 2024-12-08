@@ -179,7 +179,7 @@ public class FreightDemandGenerationUtils {
 
 		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
-			writer.write("personId	age	demand\n");
+			writer.write("personId	age	demand	xCoord	yCoord\n");
 
 			for (Id<Person> person : DemandReaderFromCSV.demandForEachPerson.keySet()) {
 				HashMap temp = DemandReaderFromCSV.demandForEachPerson.get(person);

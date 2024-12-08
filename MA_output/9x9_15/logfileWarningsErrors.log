@@ -1,7 +1,0 @@
-2024-05-24T13:25:10,315  WARN ControllerConfigGroup:465 setting overwriting behavior to overwriteExistingFiles
-2024-05-24T13:25:10,316  WARN ControllerConfigGroup:466 this is not recommended, as it might result in a directory containing output from several model runs
-2024-05-24T13:25:10,316  WARN ControllerConfigGroup:467 prefer the options deleteDirectoryIfExists or failIfDirectoryExists
-2024-05-24T13:25:10,347  WARN RandomizingTimeDistanceTravelDisutilityFactory:113 There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate to be different than zero. Continuing anyway.
-2024-05-24T13:25:10,349  WARN RandomizingTimeDistanceTravelDisutilityFactory:118 There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate to be different than zero. Continuing anyway.
-2024-05-24T13:25:10,624  WARN FreightAgentSource:86 inserting vehicleId=freight_testCarrier1_veh_testVehicle1_testCarrier1_i(2,0)_start27000_1_1 into mobsim.
-2024-05-24T13:25:11,322  WARN CarrierAgent:182 score=-172.81369999999998
