@@ -280,8 +280,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(5000);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 1800.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5000.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 1800.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 5000.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -295,8 +295,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(5000);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 900.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5005.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 900.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 5005.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -310,8 +310,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(5000);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 5000.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 4000.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 5000.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -325,8 +325,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(8000);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 11000.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 4000.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 11000.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -340,8 +340,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(6000.);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 6000.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 4000.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 6000.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));
@@ -355,8 +355,8 @@ public class RunPrebookingShiftDrtScenarioIT {
             Plan plan = factory.createPlan();
             Activity start = factory.createActivityFromLinkId("start", Id.createLinkId(1));
             start.setEndTime(6500.);
-            start.getAttributes().putAttribute("prebooking:submissionTime" + "drt", 4000.);
-            start.getAttributes().putAttribute("prebooking:plannedDepartureTime" + "drt", 6500.);
+            AttributeBasedPrebookingLogic.setSubmissionTime("drt", start, 4000.0);
+            AttributeBasedPrebookingLogic.setPlannedDepartureTime("drt", start, 6500.0);
             plan.addActivity(start);
             plan.addLeg(factory.createLeg("drt"));
             plan.addActivity(factory.createActivityFromLinkId("end", Id.createLinkId(2)));

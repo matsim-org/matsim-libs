@@ -292,13 +292,13 @@ public class PrebookingTestEnvironment {
 			plan.addLeg(firstLeg);
 
 			if (!Double.isNaN(request.submissionTime)) {
-				firstActivity.getAttributes().putAttribute(AttributeBasedPrebookingLogic.getSubmissionAttribute("drt"),
+				firstActivity.getAttributes().putAttribute(AttributeBasedPrebookingLogic.getSubmissionTimeAttribute("drt"),
 						request.submissionTime);
 			}
 
 			if (!Double.isNaN(request.plannedDepartureTime)) {
 				firstActivity.getAttributes().putAttribute(
-						AttributeBasedPrebookingLogic.getPlannedDepartureAttribute("drt"),
+						AttributeBasedPrebookingLogic.getPlannedDepartureTimeAttribute("drt"),
 						request.plannedDepartureTime);
 			}
 
