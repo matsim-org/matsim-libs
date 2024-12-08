@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -45,7 +46,7 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 			public VrpAgentSource get() {
 				return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
 						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), getMode(), qSim,
-						getModalInstance(VehicleType.class));
+						getModalInstance(VehicleType.class), getModalInstance(DvrpLoadSerializer.class));
 			}
 		});
 	}
