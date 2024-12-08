@@ -19,17 +19,17 @@
 
 package org.matsim.contrib.drt.extension;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
-import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author Steffen Axer
@@ -46,6 +46,9 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
 	@Nullable
 	private DrtServicesParams drtServicesParams;
+
+	@Nullable
+	private DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams;
 
 	public DrtWithExtensionsConfigGroup() {
 		this(DefaultDrtOptimizationConstraintsSet::new);
@@ -64,6 +67,10 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 		// Optional
 		addDefinition(DrtServicesParams.SET_TYPE, DrtServicesParams::new, () -> drtServicesParams,
 			params -> drtServicesParams = (DrtServicesParams) params);
+
+		// Optional
+		addDefinition(DrtSpatialRequestFleetFilterParams.SET_NAME, DrtSpatialRequestFleetFilterParams::new, () -> drtSpatialRequestFleetFilterParams,
+			params -> drtSpatialRequestFleetFilterParams = (DrtSpatialRequestFleetFilterParams) params);
 	}
 
 	public Optional<DrtCompanionParams> getDrtCompanionParams() {
@@ -78,4 +85,7 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 		return Optional.ofNullable(drtServicesParams);
 	}
 
+	public Optional<DrtSpatialRequestFleetFilterParams> getSpatialRequestFleetFilterParams() {
+		return Optional.ofNullable(drtSpatialRequestFleetFilterParams);
+	}
 }
