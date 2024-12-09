@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,14 +91,40 @@ public class BicycleParamsDefaultImplTest {
 			ObjectDoublePair.of("default", 0.95)
 		);
 
-//		TODO: finish test
-		List<ObjectDoublePair<String>> cycleWay = List.of();
+		List<ObjectDoublePair<String>> cycleWay = List.of(
+			ObjectDoublePair.of("cycleway", 1.0),
+			ObjectDoublePair.of("path", 1.0),
+			ObjectDoublePair.of("steps", 0.1),
+			ObjectDoublePair.of("default", 0.95)
+		);
 
-		Map<String, List<ObjectDoublePair<String>>> cycleWays = new HashMap<>();
+		Map<String, List<ObjectDoublePair<String>>> cycleWays = Map.of("noCycleWay", noCycleWay,"cycleWay", cycleWay,
+			"noTypeAttr", List.of(ObjectDoublePair.of(null, 0.85)));
 
-		cycleWays.put("noCycleWay", noCycleWay);
-		cycleWays.put("cycleWay", cycleWay);
+		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
 
+		for (Map.Entry<String, List<ObjectDoublePair<String>>> entry : cycleWays.entrySet()) {
+			if (entry.getKey().equals("cycleWay")) {
+				link.getAttributes().putAttribute(BicycleUtils.CYCLEWAY, entry.getKey());
+			} else if (entry.getKey().equals("noTypeAttr")) {
+				link.getAttributes().removeAttribute("type");
+			} else {
+				//				do not set this attr for "noCycleWay"
+				link.getAttributes().removeAttribute(BicycleUtils.CYCLEWAY);
+			}
+
+			for (ObjectDoublePair<String> pair : entry.getValue()) {
+				NetworkUtils.setType(link, pair.left());
+
+				String linkType = NetworkUtils.getType(link);
+				String cycleWayType = BicycleUtils.getCyclewaytype(link);
+
+				double expected = pair.rightDouble();
+				double actual = params.getInfrastructureFactor(linkType, cycleWayType);
+
+				assertEquals(expected, actual, 0.00001);
+			}
+		}
 	}
 
 	private static Link createLink(Coord from, Coord to) {
