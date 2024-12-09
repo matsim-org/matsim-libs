@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -27,6 +28,8 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface TransitStopHandlerFactory extends MatsimFactory {
 
-	public TransitStopHandler createTransitStopHandler(Vehicle vehicle);
+	TransitStopHandler createTransitStopHandler(Vehicle vehicle);
+
+	TransitStopHandler createTransitStopHandler(Message message);
 
 }

@@ -20,7 +20,6 @@
 
  package org.matsim.core.mobsim.dsim;
 
- import org.matsim.api.core.v01.Message;
  import org.matsim.core.mobsim.framework.MobsimAgent;
 
  /**

@@ -1,8 +1,8 @@
 package org.matsim.api.core.v01.events.handler;
 
 
-import org.matsim.api.core.v01.Message;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.dsim.Message;
 
 import java.util.List;
 
@@ -16,16 +16,16 @@ import java.util.List;
  */
 public interface AggregatingEventHandler<T extends Message> extends EventHandler {
 
-    /**
-     * Produce message sent to other partitions.
-     */
-    T send();
+	/**
+	 * Produce message sent to other partitions.
+	 */
+	T send();
 
-    /**
-     * Receive all messages from other partitions. The own message will not be included.
-     *
-     * @param messages received messages from other handlers.
-     */
-    void receive(List<T> messages);
+	/**
+	 * Receive all messages from other partitions. The own message will not be included.
+	 *
+	 * @param messages received messages from other handlers.
+	 */
+	void receive(List<T> messages);
 
 }

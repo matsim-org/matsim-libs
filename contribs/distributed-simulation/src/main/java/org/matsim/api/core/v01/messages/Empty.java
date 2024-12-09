@@ -1,9 +1,9 @@
 package org.matsim.api.core.v01.messages;
 
-import org.matsim.api.core.v01.Message;
+import org.matsim.core.mobsim.dsim.Message;
 
 public class Empty implements Message {
 
-    public static final Empty INSTANCE = new Empty();
+	public static final Empty INSTANCE = new Empty();
 
 }

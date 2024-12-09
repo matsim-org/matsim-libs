@@ -1,6 +1,5 @@
 package org.matsim.core.mobsim.dsim;
 
-import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
@@ -27,6 +26,7 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct an agent from a message.
+	 *
 	 * @return null if this source is not responsible for the given message.
 	 */
 	@Nullable
@@ -41,7 +41,8 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct a vehicle from a message.
-  	 * @return null if this source is not responsible for the given message.
+	 *
+	 * @return null if this source is not responsible for the given message.
 	 */
 	@Nullable
 	default DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {

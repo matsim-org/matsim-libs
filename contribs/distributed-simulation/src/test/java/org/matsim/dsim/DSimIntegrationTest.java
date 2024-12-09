@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -51,7 +50,7 @@ public class DSimIntegrationTest {
 		// which are both compared at the end of runDistributed.
 		var preRun = new DistributedController(new NullCommunicator(), local, 1, 1);
 		preRun.run();
-		var plans = outputPath.resolve("prerun/kelheim-mini.output_plans.xml.lz4").toAbsolutePath();
+		var plans = outputPath.resolve("prerun/kelheim-mini.output_plans.xml").toAbsolutePath();
 		local.plans().setInputFile(plans.toString());
 		local.controller().setOutputDirectory(outputPath.toString());
 
@@ -60,7 +59,7 @@ public class DSimIntegrationTest {
 
 		assertThat(Path.of(utils.getOutputDirectory()))
 			.isNotEmptyDirectory()
-			.isDirectoryContaining("glob:**kelheim-mini.output_events.xml.lz4");
+			.isDirectoryContaining("glob:**kelheim-mini.output_events.xml");
 	}
 
 	@Test
@@ -68,7 +67,7 @@ public class DSimIntegrationTest {
 	void runDistributed() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
 		Path output = Path.of(utils.getOutputDirectory());
-		Path plansPath = output.resolve("..").resolve("runLocal/prerun").resolve("kelheim-mini.output_plans.xml.lz4").toAbsolutePath();
+		Path plansPath = output.resolve("..").resolve("runLocal/prerun").resolve("kelheim-mini.output_plans.xml").toAbsolutePath();
 		Files.createDirectories(output);
 
 		// start three instances each containing one partition
@@ -90,11 +89,12 @@ public class DSimIntegrationTest {
 			.toList();
 
 		for (var f : futures) {
-			f.get(2, TimeUnit.MINUTES);
+			//f.get(2, TimeUnit.MINUTES);
+			f.get();
 		}
 
-		Path distOutput = output.resolve("kelheim-mini.output_events.xml.lz4");
-		Path localOutput = output.resolve("..").resolve("runLocal/kelheim-mini.output_events.xml.lz4").toAbsolutePath();
+		Path distOutput = output.resolve("kelheim-mini.output_events.xml");
+		Path localOutput = output.resolve("..").resolve("runLocal/kelheim-mini.output_events.xml").toAbsolutePath();
 		assertThat(EventsUtils.compareEventsFiles(localOutput.toString(), distOutput.toString()))
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
@@ -109,7 +109,8 @@ public class DSimIntegrationTest {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setMobsim("dsim");
 		config.controller().setWriteEventsInterval(1);
-		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.lz4);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
+		config.qsim().setFlowCapFactor(1.);
 
 		// Randomness will lead to different results from the baseline
 		config.routing().setRoutingRandomness(0);

@@ -2,7 +2,6 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -20,7 +19,6 @@ import org.matsim.dsim.simulation.AgentSourcesContainer;
 import java.util.HashSet;
 import java.util.Set;
 
-@Log4j2
 public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
 
 	private final SimNetwork simNetwork;

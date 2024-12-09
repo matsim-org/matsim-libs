@@ -1,6 +1,7 @@
 package org.matsim.api.core.v01;
 
 import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.core.mobsim.dsim.Message;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
