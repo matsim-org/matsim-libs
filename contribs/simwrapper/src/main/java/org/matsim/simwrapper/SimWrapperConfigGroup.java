@@ -28,10 +28,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Set of simple class names or fully qualified class names of dashboards to exclude")
 	public Set<String> exclude = new HashSet<>();
 
-	@Parameter
-	@Comment("Sample size of the run, which may be required by certain analysis functions.")
-	public Double sampleSize = 1.0d;
-
 	public SimWrapperConfigGroup() {
 		super(NAME);
 		get("");

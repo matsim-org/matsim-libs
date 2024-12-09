@@ -205,7 +205,7 @@ public final class SimWrapper {
 
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(configGroup.sampleSize);
+			runner.setSampleSize(matsimConfig.global().getScaling());
 
 			if (ctx.shp != null) {
 

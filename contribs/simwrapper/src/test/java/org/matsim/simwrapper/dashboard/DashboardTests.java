@@ -6,12 +6,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
-import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.simwrapper.viz.TransitViewer;
 import org.matsim.testcases.MatsimTestUtils;
@@ -30,9 +28,7 @@ public class DashboardTests {
 
 		Config config = TestScenario.loadConfig(utils);
 		config.controller().setLastIteration(1);
-
-		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
+		config.global().setScaling(0.001);
 
 		SimWrapper sw = SimWrapper.create(config);
 		for (Dashboard d : dashboards) {

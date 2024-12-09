@@ -26,9 +26,9 @@ public class DashboardTests {
 		config.controller().setLastIteration(4);
 		config.controller().setWritePlansInterval(4);
 		config.controller().setWriteEventsInterval(4);
+		config.global().setScaling(0.001);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
 		group.defaultParams().mapCenter = "11.891000, 48.911000";
 
 		//we have 2 operators ('av' + 'drt'), configure one of them to be areaBased (the other remains stopBased)
