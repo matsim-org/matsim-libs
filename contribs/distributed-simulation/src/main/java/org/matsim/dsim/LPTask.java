@@ -167,7 +167,9 @@ public final class LPTask implements SimTask {
         long rt = System.nanoTime() - t;
         avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
 
-        runtimes.add(rt);
+		// Only add the runtime to the list if the time is a multiple of 10
+		if ((time % 10) == 0)
+	        runtimes.add(rt);
     }
 
 	@Override

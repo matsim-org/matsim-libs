@@ -296,7 +296,7 @@ public final class EventHandlerTask implements SimTask {
             }
         }
 
-        int s = (int) time;
+        int s = (int) (time / 10);
         // Fill with zeros
         if (runtimes.size() < s)
             runtimes.addElements(runtimes.size(), new long[s - runtimes.size()]);
@@ -304,7 +304,8 @@ public final class EventHandlerTask implements SimTask {
         long rt = System.nanoTime() - t;
         avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
 
-        runtimes.add(rt);
+		if ((time % 10) == 0)
+	        runtimes.add(rt);
     }
 
 

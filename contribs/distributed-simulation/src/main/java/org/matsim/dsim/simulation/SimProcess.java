@@ -194,7 +194,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public Map<Id<Person>, MobsimAgent> getAgents() {
-		// TODO: Few engines night this, but did not occurred yet
+		// TODO: Few engines might need this, but did not occurred yet
 		throw new UnsupportedOperationException();
 	}
 
