@@ -22,6 +22,7 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,8 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	@Override public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_CMT ) ;
+		map.put(SCALING, SCALING_CMT);
+		map.put(DEFAULT_DELIMITER, DEFAULT_DELIMITER_CMT);
 		return map ;
 	}
 
@@ -125,4 +128,20 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
     public void setDefaultDelimiter(String defaultDelimiter) {
         this.defaultDelimiter = defaultDelimiter;
     }
+
+	@Positive
+	private double scaling = 1.0;
+	private static final String SCALING = "scaling" ;
+	private static final String SCALING_CMT = "Represents population sample size in respect to full real-world population, e.g. 0.1 for a 10% " +
+		"sample. Typical values are > 0 and <= 1. This config param affects especially the network capacity in the mobsim and analysis output.";
+
+	@StringGetter( SCALING )
+	public double getScaling() {
+		return this.scaling;
+	}
+
+	@StringSetter( SCALING )
+	public void setScaling(double scaling) {
+		this.scaling = scaling;
+	}
 }
