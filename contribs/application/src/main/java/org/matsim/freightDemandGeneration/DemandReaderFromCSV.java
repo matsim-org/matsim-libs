@@ -875,15 +875,12 @@ public final class DemandReaderFromCSV {
 					log.info("Demand for this carrier is set to " + demandToDistribute + " with " + PACKAGES_PER_PERSON + " demand units per person (" + sampleSizeInputPopulation + "-sample).");
 				}
 				case demandForShape -> {
-					log.info(sizeOfPopulationFilteredByArea);
-					log.info(sizeOfWholePopulation);
-
 					double demandToDistrDouble =
 							(double) demandToDistribute *
 									sizeOfPopulationFilteredByArea / sizeOfWholePopulation
 									* sampleSizeInputPopulation;
 					demandToDistribute = (int) Math.round(demandToDistrDouble);
-					log.info("Demand is set to " + demandToDistribute + " (possibly upsampled).");
+					log.info("Demand is set to " + demandToDistribute + " ("+ (double) Math.round((double) sizeOfPopulationFilteredByArea / sizeOfWholePopulation * 100.0) / 100.0 +"% of shape).");
 				}
 				case NoSelection -> log.info("Demand to distribute remains at "+demandToDistribute+".");
 			}

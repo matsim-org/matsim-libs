@@ -34,22 +34,22 @@ public class FreightDemandGenerationTest {
 			//String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 
 			//Berlin
-			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_CarrierCSV_Berlin_small.csv");
+/*			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_CarrierCSV_Berlin_small.csv");
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_DemandCSV_Berlin_small.csv");
 			//Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "PLZ_Berlin/PLZ_Berlin.shp");
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "PLZ_Gebiete_Berlin/PLZ_Gebiete_Berlin.shp");
 			//String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-only-v6.3-100pct.plans_NOT-fully-calibrated.xml.gz";
 			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-1pct.plans.xml.gz";
 			String network = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.3/input/berlin-v6.3-network.xml.gz";
-
+*/
 			//Lausitz
-/*
-			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/lausitz/input/v2024.2/lausitz-v2024.2-100pct.plans-initial.xml.gz";
+
+			String populationLocation = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/lausitz/input/v2024.2/lausitz-v2024.2-1pct.plans-initial.xml.gz";
 			String network = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/lausitz/input/v2024.2/lausitz-v2024.2-network.xml.gz";
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "PLZ_Gebiete_Görlitz/PLZ_Gebiete_Görlitz.shp");
 			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_CarrierCSV_Lausitz.csv");
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "DHL_DemandCSV_Lausitz.csv");
-*/
+
 
 			String shapeCategory = "plz";
 			//String shapeCategory = "Liefergebi";
@@ -99,7 +99,7 @@ public class FreightDemandGenerationTest {
 					"--defaultJspritIterations", "3",
 					"--totalDemandGenerationOption","demandForShape",
 					"--packagesPerPerson","0.0686", //0.14*0.49
-					"--demandDistributionOption","toPersonsByAge",
+					"--demandDistributionOption","toRandomLinks",
 					"--packagesPerRecipient","1.6"
 			);
 		} catch (Exception ee) {
