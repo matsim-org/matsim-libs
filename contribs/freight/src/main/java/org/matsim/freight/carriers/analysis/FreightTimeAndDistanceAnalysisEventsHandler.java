@@ -359,7 +359,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	void writeGeneralStats(String analysisOutputDirectory) throws IOException {
 		log.info("Writing out general analysis ...");
 		//Load per vehicle
-		String fileName = analysisOutputDirectory + "General_summary"+RunFreightAnalysisEventBased.fileExtension;
+		String fileName = analysisOutputDirectory + "General_summary.tsv";
 
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
