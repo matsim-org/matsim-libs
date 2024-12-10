@@ -32,15 +32,15 @@ public class CapacityChangeSchedulerEngine implements MobsimEngine {
 	private final LeastCostPathCalculator router;
 	private final TravelTime travelTime;
 	private static final DrtTaskType taskType = new DrtTaskType("TO_CAPACITY_CHANGE", DrtTaskBaseType.DRIVE);
-	private final CapacityReconfigurationLogic defaultCapacitiesConfigurationLogic;
+	private final CapacityReconfigurationLogic capacityReconfigurationLogic;
 	private final Network network;
 	private final double capacityChangeTaskDuration;
 
-	public CapacityChangeSchedulerEngine(Fleet fleet, Network network, TravelDisutility travelDisutility, TravelTime travelTime, CapacityReconfigurationLogic defaultCapacitiesConfigurationLogic, double capacityChangeTaskDuration) {
+	public CapacityChangeSchedulerEngine(Fleet fleet, Network network, TravelDisutility travelDisutility, TravelTime travelTime, CapacityReconfigurationLogic capacityReconfigurationLogic, double capacityChangeTaskDuration) {
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-		this.defaultCapacitiesConfigurationLogic = defaultCapacitiesConfigurationLogic;
+		this.capacityReconfigurationLogic = capacityReconfigurationLogic;
 		this.network = network;
 		this.capacityChangeTaskDuration = capacityChangeTaskDuration;
 	}
@@ -51,7 +51,7 @@ public class CapacityChangeSchedulerEngine implements MobsimEngine {
 	}
 
 	private void insertCapacityChangeTasks(DvrpVehicle vehicle) {
-		List<DefaultCapacityReconfigurationLogic.CapacityChangeItem> capacityChangeItems = this.defaultCapacitiesConfigurationLogic.getPreScheduledCapacityChanges(vehicle);
+		List<DefaultCapacityReconfigurationLogic.CapacityChangeItem> capacityChangeItems = this.capacityReconfigurationLogic.getPreScheduledCapacityChanges(vehicle);
 		Schedule schedule = vehicle.getSchedule();
 
 		assert schedule.getTasks().size() == 1;
@@ -97,7 +97,7 @@ public class CapacityChangeSchedulerEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		IdMap<DvrpVehicle, DvrpLoad> startingCapacities = this.defaultCapacitiesConfigurationLogic.getOverriddenStartingCapacities();
+		IdMap<DvrpVehicle, DvrpLoad> startingCapacities = this.capacityReconfigurationLogic.getOverriddenStartingCapacities();
 		startingCapacities.forEach((id, load) -> Objects.requireNonNull(this.fleet.getVehicles().get(id)).setCapacity(load));
 		this.fleet.getVehicles().values().forEach(this::insertCapacityChangeTasks);
 	}
