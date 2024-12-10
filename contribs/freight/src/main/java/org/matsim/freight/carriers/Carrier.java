@@ -21,12 +21,11 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A carrier.
@@ -76,7 +75,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributab
 	/**
 	 * Sets a {@link CarrierPlan} as selected.
 	 *
-	 * <p>If selectedPlan in not in plan-collection, it adds it.
+	 * <p>The selected plan should be added to the list of plans before.</p>
 	 *
 	 * @param selectedPlan to be set
 	 */

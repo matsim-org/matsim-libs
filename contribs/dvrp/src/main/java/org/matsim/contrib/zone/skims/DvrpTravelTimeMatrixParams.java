@@ -20,12 +20,15 @@
 
 package org.matsim.contrib.zone.skims;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,8 +57,12 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
 	@PositiveOrZero
 	public double maxNeighborTravelTime = 0; //[s]
+	@NotNull
 	private ZoneSystemParams zoneSystemParams;
 
+	@Parameter
+	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
+	public String cachePath = null;
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
@@ -77,6 +84,10 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
 			() -> zoneSystemParams,
 			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
@@ -96,6 +107,11 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 	}
 
 	public ZoneSystemParams getZoneSystemParams() {
+		if(this.zoneSystemParams == null) {
+			SquareGridZoneSystemParams squareGridZoneSystemParams = new SquareGridZoneSystemParams();
+			squareGridZoneSystemParams.cellSize = 200;
+			this.zoneSystemParams = squareGridZoneSystemParams;
+		}
 		return zoneSystemParams;
 	}
 }

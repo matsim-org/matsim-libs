@@ -21,9 +21,11 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.Stack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.CostInformation;
@@ -31,8 +33,6 @@ import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
-
-import java.util.Stack;
 
 class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 	private static final Logger log = LogManager.getLogger(CarrierVehicleTypeReaderV1.class) ;
@@ -54,6 +54,9 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 		if(name.equals("vehicleType")){
 			Id<VehicleType> currentTypeId = Id.create( attributes.getValue( "id" ), VehicleType.class );
 			this.currentType = VehicleUtils.getFactory().createVehicleType( currentTypeId ) ;
+			// If no network mode is given, assume car, this is to be backwards compatible
+			// The v2 format will not make this assumption, and the network mode will be required
+			this.currentType.setNetworkMode(TransportMode.car);
 		}
 		if(name.equals("allowableWeight")){
 //			String weight = atts.getValue("weight");
@@ -69,9 +72,8 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 		}
 		if(name.equals("engineInformation")){
 			EngineInformation engineInfo = this.currentType.getEngineInformation() ;
-			VehicleUtils.setFuelConsumption(this.currentType, Double.parseDouble(attributes.getValue( "gasConsumption" )));
-			engineInfo.setFuelConsumption( Double.parseDouble( attributes.getValue( "gasConsumption" ) ) );
-			engineInfo.setFuelType( EngineInformation.FuelType.valueOf( attributes.getValue( "fuelType" ) ) );
+			VehicleUtils.setHbefaTechnology(engineInfo, attributes.getValue( "fuelType"));
+			VehicleUtils.setFuelConsumptionLitersPerMeter(engineInfo, Double.parseDouble(attributes.getValue( "gasConsumption" )));
 		}
 
 		if(name.equals("costInformation")){

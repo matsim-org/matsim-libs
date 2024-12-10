@@ -24,7 +24,6 @@ package org.matsim.freight.carriers.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.events.CarrierEventsReaders;
@@ -36,7 +35,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -116,10 +114,10 @@ public class RunFreightAnalysisEventBased {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler =
-				new FreightTimeAndDistanceAnalysisEventsHandler(scenario,CarriersUtils.getCarriers(scenario));
+				new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
 		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
-		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(CarriersUtils.getCarriers(scenario));
+		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
 		eventsManager.addHandler(carrierLoadAnalysis);
 
 		eventsManager.initProcessing();
@@ -134,7 +132,7 @@ public class RunFreightAnalysisEventBased {
 		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
 		freightTimeAndDistanceAnalysisEventsHandler.writeGeneralStats(analysisOutputDirectory);
 		freightTimeAndDistanceAnalysisEventsHandler.runCarrierAnalysisAndWriteStats(analysisOutputDirectory);
-		carrierLoadAnalysis.writeLoadAnalysis(analysisOutputDirectory, scenario);
+		carrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario);
 	}
 
 }

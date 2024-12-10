@@ -27,6 +27,7 @@ public final class ColorScheme {
 	public static final String Inferne = "Inferne";
 	public static final String Cividis = "Cividis";
 	public static final String Rainbow = "Rainbow";
+	public static final String Oranges = "Oranges";
 
 
 	private ColorScheme() {

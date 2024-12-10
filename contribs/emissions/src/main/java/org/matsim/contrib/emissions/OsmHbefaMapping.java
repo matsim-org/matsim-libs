@@ -85,6 +85,8 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         mapping.put("residential", new Hbefa("Access",30,50));
         mapping.put("service", new Hbefa("Access",30,50));
         mapping.put("living", new Hbefa("Access",30,50));
+        mapping.put("cycleway", new Hbefa("Access",30,50));
+        mapping.put("path", new Hbefa("Access",30,50));
 
         return mapping;
     }

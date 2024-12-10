@@ -201,9 +201,9 @@ final class NoiseContextImpl implements NoiseContext {
 					|| this.grid.getGridParams().getReceiverPointsGridMinX() != 0.
 					|| this.grid.getGridParams().getReceiverPointsGridMaxY() != 0.
 					|| this.grid.getGridParams().getReceiverPointsGridMinY() != 0.) {
-				log.warn("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
+				log.warn("In order to keep track of ALL the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
 						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. "
-						+ "There will be more agents mapped to the receiver points at the edges. Only the inner receiver points should be used for analysis.");
+						+ "Damages will be computed only for activities that are performed within the receiver point grid.");
 			}
 						
 			if (this.grid.getGridParams().getReceiverPointsGridMinX() == 0. && this.grid.getGridParams().getReceiverPointsGridMinY() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxX() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxY() == 0.) {

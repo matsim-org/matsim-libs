@@ -24,6 +24,8 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -39,6 +41,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	private final String chargerType;
 	private final double plugPower;
 	private final int plugCount;
+	private final Attributes attributes;
 
 	private ImmutableChargerSpecification( ChargerSpecificationBuilder builder ) {
 		id = Objects.requireNonNull(builder.id);
@@ -46,6 +49,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		chargerType = Objects.requireNonNull(builder.chargerType);
 		plugPower = Objects.requireNonNull(builder.plugPower);
 		plugCount = Objects.requireNonNull(builder.plugCount);
+		attributes = builder.attributes != null ? builder.attributes : new AttributesImpl();
 
 		Preconditions.checkArgument(plugPower >= 0, "Negative plugPower of charger: %s", id);
 		Preconditions.checkArgument(plugCount >= 0, "Negative plugCount of charger: %s", id);
@@ -91,6 +95,11 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	}
 
 	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
@@ -107,6 +116,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		private String chargerType;
 		private Double plugPower;
 		private Integer plugCount;
+		private Attributes attributes;
 
 		private ChargerSpecificationBuilder() {
 		}
@@ -133,6 +143,11 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 
 		public ChargerSpecificationBuilder plugCount( int val ) {
 			plugCount = val;
+			return this;
+		}
+
+		public ChargerSpecificationBuilder attributes( Attributes val ) {
+			attributes = val;
 			return this;
 		}
 

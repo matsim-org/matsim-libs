@@ -32,12 +32,16 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	private static final Logger LOG = LogManager.getLogger(EventWriterXML.class);
 	private final BufferedWriter out;
+
+	/**
+	 * Cache for StringBuilder instances to avoid creating a new one for each event.
+	 */
+	private final ThreadLocal<StringBuilder> stringBuilder = ThreadLocal.withInitial(StringBuilder::new);
 
 	public EventWriterXML(final String outfilename) {
 		this.out = IOUtils.getBufferedWriter(outfilename);
@@ -83,73 +87,14 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		try {
-			this.out.append("\t<event ");
-			Map<String, String> attr = event.getAttributes();
-			for (Map.Entry<String, String> entry : attr.entrySet()) {
-				this.out.append(entry.getKey());
-				this.out.append("=\"");
-				this.out.append(encodeAttributeValue(entry.getValue()));
-				this.out.append("\" ");
-			}
-			this.out.append(" />\n");
+			StringBuilder b = stringBuilder.get();
+
+			b.setLength(0);
+			event.writeAsXML(b);
+			this.out.append(b);
+
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
-
-	// the following method was taken from MatsimXmlWriter in order to correctly encode attributes, but
-	// to forego the overhead of using the full MatsimXmlWriter.
-	/**
-	 * Encodes the given string in such a way that it no longer contains
-	 * characters that have a special meaning in xml.
-	 *
-	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
-	 * @param attributeValue
-	 * @return String with some characters replaced by their xml-encoding.
-	 */
-	private String encodeAttributeValue(final String attributeValue) {
-		if (attributeValue == null) {
-			return null;
-		}
-		int len = attributeValue.length();
-		boolean encode = false;
-		for (int pos = 0; pos < len; pos++) {
-			char ch = attributeValue.charAt(pos);
-			if (ch == '<') {
-				encode = true;
-				break;
-			} else if (ch == '>') {
-				encode = true;
-				break;
-			} else if (ch == '\"') {
-				encode = true;
-				break;
-			} else if (ch == '&') {
-				encode = true;
-				break;
-			}
-		}
-		if (encode) {
-			StringBuilder bf = new StringBuilder(attributeValue.length() + 30);
-			for (int pos = 0; pos < len; pos++) {
-				char ch = attributeValue.charAt(pos);
-				if (ch == '<') {
-					bf.append("&lt;");
-				} else if (ch == '>') {
-					bf.append("&gt;");
-				} else if (ch == '\"') {
-					bf.append("&quot;");
-				} else if (ch == '&') {
-					bf.append("&amp;");
-				} else {
-					bf.append(ch);
-				}
-			}
-
-			return bf.toString();
-		}
-		return attributeValue;
-
-	}
-
 }

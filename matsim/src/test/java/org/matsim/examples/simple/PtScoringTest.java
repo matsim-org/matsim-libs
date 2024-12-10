@@ -54,7 +54,7 @@ public class PtScoringTest {
 	@ParameterizedTest
 	@EnumSource(TypicalDurationScoreComputation.class)
 	void test_PtScoringLineswitch(TypicalDurationScoreComputation typicalDurationScoreComputation) {
-		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"), MatsimTestUtils.TestMethodType.Parameterized);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -208,7 +208,7 @@ public class PtScoringTest {
 	@ParameterizedTest
 	@EnumSource(TypicalDurationScoreComputation.class)
 	void test_PtScoringLineswitchAndPtConstant(TypicalDurationScoreComputation typicalDurationScoreComputation) {
-		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"), MatsimTestUtils.TestMethodType.Parameterized);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
@@ -365,7 +365,7 @@ public class PtScoringTest {
 	@ParameterizedTest
 	@EnumSource(TypicalDurationScoreComputation.class)
 	void test_PtScoring_Wait(TypicalDurationScoreComputation typicalDurationScoreComputation) {
-		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"), MatsimTestUtils.TestMethodType.Parameterized);
 		ScoringConfigGroup pcs = config.scoring();
 
 		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -452,7 +452,7 @@ public class PtScoringTest {
 	@ParameterizedTest
 	@EnumSource(TypicalDurationScoreComputation.class)
 	void test_PtScoring(TypicalDurationScoreComputation typicalDurationScoreComputation) {
-		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"), MatsimTestUtils.TestMethodType.Parameterized);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))

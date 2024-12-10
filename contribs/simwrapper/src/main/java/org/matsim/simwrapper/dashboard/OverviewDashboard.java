@@ -58,7 +58,7 @@ public class OverviewDashboard implements Dashboard {
 		});
 
 		layout.row("config").el(XML.class, (viz, data) -> {
-			viz.file = data.output("*.output_config.xml");
+			viz.file = data.output("(*.)?output_config.xml");
 			viz.height = 6d;
 			viz.width = 2d;
 			viz.unfoldLevel = 1;
@@ -66,7 +66,7 @@ public class OverviewDashboard implements Dashboard {
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
 			viz.description = "at final Iteration";
-			viz.dataset = data.output("*.modestats.csv");
+			viz.dataset = data.output("(*.)?modestats.csv");
 			viz.ignoreColumns = List.of("iteration");
 			viz.useLastRow = true;
 		});
@@ -75,7 +75,7 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("second").el(Line.class, (viz, data) -> {
 
 			viz.title = "Score";
-			viz.dataset = data.output("*.scorestats.csv");
+			viz.dataset = data.output("(*.)?scorestats.csv");
 			viz.description = "per Iteration";
 			viz.x = "iteration";
 			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
@@ -88,7 +88,7 @@ public class OverviewDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
-				viz.dataset = data.output("*.modestats.csv");
+				viz.dataset = data.output("(*.)?modestats.csv");
 				viz.x = "iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Share";
