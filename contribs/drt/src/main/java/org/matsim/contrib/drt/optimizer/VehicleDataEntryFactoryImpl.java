@@ -29,11 +29,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -83,7 +79,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		// With changing capacities, we collect the sequence of capacities that the vehicle is scheduled to have. So that we can track them backwards in the next loop
 		List<DvrpLoad> vehicleCapacities = new ArrayList<>(tasks.size() - nextTaskIdx);
-		vehicleCapacities.add(vehicle.getCapacity().getType().getEmptyLoad());
+		vehicleCapacities.add(startTask instanceof CapacityChangeTask capacityChangeTask ? capacityChangeTask.getNewVehicleCapacity() : vehicle.getCapacity().getType().getEmptyLoad());
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (STAY.isBaseTypeOf(task)) {
 				accumulatedStayTime += task.getEndTime() - task.getBeginTime();
