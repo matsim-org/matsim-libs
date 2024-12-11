@@ -59,6 +59,7 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -116,7 +117,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					public EmptyVehicleChargingScheduler get() {
 						var taskFactory = getModalInstance(DrtTaskFactory.class);
 						var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
-						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
+						ChargingStrategy.Factory chargingStrategyFactory = getModalInstance(ChargingStrategy.Factory.class);
+						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure, chargingStrategyFactory);
 					}
 				}).asEagerSingleton();
 
