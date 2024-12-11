@@ -19,25 +19,27 @@
 
 package org.matsim.contrib.parking.parkingsearch.manager;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
-public interface ParkingSearchManager {
+public interface ParkingSearchManager extends IterationEndsListener, MobsimBeforeSimStepListener, MobsimInitializedListener {
 
 	boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
+
 	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
+
 	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+
 	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	
-	List<String> produceStatistics();
+
 	void reset(int iteration);
-	
-	
+
+
 }
