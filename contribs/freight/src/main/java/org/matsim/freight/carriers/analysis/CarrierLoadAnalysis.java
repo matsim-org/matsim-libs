@@ -101,6 +101,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
+			"maxUsedCapacity [%]",
 			"load state during tour"));
 		bw1.newLine();
 
