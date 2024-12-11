@@ -373,8 +373,8 @@ public final class DemandReaderFromCSV {
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
 		checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
-				crsTransformationNetworkAndShape, jobDurationCalculator,
-				selectedDemandDistributionOption, selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
+			crsTransformationNetworkAndShape, jobDurationCalculator,
+			selectedDemandDistributionOption, selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
 	}
 
 	/**
@@ -598,10 +598,10 @@ public final class DemandReaderFromCSV {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
 				createServices(scenario, newDemandInformationElement, indexShape, population,
-						crsTransformationNetworkAndShape, jobDurationCalculator);
+					crsTransformationNetworkAndShape, jobDurationCalculator);
 			else if (newDemandInformationElement.getTypeOfDemand().equals("shipment"))
 				createShipments(scenario, newDemandInformationElement, indexShape, population,
-						crsTransformationNetworkAndShape, jobDurationCalculator, demandDistributionOption, totalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
+					crsTransformationNetworkAndShape, jobDurationCalculator, demandDistributionOption, totalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
 		}
 		if (combineSimilarJobs)
 			combineSimilarJobs(scenario);
@@ -657,7 +657,7 @@ public final class DemandReaderFromCSV {
 			else
 				possiblePersonsForService.putAll(population.getPersons());
 			int numberPossibleServices = (int) Math
-					.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
+				.round(shareOfPopulationWithThisService * possiblePersonsForService.size());
 			int sampledNumberPossibleServices = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleServices);
 			if (sampleSizeInputPopulation == sampleTo || samplingOption.equals("changeDemandOnLocation"))
 				numberOfJobs = numberPossibleServices;
@@ -688,8 +688,8 @@ public final class DemandReaderFromCSV {
 				for (int i = 0; i < demandToDistribute; i++) {
 
 					Link link = findNextUsedLink(scenario, indexShape, possibleLinksForService, numberOfJobs,
-							areasForServiceLocations, locationsOfServices, usedServiceLocations,
-							possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
+						areasForServiceLocations, locationsOfServices, usedServiceLocations,
+						possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
 					int demandForThisLink = 1;
 					double serviceTime = jobDurationCalculator.calculateServiceDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), demandForThisLink);
 					usedServiceLocations.add(link.getId().toString());
@@ -719,7 +719,7 @@ public final class DemandReaderFromCSV {
 						sumOfPossibleLinkLength, link);
 					countOfLinks++;
 					Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
-							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
+						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 					int handledDemand = 0;
 					//the number of jobs on this link is calculated based on the available vehicles
 					double largestPossibleDemandSize = getLargestVehicleCapacity(thisCarrier);
@@ -795,8 +795,8 @@ public final class DemandReaderFromCSV {
 						CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 							.put(thisService.getId(), thisService);
-					if (demandToDistribute == 0)
-						break;
+						if (demandToDistribute == 0)
+							break;
 					}
 				}
 				distributedDemand = distributedDemand + demandForThisLink;
@@ -818,7 +818,7 @@ public final class DemandReaderFromCSV {
 										ShpOptions.Index indexShape, Population population,
 										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator,
 										String selectedDemandDistributionOption,
-										FreightDemandGeneration.TotalDemandGenerationsOption selectedTotalDemandGenerationOption, Double PACKAGES_PER_PERSON, Double PACKAGES_PER_RECIPIENT) {
+										FreightDemandGeneration.TotalDemandGenerationsOption selectedTotalDemandGenerationOption, Double packagesPerPerson, Double packagesPerRecipient) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
@@ -893,14 +893,14 @@ public final class DemandReaderFromCSV {
 			switch(selectedTotalDemandGenerationOption) {
 				case demandPerPerson -> {
 					demandToDistribute =
-							(int) Math.round(PACKAGES_PER_PERSON * sizeOfPopulationFilteredByArea/ sampleSizeInputPopulation);
-					log.info("Demand for this carrier is set to " + demandToDistribute + " with " + PACKAGES_PER_PERSON + " demand units per person (" + sampleSizeInputPopulation + "-sample).");
+						(int) Math.round(packagesPerPerson * sizeOfPopulationFilteredByArea/ sampleSizeInputPopulation);
+					log.info("Demand for this carrier is set to " + demandToDistribute + " with " + packagesPerPerson + " demand units per person (" + sampleSizeInputPopulation + "-sample).");
 				}
 				case demandForShape -> {
 					double demandToDistrDouble =
-							(double) demandToDistribute *
-									sizeOfPopulationFilteredByArea / sizeOfWholePopulation
-									* sampleSizeInputPopulation;
+						(double) demandToDistribute *
+							sizeOfPopulationFilteredByArea / sizeOfWholePopulation
+							* sampleSizeInputPopulation;
 					demandToDistribute = (int) Math.round(demandToDistrDouble);
 					log.info("Demand is set to " + demandToDistribute + " ("+ (double) Math.round((double) sizeOfPopulationFilteredByArea / sizeOfWholePopulation * 100.0) / 100.0 +"% of shape).");
 				}
@@ -974,28 +974,28 @@ public final class DemandReaderFromCSV {
 			//OLD
 			//pickup
 			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
-					crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
-					setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
+				crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
+				setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
 			log.info("Possible links for pickup: " + possibleLinksPickup.size());
 
 			//delivery
 			possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
-					crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
-					setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
+				crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
+				setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
 			log.info("Possible links for delivery: " + possibleLinksDelivery.size());
 
 			if (possibleLinksPickup.isEmpty())
 				throw new RuntimeException(
-						"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
+					"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
 			if (possibleLinksDelivery.isEmpty())
 				throw new RuntimeException(
-						"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
+					"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
 
 			if (setLocationsOfPickup != null)
 				for (String selectedLinkIdPickups : setLocationsOfPickup)
 					if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
 						throw new RuntimeException("The selected link " + selectedLinkIdPickups
-								+ " for pickup is not part of the possible links for pickup. Please check!");
+							+ " for pickup is not part of the possible links for pickup. Please check!");
 
 			if (setLocationsOfDelivery != null)
 				if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
@@ -1004,7 +1004,7 @@ public final class DemandReaderFromCSV {
 					for (String selectedLinkIdDelivery : setLocationsOfDelivery)
 						if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
 							throw new RuntimeException("The selected link " + selectedLinkIdDelivery
-									+ " for delivery is not part of the possible links for delivery. Please check!");
+								+ " for delivery is not part of the possible links for delivery. Please check!");
 		}
 		else {
 			//NEW: Not links but possible persons are matched to link -> saves time
@@ -1145,15 +1145,20 @@ public final class DemandReaderFromCSV {
 					"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
 				log.info("New number of jobs: "+numberOfJobs);
 			}
-			//NEW: Poisson
-			org.apache.commons.math3.distribution.PoissonDistribution poisson = new PoissonDistribution(PACKAGES_PER_RECIPIENT-1);
-			Frequency frequency = new Frequency();
-			int upsamplingFactor = 1;
-			for (int i=0; i<11; i++){
-				frequency.incrementValue((i+1)*upsamplingFactor,Math.round(poisson.probability(i)*numberOfJobs));
-			}
-			RouletteWheel rouletteWheel = RouletteWheel.Builder.newInstance(frequency).setRandom(rand).build();
 
+			RouletteWheel rouletteWheel = null;
+			if (packagesPerPerson != null && packagesPerRecipient != null) {
+				// NEW: Poisson
+				org.apache.commons.math3.distribution.PoissonDistribution poisson =
+					new PoissonDistribution(packagesPerRecipient - 1);
+				Frequency frequency = new Frequency();
+				int upsamplingFactor = 1;
+				for (int i = 0; i < 11; i++) {
+					frequency.incrementValue(
+						(i + 1) * upsamplingFactor, Math.round(poisson.probability(i) * numberOfJobs));
+				}
+				rouletteWheel =  RouletteWheel.Builder.newInstance(frequency).setRandom(rand).build();
+			}
 
 			for (int i = 0; i < numberOfJobs; i++) {
 
@@ -1175,27 +1180,27 @@ public final class DemandReaderFromCSV {
 				if (selectedDemandDistributionOption != "toPersonsByAge" && selectedDemandDistributionOption != "toRandomPersons") {
 					//MODIFICATION: find next used link for delivery only if no population is used
 					linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
-							numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-							usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
-							crsTransformationNetworkAndShape, i);
+						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
+						usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
+						crsTransformationNetworkAndShape, i);
 					//get (random) demand for the link
 					if (distributedDemand != demandToDistribute) {
 						demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
 					}
 				} else {
-						//NEW: find next person and not next link
-						personId = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
-						possiblePersonsDelivery.remove(personId);
-						//NEW: find demand not random but with poisson and/ or by age group
-						if (distributedDemand != demandToDistribute) {
-							demandForThisLink = calculateDemandBasedOnRouletteWheel(personId, population, rouletteWheel, demandToDistribute,
-									distributedDemand, selectedDemandDistributionOption);
-							//NEW: find link for person
-							if (demandForThisLink != 0) {
-								findLinksForPerson(scenario, nearestLinkPerPersonDelivery, population.getPersons().get(personId));
-								linkDelivery = getNearestLinkForSelectedPerson(scenario, personId, nearestLinkPerPersonDelivery);
-							}
+					//NEW: find next person and not next link
+					personId = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
+					possiblePersonsDelivery.remove(personId);
+					//NEW: find demand not random but with poisson and/ or by age group
+					if (distributedDemand != demandToDistribute) {
+						demandForThisLink = calculateDemandBasedOnRouletteWheel(personId, population, rouletteWheel, demandToDistribute,
+							distributedDemand, selectedDemandDistributionOption);
+						//NEW: find link for person
+						if (demandForThisLink != 0) {
+							findLinksForPerson(scenario, nearestLinkPerPersonDelivery, population.getPersons().get(personId));
+							linkDelivery = getNearestLinkForSelectedPerson(scenario, personId, nearestLinkPerPersonDelivery);
 						}
+					}
 				}
 
 
@@ -1209,7 +1214,7 @@ public final class DemandReaderFromCSV {
 
 				if(demandForThisLink != 0) {
 					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, jobDurationCalculator);
+						demandForThisLink, jobDurationCalculator);
 					distributedDemand = distributedDemand + demandForThisLink;
 					numberOfShipments++;
 				}
@@ -1389,6 +1394,10 @@ public final class DemandReaderFromCSV {
 	private static int calculateDemandBasedOnRouletteWheel(Id<Person> person, Population population,
 														   RouletteWheel rouletteWheel, int demandToDistribute, int distributedDemand,
 														   String demandDistributionOption){
+		if (rouletteWheel == null){
+			throw new RuntimeException("RouletteWheel is null. Please check the demand distribution option and the demand distribution per age group.");
+		}
+
 
 		int demandForThisLink = 0;
 		int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
@@ -1433,8 +1442,8 @@ public final class DemandReaderFromCSV {
 		//add demand to list
 		demandForEachPerson.put(person, new HashMap<>());
 		demandForEachPerson.get(person).put(age,
-				demandForThisLink +"\t"+
-						getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
+			demandForThisLink +"\t"+
+				getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
 
 		return demandForThisLink;
 	}
@@ -1449,7 +1458,7 @@ public final class DemandReaderFromCSV {
 	private static void combineSimilarJobs(Scenario scenario) {
 
 		log.warn(
-				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
+			"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			if (!thisCarrier.getShipments().isEmpty()) {
 				int shipmentsBeforeConnection = thisCarrier.getShipments().size();
@@ -1636,8 +1645,8 @@ public final class DemandReaderFromCSV {
 	 * @return 									HashMap with all possible persons
 	 */
 	private static HashMap<Id<Person>, Person> findPossiblePersons(Population population,
-			String[] areasForJobElementLocations, ShpOptions.Index indexShape,
-			CoordinateTransformation crsTransformationNetworkAndShape) {
+																   String[] areasForJobElementLocations, ShpOptions.Index indexShape,
+																   CoordinateTransformation crsTransformationNetworkAndShape) {
 		log.info("Finding possible persons for the demand in the selected areas {}", Arrays.toString(areasForJobElementLocations));
 		HashMap<Id<Person>, Person> possiblePersons = new HashMap<>();
 
@@ -1991,7 +2000,7 @@ public final class DemandReaderFromCSV {
 
 	//NEW METHOD
 	public static Link getNearestLinkForSelectedPerson(Scenario scenario, Id<Person> person, HashMap<Id<Person>,
-			HashMap<Double, String>> nearestLinkPerPerson) {
+		HashMap<Double, String>> nearestLinkPerPerson) {
 
 		Link link = scenario.getNetwork().getLinks()
 			.get(Id.createLinkId(nearestLinkPerPerson.get(person).values().iterator().next()));
