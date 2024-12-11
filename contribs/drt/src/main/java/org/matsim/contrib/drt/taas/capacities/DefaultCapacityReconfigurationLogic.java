@@ -242,6 +242,7 @@ public class DefaultCapacityReconfigurationLogic implements CapacityReconfigurat
 							delta.put(currentVehicleToTransferCapacity, delta.get(currentVehicleToTransferCapacity) + 1);
 							currentNumberOfVehiclesPerCapacity.put(capacity, currentNumberOfVehiclesPerCapacity.getOrDefault(capacity, 0)+1);
 							currentNumberOfVehiclesPerCapacity.put(currentVehicleToTransferCapacity, currentNumberOfVehiclesPerCapacity.get(currentVehicleToTransferCapacity)-1);
+							currentCapacities.put(vehicleToTransfer, capacity);
 						} else {
 							noMoreTransferableVehicles = true;
 							break;
