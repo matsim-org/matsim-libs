@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.taas.capacities;
 
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,24 +53,28 @@ public class CapacityChangeSchedulerEngine implements MobsimEngine {
 
 	private void insertCapacityChangeTasks(DvrpVehicle vehicle) {
 		List<DefaultCapacityReconfigurationLogic.CapacityChangeItem> capacityChangeItems = this.capacityReconfigurationLogic.getPreScheduledCapacityChanges(vehicle);
+		if(capacityChangeItems.isEmpty()) {
+			return;
+		}
+
 		Schedule schedule = vehicle.getSchedule();
 
-		assert schedule.getTasks().size() == 1;
-		assert schedule.getStatus().equals(Schedule.ScheduleStatus.PLANNED);
-		assert schedule.getTasks().get(0) instanceof DrtStayTask;
+		Verify.verify(schedule.getTasks().size() == 1);
+		Verify.verify(schedule.getStatus().equals(Schedule.ScheduleStatus.PLANNED));
+		Verify.verify(schedule.getTasks().getFirst() instanceof DrtStayTask);
 
-		// We leave the initial stay task one minute after its beginning
-		DrtStayTask drtStayTask = (DrtStayTask) schedule.getTasks().get(0);
-		double initialEndTime = drtStayTask.getEndTime();
+		// We retrieve the first initial task to store its end time to conclude the schedule at the end of the process
+		DrtStayTask initialStayTask = (DrtStayTask) schedule.getTasks().getFirst();
 
-		double currentTime = drtStayTask.getBeginTime() + 60.0;
+		schedule.removeTask(initialStayTask);
+
+		double currentTime = initialStayTask.getBeginTime();
+		Link previousLink = initialStayTask.getLink();
 		for (DefaultCapacityReconfigurationLogic.CapacityChangeItem capacityChangeItem : capacityChangeItems) {
 			Link link = Objects.requireNonNull(network.getLinks().get(capacityChangeItem.linkId()));
 
-			VrpPathWithTravelData driveToCapacityChangeData = VrpPaths.calcAndCreatePath(drtStayTask.getLink(), link, currentTime, router, travelTime);
+			VrpPathWithTravelData driveToCapacityChangeData = VrpPaths.calcAndCreatePath(previousLink, link, currentTime, router, travelTime);
 			DrtDriveTask drtDriveTask = new DrtDriveTask(driveToCapacityChangeData, taskType);
-
-			drtStayTask.setEndTime(currentTime);
 
 			double capacityChangeBeginTime = Math.max(capacityChangeItem.time(), driveToCapacityChangeData.getArrivalTime());
 
@@ -82,17 +87,16 @@ public class CapacityChangeSchedulerEngine implements MobsimEngine {
 			//Then we insert a capacity change with a duration of one minute
 			Task capacityChangeTask = new DefaultDrtStopTaskWithVehicleCapacityChange(capacityChangeBeginTime, capacityChangeBeginTime + this.capacityChangeTaskDuration, link, capacityChangeItem.nextCapacity());
 
-			//Then we insert a stay task there
-			DrtStayTask stayAfterCapacityChangeTask = new DrtStayTask(capacityChangeTask.getEndTime(), Math.max(initialEndTime, capacityChangeTask.getEndTime() + capacityChangeTaskDuration), link);
 			schedule.addTask(drtDriveTask);
 			if (stayBeforeCapacityChangeTask != null) {
 				schedule.addTask(stayBeforeCapacityChangeTask);
 			}
 			schedule.addTask(capacityChangeTask);
-			schedule.addTask(stayAfterCapacityChangeTask);
-			currentTime = stayAfterCapacityChangeTask.getBeginTime() + capacityChangeTaskDuration;
-			drtStayTask = stayAfterCapacityChangeTask;
+			currentTime = capacityChangeTask.getEndTime();
+			previousLink = link;
 		}
+		DrtStayTask finalStayTask = new DrtStayTask(currentTime, initialStayTask.getEndTime(), previousLink);
+		schedule.addTask(finalStayTask);
 	}
 
 	@Override
