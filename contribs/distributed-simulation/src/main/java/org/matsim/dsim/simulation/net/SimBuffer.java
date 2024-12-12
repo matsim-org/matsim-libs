@@ -7,6 +7,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 class SimBuffer {
 
@@ -61,5 +62,11 @@ class SimBuffer {
 
 	boolean isStuck(double now) {
 		return !arrivalTimes.isEmpty() && arrivalTimes.firstDouble() + stuckThreshold <= now;
+	}
+
+	@Override
+	public String toString() {
+		var vehicles = internalBuffer.stream().map(v -> v.getId().toString()).collect(Collectors.joining(", "));
+		return "veh=[" + vehicles + "], flow=[" + flowCap + "]";
 	}
 }

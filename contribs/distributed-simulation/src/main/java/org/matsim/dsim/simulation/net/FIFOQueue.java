@@ -4,6 +4,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.stream.Collectors;
 
 class FIFOQueue implements SimDequeue {
 
@@ -36,5 +37,10 @@ class FIFOQueue implements SimDequeue {
 		assert !internalQ.contains(vehicle) : "vehicle already in queue";
 
 		internalQ.addLast(vehicle);
+	}
+
+	@Override
+	public String toString() {
+		return internalQ.stream().map(veh -> veh.getId().toString()).collect(Collectors.joining(", "));
 	}
 }

@@ -1,6 +1,6 @@
 package org.matsim.api.core.v01.events;
 
-import org.matsim.api.core.v01.Message;
+import org.matsim.core.mobsim.dsim.Message;
 
 import java.util.Comparator;
 
@@ -9,14 +9,14 @@ import java.util.Comparator;
  */
 public class MessageComparator implements Comparator<Message> {
 
-    public static final MessageComparator INSTANCE = new MessageComparator();
+	public static final MessageComparator INSTANCE = new MessageComparator();
 
-    @Override
-    public int compare(Message o1, Message o2) {
-        if (o1 instanceof Event e1 && o2 instanceof Event e2) {
-            return Double.compare(e1.getTime(), e2.getTime());
-        }
+	@Override
+	public int compare(Message o1, Message o2) {
+		if (o1 instanceof Event e1 && o2 instanceof Event e2) {
+			return Double.compare(e1.getTime(), e2.getTime());
+		}
 
-        return 0;
-    }
+		return 0;
+	}
 }

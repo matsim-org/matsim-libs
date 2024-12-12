@@ -45,4 +45,9 @@ class SimpleStorageCapacity implements StorageCapacity {
 	public boolean isAvailable() {
 		return occupied < max;
 	}
+
+	@Override
+	public String toString() {
+		return "max=" + max + " occupied=" + occupied;
+	}
 }

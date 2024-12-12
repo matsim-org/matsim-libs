@@ -13,7 +13,10 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.dsim.simulation.net.*;
+import org.matsim.dsim.simulation.net.DefaultWait2Link;
+import org.matsim.dsim.simulation.net.SimLink;
+import org.matsim.dsim.simulation.net.SimNetwork;
+import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.*;
@@ -57,13 +60,23 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	@Override
 	public void doSimStep(double now) {
-		for (var entry : activeStops.entrySet()) {
-			while (!entry.getValue().isEmpty() && entry.getValue().peek().vehicle().getEarliestLinkExitTime() <= now) {
+
+		var it = activeStops.entrySet().iterator();
+		while (it.hasNext()) {
+			var entry = it.next();
+			while (headVehicleReady(entry.getValue(), now)) {
 				var linkVehicle = entry.getValue().remove();
 				linkVehicle.link().pushVehicle(linkVehicle.vehicle(), SimLink.LinkPosition.QEnd, now);
 			}
+			if (entry.getValue().isEmpty()) {
+				it.remove();
+			}
 		}
 		transitQSimEngine.doSimStep(now);
+	}
+
+	private boolean headVehicleReady(Queue<VehicleAtStop> queue, double now) {
+		return !queue.isEmpty() && queue.peek().vehicle().getEarliestLinkExitTime() <= now;
 	}
 
 	@Override
@@ -187,9 +200,9 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 		@Override
 		public int compare(VehicleAtStop o1, VehicleAtStop o2) {
-			var timeResult = timeComparator.compare(o2, o1);
+			var timeResult = timeComparator.compare(o1, o2);
 			if (timeResult != 0) {
-				return o2.vehicle().getId().compareTo(o1.vehicle().getId());
+				return o1.vehicle().getId().compareTo(o2.vehicle().getId());
 			} else {
 				return timeResult;
 			}

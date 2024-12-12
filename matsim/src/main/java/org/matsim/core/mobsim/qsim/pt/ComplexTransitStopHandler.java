@@ -19,24 +19,24 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.List;
+
 /**
  * Continuous queue model like transit stop handler using either serial or parallel doors operation mode.
- * 
- * 
+ *
  * @author aneumann
  */
 public class ComplexTransitStopHandler implements TransitStopHandler {
-	
+
 	private final static Logger log = LogManager.getLogger(ComplexTransitStopHandler.class);
 
 	private boolean doorsOpen = false;
@@ -46,33 +46,39 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private final double personEntersTime;
 	private final double personLeavesTime;
 	private final VehicleType.DoorOperationMode doorOperationMode;
-	
+
 	// TODO make it dynamic
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
 
 	/*package*/ ComplexTransitStopHandler(Vehicle vehicle) {
-        this.personEntersTime = VehicleUtils.getAccessTime(vehicle.getType());
+		this.personEntersTime = VehicleUtils.getAccessTime(vehicle.getType());
 		this.personLeavesTime = VehicleUtils.getEgressTime(vehicle.getType());
 		this.doorOperationMode = VehicleUtils.getDoorOperationMode(vehicle.getType());
 	}
 
+	ComplexTransitStopHandler(Msg msg) {
+		this.personEntersTime = msg.personEntersTime();
+		this.personLeavesTime = msg.personLeavesTime();
+		this.doorOperationMode = msg.doorOperationMode();
+	}
+
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
-		
-		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){
-			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);			
-		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial){
+									List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
+
+		if (this.doorOperationMode == VehicleType.DoorOperationMode.parallel) {
+			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
+		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial) {
 			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
 		} else {
 			log.info("Unimplemented door operation mode " + this.doorOperationMode + " set. Using parralel mode as default.");
 			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
-		}		
+		}
 	}
-	
-	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, 
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
+
+	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
+									List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -80,7 +86,6 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 		if (!this.doorsOpen) {
 			// doors are closed
-
 			if ((cntAccess > 0) || (cntEgress > 0)) {
 				// case doors are shut, but passengers want to leave or enter
 				// the veh
@@ -93,27 +98,24 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 		} else {
 			// doors are already open
-
 			if ((cntAccess > 0) || (cntEgress > 0)) {
 				// somebody wants to leave or enter the veh
-				
 				if (cntEgress > 0) {
 
 					if (this.passengersLeavingTimeFraction < 1.0) {
 						// next passenger can leave the veh
 
 						while (this.passengersLeavingTimeFraction < 1.0) {
-							if (leavingPassengers.size() == 0) {
+							if (leavingPassengers.isEmpty()) {
 								break;
 							}
 
-							if(handler.handlePassengerLeaving(leavingPassengers.get(0), vehicle, stop.getLinkId(), now)){
-								leavingPassengers.remove(0);
+							if (handler.handlePassengerLeaving(leavingPassengers.getFirst(), vehicle, stop.getLinkId(), now)) {
+								leavingPassengers.removeFirst();
 								this.passengersLeavingTimeFraction += personLeavesTime;
 							} else {
 								break;
 							}
-
 						}
 
 						this.passengersLeavingTimeFraction -= 1.0;
@@ -128,25 +130,23 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 				} else {
 					this.passengersLeavingTimeFraction -= 1.0;
 					this.passengersLeavingTimeFraction = Math.max(0, this.passengersLeavingTimeFraction);
-					
+
 					if (cntAccess > 0) {
 
 						if (this.passengersEnteringTimeFraction < 1.0) {
 
 							// next passenger can enter the veh
-
 							while (this.passengersEnteringTimeFraction < 1.0) {
-								if (enteringPassengers.size() == 0) {
+								if (enteringPassengers.isEmpty()) {
 									break;
 								}
 
-								if(handler.handlePassengerEntering(enteringPassengers.get(0), vehicle, stop.getId(), now)){
-									enteringPassengers.remove(0);
+								if (handler.handlePassengerEntering(enteringPassengers.getFirst(), vehicle, stop.getId(), now)) {
+									enteringPassengers.removeFirst();
 									this.passengersEnteringTimeFraction += personEntersTime;
 								} else {
 									break;
 								}
-
 							}
 
 							this.passengersEnteringTimeFraction -= 1.0;
@@ -162,12 +162,11 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 						this.passengersEnteringTimeFraction -= 1.0;
 						this.passengersEnteringTimeFraction = Math.max(0, this.passengersEnteringTimeFraction);
 					}
-				}				
+				}
 
 			} else {
 
 				// nobody left to handle
-
 				if (this.passengersEnteringTimeFraction < 1.0 && this.passengersLeavingTimeFraction < 1.0) {
 					// every passenger entered or left the veh so close and
 					// leave
@@ -189,16 +188,14 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 					this.passengersLeavingTimeFraction -= 1.0;
 					stopTime = 1.0;
 				}
-
 			}
-
 		}
 
 		return stopTime;
 	}
-	
+
 	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
+									  List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -206,7 +203,6 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 		if (!this.doorsOpen) {
 			// doors are closed
-
 			if ((cntAccess > 0) || (cntEgress > 0)) {
 				// case doors are shut, but passengers want to leave or enter
 				// the veh
@@ -219,28 +215,24 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 		} else {
 			// doors are already open
-
 			if ((cntAccess > 0) || (cntEgress > 0)) {
 				// somebody wants to leave or enter the veh
-
 				if (cntAccess > 0) {
 
 					if (this.passengersEnteringTimeFraction < 1.0) {
 
 						// next passenger can enter the veh
-
 						while (this.passengersEnteringTimeFraction < 1.0) {
-							if (enteringPassengers.size() == 0) {
+							if (enteringPassengers.isEmpty()) {
 								break;
 							}
 
-							if(handler.handlePassengerEntering(enteringPassengers.get(0), vehicle, stop.getId(), now)){
-								enteringPassengers.remove(0);
+							if (handler.handlePassengerEntering(enteringPassengers.getFirst(), vehicle, stop.getId(), now)) {
+								enteringPassengers.removeFirst();
 								this.passengersEnteringTimeFraction += personEntersTime;
 							} else {
 								break;
 							}
-
 						}
 
 						this.passengersEnteringTimeFraction -= 1.0;
@@ -263,17 +255,16 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 						// next passenger can leave the veh
 
 						while (this.passengersLeavingTimeFraction < 1.0) {
-							if (leavingPassengers.size() == 0) {
+							if (leavingPassengers.isEmpty()) {
 								break;
 							}
 
-							if(handler.handlePassengerLeaving(leavingPassengers.get(0), vehicle, stop.getLinkId(), now)){
-								leavingPassengers.remove(0);
+							if (handler.handlePassengerLeaving(leavingPassengers.getFirst(), vehicle, stop.getLinkId(), now)) {
+								leavingPassengers.removeFirst();
 								this.passengersLeavingTimeFraction += personLeavesTime;
 							} else {
 								break;
 							}
-
 						}
 
 						this.passengersLeavingTimeFraction -= 1.0;
@@ -284,16 +275,12 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 						this.passengersLeavingTimeFraction -= 1.0;
 						stopTime = 1.0;
 					}
-
 				} else {
 					this.passengersLeavingTimeFraction -= 1.0;
 					this.passengersLeavingTimeFraction = Math.max(0, this.passengersLeavingTimeFraction);
 				}
-
 			} else {
-
 				// nobody left to handle
-
 				if (this.passengersEnteringTimeFraction < 1.0 && this.passengersLeavingTimeFraction < 1.0) {
 					// every passenger entered or left the veh so close and
 					// leave
@@ -315,12 +302,17 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 					this.passengersLeavingTimeFraction -= 1.0;
 					stopTime = 1.0;
 				}
-
 			}
-
 		}
-
 		return stopTime;
 	}
 
+	@Override
+	public Message toMessage() {
+		return new Msg(doorOperationMode, personEntersTime, personLeavesTime);
+	}
+
+	record Msg(VehicleType.DoorOperationMode doorOperationMode, double personEntersTime,
+			   double personLeavesTime) implements Message {
+	}
 }

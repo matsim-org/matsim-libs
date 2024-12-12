@@ -2,7 +2,6 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -20,7 +19,6 @@ import org.matsim.dsim.simulation.AgentSourcesContainer;
 import java.util.HashSet;
 import java.util.Set;
 
-@Log4j2
 public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
 
 	private final SimNetwork simNetwork;
@@ -30,7 +28,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 	private final ActiveLinks activeLinks;
 	private final ParkedVehicles parkedVehicles;
 
-	//private final Map<Id<Vehicle>, DistributedMobsimVehicle> parkedVehicles = new HashMap<>();
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
 	private final Set<String> modes;
@@ -108,7 +105,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		SimLink link = simNetwork.getLinks().get(linkId);
 
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
-		activeLinks.activate(link);
 	}
 
 	private void processUpdateMessage(CapacityUpdate updateMessage) {

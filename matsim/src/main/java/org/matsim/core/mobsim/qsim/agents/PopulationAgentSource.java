@@ -33,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
@@ -40,7 +41,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
@@ -295,6 +295,6 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 
 	@Override
 	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
-		return new QVehicleImpl((QVehicleMessage) message);
+		return new QVehicleImpl((QVehicleImpl.Msg) message);
 	}
 }
