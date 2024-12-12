@@ -33,7 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;

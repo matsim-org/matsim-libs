@@ -1,5 +1,7 @@
 package org.matsim.core.mobsim.dsim;
 
+import org.matsim.api.core.v01.Message;
+
 /**
  * Classes implementing this interface provide messages to be sent across domain boundaries in a distributed simulation. This is here in addition to
  * {@link DistributedMobsimVehicle} and {@link DistributedMobsimAgent}, because those two also tag, vehicles and agents which are ready for the

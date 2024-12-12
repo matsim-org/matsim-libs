@@ -4,9 +4,9 @@ import org.apache.fury.memory.MemoryBuffer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.core.mobsim.dsim.Message;
 
 import java.io.IOException;
 import java.util.List;

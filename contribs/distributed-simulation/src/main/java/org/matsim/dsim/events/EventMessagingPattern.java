@@ -1,8 +1,8 @@
 package org.matsim.dsim.events;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.dsim.MessageBroker;
 
 import java.util.function.Consumer;

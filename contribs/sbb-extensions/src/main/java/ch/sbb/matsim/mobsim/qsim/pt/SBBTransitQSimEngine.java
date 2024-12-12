@@ -330,7 +330,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			TransitEvent arrEvent = new TransitEvent(arrTime, TransitEventType.ArrivalAtStop, event.context);
 			this.eventQueue.add(arrEvent);
 			if (this.createLinkEvents) {
-				precomputeLinkEvents(event.time, arrTime, event.context.linksToNextStop, driver.getVehicle(), driver);
+				precomputeLinkEvents(event.time, arrTime, event.context.linksToNextStop, driver.getVehicle());
 			}
 		} else {
 			if (this.createLinkEvents) {
@@ -344,7 +344,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 		}
 	}
 
-	private void precomputeLinkEvents(double depTime, double arrTime, Link[] linksToNextStop, TransitVehicle vehicle, SBBTransitDriverAgent driver) {
+	private void precomputeLinkEvents(double depTime, double arrTime, Link[] linksToNextStop, TransitVehicle vehicle) {
 		double travelTime = arrTime - depTime;
 		double totalLength = 0.0;
 		boolean isDepartureLink = true;

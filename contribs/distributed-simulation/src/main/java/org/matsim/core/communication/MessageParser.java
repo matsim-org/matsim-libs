@@ -1,7 +1,7 @@
 package org.matsim.core.communication;
 
 
-import org.matsim.core.mobsim.dsim.Message;
+import org.matsim.api.core.v01.Message;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

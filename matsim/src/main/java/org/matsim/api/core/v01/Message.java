@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.dsim;
+package org.matsim.api.core.v01;
 
 /**
  * Interface for arbitrarily serializable and exchangeable messages.

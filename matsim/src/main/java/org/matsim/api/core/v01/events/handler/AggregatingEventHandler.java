@@ -1,8 +1,8 @@
 package org.matsim.api.core.v01.events.handler;
 
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.dsim.Message;
 
 import java.util.List;
 

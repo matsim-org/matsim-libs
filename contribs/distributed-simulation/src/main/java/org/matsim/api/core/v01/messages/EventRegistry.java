@@ -4,7 +4,7 @@ package org.matsim.api.core.v01.messages;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Builder;
 import lombok.Data;
-import org.matsim.core.mobsim.dsim.Message;
+import org.matsim.api.core.v01.Message;
 
 @Data
 @Builder

@@ -19,8 +19,8 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.vehicles.Vehicle;
 
 /**

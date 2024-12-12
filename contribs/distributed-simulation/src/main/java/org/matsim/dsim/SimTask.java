@@ -2,8 +2,8 @@ package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.LongList;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.dsim.Message;
 
 /**
  * Internal interface for processes / tasks that can be executed in parallel.
