@@ -1,6 +1,9 @@
 package org.matsim.dsim;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -17,7 +20,9 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -53,6 +58,18 @@ public class DistributedIntegrationTest {
 		return config;
 	}
 
+	private Scenario prepareScenario(Config config) {
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// Need to prepare network for freight
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
+
+		return scenario;
+	}
+
 	@Test
 	@Order(1)
 	void qsim() {
@@ -61,13 +78,7 @@ public class DistributedIntegrationTest {
 
 		local.controller().setMobsim(ControllerConfigGroup.MobsimType.qsim.name());
 
-		Scenario scenario = ScenarioUtils.loadScenario(local);
-
-		// Need to prepare network for freight
-		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-		scenario.getNetwork().getLinks().values().parallelStream()
-			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-			.forEach(l -> l.setAllowedModes(carandfreight));
+		Scenario scenario = prepareScenario(local);
 
 		Controler controler = new Controler(scenario);
 
@@ -79,13 +90,7 @@ public class DistributedIntegrationTest {
 	void runLocal() {
 
 		Config local = createScenario();
-		Scenario scenario = ScenarioUtils.loadScenario(local);
-
-		// Need to prepare network for freight
-		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-		scenario.getNetwork().getLinks().values().parallelStream()
-			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-			.forEach(l -> l.setAllowedModes(carandfreight));
+		Scenario scenario = prepareScenario(local);
 
 		Controler controler = new Controler(scenario);
 
@@ -107,33 +112,24 @@ public class DistributedIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Disabled
-	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException {
+	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
-		//Config local = createScenario();
-		//Scenario scenario = ScenarioUtils.loadScenario(local);
-
-		// Need to prepare network for freight
-		//var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-		//scenario.getNetwork().getLinks().values().parallelStream()
-		//	.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-		//	.forEach(l -> l.setAllowedModes(carandfreight));
-
-		var size = 4;
+		var size = 3;
 		var pool = Executors.newFixedThreadPool(size);
 		var comms = LocalCommunicator.create(size);
-		var outputDir = utils.getOutputDirectory();
+
+		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
 		var futures = comms.stream()
 			.map(comm -> pool.submit(() -> {
-				Config config = ConfigUtils.createConfig();
-				config.controller().setOutputDirectory(outputDir);
-				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-				config.controller().setLastIteration(2);
-				config.controller().setMobsim("dsim");
-				Activities.addScoringParams(config);
-				DistributedController c = new DistributedController(comm, config, 1, 1);
-				c.run();
+
+				Config local = createScenario();
+				Scenario scenario = prepareScenario(local);
+				Controler controler = new Controler(scenario);
+
+				controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1));
+				controler.run();
+
 				try {
 					comm.close();
 				} catch (Exception e) {
@@ -146,22 +142,16 @@ public class DistributedIntegrationTest {
 			f.get(2, TimeUnit.MINUTES);
 		}
 
+		Path outputPath = Path.of(utils.getOutputDirectory());
 
-		/*
-		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-			List<Communicator> comms = LocalCommunicator.create(4);
-			for (Communicator comm : comms) {
-				pool.submit(() -> {
-					//Controler controler = new Controler(scenario);
-					//controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-					//controler.run();
-					var distributedController = new DistributedController(comm, local, 1, 1);
-					distributedController.run();
-				});
-			}
-		}
+		Path expectedEventsPath = outputPath.resolve("..").
+			resolve("qsim").resolve("kelheim-mini.output_events.xml");
+		String actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
 
-		 */
+
+		// TODO: scenario should run through, but events are slightly different
+//		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
+//			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
 	}
 }

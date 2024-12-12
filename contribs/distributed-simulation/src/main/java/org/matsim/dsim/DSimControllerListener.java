@@ -13,14 +13,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 
@@ -30,30 +33,27 @@ import java.util.List;
  * Controller listener running during distributed simulation.
  */
 @Log4j2
-public class DSimControllerListener implements StartupListener, ShutdownListener, BeforeMobsimListener {
+public class DSimControllerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, IterationEndsListener {
 
 	public static double PRIORITY = -100;
 
-    @Inject
-    private Scenario scenario;
+	@Inject
+	private Scenario scenario;
 
-    @Inject
-    private Topology topology;
+	@Inject
+	private Topology topology;
 
 	@Inject
 	private SimulationNode node;
 
-    @Inject
-    private EventsManager manager;
+	@Inject
+	private Communicator comm;
 
-    @Inject
-    private Communicator comm;
+	@Inject
+	private SerializationProvider serializer;
 
-    @Inject
-    private SerializationProvider serializer;
-
-    @Inject
-    private Injector injector;
+	@Inject
+	private Injector injector;
 
 	@Override
 	public double priority() {
@@ -61,45 +61,66 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 	}
 
 	@Override
-    public void notifyStartup(StartupEvent event) {
+	public void notifyStartup(StartupEvent event) {
 
-        // Right now every node is required to perform the same partitioning to that results are consistent
-        // TODO: partitioning can be performed on one node only, and then broadcast to all nodes
-        // TODO: one lp provider may want to access partition information of another lp
-        NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
+		// Right now every node is required to perform the same partitioning to that results are consistent
+		// TODO: partitioning can be performed on one node only, and then broadcast to all nodes
+		// TODO: one lp provider may want to access partition information of another lp
+		NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
 
-		scenario.getNetwork().setPartitioning(new NetworkPartitioning(node, scenario.getNetwork()));
+		NetworkPartitioning partitioning = new NetworkPartitioning(node, scenario.getNetwork());
+		scenario.getNetwork().setPartitioning(partitioning);
 
-        StartUpMessage msg = StartUpMessage.builder()
-                .linkIds(Id.getAllIds(Link.class))
-                .nodeIds(Id.getAllIds(Node.class))
-                .personIds(Id.getAllIds(Person.class))
-                .build();
+		StartUpMessage msg = StartUpMessage.builder()
+			.linkIds(Id.getAllIds(Link.class))
+			.nodeIds(Id.getAllIds(Node.class))
+			.personIds(Id.getAllIds(Person.class))
+			.build();
 
 		log.info("Sending startup messages...");
 
-        // Check if Ids are consistent
-        List<StartUpMessage> all = comm.allGather(msg, -1, serializer);
-        for (StartUpMessage m : all) {
-            Id.check(Link.class, m.getLinkIds());
-            Id.check(Node.class, m.getNodeIds());
-            Id.check(Person.class, m.getPersonIds());
-        }
-    }
+		// Check if Ids are consistent
+		List<StartUpMessage> all = comm.allGather(msg, -1, serializer);
+		for (StartUpMessage m : all) {
+			Id.check(Link.class, m.getLinkIds());
+			Id.check(Node.class, m.getNodeIds());
+			Id.check(Person.class, m.getPersonIds());
+		}
+	}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-    }
+	private void partitionPopulation(NetworkPartitioning partitioning) {
+		LazyPopulationPartition population = (LazyPopulationPartition) injector.getInstance(PopulationPartition.class);
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Id<Link> startLink = PopulationAgentSource.getStartLink(scenario, person);
+			if (partitioning.isLinkOnCurrentNode(startLink)) {
+				population.addPerson(person.getId());
+			}
+		}
 
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
+		log.info("Partition #{} contains {} persons", node.getRank(), population.size());
+	}
 
-        injector.getInstance(LPExecutor.class).shutdown();
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		if (topology.getNodesCount() > 1) {
+			partitionPopulation(scenario.getNetwork().getPartitioning());
+		}
+	}
 
-        // Wait for all nodes to finish
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+
+		injector.getInstance(LPExecutor.class).shutdown();
+
+		// Wait for all nodes to finish
 		comm.allGather(new ShutDownMessage(), Integer.MIN_VALUE, serializer);
 
 		log.info("Simulation finished");
 
 	}
+
 }

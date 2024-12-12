@@ -10,9 +10,11 @@ import lombok.extern.log4j.Log4j2;
 import org.matsim.api.LPProvider;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.DistributedScoringListener;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
@@ -82,6 +84,13 @@ public class DistributedSimulationModule extends AbstractModule {
 			bind(LPExecutor.class).to(PoolExecutor.class).in(Singleton.class);
 		} else {
 			bind(LPExecutor.class).to(SingleExecutor.class).in(Singleton.class);
+		}
+
+		// If there are multiple nodes, we need to partition the population
+		if (topology.getNodesCount() > 1) {
+			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(node.getRank()));
+
+			addControlerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
 
 		// Need to define the set binder, in case no other module uses it

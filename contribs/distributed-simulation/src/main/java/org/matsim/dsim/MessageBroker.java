@@ -300,6 +300,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			if (last && task instanceof LPTask)
 				continue;
 
+			// event manager also determines when to wait for ranks,
+			// this might be not necesarry for event handler here
 			if (others == LP.ALL_NODES_BROADCAST) {
 				waitFor.addAll(otherParts);
 			} else
@@ -309,7 +311,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// remove all that are on the same partition
 		waitFor.removeAll(ownParts);
 
-//        log.debug("Node {} waiting for partitions: {}", comm.getRank(), waitFor);
+//		log.info("Rank #{}, seq{} waiting for partitions: {}", comm.getRank(), seq, waitFor);
 
 		for (int rank : sendNullMsgs) {
 			int length = dataSize[rank + 1].get();
@@ -419,7 +421,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	@Override
 	public boolean expectsMoreMessages() {
-//        System.out.println(comm.getRank() + " t" + seq + " " + waitFor);
+//		System.out.println(comm.getRank() + " t " + (seq - 1000) + " wait for " + waitFor);
 		return !waitFor.isEmpty();
 	}
 

@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -53,9 +54,15 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	@Inject private ExperiencedPlansService experiencedPlansService;
 	@Inject private NewScoreAssigner newScoreAssigner;
+	@Inject private SimulationNode simulationNode;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
+
+		// Distributed scoring is handled by DistributedScoringListener
+		if (simulationNode.isDistributed())
+			return;
+
 		scoringFunctionsForPopulation.finishScoringFunctions();
 		newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
 	}
@@ -64,6 +71,10 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.experiencedPlansService.finishIteration();
 		// (currently sets scores to experienced plans)
+
+		// Only the head node may write this
+		if (!simulationNode.isHeadNode())
+			return;
 
 		if(scoringConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controllerConfigGroup.getWritePlansInterval();
