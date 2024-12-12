@@ -14,6 +14,8 @@ import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -31,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DistributedIntegrationTest {
@@ -70,6 +73,9 @@ public class DistributedIntegrationTest {
 		return scenario;
 	}
 
+	/**
+	 * Keep this test, because we later want to introduce comparisons with other output than events
+	 */
 	@Test
 	@Order(1)
 	void qsim() {
@@ -93,65 +99,72 @@ public class DistributedIntegrationTest {
 		Scenario scenario = prepareScenario(local);
 
 		Controler controler = new Controler(scenario);
-
-		// TODO: single node module run script / controller is different from multi node setup
-
 		controler.addOverridingModule(new DistributedSimulationModule(4));
 		controler.run();
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
 
-		var expectedEventsPath = outputPath.resolve("..").
-			resolve("qsim").resolve("kelheim-mini.output_events.xml");
-		var actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
+		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml.gz");
+		var expectedPopulationPath = outputPath.resolve("..").resolve("qsim").resolve("kelheim-mini.output_plans.xml.gz");
 
-		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
-			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+		var result = PopulationComparison.compare(
+			PopulationUtils.readPopulation(expectedPopulationPath.toString()),
+			PopulationUtils.readPopulation(actualPopulationPath.toString())
+		);
 
+		assertEquals(PopulationComparison.Result.equal, result);
 	}
 
 	@Test
-	@Order(2)
+	@Order(3)
 	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
 		var size = 3;
-		var pool = Executors.newFixedThreadPool(size);
 		var comms = LocalCommunicator.create(size);
-
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
+		
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
 
-		var futures = comms.stream()
-			.map(comm -> pool.submit(() -> {
+					Config local = createScenario();
+					Scenario scenario = prepareScenario(local);
+					Controler controler = new Controler(scenario);
 
-				Config local = createScenario();
-				Scenario scenario = prepareScenario(local);
-				Controler controler = new Controler(scenario);
+					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1));
+					controler.run();
 
-				controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1));
-				controler.run();
+					try {
+						comm.close();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}))
+				.toList();
 
-				try {
-					comm.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}))
-			.toList();
-
-		for (var f : futures) {
-			f.get(2, TimeUnit.MINUTES);
+			for (var f : futures) {
+				f.get(2, TimeUnit.MINUTES);
+			}
 		}
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
 
+		// compare events of distributed and local simulation
 		Path expectedEventsPath = outputPath.resolve("..").
-			resolve("qsim").resolve("kelheim-mini.output_events.xml");
+			resolve("runLocal").resolve("kelheim-mini.output_events.xml");
 		String actualEventsPath = utils.getOutputDirectory() + "kelheim-mini.output_events.xml";
+		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
+			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 
+		// compare populations of distributed simulation and original qsim
+		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml.gz");
+		var expectedPopulationPath = outputPath.resolve("..").resolve("qsim").resolve("kelheim-mini.output_plans.xml.gz");
 
-		// TODO: scenario should run through, but events are slightly different
-//		assertThat(EventsUtils.compareEventsFiles(expectedEventsPath.toString(), actualEventsPath))
-//			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
+		var result = PopulationComparison.compare(
+			PopulationUtils.readPopulation(expectedPopulationPath.toString()),
+			PopulationUtils.readPopulation(actualPopulationPath.toString())
+		);
 
+		assertEquals(PopulationComparison.Result.equal, result);
 	}
 }
