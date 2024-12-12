@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.mobsim.dsim.Message;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;

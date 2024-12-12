@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
@@ -16,7 +17,6 @@ import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 

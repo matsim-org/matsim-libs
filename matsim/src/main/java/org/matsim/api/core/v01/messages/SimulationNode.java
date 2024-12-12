@@ -1,8 +1,8 @@
 package org.matsim.api.core.v01.messages;
 
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.core.mobsim.dsim.Message;
 
 import java.util.Objects;
 

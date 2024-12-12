@@ -1,6 +1,6 @@
 package org.matsim.api.core.v01.events;
 
-import org.matsim.core.mobsim.dsim.Message;
+import org.matsim.api.core.v01.Message;
 
 import java.util.Comparator;
 

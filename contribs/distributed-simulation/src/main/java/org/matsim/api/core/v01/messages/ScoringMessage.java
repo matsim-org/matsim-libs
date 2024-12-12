@@ -2,8 +2,8 @@ package org.matsim.api.core.v01.messages;
 
 import lombok.Getter;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.dsim.Message;
 
 import java.util.HashMap;
 import java.util.Map;

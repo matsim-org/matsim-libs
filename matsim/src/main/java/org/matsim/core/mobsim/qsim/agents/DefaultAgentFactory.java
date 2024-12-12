@@ -20,9 +20,9 @@
 package org.matsim.core.mobsim.qsim.agents;
 
 import jakarta.inject.Inject;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.timing.TimeInterpretation;

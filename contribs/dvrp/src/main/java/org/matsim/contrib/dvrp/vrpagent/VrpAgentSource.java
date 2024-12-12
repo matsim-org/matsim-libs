@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -31,7 +32,6 @@ import org.matsim.contrib.dynagent.DynAgentMessage;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.Message;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;

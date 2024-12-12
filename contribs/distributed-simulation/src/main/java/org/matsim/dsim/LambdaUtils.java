@@ -1,7 +1,7 @@
 package org.matsim.dsim;
 
 import lombok.extern.log4j.Log4j2;
-import org.matsim.core.mobsim.dsim.Message;
+import org.matsim.api.core.v01.Message;
 
 import java.lang.invoke.*;
 import java.lang.reflect.InvocationTargetException;
