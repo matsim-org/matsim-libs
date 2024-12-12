@@ -80,17 +80,16 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 				"No iteration number set. Did you try to use the module outside of the QSim initialization process?");
 	}
 
-	public SimulationNode getSimNode() {
-		if (simNode != null) {
+	public SimulationNode getSimulationNode() {
+		if (simNode != SimulationNode.SINGLE_INSTANCE) {
 			return simNode;
 		}
 
 		if (parent != null) {
-			return parent.getSimNode();
+			return parent.getSimulationNode();
 		}
 
-		throw new IllegalStateException(
-				"No simulation node set. Did you try to use the module outside of the QSim initialization process?");
+		return simNode;
 	}
 
 	protected final void configure() {
