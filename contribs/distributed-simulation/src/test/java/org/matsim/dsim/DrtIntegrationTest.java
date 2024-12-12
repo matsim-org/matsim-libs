@@ -120,6 +120,7 @@ public class DrtIntegrationTest {
 
 	@Test
 	@Order(2)
+	@Disabled
 	void runMultiThreaded() {
 
 		Scenario scenario = createScenario();

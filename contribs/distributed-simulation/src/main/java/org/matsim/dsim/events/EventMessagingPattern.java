@@ -14,19 +14,19 @@ import java.util.function.Consumer;
  */
 public sealed interface EventMessagingPattern<T extends EventHandler> extends Consumer<Message> permits AggregateFromAll {
 
-    /**
-     * Let the handler process received message.
-     */
-    void process(T handler);
+	/**
+	 * Let the handler process received message.
+	 */
+	void process(T handler);
 
-    /**
-     * Generate message and send them via the broker if necesarry. Called after the handler is done processing all messages.
-     */
-    void communicate(MessageBroker broker, T handler);
+	/**
+	 * Generate message and send them via the broker if necesarry. Called after the handler is done processing all messages.
+	 */
+	void communicate(MessageBroker broker, T handler);
 
-    /**
-     * Determine for which other precessed should be waited.
-     */
-    IntSet waitForOtherRanks(double time);
+	/**
+	 * Determine for which other precessed should be waited.
+	 */
+	IntSet waitForOtherRanks(double time);
 
 }

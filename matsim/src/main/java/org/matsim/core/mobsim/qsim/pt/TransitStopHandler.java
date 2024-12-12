@@ -20,10 +20,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-
+import org.matsim.core.mobsim.dsim.ToMessage;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 /**
  * Provides a replaceable behavior for implementing different loading and unloading procedures
@@ -31,7 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author mrieser
  */
-public interface TransitStopHandler {
+public interface TransitStopHandler extends ToMessage {
 
 	/**
 	 * <p>Handles the loading and unloading for a transit vehicle. Given a list of passengers that
@@ -49,15 +50,15 @@ public interface TransitStopHandler {
 	 * that want to enter. Only if the method returns 0, it may continue on its route to the next stop.
 	 * </p>
 	 *
-	 * @param stop the stop the vehicle is currently at
-	 * @param now the current time
-	 * @param leavingPassengers the list of passengers that want to exit
+	 * @param stop               the stop the vehicle is currently at
+	 * @param now                the current time
+	 * @param leavingPassengers  the list of passengers that want to exit
 	 * @param enteringPassengers the list of passengers that want to board
-	 * @param handler provides methods for actually removing/adding passengers to the vehicle
+	 * @param handler            provides methods for actually removing/adding passengers to the vehicle
 	 * @return the time (in seconds) how long the vehicle will stay at least at this stop.
 	 */
-	public double handleTransitStop(final TransitStopFacility stop, final double now,
-			final List<PTPassengerAgent> leavingPassengers, final List<PTPassengerAgent> enteringPassengers,
-			final PassengerAccessEgress handler, MobsimVehicle vehicle);
+	double handleTransitStop(final TransitStopFacility stop, final double now,
+							 final List<PTPassengerAgent> leavingPassengers, final List<PTPassengerAgent> enteringPassengers,
+							 final PassengerAccessEgress handler, MobsimVehicle vehicle);
 
 }

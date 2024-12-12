@@ -159,7 +159,7 @@ public final class DynAgent implements DistributedMobsimAgent, MobsimDriverPasse
 
 	// VehicleUsingAgent
 	@Override
-	public final Id<Vehicle> getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		Id<Vehicle> vehId = ((DriverDynLeg) dynLeg).getPlannedVehicleId();
 		// according to BasicPlanAgentImpl
 		return vehId != null ? vehId : Id.create(id, Vehicle.class);

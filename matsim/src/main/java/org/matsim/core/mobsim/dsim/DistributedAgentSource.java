@@ -27,6 +27,7 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct an agent from a message.
+	 *
 	 * @return null if this source is not responsible for the given message.
 	 */
 	@Nullable
@@ -41,7 +42,8 @@ public interface DistributedAgentSource {
 
 	/**
 	 * Construct a vehicle from a message.
-  	 * @return null if this source is not responsible for the given message.
+	 *
+	 * @return null if this source is not responsible for the given message.
 	 */
 	@Nullable
 	default DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {

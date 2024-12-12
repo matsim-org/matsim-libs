@@ -8,6 +8,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface FuryBufferParser {
 
-    Message parse(MemoryBuffer in) throws IOException;
+	Message parse(MemoryBuffer in) throws IOException;
 
 }

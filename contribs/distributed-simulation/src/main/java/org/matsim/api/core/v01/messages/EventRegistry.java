@@ -10,9 +10,9 @@ import org.matsim.api.core.v01.Message;
 @Builder
 public class EventRegistry implements Message {
 
-    private final int type;
-    private final int rank;
-    private final IntSet eventTypes;
+	private final int type;
+	private final int rank;
+	private final IntSet eventTypes;
 
-    private final double syncStep;
+	private final double syncStep;
 }

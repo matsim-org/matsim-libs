@@ -16,16 +16,16 @@ import java.util.List;
  */
 public interface AggregatingEventHandler<T extends Message> extends EventHandler {
 
-    /**
-     * Produce message sent to other partitions.
-     */
-    T send();
+	/**
+	 * Produce message sent to other partitions.
+	 */
+	T send();
 
-    /**
-     * Receive all messages from other partitions. The own message will not be included.
-     *
-     * @param messages received messages from other handlers.
-     */
-    void receive(List<T> messages);
+	/**
+	 * Receive all messages from other partitions. The own message will not be included.
+	 *
+	 * @param messages received messages from other handlers.
+	 */
+	void receive(List<T> messages);
 
 }

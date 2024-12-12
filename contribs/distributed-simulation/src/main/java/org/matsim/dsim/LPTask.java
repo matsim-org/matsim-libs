@@ -21,154 +21,154 @@ import java.util.function.Consumer;
 @Log4j2
 public final class LPTask implements SimTask {
 
-    /**
-     * LP to execute.
-     */
-    private final LP lp;
-    private final Steppable steppable;
-    /**
-     * Partition number.
-     */
-    private final int partition;
+	/**
+	 * LP to execute.
+	 */
+	private final LP lp;
+	private final Steppable steppable;
+	/**
+	 * Partition number.
+	 */
+	private final int partition;
 
-    /**
-     * Events manager for this task.
-     */
-    private final DistributedEventsManager manager;
+	/**
+	 * Events manager for this task.
+	 */
+	private final DistributedEventsManager manager;
 
-    /**
-     * Buffer holding incoming messages. These are switched between iterations.
-     */
-    private final ManyToOneConcurrentLinkedQueue<Message> queueOdd = new ManyToOneConcurrentLinkedQueue<>();
-    private final ManyToOneConcurrentLinkedQueue<Message> queueEven = new ManyToOneConcurrentLinkedQueue<>();
+	/**
+	 * Buffer holding incoming messages. These are switched between iterations.
+	 */
+	private final ManyToOneConcurrentLinkedQueue<Message> queueOdd = new ManyToOneConcurrentLinkedQueue<>();
+	private final ManyToOneConcurrentLinkedQueue<Message> queueEven = new ManyToOneConcurrentLinkedQueue<>();
 
-    /**
-     * This maps the messages types to corresponding function on the LP used for processing.
-     */
-    private final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
+	/**
+	 * This maps the messages types to corresponding function on the LP used for processing.
+	 */
+	private final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 
-    /**
-     * Runtimes of each iteration.
-     */
-    private final LongList runtimes = new LongArrayList();
+	/**
+	 * Runtimes of each iteration.
+	 */
+	private final LongList runtimes = new LongArrayList();
 
-    /**
-     * Avg. runtime of last iterations.
-     */
-    private float avgRuntime = 0.0f;
-    /**
-     * Indicates whether the LP has been initialized.
-     */
-    private boolean initialized = false;
+	/**
+	 * Avg. runtime of last iterations.
+	 */
+	private float avgRuntime = 0.0f;
+	/**
+	 * Indicates whether the LP has been initialized.
+	 */
+	private boolean initialized = false;
 
-    /**
-     * Current simulation time. Needs to be volatile to ensure visibility across threads.
-     */
-    @Setter
-    private volatile double time;
+	/**
+	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
+	 */
+	@Setter
+	private volatile double time;
 
-    /**
-     * Switching phase for the queues.
-     */
-    private volatile boolean phase;
+	/**
+	 * Switching phase for the queues.
+	 */
+	private volatile boolean phase;
 
-    public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
-        this.lp = lp;
-        this.steppable = lp instanceof Steppable s ? s : null;
-        this.partition = partition;
-        this.manager = manager;
+	public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
+		this.lp = lp;
+		this.steppable = lp instanceof Steppable s ? s : null;
+		this.partition = partition;
+		this.manager = manager;
 
-        buildConsumers(serializer);
-    }
+		buildConsumers(serializer);
+	}
 
-    @Override
-    public String getName() {
-        return lp.getClass().getSimpleName();
-    }
+	@Override
+	public String getName() {
+		return lp.getClass().getSimpleName();
+	}
 
-    @Override
-    public int getPartition() {
-        return partition;
-    }
+	@Override
+	public int getPartition() {
+		return partition;
+	}
 
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    private void buildConsumers(SerializationProvider serializer) {
+	@SneakyThrows
+	@SuppressWarnings("unchecked")
+	private void buildConsumers(SerializationProvider serializer) {
 
-        for (Class<?> ifType : lp.getClass().getInterfaces()) {
-            if (MessageProcessor.class.isAssignableFrom(ifType)) {
-                Method[] methods = ifType.getDeclaredMethods();
+		for (Class<?> ifType : lp.getClass().getInterfaces()) {
+			if (MessageProcessor.class.isAssignableFrom(ifType)) {
+				Method[] methods = ifType.getDeclaredMethods();
 
-                Class<?> msgType = methods[0].getParameterTypes()[0];
-                int type = serializer.getType(msgType);
+				Class<?> msgType = methods[0].getParameterTypes()[0];
+				int type = serializer.getType(msgType);
 
-                consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
-            }
-        }
-    }
+				consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
+			}
+		}
+	}
 
-    @Override
-    public void beforeExecution() {
-        phase = !phase;
-    }
+	@Override
+	public void beforeExecution() {
+		phase = !phase;
+	}
 
-    /**
-     * Adds a message to the buffer.
-     */
-    public void add(Message msg) {
-        ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueOdd : queueEven;
-        queue.add(msg);
-    }
+	/**
+	 * Adds a message to the buffer.
+	 */
+	public void add(Message msg) {
+		ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueOdd : queueEven;
+		queue.add(msg);
+	}
 
-    /**
-     * Return the set of supported messages.
-     */
-    public IntSet getSupportedMessages() {
-        return consumers.keySet();
-    }
+	/**
+	 * Return the set of supported messages.
+	 */
+	public IntSet getSupportedMessages() {
+		return consumers.keySet();
+	}
 
-    public IntSet waitForOtherRanks(double time) {
-        return lp.waitForOtherRanks(time);
-    }
+	public IntSet waitForOtherRanks(double time) {
+		return lp.waitForOtherRanks(time);
+	}
 
-    @Override
-    public LongList getRuntime() {
-        return runtimes;
-    }
+	@Override
+	public LongList getRuntime() {
+		return runtimes;
+	}
 
-    @Override
-    public float getAvgRuntime() {
-        return avgRuntime;
-    }
+	@Override
+	public float getAvgRuntime() {
+		return avgRuntime;
+	}
 
-    @Override
-    public void run() {
+	@Override
+	public void run() {
 
-        long t = System.nanoTime();
+		long t = System.nanoTime();
 
-        manager.setContext(partition);
-        ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueEven : queueOdd;
+		manager.setContext(partition);
+		ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueEven : queueOdd;
 
-        Message msg;
-        while ((msg = queue.poll()) != null) {
-            process(msg);
-        }
+		Message msg;
+		while ((msg = queue.poll()) != null) {
+			process(msg);
+		}
 
-        if (!initialized) {
-            lp.onPrepareSim();
-            initialized = true;
-        }
+		if (!initialized) {
+			lp.onPrepareSim();
+			initialized = true;
+		}
 
-        // perform a sim step, if this LP is steppable
-        if (steppable != null) {
-            steppable.doSimStep(time);
-        }
+		// perform a sim step, if this LP is steppable
+		if (steppable != null) {
+			steppable.doSimStep(time);
+		}
 
-        long rt = System.nanoTime() - t;
-        avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
+		long rt = System.nanoTime() - t;
+		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
 
-        runtimes.add(rt);
-    }
+		runtimes.add(rt);
+	}
 
 	@Override
 	public void cleanup() {
@@ -176,18 +176,18 @@ public final class LPTask implements SimTask {
 	}
 
 	private void process(Message msg) {
-        Consumer<Message> consumer = consumers.get(msg.getType());
-        if (consumer == null) {
-            throw new IllegalArgumentException("No processor found for message: " + msg);
-        }
-        consumer.accept(msg);
-    }
+		Consumer<Message> consumer = consumers.get(msg.getType());
+		if (consumer == null) {
+			throw new IllegalArgumentException("No processor found for message: " + msg);
+		}
+		consumer.accept(msg);
+	}
 
-    @Override
-    public String toString() {
-        return "LPTask{" +
-                "lp=" + lp.getClass().getName() +
-                ", partition=" + partition +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LPTask{" +
+			"lp=" + lp.getClass().getName() +
+			", partition=" + partition +
+			'}';
+	}
 }

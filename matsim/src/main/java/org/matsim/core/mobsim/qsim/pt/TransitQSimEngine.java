@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleMessage;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
@@ -51,8 +51,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.*;
+import java.io.Serial;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author mrieser
@@ -60,8 +64,6 @@ import java.util.Map.Entry;
  */
 public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, DistributedAgentSource, HasAgentTracker {
 
-
-	private Collection<MobsimAgent> ptDrivers;
 	private final UmlaufBuilder umlaufBuilder;
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
@@ -70,6 +72,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 			super(message);
 		}
 
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 	}
@@ -78,11 +81,11 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	private final Netsim qSim;
 
-	private TransitSchedule schedule = null;
+	private final TransitSchedule schedule;
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+	private final TransitStopHandlerFactory stopHandlerFactory;
 
 	private final TimeInterpretation timeInterpretation;
 	private final TransitDriverAgentFactory transitDriverFactory;
@@ -135,33 +138,30 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), ((MobsimAgent) agent).getMode()));
+				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
 			}
 		}
 	}
 
-	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
+	private void createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
 		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
-		Collection<MobsimAgent> drivers = new ArrayList<>();
-		Map<Id<Umlauf>, Umlauf> umlaufCache = getOrCreateUmlaufe(scenario);
+		Map<Id<Umlauf>, Umlauf> umlaufCache = getOrCreateUmlaufe();
 
 		for (Umlauf umlauf : umlaufCache.values()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				Id<Link> startLinkId = umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId();
 				if (partition.containsLink(startLinkId)) {
-					AbstractTransitDriverAgent driver = createAndScheduleVehicleAndDriver(mobsim, umlauf, basicVehicle);
-					drivers.add(driver);
+					createAndScheduleVehicleAndDriver(mobsim, umlauf, basicVehicle);
 				}
 			}
 		}
-		return drivers;
 	}
 
-	private Map<Id<Umlauf>, Umlauf> getOrCreateUmlaufe(final Scenario scenario) {
+	private Map<Id<Umlauf>, Umlauf> getOrCreateUmlaufe() {
 
 		if (umlaeufe != null)
 			return umlaeufe;
@@ -181,7 +181,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return umlaeufe;
 	}
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(InsertableMobsim mobsim, Umlauf umlauf, Vehicle vehicle) {
+	private void createAndScheduleVehicleAndDriver(InsertableMobsim mobsim, Umlauf umlauf, Vehicle vehicle) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
 		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
 		veh.setDriver(driver);
@@ -191,7 +191,6 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
 		mobsim.addParkedVehicle(veh, startLinkId);
 		mobsim.insertAgentIntoMobsim(driver);
-		return driver;
 	}
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {
@@ -200,7 +199,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		if (accessStopId == null) {
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
-			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent " + planAgent.getId().toString());
+			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent {}", planAgent.getId().toString());
 			this.qSim.getAgentCounter().decLiving();
 			this.qSim.getAgentCounter().incLost();
 			return;
@@ -230,10 +229,6 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return agentTracker;
 	}
 
-	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-		this.stopHandlerFactory = stopHandlerFactory;
-	}
-
 	@Override
 	public void doSimStep(double time) {
 		// Nothing to do here.
@@ -241,16 +236,12 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		ptDrivers = createVehiclesAndDriversWithUmlaeufe(NetworkPartition.SINGLE_INSTANCE, qSim);
-	}
-
-	public Collection<MobsimAgent> getPtDrivers() {
-		return Collections.unmodifiableCollection(ptDrivers);
+		createVehiclesAndDriversWithUmlaeufe(NetworkPartition.SINGLE_INSTANCE, qSim);
 	}
 
 	@Override
 	public void createAgentsAndVehicles(NetworkPartition partition, InsertableMobsim mobsim) {
-		ptDrivers = createVehiclesAndDriversWithUmlaeufe(partition, mobsim);
+		createVehiclesAndDriversWithUmlaeufe(partition, mobsim);
 	}
 
 	@Override
@@ -281,8 +272,15 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {
-		TransitQVehicle transitVehicle = new TransitQVehicle((QVehicleMessage) message);
-		transitVehicle.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(transitVehicle.getVehicle()));
-		return transitVehicle;
+
+		// wow!1! type pattern in java...
+		if (message instanceof TransitQVehicle.Msg(Message baseMessage, Message handlerMessage)) {
+			TransitQVehicle transitVehicle = new TransitQVehicle((QVehicleImpl.Msg) baseMessage);
+			var handler = stopHandlerFactory.createTransitStopHandler(handlerMessage);
+			transitVehicle.setStopHandler(handler);
+			return transitVehicle;
+		} else {
+			throw new IllegalArgumentException("Unsupported message type: " + message.getClass());
+		}
 	}
 }

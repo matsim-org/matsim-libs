@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -28,8 +29,13 @@ public class SimpleTransitStopHandlerFactory implements TransitStopHandlerFactor
 
 	@Override
 	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
-		// TODO vehicle is not used, since constant values are used for access and egress time 
+		// TODO vehicle is not used, since constant values are used for access and egress time
 		return new SimpleTransitStopHandler();
+	}
+
+	@Override
+	public TransitStopHandler createTransitStopHandler(Message message) {
+		return new SimpleTransitStopHandler((SimpleTransitStopHandler.Msg) message);
 	}
 
 }

@@ -115,7 +115,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 	 * The constructor re-creates the vehicle as well as the state it had, when it was
 	 * converted into a message.
 	 */
-	public QVehicleImpl(QVehicleMessage message) {
+	public QVehicleImpl(Msg message) {
 		this.id = message.vehicle().getId();
 		this.vehicle = message.vehicle();
 		this.passengerCapacity = message.passengerCapacity();
@@ -246,7 +246,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public Message toMessage() {
-		return new QVehicleMessage(
+		return new Msg(
 			this.linkEnterTime,
 			this.earliestLinkExitTime,
 			this.currentLinkId,
@@ -254,5 +254,18 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 			this.passengerCapacity,
 			this.scaledPce
 		);
+	}
+
+	/**
+	 * Class to represent a vehicle as message object.
+	 */
+	public record Msg(
+		double linkEnterTime,
+		double earliestLinkExitTime,
+		Id<Link> currentLinkId,
+		Vehicle vehicle,
+		int passengerCapacity,
+		double scaledPce
+	) implements Message {
 	}
 }

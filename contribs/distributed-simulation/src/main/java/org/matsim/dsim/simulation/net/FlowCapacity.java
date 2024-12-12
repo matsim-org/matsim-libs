@@ -35,6 +35,11 @@ class FlowCapacity {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "max=" + max + ", acc=" + accumulatedCapacity;
+	}
+
 	static FlowCapacity createOutflowCapacity(Link link) {
 		return new FlowCapacity(link.getFlowCapacityPerSec());
 	}

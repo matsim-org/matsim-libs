@@ -11,28 +11,28 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTask {
 
-    /**
-     * Get the name of the task.
-     */
-    String getName();
+	/**
+	 * Get the name of the task.
+	 */
+	String getName();
 
-    /**
-     * Get the partition number.
-     */
-    int getPartition();
+	/**
+	 * Get the partition number.
+	 */
+	int getPartition();
 
-    /**
-     * Check if the task needs to be executed.
-     */
-    default boolean needsExecution() {
-        return true;
-    }
+	/**
+	 * Check if the task needs to be executed.
+	 */
+	default boolean needsExecution() {
+		return true;
+	}
 
-    /**
-     * Called on all tasks before they are scheduled for execution, but only if {@link #needsExecution()} returns true.
-     */
-    default void beforeExecution() {
-    }
+	/**
+	 * Called on all tasks before they are scheduled for execution, but only if {@link #needsExecution()} returns true.
+	 */
+	default void beforeExecution() {
+	}
 
 
 	/**
@@ -40,36 +40,37 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	 */
 	default void cleanup() {}
 
-    /**
-     * Add a message to the task.
-     */
-    void add(Message msg);
+	/**
+	 * Add a message to the task.
+	 */
+	void add(Message msg);
 
-    /**
-     * Get the supported message types.
-     */
-    IntSet getSupportedMessages();
+	/**
+	 * Get the supported message types.
+	 */
+	IntSet getSupportedMessages();
 
-    /**
-     * Wait for messages from other ranks.
-     */
-    IntSet waitForOtherRanks(double time);
+	/**
+	 * Wait for messages from other ranks.
+	 */
+	IntSet waitForOtherRanks(double time);
 
-    /**
-     * Set the current simulation time.
-     */
-    void setTime(double time);
+	/**
+	 * Set the current simulation time.
+	 */
+	void setTime(double time);
 
-    /**
-     * Return the runtime of the task.
-     */
-    LongList getRuntime();
+	/**
+	 * Return the runtime of the task.
+	 */
+	LongList getRuntime();
 
-    /**
-     * Avg runtime over last few executions.
-     */
-    float getAvgRuntime();
+	/**
+	 * Avg runtime over last few executions.
+	 */
+	float getAvgRuntime();
 
-    record Info(String name, int partition, LongList runtime) {}
+	record Info(String name, int partition, LongList runtime) {
+	}
 
 }

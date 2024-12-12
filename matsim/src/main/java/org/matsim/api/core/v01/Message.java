@@ -8,10 +8,10 @@ public interface Message {
 	/**
 	 * Reserved type that indicates any arbitrary event.
 	 */
-	public static final int ANY_TYPE = Integer.MIN_VALUE;
+	int ANY_TYPE = Integer.MIN_VALUE;
 
-   default int getType() {
-       return getClass().getName().hashCode();
-   }
+	default int getType() {
+		return getClass().getName().hashCode();
+	}
 
 }

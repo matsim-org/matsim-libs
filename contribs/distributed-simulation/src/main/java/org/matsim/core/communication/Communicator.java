@@ -6,7 +6,10 @@ import org.matsim.core.serialization.SerializationProvider;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +55,6 @@ public interface Communicator extends AutoCloseable {
 		nodes.removeIf(s -> s.equals(address));
 		return nodes;
 	}
-
-	;
 
 	/**
 	 * Initializes and connects the communicator.
@@ -104,8 +105,8 @@ public interface Communicator extends AutoCloseable {
 	/**
 	 * Sends the msg to all other processes and receives messages from all other processes.
 	 *
-	 * @param msg   Message to be sent
-	 * @param tag   Tag of the message, only message with the same tag will be received
+	 * @param msg Message to be sent
+	 * @param tag Tag of the message, only message with the same tag will be received
 	 * @return All received messages, including the one sent
 	 */
 	default <T extends Message> List<T> allGather(T msg, int tag, SerializationProvider provider) {

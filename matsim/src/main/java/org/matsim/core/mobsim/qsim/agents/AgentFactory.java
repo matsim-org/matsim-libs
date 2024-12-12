@@ -34,7 +34,7 @@ public interface AgentFactory extends MatsimFactory {
 	 * but this is really old design :-(.  It also means that this is not
 	 * a plain factory.  kai, nov'11
 	 */
-	public MobsimAgent createMobsimAgentFromPerson(final Person p);
+	MobsimAgent createMobsimAgentFromPerson(final Person p);
 
 	/**
 	 * Reconstruct an agent that has been converted to a message for serialization.

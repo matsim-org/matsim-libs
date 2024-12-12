@@ -8,10 +8,10 @@ import org.matsim.api.core.v01.Message;
 @Data
 public class StartUpMessage implements Message {
 
-    private final String[] linkIds;
+	private final String[] linkIds;
 
-    private final String[] nodeIds;
+	private final String[] nodeIds;
 
-    private final String[] personIds;
+	private final String[] personIds;
 
 }

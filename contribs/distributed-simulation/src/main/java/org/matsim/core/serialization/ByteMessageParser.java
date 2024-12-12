@@ -8,6 +8,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface ByteMessageParser {
 
-    Message parse(byte[] data) throws IOException;
+	Message parse(byte[] data) throws IOException;
 
 }

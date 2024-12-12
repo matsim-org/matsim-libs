@@ -9,6 +9,6 @@ import java.nio.ByteBuffer;
 @FunctionalInterface
 public interface MessageParser<T extends Message> {
 
-    T parse(ByteBuffer in) throws IOException;
+	T parse(ByteBuffer in) throws IOException;
 
 }

@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
 
+import java.util.Objects;
+
 /**
  * Information about one computing node within a {@link Topology}.
  */
@@ -80,18 +82,16 @@ public class SimulationNode implements Message {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof SimulationNode)) return false;
-		final SimulationNode other = (SimulationNode) o;
-		if (!other.canEqual((Object) this)) return false;
+		if (!(o instanceof SimulationNode other)) return false;
+		if (!other.canEqual(this)) return false;
 		if (this.getRank() != other.getRank()) return false;
 		if (this.getCores() != other.getCores()) return false;
 		final Object this$parts = this.getParts();
 		final Object other$parts = other.getParts();
-		if (this$parts == null ? other$parts != null : !this$parts.equals(other$parts)) return false;
+		if (!Objects.equals(this$parts, other$parts)) return false;
 		final Object this$hostname = this.getHostname();
 		final Object other$hostname = other.getHostname();
-		if (this$hostname == null ? other$hostname != null : !this$hostname.equals(other$hostname)) return false;
-		return true;
+		return Objects.equals(this$hostname, other$hostname);
 	}
 
 	protected boolean canEqual(final Object other) {
