@@ -92,11 +92,12 @@ public class DistributedIntegrationTest {
 		Config local = createScenario();
 		Scenario scenario = prepareScenario(local);
 
-		Controler controler = new Controler(scenario);
+		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		Controler controler = new Controler(scenario, module.getNode());
 
 		// TODO: single node module run script / controller is different from multi node setup
 
-		controler.addOverridingModule(new DistributedSimulationModule(4));
+		controler.addOverridingModule(module);
 		controler.run();
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
@@ -125,9 +126,10 @@ public class DistributedIntegrationTest {
 
 				Config local = createScenario();
 				Scenario scenario = prepareScenario(local);
-				Controler controler = new Controler(scenario);
+				DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+				Controler controler = new Controler(scenario, module.getNode());
 
-				controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1));
+				controler.addOverridingModule(module);
 				controler.run();
 
 				try {

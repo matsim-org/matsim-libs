@@ -1,4 +1,4 @@
-package org.matsim.dsim;
+package org.matsim.contrib.drt.distributed;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -14,7 +14,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTimeModule;
-import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -24,6 +23,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.dsim.Activities;
+import org.matsim.dsim.DistributedSimulationModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -123,11 +123,13 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		Controler controler = new Controler(scenario);
+		DistributedSimulationModule module = new DistributedSimulationModule(1);
+
+		Controler controler = new Controler(scenario, module.getNode());
 
 		prepareController(controler);
 
-		controler.addOverridingModule(new DistributedSimulationModule(1));
+		controler.addOverridingModule(module);
 		controler.run();
 
 	}
@@ -139,11 +141,12 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		Controler controler = new Controler(scenario);
+		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		Controler controler = new Controler(scenario, module.getNode());
 
 		prepareController(controler);
 
-		controler.addOverridingModule(new DistributedSimulationModule(4));
+		controler.addOverridingModule(module);
 		controler.run();
 
 	}

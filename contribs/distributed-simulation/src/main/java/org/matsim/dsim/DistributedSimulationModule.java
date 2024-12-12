@@ -73,6 +73,11 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		SimulationNode node = getNode();
 
+		if (node != getSimulationNode()) {
+			throw new IllegalStateException("Controller was not created for distributed simulation. " +
+				"Use 'new Controler(scenario, module.getNode())' to specify the scenario and simulation node.");
+		}
+
 		bind(Communicator.class).toInstance(comm);
 		bind(Topology.class).toInstance(topology);
 		bind(MessageBroker.class).in(Singleton.class);
