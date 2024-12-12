@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * Class responsible for routing messages to the correct recipient.
@@ -47,6 +48,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
+
+	/**
+	 * Indicates that a message is sent to the node inbox.
+	 */
+	private static final int NODE_MESSAGE = Integer.MIN_VALUE;
 
 	/**
 	 * Communicator instance.
@@ -118,6 +124,11 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 * Stores messages that arrived from partitions that are already ahead in the sequence.
 	 */
 	private final Queue<ByteBuffer> aheadMsgs = new ManyToOneConcurrentLinkedQueue<>();
+
+	/**
+	 * Stores messages sent to this node, mapped by event type.
+	 */
+	private final Int2ObjectMap<Queue<Message>> nodesMessages = new Int2ObjectOpenHashMap<>();
 
 	private final Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
@@ -242,6 +253,50 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 	}
 
+
+	/**
+	 * Send a message to a specific node. These messages are eventually delivery during sync steps.
+	 * There are no delivery guarantees, when these messages will arrive.
+	 * Such messages need to be polled using {@link #receiveNodeMessages(Class, Consumer)}.
+	 */
+	public void sendToNode(Message msg, int receiverNode) {
+
+		if (receiverNode == Communicator.BROADCAST_TO_ALL) {
+
+			for (int i = 0; i < comm.getSize(); i++) {
+				if (i == comm.getRank())
+					nodesMessages.computeIfAbsent(msg.getType(), k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+				else {
+					queueSend(msg, i, NODE_MESSAGE);
+				}
+			}
+
+		} else if (receiverNode == comm.getRank()) {
+			nodesMessages.computeIfAbsent(msg.getType(), k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+		} else {
+			queueSend(msg, receiverNode, NODE_MESSAGE);
+		}
+	}
+
+	/**
+	 * Receive all messages that have been sent to this node via {@link #sendToNode(Message, int)}.
+	 *
+	 * @param type     message type
+	 * @param consumer method to consume the messages
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Message> void receiveNodeMessages(Class<T> type, Consumer<T> consumer) {
+
+		int t = serialization.getType(type);
+		Queue<Message> messages = nodesMessages.get(t);
+		if (messages != null) {
+			Message msg;
+			while ((msg = messages.poll()) != null) {
+				consumer.accept((T) msg);
+			}
+		}
+	}
+
 	/**
 	 * Add a rank that should be waited for in the next synchronization step.
 	 */
@@ -331,10 +386,16 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 	}
 
+	void afterSim() {
+		waitFor.clear();
+		nodesMessages.clear();
+		histogram.reset();
+	}
+
 	/**
 	 * Serialize message and put it into the outgoing buffer. This method can be called concurrently.
 	 *
-	 * @param partition receiving partition
+	 * @param partition receiving partition, if {@link Integer#MIN_VALUE} the message is send to the node inbox.
 	 */
 	@SneakyThrows
 	private void queueSend(Message msg, int rank, int partition) {
@@ -477,6 +538,11 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
+
+			if (partition == NODE_MESSAGE) {
+				nodesMessages.computeIfAbsent(type, k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+				continue;
+			}
 
 			if (msg instanceof Event m) {
 				events.add(m);

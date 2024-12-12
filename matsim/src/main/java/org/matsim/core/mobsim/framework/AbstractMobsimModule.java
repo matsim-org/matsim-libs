@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.config.Config;
 
 import com.google.inject.AbstractModule;
@@ -33,11 +34,16 @@ import com.google.inject.util.Modules;
 
 public abstract class AbstractMobsimModule extends AbstractModule {
 	private Config config = null;
+	private SimulationNode simNode = SimulationNode.SINGLE_INSTANCE;
 	private Integer iterationNumber = null;
 	private AbstractMobsimModule parent = null;
 
 	public final void setConfig(Config config) {
 		this.config = Objects.requireNonNull(config);
+	}
+
+	public final void setSimNode(SimulationNode simNode) {
+		this.simNode = simNode;
 	}
 
 	public final void setIterationNumber(int iterationNumber) {
@@ -72,6 +78,19 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 
 		throw new IllegalStateException(
 				"No iteration number set. Did you try to use the module outside of the QSim initialization process?");
+	}
+
+	public SimulationNode getSimNode() {
+		if (simNode != null) {
+			return simNode;
+		}
+
+		if (parent != null) {
+			return parent.getSimNode();
+		}
+
+		throw new IllegalStateException(
+				"No simulation node set. Did you try to use the module outside of the QSim initialization process?");
 	}
 
 	protected final void configure() {

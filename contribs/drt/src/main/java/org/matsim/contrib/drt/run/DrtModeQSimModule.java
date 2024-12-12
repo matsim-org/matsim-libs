@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.optimizer.distributed.DistributedDRTSupportModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
@@ -80,7 +81,15 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		} else {
 			install(new VrpAgentSourceQSimModule(getMode()));
 			install(new PassengerEngineQSimModule(getMode()));
-			install(optimizerQSimModule);
+
+			// Optimizer is running on the head node
+			if (getSimNode().isHeadNode()) {
+				install(optimizerQSimModule);
+			}
+
+			if (getSimNode().isDistributed()) {
+				install(new DistributedDRTSupportModule(getMode()));
+			}
 		}
 
 		if (drtCfg.getPrebookingParams().isPresent()) {

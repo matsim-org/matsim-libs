@@ -191,6 +191,8 @@ public final class DSim implements Mobsim {
             broker.deregister(task);
             executor.deregister(task);
         }
+
+		broker.afterSim();
     }
 
     @SneakyThrows
