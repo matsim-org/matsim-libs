@@ -104,8 +104,6 @@ public class RunDistributedSim implements Callable<Integer> {
 		config.controller().setWriteEventsInterval(writeEvents ? 1 : 0);
 		config.controller().setLastIteration(0);
 
-        config.qsim().setUsePersonIdForMissingVehicleId(true);
-
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
         // Randomness might cause differences on different nodes
