@@ -96,14 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Tests will cover drt -->
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>drt</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>

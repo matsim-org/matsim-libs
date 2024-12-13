@@ -20,28 +20,26 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.distributed.DrtNodeCommunicator;
+import org.matsim.contrib.drt.optimizer.distributed.DrtOptimizerCommunicator;
+import org.matsim.contrib.drt.optimizer.distributed.SecondaryOptimizerModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
-import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRouteCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -80,7 +78,24 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		} else {
 			install(new VrpAgentSourceQSimModule(getMode()));
 			install(new PassengerEngineQSimModule(getMode()));
-			install(optimizerQSimModule);
+
+			// Optimizer is running on the head node
+			if (getSimulationNode().isHeadNode()) {
+				install(optimizerQSimModule);
+
+				if (getSimulationNode().isDistributed()) {
+
+					addModalComponent(DrtOptimizerCommunicator.class, modalProvider(
+						getter -> new DrtOptimizerCommunicator(
+							getter.get(DrtNodeCommunicator.class),
+							getMode(),
+							getter.getModal(DrtOptimizer.class)
+						)));
+				}
+
+			} else
+				install(new SecondaryOptimizerModule(getMode()));
+
 		}
 
 		if (drtCfg.getPrebookingParams().isPresent()) {

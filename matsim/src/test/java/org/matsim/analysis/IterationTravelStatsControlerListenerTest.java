@@ -113,7 +113,6 @@ public class IterationTravelStatsControlerListenerTest {
 				install(new TripRouterModule());
 				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
-				bind(SimulationNode.class).toInstance(SimulationNode.SINGLE_INSTANCE);
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
 				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
 				bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);

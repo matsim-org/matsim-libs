@@ -113,6 +113,9 @@ public final class DSim implements Mobsim {
 		// Sync after all components have been added
 		manager.syncEventRegistry(comm);
 
+		// Event handler without partition may be executed within the context of the first one
+		manager.setContext(node.getParts().getFirst());
+
 		manager.initProcessing();
 
 		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
@@ -188,6 +191,8 @@ public final class DSim implements Mobsim {
             broker.deregister(task);
             executor.deregister(task);
         }
+
+		broker.afterSim();
     }
 
     @SneakyThrows
@@ -230,7 +235,8 @@ public final class DSim implements Mobsim {
                         if (runtime == 0)
                             continue;
 
-                        writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i, runtime));
+						// Runtimes are collected as 10% samples currently
+                        writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }

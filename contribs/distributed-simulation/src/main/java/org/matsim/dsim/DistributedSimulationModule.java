@@ -63,14 +63,22 @@ public class DistributedSimulationModule extends AbstractModule {
 		this(new NullCommunicator(), threads, 1);
 	}
 
+	public SimulationNode getNode() {
+		return topology.getNode(comm.getRank());
+	}
+
 	@SneakyThrows
 	@Override
 	public void install() {
 
-		SimulationNode node = topology.getNode(comm.getRank());
+		SimulationNode node = getNode();
+
+		if (node != getSimulationNode()) {
+			throw new IllegalStateException("Controller was not created for distributed simulation. " +
+				"Use 'new Controler(scenario, module.getNode())' to specify the scenario and simulation node.");
+		}
 
 		bind(Communicator.class).toInstance(comm);
-		bind(SimulationNode.class).toInstance(node);
 		bind(Topology.class).toInstance(topology);
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);

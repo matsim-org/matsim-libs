@@ -1,8 +1,6 @@
-package org.matsim.dsim;
+package org.matsim.contrib.drt.distributed;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -16,7 +14,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTimeModule;
-import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -26,17 +23,21 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.dsim.Activities;
+import org.matsim.dsim.DistributedSimulationModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrtIntegrationTest {
 
 	@RegisterExtension
@@ -105,15 +106,32 @@ public class DrtIntegrationTest {
 
 	@Test
 	@Order(1)
-	void runSingleThread() {
+	void qsim() {
 
 		Scenario scenario = createScenario();
+
+		scenario.getConfig().controller().setMobsim(ControllerConfigGroup.MobsimType.qsim.name());
 
 		Controler controler = new Controler(scenario);
 
 		prepareController(controler);
 
-		controler.addOverridingModule(new DistributedSimulationModule(1));
+		controler.run();
+	}
+
+	@Test
+	@Order(1)
+	void runSingleThread() {
+
+		Scenario scenario = createScenario();
+
+		DistributedSimulationModule module = new DistributedSimulationModule(1);
+
+		Controler controler = new Controler(scenario, module.getNode());
+
+		prepareController(controler);
+
+		controler.addOverridingModule(module);
 		controler.run();
 
 	}
@@ -125,11 +143,12 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		Controler controler = new Controler(scenario);
+		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		Controler controler = new Controler(scenario, module.getNode());
 
 		prepareController(controler);
 
-		controler.addOverridingModule(new DistributedSimulationModule(4));
+		controler.addOverridingModule(module);
 		controler.run();
 
 	}
@@ -137,20 +156,38 @@ public class DrtIntegrationTest {
 	@Test
 	@Order(3)
 	@Disabled
-	void runDistributed() {
+	void runDistributed() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
-		try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-			List<Communicator> comms = LocalCommunicator.create(4);
-			for (Communicator comm : comms) {
-				pool.submit(() -> {
-					Controler controler = new Controler(createScenario());
+		int size = 3;
+		var pool = Executors.newFixedThreadPool(size);
+		var comms = LocalCommunicator.create(size);
 
-					prepareController(controler);
+		Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1.0));
-					controler.run();
-				});
-			}
+		var futures = comms.stream()
+			.map(comm -> pool.submit(() -> {
+
+				Scenario scenario = createScenario();
+
+				DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+
+				Controler controler = new Controler(scenario, module.getNode());
+				prepareController(controler);
+
+				controler.addOverridingModule(module);
+				controler.run();
+
+				try {
+					comm.close();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}))
+			.toList();
+
+		for (var f : futures) {
+			f.get(2, TimeUnit.MINUTES);
 		}
+
 	}
 }

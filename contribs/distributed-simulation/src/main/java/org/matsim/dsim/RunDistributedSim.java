@@ -1,11 +1,15 @@
 package org.matsim.dsim;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.communication.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import picocli.CommandLine;
@@ -98,17 +102,25 @@ public class RunDistributedSim implements Callable<Integer> {
         Activities.addScoringParams(config);
         config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 		config.controller().setWriteEventsInterval(writeEvents ? 1 : 0);
-
-        config.qsim().setUsePersonIdForMissingVehicleId(true);
+		config.controller().setLastIteration(0);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
         // Randomness might cause differences on different nodes
         config.routing().setRoutingRandomness(0);
 
-        DistributedController controller = new DistributedController(comm, config, threads, oversubscribe);
+		Scenario s = ScenarioUtils.loadScenario(config);
 
-        controller.run();
+		DistributedSimulationModule module = new DistributedSimulationModule(comm, threads, oversubscribe);
+		Controler controler = new Controler(s, module.getNode());
+
+		controler.addOverridingModule(module);
+
+		controler.getInjector();
+		// Removes check after injector has been created, just a workaround to avoid exceptions
+		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
+
+		controler.run();
 
         comm.close();
 

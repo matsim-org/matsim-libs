@@ -107,6 +107,10 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				.asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtEventSequenceCollector.class));
 
+		// Only the head node performs most of the analysis
+		if (!getSimulationNode().isHeadNode())
+			return;
+
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
 						getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
