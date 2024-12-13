@@ -106,7 +106,6 @@ public class DrtIntegrationTest {
 
 	@Test
 	@Order(1)
-	@Disabled
 	void qsim() {
 
 		Scenario scenario = createScenario();
@@ -114,6 +113,8 @@ public class DrtIntegrationTest {
 		scenario.getConfig().controller().setMobsim(ControllerConfigGroup.MobsimType.qsim.name());
 
 		Controler controler = new Controler(scenario);
+
+		prepareController(controler);
 
 		controler.run();
 	}

@@ -24,6 +24,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.distributed.DrtNodeCommunicator;
+import org.matsim.contrib.drt.optimizer.distributed.DrtOptimizerCommunicator;
 import org.matsim.contrib.drt.optimizer.distributed.SecondaryOptimizerModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
@@ -79,6 +82,17 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			// Optimizer is running on the head node
 			if (getSimulationNode().isHeadNode()) {
 				install(optimizerQSimModule);
+
+				if (getSimulationNode().isDistributed()) {
+
+					addModalComponent(DrtOptimizerCommunicator.class, modalProvider(
+						getter -> new DrtOptimizerCommunicator(
+							getter.get(DrtNodeCommunicator.class),
+							getMode(),
+							getter.getModal(DrtOptimizer.class)
+						)));
+				}
+
 			} else
 				install(new SecondaryOptimizerModule(getMode()));
 

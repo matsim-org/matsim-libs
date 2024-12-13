@@ -4,7 +4,9 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.dsim.MessageBroker;
 
@@ -13,10 +15,17 @@ import org.matsim.dsim.MessageBroker;
  */
 public class SecondaryNodeOptimizer implements DrtOptimizer {
 
+	private final DrtNodeCommunicator comm;
 	private final MessageBroker broker;
+	private final Fleet fleet;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
-	public SecondaryNodeOptimizer(MessageBroker broker) {
+	public SecondaryNodeOptimizer(DrtNodeCommunicator comm, MessageBroker broker,
+								  Fleet fleet, ScheduleTimingUpdater scheduleTimingUpdater) {
+		this.comm = comm;
 		this.broker = broker;
+		this.fleet = fleet;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 	}
 
 	@Override
@@ -31,14 +40,18 @@ public class SecondaryNodeOptimizer implements DrtOptimizer {
 
 	@Override
 	public void nextTask(DvrpVehicle vehicle) {
-
+		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
+		vehicle.getSchedule().nextTask();
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 
-		// use the received schedules
+		// TODO: receive schedules
 
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
+			scheduleTimingUpdater.updateTimings(v);
+		}
 	}
 
 	private Message toMessage(DrtRequest request) {

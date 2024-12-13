@@ -11,15 +11,9 @@ public class DistributedDrtSupportModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		if (getSimulationNode().isHeadNode()) {
+		bind(DrtNodeCommunicator.class).in(Singleton.class);
 
-			addMobsimListenerBinding().to(DrtHeadNodeCommunicator.class).in(Singleton.class);
-
-		} else {
-
-			addMobsimListenerBinding().to(DrtScheduleReceiver.class).in(Singleton.class);
-
-		}
+		addMobsimListenerBinding().to(DrtNodeCommunicator.class).in(Singleton.class);
 
 	}
 
