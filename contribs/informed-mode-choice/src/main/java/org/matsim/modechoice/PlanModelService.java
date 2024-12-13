@@ -31,7 +31,7 @@ public final class PlanModelService implements StartupListener {
 	private Map<String, TripEstimator> tripEstimator;
 
 	@Inject
-	private List<TripScoreEstimator> tripScores;
+	private Set<TripScoreEstimator> tripScores;
 
 	@Inject
 	private Set<TripConstraint<?>> constraints;
