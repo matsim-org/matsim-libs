@@ -56,6 +56,12 @@ public final class LPTask implements SimTask {
 	 * Avg. runtime of last iterations.
 	 */
 	private float avgRuntime = 0.0f;
+
+	/**
+	 * Run time of the last few iterations.
+	 */
+	private long sumRuntime = 0;
+
 	/**
 	 * Indicates whether the LP has been initialized.
 	 */
@@ -166,10 +172,13 @@ public final class LPTask implements SimTask {
 
 		long rt = System.nanoTime() - t;
 		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
+		sumRuntime += rt;
 
 		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0)
-	        runtimes.add(rt);
+		if ((time % 10) == 0) {
+			sumRuntime = 0;
+			runtimes.add(sumRuntime);
+		}
     }
 
 	@Override
