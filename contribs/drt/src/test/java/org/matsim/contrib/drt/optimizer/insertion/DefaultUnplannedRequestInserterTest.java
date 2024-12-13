@@ -287,7 +287,8 @@ public class DefaultUnplannedRequestInserterTest {
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
 				vehicleEntryFactory, insertionRetryQueue, insertionSearch, new DefaultOfferAcceptor(),
-				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
+				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0),
+				RequestFleetFilter.none);
 	}
 
 	private Link link(String id) {
