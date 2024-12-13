@@ -235,7 +235,8 @@ public final class DSim implements Mobsim {
                         if (runtime == 0)
                             continue;
 
-                        writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i, runtime));
+						// Runtimes are collected as 10% samples currently
+                        writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
