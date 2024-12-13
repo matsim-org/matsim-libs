@@ -317,8 +317,8 @@ public final class EventHandlerTask implements SimTask {
 
 		// Only add the runtime to the list if the time is a multiple of 10
 		if ((time % 10) == 0) {
-			sumRuntime = 0;
 			runtimes.add(sumRuntime);
+			sumRuntime = 0;
 		}
     }
 
