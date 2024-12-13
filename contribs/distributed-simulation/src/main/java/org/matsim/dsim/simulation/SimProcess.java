@@ -230,11 +230,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 					"Even though the interface only requires MobsimAgent. Provided agent is of type: " + agent.getClass());
 		}
 
-		if (agent.getId().equals(Id.createPersonId("17883"))) {
-			var pa = (PlanAgent) agent;
-			log.info("Time: {}, Agent {} at plan element: {}", getSimTimer().getTimeOfDay(), agent.getId(), pa.getCurrentPlanElement());
-		}
-
 		switch (agent.getState()) {
 			case ACTIVITY -> arrangeAgentActivity(dma);
 			case LEG -> arrangeAgentDeparture(dma, currentTime.getTimeOfDay());

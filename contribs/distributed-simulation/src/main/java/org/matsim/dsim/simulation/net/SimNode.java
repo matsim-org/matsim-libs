@@ -1,33 +1,27 @@
 package org.matsim.dsim.simulation.net;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.MatsimRandom;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@RequiredArgsConstructor
 public class SimNode {
 
 	@Getter
 	private final Id<Node> id;
+	private final Random rng;
 	@Getter
 	private final List<SimLink> inLinks = new ArrayList<>();
 	@Getter
 	private final Map<Id<Link>, SimLink> outLinks = new HashMap<>();
 
-	// We have had problems with the order of vehicles being switched, when the number of processes changes. One source of error is the
-	// sequence of random numbers being different for varying number of processes. For example: An ActiveNodes object in a single
-	// threaded setup takes care of 100 nodes, but with 2 threads two ActiveNodes take care of ±50 nodes each. This alters the sequence
-	// of random numbers and therefore the sequence of links being served during the intersection update. This attempt puts a random
-	// seed into the node, and increments the seed everytime a random number is generated for that node. This way, the seed for each
-	// random number is the same, regardless of the number of processes.
-	private int randomSeed;
+	public SimNode(Id<Node> id) {
+		this.id = id;
+		this.rng = MatsimRandom.getLocalInstance(id.hashCode());
+	}
 
 	double calculateAvailableCapacity() {
 		return inLinks.stream()
@@ -50,9 +44,14 @@ public class SimNode {
 		return inLinks.stream().anyMatch(SimLink::isOffering);
 	}
 
-	int nextRandomSeed() {
-		this.randomSeed++;
-		return randomSeed;
+	/**
+	 * The node maintains an rng. The rng needs to reside inside the SimNode, so that the sequence of random numbers used in intersection updates
+	 * is similar regardless of the applied partitioning.
+	 *
+	 * @return next random double in the random number sequence.
+	 */
+	double nextDouble() {
+		return rng.nextDouble();
 	}
 
 	void addInLink(SimLink link) {

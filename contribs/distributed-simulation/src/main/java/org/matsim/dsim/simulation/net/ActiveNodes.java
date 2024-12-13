@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.framework.Steppable;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -26,7 +25,6 @@ public class ActiveNodes implements Steppable {
 
 	private final Set<SimNode> activeNodes = new HashSet<>();
 	private final EventsManager em;
-	private final Random rnd = new Random();
 
 	@Inject
 	public ActiveNodes(EventsManager em) {
@@ -75,11 +73,8 @@ public class ActiveNodes implements Steppable {
 
 				if (shouldVehicleMove(inLink, node.getOutLinks(), now)) {
 					selectedCapacity += inLink.getMaxFlowCapacity();
-					// Use random seed from node, to avoid inconsistencies with varying number of processes. See SimNode for more info.
-					// NOTE: I don't know whether 'setSeed' performs well. Internally it basically updates an AtomicLong, but the method is synchronized.
-					var randomSeed = node.nextRandomSeed();
-					rnd.setSeed(randomSeed);
-					var rndNum = rnd.nextDouble() * availableCapacity;
+					var rndNum = node.nextDouble() * availableCapacity;
+					// this test ensures that links with higher capacities have a higher probability of being served first.
 					if (selectedCapacity >= rndNum) {
 						var vehicle = inLink.popVehicle();
 						move(inLink, vehicle, node.getOutLinks(), now);
