@@ -21,63 +21,53 @@
 package org.matsim.core.gbl;
 
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
- * This class provides a global instance of {@link Random}. The seed of this random number generator can be reset using the {@link #reset(long)} method.
- * The {@link #reset(long)} method is designed to be used in between iterations, so that random number sequences vary between iterations.
- * <p>
- * This class also provides different variants of the {@link #getLocalInstance()}, {@link #getLocalInstance(long)} function. These functions create new instances of {@link Random} and
- * should be used to obtain Random Number Generators (RNG) in concurrent settings. This class maintains an internal counter so that each {@link Random}
- * instance obtained with {@link #getLocalInstance()} receives a distinct random seed.
+ * An abstract class, providing random numbers for MATSim. Also provides
+ * Random Number Generators (RNG) for use in threads, which should all
+ * use their own RNGs for deterministic behavior.
  *
  * @author mrieser
  */
 public abstract class MatsimRandom {
 	private static final long DEFAULT_RANDOM_SEED = 4711;
 
-	private static long globalSeed = DEFAULT_RANDOM_SEED;
-	private static AtomicInteger internalCounter = new AtomicInteger(0);
+	private static long lastUsedSeed = DEFAULT_RANDOM_SEED;
+	private static int internalCounter = 0;
 
-	/**
-	 * the global random number generator
-	 */
+	/** the global random number generator */
 	private static final Random random = new Random(DEFAULT_RANDOM_SEED);
 
-	/**
-	 * Resets the random number generator with a default random seed.
-	 */
+	/** Resets the random number generator with a default random seed. */
 	public static void reset() {
 		reset(DEFAULT_RANDOM_SEED);
 	}
 
-	/**
-	 * Resets the global random number generator with the given seed. Also resets the internal counter used to for random seeds of local {@link Random}
-	 * instances.
+	/** Resets the random number generator with the given seed.
 	 *
 	 * @param seed The seed used to draw random numbers.
 	 */
 	public static void reset(final long seed) {
-		globalSeed = seed;
-		internalCounter = new AtomicInteger(0);
+		lastUsedSeed = seed;
+		internalCounter = 0;
 		getRandom().setSeed(seed);
+//		prepareRNG(random);
 	}
-
 	public static Random getRandom() {
 		return random;
 	}
 
-	/**
-	 * Returns an instance of an RNG, which can be used
-	 * locally, e.g. in threads. Each instance of {@link Random} receives a distinct random seed. Based on the global seed and a local counter.
-	 * Additionally, each instance of @{link Random} is warmed up by invoking {@link Random#nextDouble()} 100 times.
+	/** Returns an instance of a random number generator, which can be used
+	 * locally, e.g. in threads.
 	 *
 	 * @return pseudo random number generator
 	 */
 	public static Random getLocalInstance() {
-		var localSeed = internalCounter.getAndIncrement();
-		return getLocalInstance(globalSeed + localSeed * 23L);
+		internalCounter++;
+		Random r = new Random(lastUsedSeed + internalCounter*23l);
+		prepareRNG(r);
+		return r;
 	}
 
 	/**
@@ -86,7 +76,7 @@ public abstract class MatsimRandom {
 	 * random number sequence of the returned RNG varies between MATSim iterations.
 	 */
 	public static Random getLocalInstance(final long seed) {
-		var random = new Random(globalSeed + seed);
+		var random = new Random(lastUsedSeed + seed * 23l);
 		prepareRNG(random);
 		return random;
 	}
