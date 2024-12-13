@@ -23,9 +23,6 @@ package org.matsim.freight.carriers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.freight.carriers.CarrierVehicleTypeReader;
-import org.matsim.freight.carriers.CarrierVehicleTypeWriter;
-import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CarrierVehicleTypeWriterTest {
@@ -36,7 +33,7 @@ public class CarrierVehicleTypeWriterTest {
 	@Test
 	void testTypeWriter(){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory()+ "vehicleTypes.xml");
+		new CarrierVehicleTypeReader(types).readFile(utils.getPackageInputDirectory()+ "vehicleTypes_v2.xml");
 		final String outputVehTypeFile = utils.getOutputDirectory()+ "vehicleTypesWritten.xml";
 		new CarrierVehicleTypeWriter(types).write(outputVehTypeFile);
 		types.getVehicleTypes().clear();

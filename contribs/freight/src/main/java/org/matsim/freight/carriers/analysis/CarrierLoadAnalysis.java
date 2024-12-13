@@ -21,6 +21,16 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,17 +44,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
-
 /**
  * @author Kai Martins-Turner (kturner)
  */
@@ -52,7 +51,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
-	Carriers carriers;
+	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
 
@@ -96,6 +95,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 		//Write headline:
 		bw1.write(String.join(delimiter,"vehicleId",
+			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
 			"load state during tour"));
@@ -104,12 +104,13 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
 			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
-			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).get();
+			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			bw1.write(vehicleId.toString());
+			bw1.write(delimiter + vehicleType.getId().toString());
 			bw1.write(delimiter + capacity);
 			bw1.write(delimiter + maxLoad);
 			bw1.write(delimiter + load);

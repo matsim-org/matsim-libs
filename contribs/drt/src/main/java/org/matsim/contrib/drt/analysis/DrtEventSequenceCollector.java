@@ -159,7 +159,10 @@ public class DrtEventSequenceCollector
 		}
 
 		public boolean isCompleted() {
-			return submitted.getPersonIds().stream().allMatch(personId -> personEvents.get(personId).droppedOff != null);
+			return submitted.getPersonIds().stream().allMatch(personId -> { 
+				var events = personEvents.get(personId);
+				return events != null && personEvents.get(personId).droppedOff != null; 
+			});
 		}
 	}
 

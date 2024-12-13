@@ -33,11 +33,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.controler.CarrierModule;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controller.CarrierModule;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.testcases.MatsimTestUtils;
@@ -69,10 +67,10 @@ public class CarrierModuleTest {
         config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.controller().setWritePlansInterval(1);
-        config.controller().setCreateGraphs(false);
+        config.controller().setCreateGraphsInterval(0);
         freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
         freightCarriersConfigGroup.setCarriersFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
-        freightCarriersConfigGroup.setCarriersVehicleTypesFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
 
         Scenario scenario = ScenarioUtils.loadScenario( config );
 
