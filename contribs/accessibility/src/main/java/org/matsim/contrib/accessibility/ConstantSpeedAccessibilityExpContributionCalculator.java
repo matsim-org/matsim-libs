@@ -157,7 +157,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 			double distanceIntersection2Node_m = distances.getDistanceIntersection2Node();
 			double utilityRoad2Node = (distanceIntersection2Node_m / modeSpeed_m_h * betaModeTT)	+ (distanceIntersection2Node_m * betaModeTD); // toll or money ???
 
-			// Uutility on the network from first node to destination node
+			// Utility on the network from first node to destination node
 			double travelDistance_m = lcptTravelDistance.getTree().get(((Node) destination.getNearestBasicLocation()).getId()).getCost(); // travel link distances on road network for bicycle and walk
 			double utility = ((travelDistance_m / modeSpeed_m_h * betaModeTT) + (travelDistance_m * betaModeTD)); // toll or money ???
 
