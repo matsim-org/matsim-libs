@@ -50,7 +50,7 @@ public final class LSPUtils {
     return lspPlan.getLSP().getSelectedPlan() == lspPlan;
   }
 
-  public static LogisticChainScheduler createForwardLogisiticChainScheduler() {
+  public static LogisticChainScheduler createForwardLogisticChainScheduler() {
     return new ForwardLogisticChainSchedulerImpl();
   }
 

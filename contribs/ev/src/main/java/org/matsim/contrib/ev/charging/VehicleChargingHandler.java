@@ -86,11 +86,14 @@ public class VehicleChargingHandler
 	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 	private final EvConfigGroup evCfg;
 
+	private final ChargingStrategy.Factory strategyFactory;
+
 	@Inject
-	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evConfigGroup) {
+	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evConfigGroup, ChargingStrategy.Factory strategyFactory) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
 		this.evCfg = evConfigGroup;
+		this.strategyFactory = strategyFactory;
 		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
 	}
 
@@ -112,7 +115,7 @@ public class VehicleChargingHandler
 							.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
 							.findAny()
 							.get();
-					c.getLogic().addVehicle(ev, event.getTime());
+					c.getLogic().addVehicle(ev, strategyFactory.createStrategy(c.getSpecification(), ev), event.getTime());
 					vehiclesAtChargers.put(evId, c.getId());
 				}
 			}

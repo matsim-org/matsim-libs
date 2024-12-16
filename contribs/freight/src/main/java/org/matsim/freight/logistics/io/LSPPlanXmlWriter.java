@@ -94,11 +94,11 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
     this.writer.write(NL);
   }
 
-  private void startLSP(LSP lsp) throws IOException {
+  private void startLSP(LSP lsp) {
     this.writeStartTag(LSP, List.of(createTuple(ID, lsp.getId().toString())));
   }
 
-  private void writeResources(LSP lsp) throws IOException {
+  private void writeResources(LSP lsp) {
     if (lsp.getResources().isEmpty()) return;
     this.writeStartTag(RESOURCES, null);
     for (LSPResource resource : lsp.getResources()) {
@@ -127,7 +127,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
     this.writeEndTag(RESOURCES);
   }
 
-  private void writeShipments(LSP lsp) throws IOException {
+  private void writeShipments(LSP lsp) {
     if (lsp.getLspShipments().isEmpty()) return;
     this.writeStartTag(SHIPMENTS, null);
     for (LspShipment lspShipment : lsp.getLspShipments()) {
@@ -149,7 +149,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
     this.writeEndTag(SHIPMENTS);
   }
 
-  private void writePlans(LSP lsp, BufferedWriter writer) throws IOException {
+  private void writePlans(LSP lsp, BufferedWriter writer) {
     if (lsp.getPlans().isEmpty()) return;
     this.writeStartTag(LSP_PLANS, null);
 

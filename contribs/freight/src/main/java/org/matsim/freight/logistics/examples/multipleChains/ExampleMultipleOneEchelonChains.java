@@ -35,18 +35,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -97,9 +95,9 @@ final class ExampleMultipleOneEchelonChains {
     log.info("Prepare scenario");
     Scenario scenario = prepareScenario(config);
 
-    log.info("Prepare controler");
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(
+    log.info("Prepare controller");
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(
         new AbstractModule() {
           @Override
           public void install() {
@@ -107,7 +105,7 @@ final class ExampleMultipleOneEchelonChains {
           }
         });
 
-    controler.addOverridingModule(
+    controller.addOverridingModule(
         new AbstractModule() {
           @Override
           public void install() {
@@ -119,7 +117,7 @@ final class ExampleMultipleOneEchelonChains {
                 .toProvider(
                     () -> {
                       CarrierStrategyManager strategyManager =
-                          CarrierControlerUtils.createDefaultCarrierStrategyManager();
+                          CarrierControllerUtils.createDefaultCarrierStrategyManager();
                       strategyManager.addStrategy(
                           new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                       return strategyManager;
@@ -139,11 +137,11 @@ final class ExampleMultipleOneEchelonChains {
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controler
+    controller
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
+    controller.run();
 
     log.info("Done.");
   }

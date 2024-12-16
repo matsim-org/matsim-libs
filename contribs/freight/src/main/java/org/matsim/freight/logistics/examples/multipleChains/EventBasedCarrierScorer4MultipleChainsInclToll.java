@@ -35,7 +35,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
@@ -139,7 +139,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     // scores tolls for vehicles driving on tolled links
     private void handleEvent(PersonMoneyEvent event) {
-      double tollValue = 0;
+      double tollValue;
 
       if (event.getPurpose().equals("toll")) {
         Id<Vehicle> vehicleId = d2v.getVehicleOfDriver(event.getPersonId());

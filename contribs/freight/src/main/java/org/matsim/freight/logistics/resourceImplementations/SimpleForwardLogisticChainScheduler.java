@@ -33,7 +33,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
  * LogisticChainElement}.
  *
  * <p>2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
- * exogenously, are now scheduled sequentially in an order that was also specified exogenously. This
+ * exogenous, are now scheduled sequentially in an order that was also specified exogenously. This
  * order ensures that each {@link LogisticChain} is traversed from the first to the last {@link
  * LogisticChainElement}. During this procedure, the concerned {@link LspShipment}s are taken from
  * the collection of incoming shipments, handled by the {@link LSPResource} in charge and then added

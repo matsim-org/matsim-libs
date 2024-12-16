@@ -33,16 +33,14 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
@@ -63,7 +61,7 @@ import org.matsim.vehicles.VehicleUtils;
  * Part is removed, Chain is now starting at the CollectionHub
  *
  * <p>Scheduler = Macht die Pläne für die Fahrzeuge für die nächste MATSim-Iteration. Er plant es
- * für jede Ressource. --> jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
+ * für jede Ressource. → jede Ressource hat einen eigenen Scheduler: 1.) Simple: Nimm die
  * mitgegebene Reihenfolge. 2.)
  */
 /*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
@@ -133,16 +131,16 @@ import org.matsim.vehicles.VehicleUtils;
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
     lsp.scheduleLogisticChains();
 
-    log.info("Set up simulation controler and LSPModule");
+    log.info("Set up simulation controller and LSPModule");
     LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(lsp)));
 
     // @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll. Damit kann
     // man dann auch vollständig auf
     // Injection setzen.
 
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(new LSPModule());
-    controler.addOverridingModule(
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(new LSPModule());
+    controller.addOverridingModule(
         new AbstractModule() {
           @Override
           public void install() {
@@ -164,7 +162,7 @@ import org.matsim.vehicles.VehicleUtils;
                 .toProvider(
                     () -> {
                       CarrierStrategyManager strategyManager =
-                          CarrierControlerUtils.createDefaultCarrierStrategyManager();
+                          CarrierControllerUtils.createDefaultCarrierStrategyManager();
                       strategyManager.addStrategy(
                           new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
                       return strategyManager;
@@ -174,7 +172,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     log.info("Run MATSim");
 
-    controler.run();
+    controller.run();
 
     // print the schedules for the assigned LSPShipments
     log.info("print the schedules for the assigned LSPShipments");
@@ -430,7 +428,7 @@ import org.matsim.vehicles.VehicleUtils;
         log.error(
             "This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
 
-        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffekte
+        // TODO: Habe das vorziehen vor das switch statement rückgängig gemacht, weil es sideeffects
         // hatte -> Die dürften hier auch sein!!!! (KMT may22)
         // Die createLSPPlan_reloading(..) Methoden sind nicht unabhängig voneinander.
         // Das liegt wohl am statischen und das dann dort wieder Verknüpfungen gesetzt werden -->

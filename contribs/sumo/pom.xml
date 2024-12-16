@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>osm</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<!-- Command line parser -->

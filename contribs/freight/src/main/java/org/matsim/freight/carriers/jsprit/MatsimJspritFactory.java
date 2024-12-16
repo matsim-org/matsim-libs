@@ -45,6 +45,10 @@ import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -56,11 +60,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A factory that creates matsim-object from jsprit
@@ -686,9 +685,6 @@ public final class MatsimJspritFactory {
 			capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 		} else
 			capabilityBuilder.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-		for (com.graphhopper.jsprit.core.problem.vehicle.VehicleType type : vrp.getTypes()) {
-			capabilityBuilder.addType(createMatsimVehicleType(type));
-		}
 		for (Vehicle vehicle : vrp.getVehicles()) {
 			capabilityBuilder.addVehicle(createCarrierVehicle(vehicle));
 		}

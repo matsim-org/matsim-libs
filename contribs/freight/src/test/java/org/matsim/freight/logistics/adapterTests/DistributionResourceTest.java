@@ -110,7 +110,7 @@ public class DistributionResourceTest {
 			assertTrue(distributionCarrier.getServices().isEmpty());
 			assertTrue(distributionCarrier.getShipments().isEmpty());
 			if (distributionCarrier.getCarrierCapabilities() == capabilities) {
-				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
+				assertSame(FleetSize.INFINITE, capabilities.getFleetSize());
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {

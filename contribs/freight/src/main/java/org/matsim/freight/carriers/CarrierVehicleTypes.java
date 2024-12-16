@@ -21,11 +21,10 @@
 
 package org.matsim.freight.carriers;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.VehicleType;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * VehicleTypeContainer mapping all vehicleTypes.
