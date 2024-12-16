@@ -31,12 +31,12 @@ import java.util.*;
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
-	public static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
+	public final static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
 
-	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
+	public final static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
 
-	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
-	public static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
+	public final static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
+	public final static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
 
 
 	private final Builder builder;
