@@ -2,6 +2,10 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 
+import java.util.Objects;
+
+import static org.matsim.contrib.bicycle.BicycleLinkSpeedCalculatorDefaultImpl.hasNotAttribute;
+
 public class BicycleParamsDefaultImpl implements BicycleParams {
 
 	// TODO Combine this with speeds?
@@ -57,6 +61,64 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 				case "steps" -> 0.1;
 				default -> 0.95;
 			};
+		}
+	}
+
+	// TODO combine this with comfort
+	@Override
+	public double computeSurfaceFactor(Link link) {
+		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
+			|| BicycleUtils.CYCLEWAY.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
+			|| hasNotAttribute(link, BicycleUtils.SURFACE)
+		) {
+			return 1.0;
+		}
+
+		//so, the link is NOT a cycleway, and has a surface attribute
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
+		switch (Objects.requireNonNull(surface)) {
+			case "paved":
+			case "asphalt":
+				return 1.0;
+
+			case "cobblestone (bad)":
+			case "grass":
+				return 0.4;
+
+			case "cobblestone;flattened":
+			case "cobblestone:flattened":
+			case "sett":
+			case "earth":
+				return 0.6;
+
+			case "concrete":
+			case "asphalt;paving_stones:35":
+			case "compacted":
+				return 0.9;
+
+			case "concrete:lanes":
+			case "concrete_plates":
+			case "concrete:plates":
+			case "paving_stones:3":
+				return 0.8;
+
+			case "paving_stones":
+			case "paving_stones:35":
+			case "paving_stones:30":
+			case "compressed":
+			case "bricks":
+			case "stone":
+			case "pebblestone":
+			case "fine_gravel":
+			case "gravel":
+			case "ground":
+				return 0.7;
+
+			case "sand":
+				return 0.2;
+
+			default:
+				return 0.5;
 		}
 	}
 

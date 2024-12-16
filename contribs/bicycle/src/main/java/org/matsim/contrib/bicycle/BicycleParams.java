@@ -8,4 +8,6 @@ public interface BicycleParams {
 	double getInfrastructureFactor(String type, String cyclewaytype);
 
 	double getGradient(Link link);
+
+	double computeSurfaceFactor(Link link);
 }

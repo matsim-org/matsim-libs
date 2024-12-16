@@ -127,6 +127,30 @@ public class BicycleParamsDefaultImplTest {
 		}
 	}
 
+	@Test
+	void testComputeSurfaceFactor() {
+		List<ObjectDoublePair<String>> surfaces = List.of(ObjectDoublePair.of("paved", 1.0), ObjectDoublePair.of("asphalt", 1.0),
+			ObjectDoublePair.of("concrete:lanes", .8), ObjectDoublePair.of("concrete_plates", .8), ObjectDoublePair.of("concrete:plates", .8),
+			ObjectDoublePair.of("fine_gravel", .7), ObjectDoublePair.of("paving_stones", .7), ObjectDoublePair.of("paving_stones:35", .7),
+			ObjectDoublePair.of("paving_stones:30", .7), ObjectDoublePair.of("compacted", .9),
+			ObjectDoublePair.of("asphalt;paving_stones:35", .9), ObjectDoublePair.of("bricks", .7), ObjectDoublePair.of("gravel", .7),
+			ObjectDoublePair.of("ground", .7), ObjectDoublePair.of("sett", .6), ObjectDoublePair.of("cobblestone;flattened", .6),
+			ObjectDoublePair.of("cobblestone:flattened", .6), ObjectDoublePair.of("stone", .7),
+			ObjectDoublePair.of("grass", .4), ObjectDoublePair.of("compressed", .7), ObjectDoublePair.of("paving_stones:3", .8),
+			ObjectDoublePair.of("cobblestone (bad)", .4), ObjectDoublePair.of("earth", .6), ObjectDoublePair.of("pebblestone", .7),
+			ObjectDoublePair.of("sand", .2), ObjectDoublePair.of("concrete", .9),
+			ObjectDoublePair.of(null, 1.), ObjectDoublePair.of("test:default", .5));
+
+		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
+		link.getAttributes().putAttribute(BicycleUtils.WAY_TYPE, "type");
+
+		for (ObjectDoublePair<String> pair : surfaces) {
+			link.getAttributes().putAttribute(OsmTags.SURFACE, pair.left());
+			assertEquals(pair.rightDouble(), params.computeSurfaceFactor(link), 0.00001);
+		}
+
+	}
+
 	private static Link createLink(Coord from, Coord to) {
 
 		Network net = NetworkUtils.createNetwork();
