@@ -1,7 +1,6 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.compress.utils.Sets;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -14,6 +13,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadModule;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -103,6 +103,7 @@ public class PassengerGroupTest {
 	private QSim createQSim(PassengerRequestValidator requestValidator, Class<? extends VrpOptimizer> optimizerClass) {
 		return new QSimBuilder(fixture.config).useDefaults()
 				.addOverridingModule(new MobsimScopeEventHandlingModule())
+				.addOverridingModule(new DvrpLoadModule(MODE))
 				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineQSimModule.PassengerEngineType.DEFAULT))
 				.addQSimModule(new VrpAgentSourceQSimModule(MODE))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {

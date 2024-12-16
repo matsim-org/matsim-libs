@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerWaitingEvent;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
+import org.matsim.contrib.dvrp.vrpagent.VehicleCapacityChangedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 
@@ -46,7 +47,8 @@ public class DvrpEventsReaders {
 				PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
 				PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert,//
 				TaskStartedEvent.EVENT_TYPE, e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),
-				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter));
+				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter),
+				VehicleCapacityChangedEvent.EVENT_TYPE, VehicleCapacityChangedEvent::convert);
 	}
 
 	public static MatsimEventsReader createEventsReader(EventsManager eventsManager,
