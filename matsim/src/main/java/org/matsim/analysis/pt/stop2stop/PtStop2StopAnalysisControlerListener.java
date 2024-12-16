@@ -19,6 +19,8 @@
 
 package org.matsim.analysis.pt.stop2stop;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -42,12 +44,18 @@ public class PtStop2StopAnalysisControlerListener implements IterationStartsList
     private final String sep;
     private final String sep2;
 
+	private static final Logger log = LogManager.getLogger(PtStop2StopAnalysisControlerListener.class);
+
     @Inject
     PtStop2StopAnalysisControlerListener(Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
         this.eventsManager = eventsManager;
         this.controlerIO = controlerIO;
-		// TODO: Sample size is only available in simwrapper config group which is not available here. Setting to 1, needs to be upscaled later.
-        ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
+		double sampleUpscaleFactor = 1.0 / scenario.getConfig().global().getScaling();
+		if (Double.isInfinite(sampleUpscaleFactor)) {
+			log.error("GlobalConfigGroup scaling is probably 0, so the sample upscale factor would be infinity. Falling back to 1.0 instead.");
+			sampleUpscaleFactor = 1.0;
+		}
+        ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), sampleUpscaleFactor);
         sep = scenario.getConfig().global().getDefaultDelimiter();
         sep2 = sep.equals(";") ? "_" : ";"; // TODO: move sep2 to global config
     }
