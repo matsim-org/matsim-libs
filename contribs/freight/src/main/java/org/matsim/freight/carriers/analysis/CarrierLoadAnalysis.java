@@ -27,10 +27,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -54,6 +52,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
 
 	public CarrierLoadAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;
@@ -69,9 +68,11 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		if (! vehicle2Load.containsKey(vehicleId)){
 			list = new LinkedList<>();
 			list.add(demand);
+			vehicle2DemandPerTour.put(vehicleId, demand);
 		} else {
 			list = vehicle2Load.get(vehicleId);
 			list.add(list.getLast() + demand);
+			vehicle2DemandPerTour.put(vehicleId, vehicle2DemandPerTour.get(vehicleId) + demand);
 		}
 		vehicle2Load.put(vehicleId, list);
 	}
@@ -98,6 +99,8 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
+			"maxLoadPercentage",
+			"handledDemand",
 			"load state during tour"));
 		bw1.newLine();
 
@@ -109,10 +112,15 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();
 
+			final Integer demand = vehicle2DemandPerTour.get(vehicleId);
+			final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000)/100.0;;
+
 			bw1.write(vehicleId.toString());
 			bw1.write(delimiter + vehicleType.getId().toString());
 			bw1.write(delimiter + capacity);
 			bw1.write(delimiter + maxLoad);
+			bw1.write(delimiter + maxLoadPercentage);
+			bw1.write(delimiter + demand);
 			bw1.write(delimiter + load);
 			bw1.newLine();
 		}
