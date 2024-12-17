@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRouteCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -89,6 +90,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter -> new DrtOptimizerCommunicator(
 							getter.get(DrtNodeCommunicator.class),
 							getMode(),
+							getter.getModal(Fleet.class),
 							getter.getModal(DrtOptimizer.class)
 						)));
 				}

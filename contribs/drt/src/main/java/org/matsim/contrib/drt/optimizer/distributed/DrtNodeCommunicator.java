@@ -4,6 +4,10 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.core.communication.Communicator;
 import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -24,6 +28,7 @@ public class DrtNodeCommunicator implements MobsimAfterSimStepListener {
 	private final MessageBroker broker;
 
 	private final Map<String, List<DrtRequest>> requests = new ConcurrentHashMap<>();
+	private final Map<Id<DvrpVehicle>, Schedule> schedules = new ConcurrentHashMap<>();
 
 	@Inject
 	public DrtNodeCommunicator(Network network, MessageBroker broker) {
@@ -31,10 +36,10 @@ public class DrtNodeCommunicator implements MobsimAfterSimStepListener {
 		this.broker = broker;
 	}
 
-
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		broker.receiveNodeMessages(RequestMessage.class, this::handleMessage);
+		broker.receiveNodeMessages(ScheduleMessage.class, this::handleSchedule);
 	}
 
 	/**
@@ -42,6 +47,13 @@ public class DrtNodeCommunicator implements MobsimAfterSimStepListener {
 	 */
 	public List<DrtRequest> getRequests(String mode) {
 		return requests.containsKey(mode) ? requests.remove(mode) : List.of();
+	}
+
+	/**
+	 * Return schedule of a vehicle.
+	 */
+	public Schedule getSchedule(Id<DvrpVehicle> vehicleId) {
+		return schedules.get(vehicleId);
 	}
 
 	private void handleMessage(RequestMessage message) {
@@ -59,4 +71,17 @@ public class DrtNodeCommunicator implements MobsimAfterSimStepListener {
 		);
 	}
 
+	private void handleSchedule(ScheduleMessage scheduleMessage) {
+		schedules.putAll(scheduleMessage.getSchedules());
+	}
+
+	public void sendSchedules(Fleet fleet) {
+		ScheduleMessage message = new ScheduleMessage();
+
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
+			message.addSchedule(v.getId(), v.getSchedule());
+		}
+
+		broker.sendToNode(message, Communicator.BROADCAST_TO_ALL);
+	}
 }
