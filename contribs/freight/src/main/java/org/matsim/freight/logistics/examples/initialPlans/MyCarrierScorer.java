@@ -24,7 +24,7 @@ package org.matsim.freight.logistics.examples.initialPlans;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 
 /**
  * @author Kai Martins-Turner (kturner)

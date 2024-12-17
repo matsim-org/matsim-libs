@@ -21,8 +21,12 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -32,15 +36,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 public class CarrierPlanXmlReaderV2Test {
 
@@ -192,7 +190,7 @@ public class CarrierPlanXmlReaderV2Test {
 				    </attributes>
 				    <capabilities fleetSize="INFINITE">
 				      <vehicles>
-				        <vehicle id="carrier_1_heavyVehicle" depotLinkId="12" typeId="heavy-20t" earliestStart="06:00:00" latestEnd="16:00:00"/>
+				        <vehicle id="carrier_1_heavyVehicle" depotLinkId="12" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
 				      </vehicles>
 				    </capabilities>
 				    <services>

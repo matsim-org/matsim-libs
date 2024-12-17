@@ -37,7 +37,7 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.controler.*;
+import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.logistics.analysis.LspScoreStatsModule;
 
 public class LSPModule extends AbstractModule {
@@ -48,8 +48,8 @@ public class LSPModule extends AbstractModule {
     FreightCarriersConfigGroup freightConfig =
         ConfigUtils.addOrGetModule(getConfig(), FreightCarriersConfigGroup.class);
 
-    bind(LSPControlerListener.class).in(Singleton.class);
-    addControlerListenerBinding().to(LSPControlerListener.class);
+    bind(LSPControllerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(LSPControllerListener.class);
 
     install(new CarrierModule());
     install(new LspScoreStatsModule());

@@ -22,7 +22,6 @@
 package org.matsim.freight.logistics;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Map;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -63,7 +62,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
 
 
     //---
-    // Commenting this out, because in a frist step I think it is better/ more streight forward to have the VRP logic in the carriers as an attribute.
+    // Commenting this out, because in a frist step I think it is better/ more straight forward to have the VRP logic in the carriers as an attribute.
     // please see {@link CarrierSchedulerUtils#setVrpLogic(carrier, VRPLogic)} and {@link CarrierSchedulerUtils#getVrpLogic(carrier)}
     //---
 

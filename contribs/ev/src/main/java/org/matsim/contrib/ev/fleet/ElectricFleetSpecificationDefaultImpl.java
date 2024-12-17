@@ -30,7 +30,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author Michal Maciejewski (michalm)
  */
-final class ElectricFleetSpecificationDefaultImpl implements ElectricFleetSpecification {
+public final class ElectricFleetSpecificationDefaultImpl implements ElectricFleetSpecification {
 	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
 
 	@Override

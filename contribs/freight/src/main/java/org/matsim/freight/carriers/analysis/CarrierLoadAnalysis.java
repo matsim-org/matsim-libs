@@ -21,6 +21,14 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,17 +42,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import static org.matsim.freight.carriers.events.CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND;
-
 /**
  * @author Kai Martins-Turner (kturner)
  */
@@ -52,9 +49,10 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
-	Carriers carriers;
+	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
 
 	public CarrierLoadAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;
@@ -70,9 +68,11 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		if (! vehicle2Load.containsKey(vehicleId)){
 			list = new LinkedList<>();
 			list.add(demand);
+			vehicle2DemandPerTour.put(vehicleId, demand);
 		} else {
 			list = vehicle2Load.get(vehicleId);
 			list.add(list.getLast() + demand);
+			vehicle2DemandPerTour.put(vehicleId, vehicle2DemandPerTour.get(vehicleId) + demand);
 		}
 		vehicle2Load.put(vehicleId, list);
 	}
@@ -96,22 +96,31 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 
 		//Write headline:
 		bw1.write(String.join(delimiter,"vehicleId",
+			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
+			"maxLoadPercentage",
+			"handledDemand",
 			"load state during tour"));
 		bw1.newLine();
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
 			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
-			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).get();
+			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
 
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();
 
+			final Integer demand = vehicle2DemandPerTour.get(vehicleId);
+			final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000)/100.0;;
+
 			bw1.write(vehicleId.toString());
+			bw1.write(delimiter + vehicleType.getId().toString());
 			bw1.write(delimiter + capacity);
 			bw1.write(delimiter + maxLoad);
+			bw1.write(delimiter + maxLoadPercentage);
+			bw1.write(delimiter + demand);
 			bw1.write(delimiter + load);
 			bw1.newLine();
 		}

@@ -17,6 +17,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -31,6 +32,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
+
+import com.google.inject.Key;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -177,8 +180,8 @@ public class RunEShiftDrtScenarioIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
+				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

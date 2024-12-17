@@ -28,7 +28,7 @@ import org.matsim.contrib.common.collections.SpecificationContainer;
 /**
  * @author Michal Maciejewski (michalm)
  */
-final class ChargingInfrastructureSpecificationDefaultImpl implements ChargingInfrastructureSpecification {
+public final class ChargingInfrastructureSpecificationDefaultImpl implements ChargingInfrastructureSpecification {
 	private final SpecificationContainer<Charger, ChargerSpecification> container = new SpecificationContainer<>();
 
 	@Override

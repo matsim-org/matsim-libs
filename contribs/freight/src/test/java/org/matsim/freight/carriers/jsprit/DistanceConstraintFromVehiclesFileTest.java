@@ -21,6 +21,10 @@
 
 package org.matsim.freight.carriers.jsprit;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -39,22 +43,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 /**
  *
  *  @author rewert, kturner
- *
+ * <p>
  * 	Test for the distance constraint. 4 different setups are used to control the
  * 	correct working of the constraint
  *
@@ -113,13 +112,13 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(1,
 				carrierV1.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV1 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V1", VehicleType.class));
 		VehicleType vehicleType_LargeV1 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V1", VehicleType.class));
 
-		Assertions.assertEquals(vehicleType_SmallV1.getId(), ((Vehicle) carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
-				.getVehicle()).getType().getId());
+		Assertions.assertEquals(vehicleType_SmallV1.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
+				.getVehicle().getType().getId());
 		double maxDistance_vehicleType_LargeV1 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV1.getEngineInformation())
 				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV1.getEngineInformation());
 		double maxDistance_vehicleType_SmallV1 = VehicleUtils.getEnergyCapacity(vehicleType_SmallV1.getEngineInformation())
@@ -144,12 +143,12 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 	}
 
 	/**
-	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
-	 * why one vehicle with a large battery is used.
+	 * Option 2: Tour is not possible with the vehicle with the small battery.
+	 * That's why one vehicle with a large battery is used.
 	 *
 	 */
 	@Test
@@ -190,7 +189,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(1,
 				carrierV2.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV2 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V2", VehicleType.class));
 		VehicleType vehicleType_LargeV2 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V2", VehicleType.class));
@@ -221,7 +220,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 		Assertions.assertEquals(24000, distanceTour,
 				MatsimTestUtils.EPSILON,
-				"The schedulded tour has a non expected distance");
+				"The scheduled tour has a non expected distance");
 
 	}
 
@@ -267,7 +266,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assertions.assertEquals(2,
 				carrierV3.getSelectedPlan().getScheduledTours().size(),
-				"Not the correct amout of scheduled tours");
+				"Not the correct amount of scheduled tours");
 
 		VehicleType vehicleType_SmallV3 = vehicleTypes.getVehicleTypes().get(Id.create("SmallBattery_V3", VehicleType.class));
 		VehicleType vehicleType_LargeV3 = vehicleTypes.getVehicleTypes().get(Id.create("LargeBattery_V3", VehicleType.class));
@@ -301,17 +300,17 @@ public class DistanceConstraintFromVehiclesFileTest {
 			if (distanceTour == 12000)
 				Assertions.assertEquals(12000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.assertEquals(20000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 		}
 	}
 
 	/**
-	 * Option 4: An additional shipment outside the range of both BEVtypes.
-	 * Therefore one diesel vehicle must be used and one vehicle with a small
+	 * Option 4: An additional shipment outside the range of both BEV types.
+	 * Therefore, one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
 	 */
@@ -386,11 +385,11 @@ public class DistanceConstraintFromVehiclesFileTest {
 			if (thisTypeId.equals("SmallBattery_V4"))
 				Assertions.assertEquals(24000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else if (thisTypeId.equals("DieselVehicle"))
 				Assertions.assertEquals(36000, distanceTour,
 						MatsimTestUtils.EPSILON,
-						"The schedulded tour has a non expected distance");
+						"The scheduled tour has a non expected distance");
 			else
 				Assertions.fail("Wrong vehicleType used");
 		}
@@ -453,8 +452,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Creates the vehicle at the depot, ads this vehicle to the carriers and sets
 	 * the capabilities. Sets TimeWindow for the carriers.
-	 *
-	 * @param
 	 */
 	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   CarrierVehicleTypes vehicleTypes) {
@@ -474,8 +471,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Method for creating a new carrierVehicle
 	 *
-	 * @param
-	 *
 	 * @return new carrierVehicle at the depot
 	 */
 	static CarrierVehicle createGarbageTruck(String vehicleName, double earliestStartingTime,
@@ -488,9 +483,6 @@ public class DistanceConstraintFromVehiclesFileTest {
 	/**
 	 * Defines and sets the Capabilities of the Carrier, including the vehicleTypes
 	 * for the carriers
-	 *
-	 * @param
-	 *
 	 */
 	private static void defineCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
 									   List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {
