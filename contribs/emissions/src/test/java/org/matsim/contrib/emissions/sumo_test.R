@@ -63,19 +63,19 @@ ggplot(diff_out) +
 diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_out.csv")
 
 hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Vehcat_2020_Average.csv")
-hbefa_per_tech_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
+hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
 
-hbefa_filtered <- hbefa_per_tech_avg %>%
-  filter(VehCat == "pass. car" & Component == "NOx" & EmConcept == "diesel")
-
-hbefa_avg_filtered <- hbefa_per_tech_avg %>%
+hbefa_filtered_det <- hbefa_det %>%
   filter(VehCat == "pass. car" & Component == "NOx")
 
-hbefa_NOX_max <- max(hbefa_filtered$EFA)
-hbefa_NOX_min <- min(hbefa_filtered$EFA)
+hbefa_filtered_avg <- hbefa_avg %>%
+  filter(VehCat == "pass. car" & Component == "NOx")
 
-hbefa_NOX_max_avg <- max(hbefa_avg_filtered$EFA_weighted, na.rm = T)
-hbefa_NOX_min_avg <- min(hbefa_avg_filtered$EFA_weighted, na.rm = T)
+hbefa_NOX_max_det <- max(hbefa_filtered_det$EFA)
+hbefa_NOX_min_det <- min(hbefa_filtered_det$EFA)
+
+hbefa_NOX_max_avg <- max(hbefa_filtered_avg$EFA_weighted, na.rm = T)
+hbefa_NOX_min_avg <- min(hbefa_filtered_avg$EFA_weighted, na.rm = T)
 
 lengths <- tibble(
   segment = c(0,1,2,3),
@@ -92,7 +92,7 @@ diff_out_NOx_t <- tibble(
   segment = c(0,1,2,3,0,1,2,3),
   model = c("NOX_min_det","NOX_min_det","NOX_min_det","NOX_min_det","NOX_max_det","NOX_max_det","NOX_max_det","NOX_max_det",
             "NOX_min_avg","NOX_min_avg","NOX_min_avg","NOX_min_avg","NOX_max_avg","NOX_max_avg","NOX_max_avg","NOX_max_avg"),
-  value = c(hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_min,hbefa_NOX_max,hbefa_NOX_max,hbefa_NOX_max,hbefa_NOX_max),
+  value = c(hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_max_det, hbefa_NOX_max_det, hbefa_NOX_max_det, hbefa_NOX_max_det),
   )
 
 a <- diff_out_NOx %>%
@@ -104,8 +104,8 @@ ggplot(a, aes(x=segment, y=value, color=model)) +
 
 min_max_vals <- tibble(
   table = c("avg", "det"),
-  min = c(hbefa_NOX_min_avg, hbefa_NOX_min),
-  max = c(hbefa_NOX_max_avg, hbefa_NOX_max),
+  min = c(hbefa_NOX_min_avg, hbefa_NOX_min_det),
+  max = c(hbefa_NOX_max_avg, hbefa_NOX_max_det),
 )
 
 ggplot(diff_out_NOx) +
