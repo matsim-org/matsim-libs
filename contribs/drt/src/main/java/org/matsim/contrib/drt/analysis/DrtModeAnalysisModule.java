@@ -18,9 +18,6 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
 package org.matsim.contrib.drt.analysis;
 
 import java.awt.Color;
@@ -143,8 +140,6 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		install(new SharingMetricsModule(drtCfg));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> {
-			return new CapacityLoadAnalysisHandler(getMode(), getter.get(OutputDirectoryHierarchy.class), getter.get(EventsManager.class), drtCfg.loadCapacityAnalysisInterval);
-		}));
+		addControlerListenerBinding().toProvider(modalProvider(getter -> new CapacityLoadAnalysisHandler(getMode(), getter.getModal(FleetSpecification.class), getter.get(OutputDirectoryHierarchy.class), getter.get(EventsManager.class), drtCfg.loadCapacityAnalysisInterval)));
 	}
 }

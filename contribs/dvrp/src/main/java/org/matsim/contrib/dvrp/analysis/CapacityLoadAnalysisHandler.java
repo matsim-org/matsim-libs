@@ -10,6 +10,7 @@ import java.util.Objects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
@@ -33,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * This class performs analysis on the capacities and loads that are available /
  * required at any time during the simulation.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class CapacityLoadAnalysisHandler
@@ -44,13 +45,15 @@ public class CapacityLoadAnalysisHandler
     static public final String LOADS_FILE = "dvrp_loads_{mode}.csv";
 
     private final String mode;
+	private final FleetSpecification fleetSpecification;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
-    public CapacityLoadAnalysisHandler(String mode, OutputDirectoryHierarchy outputHierarchy,
-            EventsManager eventsManager, int analysisInterval) {
+    public CapacityLoadAnalysisHandler(String mode, FleetSpecification fleetSpecification, OutputDirectoryHierarchy outputHierarchy,
+									   EventsManager eventsManager, int analysisInterval) {
         this.outputHierarchy = outputHierarchy;
         this.mode = mode;
+		this.fleetSpecification = fleetSpecification;
         this.eventsManager = eventsManager;
         this.analysisInterval = analysisInterval;
     }
@@ -73,6 +76,9 @@ public class CapacityLoadAnalysisHandler
 
     @Override
     public void handleEvent(VehicleCapacityChangedEvent event) {
+		if(!this.fleetSpecification.getVehicleSpecifications().containsKey(event.getVehicleId())) {
+			return;
+		}
         CapacityRecord current = activeCapacities.get(event.getVehicleId());
         final double startTime;
         if (current != null) {
