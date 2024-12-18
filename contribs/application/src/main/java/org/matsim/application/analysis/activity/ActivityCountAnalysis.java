@@ -203,7 +203,11 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 
 			for (Row row : resultTable) {
 				Double value = row.getDouble("density");
-				row.setDouble("relative_density", (((value - averageDensity) / (averageDensity)) * 100));
+				if (averageDensity != 0) {
+					row.setDouble("relative_density", value / averageDensity);
+				} else {
+					row.setDouble("relative_density", 0.0);
+				}
 			}
 
 

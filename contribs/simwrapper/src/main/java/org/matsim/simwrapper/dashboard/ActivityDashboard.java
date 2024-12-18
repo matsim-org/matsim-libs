@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * Dashboard to show activity related statistics aggregated by type and location.
- *
+ * <p>
  * Note that {@link #addActivityType(String, List, List, boolean, String)} needs to be called for each activity type.
  * There is no default configuration.
  */
@@ -43,12 +43,13 @@ public class ActivityDashboard implements Dashboard {
 
 	/**
 	 * Add an activity type to the dashboard.
-	 * @param name name to show in the dashboard
-	 * @param activities List of activity names to include in this type
-	 * @param indicators List of indicators to show
+	 *
+	 * @param name                     name to show in the dashboard
+	 * @param activities               List of activity names to include in this type
+	 * @param indicators               List of indicators to show
 	 * @param countMultipleOccurrences Whether multiple occurrences of the same activity for one person should be counted.
 	 *                                 Can be used to count home or workplaces only once.
-	 * @param refCsv Reference CSV file to compare the activities to. Can be null.
+	 * @param refCsv                   Reference CSV file to compare the activities to. Can be null.
 	 */
 	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators,
 											 boolean countMultipleOccurrences, @Nullable String refCsv) {
@@ -106,7 +107,7 @@ public class ActivityDashboard implements Dashboard {
 							viz.display.fill.dataset = "transit-trips";
 							viz.display.fill.join = REF_JOIN;
 							if (ind == Indicator.RELATIVE_DENSITY) {
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "-80,-75,-67,-50,-33,50,100,200,300,400,500");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0");
 							}
 						});
 
@@ -126,12 +127,11 @@ public class ActivityDashboard implements Dashboard {
 
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.columnName = "relative_density";
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "-80,-75,-67,-50,-33,50,100,200,300,400,500");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0");
 							} else if (ind == Indicator.DENSITY) {
 								viz.display.fill.columnName = "density";
 							} else {
 								viz.display.fill.columnName = "count";
-								viz.display.fill.normalize = "transit-trips:area";
 							}
 						});
 					}
