@@ -51,6 +51,7 @@ public @interface CommandSpec {
 	 * Other commands that produce the input needed by this command.
 	 */
 	Class<? extends MATSimAppCommand>[] dependsOn() default {};
+//	Dependency[] dependsOn() default {};
 
 	/**
 	 * Group name / identifier. Will use the package name if this is not changed here.

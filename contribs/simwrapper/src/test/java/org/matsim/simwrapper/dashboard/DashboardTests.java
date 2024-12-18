@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class DashboardTests {
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void run(Dashboard... dashboards) {
 
@@ -152,5 +152,11 @@ public class DashboardTests {
 
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz");
+	}
+
+	@Test
+	void impactAnalysis() {
+		ImpactAnalysisDashboard impactAnalysisDashboard = new ImpactAnalysisDashboard();
+		run(impactAnalysisDashboard);
 	}
 }
