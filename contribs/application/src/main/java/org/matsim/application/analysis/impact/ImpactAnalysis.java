@@ -57,7 +57,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		}
 
 
-		String tripStatsPath = input.getPath("trip_stats.csv");
+		String tripStatsPath = input.getPath(TripAnalysis.class,"trip_stats.csv");
 		System.out.println("Path: " + tripStatsPath);
 
 

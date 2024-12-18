@@ -76,13 +76,17 @@ public final class CommandRunner {
 			Class<? extends MATSimAppCommand> clazz = e.getKey();
 			graph.addVertex(clazz);
 			Dependency[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
+
+			boolean hasDependencies = false;
 			for (Dependency d : depends) {
-				if (d.required()) {
+				// Add dependency graph if the dependency is executed as well
+				if (args.containsKey(d.value())) {
 					graph.addVertex(d.value());
 					graph.addEdge(d.value(), clazz);
+					hasDependencies = true;
 				}
 			}
-			if (depends.length == 0)
+			if (!hasDependencies)
 				start.add(clazz);
 		}
 
