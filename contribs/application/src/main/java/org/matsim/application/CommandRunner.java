@@ -311,7 +311,7 @@ public final class CommandRunner {
 
 		// Add dependent classes
 		for (Dependency depends : spec.dependsOn()) {
-			if (!this.args.containsKey(depends.value()))
+			if (depends.required() && !this.args.containsKey(depends.value()))
 				add(depends.value());
 		}
 	}
