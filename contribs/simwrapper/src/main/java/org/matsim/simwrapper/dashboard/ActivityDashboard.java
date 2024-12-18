@@ -107,7 +107,7 @@ public class ActivityDashboard implements Dashboard {
 							viz.display.fill.dataset = "transit-trips";
 							viz.display.fill.join = REF_JOIN;
 							if (ind == Indicator.RELATIVE_DENSITY) {
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 11, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0");
 							}
 						});
 
@@ -127,7 +127,7 @@ public class ActivityDashboard implements Dashboard {
 
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.columnName = "relative_density";
-								viz.display.fill.setColorRamp(ColorScheme.RdBu, 12, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0");
+								viz.display.fill.setColorRamp(ColorScheme.RdBu, 11, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0");
 							} else if (ind == Indicator.DENSITY) {
 								viz.display.fill.columnName = "density";
 							} else {
