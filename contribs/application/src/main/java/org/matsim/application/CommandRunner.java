@@ -75,10 +75,12 @@ public final class CommandRunner {
 		for (Map.Entry<Class<? extends MATSimAppCommand>, String[]> e : args.entrySet()) {
 			Class<? extends MATSimAppCommand> clazz = e.getKey();
 			graph.addVertex(clazz);
-			Class<? extends MATSimAppCommand>[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
-			for (Class<? extends MATSimAppCommand> d : depends) {
-				graph.addVertex(d);
-				graph.addEdge(d, clazz);
+			Dependency[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
+			for (Dependency d : depends) {
+				if (d.required()) {
+					graph.addVertex(d.value());
+					graph.addEdge(d.value(), clazz);
+				}
 			}
 			if (depends.length == 0)
 				start.add(clazz);
@@ -149,11 +151,11 @@ public final class CommandRunner {
 			if (present)
 				continue;
 
-			for (Class<? extends MATSimAppCommand> depend : spec.dependsOn()) {
-				CommandSpec dependency = ApplicationUtils.getSpec(depend);
+			for (Dependency depend : spec.dependsOn()) {
+				CommandSpec dependency = ApplicationUtils.getSpec(depend.value());
 				if (ArrayUtils.contains(dependency.produces(), require)) {
 
-					String path = getPath(depend, require);
+					String path = getPath(depend.value(), require);
 
 					args.add(arg);
 					args.add(path);
@@ -308,9 +310,9 @@ public final class CommandRunner {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
 
 		// Add dependent classes
-		for (Class<? extends MATSimAppCommand> depends : spec.dependsOn()) {
-			if (!this.args.containsKey(depends))
-				add(depends);
+		for (Dependency depends : spec.dependsOn()) {
+			if (!this.args.containsKey(depends.value()))
+				add(depends.value());
 		}
 	}
 

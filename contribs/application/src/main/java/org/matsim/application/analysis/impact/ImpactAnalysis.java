@@ -4,7 +4,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
+import org.matsim.application.Dependency;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -23,12 +25,10 @@ import java.util.Map;
 	name = "impact"
 )
 @CommandSpec(requireRunDirectory = true,
-	requires = {"trip_stats.csv"},
-	dependsOn = {TripAnalysis.class},
-//	dependsOn = {
-//		@Dependency(value = TripAnalysis.class, files = "trip_stats.csv")
-//		// @Dependency(value = AirPollutionAnalysis.class, files = "...")
-//	},
+	dependsOn = {
+		@Dependency(value = TripAnalysis.class, files = "trip_stats.csv"),
+		@Dependency(value = AirPollutionAnalysis.class, files = "...")
+	},
 	produces = {
 		"data.csv",
 	}

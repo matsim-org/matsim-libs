@@ -4,14 +4,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.CommandSpec;
+import org.matsim.application.Dependency;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -102,6 +106,28 @@ public final class InputOptions {
 	public String getPath(String name) {
 		if (!inputs.containsKey(name))
 			throw new IllegalArgumentException(String.format("The input '%s' is not registered as required in @CommandSpec.", name));
+
+		return inputs.get(name);
+	}
+
+	/**
+	 * Return the path to a file provided by command defined as dependency.
+	 * @param clazz dependency
+	 * @param name file name
+	 *
+	 * @return can be null if not provided and the dependency is not required.
+	 */
+	@Nullable
+	public String getPath(Class<? extends MATSimAppCommand> clazz, String name) {
+		Optional<Dependency> first = Arrays.stream(spec.dependsOn())
+			.filter(d -> d.value().equals(clazz))
+			.findFirst();
+
+		if (first.isEmpty())
+			throw new IllegalArgumentException(String.format("Dependency to '%s' is not defined in @CommandSpec.", clazz));
+
+		if (first.get().required() && !inputs.containsKey(name))
+			throw new IllegalArgumentException(String.format("Path to '%s' is required but not provided.", name));
 
 		return inputs.get(name);
 	}
