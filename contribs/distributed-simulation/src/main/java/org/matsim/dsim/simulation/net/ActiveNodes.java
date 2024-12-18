@@ -117,4 +117,9 @@ public class ActiveNodes implements Steppable {
 		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), nextLinkId));
 		nextLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
 	}
+
+	@Override
+	public String toString() {
+		return "# nodes=" + activeNodes.size();
+	}
 }

@@ -35,4 +35,9 @@ public class ActiveLinks implements Steppable {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "#links=" + activeLinks.size();
+	}
 }
