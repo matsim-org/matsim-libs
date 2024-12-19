@@ -27,7 +27,10 @@ import org.matsim.dsim.events.EventMessagingPattern;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -263,6 +266,7 @@ public final class EventHandlerTask implements SimTask {
 	}
 
 	@Override
+	@SneakyThrows
 	public void run() {
 		long t = System.nanoTime();
 
@@ -279,8 +283,16 @@ public final class EventHandlerTask implements SimTask {
 			messages.sort(MessageComparator.INSTANCE);
 
 			for (Message m : messages) {
-				process(m);
+				try {
+					process(m);
+				} catch (Exception e) {
+					dumpEvents(Path.of("event_dump.xml"), messages);
+					throw new RuntimeException("Error in %s processing message: %s".formatted(getName(), m), e);
+				}
 			}
+
+			// TODO: remove when fixed
+			dumpEvents(Path.of("event_dump_%s_%.0f.xml".formatted(getName(), time)), messages);
 
 			messages.clear();
 			needsSorting = false;
@@ -320,7 +332,22 @@ public final class EventHandlerTask implements SimTask {
 			runtimes.add(sumRuntime);
 			sumRuntime = 0;
 		}
-    }
+	}
+
+	/**
+	 * Debug function to dump events to a file.
+	 */
+	@SneakyThrows
+	private static void dumpEvents(Path out, Collection<Message> messages) {
+		StringBuilder b = new StringBuilder();
+		for (Message m2 : messages) {
+			if (m2 instanceof Event ev) {
+				ev.writeAsXML(b);
+			}
+		}
+
+		Files.write(out, b.toString().getBytes());
+	}
 
 
 	private void process(Message msg) {

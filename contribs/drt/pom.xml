@@ -23,11 +23,6 @@
 			<artifactId>distributed-simulation</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.fury</groupId>
-			<artifactId>fury-core</artifactId>
-			<version>${fury.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
