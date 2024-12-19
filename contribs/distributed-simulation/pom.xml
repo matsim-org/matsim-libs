@@ -20,13 +20,6 @@
 
 	<dependencies>
 
-		<!-- TODO: should be removed later, the run class needs to be somewhere else-->
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim-examples</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil</artifactId>

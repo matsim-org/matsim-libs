@@ -82,6 +82,11 @@ public class TransitDriverStartsEvent extends Event {
 	}
 
 	@Override
+	public double getEventOrder() {
+		return -1;
+	}
+
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
 		atts.put(ATTRIBUTE_DRIVER_ID, this.getDriverId().toString());
