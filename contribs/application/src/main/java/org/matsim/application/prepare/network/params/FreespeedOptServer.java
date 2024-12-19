@@ -57,7 +57,8 @@ public class FreespeedOptServer implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1..*", description = "Input validation files loaded from APIs")
 	private List<String> validationFiles;
 
-	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower,upper bound)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
+	@CommandLine.Option(names = "--factor-bounds", split = ",", description = "Speed factor limits (lower, upper bound). " +
+		"Can be negative to indicate absolute speed bounds (in km/h)", defaultValue = NetworkParamsOpt.DEFAULT_FACTOR_BOUNDS)
 	private double[] speedFactorBounds;
 
 	@CommandLine.Option(names = "--ref-hours", description = "Reference hours", defaultValue = "3,21", split = ",")

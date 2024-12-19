@@ -199,9 +199,9 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		network.addNode(b);
 
 		Link ab = network.getFactory().createLink(Id.createLinkId("link_1"), a, b);
-		Link bc = network.getFactory().createLink(Id.createLinkId("link_2"), b, a);
+		Link ba = network.getFactory().createLink(Id.createLinkId("link_2"), b, a);
 		network.addLink(ab);
-		network.addLink(bc);
+		network.addLink(ba);
 		return network;
 	}
 }

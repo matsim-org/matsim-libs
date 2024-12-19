@@ -40,6 +40,9 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
  */
 public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 
+	public static final String REBALANCING_ZONAL_TARGET_ALPHA = "rebalalpha";
+	public static final String REBALANCING_ZONAL_TARGET_BETA = "rebalbeta";
+
 	private final RebalancingTargetCalculator rebalancingTargetCalculator;
 	private final ZoneSystem zonalSystem;
 	private final Fleet fleet;
@@ -68,18 +71,37 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 		return calculateMinCostRelocations(time, rebalancableVehiclesPerZone, soonIdleVehiclesPerZone);
 	}
 
-	private List<Relocation> calculateMinCostRelocations(double time,
+	List<Relocation> calculateMinCostRelocations(double time,
 			Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
 			Map<Zone, List<DvrpVehicle>> soonIdleVehiclesPerZone) {
 		ToDoubleFunction<Zone> targetFunction = rebalancingTargetCalculator.calculate(time,
 				rebalancableVehiclesPerZone);
 		var minCostFlowRebalancingStrategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
-		double alpha = minCostFlowRebalancingStrategyParams.targetAlpha;
-		double beta = minCostFlowRebalancingStrategyParams.targetBeta;
 
-		List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones().values().stream().map(z -> {
+        List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones().values().stream().map(z -> {
+			double alpha;
+        	double beta;
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, List.of()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, List.of()).size();
+
+            switch (minCostFlowRebalancingStrategyParams.targetCoefficientSource) {
+                case Static -> {
+        			alpha = minCostFlowRebalancingStrategyParams.targetAlpha;
+        			beta = minCostFlowRebalancingStrategyParams.targetBeta;
+                }
+                case FromZoneAttribute -> {
+					alpha = (Double) z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_ALPHA);
+					beta = (Double) z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_BETA);
+                }
+                case FromZoneAttributeOrStatic -> {
+					Object alphaAttribute = z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_ALPHA);
+					alpha = alphaAttribute == null ? minCostFlowRebalancingStrategyParams.targetAlpha : (Double) alphaAttribute;
+					Object betaAttribute = z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_BETA);
+					beta = betaAttribute == null ? minCostFlowRebalancingStrategyParams.targetBeta : (Double) betaAttribute;
+                }
+				default -> throw new IllegalStateException("Unknown target coefficient source " + minCostFlowRebalancingStrategyParams.targetCoefficientSource);
+            }
+
 			int target = (int)Math.floor(alpha * targetFunction.applyAsDouble(z) + beta);
 			int surplus = Math.min(rebalancable + soonIdle - target, rebalancable);
 			return new DrtZoneVehicleSurplus(z, surplus);

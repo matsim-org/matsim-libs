@@ -21,12 +21,11 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.Collection;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-
-import java.util.Collection;
 
 /**
  *
@@ -70,7 +69,6 @@ public class CarrierPlan implements BasicPlan, Attributable {
 	/**
 	 * In future (starting in May'23) this is the score from the MATSim scoring function.
 	 * The jsprit score is saved in attribute. Please use the method setJspritScore() to store it.
-	 * @return the (MATSim) score
 	 */
 	@Override
 	public void setScore(Double score) {

@@ -324,16 +324,18 @@ public final class DemandReaderFromCSV {
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
 	 * @param population                       Population
 	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
-	 * @throws IOException						if the csv file cannot be read
+	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @throws IOException if the csv file cannot be read
 	 */
 	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
 									ShpOptions.Index indexShape, boolean combineSimilarJobs,
-									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory) throws IOException {
+									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory,
+									JobDurationCalculator jobDurationCalculator) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
 		checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
-				crsTransformationNetworkAndShape);
+				crsTransformationNetworkAndShape, jobDurationCalculator);
 	}
 
 	/**
@@ -538,42 +540,45 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Creates for every demand information the services/shipments for the carriers
 	 *
-	 * @param scenario                     		Scenario
-	 * @param indexShape                   		ShpOptions.Index for the shape file
-	 * @param demandInformation            		Set<DemandInformationElement> with the demand information
-	 * @param population                   		Population
-	 * @param combineSimilarJobs           		boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param demandInformation                Set<DemandInformationElement> with the demand information
+	 * @param population                       Population
+	 * @param combineSimilarJobs               boolean if the jobs of the same carrier with same location and time will be combined
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	static void createDemandForCarriers(Scenario scenario, ShpOptions.Index indexShape,
-			Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
-			CoordinateTransformation crsTransformationNetworkAndShape) {
+										Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
+										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		for (DemandInformationElement newDemandInformationElement : demandInformation) {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
-				createServices(scenario, newDemandInformationElement, indexShape, population, combineSimilarJobs,
-						crsTransformationNetworkAndShape);
+				createServices(scenario, newDemandInformationElement, indexShape, population,
+						crsTransformationNetworkAndShape, jobDurationCalculator);
 			else if (newDemandInformationElement.getTypeOfDemand().equals("shipment"))
-				createShipments(scenario, newDemandInformationElement, indexShape, population, combineSimilarJobs,
-						crsTransformationNetworkAndShape);
+				createShipments(scenario, newDemandInformationElement, indexShape, population,
+						crsTransformationNetworkAndShape, jobDurationCalculator);
 		}
-
+		if (combineSimilarJobs)
+			combineSimilarJobs(scenario);
+		jobDurationCalculator.recalculateJobDurations(scenario);
 	}
 
 	/**
 	 * Creates the services.
 	 *
-	 * @param scenario                  		Scenario
-	 * @param newDemandInformationElement 		single DemandInformationElement
-	 * @param indexShape              			ShpOptions.Index
-	 * @param population              			Population
-	 * @param combineSimilarJobs      			boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param newDemandInformationElement      single DemandInformationElement
+	 * @param indexShape                       ShpOptions.Index
+	 * @param population                       Population
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	private static void createServices(Scenario scenario, DemandInformationElement newDemandInformationElement,
-									   ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
-									   CoordinateTransformation crsTransformationNetworkAndShape) {
+									   ShpOptions.Index indexShape, Population population,
+									   CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
@@ -643,8 +648,8 @@ public final class DemandReaderFromCSV {
 					Link link = findNextUsedLink(scenario, indexShape, possibleLinksForService, numberOfJobs,
 							areasForServiceLocations, locationsOfServices, usedServiceLocations,
 							possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
-					double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
 					int demandForThisLink = 1;
+					double serviceTime = jobDurationCalculator.calculateServiceDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), demandForThisLink);
 					usedServiceLocations.add(link.getId().toString());
 					Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
@@ -673,13 +678,19 @@ public final class DemandReaderFromCSV {
 					countOfLinks++;
 					Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-					int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
-					for (int i = 0; i < numberOfJobsForDemand; i++) {
-						int singleDemandForThisLink = demandForThisLink / numberOfJobsForDemand;
-						if (i == numberOfJobsForDemand - 1)
-							singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
-						double serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit()
-							* singleDemandForThisLink;
+					int handledDemand = 0;
+					//the number of jobs on this link is calculated based on the available vehicles
+					double largestPossibleDemandSize = getLargestVehicleCapacity(thisCarrier);
+					while (handledDemand < demandForThisLink) {
+						int singleDemandForThisLink;
+						if (demandForThisLink - handledDemand < largestPossibleDemandSize)
+							singleDemandForThisLink = demandForThisLink - handledDemand;
+						else
+							singleDemandForThisLink = (int)largestPossibleDemandSize;
+						handledDemand = handledDemand + singleDemandForThisLink;
+						double serviceTime = jobDurationCalculator.calculateServiceDuration(
+							newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
+
 						Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
@@ -718,16 +729,18 @@ public final class DemandReaderFromCSV {
 				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
 				Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-				int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
-				for (int j = 0; j < numberOfJobsForDemand; j++) {
-					int singleDemandForThisLink = demandForThisLink / numberOfJobsForDemand;
-					if (j == numberOfJobsForDemand - 1)
-						singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
-					double serviceTime;
-					if (singleDemandForThisLink == 0)
-						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
+				int handledDemand = 0;
+				//the number of jobs on this link is calculated based on the available vehicles
+				double largestPossibleDemandSize = getLargestVehicleCapacity(thisCarrier);
+				while (handledDemand < demandForThisLink || demandToDistribute == 0) {
+					int singleDemandForThisLink;
+					if (demandForThisLink - handledDemand < largestPossibleDemandSize)
+						singleDemandForThisLink = demandForThisLink - handledDemand;
 					else
-						serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
+						singleDemandForThisLink = (int)largestPossibleDemandSize;
+					handledDemand = handledDemand + singleDemandForThisLink;
+					double serviceTime = jobDurationCalculator.calculateServiceDuration(
+						newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
 					usedServiceLocations.add(link.getId().toString());
 
 					Id<CarrierService> idNewService = Id.create(
@@ -740,28 +753,28 @@ public final class DemandReaderFromCSV {
 						CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 							.put(thisService.getId(), thisService);
+					if (demandToDistribute == 0)
+						break;
 					}
 				}
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
-		if (combineSimilarJobs)
-			reduceNumberOfJobsIfSameCharacteristics(scenario, newDemandInformationElement);
 	}
 
 	/**
 	 * Creates the shipments of a carrier.
 	 *
-	 * @param scenario 							Scenario
-	 * @param newDemandInformationElement 		single DemandInformationElement
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param population 						Population
-	 * @param combineSimilarJobs 				boolean if the jobs of the same carrier with same location and time will be combined
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
+	 * @param scenario                         Scenario
+	 * @param newDemandInformationElement      single DemandInformationElement
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param population                       Population
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param jobDurationCalculator				Calculator for the job duration
 	 */
 	private static void createShipments(Scenario scenario, DemandInformationElement newDemandInformationElement,
-										ShpOptions.Index indexShape, Population population, boolean combineSimilarJobs,
-										CoordinateTransformation crsTransformationNetworkAndShape) {
+										ShpOptions.Index indexShape, Population population,
+										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
@@ -900,7 +913,7 @@ public final class DemandReaderFromCSV {
 					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
 						usedDeliveryLocations.add(linkDelivery.getId().toString());
 
-					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink);
+					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink, jobDurationCalculator);
 				}
 			} else
 			// creates a demand on each link, demand depends on the length of the link
@@ -968,7 +981,7 @@ public final class DemandReaderFromCSV {
 
 					if (demandForThisLink > 0) {
 						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink);
+							demandForThisLink, jobDurationCalculator);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
@@ -998,52 +1011,52 @@ public final class DemandReaderFromCSV {
 					usedDeliveryLocations.add(linkDelivery.getId().toString());
 
 				createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-					demandForThisLink);
+					demandForThisLink, jobDurationCalculator);
 				distributedDemand = distributedDemand + demandForThisLink;
 			}
 		}
-		if (combineSimilarJobs)
-			reduceNumberOfJobsIfSameCharacteristics(scenario, newDemandInformationElement);
 	}
 
-	/** Creates a single shipment.
+	/**
+	 * Creates a single shipment.
+	 *
 	 * @param scenario                    Scenario
 	 * @param newDemandInformationElement single DemandInformationElement
 	 * @param linkPickup                  Link for the pickup
 	 * @param linkDelivery                Link for the delivery
 	 * @param demandForThisLink           Demand for this link
+	 * @param jobDurationCalculator			Calculator for the job duration
 	 */
 	private static void createSingleShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
-											 Link linkPickup, Link linkDelivery, int demandForThisLink) {
+											 Link linkPickup, Link linkDelivery, int demandForThisLink, JobDurationCalculator jobDurationCalculator) {
 
 		Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-		int numberOfJobsForDemand = calculateNumberOfJobsForDemand(thisCarrier, demandForThisLink);
-
+		double largestPossibleDemandSize = getLargestVehicleCapacity(thisCarrier);
+		int handledDemand = 0;
 		TimeWindow timeWindowPickup = newDemandInformationElement.getFirstJobElementTimeWindow();
 		TimeWindow timeWindowDelivery = newDemandInformationElement.getSecondJobElementTimeWindow();
 
-		for (int i = 0; i < numberOfJobsForDemand; i++) {
+		while (handledDemand < demandForThisLink || demandForThisLink == 0) {
 			Id<CarrierShipment> idNewShipment = Id.create(createJobId(scenario, newDemandInformationElement,
 				linkPickup.getId(), linkDelivery.getId()), CarrierShipment.class);
-			double serviceTimePickup;
-			double serviceTimeDelivery;
-			int singleDemandForThisLink = Math.round ((float) demandForThisLink / numberOfJobsForDemand);
-			if (i == numberOfJobsForDemand - 1)
-				singleDemandForThisLink = demandForThisLink - (numberOfJobsForDemand - 1) * singleDemandForThisLink;
-			if (singleDemandForThisLink == 0) {
-				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit();
-				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit();
-			} else {
-				serviceTimePickup = newDemandInformationElement.getFirstJobElementTimePerUnit() * singleDemandForThisLink;
-				serviceTimeDelivery = newDemandInformationElement.getSecondJobElementTimePerUnit() * singleDemandForThisLink;
-			}
+			int singleDemandForThisLink;
+			if (demandForThisLink - handledDemand < largestPossibleDemandSize)
+				singleDemandForThisLink = demandForThisLink - handledDemand;
+			else
+				singleDemandForThisLink = (int)largestPossibleDemandSize;
+			handledDemand = handledDemand + singleDemandForThisLink;
+			double serviceTimePickup = jobDurationCalculator.calculatePickupDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
+			double serviceTimeDelivery = jobDurationCalculator.calculateDeliveryDuration(newDemandInformationElement.getSecondJobElementTimePerUnit(), singleDemandForThisLink);
+
 			CarrierShipment thisShipment = CarrierShipment.Builder
 				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), singleDemandForThisLink)
 				.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
 				.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
 				.build();
 			thisCarrier.getShipments().put(thisShipment.getId(), thisShipment);
+			if (demandForThisLink == 0)
+				break;
 		}
 	}
 
@@ -1051,21 +1064,16 @@ public final class DemandReaderFromCSV {
 	 * Method calculates the number of jobs for a demand on one link based on the largest vehicle capacity of the carrier.
 	 *
 	 * @param thisCarrier       the carrier of a job
-	 * @param demandForThisLink Demand for this link
 	 * @return Number of jobs for this demand
 	 */
-	private static int calculateNumberOfJobsForDemand(Carrier thisCarrier, int demandForThisLink) {
+	private static double getLargestVehicleCapacity(Carrier thisCarrier) {
 		double largestVehicleCapacity = 0;
 		for (CarrierVehicle vehicle : thisCarrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			if (vehicle.getType().getCapacity().getOther() > largestVehicleCapacity) {
 				largestVehicleCapacity = vehicle.getType().getCapacity().getOther();
 			}
 		}
-		if (demandForThisLink > largestVehicleCapacity) {
-			log.info("Demand {} is larger than the largest vehicle capacity ({}). Splitting demand into multiple jobs.", demandForThisLink, largestVehicleCapacity);
-			return (int) Math.ceil((double) demandForThisLink / largestVehicleCapacity);
-		}
-		return 1;
+		return largestVehicleCapacity;
 	}
 
 	/**
@@ -1160,109 +1168,102 @@ public final class DemandReaderFromCSV {
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
 	 *
-	 * @param scenario 						Scenario
-	 * @param newDemandInformationElement 	single DemandInformationElement
+	 * @param scenario                    Scenario
 	 */
-	private static void reduceNumberOfJobsIfSameCharacteristics(Scenario scenario,
-			DemandInformationElement newDemandInformationElement) {
+	private static void combineSimilarJobs(Scenario scenario) {
 
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
-		int connectedJobs = 0;
-		if (newDemandInformationElement.getTypeOfDemand().equals("shipment")) {
-			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<>();
-			ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<>();
-			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
-					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-			for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
-				if (!shipmentsToRemove.containsKey(baseShipmentId)) {
-					CarrierShipment baseShipment = thisCarrier.getShipments().get(baseShipmentId);
-					HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<>();
-					shipmentsToConnect.put(baseShipmentId, baseShipment);
-					for (Id<CarrierShipment> thisShipmentId : thisCarrier.getShipments().keySet()) {
-						if (!shipmentsToRemove.containsKey(thisShipmentId)) {
-							CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
-							if (baseShipment.getId() != thisShipment.getId()
+		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			if (!thisCarrier.getShipments().isEmpty()) {
+				int shipmentsBeforeConnection = thisCarrier.getShipments().size();
+				HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<>();
+				ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<>();
+				for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
+					if (!shipmentsToRemove.containsKey(baseShipmentId)) {
+						CarrierShipment baseShipment = thisCarrier.getShipments().get(baseShipmentId);
+						HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToConnect = new HashMap<>();
+						shipmentsToConnect.put(baseShipmentId, baseShipment);
+						for (Id<CarrierShipment> thisShipmentId : thisCarrier.getShipments().keySet()) {
+							if (!shipmentsToRemove.containsKey(thisShipmentId)) {
+								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
+								if (baseShipment.getId() != thisShipment.getId()
 									&& baseShipment.getFrom() == thisShipment.getFrom()
 									&& baseShipment.getTo() == thisShipment.getTo()
 									&& baseShipment.getPickupTimeWindow() == thisShipment.getPickupTimeWindow()
 									&& baseShipment.getDeliveryTimeWindow() == thisShipment.getDeliveryTimeWindow())
-								shipmentsToConnect.put(thisShipmentId, thisShipment);
+									shipmentsToConnect.put(thisShipmentId, thisShipment);
+							}
 						}
-					}
-					Id<CarrierShipment> idNewShipment = baseShipment.getId();
-					int demandForThisLink = 0;
-					double serviceTimePickup = 0;
-					double serviceTimeDelivery = 0;
-					for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-						demandForThisLink = demandForThisLink + carrierShipment.getSize();
-						serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
-						serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
-						shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
-						connectedJobs++;
-					}
-					CarrierShipment newShipment = CarrierShipment.Builder
+						Id<CarrierShipment> idNewShipment = baseShipment.getId();
+						int demandForThisLink = 0;
+						double serviceTimePickup = 0;
+						double serviceTimeDelivery = 0;
+						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
+							demandForThisLink = demandForThisLink + carrierShipment.getSize();
+							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
+							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
+							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
+						}
+						CarrierShipment newShipment = CarrierShipment.Builder
 							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
 							.setPickupServiceTime(serviceTimePickup)
 							.setPickupTimeWindow(baseShipment.getPickupTimeWindow())
 							.setDeliveryServiceTime(serviceTimeDelivery)
 							.setDeliveryTimeWindow(baseShipment.getDeliveryTimeWindow()).build();
-
-					shipmentsToAdd.add(newShipment);
-					connectedJobs++;
+						shipmentsToAdd.add(newShipment);
+					}
 				}
-			}
-			for (CarrierShipment id : shipmentsToRemove.values())
-				thisCarrier.getShipments().remove(id.getId(), id);
+				for (CarrierShipment id : shipmentsToRemove.values())
+					thisCarrier.getShipments().remove(id.getId(), id);
 
-			for (CarrierShipment carrierShipment : shipmentsToAdd) {
-				thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+				for (CarrierShipment carrierShipment : shipmentsToAdd) {
+					thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+				}
+
+				log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
 			}
-			log.warn("Number of reduced shipments: {}", connectedJobs);
-		}
-		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
-			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<>();
-			ArrayList<CarrierService> servicesToAdd = new ArrayList<>();
-			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
-					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
-			for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
-				if (!servicesToRemove.containsKey(baseServiceId)) {
-					CarrierService baseService = thisCarrier.getServices().get(baseServiceId);
-					HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<>();
-					servicesToConnect.put(baseServiceId, baseService);
-					for (Id<CarrierService> thisServiceId : thisCarrier.getServices().keySet()) {
-						if (!servicesToRemove.containsKey(thisServiceId)) {
-							CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
-							if (baseService.getId() != thisService.getId()
+			if (!thisCarrier.getServices().isEmpty()) {
+				int servicesBeforeConnection = thisCarrier.getServices().size();
+				HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<>();
+				ArrayList<CarrierService> servicesToAdd = new ArrayList<>();
+				for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
+					if (!servicesToRemove.containsKey(baseServiceId)) {
+						CarrierService baseService = thisCarrier.getServices().get(baseServiceId);
+						HashMap<Id<CarrierService>, CarrierService> servicesToConnect = new HashMap<>();
+						servicesToConnect.put(baseServiceId, baseService);
+						for (Id<CarrierService> thisServiceId : thisCarrier.getServices().keySet()) {
+							if (!servicesToRemove.containsKey(thisServiceId)) {
+								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
+								if (baseService.getId() != thisService.getId()
 									&& baseService.getLocationLinkId() == thisService.getLocationLinkId() && baseService
-											.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
-								servicesToConnect.put(thisServiceId, thisService);
+									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
+									servicesToConnect.put(thisServiceId, thisService);
+							}
 						}
-					}
-					Id<CarrierService> idNewService = baseService.getId();
-					int demandForThisLink = 0;
-					double serviceTimeService = 0;
-					for (CarrierService carrierService : servicesToConnect.values()) {
-						demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
-						serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
-						servicesToRemove.put(carrierService.getId(), carrierService);
-						connectedJobs++;
-					}
-					CarrierService newService = CarrierService.Builder
+						Id<CarrierService> idNewService = baseService.getId();
+						int demandForThisLink = 0;
+						double serviceTimeService = 0;
+						for (CarrierService carrierService : servicesToConnect.values()) {
+							demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
+							serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
+							servicesToRemove.put(carrierService.getId(), carrierService);
+						}
+						CarrierService newService = CarrierService.Builder
 							.newInstance(idNewService, baseService.getLocationLinkId())
 							.setServiceDuration(serviceTimeService)
 							.setServiceStartTimeWindow(baseService.getServiceStartTimeWindow())
 							.setCapacityDemand(demandForThisLink).build();
-					servicesToAdd.add(newService);
-					connectedJobs++;
+						servicesToAdd.add(newService);
+					}
 				}
+				for (CarrierService id : servicesToRemove.values())
+					thisCarrier.getServices().remove(id.getId(), id);
+				for (CarrierService carrierService : servicesToAdd) {
+					thisCarrier.getServices().put(carrierService.getId(), carrierService);
+				}
+				log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
 			}
-			for (CarrierService id : servicesToRemove.values())
-				thisCarrier.getServices().remove(id.getId(), id);
-			for (CarrierService carrierService : servicesToAdd) {
-				thisCarrier.getServices().put(carrierService.getId(), carrierService);
-			}
-			log.warn("Number of reduced shipments: {}", connectedJobs);
 		}
 	}
 

@@ -27,6 +27,8 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,8 +43,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.concurrent.ExecutionException;
-
 public class IntegrationIT {
 
 	@RegisterExtension
@@ -51,7 +51,7 @@ public class IntegrationIT {
 	@Test
 	void testJsprit() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
-		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+		final String vehicleTypeFilename = Path.of(utils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString();
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
 
 		Config config = ConfigUtils.createConfig();
@@ -99,7 +99,7 @@ public class IntegrationIT {
 	@Test
 	void testJspritWithDefaultSolutionOption() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
-		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+		final String vehicleTypeFilename = Path.of(utils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString();
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
 
 		Config config = ConfigUtils.createConfig();

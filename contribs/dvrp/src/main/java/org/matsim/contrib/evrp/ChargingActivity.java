@@ -21,6 +21,7 @@
 package org.matsim.contrib.evrp;
 
 import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
@@ -64,7 +65,7 @@ public class ChargingActivity implements DynActivity {
 		ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
 		ElectricVehicle ev = chargingTask.getElectricVehicle();
 		logic.unassignVehicle(ev);
-		logic.addVehicle(ev, new DvrpChargingListener(this), now);
+		logic.addVehicle(ev, chargingTask.getChargingStrategy(), new DvrpChargingListener(this), now);
 		state = State.added;
 	}
 
