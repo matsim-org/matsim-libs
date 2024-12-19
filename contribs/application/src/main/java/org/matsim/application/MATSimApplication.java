@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.dsim.DistributedSimulationModule;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
@@ -86,6 +87,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 	@CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
 	protected int iterations;
+
+	@CommandLine.Option(names = "--dsim-threads", description = "Enable distributed simulation.", defaultValue = "0")
+	protected int threads;
 
 	@CommandLine.Option(names = "--runId", description = "Overwrite runId defined by the application")
 	protected String runId;
@@ -189,7 +193,19 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
+		Controler controler;
+		if (threads > 0) {
+
+			log.info("Enabling dsim with {} threads", threads);
+
+			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+
+			DistributedSimulationModule d = new DistributedSimulationModule(threads);
+			controler = new Controler(scenario, d.getNode());
+			controler.addOverridingModule(d);
+
+		} else
+			controler = new Controler(scenario);
 
 		prepareControler(controler);
 
@@ -520,7 +536,20 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
+		Controler controler;
+		if (app.threads > 0) {
+
+			log.info("Enabling dsim with {} threads", app.threads);
+
+			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+
+			DistributedSimulationModule d = new DistributedSimulationModule(app.threads);
+			controler = new Controler(scenario, d.getNode());
+			controler.addOverridingModule(d);
+
+		} else
+			controler = new Controler(scenario);
+
 		app.prepareControler(controler);
 
 		return controler;
