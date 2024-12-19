@@ -43,64 +43,65 @@ import static com.google.inject.Key.get;
 @Log4j2
 public final class DSim implements Mobsim {
 
-    private final Injector injector;
-    private final Communicator comm;
-    private final MessageBroker broker;
-    private final Set<LPProvider> lps;
+	private final Injector injector;
+	private final Communicator comm;
+	private final MessageBroker broker;
+	private final Set<LPProvider> lps;
 	private final MobsimTimer timer;
 
-    @Inject
-    public DSim(Injector injector) {
-        this.injector = injector;
-        this.comm = injector.getInstance(Communicator.class);
-        this.broker = injector.getInstance(MessageBroker.class);
-        this.lps = injector.getInstance(get(new TypeLiteral<>() {}));
+	@Inject
+	public DSim(Injector injector) {
+		this.injector = injector;
+		this.comm = injector.getInstance(Communicator.class);
+		this.broker = injector.getInstance(MessageBroker.class);
+		this.lps = injector.getInstance(get(new TypeLiteral<>() {
+		}));
 		this.timer = new MobsimTimer();
-    }
+	}
 
-    private static double round(double v) {
-        if (Double.isNaN(v) || Double.isInfinite(v))
-            return v;
+	private static double round(double v) {
+		if (Double.isNaN(v) || Double.isInfinite(v))
+			return v;
 
-        return new BigDecimal(v).setScale(3, RoundingMode.HALF_UP).doubleValue();
-    }
+		return new BigDecimal(v).setScale(3, RoundingMode.HALF_UP).doubleValue();
+	}
 
-    @SneakyThrows
-    @Override
-    public void run() {
+	@SneakyThrows
+	@Override
+	public void run() {
 
-        SimulationNode node = injector.getInstance(SimulationNode.class);
-        Topology topology = injector.getInstance(Topology.class);
-        Config config = injector.getInstance(Config.class);
+		SimulationNode node = injector.getInstance(SimulationNode.class);
+		Topology topology = injector.getInstance(Topology.class);
+		Config config = injector.getInstance(Config.class);
 
-        LPExecutor executor = injector.getInstance(LPExecutor.class);
+		LPExecutor executor = injector.getInstance(LPExecutor.class);
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
 
-        List<LPTask> tasks = new ArrayList<>();
+		List<LPTask> tasks = new ArrayList<>();
 		Set<MobsimListener> listeners = new HashSet<>();
 
-        for (LPProvider lpp : lps) {
-            for (int part : node.getParts()) {
+		for (LPProvider lpp : lps) {
+			for (int part : node.getParts()) {
 
-                LP lp = lpp.create(part);
+				LP lp = lpp.create(part);
 
-                // Skip if no LP is created
-                if (lp == null)
-                    continue;
+				// Skip if no LP is created
+				if (lp == null)
+					continue;
 
-                log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), node.getRank(), part);
+				log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), node.getRank(), part);
 
-                LPTask task = executor.register(lp, manager, part);
-                broker.register(task, part);
+				LPTask task = executor.register(lp, manager, part);
+				broker.register(task, part);
 
-                tasks.add(task);
-                injector.injectMembers(lp);
-            }
+				tasks.add(task);
+				injector.injectMembers(lp);
+			}
 
 			if (lpp instanceof SimProvider p) {
 				listeners.addAll(p.getListeners());
 			}
-        }
+		}
 
 		// Manager for node singletons listeners
 		MobsimListenerManager listenerManager = new MobsimListenerManager(this);
@@ -121,127 +122,147 @@ public final class DSim implements Mobsim {
 		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
 		timer.setTime(timer.getSimStartTime());
 
-        Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
+		Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
-        log.info("Starting simulation");
+		log.info("Starting simulation");
 
 		listenerManager.fireQueueSimulationInitializedEvent();
 
-        long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
+
+		// Time spent in other stages than mobsim
+		long beforeListener = 0;
+		long syncStep = 0;
+		long afterListener = 0;
 
 		double time = timer.getTimeOfDay();
-        while (timer.getTimeOfDay() < config.qsim().getEndTime().orElse(86400)) {
+		while (timer.getTimeOfDay() < config.qsim().getEndTime().orElse(86400)) {
 
-            long t = System.nanoTime();
+			long t = System.nanoTime();
 
-            if (time % 3600 == 0) {
-                var hour = (int) time / 3600;
-                var formattedDuration = String.format("%02d:00:00", hour);
-                log.info("#{} at sim step: {}", comm.getRank(), formattedDuration);
-            }
+			if (time % 3600 == 0) {
+				var hour = (int) time / 3600;
+				var formattedDuration = String.format("%02d:00:00", hour);
+				log.info("#{} at sim step: {}", comm.getRank(), formattedDuration);
+			}
+
+			long t1 = System.currentTimeMillis();
 
 			listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
+			beforeListener += System.currentTimeMillis() - t1;
 
-            manager.beforeSimStep(time);
-            broker.beforeSimStep(time);
+			manager.beforeSimStep(time);
+			broker.beforeSimStep(time);
 
-            try {
-                executor.doSimStep(time);
-            } catch (Throwable e) {
-                log.error("Error in simulation step: %.2fs".formatted(time), e);
-                throw e;
-            }
+			try {
+				executor.doSimStep(time);
+			} catch (Throwable e) {
+				log.error("Error in simulation step: %.2fs".formatted(time), e);
+				throw e;
+			}
 
-            try {
-                histogram.recordValue(System.nanoTime() - t);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Overflow in histogram is ignored
-            }
+			try {
+				histogram.recordValue(System.nanoTime() - t);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				// Overflow in histogram is ignored
+			}
 
-            manager.afterSimStep(time);
-            broker.syncTimestep(time, false);
+			manager.afterSimStep(time);
 
+			long t2 = System.currentTimeMillis();
+
+			broker.syncTimestep(time, false);
+			syncStep += System.currentTimeMillis() - t2;
+
+			long t3 = System.currentTimeMillis();
 			listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+			afterListener += System.currentTimeMillis() - t3;
 
 			time = timer.incrementTime();
-        }
+		}
 
 		manager.finishProcessing();
 
 		executor.afterSim();
 
-        double mu = histogram.getMean() / 1000;
+		double mu = histogram.getMean() / 1000;
 
-        // simulated / real
-        long runtime = System.currentTimeMillis() - start;
-        double rtr = config.qsim().getEndTime().seconds() * 1000 / runtime;
+		// simulated / real
+		long runtime = System.currentTimeMillis() - start;
+		double rtr = config.qsim().getEndTime().seconds() * 1000 / runtime;
 
-        log.info("Mean time per second: {} μs, Real-time-ratio: {} ",
-                round(mu),
-                round(rtr)
-        );
+		log.info("Mean time per second: {} μs, Real-time-ratio: {} ",
+			round(mu),
+			round(rtr)
+		);
 
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
-        writeRuntimeStats(topology.getTotalPartitions(), node.getRank(), runtime, rtr);
-        writeRuntimes(node, histogram, broker.getRuntime(), executor, runtime);
+		writeRuntimeStats(topology.getTotalPartitions(), node.getRank(), runtime, rtr);
+		writeRuntimes(node, histogram, broker.getRuntime(), executor,
+			runtime, beforeListener, afterListener, syncStep);
 
-        // Simulation tasks are deregistered after execution
-        for (LPTask task : tasks) {
-            broker.deregister(task);
-            executor.deregister(task);
-        }
+		// Simulation tasks are deregistered after execution
+		for (LPTask task : tasks) {
+			broker.deregister(task);
+			executor.deregister(task);
+		}
 
 		broker.afterSim();
-    }
+	}
 
-    @SneakyThrows
-    private void writeRuntimeStats(int size, int rank, long runtimeMillis, double rtr) {
-        OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
-        Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(rank));
-        Files.createDirectories(out);
-        try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("runtime-%d.csv".formatted(rank)))) {
-            writer.write("size,rank,runtime,rtr\n");
-            writer.write(size + "," + rank + "," + runtimeMillis + "," + rtr + "\n");
-        }
-    }
+	@SneakyThrows
+	private void writeRuntimeStats(int size, int rank, long runtimeMillis, double rtr) {
+		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
+		Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(rank));
+		Files.createDirectories(out);
+		try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("runtime-%d.csv".formatted(rank)))) {
+			writer.write("size,rank,runtime,rtr\n");
+			writer.write(size + "," + rank + "," + runtimeMillis + "," + rtr + "\n");
+		}
+	}
 
-    @SneakyThrows
-    private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, LPExecutor executor, long overallRuntime) {
+	@SneakyThrows
+	private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, LPExecutor executor,
+							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
-        OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
+		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
-        Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(node.getRank()));
+		Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(node.getRank()));
 
-        Files.createDirectories(out);
+		Files.createDirectories(out);
 
-        try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("simulation.hgrm")))) {
-            simulation.outputPercentileDistribution(writer, 1000.0);
-        }
+		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("simulation.hgrm")))) {
+			simulation.outputPercentileDistribution(writer, 1000.0);
+		}
 
-        try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("broker.hgrm")))) {
-            broker.outputPercentileDistribution(writer, 1000.0);
-        }
+		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("broker.hgrm")))) {
+			broker.outputPercentileDistribution(writer, 1000.0);
+		}
 
-        try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("tasks.csv"))) {
+		try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("tasks.csv"))) {
 
-            writer.write("name,partition,step,runtime\n");
-            writer.write("OverallRuntime,-1,-1," + overallRuntime + "\n");
-            executor.processRuntimes(info -> {
-                LongList steps = info.runtime();
-                for (int i = 0; i < steps.size(); i++) {
-                    try {
-                        long runtime = steps.getLong(i);
-                        if (runtime == 0)
-                            continue;
+			writer.write("name,partition,step,runtime\n");
+			writer.write("OverallRuntime,-1,-1," + overallRuntime + "\n");
+			writer.write("BeforeListener,-1,-1," + beforeListener + "\n");
+			writer.write("AfterListener,-1,-1," + afterListener + "\n");
+			writer.write("SyncStep,-1,-1," + syncStep + "\n");
+
+			executor.processRuntimes(info -> {
+				LongList steps = info.runtime();
+				for (int i = 0; i < steps.size(); i++) {
+					try {
+						long runtime = steps.getLong(i);
+						if (runtime == 0)
+							continue;
 
 						// Runtimes are collected as 10% samples currently
-                        writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                }
-            });
-        }
-    }
+						writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+				}
+			});
+		}
+	}
 }
