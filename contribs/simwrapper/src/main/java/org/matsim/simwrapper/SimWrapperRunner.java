@@ -30,6 +30,9 @@ public class SimWrapperRunner implements MATSimAppCommand {
 	@CommandLine.Option(names = "--exclude", split = ",", description = "Exclusion that will be added to the config.")
 	private Set<String> exclude;
 
+	@CommandLine.Option(names = "--include", split = ",", description = "Use only the dashboards which classnames match.")
+	private Set<String> include;
+
 	public static void main(String[] args) {
 		new SimWrapperRunner().execute(args);
 	}
@@ -58,6 +61,8 @@ public class SimWrapperRunner implements MATSimAppCommand {
 			if (exclude != null)
 				simWrapperConfigGroup.exclude.addAll(exclude);
 
+			if (include != null)
+				simWrapperConfigGroup.include.addAll(include);
 
 			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(config), config);
 			try {
