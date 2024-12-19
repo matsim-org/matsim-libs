@@ -16,7 +16,6 @@
 	<properties>
 		<aeron.version>1.44.1</aeron.version>
 		<hazelcast.version>5.4.0</hazelcast.version>
-		<fury.version>0.8.0</fury.version>
 	</properties>
 
 	<dependencies>
