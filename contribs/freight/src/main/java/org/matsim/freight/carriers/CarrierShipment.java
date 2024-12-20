@@ -62,28 +62,10 @@ public final class CarrierShipment implements CarrierJob {
 		private TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double deliveryDuration = 0.0;
 
-
 		/**
-		 * @deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
+		 * Returns a new shipment builder.
 		 * <p>
-		 * Returns a new shipment builder.
-		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
-		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
-		 *
-		 * @param from 	the origin
-		 * @param to 	the destination
-		 * @param size 	size of the shipment
-		 * @return 		the builder
-		 */
-		@Deprecated
-		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
-			var id = Id.create(CarrierConstants.SHIPMENT +"_" + from.toString() + "_" + to.toString(), CarrierShipment.class);
-			return new Builder(id, from,to,size);
-		}
-
-		/**
-		 * Returns a new shipment builder.
-		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's demand.
+		 * The builder is init with the shipment's origin (from), destination (to) and with the shipment's demand.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
 		 * @param id 	the id of the shipment
@@ -94,18 +76,6 @@ public final class CarrierShipment implements CarrierJob {
 		 */
 		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int demand){
 			return new Builder(id, from, to, demand);
-		}
-
-		/**
-		 * @deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
-		 */
-		@Deprecated
-		public Builder(Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
-			super();
-			this.id = Id.create(CarrierConstants.SHIPMENT +"_" + pickupLinkId.toString() + "_" + deliveryLinkId.toString(), CarrierShipment.class);
-			this.pickupLinkId = pickupLinkId;
-			this.deliveryLinkId = deliveryLinkId;
-			this.demand = demand;
 		}
 
 		private Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
