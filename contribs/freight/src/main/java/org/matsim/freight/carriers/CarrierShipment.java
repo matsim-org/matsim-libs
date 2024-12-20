@@ -49,7 +49,6 @@ public final class CarrierShipment implements CarrierJob {
 		 * @deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 * <p>
 		 * Returns a new shipment builder.
-		 *
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
@@ -65,7 +64,6 @@ public final class CarrierShipment implements CarrierJob {
 
 		/**
 		 * Returns a new shipment builder.
-		 *
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
@@ -80,12 +78,14 @@ public final class CarrierShipment implements CarrierJob {
 		}
 
 		Id<CarrierShipment> id;
-		final Id<Link> from;
-		final Id<Link> to;
 		final int size;
+
+		final Id<Link> from;
 		TimeWindow pickTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;
+
+		final Id<Link> to;
+		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double delServiceTime = 0.0;
 
 		/**
@@ -133,13 +133,16 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	private final Id<CarrierShipment> id;
-	private final Id<Link> from;
-	private final Id<Link> to;
 	private final int demand;
+
+	private final Id<Link> from;
 	private final TimeWindow pickupTimeWindow;
-	private final TimeWindow deliveryTimeWindow;
 	private double pickupServiceTime;
+
+	private final Id<Link> to;
+	private final TimeWindow deliveryTimeWindow;
 	private double deliveryServiceTime;
+
 	private final Attributes attributes = new AttributesImpl();
 
 

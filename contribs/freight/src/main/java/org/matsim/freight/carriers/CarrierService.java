@@ -35,11 +35,11 @@ public final class CarrierService implements CarrierJob {
 		}
 
 		private final Id<CarrierService> id;
-		private final Id<Link> locationLinkId;
-
-		private double serviceTime = 0.0;
-		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private int demand = 0;
+
+		private final Id<Link> locationLinkId;
+		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private double serviceTime = 0.0;
 
 		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
 			super();
@@ -86,10 +86,12 @@ public final class CarrierService implements CarrierJob {
 
 
 	private final Id<CarrierService> id;
-	private final Id<Link> locationId;
-	private final double serviceDuration;
-	private final TimeWindow timeWindow;
 	private final int demand;
+
+	private final Id<Link> locationId;
+	private final TimeWindow timeWindow;
+	private final double serviceDuration;
+
 	private final Attributes attributes = new AttributesImpl();
 
 	private CarrierService(Builder builder){
