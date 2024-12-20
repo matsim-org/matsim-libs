@@ -78,12 +78,13 @@ public class SimProvider implements LPProvider {
 	public SimProcess create(NetworkPartition partition) {
 
 		modules.forEach(m -> m.setConfig(config));
+		modules.forEach(m -> m.setSimNode(node));
 
 		// Remove modules that are known to be incompatible and are not needed
 		modules.removeIf(m -> m instanceof QNetsimEngineModule);
-		//modules.removeIf(m -> m instanceof TransitEngineModule);
 
 		overridingModules.forEach(m -> m.setConfig(config));
+		overridingModules.forEach(m -> m.setSimNode(node));
 
 		int iterationNumber = iterationCounter.getIterationNumber();
 		modules.forEach(m -> m.setIterationNumber(iterationNumber));
@@ -93,11 +94,13 @@ public class SimProvider implements LPProvider {
 
 		for (AbstractQSimModule override : overridingModulesFromAbstractModule) {
 			override.setConfig(config);
+			override.setSimNode(node);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
 		for (AbstractQSimModule override : overridingModules) {
 			override.setConfig(config);
+			override.setSimNode(node);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 

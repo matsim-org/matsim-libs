@@ -98,8 +98,9 @@ public class DistributedIntegrationTest {
 		Config local = createScenario();
 		Scenario scenario = prepareScenario(local);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DistributedSimulationModule(4));
+		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		Controler controler = new Controler(scenario, module.getNode());
+		controler.addOverridingModule(module);
 		controler.run();
 
 		Path outputPath = Path.of(utils.getOutputDirectory());
@@ -119,19 +120,20 @@ public class DistributedIntegrationTest {
 	@Order(3)
 	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
-		var size = 3;
+		int size = 3;
 		var comms = LocalCommunicator.create(size);
 		Files.createDirectories(Path.of(utils.getOutputDirectory()));
-		
+
 		try (var pool = Executors.newFixedThreadPool(size)) {
 			var futures = comms.stream()
 				.map(comm -> pool.submit(() -> {
 
 					Config local = createScenario();
 					Scenario scenario = prepareScenario(local);
-					Controler controler = new Controler(scenario);
+					DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+					Controler controler = new Controler(scenario, module.getNode());
 
-					controler.addOverridingModule(new DistributedSimulationModule(comm, 2, 1));
+					controler.addOverridingModule(module);
 					controler.run();
 
 					try {

@@ -14,7 +14,7 @@ public class MessageComparator implements Comparator<Message> {
 	@Override
 	public int compare(Message o1, Message o2) {
 		if (o1 instanceof Event e1 && o2 instanceof Event e2) {
-			return Double.compare(e1.getTime(), e2.getTime());
+			return EventComparator.compareEvents(e1, e2);
 		}
 
 		return 0;

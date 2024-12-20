@@ -81,6 +81,10 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 				}
 			})).asEagerSingleton();
 
+			// Only head node performs aggregation
+			if (!getSimulationNode().isHeadNode())
+				return;
+
 			//zonal analysis
 			bindModal(ZonalIdleVehicleXYVisualiser.class).toProvider(modalProvider(
 				getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),

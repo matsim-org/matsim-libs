@@ -28,6 +28,10 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.management.InvalidAttributeValueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,11 +47,6 @@ import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import javax.management.InvalidAttributeValueException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CarriersUtils {
 
@@ -235,7 +234,7 @@ public class CarriersUtils {
 						continue;
 					}
 				}
-				case solveForAllCarriersAndAddPLans -> {carrier.setSelectedPlan(null);} // Keep existing plan(s), but make them not selected.
+				case solveForAllCarriersAndAddPLans -> carrier.setSelectedPlan(null); // Keep existing plan(s), but make them not selected.
 				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
 			}
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
@@ -338,7 +337,7 @@ public class CarriersUtils {
 
 	public static Carriers addOrGetCarriers(Scenario scenario) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controler is started, it is better to fail if the carriers are not found.
+		// controller is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {
@@ -382,8 +381,6 @@ public class CarriersUtils {
 		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
 		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
 			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
-
-//		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**

@@ -63,14 +63,22 @@ public class DistributedSimulationModule extends AbstractModule {
 		this(new NullCommunicator(), threads, 1);
 	}
 
+	public SimulationNode getNode() {
+		return topology.getNode(comm.getRank());
+	}
+
 	@SneakyThrows
 	@Override
 	public void install() {
 
-		SimulationNode node = topology.getNode(comm.getRank());
+		SimulationNode node = getNode();
+
+		if (node != getSimulationNode()) {
+			throw new IllegalStateException("Controller was not created for distributed simulation. " +
+				"Use 'new Controler(scenario, module.getNode())' to specify the scenario and simulation node.");
+		}
 
 		bind(Communicator.class).toInstance(comm);
-		bind(SimulationNode.class).toInstance(node);
 		bind(Topology.class).toInstance(topology);
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(serializer);
@@ -126,7 +134,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		for (SimulationNode value : nodes) {
 
 			SimulationNode.NodeBuilder n = value.toBuilder();
-			int parts = (int) (value.getCores() * oversubscribe);
+			int parts = Math.max(1, (int) (value.getCores() * oversubscribe));
 
 			n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
 			n.distributed(nodes.size() > 1);

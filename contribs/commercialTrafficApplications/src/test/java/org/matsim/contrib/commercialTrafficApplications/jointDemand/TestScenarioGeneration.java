@@ -126,8 +126,6 @@ public class TestScenarioGeneration {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create((id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId, type );
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
-        vBuilder.setType(type);
-        vBuilder.setTypeId(type.getId());
         return vBuilder.build();
     }
 

@@ -81,6 +81,11 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 		return EVENT_TYPE;
 	}
 
+	@Override
+	public double getEventOrder() {
+		return 3;
+	}
+
 	public String getActType() {
 		return this.acttype;
 	}

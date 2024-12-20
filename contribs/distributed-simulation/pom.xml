@@ -16,17 +16,12 @@
 	<properties>
 		<aeron.version>1.44.1</aeron.version>
 		<hazelcast.version>5.4.0</hazelcast.version>
-		<fury.version>0.8.0</fury.version>
+
+		<!-- Use -DskipShaded=false to build a executable jar. -->
+		<skipShaded>true</skipShaded>
 	</properties>
 
 	<dependencies>
-
-		<!-- TODO: should be removed later, the run class needs to be somewhere else-->
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim-examples</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
@@ -96,14 +91,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Tests will cover drt -->
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>drt</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -130,6 +117,7 @@
 				<version>3.5.3</version>
 				<configuration>
 					<outputFile>sim.jar</outputFile>
+					<skip>${skipShaded}</skip>
 					<transformers>
 						<!-- The following sets the main class for the executable jar as you otherwise would with the assembly plugin -->
 						<transformer

@@ -246,6 +246,8 @@ public final class DynAgent implements DistributedMobsimAgent, MobsimDriverPasse
 	}
 
 	// PTPassengerAgent
+	// yyyy seems a bit odd, that this and the following methods are implemented for DynAgent as not every DynAgent is a PTPassengerAgent. paul,
+	// nov'24
 	@Override
 	public boolean getExitAtStop(TransitStopFacility stop) {
 		return ((PTPassengerDynLeg) dynLeg).getExitAtStop(stop);

@@ -87,7 +87,7 @@ public class DistributedController implements ControlerI {
 
         DistributedSimulationModule simulationModule = new DistributedSimulationModule(comm, threads, oversubscribe);
 
-        Controler defaultController = new Controler(scenario);
+        Controler defaultController = new Controler(scenario, simulationModule.getNode());
         defaultController.addOverridingModule(simulationModule);
 
         Injector injector = defaultController.getInjector();

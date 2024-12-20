@@ -22,6 +22,8 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,13 +38,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.FreightActivity;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.FreightActivity;
 import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -187,9 +186,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
-				if(!employedVehicles.contains(vehicle)){
-					employedVehicles.add(vehicle);
-				}
+				employedVehicles.add(vehicle);
 				double distance = 0.0;
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());

@@ -112,7 +112,6 @@ public final class DistributedEventsManager implements EventsManager {
 		String name = handler.getName();
 
 		List<T> handlers = new ArrayList<>();
-		handlers.add(handler);
 
 		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
 
@@ -121,6 +120,7 @@ public final class DistributedEventsManager implements EventsManager {
 			Integer part = node.getParts().getFirst();
 			EventHandlerTask task = executor.register(handler, this, part, 1, null);
 			addTask(task, part);
+			handlers.add(handler);
 
 		} else if (partition != null && (partition.value() == DistributedMode.PARTITION || partition.value() == DistributedMode.PARTITION_SINGLETON)) {
 			log.info("Registering event handler {} for each partition", name);
@@ -130,13 +130,13 @@ public final class DistributedEventsManager implements EventsManager {
 				EventHandlerTask task = executor.register(handler, this, part, node.getParts().size(), partitionCounter);
 
 				addTask(task, part);
+				handlers.add(handler);
 
 				if (partition.value() == DistributedMode.PARTITION) {
 					T next = provider.get();
 					if (handler == next)
 						throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 
-					handlers.add(next);
 					handler = next;
 				}
 			}
@@ -145,6 +145,7 @@ public final class DistributedEventsManager implements EventsManager {
 			Integer part = node.getParts().getFirst();
 			EventHandlerTask task = executor.register(handler, this, part, 1, null);
 			addTask(task, part);
+			handlers.add(handler);
 		}
 
 		return handlers;
@@ -300,7 +301,7 @@ public final class DistributedEventsManager implements EventsManager {
 		List<EventHandlerTask> toRemove = tasks.stream().filter(t -> t.getHandler() == handler).toList();
 
 		if (toRemove.isEmpty()) {
-			throw new IllegalArgumentException("Handler %s not found to be removed.");
+			throw new IllegalArgumentException("Handler %s not found for removal.".formatted(handler.getName()));
 		}
 
 		toRemove.forEach(this::removeTask);

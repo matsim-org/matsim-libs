@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.traffic.traveltime;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +49,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 )
 public class TravelTimeComparison implements MATSimAppCommand {
 
+	private static final Logger log = LogManager.getLogger(TravelTimeComparison.class);
+
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TravelTimeComparison.class);
 
@@ -90,6 +94,13 @@ public class TravelTimeComparison implements MATSimAppCommand {
 
 		for (Row row : data) {
 			LeastCostPathCalculator.Path congested = computePath(network, congestedRouter, row);
+
+			// Skip if path is not found
+			if (congested == null) {
+				row.setDouble("simulated", Double.NaN);
+				continue;
+			}
+
 			double dist = congested.links.stream().mapToDouble(Link::getLength).sum();
 			double speed = 3.6 * dist / congested.travelTime;
 
@@ -101,6 +112,8 @@ public class TravelTimeComparison implements MATSimAppCommand {
 
 			row.setDouble("free_flow", speed);
 		}
+
+		data = data.dropWhere(data.doubleColumn("simulated").isMissing());
 
 		data.addColumns(
 			data.doubleColumn("simulated").subtract(data.doubleColumn("mean")).setName("bias")
@@ -128,6 +141,16 @@ public class TravelTimeComparison implements MATSimAppCommand {
 	private LeastCostPathCalculator.Path computePath(Network network, LeastCostPathCalculator router, Row row) {
 		Node fromNode = network.getNodes().get(Id.createNodeId(row.getString("from_node")));
 		Node toNode = network.getNodes().get(Id.createNodeId(row.getString("to_node")));
+
+		if (fromNode == null) {
+			log.error("Node {} not found in network", row.getString("from_node"));
+			return null;
+		}
+
+		if (toNode == null) {
+			log.error("Node {} not found in network", row.getString("to_node"));
+			return null;
+		}
 
 		return router.calcLeastCostPath(fromNode, toNode, row.getInt("hour") * 3600, null, null);
 	}

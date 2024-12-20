@@ -90,7 +90,6 @@ public class ListenersInjectionTest {
 								config.controller().getCompressionType()));
 						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
 						bind(IterationCounter.class).toInstance(() -> 0);
-						bind(SimulationNode.class).toInstance(SimulationNode.SINGLE_INSTANCE);
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
 					}
                 },

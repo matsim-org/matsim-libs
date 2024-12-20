@@ -43,7 +43,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Require that new plan modes are always different from the current one.")
-	private boolean requireDifferentModes = true;
+	private boolean requireDifferentModes = false;
 
 	@Parameter
 	@Comment("Defines how constraint violations are handled.")
