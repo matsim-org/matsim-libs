@@ -77,17 +77,17 @@ public final class CarrierShipment implements CarrierJob {
 
 		/**
 		 * Returns a new shipment builder.
-		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
+		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's demand.
 		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
 		 *
 		 * @param id 	the id of the shipment
 		 * @param from 	the origin
 		 * @param to 	the destination
-		 * @param size 	size of the shipment
+		 * @param demand 	demand of the shipment
 		 * @return 		the builder
 		 */
-		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size){
-			return new Builder(id, from,to,size);
+		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int demand){
+			return new Builder(id, from, to, demand);
 		}
 
 		/**
@@ -110,29 +110,101 @@ public final class CarrierShipment implements CarrierJob {
 			this.demand = demand;
 		}
 
-		public Builder setPickupTimeWindow(TimeWindow pickupTW){
-			this.pickupStartsTimeWindow = pickupTW;
+		/**
+		 * Sets a time-window for the beginning of the pickup
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the shipment's pickup . If one works with hard time-windows (which means that
+		 * time-windows must be met) than the pickup is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @param pickupStartsTimeWindow 	time-window for the beginning of the pickup activity
+		 * @return 							the builder
+		 */
+		public Builder setPickupStartsTimeWindow(TimeWindow pickupStartsTimeWindow){
+			this.pickupStartsTimeWindow = pickupStartsTimeWindow;
 			return this;
 		}
 
-		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
-			this.deliveryStartsTimeWindow = deliveryTW;
+		/**
+		 *  Sets the duration for the pickup activity.
+		 *  When not set, it is by default 0.0.
+		 *
+		 * @param pickupDuration Duration of the pickup activity (in seconds).
+		 * @return the Builder
+		*/
+		public Builder setPickupDuration(double pickupDuration){
+			this.pickupDuration = pickupDuration;
 			return this;
 		}
 
-		public Builder setPickupServiceTime(double pickupServiceTime){
-			this.pickupDuration = pickupServiceTime;
+		/**
+		 * Sets a time-window for the beginning of the delivery
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the shipment's delivery . If one works with hard time-windows (which means that
+		 * time-windows must be met) than the delivery is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @param deliveryStartsTimeWindow 	time-window for the beginning of the delivery activity
+		 * @return 							the builder
+		 */
+		public Builder setDeliveryStartsTimeWindow(TimeWindow deliveryStartsTimeWindow){
+			this.deliveryStartsTimeWindow = deliveryStartsTimeWindow;
 			return this;
 		}
 
-		public Builder setDeliveryServiceTime(double deliveryServiceTime){
-			this.deliveryDuration = deliveryServiceTime;
+		/**
+		 *  Sets the duration for the delivery activity.
+		 *  When not set, it is by default 0.0.
+		 *
+		 * @param deliveryDuration Duration of the delivery activity (in seconds).
+		 * @return the Builder
+		 */
+		public Builder setDeliveryDuration(double deliveryDuration){
+			this.deliveryDuration = deliveryDuration;
 			return this;
 		}
 
 		public CarrierShipment build(){
 			return new CarrierShipment(this);
 		}
+
+		//*** deprecated methods ***
+
+
+		/**
+		 * @deprecated please inline and use {@link #setPickupStartsTimeWindow(TimeWindow)} instead
+		 */
+		@Deprecated(since = "dez 2024")
+		public Builder setPickupTimeWindow(TimeWindow pickupTW){
+			return setPickupStartsTimeWindow(pickupTW);
+		}
+
+		/**
+		 * @deprecated please inline and use {@link #setPickupDuration(double)} instead
+		 */
+		@Deprecated(since = "dez 2024")
+		public Builder setPickupServiceTime(double pickupServiceTime){
+			return setPickupDuration(pickupServiceTime);
+		}
+
+		/**
+		 * @deprecated please inline and use {@link #setDeliveryStartsTimeWindow(TimeWindow)} instead
+		 */
+		@Deprecated(since = "dez 2024")
+		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
+			return setDeliveryStartsTimeWindow(deliveryTW);
+		}
+
+		/**
+		 * @deprecated please inline and use {@link #setDeliveryDuration(double)} instead
+		 */
+		@Deprecated(since = "dez 2024")
+		public Builder setDeliveryServiceTime(double deliveryServiceTime){
+			return setDeliveryDuration(deliveryServiceTime);
+		}
+
+
+
 	}
 
 	private final Id<CarrierShipment> id;
