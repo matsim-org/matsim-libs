@@ -45,16 +45,16 @@ public final class CarrierShipment implements CarrierJob {
 	 */
 	public static class Builder {
 
-		Id<CarrierShipment> id;
-		final int demand;
+		private Id<CarrierShipment> id;
+		private final int demand;
 
-		final Id<Link> pickupLinkId;
-		TimeWindow pickupStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		double pickupDuration = 0.0;
+		private final Id<Link> pickupLinkId;
+		private TimeWindow pickupStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private double pickupDuration = 0.0;
 
-		final Id<Link> deliveryLinkId;
-		TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		double deliveryDuration = 0.0;
+		private final Id<Link> deliveryLinkId;
+		private TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private double deliveryDuration = 0.0;
 
 
 		/**
