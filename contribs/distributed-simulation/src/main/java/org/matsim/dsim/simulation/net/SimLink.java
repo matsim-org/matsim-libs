@@ -163,7 +163,8 @@ public interface SimLink {
 			};
 			var speed = Math.min(freespeed, vehicle.getMaximumVelocity());
 			var duration = distanceToTravel / speed;
-			var earliestExitTime = now + duration;
+			// The original qsim floors the earliest exit time.
+			var earliestExitTime = Math.floor(now + duration);
 			vehicle.setEarliestLinkExitTime(earliestExitTime);
 			vehicle.setCurrentLinkId(id);
 

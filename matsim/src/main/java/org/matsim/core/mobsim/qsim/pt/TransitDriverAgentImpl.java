@@ -350,6 +350,11 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		);
 	}
 
+	@Override
+	public String toString() {
+		return "id=" + this.getId();
+	}
+
 	public record TransitDriverMessage(
 		Id<Umlauf> umlaufId,
 		int umlaufIndex,
@@ -361,5 +366,4 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		double departureTime
 	) implements Message {
 	}
-
 }
