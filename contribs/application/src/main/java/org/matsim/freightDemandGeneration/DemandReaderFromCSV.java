@@ -1189,10 +1189,11 @@ public final class DemandReaderFromCSV {
 								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
 								if (baseShipment.getId() != thisShipment.getId()
 									&& baseShipment.getFrom() == thisShipment.getFrom()
-									&& baseShipment.getTo() == thisShipment.getTo()
-									&& baseShipment.getPickupTimeWindow() == thisShipment.getPickupTimeWindow()
-									&& baseShipment.getDeliveryTimeWindow() == thisShipment.getDeliveryTimeWindow())
-									shipmentsToConnect.put(thisShipmentId, thisShipment);
+									&& baseShipment.getTo() == thisShipment.getTo()) {
+									if (baseShipment.getPickupStartsTimeWindow() == thisShipment.getPickupStartsTimeWindow()) {
+									if (baseShipment.getDeliveryStartsTimeWindow() == thisShipment.getDeliveryStartsTimeWindow()) shipmentsToConnect.put(thisShipmentId, thisShipment);
+								}
+								}
 							}
 						}
 						Id<CarrierShipment> idNewShipment = baseShipment.getId();
@@ -1201,16 +1202,16 @@ public final class DemandReaderFromCSV {
 						double serviceTimeDelivery = 0;
 						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
                             demandForThisLink = demandForThisLink + carrierShipment.getDemand();
-							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
-							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
+							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupDuration();
+							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryDuration();
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
 						}
 						CarrierShipment newShipment = CarrierShipment.Builder
 							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
 							.setPickupDuration(serviceTimePickup)
-							.setPickupStartsTimeWindow(baseShipment.getPickupTimeWindow())
+							.setPickupStartsTimeWindow(baseShipment.getPickupStartsTimeWindow())
 							.setDeliveryDuration(serviceTimeDelivery)
-							.setDeliveryStartsTimeWindow(baseShipment.getDeliveryTimeWindow()).build();
+							.setDeliveryStartsTimeWindow(baseShipment.getDeliveryStartsTimeWindow()).build();
 						shipmentsToAdd.add(newShipment);
 					}
 				}

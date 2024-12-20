@@ -62,10 +62,10 @@ class MultipleChainsUtils {
         builder.setCapacityDemand(shipment.getDemand());
       builder.setFromLinkId(shipment.getFrom());
       builder.setToLinkId(shipment.getTo());
-      builder.setStartTimeWindow(shipment.getPickupTimeWindow());
-      builder.setEndTimeWindow(shipment.getDeliveryTimeWindow());
-      builder.setPickupServiceTime(shipment.getPickupServiceTime());
-      builder.setDeliveryServiceTime(shipment.getDeliveryServiceTime());
+		builder.setStartTimeWindow(shipment.getPickupStartsTimeWindow());
+		builder.setEndTimeWindow(shipment.getDeliveryStartsTimeWindow());
+      builder.setPickupServiceTime(shipment.getPickupDuration());
+      builder.setDeliveryServiceTime(shipment.getDeliveryDuration());
       shipmentList.add(builder.build());
     }
     return shipmentList;

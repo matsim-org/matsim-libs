@@ -241,19 +241,35 @@ public final class CarrierShipment implements CarrierJob {
 		deliveryStartsTimeWindow = builder.deliveryStartsTimeWindow;
 	}
 
-	public double getPickupServiceTime() {
+	//* getters and setters
+
+	public double getPickupDuration() {
 		return pickupDuration;
 	}
 
-	public void setPickupServiceTime(double pickupDuration) {
-		this.pickupDuration = pickupDuration;
-	}
-
-	public double getDeliveryServiceTime() {
+	public double getDeliveryDuration() {
 		return deliveryDuration;
 	}
 
-	public void setDeliveryServiceTime(double deliveryDuration) {
+	/**
+	 * Do we really need the setter? We do have it in the builder.
+	 * I do not see, why we should be able to update it, since most of the values are immutable.
+	 * @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable..
+	 * kturner, dec'24
+	 */
+	@Deprecated(since = "dec'24")
+	public void setPickupDuration(double pickupDuration) {
+		this.pickupDuration = pickupDuration;
+	}
+
+	/**
+	* Do we really need the setter? We do have it in the builder.
+	* I do not see, why we should be able to update it, since most of the values are immutable.
+	* @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable..
+	* kturner, dec'24
+	*/
+	@Deprecated(since = "dec'24")
+	public void setDeliveryDuration(double deliveryDuration) {
 		this.deliveryDuration = deliveryDuration;
 	}
 
@@ -271,6 +287,29 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	/**
+	 * @return the demand (size; capacity needed) of the shipment.
+	 */
+	@Override
+	public int getDemand() {
+		return demand;
+	}
+
+	public TimeWindow getPickupStartsTimeWindow() {
+		return pickupStartsTimeWindow;
+	}
+
+	public TimeWindow getDeliveryStartsTimeWindow() {
+		return deliveryStartsTimeWindow;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	//*** deprecated methods ***
+
+	/**
 	 * @deprecated please inline and use {@link #getDemand()} instead
 	 */
 	@Deprecated(since = "dec'24")
@@ -279,25 +318,55 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	/**
-	 * @return the demand (size; capacity needed) of the shipment.
+	 * @deprecated please inline and use {@link #getPickupStartsTimeWindow()} instead
 	 */
-	@Override
-	public int getDemand() {
-		return demand;
-	}
-
+	@Deprecated(since = "dec'24")
 	public TimeWindow getPickupTimeWindow() {
-		return pickupStartsTimeWindow;
+		return getPickupStartsTimeWindow();
 	}
 
+
+	/**
+	 * @deprecated please inline and use {@link #getDeliveryStartsTimeWindow()} instead
+	 */
+	@Deprecated(since = "dec'24")
 	public TimeWindow getDeliveryTimeWindow() {
-		return deliveryStartsTimeWindow;
+		return getDeliveryStartsTimeWindow();
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
+	/**
+	 * @deprecated please inline and use {@link #getPickupDuration()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public double getPickupServiceTime() {
+		return getPickupDuration();
 	}
+
+	/**
+	 * @deprecated please inline and use {@link #setPickupDuration(double)} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public void setPickupServiceTime(double pickupDuration) {
+		setPickupDuration(pickupDuration);
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getDeliveryDuration()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public double getDeliveryServiceTime() {
+		return getDeliveryDuration();
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #setDeliveryDuration(double)} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public void setDeliveryServiceTime(double deliveryDuration) {
+		setDeliveryDuration(deliveryDuration);
+	}
+
+	// *** general methods ***
 
 	@Override
 	public String toString() {

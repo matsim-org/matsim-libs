@@ -157,17 +157,17 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 	private void writeShipment(CarrierShipment s, Id<CarrierShipment> shipmentId, boolean closeElement, boolean lineBreak) {
-        this.writeStartTag(SHIPMENT, List.of(
+		this.writeStartTag(SHIPMENT, List.of(
 				createTuple(ID, shipmentId.toString()),
 				createTuple(FROM, s.getFrom().toString()),
 				createTuple(TO, s.getTo().toString()),
 				createTuple(SIZE, s.getDemand()),
-				createTuple(START_PICKUP, getTime(s.getPickupTimeWindow().getStart())),
-				createTuple(END_PICKUP, getTime(s.getPickupTimeWindow().getEnd())),
-				createTuple(START_DELIVERY, getTime(s.getDeliveryTimeWindow().getStart())),
-				createTuple(END_DELIVERY, getTime(s.getDeliveryTimeWindow().getEnd())),
-				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupServiceTime())),
-				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryServiceTime()))), closeElement, lineBreak
+				createTuple(START_PICKUP, getTime(s.getPickupStartsTimeWindow().getStart())),
+				createTuple(END_PICKUP, getTime(s.getPickupStartsTimeWindow().getEnd())),
+				createTuple(START_DELIVERY, getTime(s.getDeliveryStartsTimeWindow().getStart())),
+				createTuple(END_DELIVERY, getTime(s.getDeliveryStartsTimeWindow().getEnd())),
+				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupDuration())),
+				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryDuration()))), closeElement, lineBreak
 		);
 	}
 

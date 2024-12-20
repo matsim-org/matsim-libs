@@ -109,15 +109,15 @@ public final class MatsimJspritFactory {
 	static Shipment createJspritShipment(CarrierShipment carrierShipment) {
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
 				.setDeliveryLocation(Location.newInstance(carrierShipment.getTo().toString()))
-				.setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime())
+				.setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
 				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
-						.newInstance(carrierShipment.getDeliveryTimeWindow().getStart(),
-								carrierShipment.getDeliveryTimeWindow().getEnd()))
-				.setPickupServiceTime(carrierShipment.getPickupServiceTime())
+						.newInstance(carrierShipment.getDeliveryStartsTimeWindow().getStart(),
+								carrierShipment.getDeliveryStartsTimeWindow().getEnd()))
+				.setPickupServiceTime(carrierShipment.getPickupDuration())
 				.setPickupLocation(Location.newInstance(carrierShipment.getFrom().toString()))
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierShipment.getPickupTimeWindow().getStart(),
-						carrierShipment.getPickupTimeWindow().getEnd()))
+						carrierShipment.getPickupStartsTimeWindow().getStart(),
+						carrierShipment.getPickupStartsTimeWindow().getEnd()))
 				.addSizeDimension(0, carrierShipment.getDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
@@ -141,14 +141,14 @@ public final class MatsimJspritFactory {
 		Location toLocation = toLocationBuilder.build();
 
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
-				.setDeliveryLocation(toLocation).setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime())
+				.setDeliveryLocation(toLocation).setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
 				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
-						.newInstance(carrierShipment.getDeliveryTimeWindow().getStart(),
-								carrierShipment.getDeliveryTimeWindow().getEnd()))
-				.setPickupServiceTime(carrierShipment.getPickupServiceTime()).setPickupLocation(fromLocation)
+						.newInstance(carrierShipment.getDeliveryStartsTimeWindow().getStart(),
+								carrierShipment.getDeliveryStartsTimeWindow().getEnd()))
+				.setPickupServiceTime(carrierShipment.getPickupDuration()).setPickupLocation(fromLocation)
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierShipment.getPickupTimeWindow().getStart(),
-						carrierShipment.getPickupTimeWindow().getEnd()))
+						carrierShipment.getPickupStartsTimeWindow().getStart(),
+						carrierShipment.getPickupStartsTimeWindow().getEnd()))
 				.addSizeDimension(0, carrierShipment.getDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);

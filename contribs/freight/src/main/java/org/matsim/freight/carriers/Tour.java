@@ -539,7 +539,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getPickupTimeWindow();
+			return shipment.getPickupStartsTimeWindow();
 		}
 
 		@Override
@@ -549,7 +549,7 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getPickupServiceTime();
+			return shipment.getPickupDuration();
 		}
 
 		@Override
@@ -592,7 +592,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getDeliveryTimeWindow();
+			return shipment.getDeliveryStartsTimeWindow();
 		}
 
 		@Override
@@ -607,7 +607,7 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getDeliveryServiceTime();
+			return shipment.getDeliveryDuration();
 		}
 
 		@Override
