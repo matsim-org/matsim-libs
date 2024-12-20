@@ -137,12 +137,14 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			return false;
 		}
 
+		// let the vehicle enter traffic
 		var tda = (TransitDriverAgent) vehicle.getDriver();
-		var result = handleTransitStop(tda, vehicle, link, now);
 		em.processEvent(new VehicleEntersTrafficEvent(
 			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
 			vehicle.getDriver().getMode(), 1.0)
 		);
+		var result = handleTransitStop(tda, vehicle, link, now);
+
 		switch (result) {
 			case BlockQueue -> link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
 			case MoveToBuffer -> link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
