@@ -72,11 +72,6 @@ public class PersonDepartureEvent extends Event implements HasPersonId, HasLinkI
 	}
 
 	@Override
-	public double getEventOrder() {
-		return -2;
-	}
-
-	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		// linkId, personId handled by superclass

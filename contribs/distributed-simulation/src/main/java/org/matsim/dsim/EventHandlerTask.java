@@ -286,13 +286,12 @@ public final class EventHandlerTask implements SimTask {
 				try {
 					process(m);
 				} catch (Exception e) {
-					dumpEvents(Path.of("event_dump.xml"), messages);
+					dumpEvents(Path.of("debug_event_dump.xml"), messages);
 					throw new RuntimeException("Error in %s processing message: %s".formatted(getName(), m), e);
 				}
 			}
 
-			// TODO: remove when fixed
-			dumpEvents(Path.of("event_dump_%s_%.0f.xml".formatted(getName(), time)), messages);
+//			dumpEvents(Path.of("event_dump_%s_%.0f.xml".formatted(getName(), time)), messages);
 
 			messages.clear();
 			needsSorting = false;

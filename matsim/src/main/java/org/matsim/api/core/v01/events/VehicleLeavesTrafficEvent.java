@@ -73,11 +73,6 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, Has
 		return EVENT_TYPE;
 	}
 
-	@Override
-	public double getEventOrder() {
-		return 1;
-	}
-
 	public String getNetworkMode() {
 		return networkMode;
 	}
