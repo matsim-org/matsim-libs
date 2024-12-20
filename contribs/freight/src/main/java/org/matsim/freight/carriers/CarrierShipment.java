@@ -102,7 +102,7 @@ public final class CarrierShipment implements CarrierJob {
 			this.demand = demand;
 		}
 
-		public Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
+		private Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
 			super();
 			this.id = id;
 			this.pickupLinkId = pickupLinkId;
