@@ -19,13 +19,19 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
  */
 public class SimpleTransitStopHandlerFactory implements TransitStopHandlerFactory {
+
+	@Inject
+	private Scenario scenario;
 
 	@Override
 	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
@@ -35,7 +41,13 @@ public class SimpleTransitStopHandlerFactory implements TransitStopHandlerFactor
 
 	@Override
 	public TransitStopHandler createTransitStopHandler(Message message) {
-		return new SimpleTransitStopHandler((SimpleTransitStopHandler.Msg) message);
+
+		if (!(message instanceof SimpleTransitStopHandler.Msg m)) {
+			throw new IllegalArgumentException("SimpleTransitStopHandlerFactory can only handle messages of type SimpleTransitStopHandler.Msg");
+		}
+
+		TransitStopFacility stop = scenario.getTransitSchedule().getFacilities().get(m.lastHandledStop());
+		return new SimpleTransitStopHandler(stop);
 	}
 
 }

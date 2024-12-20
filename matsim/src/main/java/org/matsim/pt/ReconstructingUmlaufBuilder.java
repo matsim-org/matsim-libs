@@ -19,12 +19,7 @@
 
 package org.matsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +54,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private final Collection<TransitLine> transitLines;
 	private final Vehicles vehicles;
 	private Map<Id<Umlauf>,Umlauf> umlaeufe = null;
-	private ArrayList<UmlaufStueck> umlaufStuecke;
+	private List<UmlaufStueck> umlaufStuecke;
 	private final UmlaufInterpolator umlaufInterpolator;
 	private final Map<Id<Vehicle>, Id<Umlauf>> umlaufIdsByVehicleId;
 
@@ -74,7 +69,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	@Override
 	public Collection<Umlauf> build() {
-		umlaeufe = new HashMap<>();
+		umlaeufe = new LinkedHashMap<>();
 		createEmptyUmlaeufe();
 		createUmlaufStuecke();
 		createUmlaeufe();

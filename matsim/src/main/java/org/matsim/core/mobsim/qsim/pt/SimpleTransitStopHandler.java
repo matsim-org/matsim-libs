@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -35,8 +36,8 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 	public SimpleTransitStopHandler() {
 	}
 
-	SimpleTransitStopHandler(Msg msg) {
-		this.lastHandledStop = msg.lastHandledStop();
+	SimpleTransitStopHandler(TransitStopFacility stop) {
+		this.lastHandledStop = stop;
 	}
 
 	@Override
@@ -63,9 +64,9 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 
 	@Override
 	public Message toMessage() {
-		return new Msg(lastHandledStop);
+		return new Msg(lastHandledStop.getId());
 	}
 
-	record Msg(TransitStopFacility lastHandledStop) implements Message {
+	record Msg(Id<TransitStopFacility> lastHandledStop) implements Message {
 	}
 }

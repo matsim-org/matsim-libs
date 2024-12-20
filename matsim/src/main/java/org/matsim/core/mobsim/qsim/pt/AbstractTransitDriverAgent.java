@@ -101,9 +101,6 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	final void init(int stopIndex, int nextLinkIndex, boolean atEnd) {
 
-		// TODO: Something wrong here:  Transit vehicle is not yet at last stop!
-		// TODO: check what happens if stops are on the boundary of partitions
-
 		if (getTransitRoute() != null) {
 			if (atEnd) {
 				this.stopIterator = getTransitRoute().getStops().listIterator(stopIndex);
