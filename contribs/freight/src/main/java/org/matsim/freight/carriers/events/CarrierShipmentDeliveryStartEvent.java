@@ -48,7 +48,7 @@ public class CarrierShipmentDeliveryStartEvent extends AbstractCarrierEvent {
 		super(time, carrierId, shipment.getTo(), vehicleId);
 		this.shipmentId = shipment.getId();
 		this.deliveryDuration = shipment.getDeliveryServiceTime();
-		this.capacityDemand = shipment.getSize();
+        this.capacityDemand = shipment.getDemand();
 	}
 
 	@Override

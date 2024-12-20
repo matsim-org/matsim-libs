@@ -105,7 +105,7 @@ public class CarriersUtilsTest {
 		Assertions.assertEquals(shipmentId, carrierShipment1b.getId());
 		Assertions.assertEquals(service1.getId(), carrierShipment1b.getId());
 		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getFrom());
-		Assertions.assertEquals(20, carrierShipment1b.getSize(), EPSILON);
+		Assertions.assertEquals(20, carrierShipment1b.getDemand(), EPSILON);
 	}
 
 	@Test

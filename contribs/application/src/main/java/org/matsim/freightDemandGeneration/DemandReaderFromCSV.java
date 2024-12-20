@@ -1200,7 +1200,7 @@ public final class DemandReaderFromCSV {
 						double serviceTimePickup = 0;
 						double serviceTimeDelivery = 0;
 						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-							demandForThisLink = demandForThisLink + carrierShipment.getSize();
+                            demandForThisLink = demandForThisLink + carrierShipment.getDemand();
 							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
 							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
@@ -1245,7 +1245,7 @@ public final class DemandReaderFromCSV {
 						int demandForThisLink = 0;
 						double serviceTimeService = 0;
 						for (CarrierService carrierService : servicesToConnect.values()) {
-							demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
+							demandForThisLink = demandForThisLink + carrierService.getDemand();
 							serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
 							servicesToRemove.put(carrierService.getId(), carrierService);
 						}

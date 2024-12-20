@@ -101,9 +101,9 @@ public class DemandReaderFromCSVTest {
 		locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier3.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			Assertions.assertEquals(5, shipment.getSize());
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            Assertions.assertEquals(5, shipment.getDemand());
 			Assertions.assertEquals(2000, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(1250, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupTimeWindow());
@@ -168,9 +168,9 @@ public class DemandReaderFromCSVTest {
 		locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier3.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			Assertions.assertEquals(10, shipment.getSize());
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            Assertions.assertEquals(10, shipment.getDemand());
 			Assertions.assertEquals(4000, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(2500, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupTimeWindow());
@@ -235,9 +235,9 @@ public class DemandReaderFromCSVTest {
 		locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier3.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			Assertions.assertEquals(10, shipment.getSize());
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            Assertions.assertEquals(10, shipment.getDemand());
 			Assertions.assertEquals(4000, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(2500, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupTimeWindow());
@@ -305,9 +305,9 @@ public class DemandReaderFromCSVTest {
 		locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier3.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			Assertions.assertEquals(10, shipment.getSize());
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            Assertions.assertEquals(10, shipment.getDemand());
 			Assertions.assertEquals(4000, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(2500, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupTimeWindow());
@@ -474,25 +474,27 @@ public class DemandReaderFromCSVTest {
 		Map<String, Set<String>> locationsPerServiceElement = new HashMap<>();
 		int countDemand = 0;
 		for (CarrierService service : testCarrier1.getServices().values()) {
-			countServicesWithCertainDemand.merge((Integer) service.getCapacityDemand(), 1, Integer::sum);
-			countDemand = countDemand + service.getCapacityDemand();
-			if (service.getCapacityDemand() == 0) {
+			countServicesWithCertainDemand.merge((Integer) service.getDemand(), 1, Integer::sum);
+			countDemand = countDemand + service.getDemand();
+			if (service.getDemand() == 0) {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
 					.add(service.getLocationLinkId().toString());
-			} else if (service.getCapacityDemand() == 1) {
+			} else if (service.getDemand() == 1) {
 				Assertions.assertEquals(100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
 					.add(service.getLocationLinkId().toString());
-			} else if (service.getCapacityDemand() == 2) {
-				Assertions.assertEquals(200, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
-				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
-					.add(service.getLocationLinkId().toString());
-			} else
-				Assertions.fail("Service has a wrong demand.");
+			} else {
+				if (service.getDemand() == 2) {
+					Assertions.assertEquals(200, service.getServiceDuration(), MatsimTestUtils.EPSILON);
+					Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
+					locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
+						.add(service.getLocationLinkId().toString());
+				} else
+					Assertions.fail("Service has a wrong demand.");
+			}
 		}
 		Assertions.assertEquals(12, countDemand);
 		Assertions.assertEquals(4, countServicesWithCertainDemand.getInt(0));
@@ -520,9 +522,9 @@ public class DemandReaderFromCSVTest {
 		Map<String, Set<String>> locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier2.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			if (shipment.getSize() == 0) {
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            if (shipment.getDemand() == 0) {
 				Assertions.assertEquals(300, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(350, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(10000, 45000), shipment.getPickupTimeWindow());
@@ -531,7 +533,7 @@ public class DemandReaderFromCSVTest {
 					.add(shipment.getFrom().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
 					.add(shipment.getTo().toString());
-			} else if (shipment.getSize() == 2) {
+			} else if (shipment.getDemand() == 2) {
 				Assertions.assertEquals(400, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(400, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupTimeWindow());
@@ -540,17 +542,19 @@ public class DemandReaderFromCSVTest {
 					.add(shipment.getFrom().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
 					.add(shipment.getTo().toString());
-			} else if (shipment.getSize() == 3) {
-				Assertions.assertEquals(600, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(600, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupTimeWindow());
-				Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryTimeWindow());
-				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
-				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
-			} else
-				Assertions.fail("Shipment has an unexpected demand.");
+			} else {
+                if (shipment.getDemand() == 3) {
+                    Assertions.assertEquals(600, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(600, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupTimeWindow());
+                    Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryTimeWindow());
+                    locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())
+                            .add(shipment.getFrom().toString());
+                    locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
+                            .add(shipment.getTo().toString());
+                } else
+                    Assertions.fail("Shipment has an unexpected demand.");
+            }
 		}
 		Assertions.assertEquals(15, countDemand);
 		Assertions.assertEquals(4, countShipmentsWithCertainDemand.getInt(0));
@@ -579,15 +583,15 @@ public class DemandReaderFromCSVTest {
 		Map<String, Set<String>> locationsPerServiceElement = new HashMap<>();
 		int countDemand = 0;
 		for (CarrierService service : testCarrier1.getServices().values()) {
-			countServicesWithCertainDemand.merge((Integer) service.getCapacityDemand(), 1, Integer::sum);
-			countDemand = countDemand + service.getCapacityDemand();
-			if (service.getCapacityDemand() == 0) {
+			countServicesWithCertainDemand.merge((Integer) service.getDemand(), 1, Integer::sum);
+			countDemand = countDemand + service.getDemand();
+			if (service.getDemand() == 0) {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
 					.add(service.getLocationLinkId().toString());
 			} else {
-				Assertions.assertEquals(service.getCapacityDemand() * 100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
+				Assertions.assertEquals(service.getDemand() * 100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
 					.add(service.getLocationLinkId().toString());
@@ -617,9 +621,9 @@ public class DemandReaderFromCSVTest {
 		Map<String, Set<String>> locationsPerShipmentElement = new HashMap<>();
 		countDemand = 0;
 		for (CarrierShipment shipment : testCarrier2.getShipments().values()) {
-			countShipmentsWithCertainDemand.merge((Integer) shipment.getSize(), 1, Integer::sum);
-			countDemand = countDemand + shipment.getSize();
-			if (shipment.getSize() == 0) {
+            countShipmentsWithCertainDemand.merge((Integer) shipment.getDemand(), 1, Integer::sum);
+            countDemand = countDemand + shipment.getDemand();
+            if (shipment.getDemand() == 0) {
 				Assertions.assertEquals(300, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(350, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(10000, 45000), shipment.getPickupTimeWindow());
@@ -629,8 +633,8 @@ public class DemandReaderFromCSVTest {
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
 					.add(shipment.getTo().toString());
 			} else {
-				Assertions.assertEquals(shipment.getSize() * 200, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(shipment.getSize() * 200, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
+                Assertions.assertEquals(shipment.getDemand() * 200, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
+                Assertions.assertEquals(shipment.getDemand() * 200, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupTimeWindow());
 				Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryTimeWindow());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())

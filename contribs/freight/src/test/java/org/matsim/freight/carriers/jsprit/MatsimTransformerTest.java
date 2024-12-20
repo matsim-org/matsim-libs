@@ -148,7 +148,7 @@ public class MatsimTransformerTest {
 		assertNotNull(service);
 		assertEquals("locationId", service.getLocationLinkId().toString());
 		assertEquals(30.0, service.getServiceDuration(), 0.01);
-		assertEquals(50, service.getCapacityDemand());
+		assertEquals(50, service.getDemand());
 		assertEquals(10.0, service.getServiceStartTimeWindow().getStart(), 0.01);
 
 		CarrierService service2 = MatsimJspritFactory.createCarrierService(carrierService);
@@ -201,7 +201,7 @@ public class MatsimTransformerTest {
 		assertEquals(40.0, carrierShipment.getDeliveryServiceTime(), 0.01);
 		assertEquals(50.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0.01);
 		assertEquals(60.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0.01);
-		assertEquals(50, carrierShipment.getSize());
+        assertEquals(50, carrierShipment.getDemand());
 
 		CarrierShipment carrierShipment2 = MatsimJspritFactory.createCarrierShipment(shipment);
 		assertNotSame(carrierShipment, carrierShipment2);

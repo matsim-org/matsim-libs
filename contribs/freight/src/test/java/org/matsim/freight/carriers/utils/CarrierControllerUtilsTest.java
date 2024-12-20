@@ -165,7 +165,7 @@ public class CarrierControllerUtilsTest{
 
 		int demandServices = 0;
 		for (CarrierService carrierService : carrierWServices.getServices().values()) {
-			demandServices += carrierService.getCapacityDemand();
+			demandServices += carrierService.getDemand();
 		}
 		Assertions.assertEquals(4, demandServices);
 
@@ -180,7 +180,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipments.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(3, demandShipments);
 	}
@@ -192,7 +192,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -204,7 +204,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWServices.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -246,7 +246,7 @@ public class CarrierControllerUtilsTest{
 				foundShipment1 = true;
 				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getFrom());
 				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getTo());
-				Assertions.assertEquals(1, carrierShipment1.getSize());
+            Assertions.assertEquals(1, carrierShipment1.getDemand());
 				Assertions.assertEquals(30.0, carrierShipment1.getDeliveryServiceTime(), 0);
 				Assertions.assertEquals(3600.0, carrierShipment1.getDeliveryTimeWindow().getStart(), 0);
 				Assertions.assertEquals(36000.0, carrierShipment1.getDeliveryTimeWindow().getEnd(), 0);
@@ -261,7 +261,7 @@ public class CarrierControllerUtilsTest{
 				foundShipment2 = true;
 				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getFrom());
 				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getTo());
-				Assertions.assertEquals(2, carrierShipment2.getSize());
+            Assertions.assertEquals(2, carrierShipment2.getDemand());
 				Assertions.assertEquals(30.0, carrierShipment2.getDeliveryServiceTime(), 0);
 				Assertions.assertEquals(3600.0, carrierShipment2.getDeliveryTimeWindow().getStart(), 0);
 				Assertions.assertEquals(36000.0, carrierShipment2.getDeliveryTimeWindow().getEnd(), 0);
@@ -284,7 +284,7 @@ public class CarrierControllerUtilsTest{
 				foundService1 = true;
 				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
 				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getTo());
-				Assertions.assertEquals(2, carrierShipment1.getSize());
+            Assertions.assertEquals(2, carrierShipment1.getDemand());
 				Assertions.assertEquals(31.0, carrierShipment1.getDeliveryServiceTime(), 0);
 				Assertions.assertEquals(3601.0, carrierShipment1.getDeliveryTimeWindow().getStart(), 0);
 				Assertions.assertEquals(36001.0, carrierShipment1.getDeliveryTimeWindow().getEnd(), 0);
@@ -298,7 +298,7 @@ public class CarrierControllerUtilsTest{
 				foundService2 = true;
 				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
 				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getTo());
-				Assertions.assertEquals(2, carrierShipment2.getSize());
+            Assertions.assertEquals(2, carrierShipment2.getDemand());
 				Assertions.assertEquals(31.0, carrierShipment2.getDeliveryServiceTime(), 0);
 				Assertions.assertEquals(3601.0, carrierShipment2.getDeliveryTimeWindow().getStart(), 0);
 				Assertions.assertEquals(36001.0, carrierShipment2.getDeliveryTimeWindow().getEnd(), 0);

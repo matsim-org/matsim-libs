@@ -431,7 +431,7 @@ public class CarriersUtils {
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
 					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
-					carrierService.getCapacityDemand())
+					carrierService.getDemand())
 				.setDeliveryServiceTime(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18

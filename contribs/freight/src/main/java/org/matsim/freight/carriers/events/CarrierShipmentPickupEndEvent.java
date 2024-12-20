@@ -49,7 +49,7 @@ public class CarrierShipmentPickupEndEvent extends AbstractCarrierEvent {
 		super(time, carrierId, shipment.getFrom(), vehicleId);
 		this.shipmentId = shipment.getId();
 		this.pickupDuration = shipment.getPickupServiceTime();
-		this.capacityDemand = shipment.getSize();
+        this.capacityDemand = shipment.getDemand();
 	}
 
 
