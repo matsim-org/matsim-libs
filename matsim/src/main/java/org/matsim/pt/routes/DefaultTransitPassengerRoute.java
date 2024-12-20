@@ -17,18 +17,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultTransitPassengerRoute extends AbstractRoute implements TransitPassengerRoute {
-	protected final static int NULL_ID = -1;
+
 	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	
+
 	final public static String ROUTE_TYPE = "default_pt";
 
 	public double boardingTime = UNDEFINED_TIME;
 
-	public int transitLineIndex;
-	public int transitRouteIndex;
+	public Id<TransitLine> transitLine;
+	public Id<TransitRoute> transitRoute;
 
-	public int accessFacilityIndex;
-	public int egressFacilityIndex;
+	public Id<TransitStopFacility> accessFacility;
+	public Id<TransitStopFacility> egressFacility;
 
 	DefaultTransitPassengerRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this(startLinkId, endLinkId, null, null, null, null);
@@ -48,10 +48,10 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 		super(accessLinkId, egressLinkId);
 
-		this.transitLineIndex = Objects.isNull(transitLineId) ? NULL_ID : transitLineId.index();
-		this.transitRouteIndex = Objects.isNull(transitRouteId) ? NULL_ID : transitRouteId.index();
-		this.accessFacilityIndex = Objects.isNull(accessFacilityId) ? NULL_ID : accessFacilityId.index();
-		this.egressFacilityIndex = Objects.isNull(egressFacilityId) ? NULL_ID : egressFacilityId.index();
+		this.transitLine = transitLineId;
+		this.transitRoute = transitRouteId;
+		this.accessFacility = accessFacilityId;
+		this.egressFacility = egressFacilityId;
 	}
 
 	@Override
@@ -65,10 +65,10 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		try {
 			RouteDescription routeDescription = new RouteDescription();
 			routeDescription.boardingTime = this.boardingTime;
-			routeDescription.accessFacilityId = this.accessFacilityIndex == NULL_ID ? null : Id.get(this.accessFacilityIndex, TransitStopFacility.class);
-			routeDescription.egressFacilityId = this.egressFacilityIndex == NULL_ID ? null : Id.get(this.egressFacilityIndex, TransitStopFacility.class);
-			routeDescription.transitLineId = this.transitLineIndex == NULL_ID ? null : Id.get(this.transitLineIndex, TransitLine.class);
-			routeDescription.transitRouteId = this.transitRouteIndex == NULL_ID ? null : Id.get(this.transitRouteIndex, TransitRoute.class);
+			routeDescription.accessFacilityId = this.accessFacility;
+			routeDescription.egressFacilityId = this.egressFacility;
+			routeDescription.transitLineId = this.transitLine;
+			routeDescription.transitRouteId = this.transitRoute;
 			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
@@ -80,10 +80,10 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		try {
 			RouteDescription parsed = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
 			this.boardingTime = parsed.boardingTime;
-			this.accessFacilityIndex = parsed.accessFacilityId == null ? NULL_ID : parsed.accessFacilityId.index();
-			this.egressFacilityIndex = parsed.egressFacilityId == null ? NULL_ID : parsed.egressFacilityId.index();
-			this.transitLineIndex = parsed.transitLineId == null ? NULL_ID : parsed.transitLineId.index();
-			this.transitRouteIndex = parsed.transitRouteId == null ? NULL_ID : parsed.transitRouteId.index();
+			this.accessFacility = parsed.accessFacilityId;
+			this.egressFacility = parsed.egressFacilityId;
+			this.transitLine = parsed.transitLineId;
+			this.transitRoute = parsed.transitRouteId;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -101,22 +101,22 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	@Override
 	public Id<TransitLine> getLineId() {
-		return this.transitLineIndex >= 0 ? Id.get(this.transitLineIndex, TransitLine.class) : null;
+		return this.transitLine;
 	}
 
 	@Override
 	public Id<TransitRoute> getRouteId() {
-		return this.transitRouteIndex >= 0 ? Id.get(this.transitRouteIndex, TransitRoute.class) : null;
+		return this.transitRoute;
 	}
 
 	@Override
 	public Id<TransitStopFacility> getAccessStopId() {
-		return this.accessFacilityIndex >= 0 ? Id.get(this.accessFacilityIndex, TransitStopFacility.class) : null;
+		return this.accessFacility;
 	}
 
 	@Override
 	public Id<TransitStopFacility> getEgressStopId() {
-		return this.egressFacilityIndex >= 0 ? Id.get(this.egressFacilityIndex, TransitStopFacility.class) : null;
+		return this.egressFacility;
 	}
 
 	@Override
