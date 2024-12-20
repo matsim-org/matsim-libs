@@ -29,11 +29,11 @@ public class IdSerializer extends Serializer<Id> {
 		// Person ids are not stable because of transit drivers which are created after simulations starts
 //        if (type == Person.class)
 //            writeCompact(buffer, value, 0);
-		if (type == Link.class)
-            writeCompact(buffer, value, 1);
-        else if (type == Node.class)
-            writeCompact(buffer, value, 2);
-        else
+//		if (type == Link.class)
+//            writeCompact(buffer, value, 1);
+//        else if (type == Node.class)
+//            writeCompact(buffer, value, 2);
+//        else
             writeString(buffer, value);
 
     }
@@ -60,11 +60,11 @@ public class IdSerializer extends Serializer<Id> {
         int n = buffer.readInt32();
 //        if (n == 0) {
 //            return Id.get(buffer.readInt32(), Person.class);
-        if (n == 1) {
-            return Id.get(buffer.readInt32(), Link.class);
-        } else if (n == 2) {
-            return Id.get(buffer.readInt32(), Node.class);
-        }
+//        if (n == 1) {
+//            return Id.get(buffer.readInt32(), Link.class);
+//        } else if (n == 2) {
+//            return Id.get(buffer.readInt32(), Node.class);
+//        }
 
         byte[] clazz = buffer.readBytes(n - 3);
 
