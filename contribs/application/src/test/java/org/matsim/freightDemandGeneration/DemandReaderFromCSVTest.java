@@ -109,9 +109,9 @@ public class DemandReaderFromCSVTest {
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupStartsTimeWindow());
 			Assertions.assertEquals(TimeWindow.newInstance(10000, 60000), shipment.getDeliveryStartsTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
+					.add(shipment.getPickupLinkId().toString());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
+					.add(shipment.getDeliveryLinkId().toString());
 		}
 		Assertions.assertEquals(20, countDemand);
 		Assertions.assertEquals(4, countShipmentsWithCertainDemand.getInt(5));
@@ -176,9 +176,9 @@ public class DemandReaderFromCSVTest {
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupStartsTimeWindow());
 			Assertions.assertEquals(TimeWindow.newInstance(10000, 60000), shipment.getDeliveryStartsTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-				.add(shipment.getFrom().toString());
+				.add(shipment.getPickupLinkId().toString());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-				.add(shipment.getTo().toString());
+				.add(shipment.getDeliveryLinkId().toString());
 		}
 		Assertions.assertEquals(20, countDemand);
 		Assertions.assertEquals(2, countShipmentsWithCertainDemand.getInt(10));
@@ -243,9 +243,9 @@ public class DemandReaderFromCSVTest {
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupStartsTimeWindow());
 			Assertions.assertEquals(TimeWindow.newInstance(10000, 60000), shipment.getDeliveryStartsTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-				.add(shipment.getFrom().toString());
+				.add(shipment.getPickupLinkId().toString());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-				.add(shipment.getTo().toString());
+				.add(shipment.getDeliveryLinkId().toString());
 		}
 		Assertions.assertEquals(20, countDemand);
 		Assertions.assertEquals(2, countShipmentsWithCertainDemand.getInt(10));
@@ -313,9 +313,9 @@ public class DemandReaderFromCSVTest {
 			Assertions.assertEquals(TimeWindow.newInstance(8000, 50000), shipment.getPickupStartsTimeWindow());
 			Assertions.assertEquals(TimeWindow.newInstance(10000, 60000), shipment.getDeliveryStartsTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-				.add(shipment.getFrom().toString());
+				.add(shipment.getPickupLinkId().toString());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-				.add(shipment.getTo().toString());
+				.add(shipment.getDeliveryLinkId().toString());
 		}
 		Assertions.assertEquals(20, countDemand);
 		Assertions.assertEquals(2, countShipmentsWithCertainDemand.getInt(10));
@@ -480,18 +480,18 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
-					.add(service.getLocationLinkId().toString());
+					.add(service.getServiceLinkId().toString());
 			} else if (service.getDemand() == 1) {
 				Assertions.assertEquals(100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
-					.add(service.getLocationLinkId().toString());
+					.add(service.getServiceLinkId().toString());
 			} else {
 				if (service.getDemand() == 2) {
 					Assertions.assertEquals(200, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 					Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
 					locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
-						.add(service.getLocationLinkId().toString());
+						.add(service.getServiceLinkId().toString());
 				} else
 					Assertions.fail("Service has a wrong demand.");
 			}
@@ -530,18 +530,18 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertEquals(TimeWindow.newInstance(10000, 45000), shipment.getPickupStartsTimeWindow());
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getDeliveryStartsTimeWindow());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
+					.add(shipment.getPickupLinkId().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
+					.add(shipment.getDeliveryLinkId().toString());
 			} else if (shipment.getDemand() == 2) {
 				Assertions.assertEquals(400, shipment.getPickupDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(400, shipment.getDeliveryDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupStartsTimeWindow());
 				Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryStartsTimeWindow());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
+					.add(shipment.getPickupLinkId().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
+					.add(shipment.getDeliveryLinkId().toString());
 			} else {
                 if (shipment.getDemand() == 3) {
                     Assertions.assertEquals(600, shipment.getPickupDuration(), MatsimTestUtils.EPSILON);
@@ -549,9 +549,9 @@ public class DemandReaderFromCSVTest {
 					Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupStartsTimeWindow());
 					Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryStartsTimeWindow());
                     locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())
-                            .add(shipment.getFrom().toString());
+                            .add(shipment.getPickupLinkId().toString());
                     locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
-                            .add(shipment.getTo().toString());
+                            .add(shipment.getDeliveryLinkId().toString());
                 } else
                     Assertions.fail("Shipment has an unexpected demand.");
             }
@@ -589,12 +589,12 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
-					.add(service.getLocationLinkId().toString());
+					.add(service.getServiceLinkId().toString());
 			} else {
 				Assertions.assertEquals(service.getDemand() * 100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
-					.add(service.getLocationLinkId().toString());
+					.add(service.getServiceLinkId().toString());
 			}
 		}
 		Assertions.assertEquals(12, countDemand);
@@ -629,18 +629,18 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertEquals(TimeWindow.newInstance(10000, 45000), shipment.getPickupStartsTimeWindow());
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getDeliveryStartsTimeWindow());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
+					.add(shipment.getPickupLinkId().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
+					.add(shipment.getDeliveryLinkId().toString());
 			} else {
                 Assertions.assertEquals(shipment.getDemand() * 200, shipment.getPickupDuration(), MatsimTestUtils.EPSILON);
                 Assertions.assertEquals(shipment.getDemand() * 200, shipment.getDeliveryDuration(), MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(TimeWindow.newInstance(11000, 44000), shipment.getPickupStartsTimeWindow());
 				Assertions.assertEquals(TimeWindow.newInstance(20000, 40000), shipment.getDeliveryStartsTimeWindow());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_pickup", (k) -> new HashSet<>())
-					.add(shipment.getFrom().toString());
+					.add(shipment.getPickupLinkId().toString());
 				locationsPerShipmentElement.computeIfAbsent("ShipmentElement2_delivery", (k) -> new HashSet<>())
-					.add(shipment.getTo().toString());
+					.add(shipment.getDeliveryLinkId().toString());
 			}
 		}
 		Assertions.assertEquals(15, countDemand);

@@ -108,13 +108,13 @@ public final class MatsimJspritFactory {
 	 */
 	static Shipment createJspritShipment(CarrierShipment carrierShipment) {
 		Shipment.Builder shipmentBuilder = Shipment.Builder.newInstance(carrierShipment.getId().toString())
-				.setDeliveryLocation(Location.newInstance(carrierShipment.getTo().toString()))
+				.setDeliveryLocation(Location.newInstance(carrierShipment.getDeliveryLinkId().toString()))
 				.setDeliveryServiceTime(carrierShipment.getDeliveryDuration())
 				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow
 						.newInstance(carrierShipment.getDeliveryStartsTimeWindow().getStart(),
 								carrierShipment.getDeliveryStartsTimeWindow().getEnd()))
 				.setPickupServiceTime(carrierShipment.getPickupDuration())
-				.setPickupLocation(Location.newInstance(carrierShipment.getFrom().toString()))
+				.setPickupLocation(Location.newInstance(carrierShipment.getPickupLinkId().toString()))
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
 						carrierShipment.getPickupStartsTimeWindow().getStart(),
 						carrierShipment.getPickupStartsTimeWindow().getEnd()))
@@ -127,14 +127,14 @@ public final class MatsimJspritFactory {
 
 	static Shipment createJspritShipment(CarrierShipment carrierShipment, Coord fromCoord, Coord toCoord) {
 		Location.Builder fromLocationBuilder = Location.Builder.newInstance();
-		fromLocationBuilder.setId(carrierShipment.getFrom().toString());
+		fromLocationBuilder.setId(carrierShipment.getPickupLinkId().toString());
 		if (fromCoord != null) {
 			fromLocationBuilder.setCoordinate(Coordinate.newInstance(fromCoord.getX(), fromCoord.getY()));
 		}
 		Location fromLocation = fromLocationBuilder.build();
 
 		Location.Builder toLocationBuilder = Location.Builder.newInstance();
-		toLocationBuilder.setId(carrierShipment.getTo().toString());
+		toLocationBuilder.setId(carrierShipment.getDeliveryLinkId().toString());
 		if (toCoord != null) {
 			toLocationBuilder.setCoordinate(Coordinate.newInstance(toCoord.getX(), toCoord.getY()));
 		}
@@ -158,7 +158,7 @@ public final class MatsimJspritFactory {
 
 	static Service createJspritService(CarrierService carrierService, Coord locationCoord) {
 		Location.Builder locationBuilder = Location.Builder.newInstance();
-		locationBuilder.setId(carrierService.getLocationLinkId().toString());
+		locationBuilder.setId(carrierService.getServiceLinkId().toString());
 		if (locationCoord != null) {
 			locationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
@@ -515,11 +515,11 @@ public final class MatsimJspritFactory {
 
 				Coord coordinate = null;
 				if (network != null) {
-					Link link = network.getLinks().get(service.getLocationLinkId());
+					Link link = network.getLinks().get(service.getServiceLinkId());
 					if (link != null) {
 						coordinate = link.getCoord();
 					} else
-						log.warn("cannot find linkId {}", service.getLocationLinkId());
+						log.warn("cannot find linkId {}", service.getServiceLinkId());
 				}
 				vrpBuilder.addJob(createJspritService(service, coordinate));
 			}
@@ -530,8 +530,8 @@ public final class MatsimJspritFactory {
 				Coord fromCoordinate = null;
 				Coord toCoordinate = null;
 				if (network != null) {
-					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-					Link toLink = network.getLinks().get(carrierShipment.getTo());
+					Link fromLink = network.getLinks().get(carrierShipment.getPickupLinkId());
+					Link toLink = network.getLinks().get(carrierShipment.getDeliveryLinkId());
 
 					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
 						// specified location
@@ -540,8 +540,8 @@ public final class MatsimJspritFactory {
 						vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));
 					} else
 						throw new IllegalStateException(
-								"cannot create shipment since neither fromLinkId " + carrierShipment.getTo()
-										+ " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+								"cannot create shipment since neither fromLinkId " + carrierShipment.getDeliveryLinkId()
+										+ " nor toLinkId " + carrierShipment.getDeliveryLinkId() + " exists in network.");
 
 				}
 				vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));
@@ -611,9 +611,9 @@ public final class MatsimJspritFactory {
 				log.debug("Handle CarrierService: {}", service.toString());
 				Coord coordinate = null;
 				if (network != null) {
-					Link link = network.getLinks().get(service.getLocationLinkId());
+					Link link = network.getLinks().get(service.getServiceLinkId());
 					if (link == null) {
-						throw new IllegalStateException("cannot create service since linkId " + service.getLocationLinkId()
+						throw new IllegalStateException("cannot create service since linkId " + service.getServiceLinkId()
 								+ " does not exists in network.");
 					} else
 						coordinate = link.getCoord();
@@ -628,8 +628,8 @@ public final class MatsimJspritFactory {
 				Coord fromCoordinate = null;
 				Coord toCoordinate = null;
 				if (network != null) {
-					Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-					Link toLink = network.getLinks().get(carrierShipment.getTo());
+					Link fromLink = network.getLinks().get(carrierShipment.getPickupLinkId());
+					Link toLink = network.getLinks().get(carrierShipment.getDeliveryLinkId());
 
 					if (fromLink != null && toLink != null) { // Shipment to be delivered from specified location to
 						// specified location
@@ -638,8 +638,8 @@ public final class MatsimJspritFactory {
 						toCoordinate = toLink.getCoord();
 					} else
 						throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString()
-								+ " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId "
-								+ carrierShipment.getTo() + " exists in network.");
+								+ " since either fromLinkId " + carrierShipment.getPickupLinkId() + " or toLinkId "
+								+ carrierShipment.getDeliveryLinkId() + " exists in network.");
 
 				}
 				vrpBuilder.addJob(createJspritShipment(carrierShipment, fromCoordinate, toCoordinate));

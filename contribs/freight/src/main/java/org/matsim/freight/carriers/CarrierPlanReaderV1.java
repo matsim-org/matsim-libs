@@ -208,16 +208,16 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 					case "pickup" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getFrom());
+						finishLeg(s.getPickupLinkId());
 						currentTourBuilder.schedulePickup(s);
-						previousActLoc = s.getFrom();
+						previousActLoc = s.getPickupLinkId();
 					}
 					case "delivery" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getTo());
+						finishLeg(s.getDeliveryLinkId());
 						currentTourBuilder.scheduleDelivery(s);
-						previousActLoc = s.getTo();
+						previousActLoc = s.getDeliveryLinkId();
 					}
 					case "end" -> {
 						finishLeg(currentVehicle.getLinkId());

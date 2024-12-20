@@ -128,8 +128,8 @@ class ShipmentTracker {
 
 	public ShipmentTracker(CarrierShipment shipment) {
 		this.id = shipment.getId();
-		this.from = shipment.getFrom();
-		this.to=shipment.getTo();
+		this.from = shipment.getPickupLinkId();
+		this.to=shipment.getDeliveryLinkId();
 		this.shipment=shipment;
 	}
 

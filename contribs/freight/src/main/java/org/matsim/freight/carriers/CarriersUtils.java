@@ -430,7 +430,7 @@ public class CarriersUtils {
 			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
+					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getServiceLinkId(),
 					carrierService.getDemand())
 				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we

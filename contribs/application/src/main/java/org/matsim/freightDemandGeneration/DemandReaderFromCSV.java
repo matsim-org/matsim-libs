@@ -1188,8 +1188,8 @@ public final class DemandReaderFromCSV {
 							if (!shipmentsToRemove.containsKey(thisShipmentId)) {
 								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
 								if (baseShipment.getId() != thisShipment.getId()
-									&& baseShipment.getFrom() == thisShipment.getFrom()
-									&& baseShipment.getTo() == thisShipment.getTo()) {
+									&& baseShipment.getPickupLinkId() == thisShipment.getPickupLinkId()
+									&& baseShipment.getDeliveryLinkId() == thisShipment.getDeliveryLinkId()) {
 									if (baseShipment.getPickupStartsTimeWindow() == thisShipment.getPickupStartsTimeWindow()) {
 									if (baseShipment.getDeliveryStartsTimeWindow() == thisShipment.getDeliveryStartsTimeWindow()) shipmentsToConnect.put(thisShipmentId, thisShipment);
 								}
@@ -1207,7 +1207,7 @@ public final class DemandReaderFromCSV {
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
 						}
 						CarrierShipment newShipment = CarrierShipment.Builder
-							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
+							.newInstance(idNewShipment, baseShipment.getPickupLinkId(), baseShipment.getDeliveryLinkId(), demandForThisLink)
 							.setPickupDuration(serviceTimePickup)
 							.setPickupStartsTimeWindow(baseShipment.getPickupStartsTimeWindow())
 							.setDeliveryDuration(serviceTimeDelivery)
@@ -1237,7 +1237,7 @@ public final class DemandReaderFromCSV {
 							if (!servicesToRemove.containsKey(thisServiceId)) {
 								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
 								if (baseService.getId() != thisService.getId()
-									&& baseService.getLocationLinkId() == thisService.getLocationLinkId() && baseService
+									&& baseService.getServiceLinkId() == thisService.getServiceLinkId() && baseService
 									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
 									servicesToConnect.put(thisServiceId, thisService);
 							}
@@ -1251,7 +1251,7 @@ public final class DemandReaderFromCSV {
 							servicesToRemove.put(carrierService.getId(), carrierService);
 						}
 						CarrierService newService = CarrierService.Builder
-							.newInstance(idNewService, baseService.getLocationLinkId())
+							.newInstance(idNewService, baseService.getServiceLinkId())
 							.setServiceDuration(serviceTimeService)
 							.setServiceStartTimeWindow(baseService.getServiceStartTimeWindow())
 							.setDemand(demandForThisLink).build();

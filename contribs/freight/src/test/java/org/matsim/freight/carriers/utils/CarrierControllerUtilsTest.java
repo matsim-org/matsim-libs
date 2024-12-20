@@ -244,8 +244,8 @@ public class CarrierControllerUtilsTest{
 		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				System.out.println("Found Shipment1");
 				foundShipment1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getTo());
+				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getDeliveryLinkId());
             Assertions.assertEquals(1, carrierShipment1.getDemand());
 				Assertions.assertEquals(30.0, carrierShipment1.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3600.0, carrierShipment1.getDeliveryStartsTimeWindow().getStart(), 0);
@@ -259,8 +259,8 @@ public class CarrierControllerUtilsTest{
 		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
 				foundShipment2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getTo());
+				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getDeliveryLinkId());
             Assertions.assertEquals(2, carrierShipment2.getDemand());
 				Assertions.assertEquals(30.0, carrierShipment2.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3600.0, carrierShipment2.getDeliveryStartsTimeWindow().getStart(), 0);
@@ -282,8 +282,8 @@ public class CarrierControllerUtilsTest{
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundService1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getTo());
+				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getDeliveryLinkId());
             Assertions.assertEquals(2, carrierShipment1.getDemand());
 				Assertions.assertEquals(31.0, carrierShipment1.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3601.0, carrierShipment1.getDeliveryStartsTimeWindow().getStart(), 0);
@@ -296,8 +296,8 @@ public class CarrierControllerUtilsTest{
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getTo());
+				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getDeliveryLinkId());
             Assertions.assertEquals(2, carrierShipment2.getDemand());
 				Assertions.assertEquals(31.0, carrierShipment2.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3601.0, carrierShipment2.getDeliveryStartsTimeWindow().getStart(), 0);

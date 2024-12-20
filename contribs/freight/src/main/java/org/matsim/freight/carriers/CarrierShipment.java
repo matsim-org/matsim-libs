@@ -278,11 +278,11 @@ public final class CarrierShipment implements CarrierJob {
 		return id;
 	}
 
-	public Id<Link> getFrom() {
+	public Id<Link> getPickupLinkId() {
 		return pickupLinkId;
 	}
 
-	public Id<Link> getTo() {
+	public Id<Link> getDeliveryLinkId() {
 		return deliveryLinkId;
 	}
 
@@ -315,6 +315,22 @@ public final class CarrierShipment implements CarrierJob {
 	@Deprecated(since = "dec'24")
 	public int getSize() {
 		return getDemand();
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getPickupLinkId()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public Id<Link> getFrom() {
+		return getPickupLinkId();
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getDeliveryLinkId()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public Id<Link> getTo() {
+		return getDeliveryLinkId();
 	}
 
 	/**

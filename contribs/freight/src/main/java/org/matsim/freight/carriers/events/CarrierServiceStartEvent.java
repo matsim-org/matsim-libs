@@ -44,7 +44,7 @@ public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 	private final int capacityDemand;
 
 	public CarrierServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
-		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		super(time, carrierId, service.getServiceLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();
         this.capacityDemand = service.getDemand();

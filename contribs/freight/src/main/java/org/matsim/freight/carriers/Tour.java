@@ -379,7 +379,7 @@ public class Tour {
 
 		@Override
 		public Id<Link> getLocation() {
-			return service.getLocationLinkId();
+			return service.getServiceLinkId();
 		}
 
 		@Override
@@ -544,7 +544,7 @@ public class Tour {
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getFrom();
+			return shipment.getPickupLinkId();
 		}
 
 		@Override
@@ -602,7 +602,7 @@ public class Tour {
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getTo();
+			return shipment.getDeliveryLinkId();
 		}
 
 		@Override

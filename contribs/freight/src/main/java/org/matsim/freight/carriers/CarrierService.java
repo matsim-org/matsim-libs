@@ -141,8 +141,16 @@ public final class CarrierService implements CarrierJob {
 		return id;
 	}
 
-	public Id<Link> getLocationLinkId() {
+	public Id<Link> getServiceLinkId() {
 		return serviceLinkId;
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getServiceLinkId()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public Id<Link> getLocationLinkId() {
+		return getServiceLinkId();
 	}
 
 	public double getServiceDuration() {
