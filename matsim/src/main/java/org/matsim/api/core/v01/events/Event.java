@@ -74,14 +74,6 @@ public abstract class Event implements Message {
 	 */
 	abstract public String getEventType();
 
-	/**
-	 * A number representing the natural order of the event. If events happen at the same time, the event with the lower order is processed first.
-	 * It can be 0 for most events which are not related to each other and can not happen in the same time step.
-	 */
-	public double getEventOrder() {
-		return 0;
-	}
-
 	public final double getTime() {
 		return this.time;
 	}

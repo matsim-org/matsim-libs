@@ -18,6 +18,8 @@ import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Communicates using shared memory.
@@ -40,6 +42,8 @@ public class SharedMemoryCommunicator implements Communicator {
 
 		File name = getName(rank);
 		log.info("Serving on {}", name);
+
+		Files.createDirectories(Path.of(CommonContext.getAeronDirectoryName()));
 
 		this.subscription = new IPC(name, size, true);
 		this.others = new IPC[size];

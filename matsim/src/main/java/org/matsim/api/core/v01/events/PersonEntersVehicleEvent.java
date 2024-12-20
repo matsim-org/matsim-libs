@@ -63,11 +63,6 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasV
 	}
 
 	@Override
-	public double getEventOrder() {
-		return -1;
-	}
-
-	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
 		// personId, vehicleId handled by superclass

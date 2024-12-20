@@ -26,9 +26,10 @@ public class IdSerializer extends Serializer<Id> {
         // TODO: at least these id classes that are known can be sent as integers
 
         Class<?> type = value.classType();
-        if (type == Person.class)
-            writeCompact(buffer, value, 0);
-        else if (type == Link.class)
+		// Person ids are not stable because of transit drivers which are created after simulations starts
+//        if (type == Person.class)
+//            writeCompact(buffer, value, 0);
+		if (type == Link.class)
             writeCompact(buffer, value, 1);
         else if (type == Node.class)
             writeCompact(buffer, value, 2);
@@ -57,9 +58,9 @@ public class IdSerializer extends Serializer<Id> {
     public Id read(MemoryBuffer buffer) {
 
         int n = buffer.readInt32();
-        if (n == 0) {
-            return Id.get(buffer.readInt32(), Person.class);
-        } else if (n == 1) {
+//        if (n == 0) {
+//            return Id.get(buffer.readInt32(), Person.class);
+        if (n == 1) {
             return Id.get(buffer.readInt32(), Link.class);
         } else if (n == 2) {
             return Id.get(buffer.readInt32(), Node.class);
