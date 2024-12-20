@@ -23,7 +23,6 @@ package org.matsim.freight.carriers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -136,7 +135,7 @@ public final class CarrierShipment implements CarrierJob {
 	private final Id<CarrierShipment> id;
 	private final Id<Link> from;
 	private final Id<Link> to;
-	private final int size;
+	private final int demand;
 	private final TimeWindow pickupTimeWindow;
 	private final TimeWindow deliveryTimeWindow;
 	private double pickupServiceTime;
@@ -148,7 +147,7 @@ public final class CarrierShipment implements CarrierJob {
 		id = builder.id;
 		from = builder.from;
 		to = builder.to;
-		size = builder.size;
+		demand = builder.size;
 		pickupServiceTime = builder.pickServiceTime;
 		deliveryServiceTime = builder.delServiceTime;
 		pickupTimeWindow = builder.pickTW;
@@ -171,9 +170,11 @@ public final class CarrierShipment implements CarrierJob {
 		this.deliveryServiceTime = deliveryServiceTime;
 	}
 
+	@Override
 	public Id<CarrierShipment> getId() {
 		return id;
 	}
+
 	public Id<Link> getFrom() {
 		return from;
 	}
@@ -182,8 +183,20 @@ public final class CarrierShipment implements CarrierJob {
 		return to;
 	}
 
+	/**
+	 * @deprecated please inline and use {@link #getDemand()} instead
+	 */
+	@Deprecated(since = "dez 2024")
 	public int getSize() {
-		return size;
+		return getDemand();
+	}
+
+	/**
+	 * @return the demand (size; capacity needed) of the shipment.
+	 */
+	@Override
+	public int getDemand() {
+		return demand;
 	}
 
 	public TimeWindow getPickupTimeWindow() {
@@ -201,7 +214,7 @@ public final class CarrierShipment implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + from.toString() + "][to=" + to.toString() + "][size=" + size + "][pickupServiceTime=" + pickupServiceTime + "]" +
+		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + from.toString() + "][to=" + to.toString() + "][size=" + demand + "][pickupServiceTime=" + pickupServiceTime + "]" +
 				"[deliveryServiceTime="+deliveryServiceTime+"][pickupTimeWindow="+pickupTimeWindow+"][deliveryTimeWindow="+deliveryTimeWindow+"]";
 	}
 

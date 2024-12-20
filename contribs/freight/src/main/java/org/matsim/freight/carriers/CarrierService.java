@@ -23,7 +23,6 @@ package org.matsim.freight.carriers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -41,7 +40,7 @@ public final class CarrierService implements CarrierJob {
 
 		private double serviceTime = 0.0;
 		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		private int capacityDemand = 0;
+		private int demand = 0;
 
 		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
 			super();
@@ -84,7 +83,7 @@ public final class CarrierService implements CarrierJob {
 		}
 
 		public Builder setCapacityDemand(int value) {
-			this.capacityDemand = value;
+			this.demand = value;
 			return this;
 		}
 
@@ -92,17 +91,11 @@ public final class CarrierService implements CarrierJob {
 
 
 	private final Id<CarrierService> id;
-
 	private final Id<Link> locationId;
-
 	private final String name;
-
 	private final double serviceDuration;
-
 	private final TimeWindow timeWindow;
-
 	private final int demand;
-
 	private final Attributes attributes = new AttributesImpl();
 
 	private CarrierService(Builder builder){
@@ -110,13 +103,16 @@ public final class CarrierService implements CarrierJob {
 		locationId = builder.locationLinkId;
 		serviceDuration = builder.serviceTime;
 		timeWindow = builder.timeWindow;
-		demand = builder.capacityDemand;
+		demand = builder.demand;
 		name = builder.name;
 	}
 
+	@Override
 	public Id<CarrierService> getId() {
 		return id;
 	}
+
+
 
 	public Id<Link> getLocationLinkId() {
 		return locationId;
@@ -130,9 +126,22 @@ public final class CarrierService implements CarrierJob {
 		return timeWindow;
 	}
 
+	/**
+	 * @deprecated please inline and use {@link #getDemand()} instead
+	 */
+	@Deprecated(since = "dez 2024")
 	public int getCapacityDemand() {
+		return getDemand();
+	}
+
+	/**
+	 * @return the demand (size; capacity needed) of the service.
+	 */
+	@Override
+	public int getDemand() {
 		return demand;
 	}
+
 
 	@Override
 	public Attributes getAttributes() {
