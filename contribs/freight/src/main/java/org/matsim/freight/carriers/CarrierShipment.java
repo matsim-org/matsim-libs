@@ -45,7 +45,7 @@ public final class CarrierShipment implements CarrierJob {
 	 */
 	public static class Builder {
 
-		private Id<CarrierShipment> id;
+		private final Id<CarrierShipment> id;
 		private final int demand;
 
 		private final Id<Link> pickupLinkId;
@@ -71,7 +71,8 @@ public final class CarrierShipment implements CarrierJob {
 		 */
 		@Deprecated
 		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
-			return new Builder(from,to,size);
+			var id = Id.create(CarrierConstants.SHIPMENT +"_" + from.toString() + "_" + to.toString(), CarrierShipment.class);
+			return new Builder(id, from,to,size);
 		}
 
 		/**
@@ -95,6 +96,7 @@ public final class CarrierShipment implements CarrierJob {
 		@Deprecated
 		public Builder(Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
 			super();
+			this.id = Id.create(CarrierConstants.SHIPMENT +"_" + pickupLinkId.toString() + "_" + deliveryLinkId.toString(), CarrierShipment.class);
 			this.pickupLinkId = pickupLinkId;
 			this.deliveryLinkId = deliveryLinkId;
 			this.demand = demand;
