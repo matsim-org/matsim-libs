@@ -48,10 +48,16 @@ public final class CarrierShipment implements CarrierJob {
 		private final Id<CarrierShipment> id;
 		private final int demand;
 
+		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+		//kturner dec'24
 		private final Id<Link> pickupLinkId;
 		private TimeWindow pickupStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double pickupDuration = 0.0;
 
+		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+		//kturner dec'24
 		private final Id<Link> deliveryLinkId;
 		private TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double deliveryDuration = 0.0;
@@ -174,7 +180,7 @@ public final class CarrierShipment implements CarrierJob {
 		/**
 		 * @deprecated please inline and use {@link #setPickupStartsTimeWindow(TimeWindow)} instead
 		 */
-		@Deprecated(since = "dez 2024")
+		@Deprecated(since = "dec'24")
 		public Builder setPickupTimeWindow(TimeWindow pickupTW){
 			return setPickupStartsTimeWindow(pickupTW);
 		}
@@ -182,7 +188,7 @@ public final class CarrierShipment implements CarrierJob {
 		/**
 		 * @deprecated please inline and use {@link #setPickupDuration(double)} instead
 		 */
-		@Deprecated(since = "dez 2024")
+		@Deprecated(since = "dec'24")
 		public Builder setPickupServiceTime(double pickupServiceTime){
 			return setPickupDuration(pickupServiceTime);
 		}
@@ -190,7 +196,7 @@ public final class CarrierShipment implements CarrierJob {
 		/**
 		 * @deprecated please inline and use {@link #setDeliveryStartsTimeWindow(TimeWindow)} instead
 		 */
-		@Deprecated(since = "dez 2024")
+		@Deprecated(since = "dec'24")
 		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
 			return setDeliveryStartsTimeWindow(deliveryTW);
 		}
@@ -198,22 +204,25 @@ public final class CarrierShipment implements CarrierJob {
 		/**
 		 * @deprecated please inline and use {@link #setDeliveryDuration(double)} instead
 		 */
-		@Deprecated(since = "dez 2024")
+		@Deprecated(since = "dec'24")
 		public Builder setDeliveryServiceTime(double deliveryServiceTime){
 			return setDeliveryDuration(deliveryServiceTime);
 		}
-
-
-
 	}
 
 	private final Id<CarrierShipment> id;
 	private final int demand;
 
+	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+	//kturner dec'24
 	private final Id<Link> pickupLinkId;
 	private final TimeWindow pickupStartsTimeWindow;
 	private double pickupDuration;
 
+	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+	//kturner dec'24
 	private final Id<Link> deliveryLinkId;
 	private final TimeWindow deliveryStartsTimeWindow;
 	private double deliveryDuration;
@@ -264,7 +273,7 @@ public final class CarrierShipment implements CarrierJob {
 	/**
 	 * @deprecated please inline and use {@link #getDemand()} instead
 	 */
-	@Deprecated(since = "dez 2024")
+	@Deprecated(since = "dec'24")
 	public int getSize() {
 		return getDemand();
 	}

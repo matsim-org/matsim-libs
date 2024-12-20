@@ -33,6 +33,9 @@ public final class CarrierService implements CarrierJob {
 		private final Id<CarrierService> id;
 		private int demand = 0;
 
+		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+		//kturner dec'24
 		private final Id<Link> serviceLinkId;
 		private TimeWindow serviceStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double serviceDuration = 0.0;
@@ -59,7 +62,7 @@ public final class CarrierService implements CarrierJob {
 		 * Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
 		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
 		 *
-		 * @param startTimeWindow 	time-window for the beginning of the service acti
+		 * @param startTimeWindow 	time-window for the beginning of the service activity
 		 * @return 					the builder
 		 */
 		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
@@ -79,9 +82,15 @@ public final class CarrierService implements CarrierJob {
 			return this;
 		}
 
-
-
-
+		/**
+		* Sets the demand (size; capacity needed) of the service.
+		 * When not set, it is by default 0.
+		 * <p>
+		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 *
+		 * @param value the demand (size; capacity needed) of the service
+		 * @return the builder
+		*/
 		public Builder setCapacityDemand(int value) {
 			this.demand = value;
 			return this;
@@ -93,6 +102,9 @@ public final class CarrierService implements CarrierJob {
 	private final Id<CarrierService> id;
 	private final int demand;
 
+	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+	//kturner dec'24
 	private final Id<Link> serviceLinkId;
 	private final TimeWindow serviceStartsTimeWindow;
 	private final double serviceDuration;
@@ -127,7 +139,7 @@ public final class CarrierService implements CarrierJob {
 	/**
 	 * @deprecated please inline and use {@link #getDemand()} instead
 	 */
-	@Deprecated(since = "dez 2024")
+	@Deprecated(since = "dec'24")
 	public int getCapacityDemand() {
 		return getDemand();
 	}
