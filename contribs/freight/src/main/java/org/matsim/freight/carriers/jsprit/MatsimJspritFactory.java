@@ -88,11 +88,11 @@ public final class MatsimJspritFactory {
 				.newInstance(Id.create(jspritShipment.getId(), CarrierShipment.class),
 						Id.createLinkId(jspritShipment.getPickupLocation().getId()),
 						Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
-				.setDeliveryServiceTime(jspritShipment.getDeliveryServiceTime())
-				.setDeliveryTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
+				.setDeliveryDuration(jspritShipment.getDeliveryServiceTime())
+				.setDeliveryStartsTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
 						jspritShipment.getDeliveryTimeWindow().getEnd()))
-				.setPickupServiceTime(jspritShipment.getPickupServiceTime())
-				.setPickupTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
+				.setPickupDuration(jspritShipment.getPickupServiceTime())
+				.setPickupStartsTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
 						jspritShipment.getPickupTimeWindow().getEnd()))
 				.build();
 		CarriersUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
@@ -184,7 +184,7 @@ public final class MatsimJspritFactory {
 	static CarrierService createCarrierService(Service jspritService) {
 		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(
 				Id.create(jspritService.getId(), CarrierService.class), Id.create(jspritService.getLocation().getId(), Link.class));
-		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
+		serviceBuilder.setDemand(jspritService.getSize().get(0));
 		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(
 				org.matsim.freight.carriers.TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));

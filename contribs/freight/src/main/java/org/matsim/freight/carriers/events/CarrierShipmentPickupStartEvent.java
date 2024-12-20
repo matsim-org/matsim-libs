@@ -77,7 +77,7 @@ public class CarrierShipmentPickupStartEvent extends AbstractCarrierEvent {
 		Id<Link> shipmentFrom = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		int shipmentSize = Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND));
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, shipmentFrom, null, shipmentSize)
-				.setPickupServiceTime(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_PICKUP_DURATION)))
+				.setPickupDuration(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_PICKUP_DURATION)))
 				.build();
 		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
 		return new CarrierShipmentPickupStartEvent(time, carrierId, shipment, vehicleId);

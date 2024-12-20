@@ -101,7 +101,7 @@ final class FreightScenarioCreator {
 
         for(int i=0;i<20;i++){
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create((i + 1),CarrierService.class), drawLocationLinkId(innerCityLinks, outerCityLinks));
-            serviceBuilder.setCapacityDemand(1);
+            serviceBuilder.setDemand(1);
             serviceBuilder.setServiceDuration(5*60);
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
             CarrierService carrierService = serviceBuilder.build();

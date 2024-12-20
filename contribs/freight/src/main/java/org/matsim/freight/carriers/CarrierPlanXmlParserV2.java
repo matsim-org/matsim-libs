@@ -117,7 +117,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				Id<Link> to = Id.create(toLocation, Link.class);
 				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 				String capDemandString = atts.getValue("capacityDemand");
-				if (capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
+				if (capDemandString != null) serviceBuilder.setDemand(getInt(capDemandString));
 				String startString = atts.getValue("earliestStart");
 				double start = parseTimeToDouble(startString);
 				double end;
@@ -157,13 +157,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
 				if (startPickup != null && endPickup != null)
-					shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+					shipmentBuilder.setPickupStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 				if (startDelivery != null && endDelivery != null)
-					shipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+					shipmentBuilder.setDeliveryStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
 				if (pickupServiceTime != null)
-					shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
+					shipmentBuilder.setPickupDuration(parseTimeToDouble(pickupServiceTime));
 				if (deliveryServiceTime != null)
-					shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
+					shipmentBuilder.setDeliveryDuration(parseTimeToDouble(deliveryServiceTime));
 
 				currentShipment = shipmentBuilder.build();
 				currentShipments.put(atts.getValue(ID), currentShipment);
