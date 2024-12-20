@@ -374,7 +374,7 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return service.getType();
+			return CarrierConstants.SERVICE;
 		}
 
 		@Override

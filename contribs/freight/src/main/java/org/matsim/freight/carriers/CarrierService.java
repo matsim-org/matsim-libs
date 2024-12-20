@@ -36,7 +36,6 @@ public final class CarrierService implements CarrierJob {
 
 		private final Id<CarrierService> id;
 		private final Id<Link> locationLinkId;
-		private String name = "service";
 
 		private double serviceTime = 0.0;
 		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
@@ -48,10 +47,6 @@ public final class CarrierService implements CarrierJob {
 			this.locationLinkId = locationLinkId;
 		}
 
-		public Builder setName(String name){
-			this.name = name;
-			return this;
-		}
 
 		/**
 		 * By default, it is [0.0,Integer.MaxValue].
@@ -92,7 +87,6 @@ public final class CarrierService implements CarrierJob {
 
 	private final Id<CarrierService> id;
 	private final Id<Link> locationId;
-	private final String name;
 	private final double serviceDuration;
 	private final TimeWindow timeWindow;
 	private final int demand;
@@ -104,7 +98,6 @@ public final class CarrierService implements CarrierJob {
 		serviceDuration = builder.serviceTime;
 		timeWindow = builder.timeWindow;
 		demand = builder.demand;
-		name = builder.name;
 	}
 
 	@Override
@@ -148,12 +141,6 @@ public final class CarrierService implements CarrierJob {
 		return attributes;
 	}
 
-	/**
-	 * @return the name
-	 */
-	public String getType() {
-		return name;
-	}
 
 	@Override
 	public String toString() {
