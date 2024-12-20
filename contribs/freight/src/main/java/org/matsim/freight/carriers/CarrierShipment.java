@@ -254,7 +254,7 @@ public final class CarrierShipment implements CarrierJob {
 	/**
 	 * Do we really need the setter? We do have it in the builder.
 	 * I do not see, why we should be able to update it, since most of the values are immutable.
-	 * @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable..
+	 * @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable.
 	 * kturner, dec'24
 	 */
 	@Deprecated(since = "dec'24")
@@ -265,7 +265,7 @@ public final class CarrierShipment implements CarrierJob {
 	/**
 	* Do we really need the setter? We do have it in the builder.
 	* I do not see, why we should be able to update it, since most of the values are immutable.
-	* @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable..
+	* @deprecated Consider setting it using the Builder. This will maybe be removed and the field gets immutable.
 	* kturner, dec'24
 	*/
 	@Deprecated(since = "dec'24")
@@ -317,20 +317,13 @@ public final class CarrierShipment implements CarrierJob {
 		return getDemand();
 	}
 
+
 	/**
 	 * @deprecated please inline and use {@link #getPickupLinkId()} instead
 	 */
 	@Deprecated(since = "dec'24")
 	public Id<Link> getFrom() {
 		return getPickupLinkId();
-	}
-
-	/**
-	 * @deprecated please inline and use {@link #getDeliveryLinkId()} instead
-	 */
-	@Deprecated(since = "dec'24")
-	public Id<Link> getTo() {
-		return getDeliveryLinkId();
 	}
 
 	/**
@@ -341,13 +334,12 @@ public final class CarrierShipment implements CarrierJob {
 		return getPickupStartsTimeWindow();
 	}
 
-
 	/**
-	 * @deprecated please inline and use {@link #getDeliveryStartsTimeWindow()} instead
+	 * @deprecated please inline and use {@link #setPickupDuration(double)} instead
 	 */
 	@Deprecated(since = "dec'24")
-	public TimeWindow getDeliveryTimeWindow() {
-		return getDeliveryStartsTimeWindow();
+	public void setPickupServiceTime(double pickupDuration) {
+		setPickupDuration(pickupDuration);
 	}
 
 	/**
@@ -358,12 +350,21 @@ public final class CarrierShipment implements CarrierJob {
 		return getPickupDuration();
 	}
 
+
 	/**
-	 * @deprecated please inline and use {@link #setPickupDuration(double)} instead
+	 * @deprecated please inline and use {@link #getDeliveryLinkId()} instead
 	 */
 	@Deprecated(since = "dec'24")
-	public void setPickupServiceTime(double pickupDuration) {
-		setPickupDuration(pickupDuration);
+	public Id<Link> getTo() {
+		return getDeliveryLinkId();
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getDeliveryStartsTimeWindow()} instead
+	 */
+	@Deprecated(since = "dec'24")
+	public TimeWindow getDeliveryTimeWindow() {
+		return getDeliveryStartsTimeWindow();
 	}
 
 	/**
