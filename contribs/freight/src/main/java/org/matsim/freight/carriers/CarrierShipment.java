@@ -45,6 +45,18 @@ public final class CarrierShipment implements CarrierJob {
 	 */
 	public static class Builder {
 
+		Id<CarrierShipment> id;
+		final int demand;
+
+		final Id<Link> pickupLinkId;
+		TimeWindow pickupStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		double pickupDuration = 0.0;
+
+		final Id<Link> deliveryLinkId;
+		TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		double deliveryDuration = 0.0;
+
+
 		/**
 		 * @deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 * <p>
@@ -77,53 +89,42 @@ public final class CarrierShipment implements CarrierJob {
 			return new Builder(id, from,to,size);
 		}
 
-		Id<CarrierShipment> id;
-		final int size;
-
-		final Id<Link> from;
-		TimeWindow pickTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		double pickServiceTime = 0.0;
-
-		final Id<Link> to;
-		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		double delServiceTime = 0.0;
-
 		/**
 		 * @deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 */
 		@Deprecated
-		public Builder(Id<Link> from, Id<Link> to, int size) {
+		public Builder(Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
 			super();
-			this.from = from;
-			this.to = to;
-			this.size = size;
+			this.pickupLinkId = pickupLinkId;
+			this.deliveryLinkId = deliveryLinkId;
+			this.demand = demand;
 		}
 
-		public Builder(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) {
+		public Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
 			super();
 			this.id = id;
-			this.from = from;
-			this.to = to;
-			this.size = size;
+			this.pickupLinkId = pickupLinkId;
+			this.deliveryLinkId = deliveryLinkId;
+			this.demand = demand;
 		}
 
 		public Builder setPickupTimeWindow(TimeWindow pickupTW){
-			this.pickTW = pickupTW;
+			this.pickupStartsTimeWindow = pickupTW;
 			return this;
 		}
 
 		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
-			this.delTW = deliveryTW;
+			this.deliveryStartsTimeWindow = deliveryTW;
 			return this;
 		}
 
 		public Builder setPickupServiceTime(double pickupServiceTime){
-			this.pickServiceTime = pickupServiceTime;
+			this.pickupDuration = pickupServiceTime;
 			return this;
 		}
 
 		public Builder setDeliveryServiceTime(double deliveryServiceTime){
-			this.delServiceTime = deliveryServiceTime;
+			this.deliveryDuration = deliveryServiceTime;
 			return this;
 		}
 
@@ -135,42 +136,42 @@ public final class CarrierShipment implements CarrierJob {
 	private final Id<CarrierShipment> id;
 	private final int demand;
 
-	private final Id<Link> from;
-	private final TimeWindow pickupTimeWindow;
-	private double pickupServiceTime;
+	private final Id<Link> pickupLinkId;
+	private final TimeWindow pickupStartsTimeWindow;
+	private double pickupDuration;
 
-	private final Id<Link> to;
-	private final TimeWindow deliveryTimeWindow;
-	private double deliveryServiceTime;
+	private final Id<Link> deliveryLinkId;
+	private final TimeWindow deliveryStartsTimeWindow;
+	private double deliveryDuration;
 
 	private final Attributes attributes = new AttributesImpl();
 
 
 	private CarrierShipment(Builder builder) {
 		id = builder.id;
-		from = builder.from;
-		to = builder.to;
-		demand = builder.size;
-		pickupServiceTime = builder.pickServiceTime;
-		deliveryServiceTime = builder.delServiceTime;
-		pickupTimeWindow = builder.pickTW;
-		deliveryTimeWindow = builder.delTW;
+		pickupLinkId = builder.pickupLinkId;
+		deliveryLinkId = builder.deliveryLinkId;
+		demand = builder.demand;
+		pickupDuration = builder.pickupDuration;
+		deliveryDuration = builder.deliveryDuration;
+		pickupStartsTimeWindow = builder.pickupStartsTimeWindow;
+		deliveryStartsTimeWindow = builder.deliveryStartsTimeWindow;
 	}
 
 	public double getPickupServiceTime() {
-		return pickupServiceTime;
+		return pickupDuration;
 	}
 
-	public void setPickupServiceTime(double pickupServiceTime) {
-		this.pickupServiceTime = pickupServiceTime;
+	public void setPickupServiceTime(double pickupDuration) {
+		this.pickupDuration = pickupDuration;
 	}
 
 	public double getDeliveryServiceTime() {
-		return deliveryServiceTime;
+		return deliveryDuration;
 	}
 
-	public void setDeliveryServiceTime(double deliveryServiceTime) {
-		this.deliveryServiceTime = deliveryServiceTime;
+	public void setDeliveryServiceTime(double deliveryDuration) {
+		this.deliveryDuration = deliveryDuration;
 	}
 
 	@Override
@@ -179,11 +180,11 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	public Id<Link> getFrom() {
-		return from;
+		return pickupLinkId;
 	}
 
 	public Id<Link> getTo() {
-		return to;
+		return deliveryLinkId;
 	}
 
 	/**
@@ -203,11 +204,11 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	public TimeWindow getPickupTimeWindow() {
-		return pickupTimeWindow;
+		return pickupStartsTimeWindow;
 	}
 
 	public TimeWindow getDeliveryTimeWindow() {
-		return deliveryTimeWindow;
+		return deliveryStartsTimeWindow;
 	}
 
 	@Override
@@ -217,8 +218,8 @@ public final class CarrierShipment implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + from.toString() + "][to=" + to.toString() + "][size=" + demand + "][pickupServiceTime=" + pickupServiceTime + "]" +
-				"[deliveryServiceTime="+deliveryServiceTime+"][pickupTimeWindow="+pickupTimeWindow+"][deliveryTimeWindow="+deliveryTimeWindow+"]";
+		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + pickupLinkId.toString() + "][to=" + deliveryLinkId.toString() + "][size=" + demand + "][pickupServiceTime=" + pickupDuration + "]" +
+				"[deliveryServiceTime="+ deliveryDuration +"][pickupTimeWindow="+ pickupStartsTimeWindow +"][deliveryTimeWindow="+ deliveryStartsTimeWindow +"]";
 	}
 
 	/* (non-Javadoc)

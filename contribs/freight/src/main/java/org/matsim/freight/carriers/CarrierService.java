@@ -30,21 +30,21 @@ public final class CarrierService implements CarrierJob {
 
 	public static class Builder {
 
+		private final Id<CarrierService> id;
+		private int demand = 0;
+
+		private final Id<Link> serviceLinkId;
+		private TimeWindow serviceStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private double serviceDuration = 0.0;
+
 		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId){
 			return new Builder(id,locationLinkId);
 		}
 
-		private final Id<CarrierService> id;
-		private int demand = 0;
-
-		private final Id<Link> locationLinkId;
-		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		private double serviceTime = 0.0;
-
-		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
+		private Builder(Id<CarrierService> id, Id<Link> serviceLinkId) {
 			super();
 			this.id = id;
-			this.locationLinkId = locationLinkId;
+			this.serviceLinkId = serviceLinkId;
 		}
 
 
@@ -55,7 +55,7 @@ public final class CarrierService implements CarrierJob {
 		 * @return 					the builder
 		 */
 		public Builder setServiceDuration(double serviceDuration){
-			this.serviceTime = serviceDuration;
+			this.serviceDuration = serviceDuration;
 			return this;
 		}
 
@@ -69,7 +69,7 @@ public final class CarrierService implements CarrierJob {
 		 * @return 					the builder
 		 */
 		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
-			this.timeWindow = startTimeWindow;
+			this.serviceStartsTimeWindow = startTimeWindow;
 			return this;
 		}
 
@@ -88,17 +88,17 @@ public final class CarrierService implements CarrierJob {
 	private final Id<CarrierService> id;
 	private final int demand;
 
-	private final Id<Link> locationId;
-	private final TimeWindow timeWindow;
+	private final Id<Link> serviceLinkId;
+	private final TimeWindow serviceStartsTimeWindow;
 	private final double serviceDuration;
 
 	private final Attributes attributes = new AttributesImpl();
 
 	private CarrierService(Builder builder){
 		id = builder.id;
-		locationId = builder.locationLinkId;
-		serviceDuration = builder.serviceTime;
-		timeWindow = builder.timeWindow;
+		serviceLinkId = builder.serviceLinkId;
+		serviceDuration = builder.serviceDuration;
+		serviceStartsTimeWindow = builder.serviceStartsTimeWindow;
 		demand = builder.demand;
 	}
 
@@ -107,10 +107,8 @@ public final class CarrierService implements CarrierJob {
 		return id;
 	}
 
-
-
 	public Id<Link> getLocationLinkId() {
-		return locationId;
+		return serviceLinkId;
 	}
 
 	public double getServiceDuration() {
@@ -118,7 +116,7 @@ public final class CarrierService implements CarrierJob {
 	}
 
 	public TimeWindow getServiceStartTimeWindow(){
-		return timeWindow;
+		return serviceStartsTimeWindow;
 	}
 
 	/**
@@ -146,7 +144,7 @@ public final class CarrierService implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + locationId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + timeWindow + "]";
+		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartsTimeWindow + "]";
 	}
 
 	/* (non-Javadoc)
