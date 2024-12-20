@@ -156,15 +156,10 @@ public interface SimLink {
 		@Override
 		public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 
-			// calculate the speed directly. This should be done with a link speed calculator later
-			var distanceToTravel = switch (position) {
-				case QStart -> length;
-				case QEnd, Buffer -> 0.;
+			var earliestExitTime = switch (position) {
+				case QStart -> calculateExitTime(vehicle, now);
+				case QEnd, Buffer -> now;
 			};
-			var speed = Math.min(freespeed, vehicle.getMaximumVelocity());
-			var duration = distanceToTravel / speed;
-			// The original qsim floors the earliest exit time.
-			var earliestExitTime = Math.floor(now + duration);
 			vehicle.setEarliestLinkExitTime(earliestExitTime);
 			vehicle.setCurrentLinkId(id);
 
@@ -175,6 +170,17 @@ public interface SimLink {
 				}
 				case Buffer -> buffer.add(vehicle, now);
 			}
+		}
+
+		private double calculateExitTime(DistributedMobsimVehicle vehicle, double now) {
+			// The original QSim floors the travel time. We also do this but additionally,
+			// assume a travel time of at least one second. This is due to how messaging is
+			// implemented. Vehicles sent to the next partition can only be processed in the
+			// next. By giving each vehicle a travel time of at least one, we can ensure that
+			// travel time is the same between split and local links
+			var speed = Math.min(freespeed, vehicle.getMaximumVelocity());
+			var duration = Math.max(1, length / speed);
+			return Math.floor(now + duration);
 		}
 
 		@Override
