@@ -165,7 +165,7 @@ public class CarrierControllerUtilsTest{
 
 		int demandServices = 0;
 		for (CarrierService carrierService : carrierWServices.getServices().values()) {
-			demandServices += carrierService.getCapacityDemand();
+			demandServices += carrierService.getDemand();
 		}
 		Assertions.assertEquals(4, demandServices);
 
@@ -180,7 +180,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipments.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(3, demandShipments);
 	}
@@ -192,7 +192,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -204,7 +204,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWServices.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-			demandShipments += carrierShipment.getSize();
+            demandShipments += carrierShipment.getDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -244,30 +244,30 @@ public class CarrierControllerUtilsTest{
 		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				System.out.println("Found Shipment1");
 				foundShipment1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getTo());
-				Assertions.assertEquals(1, carrierShipment1.getSize());
-				Assertions.assertEquals(30.0, carrierShipment1.getDeliveryServiceTime(), 0);
-				Assertions.assertEquals(3600.0, carrierShipment1.getDeliveryTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36000.0, carrierShipment1.getDeliveryTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(5.0, carrierShipment1.getPickupServiceTime(), 0);
-				Assertions.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
-				Assertions.assertEquals(7200.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getDeliveryLinkId());
+            Assertions.assertEquals(1, carrierShipment1.getDemand());
+				Assertions.assertEquals(30.0, carrierShipment1.getDeliveryDuration(), 0);
+			Assertions.assertEquals(3600.0, carrierShipment1.getDeliveryStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36000.0, carrierShipment1.getDeliveryStartsTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(5.0, carrierShipment1.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment1.getPickupStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(7200.0, carrierShipment1.getPickupStartsTimeWindow().getEnd(), 0);
 			}
 		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
 				foundShipment2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getTo());
-				Assertions.assertEquals(2, carrierShipment2.getSize());
-				Assertions.assertEquals(30.0, carrierShipment2.getDeliveryServiceTime(), 0);
-				Assertions.assertEquals(3600.0, carrierShipment2.getDeliveryTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36000.0, carrierShipment2.getDeliveryTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(5.0, carrierShipment2.getPickupServiceTime(), 0);
-				Assertions.assertEquals(0.0, carrierShipment2.getPickupTimeWindow().getStart(), 0);
-				Assertions.assertEquals(7200.0, carrierShipment2.getPickupTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getDeliveryLinkId());
+            Assertions.assertEquals(2, carrierShipment2.getDemand());
+				Assertions.assertEquals(30.0, carrierShipment2.getDeliveryDuration(), 0);
+			Assertions.assertEquals(3600.0, carrierShipment2.getDeliveryStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36000.0, carrierShipment2.getDeliveryStartsTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(5.0, carrierShipment2.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment2.getPickupStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(7200.0, carrierShipment2.getPickupStartsTimeWindow().getEnd(), 0);
 			}
 		Assertions.assertTrue(foundShipment1, "Not found Shipment1 after copying");
 		Assertions.assertTrue(foundShipment2, "Not found Shipment2 after copying");
@@ -282,29 +282,29 @@ public class CarrierControllerUtilsTest{
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundService1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getTo());
-				Assertions.assertEquals(2, carrierShipment1.getSize());
-				Assertions.assertEquals(31.0, carrierShipment1.getDeliveryServiceTime(), 0);
-				Assertions.assertEquals(3601.0, carrierShipment1.getDeliveryTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36001.0, carrierShipment1.getDeliveryTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(0.0, carrierShipment1.getPickupServiceTime(), 0);
-				Assertions.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36001.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getDeliveryLinkId());
+            Assertions.assertEquals(2, carrierShipment1.getDemand());
+				Assertions.assertEquals(31.0, carrierShipment1.getDeliveryDuration(), 0);
+			Assertions.assertEquals(3601.0, carrierShipment1.getDeliveryStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36001.0, carrierShipment1.getDeliveryStartsTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(0.0, carrierShipment1.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment1.getPickupStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36001.0, carrierShipment1.getPickupStartsTimeWindow().getEnd(), 0);
 			}
 		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
-				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getTo());
-				Assertions.assertEquals(2, carrierShipment2.getSize());
-				Assertions.assertEquals(31.0, carrierShipment2.getDeliveryServiceTime(), 0);
-				Assertions.assertEquals(3601.0, carrierShipment2.getDeliveryTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36001.0, carrierShipment2.getDeliveryTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(0.0, carrierShipment2.getPickupServiceTime(), 0);
-				Assertions.assertEquals(0.0, carrierShipment2.getPickupTimeWindow().getStart(), 0);
-				Assertions.assertEquals(36001.0, carrierShipment2.getPickupTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getPickupLinkId());
+				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getDeliveryLinkId());
+            Assertions.assertEquals(2, carrierShipment2.getDemand());
+				Assertions.assertEquals(31.0, carrierShipment2.getDeliveryDuration(), 0);
+			Assertions.assertEquals(3601.0, carrierShipment2.getDeliveryStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36001.0, carrierShipment2.getDeliveryStartsTimeWindow().getEnd(), 0);
+				Assertions.assertEquals(0.0, carrierShipment2.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment2.getPickupStartsTimeWindow().getStart(), 0);
+			Assertions.assertEquals(36001.0, carrierShipment2.getPickupStartsTimeWindow().getEnd(), 0);
 			}
 		Assertions.assertTrue(foundService1, "Not found converted Service1 after converting");
 		Assertions.assertTrue(foundService2, "Not found converted Service2 after converting");
@@ -343,16 +343,16 @@ public class CarrierControllerUtilsTest{
 		}
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
-				.setDeliveryServiceTime(30.0)
-				.setDeliveryTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
-				.setPickupServiceTime(5.0)
-				.setPickupTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
+				.setDeliveryDuration(30.0)
+				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+				.setPickupDuration(5.0)
+				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setCapacityDemand(size)
+				.setDemand(size)
 				.setServiceDuration(31.0)
 				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 				.build();
