@@ -83,17 +83,34 @@ public final class CarrierService implements CarrierJob {
 		}
 
 		/**
+		 * Sets the demand (size; capacity needed) of the service.
+		 * When not set, it is by default 0.
+		 * <p>
+		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 *
+		 * @param demand the demand (size; capacity needed) of the service
+		 * @return the builder
+		 */
+		public Builder setDemand(int demand) {
+			this.demand = demand;
+			return this;
+		}
+
+
+		/**
 		* Sets the demand (size; capacity needed) of the service.
 		 * When not set, it is by default 0.
 		 * <p>
 		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
 		 *
+		 * @deprecated please use {@link #setDemand(int)} instead
+		 *
 		 * @param value the demand (size; capacity needed) of the service
 		 * @return the builder
 		*/
+		@Deprecated(since = "dec'24")
 		public Builder setCapacityDemand(int value) {
-			this.demand = value;
-			return this;
+			return setDemand(value);
 		}
 
 	}
