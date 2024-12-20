@@ -160,6 +160,12 @@ public class NetworkDecomposition {
 		}
 
 		Int2IntMap nodeWeights = new Int2IntOpenHashMap();
+
+		// Initialize node weights as 1
+		for (Node n : network.getNodes().values()) {
+			nodeWeights.put(n.getId().index(), 1);
+		}
+
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			for (Leg leg : TripStructureUtils.getLegs(plan)) {
