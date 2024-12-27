@@ -1,6 +1,9 @@
 package org.matsim.core.replanning.choosers;
 
-import com.google.inject.*;
+import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -26,6 +29,16 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 	 * The total number of agents per subpopulation.
 	 */
 	private final Object2IntMap<String> total = new Object2IntOpenHashMap<>();
+
+	/**
+	 * Number of agents already processed this iteration.
+	 */
+	private final Object2IntMap<String> seen = new Object2IntOpenHashMap<>();
+
+	/**
+	 * Number of agents already decided to innovate this iteration.
+	 */
+	private final Object2IntMap<String> innovated = new Object2IntOpenHashMap<>();
 
 	/**
 	 * Agents that are forced to innovate (per subpopulation).
@@ -59,10 +72,19 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 
 	/**
 	 * Convenience method to bind this strategy chooser to a Guice binder.
+	 *
 	 * @param binder Guice binder
 	 */
 	public static void bind(Binder binder) {
-		binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(new TypeLiteral<BalancedInnovationStrategyChooser<Plan, Person>>() {}).in(Singleton.class);
+		binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {
+		}).to(new TypeLiteral<BalancedInnovationStrategyChooser<Plan, Person>>() {
+		}).in(Singleton.class);
+	}
+
+	@Override
+	public void beforeReplanning(ReplanningContext replanningContext) {
+		innovated.clear();
+		seen.clear();
 	}
 
 	@Override
@@ -97,6 +119,12 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 
 		int id = person.getId().index();
 
+		// Expected number of innovations (this iteration)
+		double expected = (seen.getInt(subpopulation) * totalInno) / (totalInno + totalSel);
+		double diff = expected - innovated.getInt(subpopulation);
+
+		seen.mergeInt(subpopulation, 1, Integer::sum);
+
 		if (rnd < totalInno) {
 			// Agent would innovate
 
@@ -107,6 +135,7 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 			}
 
 			oneAhead.add(id);
+			innovated.mergeInt(subpopulation, 1, Integer::sum);
 			advanceStep(subpopulation);
 
 			return chooseStrategy(totalInno, wInno, weights);
@@ -118,16 +147,17 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 				carryOver.mergeInt(subpopulation, -1, Integer::sum);
 
 				oneAhead.add(id);
+				innovated.mergeInt(subpopulation, 1, Integer::sum);
 				advanceStep(subpopulation);
-
 				return chooseStrategy(totalInno, wInno, weights);
 			}
 
-			// If the carry over becomes too large, agents are allowed
-			if (carryOver.getInt(subpopulation) > 100 && !twoAhead.contains(id)) {
+			// If the difference becomes too large, agents are allowed to innovate again
+			if (carryOver.getInt(subpopulation) > 0 && diff > 10 && !twoAhead.contains(id)) {
 				carryOver.mergeInt(subpopulation, -1, Integer::sum);
 
 				twoAhead.add(id);
+				innovated.mergeInt(subpopulation, 1, Integer::sum);
 				return chooseStrategy(totalInno, wInno, weights);
 			}
 
