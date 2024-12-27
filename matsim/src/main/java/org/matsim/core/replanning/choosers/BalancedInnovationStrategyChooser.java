@@ -20,8 +20,8 @@ import java.util.Map;
 
 /**
  * Strategy chooser which ensures that all agents perform innovative strategies in a balanced manner.
- * That is at any time all agents have either performed n, n+1, n+2 times an innovative strategy. This difference is never larger than 2.
- * Reducing the distance to 1, is possible, but restricts the number of innovations per iteration.
+ * That is at any time all agents have either performed n, n+1 or n+2 times an innovative strategy. This difference is never larger than 2.
+ * The class also tries to balance the number of innovations in a single iteration.
  */
 public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements StrategyChooser<PL, AG> {
 
@@ -181,7 +181,7 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 	private GenericPlanStrategy<PL, AG> chooseStrategy(double total, double[] w, StrategyChooser.Weights<PL, AG> weights) {
 		double rnd = MatsimRandom.getRandom().nextDouble() * total;
 		double sum = 0.0;
-		for (int i = 0, max = weights.size(); i < max; i++) {
+		for (int i = 0, max = w.length; i < max; i++) {
 			sum += w[i];
 			if (rnd <= sum) {
 				return weights.getStrategy(i);

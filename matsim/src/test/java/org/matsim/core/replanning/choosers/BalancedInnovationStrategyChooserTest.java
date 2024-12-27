@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
@@ -43,6 +44,10 @@ class BalancedInnovationStrategyChooserTest {
 		chooser = new BalancedInnovationStrategyChooser(population);
 		count = new InnovationCounting();
 		weights = new StrategyChooser.Weights<>() {
+
+			private final PlanStrategy sel = new PlanStrategyImpl.Builder(new RandomPlanSelector<>()).build();
+			private final PlanStrategy inno = new PlanStrategyImpl.Builder(new RandomPlanSelector<>()).addStrategyModule(count).build();
+
 			@Override
 			public int size() {
 				return 3;
@@ -61,8 +66,8 @@ class BalancedInnovationStrategyChooserTest {
 			@Override
 			public PlanStrategy getStrategy(int i) {
 				return switch (i) {
-					case 0 -> new PlanStrategyImpl.Builder(new RandomPlanSelector<>()).build();
-					case 1, 2 -> new PlanStrategyImpl.Builder(new RandomPlanSelector<>()).addStrategyModule(count).build();
+					case 0 -> sel;
+					case 1, 2 -> inno;
 					default -> throw new IllegalStateException("Unexpected value: " + i);
 				};
 			}
@@ -102,13 +107,35 @@ class BalancedInnovationStrategyChooserTest {
 		assertThat(count.getDifference()).isLessThanOrEqualTo(2);
 	}
 
+	@Test
+	void baseline() {
+
+		// Compare how balanced baseline iterative algorithm is per iteration
+		for (int i = 0; i < 600; i++) {
+			int innovation = 0;
+			for (Person person : population.getPersons().values()) {
+				double rnd = MatsimRandom.getRandom().nextDouble();
+				if (rnd < 0.3) {
+					innovation++;
+				}
+			}
+
+			assertThat(innovation).isCloseTo(3000, Offset.offset(300));
+		}
+
+	}
+
 	private void runReplanning() {
 
 		chooser.beforeReplanning(null);
 
 		for (Person person : population.getPersons().values()) {
+
 			GenericPlanStrategy strategy = chooser.chooseStrategy(person, PopulationUtils.getSubpopulation(person), null, weights);
 			strategy.run(person);
+
+			// Always remove old plan
+			person.getPlans().removeIf(p -> p != person.getSelectedPlan());
 		}
 	}
 
