@@ -3,6 +3,8 @@ package org.matsim.modechoice.search;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ModeChoiceSearchTest {
@@ -97,4 +99,60 @@ public class ModeChoiceSearchTest {
 
 	}
 
+	@Test
+	void entry() {
+
+		int depth = 6;
+		long base = (long) Math.pow(depth, 9);
+
+		long b = 1;
+		for (int i = 0; i < 9; i++) {
+			b *= depth;
+		}
+
+		assertThat(b)
+			.isEqualTo(base);
+
+		byte[] modes = new byte[10];
+		Arrays.fill(modes, (byte) -1);
+
+		assertThat(ModeChoiceSearch.Entry.toIndex(modes, depth))
+			.isEqualTo(0);
+
+		modes[0] = 0;
+
+		assertThat(ModeChoiceSearch.Entry.toIndex(modes, depth))
+			.isEqualTo(1);
+
+		modes[1] = 1;
+		modes[2] = 2;
+		modes[3] = 3;
+		modes[4] = 4;
+
+		ModeChoiceSearch.Entry e = new ModeChoiceSearch.Entry(modes, depth, 0);
+
+		assertThat(e.getIndex())
+			.isEqualTo(7465);
+
+		byte[] result = new byte[10];
+		Arrays.fill(result, (byte) -1);
+
+		e.toArray(result, base, depth);
+
+		assertThat(result)
+			.isEqualTo(modes);
+
+		Arrays.fill(modes, (byte) 4);
+
+		e = new ModeChoiceSearch.Entry(modes, depth, 0);
+
+		e.toArray(result, base, depth);
+
+		assertThat(result)
+			.isEqualTo(modes);
+
+		assertThat(e.getIndex())
+			.isEqualTo(base * depth - 1);
+
+	}
 }
