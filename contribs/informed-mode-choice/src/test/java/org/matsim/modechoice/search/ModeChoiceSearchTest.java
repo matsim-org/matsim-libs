@@ -153,10 +153,16 @@ public class ModeChoiceSearchTest {
 		assertThat(ModeLongIterator.Entry.toIndex(modes, depth))
 			.isEqualTo(0);
 
+		assertThat(ModeLongIterator.Entry.toIndex(modes, depth, 0, (byte) 0))
+			.isEqualTo(1);
+
 		modes[0] = 0;
 
 		assertThat(ModeLongIterator.Entry.toIndex(modes, depth))
 			.isEqualTo(1);
+
+		assertThat(ModeLongIterator.Entry.toIndex(modes, depth, 1,  (byte) 0))
+			.isEqualTo(depth + 1);
 
 		modes[1] = 1;
 		modes[2] = 2;
@@ -214,6 +220,12 @@ public class ModeChoiceSearchTest {
 
 		assertThat(ModeIntIterator.Entry.toIndex(modes, depth))
 			.isEqualTo(1);
+
+		assertThat(ModeLongIterator.Entry.toIndex(modes, depth, 0, (byte) 0))
+			.isEqualTo(1);
+
+		assertThat(ModeLongIterator.Entry.toIndex(modes, depth, 1,  (byte) 0))
+			.isEqualTo(depth + 1);
 
 		modes[1] = 1;
 		modes[2] = 2;

@@ -153,7 +153,7 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 			}
 
 			// If the difference becomes too large, agents are allowed to innovate again
-			if (carryOver.getInt(subpopulation) > 0 && diff > 10 && !twoAhead.contains(id)) {
+			if (carryOver.getInt(subpopulation) > 0 && diff > 50 && !twoAhead.contains(id)) {
 				carryOver.mergeInt(subpopulation, -1, Integer::sum);
 
 				twoAhead.add(id);
