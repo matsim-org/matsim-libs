@@ -129,9 +129,6 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 				List<String[]> options = new ArrayList<>();
 
-				// current mode for comparison
-				options.add(model.getCurrentModes());
-
 				// generate all single mode options
 				for (String m : config.getModes()) {
 					String[] option = model.getCurrentModes();
@@ -140,11 +137,9 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 					for (int i = 0; i < mask.length; i++) {
 						if (mask[i])
 							option[i] = m;
-					}
 
-					// Current option is not added twice
-					if (!Arrays.equals(model.getCurrentModesMutable(), option))
 						options.add(option);
+					}
 				}
 
 				List<PlanCandidate> singleModeCandidates = ctx.generator.generatePredefined(model, options);

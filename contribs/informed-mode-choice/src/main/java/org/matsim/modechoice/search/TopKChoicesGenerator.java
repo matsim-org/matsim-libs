@@ -111,7 +111,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 						continue m;
 				}
 
-				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
+				// Only add estimates for desired modes and those that have actual usage
+				search.addEstimates(mode.getMode(), mode.getEstimates(), mask, mode.getNoRealUsage());
 			}
 
 			if (search.isEmpty())

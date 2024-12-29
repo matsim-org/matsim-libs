@@ -89,21 +89,6 @@ public final class EstimateRouter {
 						.map(el -> (Leg) el)
 						.collect(Collectors.toList());
 
-				// The PT router can return walk only trips that don't actually use pt
-				// this one special case is handled here, it is unclear if similar behaviour might be present in other modes
-				if (mode.equals(TransportMode.pt) && ll.stream().noneMatch(l -> l.getMode().equals(TransportMode.pt))) {
-					legs[i++] = null;
-					continue;
-				}
-
-				// TODO: might consider access agress walk modes
-
-				// Filters all kind of modes that did return only walk legs when they could not be used (e.g. drt)
-				if (!mode.equals(TransportMode.walk) && ll.stream().allMatch(l -> l.getMode().equals(TransportMode.walk))) {
-					legs[i++] = null;
-					continue;
-				}
-
 				legs[i++] = ll;
 
 			}

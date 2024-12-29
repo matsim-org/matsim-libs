@@ -104,17 +104,24 @@ final class ModeChoiceSearch {
 	 * Copy estimates into the internal map.
 	 */
 	public void addEstimates(String mode, double[] values) {
-		addEstimates(mode, values, null);
+		addEstimates(mode, values, null, null);
 	}
 
-	public void addEstimates(String mode, double[] values, boolean[] mask) {
+	/**
+	 * Copy estimates into the internal map.
+	 * @param mode added mode
+	 * @param values utility estimates
+	 * @param mask only use estimates where the mask is true
+	 * @param filter only use estimates where the filter is false
+	 */
+	public void addEstimates(String mode, double[] values, boolean[] mask, boolean[] filter) {
 
 		byte idx = mapping.computeIfAbsent(mode, k -> (byte) mapping.size());
 		inv.putIfAbsent(idx, mode);
 
 		// estimates needs to be accessed by each trip index first and then by mode
 		for (int i = 0; i < values.length; i++) {
-			if (mask == null || mask[i])
+			if ( (mask == null || mask[i]) && (filter == null || !filter[i]) )
 				estimates[i][idx] = values[i];
 		}
 	}
