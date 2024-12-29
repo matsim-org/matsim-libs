@@ -55,7 +55,7 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		if (anneal == InformedModeChoiceConfigGroup.Schedule.off || event.getIteration() == 0)
+		if (anneal == InformedModeChoiceConfigGroup.Schedule.off || event.getIteration() == 0 || currentBeta == Double.POSITIVE_INFINITY)
 			return;
 
 		// anneal target is 0, iterations are offset by 1 because first iteration does not do replanning
