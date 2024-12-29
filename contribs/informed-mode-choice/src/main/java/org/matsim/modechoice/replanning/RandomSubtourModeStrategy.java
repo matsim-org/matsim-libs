@@ -87,9 +87,9 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 					}
 				}
 
-				if (!options.isEmpty()) {
+				while (!options.isEmpty()) {
 
-					int idx = options.getInt(rnd.nextInt(options.size()));
+					int idx = options.removeInt(rnd.nextInt(options.size()));
 
 					String[] current = model.getCurrentModes();
 
@@ -98,9 +98,14 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 					if (config.isRequireDifferentModes())
 						candidates.remove(current[idx]);
 
-					if (!candidates.isEmpty()) {
+					while (!candidates.isEmpty()) {
 
-						current[idx] = candidates.get(rnd.nextInt(candidates.size()));
+						current[idx] = candidates.remove(rnd.nextInt(candidates.size()));
+
+						// Check further constraints
+						if (!planModelService.isValidOption(model, current))
+							continue;
+
 						new PlanCandidate(current, -1).applyTo(plan);
 						return;
 					}
@@ -141,7 +146,6 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 							candidates.add(new PlanCandidate(option, -1));
 
 				}
-
 
 				if (!candidates.isEmpty()) {
 					PlanCandidate select = candidates.get(rnd.nextInt(candidates.size()));

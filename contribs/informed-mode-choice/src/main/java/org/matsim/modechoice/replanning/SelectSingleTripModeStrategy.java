@@ -31,13 +31,13 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	private final Provider<SingleTripChoicesGenerator> generator;
 	private final Provider<PlanSelector> selector;
 
-	private final List<String> modes;
+	private final Set<String> modes;
 	private final Provider<CandidatePruner> pruner;
 
 	private final boolean requireDifferentModes;
 
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
-	                                    List<String> modes,
+	                                    Set<String> modes,
 	                                    Provider<SingleTripChoicesGenerator> generator,
 	                                    Provider<PlanSelector> selector,
 	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
