@@ -81,7 +81,8 @@ public class RandomSubtourModeStrategy extends AbstractMultithreadedModule {
 
 				// only select trips that are allowed to change
 				for (int i = 0; i < model.trips(); i++) {
-					if (nonChainBasedModes.contains(model.getTripMode(i))) {
+					String m = model.getTripMode(i);
+					if (nonChainBasedModes.contains(m) && switchModes.contains(m)) {
 						options.add(i);
 					}
 				}
