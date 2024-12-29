@@ -9,6 +9,8 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -79,6 +81,19 @@ public class BalancedInnovationStrategyChooser<PL extends BasicPlan, AG extends 
 		binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {
 		}).to(new TypeLiteral<BalancedInnovationStrategyChooser<Plan, Person>>() {
 		}).in(Singleton.class);
+	}
+
+
+	/**
+	 * Install this strategy chooser in the given controller.
+	 */
+	public static void install(Controller controller) {
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				BalancedInnovationStrategyChooser.bind(binder());
+			}
+		});
 	}
 
 	@Override
