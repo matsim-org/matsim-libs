@@ -3,8 +3,10 @@ package org.matsim.simwrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.utils.io.IOUtils;
 
 import javax.annotation.Nullable;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -154,13 +156,40 @@ public final class Data {
 	 */
 	public String resource(String name) {
 
-		URL resource = this.getClass().getResource(name);
+		String path = resolveResource(name, true);
+
+		// Handle shape files separately, copy additional files that are known to belong to shp files
+		if (name.endsWith(".shp")) {
+			resolveResource(name.replace(".shp", ".cpg"), false);
+			resolveResource(name.replace(".shp", ".dbf"), false);
+			resolveResource(name.replace(".shp", ".qix"), false);
+			resolveResource(name.replace(".shp", ".qmd"), false);
+			resolveResource(name.replace(".shp", ".prj"), false);
+			resolveResource(name.replace(".shp", ".shx"), false);
+		}
+
+		return path;
+	}
+
+	private String resolveResource(String name, boolean required) {
+		URL resource = null;
+
+		try {
+			resource = IOUtils.resolveFileOrResource(name);
+		} catch (UncheckedIOException e) {
+			// Nothing to do
+		}
 
 		if (resource == null) {
 			// Try to prefix / automatically
 			resource = this.getClass().getResource("/" + name);
-			if (resource == null)
+		}
+
+		if (resource == null) {
+			if (required)
 				throw new IllegalArgumentException("Resource '" + name + "' not found!");
+			else
+				return null;
 		}
 
 		String baseName = FilenameUtils.getName(resource.getPath());

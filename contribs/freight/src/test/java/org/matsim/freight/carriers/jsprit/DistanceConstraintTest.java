@@ -614,14 +614,14 @@ public class DistanceConstraintTest {
 		CarrierService service1 = CarrierService.Builder
 				.newInstance(Id.create("Service1", CarrierService.class), Id.createLinkId("j(3,8)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setCapacityDemand(40).build();
+				.setDemand(40).build();
 		CarriersUtils.addService(carrier, service1);
 
 		// Service 2
 		CarrierService service2 = CarrierService.Builder
 				.newInstance(Id.create("Service2", CarrierService.class), Id.createLinkId("j(0,3)R"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setCapacityDemand(40).build();
+				.setDemand(40).build();
 		CarriersUtils.addService(carrier, service2);
 
 		return carrier;
@@ -631,14 +631,14 @@ public class DistanceConstraintTest {
 		// Shipment 1
 		CarrierShipment shipment1 = CarrierShipment.Builder
 				.newInstance(Id.create("Shipment1", CarrierShipment.class), Id.createLinkId("i(1,8)"), Id.createLinkId("j(3,8)"), 40)
-				.setDeliveryServiceTime(20).setDeliveryTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.setDeliveryDuration(20).setDeliveryStartsTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
 				.build();
 		CarriersUtils.addShipment(carrier, shipment1);
 
 		// Shipment 2
 		CarrierShipment shipment2 = CarrierShipment.Builder
 				.newInstance(Id.create("Shipment2", CarrierShipment.class),Id.createLinkId("i(1,8)"), Id.createLinkId("j(0,3)R"), 40)
-				.setDeliveryServiceTime(20).setDeliveryTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.setDeliveryDuration(20).setDeliveryStartsTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
 				.build();
 		CarriersUtils.addShipment(carrier, shipment2);
 
@@ -653,7 +653,7 @@ public class DistanceConstraintTest {
 		CarrierService service3 = CarrierService.Builder
 				.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setCapacityDemand(40).build();
+				.setDemand(40).build();
 		CarriersUtils.addService(carrier, service3);
 
 		return carrier;

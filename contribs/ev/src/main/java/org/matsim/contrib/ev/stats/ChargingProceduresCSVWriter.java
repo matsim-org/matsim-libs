@@ -83,8 +83,12 @@ public final class ChargingProceduresCSVWriter implements IterationEndsListener 
 
 			if (sequence.getQueuedAtCharger().isPresent()) {
 				waitStartTime = sequence.getQueuedAtCharger().get().getTime();
-				waitEndTime = sequence.getQuitQueueAtChargerEvent().isPresent() ?
-					sequence.getQuitQueueAtChargerEvent().get().getTime() : sequence.getChargingStart().get().getTime();
+
+				if (sequence.getQuitQueueAtChargerEvent().isPresent()) {
+					waitEndTime = sequence.getQuitQueueAtChargerEvent().get().getTime();
+				} else if (sequence.getChargingStart().isPresent()) {
+					waitEndTime = sequence.getChargingStart().get().getTime();
+				}
 			}
 
 			double startEnergy = Double.NaN;

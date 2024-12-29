@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.PlanRouter;
@@ -13,20 +15,14 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.ActivityEstimator;
-import org.matsim.modechoice.estimators.FixedCostsEstimator;
-import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.estimators.*;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.replanning.*;
 import org.matsim.modechoice.search.BestChoiceGenerator;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The main and only module needed to install to use informed mode choice functionality.
@@ -35,18 +31,45 @@ import java.util.Set;
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
-	public static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
+	public final static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
 
-	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
+	public final static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
 
-	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
-	public static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
+	public final static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
+	public final static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
 
 
 	private final Builder builder;
 
 	private InformedModeChoiceModule(Builder builder) {
 		this.builder = builder;
+	}
+
+	/**
+	 * Replaces a strategy in the config. Can be used to enable one of the strategies in this module programmatically.
+	 */
+	public static void replaceReplanningStrategy(Config config, String subpopulation,
+									   String existing, String replacement) {
+
+		// Copy list because it is unmodifiable
+		List<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(config.replanning().getStrategySettings());
+		List<ReplanningConfigGroup.StrategySettings> found = strategies.stream()
+			.filter(s -> s.getSubpopulation().equals(subpopulation))
+			.filter(s -> s.getStrategyName().equals(existing))
+			.toList();
+
+		if (found.isEmpty())
+			throw new IllegalArgumentException("No strategy %s found for subpopulation %s".formatted(existing, subpopulation));
+
+		if (found.size() > 1)
+			throw new IllegalArgumentException("Multiple strategies %s found for subpopulation %s".formatted(existing, subpopulation));
+
+		ReplanningConfigGroup.StrategySettings old = found.getFirst();
+		old.setStrategyName(replacement);
+
+		// reset und set new strategies
+		config.replanning().clearStrategySettings();
+		strategies.forEach(s -> config.replanning().addStrategySettings(s));
 	}
 
 	public static Builder newBuilder() {
@@ -56,14 +79,10 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		bindAllModes(builder.fixedCosts, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.legEstimators, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.options, new TypeLiteral<>() {
-		});
+		bindAllModes(builder.fixedCosts, new TypeLiteral<>() {});
+		bindAllModes(builder.legEstimators, new TypeLiteral<>() {});
+		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {});
+		bindAllModes(builder.options, new TypeLiteral<>() {});
 
 		bind(ActivityEstimator.class).to(builder.activityEstimator).in(Singleton.class);
 
@@ -77,10 +96,14 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(PlanModelService.class).asEagerSingleton();
 		addControlerListenerBinding().to(PlanModelService.class).asEagerSingleton();
 
-		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
-		});
+		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {});
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
+		}
+
+		Multibinder<TripScoreEstimator> tripScores = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {});
+		for (Class<? extends TripScoreEstimator> c : builder.tripScoreEstimators) {
+			tripScores.addBinding().to(c).in(Singleton.class);
 		}
 
 		MapBinder<String, CandidatePruner> pBinder = MapBinder.newMapBinder(binder(), String.class, CandidatePruner.class);
@@ -133,8 +156,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	private <T> void bindAllModes(Map<String, Class<? extends T>> map, TypeLiteral<T> value) {
 
 		// Ensure to bind to internal strings
-		MapBinder<String, T> mapBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
-		}, value);
+		MapBinder<String, T> mapBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, value);
 		for (Map.Entry<String, Class<? extends T>> e : map.entrySet()) {
 			Class<? extends T> clazz = e.getValue();
 			mapBinder.addBinding(e.getKey().intern()).to(clazz).in(Singleton.class);
@@ -153,6 +175,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		private final Map<String, Class<? extends ModeOptions>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
+		private final Set<Class<? extends TripScoreEstimator>> tripScoreEstimators = new LinkedHashSet<>();
 
 		private final Map<String, CandidatePruner> pruner = new HashMap<>();
 
@@ -227,6 +250,14 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		public Builder withActivityEstimator(Class<? extends ActivityEstimator> activityEstimator) {
 			this.activityEstimator = activityEstimator;
+			return this;
+		}
+
+		/**
+		 * Add general score estimator that is applied to all trips.
+		 */
+		public Builder withTripScoreEstimator(Class<? extends TripScoreEstimator> tripScoreEstimator) {
+			tripScoreEstimators.add(tripScoreEstimator);
 			return this;
 		}
 

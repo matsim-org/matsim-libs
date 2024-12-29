@@ -130,23 +130,23 @@ public class FreightDemandGenerationUtils {
 			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
+							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
 					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" + coord.getX()
 							+ "	" + coord.getY() + "	" + "Service" + "	"
-							+ thisService.getLocationLinkId().toString() + "		" + "\n");
+							+ thisService.getServiceLinkId().toString() + "		" + "\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getFrom()));
+							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
 					Coord coordTo = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getTo()));
+							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
 							+ coordFrom.getX() + "	" + coordFrom.getY() + "	" + "Pickup" + "		"
-							+ thisShipment.getFrom().toString() + "	" + thisShipment.getTo().toString() + "\n");
+							+ thisShipment.getPickupLinkId().toString() + "	" + thisShipment.getDeliveryLinkId().toString() + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 							+ coordTo.getX() + "	" + coordTo.getY() + "	" + "Delivery" + "		"
-							+ thisShipment.getFrom() + "	" + thisShipment.getTo() + "\n");
+							+ thisShipment.getPickupLinkId() + "	" + thisShipment.getDeliveryLinkId() + "\n");
 				}
 			}
 			writer.flush();

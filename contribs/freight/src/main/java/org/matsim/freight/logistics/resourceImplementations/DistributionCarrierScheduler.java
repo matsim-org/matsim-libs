@@ -184,7 +184,7 @@ import org.matsim.vehicles.VehicleType;
     CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo())
             //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
             //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-            .setCapacityDemand(lspShipment.getSize())
+            .setDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
     //ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
@@ -207,7 +207,7 @@ import org.matsim.vehicles.VehicleType;
     CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
             //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
             //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-            .setDeliveryServiceTime(lspShipment.getDeliveryServiceTime())
+            .setDeliveryDuration(lspShipment.getDeliveryServiceTime())
             .build();
     //ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
     if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {

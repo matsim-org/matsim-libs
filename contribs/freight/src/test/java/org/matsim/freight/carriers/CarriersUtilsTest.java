@@ -68,21 +68,21 @@ public class CarriersUtilsTest {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<CarrierService> serviceId = Id.create("testVehicle", CarrierService.class);
 		CarrierService service1 = CarrierService.Builder.newInstance(serviceId,Id.createLinkId("link0") )
-				.setName("service1").setCapacityDemand(15).setServiceDuration(30).build();
+				.setDemand(15).setServiceDuration(30).build();
 
 		//add Service
 		CarriersUtils.addService(carrier, service1);
 		Assertions.assertEquals(1, carrier.getServices().size());
 		CarrierService cs1a  = (CarrierService) carrier.getServices().values().toArray()[0];
 		Assertions.assertEquals(service1, cs1a);
-		Assertions.assertEquals(Id.createLinkId("link0"), cs1a.getLocationLinkId());
+		Assertions.assertEquals(Id.createLinkId("link0"), cs1a.getServiceLinkId());
 
 		//get Service
 		CarrierService cs1b  = CarriersUtils.getService(carrier, serviceId );
 		assert cs1b != null;
 		Assertions.assertEquals(serviceId, cs1b.getId());
 		Assertions.assertEquals(service1.getId(), cs1b.getId());
-		Assertions.assertEquals(Id.createLinkId("link0"), cs1b.getLocationLinkId());
+		Assertions.assertEquals(Id.createLinkId("link0"), cs1b.getServiceLinkId());
 		Assertions.assertEquals(30, cs1b.getServiceDuration(), EPSILON);
 	}
 
@@ -97,15 +97,15 @@ public class CarriersUtilsTest {
 		Assertions.assertEquals(1, carrier.getShipments().size());
 		CarrierShipment carrierShipment1a  = (CarrierShipment) carrier.getShipments().values().toArray()[0];
 		Assertions.assertEquals(service1, carrierShipment1a);
-		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1a.getFrom());
+		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1a.getPickupLinkId());
 
 		//get Shipment
 		CarrierShipment carrierShipment1b  = CarriersUtils.getShipment(carrier, shipmentId );
 		assert carrierShipment1b != null;
 		Assertions.assertEquals(shipmentId, carrierShipment1b.getId());
 		Assertions.assertEquals(service1.getId(), carrierShipment1b.getId());
-		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getFrom());
-		Assertions.assertEquals(20, carrierShipment1b.getSize(), EPSILON);
+		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getPickupLinkId());
+		Assertions.assertEquals(20, carrierShipment1b.getDemand(), EPSILON);
 	}
 
 	@Test

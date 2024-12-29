@@ -1,0 +1,5 @@
+linkId;X;Y;parkingFacility;capacity;EndOccupation;reservationsRequests;numberOfParkedVehicles;rejectedParkingRequest;numberOfWaitingActivities;numberOfStaysFromGetOffUntilGetIn;numberOfParkingBeforeGetIn
+114;-300.0;-790.0;114_curbside;5.0;1;1;1;0;0;0;0
+149;300.0;-190.0;149_curbside;5.0;0;0;0;0;0;0;0
+349;300.0;-210.0;349_curbside;5.0;0;1;1;0;0;0;0
+314;-300.0;-810.0;314_curbside;5.0;0;0;0;0;0;0;0

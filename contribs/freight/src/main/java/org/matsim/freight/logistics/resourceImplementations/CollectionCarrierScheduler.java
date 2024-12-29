@@ -84,7 +84,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
     CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom())
             .setServiceStartTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
-            .setCapacityDemand(lspShipment.getSize())
+            .setDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
     //ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan

@@ -44,7 +44,6 @@ import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 //TODO: length of routes (legs) AND end time of route are missing.
 /**
@@ -286,16 +285,16 @@ public class CarrierControllerUtilsIT{
 		}
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
-				.setDeliveryServiceTime(30.0)
-				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
-				.setPickupServiceTime(5.0)
-				.setPickupTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
+				.setDeliveryDuration(30.0)
+				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
+				.setPickupDuration(5.0)
+				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setCapacityDemand(size)
+				.setDemand(size)
 				.setServiceDuration(31.0)
 				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();

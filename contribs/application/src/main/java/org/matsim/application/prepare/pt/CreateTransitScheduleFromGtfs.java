@@ -33,10 +33,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -205,6 +202,13 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		Network network = NetworkUtils.readNetwork(networkFile);
 
 		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
+
+		for (TransitLine line : new ArrayList<>(scenario.getTransitSchedule().getTransitLines().values())) {
+			if (line.getRoutes().isEmpty()) {
+				log.warn("Line {} with no routes removed.", line.getId());
+				scenario.getTransitSchedule().removeTransitLine(line);
+			}
+		}
 
 		if (validate) {
 			//Check schedule and network
@@ -477,8 +481,12 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				// so we need to add time for passengers to board and alight
 				double minStopTime = 30.0;
 
+				List<Id<Link>> routeIds = new LinkedList<>();
+				routeIds.add(route.getRoute().getStartLinkId());
+				routeIds.addAll(route.getRoute().getLinkIds());
+				routeIds.add(route.getRoute().getEndLinkId());
+
 				for (int i = 1; i < routeStops.size(); i++) {
-					// TODO cater for loop link at first stop? Seems to just work without.
 					TransitRouteStop routeStop = routeStops.get(i);
 					// if there is no departure offset set (or infinity), it is the last stop of the line,
 					// so we don't need to care about the stop duration
@@ -490,8 +498,23 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					// Math.max to avoid negative values of travelTime
 					double travelTime = Math.max(1, routeStop.getArrivalOffset().seconds() - lastDepartureOffset - 1.0 -
 						(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration)));
-					Link link = network.getLinks().get(routeStop.getStopFacility().getLinkId());
-					increaseLinkFreespeedIfLower(link, link.getLength() / travelTime);
+
+
+					Id<Link> stopLink = routeStop.getStopFacility().getLinkId();
+					List<Id<Link>> subRoute = new LinkedList<>();
+					do {
+						Id<Link> linkId = routeIds.removeFirst();
+						subRoute.add(linkId);
+					} while (!subRoute.contains(stopLink));
+
+					List<? extends Link> links = subRoute.stream().map(scenario.getNetwork().getLinks()::get)
+						.toList();
+
+					double length = links.stream().mapToDouble(Link::getLength).sum();
+
+					for (Link link : links) {
+						increaseLinkFreespeedIfLower(link, length / travelTime);
+					}
 					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
 				}
 

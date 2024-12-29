@@ -117,7 +117,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				Id<Link> to = Id.create(toLocation, Link.class);
 				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 				String capDemandString = atts.getValue("capacityDemand");
-				if (capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
+				if (capDemandString != null) serviceBuilder.setDemand(getInt(capDemandString));
 				String startString = atts.getValue("earliestStart");
 				double start = parseTimeToDouble(startString);
 				double end;
@@ -157,13 +157,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
 				if (startPickup != null && endPickup != null)
-					shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+					shipmentBuilder.setPickupStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 				if (startDelivery != null && endDelivery != null)
-					shipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+					shipmentBuilder.setDeliveryStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
 				if (pickupServiceTime != null)
-					shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
+					shipmentBuilder.setPickupDuration(parseTimeToDouble(pickupServiceTime));
 				if (deliveryServiceTime != null)
-					shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
+					shipmentBuilder.setDeliveryDuration(parseTimeToDouble(deliveryServiceTime));
 
 				currentShipment = shipmentBuilder.build();
 				currentShipments.put(atts.getValue(ID), currentShipment);
@@ -261,26 +261,26 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getFrom());
+						finishLeg(s.getPickupLinkId());
 						currentTourBuilder.schedulePickup(s);
-						previousActLoc = s.getFrom();
+						previousActLoc = s.getPickupLinkId();
 					}
 					case "delivery" -> {
 						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getTo());
+						finishLeg(s.getDeliveryLinkId());
 						currentTourBuilder.scheduleDelivery(s);
-						previousActLoc = s.getTo();
+						previousActLoc = s.getDeliveryLinkId();
 					}
 					case "service" -> {
 						String id = atts.getValue("serviceId");
 						if (id == null) throw new IllegalStateException("act.serviceId is missing.");
 						CarrierService s = serviceMap.get(Id.create(id, CarrierService.class));
 						if (s == null) throw new IllegalStateException("serviceId is not known.");
-						finishLeg(s.getLocationLinkId());
+						finishLeg(s.getServiceLinkId());
 						currentTourBuilder.scheduleService(s);
-						previousActLoc = s.getLocationLinkId();
+						previousActLoc = s.getServiceLinkId();
 					}
 					case "end" -> {
 						finishLeg(currentVehicle.getLinkId());
