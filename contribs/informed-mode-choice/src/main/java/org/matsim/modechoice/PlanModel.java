@@ -257,6 +257,9 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return estimates;
 	}
 
+	/**
+	 * Iterate over estimates and collect modes that match the predicate.
+	 */
 	public Set<String> filterModes(Predicate<? super ModeEstimate> predicate) {
 		Set<String> modes = new HashSet<>();
 		for (Map.Entry<String, List<ModeEstimate>> e : estimates.entrySet()) {

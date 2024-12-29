@@ -104,7 +104,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
-				PlanCandidate c = singleTrip.chooseCandidate(model, null);
+				PlanCandidate c = singleTrip.chooseCandidate(model);
 				if (c != null) {
 					c.applyTo(plan);
 					return;
@@ -176,9 +176,13 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				// Pruning is applied based on current plan estimate
 				// best k generator applied pruning already, but the single trip options need to be checked again
 				if (ctx.pruner != null) {
-					double threshold = ctx.pruner.planThreshold(model);
-					if (!Double.isNaN(threshold) && threshold > 0) {
-						candidates.removeIf(c -> c.getUtility() < singleModeCandidates.get(0).getUtility() - threshold);
+
+					OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
+					double t = ctx.pruner.planThreshold(model);
+
+					if (max.isPresent() && t >= 0) {
+						double threshold = max.getAsDouble() - t;
+						candidates.removeIf(c -> c.getUtility() < threshold);
 					}
 
 					// Only applied at the end
