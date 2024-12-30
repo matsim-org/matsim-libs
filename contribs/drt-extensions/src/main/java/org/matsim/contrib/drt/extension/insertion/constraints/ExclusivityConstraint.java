@@ -25,7 +25,7 @@ public class ExclusivityConstraint implements DrtInsertionConstraint {
 
 	private boolean isValidInsertionForExclusiveRequest(DrtRequest drtRequest, Insertion insertion,
 			DetourTimeInfo detourTimeInfo) {
-		if (insertion.pickup.previousWaypoint.getOutgoingOccupancy() > 0) {
+		if (!insertion.pickup.previousWaypoint.getOutgoingOccupancy().isEmpty()) {
 			// attempt to attach pickup to existing trip
 			return false;
 		}
