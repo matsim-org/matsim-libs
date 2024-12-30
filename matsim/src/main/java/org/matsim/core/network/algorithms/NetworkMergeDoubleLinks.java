@@ -105,7 +105,6 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 				link1.setFreespeed(fs);
 				link1.setNumberOfLanes(lanes);
 				link1.setLength(length);
-				mergeTurnRestrictions(link1, link2);
 				network.removeLink(link2.getId());
 			}
 			break;
@@ -124,38 +123,11 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 					link1.setFreespeed(fs);
 					link1.setNumberOfLanes(lanes);
 					link1.setLength(length);
-					mergeTurnRestrictions(link1, link2);
 					network.removeLink(link2.getId());
 				}
 				break;
 			default:
 				throw new IllegalArgumentException("'mergetype' not known!");
-		}
-	}
-
-	private static void mergeTurnRestrictions(Link link1, Link link2) {
-		DisallowedNextLinks disallowedNextLinks1 = NetworkUtils.getDisallowedNextLinks(link1);
-		DisallowedNextLinks disallowedNextLinks2 = NetworkUtils.getDisallowedNextLinks(link2);
-        if (disallowedNextLinks1 != null) {
-			if (disallowedNextLinks2 != null) {
-				Map<String, List<List<Id<Link>>>> perMode1 = disallowedNextLinks1.getAsMap();
-				Map<String, List<List<Id<Link>>>> perMode2 = disallowedNextLinks2.getAsMap();
-				Map<String, List<List<Id<Link>>>> merged = new HashMap<>();
-				for (Map.Entry<String, List<List<Id<Link>>>> restrictionsPerMode : perMode1.entrySet()) {
-					if (perMode2.containsKey(restrictionsPerMode.getKey())) {
-						for (List<Id<Link>> forbiddenSequence : restrictionsPerMode.getValue()) {
-							Id<Link> target = forbiddenSequence.getLast();
-							if (perMode2.get(restrictionsPerMode.getKey()).stream().anyMatch(ls -> ls.getLast().equals(target))) {
-								merged.computeIfAbsent(restrictionsPerMode.getKey(), k -> new ArrayList<>()).add(forbiddenSequence);
-							}
-						}
-					}
-				}
-				disallowedNextLinks1.clear();
-				merged.forEach((mode, sequences) -> sequences.forEach(sequence -> disallowedNextLinks1.addDisallowedLinkSequence(mode, sequence)));
-			} else {
-				NetworkUtils.removeDisallowedNextLinks(link1);
-			}
 		}
 	}
 
@@ -166,7 +138,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 	@Override
 	public void run(Network network) {
 
-		Map<Id<Link>, Id<Link>> replacedLinks = new HashMap<>();
+		Map<Id<Link>, Replacement> replacedLinks = new HashMap<>();
 		for (Node n : network.getNodes().values()) {
 			Iterator<? extends Link> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
@@ -181,7 +153,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 							}
 
 							this.mergeLink2IntoLink1(l1, l2, network);
-							replacedLinks.put(l2.getId(), l1.getId());
+							replacedLinks.put(l2.getId(), new Replacement(l2, l1));
 							// restart
 							l1_it = n.getOutLinks().values().iterator();
 							l2_it = n.getOutLinks().values().iterator();
@@ -191,10 +163,15 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 			}
 		}
 
-		copyAndReplaceTurnRestrictions(network, replacedLinks);
+		handleTurnRestrictions(network, replacedLinks);
 	}
 
-	private static void copyAndReplaceTurnRestrictions(Network network, Map<Id<Link>, Id<Link>> replacedLinks) {
+	private void handleTurnRestrictions(Network network, Map<Id<Link>, Replacement> replacedLinks) {
+
+		for (Replacement mergedLinks : replacedLinks.values()) {
+			mergeTurnRestrictions(mergedLinks.substitute, mergedLinks.orginal, replacedLinks);
+		}
+
 		for (Link link : network.getLinks().values()) {
 			DisallowedNextLinks disallowedNextLinks = NetworkUtils.getDisallowedNextLinks(link);
 
@@ -208,7 +185,11 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 					for (List<Id<Link>> restriction : restrictions.getValue()) {
 						List<Id<Link>> restrictionCopy = new ArrayList<>();
 						for (Id<Link> linkId : restriction) {
-                            restrictionCopy.add(replacedLinks.getOrDefault(linkId, linkId));
+							if(replacedLinks.containsKey(linkId)) {
+                            	restrictionCopy.add(replacedLinks.get(linkId).substitute.getId());
+							} else {
+								restrictionCopy.add(linkId);
+							}
 						}
 						restrictionsCopy.add(restrictionCopy);
 					}
@@ -226,4 +207,45 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
 	}
+
+	private static void mergeTurnRestrictions(Link link1, Link link2, Map<Id<Link>, Replacement> replacedLinks) {
+		DisallowedNextLinks disallowedNextLinks1 = NetworkUtils.getDisallowedNextLinks(link1);
+		DisallowedNextLinks disallowedNextLinks2 = NetworkUtils.getDisallowedNextLinks(link2);
+		if (disallowedNextLinks1 != null) {
+			if (disallowedNextLinks2 != null) {
+
+				Map<String, List<List<Id<Link>>>> perMode1 = disallowedNextLinks1.getAsMap();
+				Map<String, List<List<Id<Link>>>> perMode2 = disallowedNextLinks2.getAsMap();
+				Map<String, List<List<Id<Link>>>> merged = new HashMap<>();
+
+				for (Map.Entry<String, List<List<Id<Link>>>> restrictionsPerMode : perMode1.entrySet()) {
+					if (perMode2.containsKey(restrictionsPerMode.getKey())) {
+						for (List<Id<Link>> forbiddenSequence : restrictionsPerMode.getValue()) {
+							Id<Link> target = forbiddenSequence.getLast();
+							if(replacedLinks.containsKey(target)) {
+								target = replacedLinks.get(target).substitute.getId();
+							}
+
+							for (List<Id<Link>> forbiddenSequence2 : perMode2.get(restrictionsPerMode.getKey())) {
+								Id<Link> target2 = forbiddenSequence2.getLast();
+								if(replacedLinks.containsKey(target2)) {
+									target2 = replacedLinks.get(target2).substitute.getId();
+								}
+								if(target.equals(target2)) {
+									merged.computeIfAbsent(restrictionsPerMode.getKey(), k -> new ArrayList<>()).add(forbiddenSequence);
+								}
+							}
+						}
+					}
+				}
+				disallowedNextLinks1.clear();
+				merged.forEach((mode, sequences) -> sequences.forEach(sequence -> disallowedNextLinks1.addDisallowedLinkSequence(mode, sequence)));
+			} else {
+				NetworkUtils.removeDisallowedNextLinks(link1);
+			}
+		}
+	}
+
+	private record Replacement(Link orginal, Link substitute){}
+
 }
