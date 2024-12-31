@@ -92,6 +92,12 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		if (event.isUnexpected()) {
 			return;
 		}
+//	// consider refactoring the rest of this class into the method process and  call this from the simwrapper (see kelheim emissions dashboard)
+
+//		process();
+//	}
+//
+//	public void process() {
 		LOG.info("Initializing accessibility computation...");
 		accessibilityAggregator = new AccessibilityAggregator();
 		addFacilityDataExchangeListener(accessibilityAggregator);
