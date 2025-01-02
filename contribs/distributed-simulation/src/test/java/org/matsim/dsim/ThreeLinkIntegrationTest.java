@@ -72,7 +72,7 @@ public class ThreeLinkIntegrationTest {
 
 		config.controller().setOutputDirectory(outputDir.resolve("output").toString());
 		config.network().setInputFile(netPath.toString());
-		var controller = new DistributedController(new NullCommunicator(), config, 1, 1);
+		var controller = new DistributedController(new NullCommunicator(), config, 1);
 		controller.run();
 
 		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");
@@ -93,7 +93,7 @@ public class ThreeLinkIntegrationTest {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		var controller = new DistributedController(new NullCommunicator(), config, 3, 1);
+		var controller = new DistributedController(new NullCommunicator(), config, 3);
 		controller.run();
 
 		var outputDir = Paths.get(utils.getOutputDirectory());
@@ -118,7 +118,7 @@ public class ThreeLinkIntegrationTest {
 		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.plans().setInputFile("three-links-plans-2.xml");
-		var controller = new DistributedController(new NullCommunicator(), config, 3, 1);
+		var controller = new DistributedController(new NullCommunicator(), config, 3);
 		controller.run();
 
 		var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-2-plans.xml";
@@ -143,7 +143,7 @@ public class ThreeLinkIntegrationTest {
 				Config config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
 				config.controller().setOutputDirectory(outputDirectory);
 				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-				DistributedController c = new DistributedController(comm, config, 1, 1);
+				DistributedController c = new DistributedController(comm, config, 1);
 				c.run();
 				try {
 					comm.close();
@@ -188,7 +188,7 @@ public class ThreeLinkIntegrationTest {
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory() + "output");
 		config.network().setInputFile(netPath);
-		var controller = new DistributedController(new NullCommunicator(), config, 1, 1);
+		var controller = new DistributedController(new NullCommunicator(), config, 1);
 		controller.run();
         /*
         // start three instances each containing one partition

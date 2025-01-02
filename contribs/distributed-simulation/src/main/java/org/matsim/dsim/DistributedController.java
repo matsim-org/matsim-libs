@@ -38,13 +38,11 @@ public class DistributedController implements ControlerI {
     private final Communicator comm;
     private final Config config;
     private final int threads;
-    private final double oversubscribe;
 
-    public DistributedController(Communicator comm, Config config, int threads, double oversubscribe) {
+    public DistributedController(Communicator comm, Config config, int threads) {
         this.comm = comm;
         this.config = config;
         this.threads = threads;
-        this.oversubscribe = oversubscribe;
     }
 
     @Override
@@ -85,7 +83,7 @@ public class DistributedController implements ControlerI {
                 .forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
 
 
-        DistributedSimulationModule simulationModule = new DistributedSimulationModule(comm, threads, oversubscribe);
+        DistributedSimulationModule simulationModule = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(threads));
 
         Controler defaultController = new Controler(scenario, simulationModule.getNode());
         defaultController.addOverridingModule(simulationModule);

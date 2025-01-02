@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.DistributedSimulationModule;
 import picocli.AutoComplete;
 import picocli.CommandLine;
@@ -200,7 +201,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 
-			DistributedSimulationModule d = new DistributedSimulationModule(threads);
+			DSimConfigGroup dsim = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+			dsim.threads = threads;
+
+			DistributedSimulationModule d = new DistributedSimulationModule(dsim);
 			controler = new Controler(scenario, d.getNode());
 			controler.addOverridingModule(d);
 
@@ -543,7 +547,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 
-			DistributedSimulationModule d = new DistributedSimulationModule(app.threads);
+			DSimConfigGroup dsim = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+			dsim.threads = app.threads;
+
+			DistributedSimulationModule d = new DistributedSimulationModule(dsim);
 			controler = new Controler(scenario, d.getNode());
 			controler.addOverridingModule(d);
 

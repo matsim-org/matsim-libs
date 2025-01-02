@@ -34,9 +34,6 @@ public class RunDistributedSim implements Callable<Integer> {
 	@CommandLine.Option(names = {"--threads"}, description = "Number of threads on a node", defaultValue = "4")
 	private int threads;
 
-	@CommandLine.Option(names = {"--oversubscribe"}, description = "Create more partitions than cores", defaultValue = "1")
-	private double oversubscribe;
-
 	@CommandLine.Option(names = {"--write-events"}, description = "Write events to the output directory", defaultValue = "false")
 	private boolean writeEvents;
 
@@ -111,7 +108,7 @@ public class RunDistributedSim implements Callable<Integer> {
 
 		Scenario s = ScenarioUtils.loadScenario(config);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(comm, threads, oversubscribe);
+		DistributedSimulationModule module = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(threads));
 		Controler controler = new Controler(s, module.getNode());
 
 		controler.addOverridingModule(module);

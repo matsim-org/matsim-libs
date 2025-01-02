@@ -98,7 +98,7 @@ public class DistributedIntegrationTest {
 		Config local = createScenario();
 		Scenario scenario = prepareScenario(local);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(4));
 		Controler controler = new Controler(scenario, module.getNode());
 		controler.addOverridingModule(module);
 		controler.run();
@@ -132,7 +132,7 @@ public class DistributedIntegrationTest {
 
 					Config local = createScenario();
 					Scenario scenario = prepareScenario(local);
-					DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+					DistributedSimulationModule module = new DistributedSimulationModule(comm,  DSimConfigGroup.ofThreads(2));
 					Controler controler = new Controler(scenario, module.getNode());
 
 					controler.addOverridingModule(module);

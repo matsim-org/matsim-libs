@@ -48,13 +48,13 @@ public class DSimIntegrationTest {
 		// different travel times, due to Double-rounding errors. This would cause varying orders of agent leaving the Activity engine for example.
 		// Therefore, conduct a pre run, then do a local run using the output plans file from that run for the local run and for the distributed run,
 		// which are both compared at the end of runDistributed.
-		var preRun = new DistributedController(new NullCommunicator(), local, 1, 1);
+		var preRun = new DistributedController(new NullCommunicator(), local, 1);
 		preRun.run();
 		var plans = outputPath.resolve("prerun/kelheim-mini.output_plans.xml").toAbsolutePath();
 		local.plans().setInputFile(plans.toString());
 		local.controller().setOutputDirectory(outputPath.toString());
 
-		DistributedController controller = new DistributedController(new NullCommunicator(), local, 1, 1);
+		DistributedController controller = new DistributedController(new NullCommunicator(), local, 1);
 		controller.run();
 
 		assertThat(Path.of(utils.getOutputDirectory()))
@@ -78,7 +78,7 @@ public class DSimIntegrationTest {
 			.map(comm -> pool.submit(() -> {
 				Config config = createScenario();
 				config.plans().setInputFile(plansPath.toString());
-				DistributedController c = new DistributedController(comm, config, 2, 1);
+				DistributedController c = new DistributedController(comm, config, 2);
 				c.run();
 				try {
 					comm.close();

@@ -50,14 +50,14 @@ class NetworkDecompositionTest {
         assertEquals(0, (int) l4.getAttributes().getAttribute(PARTITION_ATTR_KEY));
 
         n2 = network.getNodes().get(Id.createNodeId("n2"));
-        assertEquals(2, (int) n2.getAttributes().getAttribute(PARTITION_ATTR_KEY));
+        assertEquals(1, (int) n2.getAttributes().getAttribute(PARTITION_ATTR_KEY));
         l1 = network.getLinks().get(Id.createLinkId("l1"));
-        assertEquals(2, (int) l1.getAttributes().getAttribute(PARTITION_ATTR_KEY));
+        assertEquals(1, (int) l1.getAttributes().getAttribute(PARTITION_ATTR_KEY));
 
         n3 = network.getNodes().get(Id.createNodeId("n3"));
-        assertEquals(3, (int) n3.getAttributes().getAttribute(PARTITION_ATTR_KEY));
+        assertEquals(2, (int) n3.getAttributes().getAttribute(PARTITION_ATTR_KEY));
         l2 = network.getLinks().get(Id.createLinkId("l2"));
-        assertEquals(3, (int) l2.getAttributes().getAttribute(PARTITION_ATTR_KEY));
+        assertEquals(2, (int) l2.getAttributes().getAttribute(PARTITION_ATTR_KEY));
 
         n4 = network.getNodes().get(Id.createNodeId("n4"));
         assertEquals(3, (int) n4.getAttributes().getAttribute(PARTITION_ATTR_KEY));

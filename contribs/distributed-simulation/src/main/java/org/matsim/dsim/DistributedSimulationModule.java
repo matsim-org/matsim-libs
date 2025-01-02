@@ -30,14 +30,12 @@ public class DistributedSimulationModule extends AbstractModule {
 
 	private final Communicator comm;
 	private final int threads;
-	private final double oversubscribe;
 	private final SerializationProvider serializer = new SerializationProvider();
 	private final Topology topology;
 
-	public DistributedSimulationModule(Communicator comm, int threads, double oversubscribe) {
+	public DistributedSimulationModule(Communicator comm, DSimConfigGroup config) {
 		this.comm = comm;
-		this.threads = threads;
-		this.oversubscribe = oversubscribe;
+		this.threads = config.threads == 0 ? Runtime.getRuntime().availableProcessors() : config.threads;
 
 		// TODO: Connecting logic is currently here to support standard matsim controller without modification
 		log.info("Waiting for {} other nodes to connect...", comm.getSize() - 1);
@@ -59,8 +57,8 @@ public class DistributedSimulationModule extends AbstractModule {
 	/**
 	 * Constructor for module, without communication.
 	 */
-	public DistributedSimulationModule(int threads) {
-		this(new NullCommunicator(), threads, 1);
+	public DistributedSimulationModule(DSimConfigGroup config) {
+		this(new NullCommunicator(), config);
 	}
 
 	public SimulationNode getNode() {
@@ -134,7 +132,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		for (SimulationNode value : nodes) {
 
 			SimulationNode.NodeBuilder n = value.toBuilder();
-			int parts = Math.max(1, (int) (value.getCores() * oversubscribe));
+			int parts = Math.max(1, value.getCores());
 
 			n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
 			n.distributed(nodes.size() > 1);

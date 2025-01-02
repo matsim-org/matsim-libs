@@ -24,6 +24,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.dsim.Activities;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.DistributedSimulationModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -125,7 +126,7 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		DistributedSimulationModule module = new DistributedSimulationModule(1);
+		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(1));
 
 		Controler controler = new Controler(scenario, module.getNode());
 
@@ -142,7 +143,7 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		DistributedSimulationModule module = new DistributedSimulationModule(4);
+		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(4));
 		Controler controler = new Controler(scenario, module.getNode());
 
 		prepareController(controler);
@@ -168,7 +169,7 @@ public class DrtIntegrationTest {
 
 				Scenario scenario = createScenario();
 
-				DistributedSimulationModule module = new DistributedSimulationModule(comm, 2, 1);
+				DistributedSimulationModule module = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(2));
 
 				Controler controler = new Controler(scenario, module.getNode());
 				prepareController(controler);
