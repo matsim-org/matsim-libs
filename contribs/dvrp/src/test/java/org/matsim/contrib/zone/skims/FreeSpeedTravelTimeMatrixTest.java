@@ -23,6 +23,8 @@ package org.matsim.contrib.zone.skims;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -56,7 +58,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 	}
 
 	@Test
-	void matrix() {
+	void matrix() throws MalformedURLException {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
 		params.maxNeighborDistance = 0;
 		ZoneSystem zoneSystem = new SquareGridZoneSystem(network, 100.);
@@ -75,7 +77,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 1); // 1 s for moving over nodes
 	
 		// write and read cache
-		File cachePath = new File(utils.getOutputDirectory(), "cache.bin");
+		URL cachePath = new File(utils.getOutputDirectory(), "cache.bin").toURI().toURL();
 		matrix.write(cachePath, network);
 		matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, null, 1, 1, cachePath);
 
@@ -93,7 +95,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 	}
 
 	@Test
-	void sparseMatrix() {
+	void sparseMatrix() throws MalformedURLException {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
 		params.maxNeighborDistance = 9999;
 
@@ -113,7 +115,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 9 + 2); // 2 s for moving over nodes
 
 		// write and read cache
-		File cachePath = new File(utils.getOutputDirectory(), "cache.bin");
+		URL cachePath = new File(utils.getOutputDirectory(), "cache.bin").toURI().toURL();
 		matrix.write(cachePath, network);
 		matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, null, 1, 1, cachePath);
 
