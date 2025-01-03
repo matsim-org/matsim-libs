@@ -141,7 +141,6 @@ public class VrpAgentSource implements AgentSource, DistributedAgentSource {
 		return new DynAgent(m, qSim.getEventsManager(), vrpAgentLogic);
 	}
 
-
 	@Nullable
 	@Override
 	public DistributedMobsimVehicle vehicleFromMessage(Class<? extends DistributedMobsimVehicle> type, Message message) {

@@ -247,12 +247,19 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		agents.put(agent.getId(), agent);
+		Id<Link> link = agent.getCurrentLinkId();
+		if (partition.containsLink(link))
+			agents.put(agent.getId(), agent);
+		else
+			throw new IllegalArgumentException("Agent " + agent.getId() + " is not on a link in the partition");
 	}
 
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		return agents.remove(agentId);
+		if (partition.containsLink(linkId))
+			return agents.remove(agentId);
+		else
+			throw new IllegalArgumentException("Link " + linkId + " is not on a link in the partition");
 	}
 
 	@Override

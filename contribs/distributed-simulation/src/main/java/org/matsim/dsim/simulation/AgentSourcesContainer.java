@@ -54,10 +54,13 @@ public class AgentSourcesContainer {
 	/**
 	 * Create a vehicle and its occupants from received container.
 	 */
+	@SuppressWarnings("rawtypes")
 	public DistributedMobsimVehicle vehicleFromContainer(VehicleContainer container) {
 
 		DistributedMobsimVehicle vehicle = vehicleFromMessage(container.vehicleType(), container.vehicle());
-		DriverAgent driver = (DriverAgent) agentFromMessage(container.driver().type(), container.driver().occupant());
+		SourceAgent sa = agentAndSourceFromMessage(container.driver().type(), container.driver().occupant());
+
+		DriverAgent driver = (DriverAgent) sa.agent;
 		vehicle.setDriver(driver);
 		driver.setVehicle(vehicle);
 
@@ -66,6 +69,8 @@ public class AgentSourcesContainer {
 			vehicle.addPassenger(p);
 			p.setVehicle(vehicle);
 		}
+
+		sa.source.onDriverCreated(driver, vehicle);
 
 		return vehicle;
 	}
@@ -94,8 +99,12 @@ public class AgentSourcesContainer {
 	/**
 	 * Create an agent from a received message.
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends DistributedMobsimAgent> T agentFromMessage(Class<T> type, Message m) {
+		return agentAndSourceFromMessage(type, m).agent;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends DistributedMobsimAgent> SourceAgent<T> agentAndSourceFromMessage(Class<T> type, Message m) {
 		List<DistributedAgentSource> sources = agentTypes.get(type);
 		if (sources == null) {
 			throw new RuntimeException("No agent provider found for type %s".formatted(type));
@@ -104,10 +113,13 @@ public class AgentSourcesContainer {
 		for (DistributedAgentSource source : sources) {
 			T agent = (T) source.agentFromMessage(type, m);
 			if (agent != null) {
-				return agent;
+				return new SourceAgent<>(source, agent);
 			}
 		}
 
 		throw new IllegalStateException("No agent provider found for type %s with message %s".formatted(type, m));
+	}
+
+	private record SourceAgent<T extends DistributedMobsimAgent>(DistributedAgentSource source, T agent) {
 	}
 }
