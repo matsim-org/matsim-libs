@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -41,18 +43,21 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private final String mode;
 	private final EventsManager eventsManager;
 
-	public DrtRequestCreator(String mode, EventsManager eventsManager) {
+    public DrtRequestCreator(String mode, EventsManager eventsManager) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
-	}
+    }
 
 	@Override
 	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
-		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
-		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
-		double maxRideDuration = drtRoute.getMaxRideTime();
+		DrtRouteConstraints constraints = drtRoute.getConstraints();
+		double latestDepartureTime = departureTime + constraints.maxWaitTime();
+		double latestArrivalTime = departureTime + constraints.maxTravelTime();
+		double maxRideDuration = constraints.maxRideTime();
+		double maxPickupDelay = constraints.maxPickupDelay();
+		double lateDiversionThreshold = constraints.lateDiversionThreshold();
 
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
@@ -68,6 +73,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.latestStartTime(latestDepartureTime)
 				.latestArrivalTime(latestArrivalTime)
 				.maxRideDuration(maxRideDuration)
+				.maxPickupDelay(maxPickupDelay)
+				.lateDiversionThreshold(lateDiversionThreshold)
 				.submissionTime(submissionTime)
 				.build();
 
