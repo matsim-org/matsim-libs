@@ -1,5 +1,6 @@
 package org.matsim.application.options;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +39,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
@@ -118,6 +121,19 @@ public final class ShpOptions {
 		if (shp.endsWith(".shp"))
 			ds = factory.createDataStore(url);
 		else if (shp.endsWith(".gpkg")) {
+
+			// GeoPackage does not work with URLs, need to download it first
+			if (url.getProtocol().startsWith("http")) {
+
+				String name = FilenameUtils.getBaseName(url.getFile());
+
+				Path tmp = Files.createTempFile(name, ".gpkg");
+				Files.copy(url.openStream(), tmp, StandardCopyOption.REPLACE_EXISTING);
+				tmp.toFile().deleteOnExit();
+
+				shp = tmp.toString();
+			}
+
 			ds = DataStoreFinder.getDataStore(Map.of(
 				GeoPkgDataStoreFactory.DBTYPE.key, "geopkg",
 				GeoPkgDataStoreFactory.DATABASE.key, shp,
