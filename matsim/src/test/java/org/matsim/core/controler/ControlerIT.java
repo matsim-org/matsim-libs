@@ -141,7 +141,7 @@ public class ControlerIT {
 	@ParameterizedTest
 	@ValueSource(booleans = {true, false})
 	void testTravelTimeCalculation(boolean isUsingFastCapacityUpdate) {
-		Fixture f = new Fixture(ConfigUtils.createConfig());
+		Fixture f = new Fixture(this.utils.loadConfig((String) null));
 		Config config = f.scenario.getConfig();
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the same time at 7am.  */
@@ -185,7 +185,7 @@ public class ControlerIT {
 		// Complete the configuration for our test case
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setCreateGraphs(false);
-		config.controller().setWriteEventsInterval(0);
+		config.controller().setWriteEventsInterval(1);
 		config.controller().setDumpDataAtEnd(false);
 		// - set scoring parameters
 		ActivityParams actParams = new ActivityParams("h");
@@ -222,8 +222,9 @@ public class ControlerIT {
 
 		// test that the plans have the correct travel times
 		// (travel time of the plan does not contain first and last link)
+		double seconds = ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds();
 		assertEquals(avgTravelTimeLink2,
-				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
+			seconds, MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
 	}
 
 	/**
@@ -241,7 +242,7 @@ public class ControlerIT {
 		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		// create a very simple network with one link only and an empty population
+		// create a very simple network with two links only and an empty population
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(100, 0));
@@ -252,6 +253,13 @@ public class ControlerIT {
 		link.setFreespeed(1);
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1);
+		Link linkOpposite = network.getFactory().createLink(Id.create(2, Link.class), node2, node1);
+		link.setLength(100);
+		link.setFreespeed(1);
+		link.setCapacity(3600.0);
+		link.setNumberOfLanes(1);
+		network.addLink(link);
+		network.addLink(linkOpposite);
 
 		final Controler controler = new Controler(scenario);
         controler.getConfig().controller().setCreateGraphs(false);

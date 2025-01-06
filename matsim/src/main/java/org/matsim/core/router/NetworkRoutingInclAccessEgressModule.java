@@ -397,7 +397,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			}
 
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId); // TODO This line creates a lot of problems in the tests: The old router did not need any vehicles, but this one does #aleks
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) {
 				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " for mode " + mode + ".");
@@ -417,7 +417,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
-			travTime = (int) path.travelTime;
+			travTime = (int) path.travelTime; // yyyy Why are we casting to int here? This causes the link traveltime to be different from the route traveltime. aleks Jan'2025
 
 		} else {
 			// create an empty route == staying on place if toLink == endLink

@@ -90,7 +90,6 @@ public class PlanRouterTest {
 		// yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
     }
 
-	//TODO This test will currently not work. The objects needed can only be injected. #aleks
 	@Test
 	void keepsVehicleIfTripRouterUsesOneAlready() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
@@ -119,14 +118,23 @@ public class PlanRouterTest {
 				  Network carOnlyNetwork = NetworkUtils.createNetwork();
 				  filter.filter(carOnlyNetwork, Set.of("car"));
 
+				  // We create a teleport with beelineDistanceFactor 0, so that the access and egress do not change the overall plan-stats
+				  RoutingModule teleportModule = new TeleportationRoutingModule(
+					  "walk",
+					  scenario,
+					  1,
+					  0);
+
+				  // TODO I have used the default impls for all needed interfaces. Check if this is okay # aleks
 				  List<? extends PlanElement> trip = DefaultRoutingModules.createAccessEgressNetworkRouter(
 					  "car",
 					  leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime),
 					  scenario,
 					  carOnlyNetwork,
-					  null,
-					  null,
-					  null
+					  teleportModule,
+					  teleportModule,
+					  TimeInterpretation.create(config),
+					  RouterUtils.getMultimodalLinkChooserDefault()
 				  ).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
 				  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
 				  return trip;
