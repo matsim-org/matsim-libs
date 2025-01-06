@@ -320,8 +320,6 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
 		Set<String> usableModes = planModel.filterModes(ModeEstimate::isUsable);
 
-		ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
-
 		// Same Logic as the top k estimator
 		for (String[] result : modes) {
 
@@ -329,6 +327,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, planModel.trips()));
 
 			double estimate = 0;
+
+			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
 
 			// Collect estimates for all entries
 			for (int i = 0; i < result.length; i++) {
