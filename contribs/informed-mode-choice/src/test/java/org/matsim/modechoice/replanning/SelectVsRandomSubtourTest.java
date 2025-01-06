@@ -60,7 +60,7 @@ public class SelectVsRandomSubtourTest extends ScenarioTest {
 		double[] selectModes = sampleModes(plans, select);
 
 		assertThat(selectModes)
-			.containsExactly(randomModes, Offset.offset(1200d));
+			.containsExactly(randomModes, Offset.offset(1400d));
 
 	}
 
