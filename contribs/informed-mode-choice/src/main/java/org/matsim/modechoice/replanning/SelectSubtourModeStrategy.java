@@ -137,19 +137,13 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 					for (int i = 0; i < mask.length; i++) {
 						if (mask[i])
 							option[i] = m;
-
-						options.add(option);
 					}
+
+					options.add(option);
 				}
 
 				List<PlanCandidate> singleModeCandidates = ctx.generator.generatePredefined(model, options);
 				singleModeCandidates.removeIf(p -> p.getUtility() == Double.NEGATIVE_INFINITY);
-
-				// if none of the single mode options are valid, no further search is needed
-				// this works in conjunction with subtour constraints, with other constraints it might be too strict
-				if (singleModeCandidates.size() <= 1) {
-					continue;
-				}
 
 				// Single modes are also added
 				Set<PlanCandidate> candidateSet = new LinkedHashSet<>(singleModeCandidates);

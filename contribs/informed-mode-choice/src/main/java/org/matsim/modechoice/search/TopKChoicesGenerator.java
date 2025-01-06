@@ -306,7 +306,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		// reduce to single options that are usable
 		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
 			for (ModeEstimate o : e.getValue()) {
-				// check if a mode can be use at all
+				// check if a mode can be used at all
 				if (!o.isUsable() || o.isMin())
 					continue;
 
@@ -327,6 +327,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, planModel.trips()));
 
 			double estimate = 0;
+
+			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
 
 			// Collect estimates for all entries
 			for (int i = 0; i < result.length; i++) {
@@ -351,9 +353,10 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 				estimate += opt.getEstimates()[i];
 
+				// Store modes that have been used
+				if (!opt.getNoRealUsage()[i])
+					usedModes.add(mode);
 			}
-
-			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
 
 			estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, singleOptions.values());
 

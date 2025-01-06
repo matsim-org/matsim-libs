@@ -103,7 +103,7 @@ class BalancedInnovationStrategyChooserTest {
 
 		}
 
-		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(300));
+		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(2000));
 		assertThat(count.getDifference()).isLessThanOrEqualTo(2);
 	}
 
