@@ -31,7 +31,6 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
-import org.geotools.jdbc.JDBCDataStore;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
@@ -83,7 +82,7 @@ public class GeoFileReader implements MatsimSomeReader {
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put("read-only", true);
+				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
 				DataStore dataStore = DataStoreFinder.getDataStore(params);
 				return getSimpleFeatures(dataStore, layerName);
 			} else {
@@ -235,7 +234,7 @@ public class GeoFileReader implements MatsimSomeReader {
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put("read-only", true);
+				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
 
 				DataStore datastore = DataStoreFinder.getDataStore(params);
 				featureSource = datastore.getFeatureSource(layerName);
