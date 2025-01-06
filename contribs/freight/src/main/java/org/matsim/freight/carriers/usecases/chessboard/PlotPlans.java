@@ -47,8 +47,6 @@ final class PlotPlans {
 //		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
         new CarrierPlanXmlReader(carriers, types ).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
 
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-
         final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));
         VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
         VehicleRoutingProblem vrp = vrpBuilder.build();

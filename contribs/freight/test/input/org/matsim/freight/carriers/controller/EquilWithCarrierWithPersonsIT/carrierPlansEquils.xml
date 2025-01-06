@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+  ~ /* *********************************************************************** *
+  ~  * project: org.matsim.*
+  ~  * ${file_name}
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  * copyright       : (C) ${year} by the members listed in the COPYING,        *
+  ~  *                   LICENSE and WARRANTY file.                            *
+  ~  * email           : info at matsim dot org                                *
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  *   This program is free software; you can redistribute it and/or modify  *
+  ~  *   it under the terms of the GNU General Public License as published by  *
+  ~  *   the Free Software Foundation; either version 2 of the License, or     *
+  ~  *   (at your option) any later version.                                   *
+  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
+  ~  *                                                                         *
+  ~  * *********************************************************************** */
+  ~
+  ~ ${filecomment}
+  ~ ${package_declaration}
+  ~
+  ~ ${typecomment}
+  ~ ${type_declaration}
+  -->
+
+<carriers>
+		<carrier id="carrier1" linkId="1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="vehicle_c1" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="vehicle_c2" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
+
+			<shipments>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="09:00:00" endDelivery="20:00:00" pickupServiceTime="00:02:00" deliveryServiceTime="00:02:00"/>
+				<shipment id="s2" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="00:0:00" deliveryServiceTime="00:0:00"/>
+<!-- 				<shipment id="s2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/> -->
+			</shipments>
+
+			<plan score="-100.0" selected="true">
+				<tour vehicleId="vehicle_c1">
+					<act type="start" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:30:00">
+						<route>6</route>
+					</leg>
+					<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>20 21</route>
+					</leg>
+					<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>23</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+
+				<tour vehicleId="vehicle_c2">
+					<act type="start" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:30:00">
+						<route>6</route>
+					</leg>
+					<act type="pickup" shipmentId="s2" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>20 21</route>
+					</leg>
+					<act type="delivery" shipmentId="s2" end_time="07:30:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>23</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</carrier>
+
+		<carrier id="carrier2" linkId="1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="c2_vehicle_c1" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
+
+			<shipments>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
+			</shipments>
+
+			<plan score="-100.0" selected="true">
+				<tour vehicleId="c2_vehicle_c1">
+					<act type="start" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:30:00">
+						<route>6</route>
+					</leg>
+					<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>20 21</route>
+					</leg>
+					<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
+					<leg dep_time="07:00:00" transp_time="00:00:00">
+						<route>23</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</carrier>
+
+		<carrier id="carrier3" linkId="1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="c3_vehicle_c1" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
+
+			<shipments>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:00:00" startDelivery="0.0" endDelivery="12:00:00" pickupServiceTime="00:20:00" deliveryServiceTime="00:00:00"/>
+			</shipments>
+
+			<plan score="-100.0" selected="true">
+				<tour vehicleId="c3_vehicle_c1">
+					<act type="start" end_time="07:00:00"/>
+					<leg dep_time="07:00:00" transp_time="00:06:35">
+						<route>6</route>
+					</leg>
+					<act type="pickup" shipmentId="s1" end_time="07:26:35"/>
+					<leg dep_time="07:26:35" transp_time="00:32:59">
+						<route>20 21</route>
+					</leg>
+					<act type="delivery" shipmentId="s1" end_time="07:59:35"/>
+					<leg dep_time="07:59:35" transp_time="00:11:59">
+						<route>23</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</carrier>
+
+	</carriers>
+

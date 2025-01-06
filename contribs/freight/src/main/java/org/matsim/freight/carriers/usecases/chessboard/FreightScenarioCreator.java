@@ -21,6 +21,9 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,10 +36,6 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Creates chessboard freight scenario.
@@ -102,7 +101,7 @@ final class FreightScenarioCreator {
 
         for(int i=0;i<20;i++){
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create((i + 1),CarrierService.class), drawLocationLinkId(innerCityLinks, outerCityLinks));
-            serviceBuilder.setCapacityDemand(1);
+            serviceBuilder.setDemand(1);
             serviceBuilder.setServiceDuration(5*60);
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
             CarrierService carrierService = serviceBuilder.build();

@@ -9,6 +9,9 @@ import org.matsim.core.replanning.ReplanningUtils;
 
 /**
  * This chooser forces to select an innovative strategy every X iteration for every X person in the population.
+ * This chooser forces innovation regardless of the weights.
+ * <p>
+ * For a more consistent innovation rate use {@link BalancedInnovationStrategyChooser}.
  */
 public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements StrategyChooser<PL, AG> {
 

@@ -30,7 +30,6 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
 		prepare.run();
 
-
 		PlanStrategy strategy = injector.getInstance(Key.get(PlanStrategy.class, Names.named(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY)));
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(5));
@@ -69,7 +68,6 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 
 	@Test
 	void allowedModes() {
-
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 

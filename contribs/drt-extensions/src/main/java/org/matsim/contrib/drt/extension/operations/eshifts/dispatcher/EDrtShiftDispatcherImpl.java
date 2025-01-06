@@ -42,15 +42,18 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
 	private final Fleet fleet;
 
+	private final ChargingStrategy.Factory chargingStrategyFactory;
+
 	public EDrtShiftDispatcherImpl(EShiftTaskScheduler shiftTaskScheduler, ChargingInfrastructure chargingInfrastructure,
 								   ShiftsParams drtShiftParams, OperationFacilities operationFacilities,
-								   DrtShiftDispatcher delegate, Fleet fleet) {
+								   DrtShiftDispatcher delegate, Fleet fleet, ChargingStrategy.Factory chargingStrategyFactory) {
 		this.shiftTaskScheduler = shiftTaskScheduler;
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.drtShiftParams = drtShiftParams;
 		this.operationFacilities = operationFacilities;
 		this.delegate = delegate;
 		this.fleet = fleet;
+		this.chargingStrategyFactory = chargingStrategyFactory;
 	}
 
 	@Override
@@ -112,18 +115,18 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
 								if (selectedCharger.isPresent()) {
 									Charger selectedChargerImpl = selectedCharger.get();
-									ChargingStrategy chargingStrategy = selectedChargerImpl.getLogic().getChargingStrategy();
-									if (!chargingStrategy.isChargingCompleted(electricVehicle)) {
+									ChargingStrategy chargingStrategy = chargingStrategyFactory.createStrategy(selectedChargerImpl.getSpecification(), electricVehicle);
+									if (!chargingStrategy.isChargingCompleted()) {
 										final double waitTime = ChargingEstimations
 												.estimateMaxWaitTimeForNextVehicle(selectedChargerImpl);
 										final double chargingTime = chargingStrategy
-												.calcRemainingTimeToCharge(electricVehicle);
+												.calcRemainingTimeToCharge();
 										double energy = -chargingStrategy
-												.calcRemainingEnergyToCharge(electricVehicle);
+												.calcRemainingEnergyToCharge();
 										final double endTime = timeStep + waitTime + chargingTime;
 										if (endTime < currentTask.getEndTime()) {
 											shiftTaskScheduler.chargeAtHub((WaitForShiftTask) currentTask, eShiftVehicle,
-													electricVehicle, selectedChargerImpl, timeStep, endTime, energy);
+													electricVehicle, selectedChargerImpl, timeStep, endTime, energy, chargingStrategy);
 										}
 									}
 								}

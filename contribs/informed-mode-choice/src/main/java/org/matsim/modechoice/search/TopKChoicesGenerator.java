@@ -22,11 +22,6 @@ import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
 @SuppressWarnings("unchecked")
 public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
-	/**
-	 * Maximum number of iterations. Memory usage will increase the more iterations are done.
-	 */
-	private static final int MAX_ITER = 10_000_000;
-
 	private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
 
 
@@ -116,7 +111,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 						continue m;
 				}
 
-				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
+				// Only add estimates for desired modes and those that have actual usage
+				search.addEstimates(mode.getMode(), mode.getEstimates(), mask, mode.getNoRealUsage());
 			}
 
 			if (search.isEmpty())
@@ -167,14 +163,14 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			int k = 0;
 			int n = 0;
-			DoubleIterator it = search.iter(result);
+			ModeIterator it = search.iter(result);
 			double best = Double.NEGATIVE_INFINITY;
 
 			outer:
 			while (it.hasNext() && k < topK) {
 				double estimate = preDeterminedEstimate + it.nextDouble();
 
-				if (n++ > MAX_ITER) {
+				if (n++ > it.maxIters()) {
 					log.warn("Maximum number of iterations reached for person {}", context.person.getId());
 					break;
 				}

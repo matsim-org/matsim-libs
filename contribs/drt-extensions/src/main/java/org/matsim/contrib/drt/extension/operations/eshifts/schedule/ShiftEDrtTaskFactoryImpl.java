@@ -19,6 +19,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.evrp.ChargingTaskImpl;
@@ -99,21 +100,21 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     public WaitForShiftTask createChargingWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime,
                                                                double endTime, Link link, OperationFacility facility,
-                                                               double totalEnergy, Charger charger) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+                                                               double totalEnergy, Charger charger, ChargingStrategy strategy) {
+        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy, strategy);
         return new EDrtWaitForShiftTask(beginTime, endTime, link, totalEnergy, facility, chargingTask);
     }
 
     public EDrtShiftBreakTaskImpl createChargingShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                                               DrtShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+                                                               DrtShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility, ChargingStrategy strategy) {
+        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy, strategy);
         return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facility);
     }
 
     public ShiftChangeOverTask createChargingShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
                                                                  Link link, Charger charger, double totalEnergy,
-                                                                 DrtShift shift, OperationFacility facility) {
-        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
+                                                                 DrtShift shift, OperationFacility facility, ChargingStrategy strategy) {
+        ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy, strategy);
         return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, totalEnergy, chargingTask, facility);
     }
 }

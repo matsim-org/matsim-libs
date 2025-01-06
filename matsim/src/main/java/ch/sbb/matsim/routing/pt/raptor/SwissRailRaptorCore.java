@@ -38,15 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * The actual RAPTOR implementation, based on Delling et al, Round-Based Public Transit Routing.
@@ -118,7 +110,8 @@ public class SwissRailRaptorCore {
         reset();
         CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
-        Map<TransitStopFacility, InitialStop> destinationStops = new HashMap<>();
+		// Using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+        Map<TransitStopFacility, InitialStop> destinationStops = new LinkedHashMap<>();
 
         // go through all egressStops; check if already in destinationStops; if so, check if current cost is smaller; if so, then replace.  This can
         // presumably happen when the same stop can be reached at lower cost by a different egress mode. (*)
@@ -141,7 +134,8 @@ public class SwissRailRaptorCore {
         }
 
         // same as (*) for access stops:
-        Map<TransitStopFacility, InitialStop> initialStops = new HashMap<>();
+		// Also, using a LinkedHashMap instead of a regular HashMap here is necessary to have a deterministic behaviour
+        Map<TransitStopFacility, InitialStop> initialStops = new LinkedHashMap<>();
         for (InitialStop accessStop : accessStops) {
             InitialStop alternative = initialStops.get(accessStop.stop);
             if (alternative == null || accessStop.accessCost < alternative.accessCost) {
@@ -833,7 +827,7 @@ public class SwissRailRaptorCore {
             final int firstTransferIndex;
             final int lastTransferIndex;
             final RTransfer[] transfers;
-            
+
             if (!useAdaptiveTransferCalculation) {
             	// efficient lookup from the precomputed transfer candidates
             	transfers = this.data.transfers;

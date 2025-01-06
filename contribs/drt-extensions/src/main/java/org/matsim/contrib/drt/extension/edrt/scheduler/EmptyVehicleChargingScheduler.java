@@ -47,10 +47,12 @@ public class EmptyVehicleChargingScheduler {
 	private final MobsimTimer timer;
 	private final EDrtTaskFactoryImpl taskFactory;
 	private final Map<Id<Link>, List<Charger>> linkToChargersMap;
+	private final ChargingStrategy.Factory chargingStrategyFactory;
 
 	public EmptyVehicleChargingScheduler(MobsimTimer timer, DrtTaskFactory taskFactory,
-			ChargingInfrastructure chargingInfrastructure) {
+			ChargingInfrastructure chargingInfrastructure, ChargingStrategy.Factory chargingStrategyFactory) {
 		this.timer = timer;
+		this.chargingStrategyFactory = chargingStrategyFactory;
 		this.taskFactory = (EDrtTaskFactoryImpl)taskFactory;
 		linkToChargersMap = chargingInfrastructure.getChargers()
 				.values()
@@ -68,15 +70,16 @@ public class EmptyVehicleChargingScheduler {
 			// Empty charger or at least smallest queue charger
 			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparingInt(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
-				chargeVehicleImpl(vehicle, charger);
+			ChargingStrategy strategy = chargingStrategyFactory.createStrategy(charger.getSpecification(), ev);
+			if (!strategy.isChargingCompleted()) {
+				chargeVehicleImpl(vehicle, ev, charger, strategy);
 			}
 		}
 	}
 
 
 
-	private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
+	private void chargeVehicleImpl(DvrpVehicle vehicle, ElectricVehicle ev, Charger charger, ChargingStrategy strategy) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
@@ -86,19 +89,17 @@ public class EmptyVehicleChargingScheduler {
 
 		// add CHARGING TASK
 		double beginTime = stayTask.getEndTime();
-		ChargingStrategy strategy = charger.getLogic().getChargingStrategy();
-		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double totalEnergy = -strategy.calcRemainingEnergyToCharge(ev);
+		double totalEnergy = -strategy.calcRemainingEnergyToCharge();
 
-		double chargingDuration = Math.min(strategy.calcRemainingTimeToCharge(ev),
+		double chargingDuration = Math.min(strategy.calcRemainingTimeToCharge(),
 				vehicle.getServiceEndTime() - beginTime);
 		if (chargingDuration <= 0) {
 			return;// no charging
 		}
 		double endTime = beginTime + chargingDuration;
 
-		schedule.addTask(taskFactory.createChargingTask(vehicle, beginTime, endTime, charger, totalEnergy));
-		((ChargingWithAssignmentLogic)charger.getLogic()).assignVehicle(ev);
+		schedule.addTask(taskFactory.createChargingTask(vehicle, beginTime, endTime, charger, totalEnergy, strategy));
+		((ChargingWithAssignmentLogic)charger.getLogic()).assignVehicle(ev, strategy);
 
 		// append STAY
 		schedule.addTask(taskFactory.createStayTask(vehicle, endTime, vehicle.getServiceEndTime(), charger.getLink()));

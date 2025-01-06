@@ -431,8 +431,15 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
 
+	/**
+	 * This determines the traffic dynamics of a link. The default is 'queue', but the recommended setting is kinematic waves.
+	 *
+	 * DEPRECATION NOTE: 'withHoles' is deprecated, use 'kinematicWaves' instead, as that uses 'withHoles' and adds an inflow capacity on top.
+	 */
 	public enum TrafficDynamics {
-		queue, withHoles,
+		queue,
+		@Deprecated
+		withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	}
 
@@ -440,11 +447,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 * Defines how the qsim sets the inflow and/or how it reacts to link attributes which are inconsistent with regard to the fundamental diagram. <br>
 	 *
 	 * <li>Note that {@code MAX_CAP_FOR_ONE_LANE} is backwards-compatible but always sets the inflow capacity to the maximum according to the fundamental diagram for one lane,
-	 * so it essentially sets the inflow capacity too low for multiple-lane-links. </li>
-	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
-	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental diagram, assuming the flow capacity in the link attributes to be correct.</li>
+	 * so it essentially sets the inflow capacity too low for multiple-lane-links. DEPRECATED: This is only for backwards compatibility. Use
+	 * INFLOW_FROM_FDIAG instead.</li>
+	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the
+	 * fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
+	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental
+	 * diagram, assuming the flow capacity in the link attributes to be correct. DEPRECATED: In practice the other setting is used most often! Use\
+	 * INFLOW_FROM_FDIAG instead.</li>
 	 */
-	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG, NR_OF_LANES_FROM_FDIAG, MAX_CAP_FOR_ONE_LANE}
+	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG,
+		@Deprecated
+		NR_OF_LANES_FROM_FDIAG,
+		@Deprecated
+		MAX_CAP_FOR_ONE_LANE}
 
 	@StringSetter(TRAFFIC_DYNAMICS)
 	public void setTrafficDynamics(final TrafficDynamics str) {
