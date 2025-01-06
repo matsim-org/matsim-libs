@@ -20,18 +20,15 @@
 
 package org.matsim.contrib.zone.skims;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.network.Network;
@@ -43,15 +40,20 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.base.Verify;
 import com.google.common.collect.Sets;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
+
+	private final static Logger log = LogManager.getLogger(FreeSpeedTravelTimeMatrix.class);
+
 	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads,
 		double qSimTimeStepSize) {
 		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
@@ -89,24 +91,25 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		return freeSpeedTravelTimeMatrix.get(zoneSystem.getZoneForNodeId(fromNode.getId()).orElseThrow(), zoneSystem.getZoneForNodeId(toNode.getId()).orElseThrow());
 	}
 
-	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrixFromCache(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads, double qSimTimeStepSize, File cachePath) {
-		boolean exists = cachePath.exists();
+	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrixFromCache(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads, double qSimTimeStepSize, URL cachePath) {
 
-		final FreeSpeedTravelTimeMatrix matrix;
-		if (exists) {
-			matrix = new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, cachePath);
-		} else {
-			matrix = createFreeSpeedMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, qSimTimeStepSize);
-			matrix.write(cachePath, dvrpNetwork);
-		}
-
+		FreeSpeedTravelTimeMatrix matrix;
+		if (cachePath != null) {
+            try {
+                return new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, cachePath);
+            } catch (FileNotFoundException e) {
+				log.warn("Freespeed matrix cache file not found, will use as output path for on-the-fly creation.");
+            }
+        }
+		matrix = createFreeSpeedMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, qSimTimeStepSize);
+		matrix.write(cachePath, dvrpNetwork);
 		return matrix;
 	}
 
-	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, File cachePath) {
+	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, URL cachePath) throws FileNotFoundException {
 		this.zoneSystem = zoneSystem;
 
-		try (DataInputStream inputStream = new DataInputStream(new FileInputStream(cachePath))) {
+		try (DataInputStream inputStream = new DataInputStream(IOUtils.getInputStream(cachePath))) {
 			// number of zones
 			int numberOfZones = inputStream.readInt();
 			Verify.verify(numberOfZones == zoneSystem.getZones().size());
@@ -175,13 +178,15 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 					}
 				}
 			}
+		} catch (FileNotFoundException e) {
+			throw e;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-	}
+    }
 
-	public void write(File outputPath, Network dvrpNetwork) {
-		try (DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputPath))) {
+	public void write(URL outputPath, Network dvrpNetwork) {
+		try (DataOutputStream outputStream = new DataOutputStream(IOUtils.getOutputStream(outputPath, false))) {
 			// obtain fixed order of zones
 			List<Zone> zones = new ArrayList<>(zoneSystem.getZones().values());
 			outputStream.writeInt(zones.size());
