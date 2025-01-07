@@ -57,6 +57,8 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,6 +69,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -402,7 +410,28 @@ public class RailsimIntegrationTest {
 	
 	@Test
 	void testMicroStationReroutingTwoDirections() {
-		modifyScheduleAndRunSimulation(new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"), 300, 1800);
+//		modifyScheduleAndRunSimulation(new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"), 300, 1800);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            modifyScheduleAndRunSimulation(
+                new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"),
+                300,
+                1800
+            );
+        });
+        
+        try {
+            future.get(30, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            fail("Simulation took too long and was aborted!");
+        } catch (ExecutionException | InterruptedException e) {
+        	// other exceptions
+        	fail("An error occurred during the simulation: " + e.getMessage());
+        } finally {
+            executor.shutdownNow();
+        }
 	}
 
 	@Test
