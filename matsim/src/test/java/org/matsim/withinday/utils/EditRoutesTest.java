@@ -505,7 +505,7 @@ private void createSamplePlan() {
 	scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
 	scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
 
-	Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+	Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId(1));
 	PersonVehicles vehicles = new PersonVehicles();
 	vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
 	VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
