@@ -676,7 +676,7 @@ public final class DemandReaderFromCSV {
 			if (possibleLinkPersonPairsForService.size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
 
-					LinkPersonPair linkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsForService, numberOfJobs,
+					LinkPersonPair linkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsForService, numberOfJobs,
 							areasForServiceLocations, locationsOfServices, usedServiceLocationsOrPersons,
 							possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
 					int demandForThisLink = 1;
@@ -749,7 +749,7 @@ public final class DemandReaderFromCSV {
 					if (locationsOfServices != null && locationsOfServices.length > i) {
 						linkPersonPair = new LinkPersonPair(scenario.getNetwork().getLinks().get(Id.createLinkId(locationsOfServices[i])), null);
 					} else
-						linkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsForService,
+						linkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsForService,
 							numberOfServiceLocations, areasForServiceLocations, locationsOfServices,
 							usedServiceLocationsOrPersons, possiblePersonsForService, nearestLinkPerPerson,
 							crsTransformationNetworkAndShape, i);
@@ -946,10 +946,10 @@ public final class DemandReaderFromCSV {
 			// creates shipments with a demand of 1
 			if (possibleLinkPersonPairsPickup.size() > demandToDistribute || Objects.requireNonNull(possibleLinkPersonPairsDelivery).size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
-					LinkPersonPair pickupLinkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsPickup,
+					LinkPersonPair pickupLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsPickup,
 						numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocationsOrPersons,
 						possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
-					LinkPersonPair deliveryLinkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsDelivery,
+					LinkPersonPair deliveryLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsDelivery,
 						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
 						usedDeliveryLocationsOrPersons, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 						crsTransformationNetworkAndShape, i);
@@ -1035,11 +1035,11 @@ public final class DemandReaderFromCSV {
 
 			for (int i = 0; i < numberOfJobs; i++) {
 
-				LinkPersonPair pickupLinkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsPickup,
+				LinkPersonPair pickupLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsPickup,
 					numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocationsOrPersons,
 					possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
 
-				LinkPersonPair deliveryLinkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairsDelivery,
+				LinkPersonPair deliveryLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsDelivery,
 					numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
 					usedDeliveryLocationsOrPersons, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 					crsTransformationNetworkAndShape, i);
@@ -1099,7 +1099,7 @@ public final class DemandReaderFromCSV {
 														 HashMap<Id<Person>, Person> possiblePersons,
 														 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, int countOfLinks) {
 		while (LinkPersonPair == null || usedLocationsOrPersons.contains(LinkPersonPair)) {
-			LinkPersonPair = findNextUsedLink(scenario, indexShape, possibleLinkPersonPairs,
+			LinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairs,
 				numberOfLocations, areasForLocations, setLocations,
 				usedLocationsOrPersons, possiblePersons, nearestLinkPerPerson,
 				crsTransformationNetworkAndShape, countOfLinks - 1);
@@ -1346,7 +1346,7 @@ public final class DemandReaderFromCSV {
 		} else {
 			LinkPersonPair newPossibleLink;
 			while (possibleLinkPersonPairs.size() < numberOfLocations) {
-				newPossibleLink = findPossibleLinkForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
+				newPossibleLink = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 					crsTransformationNetworkAndShape);
 				if (!possibleLinkPersonPairs.contains(newPossibleLink)){
@@ -1360,7 +1360,10 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Finds the next link which can be used as a location.
+	 * Finds the next link or person which can be used as a location.
+	 * If persons for locations are selected, the nearest link for each person will be used and added to the return LinkPersonPair.
+	 * If no persons are selected, only a possible link will be returned.
+	 * If the maximum number of locations is reached, a random location of the already used locations will be returned, if not a new LinkPersonPair will be found.
 	 *
 	 * @param scenario                         Scenario
 	 * @param indexShape                       ShpOptions.Index for the shape file
@@ -1375,11 +1378,11 @@ public final class DemandReaderFromCSV {
 	 * @param i                                Counter for the number of locations
 	 * @return Next link for the demand
 	 */
-	private static LinkPersonPair findNextUsedLink(Scenario scenario, ShpOptions.Index indexShape,
-												   ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer selectedNumberOfLocations, String[] areasForLocations,
-												   String[] selectedLocations, ArrayList<LinkPersonPair> usedLocationsOrPersons, HashMap<Id<Person>, Person> possiblePersons,
-												   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
-												   CoordinateTransformation crsTransformationNetworkAndShape, int i) {
+	private static LinkPersonPair findNextUsedLinkPersonPair(Scenario scenario, ShpOptions.Index indexShape,
+															 ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer selectedNumberOfLocations, String[] areasForLocations,
+															 String[] selectedLocations, ArrayList<LinkPersonPair> usedLocationsOrPersons, HashMap<Id<Person>, Person> possiblePersons,
+															 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
+															 CoordinateTransformation crsTransformationNetworkAndShape, int i) {
 		LinkPersonPair linkPersonPair = null;
 		if (selectedNumberOfLocations == null || usedLocationsOrPersons.size() < selectedNumberOfLocations) {
 			if (selectedLocations != null && selectedLocations.length > i) {
@@ -1387,7 +1390,7 @@ public final class DemandReaderFromCSV {
 			} else
 				while (linkPersonPair == null || (possibleLinkPersonPairs.size() > usedLocationsOrPersons.size()
 					&& usedLocationsOrPersons.contains(linkPersonPair)))
-					linkPersonPair = findPossibleLinkForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
+					linkPersonPair = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
 						indexShape, areasForLocations, selectedNumberOfLocations, scenario, selectedLocations,
 						crsTransformationNetworkAndShape);
 
@@ -1475,7 +1478,7 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Searches a possible link for the demand.
+	 * Searches a possible LinkPersonPair for the demand.
 	 *
 	 * @param possibleLinkPersonPairs          HashMap with all possible links
 	 * @param possiblePersons                  HashMap with all possible persons
@@ -1488,11 +1491,11 @@ public final class DemandReaderFromCSV {
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
 	 * @return The selected link for the demand
 	 */
-	private static LinkPersonPair findPossibleLinkForDemand(ArrayList<LinkPersonPair> possibleLinkPersonPairs,
-															HashMap<Id<Person>, Person> possiblePersons,
-															HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
-															ShpOptions.Index indexShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
-															Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
+	private static LinkPersonPair findPossibleLinkPersonPairForDemand(ArrayList<LinkPersonPair> possibleLinkPersonPairs,
+																	  HashMap<Id<Person>, Person> possiblePersons,
+																	  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
+																	  ShpOptions.Index indexShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
+																	  Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
 		LinkPersonPair linkPersonPair = null;
 		LinkPersonPair newLinkPersonPair;
 
