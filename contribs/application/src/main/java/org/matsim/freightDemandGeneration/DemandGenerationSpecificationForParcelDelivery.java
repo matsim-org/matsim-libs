@@ -32,7 +32,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 	private static final Joiner JOIN = Joiner.on("\t");
 
 	private static DemandDistributionOption demandDistributionOption;
-	protected static HashMap<Person, Integer> demandForEachPerson = new HashMap<>();
+	protected static HashMap<Person, Integer> parcelsPerPerson = new HashMap<>();
 
 	/**
 	 * Gives the share of each age group for all online shoppers in Germany.
@@ -199,7 +199,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 
 		//add remainingDemand to list
 		if (demandForThisLink > 0)
-			demandForEachPerson.put(selectedNewLinkPersonPairForSecondJobElement.getPerson(), demandForThisLink);
+			parcelsPerPerson.put(selectedNewLinkPersonPairForSecondJobElement.getPerson(), demandForThisLink);
 		return demandForThisLink;
 	}
 
@@ -321,18 +321,22 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 			StandardCharsets.UTF_8, true);
 		try {
 			// Write the header
-			String[] header = new String[]{"ageGroup", "share", "totalPersonsInAgeGroup", "possiblePersonsWithDemand"};
+			String[] header = new String[]{"ageGroup", "share", "totalPersonsInAgeGroup", "possiblePersonsWithDemand", "personsWithDemand", "parcels"};
 			JOIN.appendTo(writer, header);
+			calculateGeneratedDemandForAgeGroup();
 
 			// Write the age group data to the file
 			for (AgeGroup ageGroup : ageGroupDemandShare.keySet()) {
+
 				writer.newLine();
 				List<String> row = new ArrayList<>();
 				row.add(ageGroup.boundsToString());
 				row.add(String.valueOf(ageGroupDemandShare.get(ageGroup).getPmf().stream().filter(
 					e -> e.getFirst().equals("WithDemand")).findFirst().get().getSecond()));
 				row.add(String.valueOf(ageGroup.getTotalPersonsInAgeGroup()));
+				row.add(String.valueOf(ageGroup.getPossiblePersonsWithDemandInThisAgeGroup()));
 				row.add(String.valueOf(ageGroup.getPersonsWithDemandInThisAgeGroup()));
+				row.add(String.valueOf(ageGroup.getTotalAmountParcels()));
 				JOIN.appendTo(writer, row);
 			}
 
@@ -345,6 +349,18 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 		log.info("Wrote remainingDemand share file under " + "/outputAgeGroupDemandShareFile.xml.gz");
 	}
 
+	/**
+	 * Calculates the generated demand for each age group of the ageGroupDemandShare map.
+	 */
+	private static void calculateGeneratedDemandForAgeGroup() {
+		for (Person person : parcelsPerPerson.keySet()) {
+			int age = (int) person.getAttributes().getAttribute("age");
+			AgeGroup ageGroup = getAgeGroup(DemandGenerationSpecificationForParcelDelivery.ageGroupDemandShare.keySet(), age);
+			assert ageGroup != null;
+			ageGroup.setPossiblePersonsWithDemandInThisAgeGroup(ageGroup.getPossiblePersonsWithDemandInThisAgeGroup() + 1);
+			ageGroup.setTotalAmountParcels(ageGroup.getTotalAmountParcels() + parcelsPerPerson.get(person));
+		}
+	}
 
 	/**
 	 * Creates a tsv file with the remainingDemand distribution.
@@ -357,14 +373,14 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 			IOUtils.getFileUrl(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv"),
 			StandardCharsets.UTF_8, true);
 		try {
-			String[] header = new String[]{"personId", "age", "remainingDemand", "xCoord", "yCoord"};
+			String[] header = new String[]{"personId", "age", "amountOfParcels", "xCoord", "yCoord"};
 			JOIN.appendTo(writer, header);
-			for (Person person : demandForEachPerson.keySet()) {
+			for (Person person : parcelsPerPerson.keySet()) {
 				writer.newLine();
 				List<String> row = new ArrayList<>();
 				row.add(person.getId().toString());
 				row.add(person.getAttributes().getAttribute("age").toString());
-				row.add(demandForEachPerson.get(person).toString());
+				row.add(parcelsPerPerson.get(person).toString());
 				row.add(String.valueOf(getHomeCoord(person).getX()));
 				row.add(String.valueOf(getHomeCoord(person).getY()));
 				JOIN.appendTo(writer, row);
@@ -385,6 +401,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 		private final int upperBound;
 		private int totalPersonsInAgeGroup;
 		private int personsWithDemandInThisAgeGroup;
+		private int possiblePersonsWithDemandInThisAgeGroup;
 		private int remainingDemand;
 		private int totalAmountParcels;
 		private double error;
@@ -394,6 +411,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 			this.upperBound = upperBound;
 			this.totalAmountParcels = 0;
 			this.totalPersonsInAgeGroup = 0;
+			this.possiblePersonsWithDemandInThisAgeGroup = 0;
 			this.personsWithDemandInThisAgeGroup = 0;
 			this.remainingDemand = 0;
 			this.error = 0;
@@ -449,6 +467,14 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 
 		public int getTotalAmountParcels() {
 			return totalAmountParcels;
+		}
+
+		public int getPossiblePersonsWithDemandInThisAgeGroup() {
+			return possiblePersonsWithDemandInThisAgeGroup;
+		}
+
+		public void setPossiblePersonsWithDemandInThisAgeGroup(int possiblePersonsWithDemandInThisAgeGroup) {
+			this.possiblePersonsWithDemandInThisAgeGroup = possiblePersonsWithDemandInThisAgeGroup;
 		}
 
 		@Override
