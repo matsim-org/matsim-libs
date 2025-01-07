@@ -2,13 +2,11 @@ package org.matsim.freightDemandGeneration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,7 +20,6 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.freight.carriers.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
@@ -447,10 +444,8 @@ public class DemandReaderFromCSVTest {
 													Population population, Boolean combineSimilarJobs) throws IOException {
 		DemandDistributionOption demandDistributionOption = DemandDistributionOption.NoSelection;
 		TotalDemandGenerationsOption totalDemandGenerationOption = TotalDemandGenerationsOption.NoSelection;
-		Double PACKAGES_PER_PERSON = null;
-		Double PACKAGES_PER_RECIPIENT = null;
 
-		JobDurationCalculator jobDurationCalculator = new DefaultJobDurationCalculator();
+		DemandGenerationSpecification demandGenerationSpecification = new DefaultDemandGenerationSpecification();
 		// run methods
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
 			.readCarrierInformation(carrierCSVLocation);
@@ -459,7 +454,7 @@ public class DemandReaderFromCSVTest {
 		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
 		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		DemandReaderFromCSV.createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
-			null, jobDurationCalculator, demandDistributionOption.toString(), totalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
+			null, demandGenerationSpecification);
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
 		Assertions.assertTrue(
 			CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));

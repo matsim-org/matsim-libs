@@ -171,98 +171,6 @@ public class FreightDemandGenerationUtils {
 	}
 
 	/**
-	 * Creates a tsv file with the demand distribution.
-	 *
-	 * @param controler The controller to get the network from
-	 */
-	static void createDemandDistributionFile(Controler controler) {
-
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv");
-		try (FileWriter writer = new FileWriter(file, true)) {
-			writer.write("personId	age	demand	xCoord	yCoord\n");
-
-			for (Id<Person> person : DemandReaderFromCSV.demandForEachPerson.keySet()) {
-				HashMap temp = DemandReaderFromCSV.demandForEachPerson.get(person);
-				for (Object age : temp.keySet()){
-					writer.write(person+"	"+age+"	"+temp.get(age)+"\n");
-				}
-
-			}
-
-			writer.flush();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote demand distribution file under " + "/outputDemandDistributionFile.xml.gz");
-	}
-
-	/**
-	 * Creates a tsv file with the age distribution.
-	 *
-	 * @param controler The controller to get the network from
-	 */
-	static void createAgeDistributionFile(Controler controler) {
-
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandDistrPerAgeGroup.tsv");
-		try (FileWriter writer = new FileWriter(file, true)) {
-			// Write the header
-			writer.write("ageGroup	lower	upper	share	demand	personsWithDemand	ignoredPersons\n");
-
-			// Iterate through the demandDistributionPerAgeGroup map
-			for (Object ageGroup : DemandReaderFromCSV.demandDistributionPerAgeGroup.keySet()) {
-				HashMap ageGroupData = (HashMap) DemandReaderFromCSV.demandDistributionPerAgeGroup.get(ageGroup);
-
-				// Write the age group data to the file
-				writer.write(ageGroup + "	" +
-					ageGroupData.get("lower") + "	" +
-					ageGroupData.get("upper") + "	" +
-					ageGroupData.get("share") + "	"+
-					ageGroupData.get("totalDemand") + "	"+
-					ageGroupData.get("personsWithDemandInThisAgeGroup")+ "	"+
-					ageGroupData.get("personsWithDemandInThisAgeGroup_counter")+ "\n");
-			}
-
-			// Flush the writer to ensure all data is written to the file
-			writer.flush();
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote age distribution file under " + "/outputDemandDistrPerAgeGroupFile.xml.gz");
-
-		File file2 = new File(controler.getConfig().controller().getOutputDirectory() + "/outputAgeGroupDemandShareFile.tsv");
-		try (FileWriter writer = new FileWriter(file2, true)) {
-			// Write the header
-			writer.write("ageGroup	lower	upper	share	totalPersons	personsWithDemand\n");
-
-			// Iterate through the demandDistributionPerAgeGroup map
-			for (Object ageGroup : DemandReaderFromCSV.ageGroupDemandShare.keySet()) {
-				HashMap ageGroupData = (HashMap) DemandReaderFromCSV.ageGroupDemandShare.get(ageGroup);
-
-				// Write the age group data to the file
-				writer.write(ageGroup + "	" +
-					ageGroupData.get("lower") + "	" +
-					ageGroupData.get("upper") + "	" +
-					ageGroupData.get("share") + "	"+
-					ageGroupData.get("total") + "	"+
-					ageGroupData.get("possiblePersonsInThisAge")+ "\n");
-			}
-
-			// Flush the writer to ensure all data is written to the file
-			writer.flush();
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote demand share file under " + "/outputAgeGroupDemandShareFile.xml.gz");
-
-
-	}
-
-	/**
 	 * Reduces the population to all persons having their home in the shape
 	 *
 	 * @param population 	The population to be reduced
@@ -286,7 +194,8 @@ public class FreightDemandGenerationUtils {
 			if (!index.contains(new Coord(x, y)))
 				personsToRemove.add(person.getId());
 		}
-		log.info(personsToRemove.size()+" out of "+population.getPersons().size()+" persons are removed because of their home location outside of the shpfile.");
+		log.info("{} out of {} persons are removed because of their home location outside of the shapefile.", personsToRemove.size(),
+			population.getPersons().size());
 		for (Id<Person> id : personsToRemove)
 			population.removePerson(id);
 	}
