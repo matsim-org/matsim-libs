@@ -15,7 +15,6 @@ import jakarta.inject.Provider;
 public final class GeneratorContext {
 
 	public final TopKChoicesGenerator generator;
-	public final SingleTripChoicesGenerator singleGenerator;
 	public final PlanSelector selector;
 	public final PlanRouter planRouter;
 
@@ -23,9 +22,8 @@ public final class GeneratorContext {
 	public final CandidatePruner pruner;
 
 	@Inject
-	public GeneratorContext(TopKChoicesGenerator generator, SingleTripChoicesGenerator singleGenerator, PlanSelector selector, PlanRouter planRouter, Provider<CandidatePruner> pruner) {
+	public GeneratorContext(TopKChoicesGenerator generator, PlanSelector selector, PlanRouter planRouter, Provider<CandidatePruner> pruner) {
 		this.generator = generator;
-		this.singleGenerator = singleGenerator;
 		this.selector = selector;
 		this.planRouter = planRouter;
 		this.pruner = pruner.get();

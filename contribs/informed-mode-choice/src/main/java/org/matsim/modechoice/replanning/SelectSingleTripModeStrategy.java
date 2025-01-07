@@ -2,7 +2,7 @@ package org.matsim.modechoice.replanning;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
+import jakarta.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
@@ -13,10 +13,9 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.pruning.CandidatePruner;
-import org.matsim.modechoice.search.SingleTripChoicesGenerator;
+import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.annotation.Nullable;
-import jakarta.inject.Provider;
 import java.util.*;
 
 /**
@@ -28,7 +27,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 	private static final Logger log = LogManager.getLogger(SelectSingleTripModeStrategy.class);
 
-	private final Provider<SingleTripChoicesGenerator> generator;
+	private final Provider<TopKChoicesGenerator> generator;
 	private final Provider<PlanSelector> selector;
 
 	private final Set<String> modes;
@@ -38,7 +37,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
 	                                    Set<String> modes,
-	                                    Provider<SingleTripChoicesGenerator> generator,
+	                                    Provider<TopKChoicesGenerator> generator,
 	                                    Provider<PlanSelector> selector,
 	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
 		super(globalConfigGroup);
@@ -55,20 +54,20 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	}
 
 
-	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
+	public static Algorithm newAlgorithm(TopKChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
 		return new Algorithm(generator, selector, pruner, modes, requireDifferentModes);
 	}
 
 	public static final class Algorithm implements PlanAlgorithm {
 
-		private final SingleTripChoicesGenerator generator;
+		private final TopKChoicesGenerator generator;
 		private final PlanSelector selector;
 		private final CandidatePruner pruner;
 		private final Set<String> modes;
 		private final Random rnd;
 		private final boolean requireDifferentModes;
 
-		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
+		public Algorithm(TopKChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
 			this.generator = generator;
 			this.selector = selector;
 			this.pruner = pruner;
@@ -105,26 +104,30 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			if (model.trips() == 0)
 				return null;
 
-			boolean[] mask = new boolean[model.trips()];
-
-			IntList options = new IntArrayList();
+			IntList tripIdx = new IntArrayList();
 
 			// only select trips that are allowed to change
 			for (int i = 0; i < model.trips(); i++) {
 				if (modes.contains(model.getTripMode(i))) {
-					options.add(i);
+					tripIdx.add(i);
 				}
 			}
 
-			if (options.isEmpty())
+			if (tripIdx.isEmpty())
 				return null;
 
 			// Select one random trip index
-			int idx = options.getInt(rnd.nextInt(options.size()));
-			// Set it to be modifiable
-			mask[idx] = true;
+			int idx = tripIdx.getInt(rnd.nextInt(tripIdx.size()));
 
-			List<PlanCandidate> candidates = generator.generate(model, modes, mask);
+			List<String[]> options = new ArrayList<>();
+
+			for (String mode : modes) {
+				String[] modes = model.getCurrentModes();
+				modes[idx] = mode;
+				options.add(modes);
+			}
+
+			List<PlanCandidate> candidates = generator.generatePredefined(model, options);
 
 			// Remove based on threshold
 			if (pruner != null) {
@@ -140,7 +143,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 				pruner.pruneCandidates(model, candidates, rnd);
 			}
 
-			// Remove options that are the same as the current mode
+			// Remove tripIdx that are the same as the current mode
 			if (requireDifferentModes)
 				candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
 

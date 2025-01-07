@@ -1,5 +1,7 @@
 package org.matsim.modechoice.replanning;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -10,10 +12,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.pruning.CandidatePruner;
-import org.matsim.modechoice.search.SingleTripChoicesGenerator;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashSet;
 
@@ -33,7 +32,7 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 	private TimeInterpretation timeInterpretation;
 
 	@Inject
-	private Provider<SingleTripChoicesGenerator> generator;
+	private Provider<TopKChoicesGenerator> generator;
 
 	@Inject
 	private InformedModeChoiceConfigGroup config;

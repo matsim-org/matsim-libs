@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 /**
  * Generates candidates for choices at one particular trip.
  */
+@Deprecated
 public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 	@Inject

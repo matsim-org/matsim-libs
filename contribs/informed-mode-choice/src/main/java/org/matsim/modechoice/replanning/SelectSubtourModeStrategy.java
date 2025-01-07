@@ -61,7 +61,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		GeneratorContext context = generator.get();
-		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes, config.isRequireDifferentModes()));
+		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.generator, context.selector, context.pruner, nonChainBasedModes, config.isRequireDifferentModes()));
 	}
 
 	/**
