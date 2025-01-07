@@ -65,6 +65,9 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class EditRoutesTest {
 
@@ -497,7 +500,16 @@ private void createSampleNetwork() {
  * @author cdobler
  */
 private void createSamplePlan() {
-	plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+	// We need to add a vehicle, it however does not affect the results
+	Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+	scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+	scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+	Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+	PersonVehicles vehicles = new PersonVehicles();
+	vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+	VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+	plan = PopulationUtils.createPlan(p);
 
 	Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
 	PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );

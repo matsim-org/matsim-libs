@@ -54,7 +54,7 @@ public class ScoreStatsModuleTest {
 
 	@ParameterizedTest
 	@MethodSource("arguments")
-	void testScoreStats(boolean isUsingFastCapacityUpdate) { //TODO changed method signature, check if this broke something #aleks
+	void testScoreStats(boolean isUsingFastCapacityUpdate) {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
