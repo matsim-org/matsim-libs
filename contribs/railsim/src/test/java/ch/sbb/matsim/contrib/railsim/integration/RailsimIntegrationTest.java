@@ -41,6 +41,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -62,6 +65,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -395,6 +399,11 @@ public class RailsimIntegrationTest {
 
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
 	}
+	
+	@Test
+	void testMicroStationReroutingTwoDirections() {
+		modifyScheduleAndRunSimulation(new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"), 300, 1800);
+	}
 
 	@Test
 	void testScenarioKelheim() {
@@ -492,6 +501,50 @@ public class RailsimIntegrationTest {
 		controler.run();
 
 		return collector;
+	}
+	
+	private void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
+		Random rnd = MatsimRandom.getRandom();
+		rnd.setSeed(1242);
+
+		for (double maxRndDelaySeconds = 0; maxRndDelaySeconds <= maxMaxRndDelay; maxRndDelaySeconds = maxRndDelaySeconds + maxRndDelayStepSize) {
+			Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
+			
+			config.controller().setOutputDirectory(utils.getOutputDirectory() + "maxRndDelay_" + maxRndDelaySeconds);
+			config.controller().setDumpDataAtEnd(true);
+			config.controller().setCreateGraphs(false);
+			config.controller().setLastIteration(0);
+
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new RailsimModule());
+			controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+						
+			// modify scenario
+			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					List<Departure> departuresToRemove = new ArrayList<>();
+					List<Departure> departuresToAdd = new ArrayList<>();
+					for (Departure departure : route.getDepartures().values()) {
+						departuresToRemove.add(departure);
+						double departureTime = departure.getDepartureTime() + rnd.nextDouble() * maxRndDelaySeconds;
+						Departure modifiedDeparture = scenario.getTransitSchedule().getFactory().createDeparture(departure.getId(), departureTime);
+						modifiedDeparture.setVehicleId(departure.getVehicleId());
+						departuresToAdd.add(modifiedDeparture);
+					}
+					
+					for (Departure departureToRemove : departuresToRemove) {
+						route.removeDeparture(departureToRemove);
+					}
+					for (Departure departureToAdd : departuresToAdd) {
+						route.addDeparture(departureToAdd);
+					}
+				}
+			}
+			
+			controler.run();
+		}
 	}
 
 	private double timeToAccelerate(double v0, double v, double a) {
