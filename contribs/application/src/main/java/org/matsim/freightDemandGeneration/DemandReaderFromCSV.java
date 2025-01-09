@@ -1171,7 +1171,7 @@ public final class DemandReaderFromCSV {
 	 * @param scenario                    Scenario
 	 */
 	private static void combineSimilarJobs(Scenario scenario) {
-
+		//TODO: add check of possible vehicles capacity
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
