@@ -211,7 +211,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// create the demand
 		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
-				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
+				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
