@@ -1046,11 +1046,11 @@ public final class DemandReaderFromCSV {
 
 				int demandForThisLink = demandGenerationSpecification.calculateDemandForThisLinkWithFixNumberOfJobs(demandToDistribute, numberOfJobs, distributedDemand, pickupLinkPersonPair, deliveryLinkPersonPair, i);
 
-				if (!usedPickupLocationsOrPersons.contains(pickupLinkPersonPair))
-					usedPickupLocationsOrPersons.add(pickupLinkPersonPair);
-				if (!usedDeliveryLocationsOrPersons.contains(deliveryLinkPersonPair))
-					usedDeliveryLocationsOrPersons.add(deliveryLinkPersonPair);
 				if (demandToDistribute == 0 || demandForThisLink > 0) {
+					if (!usedPickupLocationsOrPersons.contains(pickupLinkPersonPair))
+						usedPickupLocationsOrPersons.add(pickupLinkPersonPair);
+					if (!usedDeliveryLocationsOrPersons.contains(deliveryLinkPersonPair))
+						usedDeliveryLocationsOrPersons.add(deliveryLinkPersonPair);
 					createSingleShipment(scenario, newDemandInformationElement, pickupLinkPersonPair.getLink(), deliveryLinkPersonPair.getLink(),
 						demandForThisLink, demandGenerationSpecification);
 					distributedDemand = distributedDemand + demandForThisLink;
