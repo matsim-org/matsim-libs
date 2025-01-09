@@ -142,7 +142,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 									 HashMap<Id<Person>, Person> possiblePersonsSecondJobElement) {
 
 		int demandToDistribute = (int) Math.round(PACKAGES_PER_PERSON * possiblePersonsSecondJobElement.size());
-		log.info("Demand for this carrier is set to {} with {} remainingDemand units per person (Possible persons: {}).", demandToDistribute,
+		log.info("Demand for this carrier is set to {} with {} Demand units per person (Possible persons: {}).", demandToDistribute,
 			PACKAGES_PER_PERSON, possiblePersonsSecondJobElement.size());
 		if (demandDistributionOption == DemandDistributionOption.toPersonsByAge) {
 			getAgeDistribution(possiblePersonsSecondJobElement);
