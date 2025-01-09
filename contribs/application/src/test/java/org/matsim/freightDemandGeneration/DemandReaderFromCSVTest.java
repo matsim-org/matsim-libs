@@ -25,8 +25,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
 import org.matsim.freightDemandGeneration.DemandReaderFromCSV.DemandInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.freightDemandGeneration.FreightDemandGeneration.TotalDemandGenerationsOption;
-import org.matsim.freightDemandGeneration.FreightDemandGeneration.DemandDistributionOption;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -337,6 +335,66 @@ public class DemandReaderFromCSVTest {
 	}
 
 	@Test
+	void demandCreationParcelsNoSampling() throws IOException {
+		// read inputs
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(
+			"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+			FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
+		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
+		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
+		String shapeCategory = "Ortsteil";
+		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
+		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
+		Population population = PopulationUtils.readPopulation(populationLocation);
+		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 0.5, "changeDemandOnLocation");
+		Boolean combineSimilarJobs = false;
+
+		// run methods
+		createDemandAndCheckCarrierForParcel(carrierCSVLocation, scenario, freightCarriersConfigGroup, indexShape, demandCSVLocation, shapeCategory,
+			population, combineSimilarJobs);
+
+		// check carrier 1
+		Network network = scenario.getNetwork();
+
+		Assertions.assertEquals(1, CarriersUtils.getCarriers(scenario).getCarriers().size());
+
+		Carrier testCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers()
+			.get(Id.create("testCarrier1", Carrier.class));
+
+		Assertions.assertEquals(3, testCarrier1.getShipments().values().stream().mapToInt(CarrierShipment::getSize).sum());
+		Map<String, Set<String>> locationsPerShipmentElement = new HashMap<>();
+		for (CarrierShipment shipment : testCarrier1.getShipments().values()) {
+			Assertions.assertEquals("i(2,0)", shipment.getFrom().toString());
+			Assertions.assertEquals(1, shipment.getSize());
+			Assertions.assertEquals(0, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(180, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getPickupTimeWindow());
+			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getDeliveryTimeWindow());
+			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
+				.add(shipment.getFrom().toString());
+			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
+				.add(shipment.getTo().toString());
+		}
+		Assertions.assertEquals(1, locationsPerShipmentElement.get("ShipmentElement1_pickup").size());
+		Assertions.assertEquals(3, locationsPerShipmentElement.get("ShipmentElement1_delivery").size());
+
+		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
+			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
+			Assertions.assertTrue(
+				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
+			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null) || FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null));
+		}
+	}
+
+	@Test
 	void csvDemandReader() throws IOException {
 
 		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
@@ -417,7 +475,7 @@ public class DemandReaderFromCSVTest {
 			} else if (demandInformationElement.getCarrierName().equals("testCarrier3")) {
 				Assertions.assertEquals(20, (int) demandInformationElement.getDemandToDistribute());
 				Assertions.assertNull(demandInformationElement.getNumberOfJobs());
-				Assertions.assertEquals(0.125, (double) demandInformationElement.getShareOfPopulationWithFirstJobElement(),
+				Assertions.assertEquals(0.125, demandInformationElement.getShareOfPopulationWithFirstJobElement(),
 						MatsimTestUtils.EPSILON);
 				Assertions.assertNull(demandInformationElement.getAreasFirstJobElement());
 				Assertions.assertNull(demandInformationElement.getNumberOfFirstJobElementLocations());
@@ -425,7 +483,7 @@ public class DemandReaderFromCSVTest {
 				Assertions.assertEquals(400, (int) demandInformationElement.getFirstJobElementTimePerUnit());
 				Assertions.assertEquals(TimeWindow.newInstance(8000, 50000),
 						demandInformationElement.getFirstJobElementTimeWindow());
-				Assertions.assertEquals(0.4, (double) demandInformationElement.getShareOfPopulationWithSecondJobElement(),
+				Assertions.assertEquals(0.4, demandInformationElement.getShareOfPopulationWithSecondJobElement(),
 						MatsimTestUtils.EPSILON);
 				Assertions.assertEquals(1, demandInformationElement.getAreasSecondJobElement().length);
 				Assertions.assertEquals("area1", demandInformationElement.getAreasSecondJobElement()[0]);
@@ -442,8 +500,6 @@ public class DemandReaderFromCSVTest {
 	private static void createDemandAndCheckCarrier(Path carrierCSVLocation, Scenario scenario, FreightCarriersConfigGroup freightCarriersConfigGroup,
 													ShpOptions.Index indexShape, Path demandCSVLocation, String shapeCategory,
 													Population population, Boolean combineSimilarJobs) throws IOException {
-		DemandDistributionOption demandDistributionOption = DemandDistributionOption.NoSelection;
-		TotalDemandGenerationsOption totalDemandGenerationOption = TotalDemandGenerationsOption.NoSelection;
 
 		DemandGenerationSpecification demandGenerationSpecification = new DefaultDemandGenerationSpecification();
 		// run methods
@@ -462,6 +518,25 @@ public class DemandReaderFromCSVTest {
 			CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
 		Assertions.assertTrue(
 			CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
+	}
+
+	private static void createDemandAndCheckCarrierForParcel(Path carrierCSVLocation, Scenario scenario, FreightCarriersConfigGroup freightCarriersConfigGroup,
+													ShpOptions.Index indexShape, Path demandCSVLocation, String shapeCategory,
+													Population population, Boolean combineSimilarJobs) throws IOException {
+
+		DemandGenerationSpecification demandGenerationSpecification = new DemandGenerationSpecificationForParcelDelivery(0.5, 2.0, true);
+		// run methods
+		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
+			.readCarrierInformation(carrierCSVLocation);
+		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup,
+			indexShape, 1, null);
+		Set<DemandInformationElement> demandInformation = DemandReaderFromCSV.readDemandInformation(demandCSVLocation);
+		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
+		DemandReaderFromCSV.createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
+			null, demandGenerationSpecification);
+		Assertions.assertEquals(1, CarriersUtils.getCarriers(scenario).getCarriers().size());
+		Assertions.assertTrue(
+			CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
 	}
 
 	/**
