@@ -344,8 +344,8 @@ public class DemandReaderFromCSVTest {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 			FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
-		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_1.csv");
-		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_1.csv");
+		Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV_parcels.csv");
+		Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_parcels.csv");
 		Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 		ShpOptions shp = new ShpOptions(shapeFilePath, "WGS84", null);
 		String shapeCategory = "Ortsteil";
