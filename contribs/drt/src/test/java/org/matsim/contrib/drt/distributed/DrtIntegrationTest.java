@@ -69,8 +69,8 @@ public class DrtIntegrationTest {
 		dsimConfig.setTrafficDynamics(config.qsim().getTrafficDynamics());
 		dsimConfig.setStuckTime(config.qsim().getStuckTime());
 		dsimConfig.setNetworkModes(new HashSet<>(config.qsim().getMainModes()));
-		dsimConfig.setStartTime(config.qsim().getStartTime());
-		dsimConfig.setEndTime(config.qsim().getEndTime());
+		dsimConfig.setStartTime(config.qsim().getStartTime().orElse(0));
+		dsimConfig.setEndTime(config.qsim().getEndTime().orElse(86400));
 		dsimConfig.setVehicleBehavior(config.qsim().getVehicleBehavior());
 		// use bisect to partition scenario
 		dsimConfig.setPartitioning(DSimConfigGroup.Partitioning.bisect);

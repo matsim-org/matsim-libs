@@ -121,7 +121,7 @@ public final class DSim implements Mobsim {
 
 		manager.initProcessing();
 
-		timer.setSimStartTime(dsimConfig.getStartTime().orElse(0));
+		timer.setSimStartTime(dsimConfig.getStartTime());
 		timer.setTime(timer.getSimStartTime());
 
 		Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
@@ -138,7 +138,7 @@ public final class DSim implements Mobsim {
 		long afterListener = 0;
 
 		double time = timer.getTimeOfDay();
-		while (timer.getTimeOfDay() < dsimConfig.getEndTime().orElse(86400)) {
+		while (timer.getTimeOfDay() < dsimConfig.getEndTime()) {
 
 			long t = System.nanoTime();
 
@@ -191,7 +191,7 @@ public final class DSim implements Mobsim {
 
 		// simulated / real
 		long runtime = System.currentTimeMillis() - start;
-		double rtr = dsimConfig.getEndTime().seconds() * 1000 / runtime;
+		double rtr = dsimConfig.getEndTime() * 1000 / runtime;
 
 		log.info("Mean time per second: {} μs, Real-time-ratio: {} ",
 			round(mu),

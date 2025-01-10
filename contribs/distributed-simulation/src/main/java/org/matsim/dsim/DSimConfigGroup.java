@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.HashSet;
@@ -58,28 +57,28 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Traffic dynamics determine how storage capacities and inflow capacities are freed. Options: [queue, kinematicWaves, withHoles (not implemented), Default: kinematicWaves")
 	private QSimConfigGroup.TrafficDynamics trafficDynamics = QSimConfigGroup.TrafficDynamics.kinematicWaves;
 
-	private OptionalTime startTime = OptionalTime.zeroSeconds();
+	private double startTime = 0;
 
 	@StringSetter(value = "startTime")
-	public void setStartTimeFromString(String startTime) {
-		this.startTime = Time.parseOptionalTime(startTime);
+	public void setStartTimeFromString(String value) {
+		startTime = Time.parseTime(value);
 	}
 
 	@StringGetter(value = "startTime")
-	public String getStartTimeString() {
-		return startTime.toString();
+	public String getStartTimeAsString() {
+		return Time.writeTime(startTime);
 	}
 
-	private OptionalTime endTime = OptionalTime.defined(86400);
+	private double endTime = 86400;
 
 	@StringSetter(value = "endTime")
-	public void setEndTimeFromString(String endTime) {
-		this.endTime = Time.parseOptionalTime(endTime);
+	public void setEndTimeFromString(String value) {
+		endTime = Time.parseTime(value);
 	}
 
 	@StringGetter(value = "endTime")
-	public String getEndTimeString() {
-		return endTime.toString();
+	public String getEndTimeAsString() {
+		return Time.writeTime(endTime);
 	}
 
 	@Parameter
@@ -106,7 +105,6 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 		if (networkModes.isEmpty()) {
 			log.warn("No network modes were defined. Most of the times at least car is simulated as network mode. Make sure this is intended.");
 		}
-
 	}
 
 	@Override
