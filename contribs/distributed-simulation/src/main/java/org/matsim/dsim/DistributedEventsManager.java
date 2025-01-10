@@ -163,30 +163,28 @@ public final class DistributedEventsManager implements EventsManager {
 			}
 
 			EventSource source = task.getEventSource(type);
-			if (task.isDirect()) {
-				// Not added to any queue, always local
-			} else if (source == EventSource.GLOBAL) {
-				globalListener.computeIfAbsent(type, k -> new ArrayList<>()).add(task);
+			if (!task.isDirect() && source == EventSource.GLOBAL) {
+				globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
 				remoteSyncStep = Double.min(remoteSyncStep, task.getHandler().getProcessInterval());
-
 			}
+			// otherwise the task is local and is not added to any queue.
 
 			// Store handler as listener for all partitions
 			if (source == EventSource.GLOBAL || source == EventSource.NODE) {
 				for (Integer p : node.getParts()) {
 					long address = MessageBroker.address(p, type);
 					if (task.isDirect())
-						directListener.computeIfAbsent(address, k -> new ArrayList<>()).add(task.getConsumer(type));
+						directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
 					else
-						byPartitionAndType.computeIfAbsent(address, k -> new ArrayList<>()).add(task);
+						byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
 				}
 			} else {
 
 				long address = MessageBroker.address(part, type);
 				if (task.isDirect())
-					directListener.computeIfAbsent(address, k -> new ArrayList<>()).add(task.getConsumer(type));
+					directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
 				else
-					byPartitionAndType.computeIfAbsent(address, k -> new ArrayList<>()).add(task);
+					byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
 
 			}
 		}

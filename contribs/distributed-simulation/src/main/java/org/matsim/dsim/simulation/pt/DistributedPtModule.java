@@ -8,10 +8,7 @@ public class DistributedPtModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-
 		bind(DistributedPtEngine.class).in(Singleton.class);
 		addQSimComponentBinding(TransitEngineModule.TRANSIT_ENGINE_NAME).to(DistributedPtEngine.class);
-
 	}
-
 }

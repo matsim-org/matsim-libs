@@ -143,6 +143,76 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	@Override
+	public void arrangeNextAgentState(MobsimAgent agent) {
+
+		if (!(agent instanceof DistributedMobsimAgent dma)) {
+			throw new IllegalArgumentException(
+				"Distributed Simulation only works with DistributedMobsimAgent implementations. " +
+					"Even though the interface only requires MobsimAgent. Provided agent is of type: " + agent.getClass());
+		}
+
+		switch (agent.getState()) {
+			case ACTIVITY -> arrangeAgentActivity(dma);
+			case LEG -> arrangeAgentDeparture(dma, currentTime.getTimeOfDay());
+			case ABORT -> em.processEvent(new PersonStuckEvent(currentTime.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
+		}
+	}
+
+	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
+		for (ActivityHandler activityHandler : activityHandlers) {
+			if (activityHandler.handleActivity(agent)) {
+				return;
+			}
+		}
+	}
+
+	private void arrangeAgentDeparture(DistributedMobsimAgent agent, double now) {
+
+		String routingMode = routingModeOrNull(agent);
+		em.processEvent(new PersonDepartureEvent(
+			now, agent.getId(), agent.getCurrentLinkId(), agent.getMode(), routingMode
+		));
+
+		Id<Link> linkId = agent.getCurrentLinkId();
+
+		// Try to handle departure with standard qsim handlers
+		for (DepartureHandler departureHandler : this.departureHandlers) {
+			if (departureHandler.handleDeparture(now, agent, linkId)) {
+				return;
+			}
+		}
+	}
+
+	private String routingModeOrNull(MobsimAgent agent) {
+		return agent instanceof PlanAgent pa ? TripStructureUtils.getRoutingMode((Leg) pa.getCurrentPlanElement()) : null;
+	}
+
+	@Override
+	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
+		Id<Link> link = agent.getCurrentLinkId();
+		if (partition.containsLink(link))
+			agents.put(agent.getId(), agent);
+		else
+			throw new IllegalArgumentException("Agent " + agent.getId() + " is not on a link in the partition");
+	}
+
+	@Override
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+		if (partition.containsLink(linkId))
+			return agents.remove(agentId);
+		else
+			throw new IllegalArgumentException("Link " + linkId + " is not on a link in the partition");
+	}
+
+	@Override
+	public void rescheduleActivityEnd(MobsimAgent agent) {
+		for (ActivityHandler activityHandler : activityHandlers) {
+			Gbl.assertNotNull(activityHandler);
+			activityHandler.rescheduleActivityEnd(agent);
+		}
+	}
+
+	@Override
 	public IntSet waitForOtherRanks(double time) {
 		return partition.getNeighbors();
 	}
@@ -209,57 +279,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	@Override
-	public void rescheduleActivityEnd(MobsimAgent agent) {
-		for (ActivityHandler activityHandler : activityHandlers) {
-			Gbl.assertNotNull(activityHandler);
-			activityHandler.rescheduleActivityEnd(agent);
-		}
-	}
-
-	@Override
 	public Netsim getMobsim() {
 		return this;
-	}
-
-	@Override
-	public void arrangeNextAgentState(MobsimAgent agent) {
-
-		if (!(agent instanceof DistributedMobsimAgent dma)) {
-			throw new IllegalArgumentException(
-				"Distributed Simulation only works with DistributedMobsimAgent implementations. " +
-					"Even though the interface only requires MobsimAgent. Provided agent is of type: " + agent.getClass());
-		}
-
-		switch (agent.getState()) {
-			case ACTIVITY -> arrangeAgentActivity(dma);
-			case LEG -> arrangeAgentDeparture(dma, currentTime.getTimeOfDay());
-			case ABORT -> em.processEvent(new PersonStuckEvent(currentTime.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
-		}
-	}
-
-	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
-		for (ActivityHandler activityHandler : activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				return;
-			}
-		}
-	}
-
-	@Override
-	public void registerAdditionalAgentOnLink(MobsimAgent agent) {
-		Id<Link> link = agent.getCurrentLinkId();
-		if (partition.containsLink(link))
-			agents.put(agent.getId(), agent);
-		else
-			throw new IllegalArgumentException("Agent " + agent.getId() + " is not on a link in the partition");
-	}
-
-	@Override
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		if (partition.containsLink(linkId))
-			return agents.remove(agentId);
-		else
-			throw new IllegalArgumentException("Link " + linkId + " is not on a link in the partition");
 	}
 
 	@Override
@@ -270,26 +291,5 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public void run() {
 		// This method is not called
-	}
-
-	private void arrangeAgentDeparture(DistributedMobsimAgent agent, double now) {
-
-		String routingMode = routingModeOrNull(agent);
-		em.processEvent(new PersonDepartureEvent(
-			now, agent.getId(), agent.getCurrentLinkId(), agent.getMode(), routingMode
-		));
-
-		Id<Link> linkId = agent.getCurrentLinkId();
-
-		// Try to handle departure with standard qsim handlers
-		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, agent, linkId)) {
-				return;
-			}
-		}
-	}
-
-	private String routingModeOrNull(MobsimAgent agent) {
-		return agent instanceof PlanAgent pa ? TripStructureUtils.getRoutingMode((Leg) pa.getCurrentPlanElement()) : null;
 	}
 }

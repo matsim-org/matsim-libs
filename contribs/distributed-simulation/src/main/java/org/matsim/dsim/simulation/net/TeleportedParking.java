@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Parged vehicles logic for config:qsim.vehicleBehavior=teleport. The logic for parked vehicles diverts from that implemented in the
+ * Parked vehicles logic for config:dsim.vehicleBehavior=teleport. The logic for parked vehicles diverts from that implemented in the
  * Qsim.
  * <p>
  * TeleportedParking does not keep track of vehicles, but hands out vehicle references. This means there is no guarantee that a certain
- * vehicle is only used once. Use config:qsim.vehicleBehavior=exception to ensure this behavior
+ * vehicle is only used once. Use config:dsim.vehicleBehavior=exception to ensure this behavior
  */
 class TeleportedParking implements ParkedVehicles {
 
