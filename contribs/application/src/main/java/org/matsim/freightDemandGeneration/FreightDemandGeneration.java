@@ -468,7 +468,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static void solveSelectedSolution(OptionsOfVRPSolutions selectedSolution, Config config,
 			Controller controller) throws ExecutionException, InterruptedException {
-		CarriersUtils.writeCarriers(CarriersUtils.addOrGetCarriers(controller.getScenario()), config.controller().getOutputDirectory(), "output_carriersNoPlans.xml", controller.getConfig().controller().getRunId());
+		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersNoPlans.xml");
 
 		if (Objects.requireNonNull(selectedSolution) == OptionsOfVRPSolutions.createNoSolutionAndOnlyWriteCarrierFile) {
 			log.warn(
@@ -489,7 +489,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		else
 			log.warn(
 					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-		CarriersUtils.writeCarriers(CarriersUtils.addOrGetCarriers(controller.getScenario()), config.controller().getOutputDirectory(), "output_carriersWithPlans.xml", controller.getConfig().controller().getRunId());
+		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersWithPlans.xml");
 	}
 
 	/**
