@@ -674,8 +674,33 @@ public class CarriersUtils {
 		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
 	}
 
-	public static void writeCarriers(Carriers carriers, String filename) {
-		new CarrierPlanWriter(carriers).write(filename);
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers the carriers
+	 * @param file     the file should contain the location of the file and the name of the file (e.g. /path/to/carriers.xml)
+	 */
+	public static void writeCarriers(Carriers carriers, String file) {
+		new CarrierPlanWriter(carriers).write(file);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers   the carriers
+	 * @param pathFolder the path to the folder where the file should be written
+	 * @param filename   the name of the file
+	 * @param prefix     the prefix of the filename being added before the filename delimited by a dot
+	 */
+	public static void writeCarriers(Carriers carriers, String pathFolder, String filename, String prefix) {
+		String pathFile;
+		if (prefix == null) {
+			pathFile = pathFolder + "/" + filename;
+		} else {
+			pathFile = pathFolder + "/" + prefix + "." + filename;
+		}
+		new CarrierPlanWriter(carriers).write(pathFile);
+		log.info("Carriers file written to: {}", pathFile);
 	}
 
 	static class JspritCarrierTask implements Runnable {
