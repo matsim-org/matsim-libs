@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.HdrHistogram.Histogram;
@@ -131,6 +132,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private final Int2ObjectMap<Queue<Message>> nodesMessages = new Int2ObjectOpenHashMap<>();
 
 	private final Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
+
+	@Getter
+	private final Histogram sizes = new Histogram(Integer.MAX_VALUE, 0);
 
 	/**
 	 * Current sequence number, used as tag.
@@ -390,6 +394,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		waitFor.clear();
 		nodesMessages.clear();
 		histogram.reset();
+		sizes.reset();
 	}
 
 	/**
@@ -459,6 +464,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			if (length > 0) {
 				int receiver = i - 1;
 //                log.debug("Rank #{}, seq{}: Send message to {}", comm.getRank(), seq, receiver);
+
+				sizes.recordValue(length);
 				comm.send(receiver, outgoing[i], 0, length);
 				dataSize[i].set(0);
 			}
@@ -565,4 +572,5 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	public Histogram getRuntime() {
 		return histogram;
 	}
+
 }

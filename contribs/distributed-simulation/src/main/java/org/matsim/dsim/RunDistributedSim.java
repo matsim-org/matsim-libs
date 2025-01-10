@@ -106,9 +106,12 @@ public class RunDistributedSim implements Callable<Integer> {
 		// Randomness might cause differences on different nodes
 		config.routing().setRoutingRandomness(0);
 
+		DSimConfigGroup dSimConfigGroup = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+		dSimConfigGroup.setThreads(threads);
+
 		Scenario s = ScenarioUtils.loadScenario(config);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(threads));
+		DistributedSimulationModule module = new DistributedSimulationModule(comm, dSimConfigGroup);
 		Controler controler = new Controler(s, module.getNode());
 
 		controler.addOverridingModule(module);

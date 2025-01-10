@@ -201,7 +201,7 @@ public final class DSim implements Mobsim {
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		writeRuntimeStats(topology.getTotalPartitions(), node.getRank(), runtime, rtr);
-		writeRuntimes(node, histogram, broker.getRuntime(), executor,
+		writeRuntimes(node, histogram, broker.getRuntime(), broker.getSizes(), executor,
 			runtime, beforeListener, afterListener, syncStep);
 
 		// Simulation tasks are deregistered after execution
@@ -225,7 +225,7 @@ public final class DSim implements Mobsim {
 	}
 
 	@SneakyThrows
-	private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, LPExecutor executor,
+	private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
 							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
@@ -240,6 +240,10 @@ public final class DSim implements Mobsim {
 
 		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("broker.hgrm")))) {
 			broker.outputPercentileDistribution(writer, 1000.0);
+		}
+
+		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("msgSizes.hgrm")))) {
+			sizes.outputPercentileDistribution(writer, 1.0);
 		}
 
 		try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("tasks.csv"))) {
