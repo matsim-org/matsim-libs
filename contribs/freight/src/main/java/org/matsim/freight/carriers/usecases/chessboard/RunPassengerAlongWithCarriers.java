@@ -125,7 +125,7 @@ final class RunPassengerAlongWithCarriers {
 		controler.addControlerListener((IterationEndsListener) event -> {
 			//write plans
 			String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-			new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+			CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 			//write stats
 			freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

@@ -92,7 +92,7 @@ final class FreightScenarioCreator {
             carriers.addCarrier(carrier_);
         }
 
-        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
+		CarriersUtils.writeCarriers(carriers, "input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
     private static void createCustomers(Carrier carrier, Network network) {
