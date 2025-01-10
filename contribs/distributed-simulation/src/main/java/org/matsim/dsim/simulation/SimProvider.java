@@ -52,8 +52,8 @@ public class SimProvider implements LPProvider {
 
 	@Inject
 	SimProvider(Injector injector, Collection<AbstractQSimModule> modules,
-					  @Named("overrides") List<AbstractQSimModule> overridingModules,
-					  @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
+				@Named("overrides") List<AbstractQSimModule> overridingModules,
+				@Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule) {
 		this.injector = injector;
 		this.modules = new ArrayList<>(modules);
 		// (these are the implementations)
@@ -127,7 +127,8 @@ public class SimProvider implements LPProvider {
 		AgentSourcesContainer agentSources = dsimInjector.getInstance(AgentSourcesContainer.class);
 
 		// Retrieve all mobsim listeners
-		Set<MobsimListener> listener = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {}));
+		Set<MobsimListener> listener = dsimInjector.getInstance(Key.get(new TypeLiteral<>() {
+		}));
 
 		// Add all listener that are not node singletons, or this is the first instance
 		listener = listener.stream()
@@ -137,10 +138,10 @@ public class SimProvider implements LPProvider {
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
-				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>() {
+				activeComponentKey = Key.get(new TypeLiteral<>() {
 				}, (Annotation) activeComponent);
 			} else {
-				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>() {
+				activeComponentKey = Key.get(new TypeLiteral<>() {
 				}, (Class<? extends Annotation>) activeComponent);
 			}
 
@@ -180,5 +181,4 @@ public class SimProvider implements LPProvider {
 
 		return simProcess;
 	}
-
 }

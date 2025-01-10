@@ -8,7 +8,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * QVehicle factory which creates {@link QVehicleImpl} instances and sclaes the pce of the vehicle according to
+ * QVehicle factory which creates {@link QVehicleImpl} instances and scales the pce of the vehicle according to
  * config:qsim.flowCapacityFactor.
  */
 public class ScaledQVehicleFactory implements QVehicleFactory {
