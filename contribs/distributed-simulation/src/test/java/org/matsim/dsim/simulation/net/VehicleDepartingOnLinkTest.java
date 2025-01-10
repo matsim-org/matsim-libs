@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 
 import java.util.List;
@@ -27,7 +29,8 @@ class VehicleDepartingOnLinkTest {
 		var wait2link = new DefaultWait2Link(em);
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
-		var simLink = TestUtils.createLink(link, 0, 10);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		var simLink = TestUtils.createLink(link, config, 10);
 
 		var simPerson1 = createPerson("p-1", List.of(simLink.getId().toString(), "l2", "l3"), mock(EventsManager.class));
 		var simVehicle1 = TestUtils.createVehicle("veh-1", 2, 1);
@@ -80,7 +83,10 @@ class VehicleDepartingOnLinkTest {
 		var wait2link = new DefaultWait2Link(em);
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
-		var simLink = TestUtils.createLink(link, 0, 1);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var simLink = TestUtils.createLink(link, config, 1);
 
 		var simPerson1 = createPerson("p-1", List.of(simLink.getId().toString()), mock(EventsManager.class));
 		var simVehicle1 = TestUtils.createVehicle("veh-1", 2, 1);
@@ -131,8 +137,9 @@ class VehicleDepartingOnLinkTest {
 		link1.setCapacity(3600);
 		var link2 = TestUtils.createSingleLink(0, 0);
 		link2.setCapacity(3600);
-		var simLink1 = TestUtils.createLink(link1, 0, 1);
-		var simLink2 = TestUtils.createLink(link2, 0, 1);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		var simLink1 = TestUtils.createLink(link1, config, 1);
+		var simLink2 = TestUtils.createLink(link2, config, 1);
 
 		var simPerson1 = createPerson("p-1", List.of(simLink1.getId().toString(), "l2", "l3"), em);
 		var simVehicle1 = TestUtils.createVehicle("veh-1", 2, 1);

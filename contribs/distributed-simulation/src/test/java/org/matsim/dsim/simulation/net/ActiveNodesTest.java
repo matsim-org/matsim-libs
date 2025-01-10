@@ -3,6 +3,8 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimpleAgent;
 
@@ -20,7 +22,9 @@ class ActiveNodesTest {
 
 		var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
 		var link = TestUtils.createSingleLink(0, 0);
-		var offeringLink = TestUtils.createLink(link, 0, 1000);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setStuckTime(1000);
+		var offeringLink = TestUtils.createLink(link, config, 0);
 		offeringLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
 		offeringLink.doSimStep(null, 100.);
 		offeringLink = spy(offeringLink);
@@ -58,8 +62,9 @@ class ActiveNodesTest {
 		when(driver.chooseNextLinkId()).thenReturn(Id.createLinkId("next-link"));
 
 		var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
-
-		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), 0, 1000);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setStuckTime(1000);
+		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), config, 0);
 		inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
 		var nextLink = mock(SimLink.class);
 		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
@@ -94,7 +99,9 @@ class ActiveNodesTest {
 		link.setCapacity(1800); // the link can release one vehicle every two seconds
 		link.setLength(100);
 		link.setFreespeed(200);
-		var inLink = TestUtils.createLink(link, 0, 1000);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setStuckTime(1000);
+		var inLink = TestUtils.createLink(link, config, 0);
 		for (var i = 0; i < 100; i++) {
 			inLink.pushVehicle(TestUtils.createVehicle(String.valueOf(i), driver, 1, 200), SimLink.LinkPosition.QStart, 0);
 		}
@@ -128,7 +135,9 @@ class ActiveNodesTest {
 
 		var vehicle = TestUtils.createVehicle("vehicle", driver, 1, 100);
 
-		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), 0, stuckThreshold);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setStuckTime(stuckThreshold);
+		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), config, 0);
 		inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
 		inLink.doSimStep(null, 100); // move vehicle into the buffer, which starts the stuck timer
 

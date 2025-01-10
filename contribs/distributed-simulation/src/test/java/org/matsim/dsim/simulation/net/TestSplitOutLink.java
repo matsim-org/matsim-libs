@@ -18,7 +18,7 @@ public class TestSplitOutLink {
 	public void init() {
 		var toPart = 42;
 		var link = TestUtils.createSingleLink(0, toPart);
-		var simLink = TestUtils.createLink(link, 0, 10);
+		var simLink = TestUtils.createLink(link, 0);
 
 		assertInstanceOf(SimLink.SplitOutLink.class, simLink);
 		assertEquals(link.getId(), simLink.getId());
@@ -50,6 +50,7 @@ public class TestSplitOutLink {
 
 		var link = TestUtils.createSingleLink(0, 42);
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
 		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});

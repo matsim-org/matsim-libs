@@ -39,7 +39,7 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	private int threads = 0;
 
 	@Parameter
-	@Comment("Nodes which are simulated on the network. All other modes, expect pt will be teleported. default: Empty collection")
+	@Comment("Modes which are simulated on the network. All other modes, expect pt will be teleported. default: Empty collection")
 	private Set<String> networkModes = new HashSet<>();
 
 	@Parameter
@@ -58,7 +58,7 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	private OptionalTime startTime = OptionalTime.zeroSeconds();
 
 	@StringSetter(value = "startTime")
-	public void setStartTime(String startTime) {
+	public void setStartTimeFromString(String startTime) {
 		this.startTime = Time.parseOptionalTime(startTime);
 	}
 
@@ -71,7 +71,7 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	private OptionalTime endTime = OptionalTime.defined(86400);
 
 	@StringSetter(value = "endTime")
-	public void setEndTime(String endTime) {
+	public void setEndTimeFromString(String endTime) {
 		this.endTime = Time.parseOptionalTime(endTime);
 	}
 

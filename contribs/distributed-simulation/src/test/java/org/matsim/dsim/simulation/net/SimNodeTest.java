@@ -15,7 +15,7 @@ class SimNodeTest {
 	public void init() {
 		var network = TestUtils.createLocalThreeLinkNetwork();
 		var simLinks = network.getLinks().values().stream()
-			.map(link -> TestUtils.createLink(link, 0, 30))
+			.map(link -> TestUtils.createLink(link, 0))
 			.collect(Collectors.toMap(SimLink::getId, link -> link));
 		var node = network.getNodes().get(Id.createNodeId("n3"));
 		var simNode = new SimNode(node.getId());

@@ -54,6 +54,8 @@ public class TestSplitInLink {
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
 		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var node = new SimNode(link.getToNode().getId());
 		var wasActivated = new AtomicInteger(0);
 		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
@@ -111,6 +113,8 @@ public class TestSplitInLink {
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
 		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var node = new SimNode(link.getToNode().getId());
 		var wasActivated = new AtomicInteger(0);
 		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
