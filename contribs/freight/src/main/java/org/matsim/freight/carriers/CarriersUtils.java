@@ -683,6 +683,7 @@ public class CarriersUtils {
 	 */
 	public static void writeCarriers(Carriers carriers, String file) {
 		new CarrierPlanWriter(carriers).write(file);
+		log.info("Carriers file written to: {}", file);
 	}
 
 	/**
@@ -690,7 +691,7 @@ public class CarriersUtils {
 	 *
 	 * @param carriers   the carriers
 	 * @param pathFolder the path to the folder where the file should be written
-	 * @param filename   the name of the file
+	 * @param filename   the name of the file including the file extension
 	 * @param prefix     the prefix of the filename being added before the filename delimited by a dot
 	 */
 	public static void writeCarriers(Carriers carriers, String pathFolder, String filename, String prefix) {
@@ -700,8 +701,41 @@ public class CarriersUtils {
 		} else {
 			pathFile = pathFolder + "/" + prefix + "." + filename;
 		}
-		new CarrierPlanWriter(carriers).write(pathFile);
-		log.info("Carriers file written to: {}", pathFile);
+		writeCarriers(carriers, pathFile);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param controller the controller
+	 * @param filename   the name of the file including the file extension
+	 */
+	public static void writeCarriers(Controller controller, String filename) {
+		String pathFile;
+		String outputPath = controller.getControlerIO().getOutputPath();
+		if (controller.getConfig().controller().getRunId() == null) {
+			pathFile = outputPath + "/" + filename;
+		} else {
+			pathFile = outputPath + "/" + controller.getConfig().controller().getRunId() + "." + filename;
+		}
+		writeCarriers(getCarriers(controller.getScenario()), pathFile);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param scenario 	the scenario
+	 * @param filename   the name of the file including the file extension
+	 */
+	public static void writeCarriers(Scenario scenario, String filename) {
+		String pathFile;
+		String outputPath = scenario.getConfig().controller().getOutputDirectory();
+		if (scenario.getConfig().controller().getRunId() == null) {
+			pathFile = outputPath + "/" + filename;
+		} else {
+			pathFile = outputPath + "/" + scenario.getConfig().controller().getRunId() + "." + filename;
+		}
+		writeCarriers(getCarriers(scenario), pathFile);
 	}
 
 	static class JspritCarrierTask implements Runnable {
