@@ -21,6 +21,12 @@ import java.util.*;
 
 import static org.matsim.freightDemandGeneration.DemandReaderFromCSV.getHomeCoord;
 
+/**
+ * This class can be used to generate demand for parcel delivery shipments by using the tool FreightDemandGeneration.
+ *
+ * @see FreightDemandGeneration
+ * @Author Ricardo Ewert (based on the work of the master thesis of Ana Ueberhorst)
+ */
 public class DemandGenerationSpecificationForParcelDelivery extends DefaultDemandGenerationSpecification {
 	//	private static double PACKAGES_PER_PERSON = 0.0686; //default value
 	private static double PACKAGES_PER_PERSON = 0.14; //default value
