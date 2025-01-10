@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controller;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
@@ -702,23 +701,6 @@ public class CarriersUtils {
 			pathFile = pathFolder + "/" + prefix + "." + filename;
 		}
 		writeCarriers(carriers, pathFile);
-	}
-
-	/**
-	 * Writes the carriers to a file.
-	 *
-	 * @param controller the controller
-	 * @param filename   the name of the file including the file extension
-	 */
-	public static void writeCarriers(Controller controller, String filename) {
-		String pathFile;
-		String outputPath = controller.getControlerIO().getOutputPath();
-		if (controller.getConfig().controller().getRunId() == null) {
-			pathFile = outputPath + "/" + filename;
-		} else {
-			pathFile = outputPath + "/" + controller.getConfig().controller().getRunId() + "." + filename;
-		}
-		writeCarriers(getCarriers(controller.getScenario()), pathFile);
 	}
 
 	/**
