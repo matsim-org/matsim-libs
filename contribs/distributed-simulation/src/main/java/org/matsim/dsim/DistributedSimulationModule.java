@@ -35,7 +35,7 @@ public class DistributedSimulationModule extends AbstractModule {
 
 	public DistributedSimulationModule(Communicator comm, DSimConfigGroup config) {
 		this.comm = comm;
-		this.threads = config.threads == 0 ? Runtime.getRuntime().availableProcessors() : config.threads;
+		this.threads = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
 
 		// TODO: Connecting logic is currently here to support standard matsim controller without modification
 		log.info("Waiting for {} other nodes to connect...", comm.getSize() - 1);

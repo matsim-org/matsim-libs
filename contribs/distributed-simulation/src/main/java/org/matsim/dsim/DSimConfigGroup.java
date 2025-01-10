@@ -1,15 +1,25 @@
 package org.matsim.dsim;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.misc.Time;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Config group for distributed simulation.
  */
+@Getter
+@Setter
 public class DSimConfigGroup extends ReflectiveConfigGroup {
 
-    public enum Partitioning {none, bisect, metis}
+	public enum Partitioning {none, bisect, metis}
 
-    public final static String CONFIG_MODULE_NAME = "dsim";
+	public final static String CONFIG_MODULE_NAME = "dsim";
 
 	/**
 	 * Create a new config group with the given number of threads.
@@ -20,15 +30,61 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 		return config;
 	}
 
-    @Parameter
-    @Comment("Partitioning strategy for the network")
-    public Partitioning partitioning = Partitioning.bisect;
+	@Parameter
+	@Comment("Partitioning strategy for the network. Options: [none, bisect, metis], default: 'bisect'")
+	private Partitioning partitioning = Partitioning.bisect;
 
 	@Parameter
 	@Comment("Number of threads to use for execution. If <= 0, the number of available processors is used.")
-	public int threads = 0;
+	private int threads = 0;
 
-    public DSimConfigGroup() {
-        super(CONFIG_MODULE_NAME);
-    }
+	@Parameter
+	@Comment("Nodes which are simulated on the network. All other modes, expect pt will be teleported. default: Empty collection")
+	private Set<String> networkModes = new HashSet<>();
+
+	@Parameter
+	@Comment("Stuck time [s] after which a vehicle is pushed onto the next link regardless of available capacity. Default: 30")
+	private double stuckTime = 30;
+
+	@Parameter
+	@Comment("Link dynamics determine how vehicles can overtake. Options: [FIFO, PassingQ, Seepage(not implemented)], Default: PassingQ")
+	private QSimConfigGroup.LinkDynamics linkDynamics = QSimConfigGroup.LinkDynamics.PassingQ;
+
+	@Parameter
+	@Comment("Traffic dynamics determine how storage capacities and inflow capacities are freed. Options: [queue, kinematicWaves, withHoles (not implemented), Default: kinematicWaves")
+	private QSimConfigGroup.TrafficDynamics trafficDynamics = QSimConfigGroup.TrafficDynamics.kinematicWaves;
+
+	@Comment("Start time of the simulation. Default: 00:00:00")
+	private OptionalTime startTime = OptionalTime.zeroSeconds();
+
+	@StringSetter(value = "startTime")
+	public void setStartTime(String startTime) {
+		this.startTime = Time.parseOptionalTime(startTime);
+	}
+
+	@StringGetter(value = "startTime")
+	public String getStartTimeString() {
+		return startTime.toString();
+	}
+
+	@Comment("End time of the simulation. Default: 24:00:00")
+	private OptionalTime endTime = OptionalTime.defined(86400);
+
+	@StringSetter(value = "endTime")
+	public void setEndTime(String endTime) {
+		this.endTime = Time.parseOptionalTime(endTime);
+	}
+
+	@StringGetter(value = "endTime")
+	public String getEndTimeString() {
+		return endTime.toString();
+	}
+
+	@Parameter
+	@Comment("Determines how agents can access vehicles when starting a trip. Options=[teleport, wait (not implemented), exception], Default: exception")
+	private QSimConfigGroup.VehicleBehavior vehicleBehavior = QSimConfigGroup.VehicleBehavior.exception;
+
+	public DSimConfigGroup() {
+		super(CONFIG_MODULE_NAME);
+	}
 }

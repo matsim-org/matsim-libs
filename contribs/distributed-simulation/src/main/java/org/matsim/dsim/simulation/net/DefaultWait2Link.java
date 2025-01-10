@@ -12,7 +12,6 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.function.Consumer;
 
 @Log4j2
 public class DefaultWait2Link implements Wait2Link {
@@ -64,8 +63,6 @@ public class DefaultWait2Link implements Wait2Link {
 				vehicle.getDriver().getMode(), 1.0)
 			);
 			link.pushVehicle(vehicle, position, now);
-			// TODO replace
-			//activateLink.accept(link.getId());
 			return true;
 		} else {
 			return false;

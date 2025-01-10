@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handles parked vehicles according to config:qsim.vehicleBehavio=exception. This Parking implementation stores vehicles parked at links. When
+ * Handles parked vehicles according to config:qsim.vehicleBehavior=exception. This Parking implementation stores vehicles parked at links. When
  * a vehicle is requested to be unparked, it will throw an exception if the vehicle has not been parked on that link.
  */
 class MassConservingParking implements ParkedVehicles {

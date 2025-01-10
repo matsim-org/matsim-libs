@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -73,6 +74,7 @@ public final class DSim implements Mobsim {
 		SimulationNode node = injector.getInstance(SimulationNode.class);
 		Topology topology = injector.getInstance(Topology.class);
 		Config config = injector.getInstance(Config.class);
+		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
 
 		LPExecutor executor = injector.getInstance(LPExecutor.class);
 		DistributedEventsManager manager = (DistributedEventsManager) injector.getInstance(EventsManager.class);
@@ -119,7 +121,7 @@ public final class DSim implements Mobsim {
 
 		manager.initProcessing();
 
-		timer.setSimStartTime(config.qsim().getStartTime().orElse(0));
+		timer.setSimStartTime(dsimConfig.getStartTime().orElse(0));
 		timer.setTime(timer.getSimStartTime());
 
 		Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
@@ -136,7 +138,7 @@ public final class DSim implements Mobsim {
 		long afterListener = 0;
 
 		double time = timer.getTimeOfDay();
-		while (timer.getTimeOfDay() < config.qsim().getEndTime().orElse(86400)) {
+		while (timer.getTimeOfDay() < dsimConfig.getEndTime().orElse(86400)) {
 
 			long t = System.nanoTime();
 
@@ -189,7 +191,7 @@ public final class DSim implements Mobsim {
 
 		// simulated / real
 		long runtime = System.currentTimeMillis() - start;
-		double rtr = config.qsim().getEndTime().seconds() * 1000 / runtime;
+		double rtr = dsimConfig.getEndTime().seconds() * 1000 / runtime;
 
 		log.info("Mean time per second: {} μs, Real-time-ratio: {} ",
 			round(mu),

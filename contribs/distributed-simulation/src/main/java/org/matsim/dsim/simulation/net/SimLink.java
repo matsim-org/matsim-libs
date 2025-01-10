@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
 import java.util.ArrayDeque;
@@ -61,7 +61,7 @@ public interface SimLink {
 		}
 	}
 
-	static SimLink create(Link link, SimNode toNode, QSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
+	static SimLink create(Link link, SimNode toNode, DSimConfigGroup config, double effectiveCellSize, int part, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
 		var fromPart = getPartition(link.getFromNode());
 		var toPart = getPartition(link.getToNode());
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);

@@ -25,10 +25,10 @@ import static org.mockito.Mockito.mock;
 public class TestUtils {
 
 	public static SimLink createLink(Link link, int part, double stuckTime) {
-		var defaultQsimConfig = ConfigUtils.createConfig().qsim();
-		defaultQsimConfig.setStuckTime(stuckTime);
+		var defaultDSimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		defaultDSimConfig.setStuckTime(stuckTime);
 		var simNode = new SimNode(link.getToNode().getId());
-		return SimLink.create(link, simNode, defaultQsimConfig, 7.5, part, _ -> {}, _ -> {});
+		return SimLink.create(link, simNode, defaultDSimConfig, 7.5, part, _ -> {}, _ -> {});
 	}
 
 	public static Link createSingleLink() {

@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,13 +14,13 @@ class SimQueueTest {
 	void linkDynamicsFifoTrafficDynamicsQueue() {
 
 		var link = TestUtils.createSingleLink();
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var vehicle1 = TestUtils.createVehicle("veh-1", 4, 10);
 		var vehicle2 = TestUtils.createVehicle("veh-2", 4, 10);
 		var vehicle3 = TestUtils.createVehicle("veh-3", 4, 10);
-		var queue = SimQueue.create(link, config.qsim(), 10);
+		var queue = SimQueue.create(link, config, 10);
 
 		assertTrue(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -48,12 +49,12 @@ class SimQueueTest {
 	@Test
 	void linkDynamicsPassingTrafficDynamicsQueue() {
 		var link = TestUtils.createSingleLink();
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		var vehicle1 = TestUtils.createVehicle("veh-1", 5, 10);
 		var vehicle2 = TestUtils.createVehicle("veh-2", 5, 10);
-		var queue = SimQueue.create(link, config.qsim(), 10);
+		var queue = SimQueue.create(link, config, 10);
 
 		assertTrue(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -84,12 +85,12 @@ class SimQueueTest {
 		link.setCapacity(1800);
 		link.setFreespeed(10);
 		var holeTravelTime = link.getLength() / KinematicWavesStorageCapacity.HOLE_SPEED;
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var vehicle1 = TestUtils.createVehicle("veh-1", 2, 10);
 		var vehicle2 = TestUtils.createVehicle("veh-2", 1, 10);
-		var queue = SimQueue.create(link, config.qsim(), 5);
+		var queue = SimQueue.create(link, config, 5);
 
 		assertTrue(queue.isEmpty());
 		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));

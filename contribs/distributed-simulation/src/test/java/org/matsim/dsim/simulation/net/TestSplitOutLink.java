@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
@@ -28,9 +29,9 @@ public class TestSplitOutLink {
 	public void storageCapacityWhenUpdated() {
 
 		var link = TestUtils.createSingleLink(0, 42);
-		var config = ConfigUtils.createConfig();
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> {}, _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> {}, _ -> {});
 
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		simLink.applyCapacityUpdate(0, 2);
@@ -48,10 +49,10 @@ public class TestSplitOutLink {
 	public void storageCapacityWhenPushedQueue() {
 
 		var link = TestUtils.createSingleLink(0, 42);
-		var config = ConfigUtils.createConfig();
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});
 
 		// the link can take 2 vehicles. Push two and test whether there is space left.
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -69,11 +70,11 @@ public class TestSplitOutLink {
 		link.setCapacity(1800);
 		link.setFreespeed(10);
 		link.setLength(20);
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 10, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 10, 0, _ -> activated.incrementAndGet(), _ -> {});
 
 		// push one vehicle which consumes inflow capacity
 		var now = 0;
@@ -96,10 +97,10 @@ public class TestSplitOutLink {
 	@Test
 	public void sendVehicles() {
 		var link = TestUtils.createSingleLink(0, 42);
-		var config = ConfigUtils.createConfig();
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config.qsim(), 50, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});
 
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);

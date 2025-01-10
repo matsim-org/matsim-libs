@@ -9,11 +9,13 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
 import java.util.HashSet;
@@ -46,7 +48,8 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		this.activeLinks = activeLinks;
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
-		this.modes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
+		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
+		this.modes = new HashSet<>(dsimConfig.getNetworkModes());
 	}
 
 	@Override
