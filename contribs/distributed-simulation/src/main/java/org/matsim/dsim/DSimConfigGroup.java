@@ -10,6 +10,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,7 +58,6 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Traffic dynamics determine how storage capacities and inflow capacities are freed. Options: [queue, kinematicWaves, withHoles (not implemented), Default: kinematicWaves")
 	private QSimConfigGroup.TrafficDynamics trafficDynamics = QSimConfigGroup.TrafficDynamics.kinematicWaves;
 
-	@Comment("Start time of the simulation. Default: 00:00:00")
 	private OptionalTime startTime = OptionalTime.zeroSeconds();
 
 	@StringSetter(value = "startTime")
@@ -70,7 +70,6 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 		return startTime.toString();
 	}
 
-	@Comment("End time of the simulation. Default: 24:00:00")
 	private OptionalTime endTime = OptionalTime.defined(86400);
 
 	@StringSetter(value = "endTime")
@@ -107,5 +106,14 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 		if (networkModes.isEmpty()) {
 			log.warn("No network modes were defined. Most of the times at least car is simulated as network mode. Make sure this is intended.");
 		}
+
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		var comments = super.getComments();
+		comments.put("endTime", "End time of the simulation. Default: 24:00:00");
+		comments.put("startTime", "Start time of the simulation. Default: 00:00:00");
+		return comments;
 	}
 }
