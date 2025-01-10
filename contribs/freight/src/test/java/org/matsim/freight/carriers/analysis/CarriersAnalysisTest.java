@@ -29,7 +29,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class FreightAnalysisEventBasedTest {
+public class CarriersAnalysisTest {
 
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -40,7 +40,7 @@ public class FreightAnalysisEventBasedTest {
 		// Note: I had to manually change the files for this test to run, as I did not have access to the original input file of the events-file
 		// This results in the carrier-plans not being related to the actual events. This is however no problem for testing the core functionality,
 		// as those are two disjunct analysis outputs, which do not depend on each other. (aleks Sep'24)
-		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(
 			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
 			testUtils.getInputDirectory() + "in/output_allVehicles.xml",
 			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities.xml" ).toString(),
@@ -48,7 +48,7 @@ public class FreightAnalysisEventBasedTest {
 			testUtils.getInputDirectory() + "in/serviceBasedEvents.xml",
 			testUtils.getOutputDirectory(),
 			null);
-		analysisEventBased.runCompleteAnalysis();
+		carriersAnalysis.runCompleteAnalysis();
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carrier_stats.tsv",  testUtils.getOutputDirectory() + "Carrier_stats.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
@@ -58,7 +58,7 @@ public class FreightAnalysisEventBasedTest {
 
 	@Test
 	void runShipmentEventTest() throws IOException {
-		RunFreightAnalysisEventBased analysisEventBased = new RunFreightAnalysisEventBased(
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(
 			IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml" ).toString(),
 			testUtils.getInputDirectory() + "in/carrierVehicles.xml",
 			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities_Shipments.xml" ).toString(),
@@ -66,7 +66,7 @@ public class FreightAnalysisEventBasedTest {
 			testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml",
 			testUtils.getOutputDirectory(),
 			null);
-		analysisEventBased.runCompleteAnalysis();
+		carriersAnalysis.runCompleteAnalysis();
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carrier_stats.tsv",  testUtils.getOutputDirectory() + "Carrier_stats.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");

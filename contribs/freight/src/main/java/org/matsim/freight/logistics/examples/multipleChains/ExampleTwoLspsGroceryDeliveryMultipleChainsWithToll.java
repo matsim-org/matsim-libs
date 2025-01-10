@@ -43,7 +43,7 @@ import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
@@ -243,9 +243,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   }
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
-    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
     try {
-      freightAnalysis.runCompleteAnalysis();
+      carriersAnalysis.runCompleteAnalysis();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

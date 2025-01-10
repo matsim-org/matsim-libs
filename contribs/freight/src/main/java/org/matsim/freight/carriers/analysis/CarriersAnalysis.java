@@ -33,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -52,9 +51,9 @@ import org.matsim.freight.carriers.events.CarrierEventsReaders;
  *
  * @author kturner (Kai Martins-Turner)
  */
-public class RunFreightAnalysisEventBased {
+public class CarriersAnalysis {
 
-	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventBased.class);
+	private static final Logger log = LogManager.getLogger(CarriersAnalysis.class);
 
 	//Where is your simulation output, that should be analysed?
 	private String EVENTS_PATH = null;
@@ -63,7 +62,6 @@ public class RunFreightAnalysisEventBased {
 	private Carriers carriers = null;
 	private final String delimiter = "\t";
 
-	//TODO discuss renaming without EventBased. If this becomes the standard carrier output
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
 	 *
@@ -71,7 +69,7 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(String simOutputPath, String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 //		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
@@ -103,8 +101,8 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath       Path to the output directory
 	 * @param globalCrs                The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
-										String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
+							String analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
@@ -114,10 +112,10 @@ public class RunFreightAnalysisEventBased {
 	/**
 	 * Constructor, if you only want to have the carrier analysis.
 	 *
-	 * @param carriers           The carriers to be analysed
+	 * @param carriers           The carriers to be analyzed
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 */
-	public RunFreightAnalysisEventBased(Carriers carriers, String analysisOutputPath) {
+	public CarriersAnalysis(Carriers carriers, String analysisOutputPath) {
 		this.carriers = carriers;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
@@ -147,12 +145,17 @@ public class RunFreightAnalysisEventBased {
 		this.carriers = CarriersUtils.addOrGetCarriers(scenario);
 	}
 
+	/**
+	 * Run the analysis of the carriers based on the carrier file.
+	 *
+	 * @throws IOException If the output file cannot be written
+	 */
 	public void runCarriersAnalysis() throws IOException {
 
 		//Where to store the analysis output?
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		folder.mkdirs();
-		if (allCarriersHavePlans(carriers)) {
+		if (CarriersUtils.allCarriersWithDemandHavePlans(carriers)) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
 		}
@@ -185,10 +188,4 @@ public class RunFreightAnalysisEventBased {
 		carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
 	}
 
-	private boolean allCarriersHavePlans(Carriers carriers) {
-		for (Carrier carrier : carriers.getCarriers().values())
-			if (carrier.getSelectedPlan() == null) return false;
-
-		return true;
-	}
 }

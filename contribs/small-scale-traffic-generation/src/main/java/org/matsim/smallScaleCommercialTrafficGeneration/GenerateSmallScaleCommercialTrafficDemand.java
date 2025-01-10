@@ -69,7 +69,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
@@ -336,8 +336,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		//Analysis
 		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
 		//TODO perhaps change to complete carrier analysis
-		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis").toString());
-		freightAnalysis.runCarriersAnalysis();
+		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis").toString());
+		carriersAnalysis.runCarriersAnalysis();
 		System.out.println("Finishing Analysis of Carrier.");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
