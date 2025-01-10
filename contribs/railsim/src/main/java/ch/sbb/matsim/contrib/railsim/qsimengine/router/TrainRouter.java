@@ -90,7 +90,7 @@ public final class TrainRouter {
 			int weight = resources.hasCapacity(time, link.getId(), RailResourceManager.ANY_TRACK, position) ? 0 : 1;
 
 			// Small offset in the weight prevents dead-locks in case there are loops within the station
-			return weight + 0.001;
+			return weight + 0.00001;
 		}
 
 		@Override
