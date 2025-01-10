@@ -305,11 +305,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				CarriersUtils.writeCarriers(CarriersUtils.addOrGetCarriers(scenario), scenario.getConfig().controller().getOutputDirectory(), "output_CarriersNoPlans.xml", config.controller().getRunId());
+				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml");
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		CarriersUtils.writeCarriers(CarriersUtils.addOrGetCarriers(scenario), scenario.getConfig().controller().getOutputDirectory(), "output_CarriersWithPlans.xml", config.controller().getRunId());
+		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml");
 
 		Controler controler = prepareControler(scenario);
 
