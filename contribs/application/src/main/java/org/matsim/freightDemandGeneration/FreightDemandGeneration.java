@@ -491,8 +491,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		else
 			log.warn(
 					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-			.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
+		CarriersUtils.writeCarriers(CarriersUtils.addOrGetCarriers(controller.getScenario()), config.controller().getOutputDirectory(), "output_carriersWithPlans.xml", controller.getConfig().controller().getRunId());
 	}
 
 	/**
