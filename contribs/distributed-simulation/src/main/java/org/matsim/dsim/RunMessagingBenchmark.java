@@ -49,6 +49,7 @@ public class RunMessagingBenchmark implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
+		log.info("Communicator: {}", communicator);
         log.info("Starting distributed benchmark as rank {} of {} and {}k messages ({} bytes)", rank, total, n, size);
 
 		Communicator comm = total == 1 ? new NullCommunicator() : switch (communicator) {
