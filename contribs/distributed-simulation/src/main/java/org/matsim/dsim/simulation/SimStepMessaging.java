@@ -3,10 +3,6 @@ package org.matsim.dsim.simulation;
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,9 +10,6 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.dsim.MessageBroker;
-import org.matsim.dsim.QSimCompatibility;
-
-import static org.matsim.dsim.NetworkDecomposition.PARTITION_ATTR_KEY;
 
 /**
  * Bridge between simulation and Message broker. Have this behind an interface, so that
@@ -96,5 +89,4 @@ public class SimStepMessaging {
 	public boolean isLocal(Id<Link> linkId) {
 		return partition.containsLink(linkId);
 	}
-
 }

@@ -6,8 +6,8 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Functionality to park vehicles in the Simulation. Currently we support varying modes of how parked vehicles are handled. This is done via
- * config:qsim.vehicleBehavior. Depending on the config param different behaviors can be implemented to be bound into the {@link NetworkTrafficEngine}
+ * Functionality to park vehicles in the Simulation. Currently, we support varying modes of how parked vehicles are handled. This is done via
+ * config:dsim.vehicleBehavior. Depending on the config param different behaviors can be implemented to be bound into the {@link NetworkTrafficEngine}
  */
 public interface ParkedVehicles {
 

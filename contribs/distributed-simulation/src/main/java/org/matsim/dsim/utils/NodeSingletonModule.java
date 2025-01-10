@@ -41,5 +41,4 @@ public class NodeSingletonModule extends AbstractModule {
 
 		return type.isAnnotationPresent(NodeSingleton.class);
 	}
-
 }
