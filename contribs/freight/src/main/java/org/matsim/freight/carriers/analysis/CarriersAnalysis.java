@@ -150,7 +150,7 @@ public class CarriersAnalysis {
 	 *
 	 * @throws IOException If the output file cannot be written
 	 */
-	public void runCarriersAnalysis() throws IOException {
+	public void runBasicCarriersAnalysis() throws IOException {
 
 		//Where to store the analysis output?
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
@@ -164,7 +164,7 @@ public class CarriersAnalysis {
 		}
 	}
 	public void runCompleteAnalysis() throws IOException {
-		runCarriersAnalysis();
+		runBasicCarriersAnalysis();
 
 		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
