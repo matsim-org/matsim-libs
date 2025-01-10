@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * Controller.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,9 +46,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -305,33 +303,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				if (config.controller().getRunId() == null)
-					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemand.xml");
-				else
-					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
-							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
+				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml");
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		if (config.controller().getRunId() == null)
-			new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario)).write(
-				scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemandWithPlans.xml");
-		else
-			new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-				.write(
-					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_CarrierDemandWithPlans.xml");
+		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml");
 
-		Controler controler = prepareControler(scenario);
+		Controller controller = prepareController(scenario);
 
 		// Creating inject always adds check for unmaterialized config groups.
-		controler.getInjector();
+		controller.getInjector();
 
 		// Removes check after injector has been created
-		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
+		controller.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
-		controler.run();
+		controller.run();
 
 		//Analysis
 		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
@@ -340,7 +326,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriersAnalysis.runCarriersAnalysis();
 		System.out.println("Finishing Analysis of Carrier.");
 
-		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
+		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controller.getScenario(),
 			usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 
 		return 0;
@@ -596,11 +582,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Prepares the controller.
 	 */
-	private Controler prepareControler(Scenario scenario) {
-		Controler controler = new Controler(scenario);
+	private Controller prepareController(Scenario scenario) {
+		Controller controller = ControllerUtils.createController(scenario);
 
-		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new CarrierModule());
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(CarrierStrategyManager.class).toProvider(
@@ -609,9 +595,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		});
 
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
-		return controler;
+		return controller;
 	}
 
 	/**
