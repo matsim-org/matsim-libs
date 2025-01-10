@@ -101,13 +101,13 @@ public class CarrierPlanAnalysis {
 				int numberOfHandledDemandSize;
 				int notHandledJobs;
 				if (numberOfPlanedShipments > 0) {
-					numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(carrierShipment -> carrierShipment.getDemand()).sum();
+					numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getDemand).sum();
 					numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 						t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
 							te -> ((Tour.Pickup) te).getShipment().getDemand()).sum()).sum();
 					notHandledJobs = numberOfPlanedShipments - numberOfHandledPickups;
 				} else {
-					numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(carrierService -> carrierService.getDemand()).sum();
+					numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getDemand).sum();
 					numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 						t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
 							te -> ((Tour.ServiceActivity) te).getService().getDemand()).sum()).sum();
