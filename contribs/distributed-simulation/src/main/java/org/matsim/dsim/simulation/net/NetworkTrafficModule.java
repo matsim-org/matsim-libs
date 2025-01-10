@@ -1,7 +1,9 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Singleton;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.dsim.DSimConfigGroup;
 
 public class NetworkTrafficModule extends AbstractQSimModule {
 
@@ -16,8 +18,9 @@ public class NetworkTrafficModule extends AbstractQSimModule {
 		bind(ActiveNodes.class).in(Singleton.class);
 
 		addQSimComponentBinding(COMPONENT_NAME).to(NetworkTrafficEngine.class);
+		var dsimConfig = ConfigUtils.addOrGetModule(getConfig(), DSimConfigGroup.class);
 
-		var parkedClass = switch (getConfig().qsim().getVehicleBehavior()) {
+		var parkedClass = switch (dsimConfig.getVehicleBehavior()) {
 			case teleport -> TeleportedParking.class;
 			case wait ->
 				throw new IllegalArgumentException("Dsim only supports config:qsim.vehicleBehavior='teleport' and 'exception'. " + getConfig().qsim().getVehicleBehavior() + " is not supported.");

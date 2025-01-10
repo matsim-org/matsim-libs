@@ -40,7 +40,6 @@ public class ThreeLinkIntegrationTest {
 	void qsim() {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
-		var outputDir = utils.getOutputDirectory();
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setMobsim("qsim");
@@ -137,25 +136,27 @@ public class ThreeLinkIntegrationTest {
 		// start three instances each containing one partition
 		var size = 3;
 		var comms = LocalCommunicator.create(size);
-		var pool = Executors.newFixedThreadPool(size);
-		var futures = comms.stream()
-			.map(comm -> pool.submit(() -> {
-				Config config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
-				config.controller().setOutputDirectory(outputDirectory);
-				config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-				DistributedController c = new DistributedController(comm, config, 1);
-				c.run();
-				try {
-					comm.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}))
-			.toList();
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
+					Config config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+					config.controller().setOutputDirectory(outputDirectory);
+					config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+					DistributedController c = new DistributedController(comm, config, 1);
+					c.run();
+					try {
+						comm.close();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}))
+				.toList();
 
-		for (var f : futures) {
-			f.get(2, TimeUnit.MINUTES);
+			for (var f : futures) {
+				f.get(1, TimeUnit.MINUTES);
+			}
 		}
+
 
 		var outputDir = Paths.get(utils.getOutputDirectory());
 		var expectedEventsPath = outputDir.resolve("..").resolve("qsim").resolve("three-links.output_events.xml");

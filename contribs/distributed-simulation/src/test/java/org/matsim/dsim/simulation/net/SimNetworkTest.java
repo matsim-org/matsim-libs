@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.NetworkDecomposition;
 import org.matsim.examples.ExamplesUtils;
 
@@ -46,8 +47,8 @@ class SimNetworkTest {
 
 		NetworkPartitioning partitioning = new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network);
 
-		// TODO, do we want to pass that handler here?
-		var simNetwork = new SimNetwork(network, ConfigUtils.createConfig(), partitioning.getPartition(part),
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		var simNetwork = new SimNetwork(network, config, partitioning.getPartition(part),
 			mock(ActiveLinks.class), mock(ActiveNodes.class));
 
 		assertInstanceOf(SimLink.SplitInLink.class, simNetwork.getLinks().get(l1.getId()));
@@ -65,14 +66,15 @@ class SimNetworkTest {
 		var network = NetworkUtils.readNetwork(netPath.toString());
 		NetworkDecomposition.scattered(network, 2);
 
-		var localNetwork = new SimNetwork(network, config, NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
+		var dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+		var localNetwork = new SimNetwork(network, dsimConfig, NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
 		var simulationNode = SimulationNode.builder()
 			.rank(0)
 			.parts(new IntArrayList(new int[]{0, 1}))
 			.cores(2)
 			.build();
 		var netPart = new NetworkPartitioning(simulationNode, network);
-		var distNetwork = new SimNetwork(network, config, netPart.getPartition(0), mock(ActiveLinks.class), mock(ActiveNodes.class));
+		var distNetwork = new SimNetwork(network, dsimConfig, netPart.getPartition(0), mock(ActiveLinks.class), mock(ActiveNodes.class));
 
 		assertNotEquals(localNetwork.getLinks().size(), distNetwork.getLinks().size());
 		assertNotEquals(localNetwork.getNodes().size(), distNetwork.getNodes().size());

@@ -2,8 +2,8 @@ package org.matsim.dsim.simulation.net;
 
 import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.dsim.DSimConfigGroup;
 
 @RequiredArgsConstructor
 class SimQueue {
@@ -69,7 +69,7 @@ class SimQueue {
 		return "q=[" + internalQ.toString() + "], inflowCapacity=[" + inflowCapacity.toString() + "], storageCapacity=[" + storageCapacity.toString() + "]";
 	}
 
-	static SimQueue create(Link link, QSimConfigGroup config, double effectiveCellSize) {
+	static SimQueue create(Link link, DSimConfigGroup config, double effectiveCellSize) {
 		var internalQueue = createInternalQueue(config);
 		var inflowCap = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
 		var storageCapacity = createStorageCapacity(link, config, effectiveCellSize);
@@ -78,7 +78,7 @@ class SimQueue {
 		return new SimQueue(internalQueue, inflowCap, storageCapacity);
 	}
 
-	static SimDequeue createInternalQueue(QSimConfigGroup config) {
+	static SimDequeue createInternalQueue(DSimConfigGroup config) {
 		return switch (config.getLinkDynamics()) {
 			case FIFO -> new FIFOQueue();
 			case PassingQ -> new PassingQueue();
@@ -87,7 +87,7 @@ class SimQueue {
 		};
 	}
 
-	static StorageCapacity createStorageCapacity(Link link, QSimConfigGroup config, double effectiveCellSize) {
+	static StorageCapacity createStorageCapacity(Link link, DSimConfigGroup config, double effectiveCellSize) {
 		return switch (config.getTrafficDynamics()) {
 			case queue -> new SimpleStorageCapacity(link, effectiveCellSize);
 			case kinematicWaves -> new KinematicWavesStorageCapacity(link, effectiveCellSize);

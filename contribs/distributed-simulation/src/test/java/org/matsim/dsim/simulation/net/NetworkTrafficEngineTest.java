@@ -19,6 +19,7 @@ import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
@@ -45,12 +46,11 @@ class NetworkTrafficEngineTest {
 		var activeNodes = new ActiveNodes(eventsManager);
 		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
 		var parkedVehicles = new MassConservingParking();
-		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
+		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
+		var simNetwork = new SimNetwork(scenario.getNetwork(), dsimConfig, NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
 
 		var engine = new NetworkTrafficEngine(scenario, mock(AgentSourcesContainer.class), simNetwork,
 			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager);
-
-		//Assertions.fail("Needs real simnetwork");
 
 		var timer = mock(MobsimTimer.class);
 

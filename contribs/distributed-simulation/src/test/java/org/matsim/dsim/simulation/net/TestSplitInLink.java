@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
@@ -19,9 +20,9 @@ public class TestSplitInLink {
 	public void init() {
 		var fromPart = 42;
 		var link = TestUtils.createSingleLink(fromPart, 0);
-		var config = ConfigUtils.createConfig();
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config.qsim(), 10, 0, _ -> {}, _ -> {});
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> {}, _ -> {});
 
 		assertInstanceOf(SimLink.SplitInLink.class, simLink);
 		assertEquals(fromPart, ((SimLink.SplitInLink) simLink).getFromPart());
@@ -32,9 +33,9 @@ public class TestSplitInLink {
 		var fromPart = 42;
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
-		var config = ConfigUtils.createConfig();
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config.qsim(), 10, 0, _ -> {}, _ -> {});
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> {}, _ -> {});
 		// push vehicles onto link and check that the consumed capacity is passed upstream
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.Buffer, 0);
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QEnd, 0);
@@ -52,10 +53,12 @@ public class TestSplitInLink {
 		var fromPart = 42;
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
-		var config = ConfigUtils.createConfig();
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var node = new SimNode(link.getToNode().getId());
 		var wasActivated = new AtomicInteger(0);
-		var simLink = SimLink.create(link, node, config.qsim(), 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
 		// push vehicles onto link and check that the consumed capacity is passed upstream
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.QEnd, 0);
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QEnd, 0);
@@ -81,11 +84,11 @@ public class TestSplitInLink {
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
 		link.setFreespeed(10);
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var node = new SimNode(link.getToNode().getId());
 		var wasActivated = new AtomicInteger(0);
-		var simLink = SimLink.create(link, node, config.qsim(), 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
 		// push vehicle onto link and check that the consumed capacity is passed upstream
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 42, 10), SimLink.LinkPosition.QEnd, 0);
 		assertEquals(2, wasActivated.get());
@@ -109,10 +112,12 @@ public class TestSplitInLink {
 		var fromPart = 42;
 		var link = TestUtils.createSingleLink(fromPart, 0);
 		link.setCapacity(3600);
-		var config = ConfigUtils.createConfig();
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		var node = new SimNode(link.getToNode().getId());
 		var wasActivated = new AtomicInteger(0);
-		var simLink = SimLink.create(link, node, config.qsim(), 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
 		// push vehicles onto link and check that the consumed capacity is passed upstream
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.QStart, 0);
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QStart, 0);

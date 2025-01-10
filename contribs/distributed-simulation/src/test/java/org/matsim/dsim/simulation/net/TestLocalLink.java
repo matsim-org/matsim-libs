@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation.net;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,7 +15,7 @@ public class TestLocalLink {
 	@Test
 	public void init() {
 		var link = TestUtils.createSingleLink(0, 0);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var simLink = TestUtils.createLink(link, 0);
 
 		assertInstanceOf(SimLink.LocalLink.class, simLink);
 		assertEquals(link.getId(), simLink.getId());
@@ -28,7 +29,10 @@ public class TestLocalLink {
 		link.setFreespeed(20);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, ConfigUtils.createConfig().qsim(), 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -52,11 +56,13 @@ public class TestLocalLink {
 	public void pushVehicleAtStartPassingQ() {
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setFreespeed(20);
-		var config = ConfigUtils.createConfig();
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
-		var simLink = SimLink.create(link, node, config.qsim(), 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -80,11 +86,11 @@ public class TestLocalLink {
 	void pushVehicleKinematicWaves() {
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setFreespeed(10);
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config.qsim(), 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10., 1);
 
 		// push one vehicle. This consumes the entire inflow, but only some storage
@@ -105,7 +111,9 @@ public class TestLocalLink {
 		var linkActivated = new AtomicInteger(0);
 		var nodeActivated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, ConfigUtils.createConfig().qsim(), 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -141,7 +149,8 @@ public class TestLocalLink {
 		var linkActivated = new AtomicInteger(0);
 		var nodeActivated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, ConfigUtils.createConfig().qsim(), 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> linkActivated.incrementAndGet(), _ -> nodeActivated.incrementAndGet());
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 		var vehicle3 = TestUtils.createVehicle("vehicle-3", 10, 10);
@@ -167,7 +176,9 @@ public class TestLocalLink {
 	public void doSimStep() {
 		var link = TestUtils.createSingleLink(0, 0);
 		var stuckThreshold = 42;
-		var simLink = TestUtils.createLink(link, 0, stuckThreshold);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setStuckTime(stuckThreshold);
+		var simLink = TestUtils.createLink(link, config, 0);
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10);
 		simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
 
@@ -192,7 +203,10 @@ public class TestLocalLink {
 		var link = TestUtils.createSingleLink(0, 0);
 		// 2 pce per second
 		link.setCapacity(7200);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var simLink = TestUtils.createLink(link, config, 0);
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 3, 10);
 		var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10);
@@ -224,29 +238,25 @@ public class TestLocalLink {
 		var link = TestUtils.createSingleLink(0, 0);
 		link.setCapacity(3600);
 		link.setFreespeed(10);
-		var config = ConfigUtils.createConfig();
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config.qsim(), 7.5, 0, _ -> {}, _ -> {});
-		//var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10, 30);
-		//var vehicle2 = TestUtils.createVehicle("vehicle-2", 3, 10, 30);
-		var vehicle3 = TestUtils.createVehicle("vehicle-3", 42, 10);
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {}, _ -> {});
+		var vehicle = TestUtils.createVehicle("vehicle-3", 42, 10);
 
-		//simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QEnd, 0);
-		//simLink.pushVehicle(vehicle2, SimLink.LinkPosition.QEnd, 0);
-		simLink.pushVehicle(vehicle3, SimLink.LinkPosition.QEnd, 0);
+		simLink.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, 0);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 
-		// move the big vehicle into the buffer, which de-activates link
+		// move the vehicle into the buffer, which starts a backwards travelling hole.
 		assertFalse(simLink.doSimStep(null, 0));
 		assertTrue(simLink.isOffering());
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
 
-		// remove the vehicle from the buffer
-		assertEquals(vehicle3.getId(), simLink.popVehicle().getId());
+		// remove the vehicle from the buffer - not strictly necessary
+		assertEquals(vehicle.getId(), simLink.popVehicle().getId());
 		assertFalse(simLink.isOffering());
 
 		// the backward travelling hole arrives after 24 seconds
@@ -263,7 +273,7 @@ public class TestLocalLink {
 		link.setFreespeed(10);
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var simLink = TestUtils.createLink(link, 0);
 		simLink.addLeaveHandler((v, l, n) -> {
 			assertEquals(link.getId(), l.getId());
 			if (v.getId().equals(vehicle1.getId())) {
@@ -307,7 +317,7 @@ public class TestLocalLink {
 		link.setFreespeed(10);
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 10);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var simLink = TestUtils.createLink(link, 0);
 		var leaveHandlerCounter = new AtomicInteger(0);
 		var blockTime = 42;
 		simLink.addLeaveHandler((v, _, n) -> {
@@ -355,7 +365,7 @@ public class TestLocalLink {
 	public void popVehicleEmptyBuffer() {
 
 		var link = TestUtils.createSingleLink(0, 0);
-		var simLink = TestUtils.createLink(link, 0, 30);
+		var simLink = TestUtils.createLink(link, 0);
 		assertThrows(RuntimeException.class, simLink::popVehicle);
 	}
 }

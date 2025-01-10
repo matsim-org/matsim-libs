@@ -34,7 +34,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.*;
+import java.util.HashSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +52,8 @@ public class DrtIntegrationTest {
 
 		URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config-with-drt.xml");
 
-		Config config = ConfigUtils.loadConfig(kelheim);
+		DSimConfigGroup dsimConfig = new DSimConfigGroup();
+		Config config = ConfigUtils.loadConfig(kelheim, dsimConfig);
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -58,6 +63,17 @@ public class DrtIntegrationTest {
 
 		config.routing().setRoutingRandomness(0);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+
+		// copy qsim config from scenario into dsimconfig
+		dsimConfig.setLinkDynamics(config.qsim().getLinkDynamics());
+		dsimConfig.setTrafficDynamics(config.qsim().getTrafficDynamics());
+		dsimConfig.setStuckTime(config.qsim().getStuckTime());
+		dsimConfig.setNetworkModes(new HashSet<>(config.qsim().getMainModes()));
+		dsimConfig.setStartTime(config.qsim().getStartTime());
+		dsimConfig.setEndTime(config.qsim().getEndTime());
+		dsimConfig.setVehicleBehavior(config.qsim().getVehicleBehavior());
+		// use bisect to partition scenario
+		dsimConfig.setPartitioning(DSimConfigGroup.Partitioning.bisect);
 
 		// Compatibility with many scenarios
 		Activities.addScoringParams(config);

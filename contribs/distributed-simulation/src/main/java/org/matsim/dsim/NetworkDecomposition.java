@@ -43,7 +43,7 @@ public class NetworkDecomposition {
 
 		var dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
 
-		switch (dsimConfig.partitioning) {
+		switch (dsimConfig.getPartitioning()) {
 			case bisect -> bisection(network, population, numParts);
 			case metis -> metis(network, population, numParts);
 			// none means don't do anything
