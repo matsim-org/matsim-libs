@@ -96,6 +96,8 @@ public class RunMessagingBenchmark implements Callable<Integer> {
 
 			comm.send(Communicator.BROADCAST_TO_ALL, data, 0, size);
 
+//			System.out.println("Sent: " + k);
+
 			int finalK = k;
 			comm.recv(() -> received.size() < total - 1, (buf) -> {
 				int seq = buf.getInt(); // seq
