@@ -2,6 +2,8 @@ package org.matsim.dsim;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -15,6 +17,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@Log4j2
 public class DSimConfigGroup extends ReflectiveConfigGroup {
 
 	public enum Partitioning {none, bisect, metis}
@@ -86,5 +89,23 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 
 	public DSimConfigGroup() {
 		super(CONFIG_MODULE_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (vehicleBehavior == QSimConfigGroup.VehicleBehavior.wait) {
+			throw new IllegalArgumentException("vehicleBehavior='wait' is not implemented for DSim. Available options: [teleport, exception (default)]");
+		}
+		if (linkDynamics == QSimConfigGroup.LinkDynamics.SeepageQ) {
+			throw new IllegalArgumentException("LinkDynamics=SeepageQ is not implemented for DSim. Available options: [FIFO, PassingQ (default)]]");
+		}
+		if (trafficDynamics == QSimConfigGroup.TrafficDynamics.withHoles) {
+			throw new IllegalArgumentException("TrafficDynamics=withHoles is not implemented for DSim. Available options: [queue, kinematicWaves (default)]");
+		}
+		if (networkModes.isEmpty()) {
+			log.warn("No network modes were defined. Most of the times at least car is simulated as network mode. Make sure this is intended.");
+		}
 	}
 }
