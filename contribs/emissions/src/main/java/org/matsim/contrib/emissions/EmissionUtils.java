@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,10 +33,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -416,6 +424,115 @@ public abstract class EmissionUtils {
 				break;
 		}
 		return attribs2;
+	}
+
+	/**
+	 * Some hbefa table have missing entries for specific keys. This causes the hbefa-reader to crash. This method inserts null values for all missing keys.
+	 * The fixed table is saved as a copy with an appended "_fixed".
+	 * @param path Path tot the table to fix.
+	 * @param type Type of the given table. Use {@link HbefaType}: average / detailed and hot / cold
+	 */
+	public static void fillMissingWarmHbefaEntries(String path, HbefaType type) throws IOException, URISyntaxException {
+		// Read in the warmHbefaTable, throw error if not successful
+		List<String> header;
+		Map<HbefaWarmEmissionFactorKey, CSVRecord> warmKey2record = new HashMap<>();
+
+		// Get all possible combinations
+		Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
+		Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
+		Set<String> roadCategories = new HashSet<>();
+		Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+		Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+
+		// First we get all the possible combinations
+		try (var reader = IOUtils.getBufferedReader(path);
+			var parser = CSVParser.parse(reader, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
+
+			header = parser.getHeaderNames();
+
+			// TODO Many parts of this method are a copy of createWarmKey() and other methods but they are private. Maybe move this method to HbefaTable.java?
+
+			for (var record : parser) {
+				var trafficSit = record.get("TrafficSit");
+				var component = EmissionUtils.getPollutant(record.get("Component"));
+
+				var key = new HbefaWarmEmissionFactorKey();
+				key.setVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(record.get("VehCat")));
+				key.setRoadCategory(trafficSit.substring(0, trafficSit.lastIndexOf('/')));
+				key.setComponent(EmissionUtils.getPollutant(record.get("Component")));
+
+				if (trafficSit.endsWith("Freeflow")) key.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+				else if (trafficSit.endsWith("Heavy")) key.setTrafficSituation(HbefaTrafficSituation.HEAVY);
+				else if (trafficSit.endsWith("Satur."))  key.setTrafficSituation(HbefaTrafficSituation.SATURATED);
+				else if (trafficSit.endsWith("St+Go")) key.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+				else if (trafficSit.endsWith("St+Go2")) key.setTrafficSituation(HbefaTrafficSituation.STOPANDGO_HEAVY);
+
+				else {
+					logger.warn("Could not map String {} to any HbefaTrafficSituation; please check syntax in hbefa input file.", trafficSit);
+					throw new RuntimeException();
+				}
+
+				if(type == HbefaType.AVG_WARM){
+					key.setVehicleAttributes(new HbefaVehicleAttributes());
+					vehicleAttributes.add(new HbefaVehicleAttributes());
+				} else {
+					// TODO Add all combinations of these too?
+					key.getVehicleAttributes().setHbefaTechnology(record.get("Technology"));
+					key.getVehicleAttributes().setHbefaEmConcept(record.get("EmConcept"));
+					key.getVehicleAttributes().setHbefaSizeClass(record.get("SizeClasse"));
+				}
+
+				vehicleCategories.add(key.getVehicleCategory());
+				trafficSituations.add(key.getTrafficSituation());
+				roadCategories.add(key.getRoadCategory());
+				pollutantsInTable.add(key.getComponent());
+
+				warmKey2record.put(key, record);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// Now we have all possible combinations. We will iterate trough them and add any missing combinations if needed
+		BufferedWriter writer = IOUtils.getBufferedWriter(path.split("\\.")[0] + "_fixed." + path.split("\\.")[1]); // TODO do not change file ending but name
+		CSVPrinter printer = new CSVPrinter(writer, CSVFormat.newFormat(';').withRecordSeparator("\n"));
+		int added = 0;
+
+		printer.printRecord(header);
+
+		for (String roadCategory : roadCategories) {
+			for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+				for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+					for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+						for (Pollutant pollutant : pollutantsInTable) {
+							HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+							key.setRoadCategory(roadCategory);
+							key.setTrafficSituation(trafficSituation);
+							key.setVehicleCategory(vehicleCategory);
+							key.setVehicleAttributes(vehicleAttribute);
+							key.setComponent(pollutant);
+
+							if(warmKey2record.containsKey(key)){
+								printer.printRecord(warmKey2record.get(key));
+							} else{
+								printer.printRecord(0); // TODO
+								added++;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		printer.flush();
+		logger.info("{} missing entries were added", added);
+	}
+
+	public enum HbefaType {
+		AVG_COLD,
+		AVG_WARM,
+		DET_COLD,
+		DET_WARM
 	}
 
 }
