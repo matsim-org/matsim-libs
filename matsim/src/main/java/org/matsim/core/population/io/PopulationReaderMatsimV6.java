@@ -62,6 +62,8 @@ import org.xml.sax.Attributes;
 
 import com.google.inject.Inject;
 
+import static org.matsim.core.scenario.SubpopulationSampleSizeUtils.getSubpopulation2SampleSize;
+
 /**
  * A reader for plans files of MATSim according to <code>population_v6.dtd</code>.
  *
@@ -229,6 +231,9 @@ import com.google.inject.Inject;
 							coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
 							ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 						}
+
+						Map<String, Double> subpopulation2SampleSize = getSubpopulation2SampleSize(scenario.getPopulation());
+
 						break;
 					case LEG:
 						Object routingMode = currAttributes.getAttribute(TripStructureUtils.routingMode);
