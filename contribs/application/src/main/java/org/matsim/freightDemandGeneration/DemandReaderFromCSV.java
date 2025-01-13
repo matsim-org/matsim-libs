@@ -1063,12 +1063,12 @@ public final class DemandReaderFromCSV {
 			}
 		}
 
-//		//NEW: if more possible persons than demand -> add to demandForEachPerson
+//		//NEW: if more possible persons than demand -> add to parcelsPerPerson
 //		if (!possiblePersonsDelivery.isEmpty() && !Objects.equals(selectedDemandDistributionOption, "noSelection")) {
 //			for (Id<Person> person : possiblePersonsDelivery.keySet()) {
-//				demandForEachPerson.put(person, new HashMap<>());
+//				parcelsPerPerson.put(person, new HashMap<>());
 //				int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-//				demandForEachPerson.get(person).put(age, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
+//				parcelsPerPerson.get(person).put(age, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
 //			}
 //		} //TODO check if this is necessary
 	}
