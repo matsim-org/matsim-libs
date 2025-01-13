@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -119,46 +119,46 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Creates a tsv file with the locations of all created demand elements.
 	 *
-	 * @param controler The controller to get the network from
+	 * @param controller The controller to get the network from
 	 */
-	static void createDemandLocationsFile(Controler controler) {
+	static void createDemandLocationsFile(Controller controller) {
 
-		Network network = controler.getScenario().getNetwork();
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		Network network = controller.getScenario().getNetwork();
+		File file = new File(controller.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation	size\n");
 
-			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			for (Carrier thisCarrier : CarriersUtils.getCarriers(controller.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
 					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" +
 							coord.getX()+ "	" + coord.getY() + "	" +
 							"Service" + "	" +
-							thisService.getLocationLinkId().toString() + "	"+
+							thisService.getServiceLinkId().toString() + "	"+
 							" "+ "	"+
 							" "+ "	"+
 							" "+"\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getFrom()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
 					Coord coordTo = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getTo()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
 						+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
 						"Pickup" + "	"+
 							" "+"	"+
-						thisShipment.getFrom().toString() + "	" +
-						thisShipment.getTo().toString() + "	"+
+						thisShipment.getPickupLinkId().toString() + "	" +
+						thisShipment.getDeliveryLinkId().toString() + "	"+
 						0 + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 						+ coordTo.getX() + "	" + coordTo.getY() + "	"
 						+ "Delivery" + "	"+
 							" "+"	"+
-						thisShipment.getFrom() + "	" +
-						thisShipment.getTo() + "	"+
+						thisShipment.getPickupLinkId() + "	" +
+						thisShipment.getDeliveryLinkId() + "	"+
 						thisShipment.getSize() + "\n");
 				}
 			}
@@ -168,98 +168,6 @@ public class FreightDemandGenerationUtils {
 			log.error("Could not write job locations file under " + "/outputLocationFile.xml.gz");
 		}
 		log.info("Wrote job locations file under " + "/outputLocationFile.xml.gz");
-	}
-
-	/**
-	 * Creates a tsv file with the demand distribution.
-	 *
-	 * @param controler The controller to get the network from
-	 */
-	static void createDemandDistributionFile(Controler controler) {
-
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv");
-		try (FileWriter writer = new FileWriter(file, true)) {
-			writer.write("personId	age	demand	xCoord	yCoord\n");
-
-			for (Id<Person> person : DemandReaderFromCSV.demandForEachPerson.keySet()) {
-				HashMap temp = DemandReaderFromCSV.demandForEachPerson.get(person);
-				for (Object age : temp.keySet()){
-					writer.write(person+"	"+age+"	"+temp.get(age)+"\n");
-				}
-
-			}
-
-			writer.flush();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote demand distribution file under " + "/outputDemandDistributionFile.xml.gz");
-	}
-
-	/**
-	 * Creates a tsv file with the age distribution.
-	 *
-	 * @param controler The controller to get the network from
-	 */
-	static void createAgeDistributionFile(Controler controler) {
-
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputDemandDistrPerAgeGroup.tsv");
-		try (FileWriter writer = new FileWriter(file, true)) {
-			// Write the header
-			writer.write("ageGroup	lower	upper	share	demand	personsWithDemand	ignoredPersons\n");
-
-			// Iterate through the demandDistributionPerAgeGroup map
-			for (Object ageGroup : DemandReaderFromCSV.demandDistributionPerAgeGroup.keySet()) {
-				HashMap ageGroupData = (HashMap) DemandReaderFromCSV.demandDistributionPerAgeGroup.get(ageGroup);
-
-				// Write the age group data to the file
-				writer.write(ageGroup + "	" +
-					ageGroupData.get("lower") + "	" +
-					ageGroupData.get("upper") + "	" +
-					ageGroupData.get("share") + "	"+
-					ageGroupData.get("totalDemand") + "	"+
-					ageGroupData.get("personsWithDemandInThisAgeGroup")+ "	"+
-					ageGroupData.get("personsWithDemandInThisAgeGroup_counter")+ "\n");
-			}
-
-			// Flush the writer to ensure all data is written to the file
-			writer.flush();
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote age distribution file under " + "/outputDemandDistrPerAgeGroupFile.xml.gz");
-
-		File file2 = new File(controler.getConfig().controller().getOutputDirectory() + "/outputAgeGroupDemandShareFile.tsv");
-		try (FileWriter writer = new FileWriter(file2, true)) {
-			// Write the header
-			writer.write("ageGroup	lower	upper	share	totalPersons	personsWithDemand\n");
-
-			// Iterate through the demandDistributionPerAgeGroup map
-			for (Object ageGroup : DemandReaderFromCSV.ageGroupDemandShare.keySet()) {
-				HashMap ageGroupData = (HashMap) DemandReaderFromCSV.ageGroupDemandShare.get(ageGroup);
-
-				// Write the age group data to the file
-				writer.write(ageGroup + "	" +
-					ageGroupData.get("lower") + "	" +
-					ageGroupData.get("upper") + "	" +
-					ageGroupData.get("share") + "	"+
-					ageGroupData.get("total") + "	"+
-					ageGroupData.get("possiblePersonsInThisAge")+ "\n");
-			}
-
-			// Flush the writer to ensure all data is written to the file
-			writer.flush();
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Wrote demand share file under " + "/outputAgeGroupDemandShareFile.xml.gz");
-
-
 	}
 
 	/**
@@ -286,7 +194,8 @@ public class FreightDemandGenerationUtils {
 			if (!index.contains(new Coord(x, y)))
 				personsToRemove.add(person.getId());
 		}
-		log.info(personsToRemove.size()+" out of "+population.getPersons().size()+" persons are removed because of their home location outside of the shpfile.");
+		log.info("{} out of {} persons are removed because of their home location outside of the shapefile.", personsToRemove.size(),
+			population.getPersons().size());
 		for (Id<Person> id : personsToRemove)
 			population.removePerson(id);
 	}

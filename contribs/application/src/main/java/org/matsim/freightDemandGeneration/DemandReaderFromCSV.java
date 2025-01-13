@@ -22,8 +22,6 @@ package org.matsim.freightDemandGeneration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.math3.distribution.PoissonDistribution;
-import org.apache.commons.math3.stat.Frequency;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -55,40 +53,6 @@ import java.util.*;
 public final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
 	private static final Random rand = new Random(4711);
-	//public static final double PACKAGES_PER_RECIPIENT = 1.6;
-	private static double roundingError;
-
-	// NEW
-	protected static HashMap<Id<Person>, HashMap<Integer, String>> demandForEachPerson = new HashMap<>();
-
-	protected static final HashMap demandDistributionPerAgeGroup = new HashMap<>(Map.of(
-		(int) 0,new HashMap<>(Map.of("lower",0,"upper",13,"share", 0.0)),
-		(int) 1,new HashMap<>(Map.of("lower",14,"upper",19,"share", 7.4)),
-		(int) 2,new HashMap<>(Map.of("lower",20,"upper",29,"share", 18.5)),
-		(int) 3,new HashMap<>(Map.of("lower",30,"upper",39,"share", 20.7)),
-		(int) 4,new HashMap<>(Map.of("lower",40,"upper",49,"share", 17.1)),
-		(int) 5,new HashMap<>(Map.of("lower",50,"upper",59,"share", 18.9)),
-		(int) 6,new HashMap<>(Map.of("lower",60,"upper",69,"share", 11.5)),
-		(int) 7,new HashMap<>(Map.of("lower",70,"upper",1000,"share", 5.9)))
-	);
-
-	protected static final HashMap ageGroupDemandShare = new HashMap<>(Map.of(
-		(int) 100,new HashMap<>(Map.of("lower",0,"upper",15,"share", 0.0,"total",0)),
-		(int) 101,new HashMap<>(Map.of("lower",16,"upper",25,"share", 71.5,"total",0)),
-		(int) 102,new HashMap<>(Map.of("lower",26,"upper",45,"share", 78.2,"total",0)),
-		(int) 103,new HashMap<>(Map.of("lower",46,"upper",65,"share", 66.2,"total",0)),
-		(int) 104,new HashMap<>(Map.of("lower",66,"upper",75,"share", 43.3,"total",0)),
-		(int) 105,new HashMap<>(Map.of("lower",76,"upper",1000,"share", 0.00,"total",0))
-	));
-
-	//private static final String demandDistributionOption = "toPersonsByAge";
-	//private static final String demandDistributionOption = "toRandomPersons";
-	//private static final String demandDistributionOption = "toRandomLinks";
-	//private static final String demandDistributionOption = "";
-	//private static final String totalDemandGenerationOption = "DemandPerPerson";
-	//private static final String totalDemandGenerationOption = "DemandForShape";
-	//private static final String totalDemandGenerationOption = "";
-	//private static final double PACKAGES_PER_PERSON = 0.14;
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -100,7 +64,7 @@ public final class DemandReaderFromCSV {
 	 * this demand creates a shipment, the firstJobElement is the pickup and the
 	 * secondJobElement is the delivery.
 	 */
-	static class DemandInformationElement {
+	public static class DemandInformationElement {
 
 		/**
 		 * Name of the carrier with this demand configuration.
@@ -348,6 +312,36 @@ public final class DemandReaderFromCSV {
 		}
 	}
 
+	public static class LinkPersonPair {
+		Link link;
+		Person person;
+
+		LinkPersonPair(Link link, Person person) {
+			this.link = link;
+			this.person = person;
+		}
+
+		public Link getLink() {
+			return link;
+		}
+
+		public Person getPerson() {
+			return person;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			LinkPersonPair that = (LinkPersonPair) o;
+			return Objects.equals(link, that.link) && Objects.equals(person, that.person);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(link, person);
+		}
+	}
 	/**
 	 * Reads the csv with the demand information and adds this demand to the related
 	 * carriers.
@@ -359,22 +353,18 @@ public final class DemandReaderFromCSV {
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
 	 * @param population                       Population
 	 * @param shapeCategory                    Column name in the shape file for the data connection in the csv files
-	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @param demandGenerationSpecification				Calculator for the job duration
 	 * @throws IOException if the csv file cannot be read
 	 */
 	static void readAndCreateDemand(Scenario scenario, Path csvLocationDemand,
 									ShpOptions.Index indexShape, boolean combineSimilarJobs,
 									CoordinateTransformation crsTransformationNetworkAndShape, Population population, String shapeCategory,
-									JobDurationCalculator jobDurationCalculator,
-									String selectedDemandDistributionOption,
-									FreightDemandGeneration.TotalDemandGenerationsOption selectedTotalDemandGenerationOption,
-									Double PACKAGES_PER_PERSON, Double PACKAGES_PER_RECIPIENT) throws IOException {
+									DemandGenerationSpecification demandGenerationSpecification) throws IOException {
 
 		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
 		checkNewDemand(scenario, demandInformation, indexShape, shapeCategory);
 		createDemandForCarriers(scenario, indexShape, demandInformation, population, combineSimilarJobs,
-				crsTransformationNetworkAndShape, jobDurationCalculator,
-				selectedDemandDistributionOption, selectedTotalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
+				crsTransformationNetworkAndShape, demandGenerationSpecification);
 	}
 
 	/**
@@ -586,26 +576,24 @@ public final class DemandReaderFromCSV {
 	 * @param population                       Population
 	 * @param combineSimilarJobs               boolean if the jobs of the same carrier with same location and time will be combined
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
-	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @param demandGenerationSpecification				Calculator for the job duration
 	 */
 	static void createDemandForCarriers(Scenario scenario, ShpOptions.Index indexShape,
 										Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
-										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator,
-										String demandDistributionOption, FreightDemandGeneration.TotalDemandGenerationsOption totalDemandGenerationOption,
-										Double PACKAGES_PER_PERSON, Double PACKAGES_PER_RECIPIENT) {
+										CoordinateTransformation crsTransformationNetworkAndShape, DemandGenerationSpecification demandGenerationSpecification) {
 
 		for (DemandInformationElement newDemandInformationElement : demandInformation) {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
 				createServices(scenario, newDemandInformationElement, indexShape, population,
-						crsTransformationNetworkAndShape, jobDurationCalculator);
+						crsTransformationNetworkAndShape, demandGenerationSpecification);
 			else if (newDemandInformationElement.getTypeOfDemand().equals("shipment"))
 				createShipments(scenario, newDemandInformationElement, indexShape, population,
-						crsTransformationNetworkAndShape, jobDurationCalculator, demandDistributionOption, totalDemandGenerationOption, PACKAGES_PER_PERSON, PACKAGES_PER_RECIPIENT);
+						crsTransformationNetworkAndShape, demandGenerationSpecification);
 		}
 		if (combineSimilarJobs)
 			combineSimilarJobs(scenario);
-		jobDurationCalculator.recalculateJobDurations(scenario);
+		demandGenerationSpecification.recalculateJobDurations(scenario);
 	}
 
 	/**
@@ -616,22 +604,20 @@ public final class DemandReaderFromCSV {
 	 * @param indexShape                       ShpOptions.Index
 	 * @param population                       Population
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
-	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @param demandGenerationSpecification				Calculator for the job duration
 	 */
 	private static void createServices(Scenario scenario, DemandInformationElement newDemandInformationElement,
 									   ShpOptions.Index indexShape, Population population,
-									   CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator) {
+									   CoordinateTransformation crsTransformationNetworkAndShape, DemandGenerationSpecification demandGenerationSpecification) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
-		roundingError = 0;
 		Double shareOfPopulationWithThisService = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Integer numberOfJobs;
-		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
 		String[] areasForServiceLocations = newDemandInformationElement.getAreasFirstJobElement();
 		String[] locationsOfServices = newDemandInformationElement.getLocationsOfFirstJobElement();
 		Integer numberOfServiceLocations = newDemandInformationElement.getNumberOfFirstJobElementLocations();
-		ArrayList<String> usedServiceLocations = new ArrayList<String>();
+		ArrayList<LinkPersonPair> usedServiceLocationsOrPersons = new ArrayList<>();
 		int numberOfLinksInNetwork = scenario.getNetwork().getLinks().size();
 		HashMap<Id<Person>, Person> possiblePersonsForService = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
@@ -672,32 +658,35 @@ public final class DemandReaderFromCSV {
 				numberOfServiceLocations = numberPossibleServices;
 		}
 		// find possible links for the services
-		HashMap<Id<Link>, Link> possibleLinksForService = findAllPossibleLinks(scenario, indexShape,
+		ArrayList<LinkPersonPair> possibleLinkPersonPairsForService = findAllPossibleLinks(scenario, indexShape,
 			crsTransformationNetworkAndShape, numberOfServiceLocations, areasForServiceLocations,
 			locationsOfServices, possiblePersonsForService, nearestLinkPerPerson);
 
 		if (locationsOfServices != null)
 			for (String selectedLinkIdService : locationsOfServices)
-				if (!possibleLinksForService.containsKey(Id.createLinkId(selectedLinkIdService)))
+				if (possibleLinkPersonPairsForService.stream().noneMatch(linkPersonPair -> linkPersonPair.getLink().getId().toString().equals(selectedLinkIdService)))
 					throw new RuntimeException("The selected link " + selectedLinkIdService
 						+ " for the service is not part of the possible links. Please check!");
 
+		log.info("Number of service locations for this job element of carrier {}: {}", newDemandInformationElement.getCarrierName(), numberOfServiceLocations);
+		int demandToDistribute = demandGenerationSpecification.getDemandToDistribute(newDemandInformationElement, possiblePersonsForService, null);
+
 		if (numberOfJobs == null) {
 			// creates services with a demand of 1
-			if (possibleLinksForService.size() > demandToDistribute) {
+			if (possibleLinkPersonPairsForService.size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
 
-					Link link = findNextUsedLink(scenario, indexShape, possibleLinksForService, numberOfJobs,
-							areasForServiceLocations, locationsOfServices, usedServiceLocations,
+					LinkPersonPair linkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsForService, numberOfJobs,
+							areasForServiceLocations, locationsOfServices, usedServiceLocationsOrPersons,
 							possiblePersonsForService, nearestLinkPerPerson, crsTransformationNetworkAndShape, i);
 					int demandForThisLink = 1;
-					double serviceTime = jobDurationCalculator.calculateServiceDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), demandForThisLink);
-					usedServiceLocations.add(link.getId().toString());
+					double serviceTime = demandGenerationSpecification.calculateServiceDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), demandForThisLink);
+					usedServiceLocationsOrPersons.add(linkPersonPair);
 					Id<CarrierService> idNewService = Id.create(
-						createJobId(scenario, newDemandInformationElement, link.getId(), null),
+						createJobId(scenario, newDemandInformationElement, linkPersonPair.getLink().getId(), null),
 						CarrierService.class);
-					CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-						.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
+					CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId())
+						.setDemand(demandForThisLink).setServiceDuration(serviceTime)
 						.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 						.build();
 					CarriersUtils.getCarriers(scenario).getCarriers()
@@ -707,15 +696,15 @@ public final class DemandReaderFromCSV {
 			} else
 			// creates a demand on each link, demand depends on the length of the link
 			{
-				if (possibleLinksForService.isEmpty())
+				if (possibleLinkPersonPairsForService.isEmpty())
 					throw new RuntimeException(
 						"Not enough links in the shape file to distribute the demand. Select an different shapefile or check the CRS of the shapefile and network");
 				if (numberOfServiceLocations != null)
 					throw new RuntimeException(
 						"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of service locations, which is not possible here!");
-				double sumOfPossibleLinkLength = possibleLinksForService.values().stream().mapToDouble(Link::getLength).sum();
-				for (Link link : possibleLinksForService.values()) {
-					int demandForThisLink = calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, possibleLinksForService.size(),
+				double sumOfPossibleLinkLength = possibleLinkPersonPairsForService.stream().mapToDouble(linkPersonPair -> linkPersonPair.getLink().getLength()).sum();
+				for (Link link : possibleLinkPersonPairsForService.stream().map(LinkPersonPair::getLink).toList()) {
+					int demandForThisLink = demandGenerationSpecification.calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, possibleLinkPersonPairsForService.size(),
 						sumOfPossibleLinkLength, link);
 					countOfLinks++;
 					Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
@@ -730,7 +719,7 @@ public final class DemandReaderFromCSV {
 						else
 							singleDemandForThisLink = (int)largestPossibleDemandSize;
 						handledDemand = handledDemand + singleDemandForThisLink;
-						double serviceTime = jobDurationCalculator.calculateServiceDuration(
+						double serviceTime = demandGenerationSpecification.calculateServiceDuration(
 							newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
 
 						Id<CarrierService> idNewService = Id.create(
@@ -738,7 +727,7 @@ public final class DemandReaderFromCSV {
 							CarrierService.class);
 						if (demandToDistribute > 0 && singleDemandForThisLink > 0) {
 							CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-								.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
+								.setDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
 								.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 								.build();
 							thisCarrier.getServices().put(thisService.getId(), thisService);
@@ -755,20 +744,20 @@ public final class DemandReaderFromCSV {
 				if (i * 2 > numberOfLinksInNetwork)
 					throw new RuntimeException(
 						"Not enough links in the shape file to distribute the demand. Select an different shapefile or check if shapefile and network has the same coordinateSystem.");
-				Link link;
-				if (numberOfServiceLocations == null || usedServiceLocations.size() < numberOfServiceLocations) {
+				LinkPersonPair linkPersonPair;
+				if (numberOfServiceLocations == null || usedServiceLocationsOrPersons.size() < numberOfServiceLocations) {
 					if (locationsOfServices != null && locationsOfServices.length > i) {
-						link = scenario.getNetwork().getLinks().get(Id.createLinkId(locationsOfServices[i]));
+						linkPersonPair = new LinkPersonPair(scenario.getNetwork().getLinks().get(Id.createLinkId(locationsOfServices[i])), null);
 					} else
-						link = findNextUsedLink(scenario, indexShape, possibleLinksForService,
+						linkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsForService,
 							numberOfServiceLocations, areasForServiceLocations, locationsOfServices,
-							usedServiceLocations, possiblePersonsForService, nearestLinkPerPerson,
+							usedServiceLocationsOrPersons, possiblePersonsForService, nearestLinkPerPerson,
 							crsTransformationNetworkAndShape, i);
 				} else {
-					link = scenario.getNetwork().getLinks().get(Id.createLinkId(usedServiceLocations.stream()
-						.skip(rand.nextInt(usedServiceLocations.size() - 1)).findFirst().get()));
+					linkPersonPair = usedServiceLocationsOrPersons.stream().skip(rand.nextInt(usedServiceLocationsOrPersons.size() - 1)).findFirst().get();
 				}
-				int demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
+				int demandForThisLink = demandGenerationSpecification.calculateDemandForThisLinkWithFixNumberOfJobs(demandToDistribute, numberOfJobs, distributedDemand,
+					linkPersonPair, null, i);
 				Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 				int handledDemand = 0;
@@ -781,15 +770,15 @@ public final class DemandReaderFromCSV {
 					else
 						singleDemandForThisLink = (int)largestPossibleDemandSize;
 					handledDemand = handledDemand + singleDemandForThisLink;
-					double serviceTime = jobDurationCalculator.calculateServiceDuration(
+					double serviceTime = demandGenerationSpecification.calculateServiceDuration(
 						newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
-					usedServiceLocations.add(link.getId().toString());
+					usedServiceLocationsOrPersons.add(linkPersonPair);
 
 					Id<CarrierService> idNewService = Id.create(
-						createJobId(scenario, newDemandInformationElement, link.getId(), null), CarrierService.class);
+						createJobId(scenario, newDemandInformationElement, linkPersonPair.getLink().getId(), null), CarrierService.class);
 					if ((demandToDistribute > 0 && singleDemandForThisLink > 0) || demandToDistribute == 0) {
-						CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-							.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
+						CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId())
+							.setDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
 							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
 						CarriersUtils.getCarriers(scenario).getCarriers()
@@ -812,30 +801,26 @@ public final class DemandReaderFromCSV {
 	 * @param indexShape                       ShpOptions.Index for the shape file
 	 * @param population                       Population
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
-	 * @param jobDurationCalculator				Calculator for the job duration
+	 * @param demandGenerationSpecification				Calculator for the job duration
 	 */
 	private static void createShipments(Scenario scenario, DemandInformationElement newDemandInformationElement,
 										ShpOptions.Index indexShape, Population population,
-										CoordinateTransformation crsTransformationNetworkAndShape, JobDurationCalculator jobDurationCalculator,
-										String selectedDemandDistributionOption,
-										FreightDemandGeneration.TotalDemandGenerationsOption selectedTotalDemandGenerationOption, Double PACKAGES_PER_PERSON, Double PACKAGES_PER_RECIPIENT) {
+										CoordinateTransformation crsTransformationNetworkAndShape, DemandGenerationSpecification demandGenerationSpecification) {
 
 		int countOfLinks = 1;
 		int distributedDemand = 0;
-		roundingError = 0;
 		Double shareOfPopulationWithThisPickup = newDemandInformationElement.getShareOfPopulationWithFirstJobElement();
 		Double shareOfPopulationWithThisDelivery = newDemandInformationElement
 			.getShareOfPopulationWithSecondJobElement();
 		Integer numberOfJobs;
-		Integer demandToDistribute = newDemandInformationElement.getDemandToDistribute();
 		Integer numberOfPickupLocations = newDemandInformationElement.getNumberOfFirstJobElementLocations();
 		Integer numberOfDeliveryLocations = newDemandInformationElement.getNumberOfSecondJobElementLocations();
 		String[] areasForPickupLocations = newDemandInformationElement.getAreasFirstJobElement();
 		String[] areasForDeliveryLocations = newDemandInformationElement.getAreasSecondJobElement();
 		String[] setLocationsOfPickup = newDemandInformationElement.getLocationsOfFirstJobElement();
 		String[] setLocationsOfDelivery = newDemandInformationElement.getLocationsOfSecondJobElement();
-		ArrayList<String> usedPickupLocations = new ArrayList<>();
-		ArrayList<String> usedDeliveryLocations = new ArrayList<>();
+		ArrayList<LinkPersonPair> usedPickupLocationsOrPersons = new ArrayList<>();
+		ArrayList<LinkPersonPair> usedDeliveryLocationsOrPersons = new ArrayList<>();
 		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<>();
 		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<>();
 		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonPickup = new HashMap<>();
@@ -852,60 +837,27 @@ public final class DemandReaderFromCSV {
 			throw new RuntimeException(
 				"No population found although input parameter <ShareOfPopulationWithThisDemand> is set");
 		else {
-			Integer sizeOfWholePopulation = population.getPersons().size();
-			Integer sizeOfPopulationFilteredByArea;
+
 			double sampleSizeInputPopulation = (double) population.getAttributes().getAttribute("sampleSize");
 			double sampleTo = (double) population.getAttributes().getAttribute("samplingTo");
 			String samplingOption = String.valueOf(population.getAttributes().getAttribute("samplingOption"));
 
 			//Pickup
-			// ERROR2: index shape, da sonst Endlosschleife, wenn keine Area angegeben
-			if (areasForPickupLocations != null || indexShape != null)
-				possiblePersonsPickup = findPossiblePersons(population, areasForPickupLocations, indexShape,
-					crsTransformationNetworkAndShape);
-			else
-				possiblePersonsPickup.putAll(population.getPersons());
+			if (setLocationsOfPickup == null || setLocationsOfPickup.length != numberOfPickupLocations)
+				if (areasForPickupLocations != null || indexShape != null)
+					possiblePersonsPickup = findPossiblePersons(population, areasForPickupLocations, indexShape,
+						crsTransformationNetworkAndShape);
+				else
+					possiblePersonsPickup.putAll(population.getPersons());
 
 			//Delivery
-			//NEW / MODIFICATIONS
-			//AGENTS ARE DELETED IN THE POPULATION: PROBLEM FOR OTHER USECASES?
-			if (areasForDeliveryLocations != null || indexShape != null) {
-				log.info("Population is reduced to selected delivery areas...");
-				//possiblePersonsDelivery = findPossiblePersons(population, areasForDeliveryLocations, indexShape,
-				//		crsTransformationNetworkAndShape);
-				population = findPopulationWithPossiblePersons(population, areasForDeliveryLocations, indexShape,
-					crsTransformationNetworkAndShape);
-				sizeOfPopulationFilteredByArea = population.getPersons().size();
-				log.info("Population size decreased from "+ sizeOfWholePopulation+" to "+sizeOfPopulationFilteredByArea+ " due to defined area(s).");
-			}
-			else{
-				sizeOfPopulationFilteredByArea = population.getPersons().size();
-				log.info("Population size not decreased due to defined areas.");
-			}
-			if (selectedDemandDistributionOption == "toPersonsByAge") {
-				population = modifyPopulation(population, areasForDeliveryLocations, indexShape,
-					crsTransformationNetworkAndShape);
-			}
-
-			possiblePersonsDelivery.putAll(population.getPersons());
-
-			//NEW: generation of total demand to distribute
-			switch(selectedTotalDemandGenerationOption) {
-				case demandPerPerson -> {
-					demandToDistribute =
-							(int) Math.round(PACKAGES_PER_PERSON * sizeOfPopulationFilteredByArea/ sampleSizeInputPopulation);
-					log.info("Demand for this carrier is set to " + demandToDistribute + " with " + PACKAGES_PER_PERSON + " demand units per person (" + sampleSizeInputPopulation + "-sample).");
+			if (setLocationsOfDelivery == null || setLocationsOfDelivery.length != numberOfDeliveryLocations)
+				if (areasForDeliveryLocations != null || indexShape != null) {
+					possiblePersonsDelivery = findPossiblePersons(population, areasForDeliveryLocations, indexShape,
+						crsTransformationNetworkAndShape);
+				} else {
+					possiblePersonsDelivery.putAll(population.getPersons());
 				}
-				case demandForShape -> {
-					double demandToDistrDouble =
-							(double) demandToDistribute *
-									sizeOfPopulationFilteredByArea / sizeOfWholePopulation
-									* sampleSizeInputPopulation;
-					demandToDistribute = (int) Math.round(demandToDistrDouble);
-					log.info("Demand is set to " + demandToDistribute + " ("+ (double) Math.round((double) sizeOfPopulationFilteredByArea / sizeOfWholePopulation * 100.0) / 100.0 +"% of shape).");
-				}
-				case NoSelection -> log.info("Demand to distribute remains at "+demandToDistribute+".");
-			}
 
 			// set number of jobs part 2, upsampling
 			int numberPossibleJobsPickup = 0;
@@ -917,7 +869,7 @@ public final class DemandReaderFromCSV {
 				numberPossibleJobsDelivery = (int) Math
 					.round(shareOfPopulationWithThisDelivery * possiblePersonsDelivery.size());
 
-			int sampledNumberPossibleJobsPickup = (int)Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
+			int sampledNumberPossibleJobsPickup = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsPickup);
 			int sampledNumberPossibleJobsDelivery = (int) Math.round((sampleTo / sampleSizeInputPopulation) * numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup > numberPossibleJobsDelivery) {
 				if (sampleSizeInputPopulation == sampleTo ||samplingOption.equals("changeDemandOnLocation")) {
@@ -943,125 +895,73 @@ public final class DemandReaderFromCSV {
 						"Error with the sampling of the demand based on the population. Please check sampling sizes and sampling options!!");
 			}
 
-
-			log.info("Number of possible jobs pickup: "+numberPossibleJobsPickup);
-			log.info("Number of possible jobs delivery: "+numberPossibleJobsDelivery);
 			if (numberPossibleJobsPickup != 0)
 				numberOfPickupLocations = numberPossibleJobsPickup;
 			if (numberPossibleJobsDelivery != 0)
 				numberOfDeliveryLocations = numberPossibleJobsDelivery;
 
-		}
-
-		//NEW: get demand per age group and add it to "demandDistributionPerAgeGroup" or delete population bcs "toRandomLinks" was selected
-		if (selectedDemandDistributionOption == "toPersonsByAge") {
-			getDemandAndPersonsPerAgeGroup(demandToDistribute, population);
-		} else if (selectedDemandDistributionOption == "toRandomLinks") {
-			log.warn("Because the option toRandomLinks was selected, population is deleted for the distribution.");
-			log.warn("Number of jobs is set to 0.");
-			numberOfDeliveryLocations = null;
-			possiblePersonsDelivery.clear();
-			nearestLinkPerPersonDelivery.clear();
-			numberOfJobs = null;
+			log.info("Number of possible pickup locations for this job element of carrier {}: {}", newDemandInformationElement.getCarrierName(), numberOfPickupLocations);
+			log.info("Number of possible delivery locations for this job element of carrier {}: {}", newDemandInformationElement.getCarrierName(), numberOfDeliveryLocations);
 		}
 
 		// find possible Links for delivery and pickup
-		HashMap<Id<Link>, Link> possibleLinksDelivery = null;
-		HashMap<Id<Link>, Link> possibleLinksPickup = null;
+		ArrayList<LinkPersonPair> possibleLinkPersonPairsPickup = findAllPossibleLinks(scenario, indexShape,
+			crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
+			setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
+		log.info("Possible links or persons for pickup: {}", possibleLinkPersonPairsPickup.size());
+
+		ArrayList<LinkPersonPair> possibleLinkPersonPairsDelivery = findAllPossibleLinks(scenario, indexShape,
+			crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
+			setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
+		log.info("Possible links or persons for delivery: {}", possibleLinkPersonPairsDelivery.size());
 
 
-		if (selectedDemandDistributionOption != "toPersonsByAge"&& selectedDemandDistributionOption!="toRandomPersons"){
-			//OLD
-			//pickup
-			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
-					crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
-					setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
-			log.info("Possible links for pickup: " + possibleLinksPickup.size());
+		if (possibleLinkPersonPairsPickup.isEmpty())
+			throw new RuntimeException(
+				"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
+		if (possibleLinkPersonPairsDelivery.isEmpty())
+			throw new RuntimeException(
+				"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
 
-			//delivery
-			possibleLinksDelivery = findAllPossibleLinks(scenario, indexShape,
-					crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
-					setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
-			log.info("Possible links for delivery: " + possibleLinksDelivery.size());
+		if (setLocationsOfPickup != null)
+			for (String selectedLinkIdPickups : setLocationsOfPickup)
+				if (possibleLinkPersonPairsPickup.stream().noneMatch(linkPersonPair -> linkPersonPair.getLink().getId().toString().equals(selectedLinkIdPickups)))
+					throw new RuntimeException("The selected link " + selectedLinkIdPickups
+						+ " for pickup is not part of the possible links for pickup. Please check!");
 
-			if (possibleLinksPickup.isEmpty())
-				throw new RuntimeException(
-						"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
-			if (possibleLinksDelivery.isEmpty())
-				throw new RuntimeException(
-						"Not enough possible links to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
+		if (setLocationsOfDelivery != null)
+			if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
+				log.warn("You selected more certain locations than the set number of locations. Randomly selected locations will be used.");
+			else
+				for (String selectedLinkIdDelivery : setLocationsOfDelivery)
+					if (possibleLinkPersonPairsDelivery.stream().noneMatch(linkPersonPair -> linkPersonPair.getLink().getId().toString().equals(selectedLinkIdDelivery)))
+						throw new RuntimeException("The selected link " + selectedLinkIdDelivery
+							+ " for delivery is not part of the possible links for delivery. Please check!");
 
-			if (setLocationsOfPickup != null)
-				for (String selectedLinkIdPickups : setLocationsOfPickup)
-					if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
-						throw new RuntimeException("The selected link " + selectedLinkIdPickups
-								+ " for pickup is not part of the possible links for pickup. Please check!");
+		int demandToDistribute = demandGenerationSpecification.getDemandToDistribute(newDemandInformationElement, possiblePersonsPickup, possiblePersonsDelivery);
 
-			if (setLocationsOfDelivery != null)
-				if (numberOfDeliveryLocations < setLocationsOfDelivery.length)
-					log.warn("You selected more certain locations than the set number of locations. Randomly selected locations will be used.");
-				else
-					for (String selectedLinkIdDelivery : setLocationsOfDelivery)
-						if (!possibleLinksDelivery.containsKey(Id.createLinkId(selectedLinkIdDelivery)))
-							throw new RuntimeException("The selected link " + selectedLinkIdDelivery
-									+ " for delivery is not part of the possible links for delivery. Please check!");
-		}
-		else {
-			//NEW: Not links but possible persons are matched to link -> saves time
-			//pickup
-			possibleLinksPickup = findAllPossibleLinks(scenario, indexShape,
-				crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
-				setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
-			log.info("Possible links for pickup: "+possibleLinksPickup.size());
-
-			//delivery
-			/* log.info("Possible persons for delivery are matched with link...");
-			for (Id<Person> personId:possiblePersonsDelivery.keySet()) {
-			Person person = possiblePersonsDelivery.get(personId);
-				//findLinksForPerson(scenario, nearestLinkPerPersonDelivery, person); //NEW: moved
-			}
-			log.info("Possible persons for delivery ("+nearestLinkPerPersonDelivery.size()+") were matched with link.");
-*/
-			if (possibleLinksPickup.isEmpty())
-				throw new RuntimeException(
-					"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
-
-			if (setLocationsOfPickup != null)
-				for (String selectedLinkIdPickups : setLocationsOfPickup)
-					if (!possibleLinksPickup.containsKey(Id.createLinkId(selectedLinkIdPickups)))
-						throw new RuntimeException("The selected link " + selectedLinkIdPickups
-							+ " for pickup is not part of the possible links for pickup. Please check!");
-
-			if (possiblePersonsDelivery.isEmpty())
-				throw new RuntimeException(
-					"Not enough possible persons to distribute the deliveries. Select an different shapefile or check the CRS of the shapefile and network.");
-		}
-
-
-		int numberOfShipments = 0;
 		// distribute the demand over the network because no number of jobs is selected
 		if (numberOfJobs == null) {
 			log.info("Creates shipments with a demand of 1 or proportional to link length.");
 			// creates shipments with a demand of 1
-			if (possibleLinksPickup.size() > demandToDistribute || possibleLinksDelivery.size() > demandToDistribute) {
+			if (possibleLinkPersonPairsPickup.size() > demandToDistribute || Objects.requireNonNull(possibleLinkPersonPairsDelivery).size() > demandToDistribute) {
 				for (int i = 0; i < demandToDistribute; i++) {
-					Link linkPickup;
-					Link linkDelivery;
-					linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
-						numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocations,
+					LinkPersonPair pickupLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsPickup,
+						numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocationsOrPersons,
 						possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
-					linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
+					LinkPersonPair deliveryLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsDelivery,
 						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-						usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
+						usedDeliveryLocationsOrPersons, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
 						crsTransformationNetworkAndShape, i);
 
 					int demandForThisLink = 1;
-					if (!usedPickupLocations.contains(linkPickup.getId().toString()))
-						usedPickupLocations.add(linkPickup.getId().toString());
-					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
-						usedDeliveryLocations.add(linkDelivery.getId().toString());
+					if (!usedPickupLocationsOrPersons.contains(pickupLinkPersonPair))
+						usedPickupLocationsOrPersons.add(pickupLinkPersonPair);
+					if (!usedDeliveryLocationsOrPersons.contains(deliveryLinkPersonPair))
+						usedDeliveryLocationsOrPersons.add(deliveryLinkPersonPair);
 
-					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery, demandForThisLink, jobDurationCalculator);
+					createSingleShipment(scenario, newDemandInformationElement, pickupLinkPersonPair.getLink(), deliveryLinkPersonPair.getLink(), demandForThisLink,
+						demandGenerationSpecification);
 				}
 			} else
 			// creates a demand on each link, demand depends on the length of the link
@@ -1069,164 +969,146 @@ public final class DemandReaderFromCSV {
 				if (numberOfPickupLocations != null && numberOfDeliveryLocations != null)
 					throw new RuntimeException(
 						"Because the demand is higher than the number of links, the demand will be distributed evenly over all links. You selected a certain number of pickup and delivery locations, which is not possible here!");
-				HashMap<Id<Link>, Link> demandBasesLinks;
+				ArrayList<LinkPersonPair> demandBasesLinks;
 				double sumOfDemandBasedLinks;
 				boolean pickupIsDemandBase = true;
-				Link linkPickup = null;
-				Link linkDelivery= null;
-				double sumOfPossibleLinkLengthPickup = possibleLinksPickup.values().stream().mapToDouble(Link::getLength).sum();
-				double sumOfPossibleLinkLengthDelivery = possibleLinksDelivery.values().stream().mapToDouble(Link::getLength).sum();
+				LinkPersonPair pickupLinkPersonPair = null;
+				LinkPersonPair deliveryLinkPersonPair = null;
+				double sumOfPossibleLinkLengthPickup = possibleLinkPersonPairsPickup.stream().mapToDouble(LinkPersonPair -> LinkPersonPair.getLink().getLength()).sum();
+				double sumOfPossibleLinkLengthDelivery = possibleLinkPersonPairsDelivery.stream().mapToDouble(LinkPersonPair -> LinkPersonPair.getLink().getLength()).sum();
 				if (numberOfPickupLocations == null && numberOfDeliveryLocations == null)
-					if (possibleLinksPickup.size() > possibleLinksDelivery.size()) {
-						demandBasesLinks = possibleLinksPickup;
+					if (possibleLinkPersonPairsPickup.size() > possibleLinkPersonPairsDelivery.size()) {
+						demandBasesLinks = possibleLinkPersonPairsPickup;
 						sumOfDemandBasedLinks = sumOfPossibleLinkLengthPickup;
 					} else {
-						demandBasesLinks = possibleLinksDelivery;
+						demandBasesLinks = possibleLinkPersonPairsDelivery;
 						sumOfDemandBasedLinks = sumOfPossibleLinkLengthDelivery;
 						pickupIsDemandBase = false;
 					}
 				else if (numberOfPickupLocations != null) {
-					demandBasesLinks = possibleLinksDelivery;
+					demandBasesLinks = possibleLinkPersonPairsDelivery;
 					sumOfDemandBasedLinks = sumOfPossibleLinkLengthDelivery;
 					pickupIsDemandBase = false;
 				} else {
-					demandBasesLinks = possibleLinksPickup;
+					demandBasesLinks = possibleLinkPersonPairsPickup;
 					sumOfDemandBasedLinks = sumOfPossibleLinkLengthPickup;
 				}
-				for (Link demandBasedLink : demandBasesLinks.values()) {
-					int demandForThisLink = calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, demandBasesLinks.size(), sumOfDemandBasedLinks,
+				for (Link demandBasedLink : demandBasesLinks.stream().map(LinkPersonPair::getLink).toList()) {
+					int demandForThisLink = demandGenerationSpecification.calculateDemandBasedOnLinkLength(countOfLinks, distributedDemand, demandToDistribute, demandBasesLinks.size(), sumOfDemandBasedLinks,
 						demandBasedLink);
 					if (pickupIsDemandBase) {
-						linkPickup = demandBasedLink;
-						while (linkDelivery == null || usedDeliveryLocations.contains(linkDelivery.getId().toString())) {
-							linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
-								numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-								usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
-								crsTransformationNetworkAndShape, countOfLinks - 1);
-							if (usedDeliveryLocations.size() == possibleLinksDelivery.size()
-								|| (numberOfDeliveryLocations != null
-								&& usedDeliveryLocations.size() == numberOfDeliveryLocations))
-								break;
-						}
+						pickupLinkPersonPair = new LinkPersonPair(demandBasedLink, null);
+						deliveryLinkPersonPair = findNextLinkPersonPair(scenario, indexShape, crsTransformationNetworkAndShape,
+							deliveryLinkPersonPair,
+							usedDeliveryLocationsOrPersons, possibleLinkPersonPairsDelivery, numberOfDeliveryLocations, areasForDeliveryLocations,
+							setLocationsOfDelivery,
+							possiblePersonsDelivery, nearestLinkPerPersonDelivery, countOfLinks);
 					} else {
-						linkDelivery = demandBasedLink;
-						while (linkPickup == null || usedPickupLocations.contains(linkPickup.getId().toString())) {
-							linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
-								numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup,
-								usedPickupLocations, possiblePersonsPickup, nearestLinkPerPersonPickup,
-								crsTransformationNetworkAndShape, countOfLinks - 1);
-							if (usedPickupLocations.size() == possibleLinksPickup.size()
-								|| (numberOfPickupLocations != null
-								&& usedPickupLocations.size() == numberOfPickupLocations))
-								break;
-						}
+						deliveryLinkPersonPair = new LinkPersonPair(demandBasedLink, null);
+						pickupLinkPersonPair = findNextLinkPersonPair(scenario, indexShape, crsTransformationNetworkAndShape, pickupLinkPersonPair,
+							usedPickupLocationsOrPersons,
+							possibleLinkPersonPairsPickup, numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup,
+							possiblePersonsPickup,
+							nearestLinkPerPersonPickup, countOfLinks);
 					}
 					countOfLinks++;
-					if (!usedPickupLocations.contains(linkPickup.getId().toString()))
-						usedPickupLocations.add(linkPickup.getId().toString());
-					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
-						usedDeliveryLocations.add(linkDelivery.getId().toString());
+					if (!usedPickupLocationsOrPersons.contains(pickupLinkPersonPair))
+						usedPickupLocationsOrPersons.add(pickupLinkPersonPair);
+					if (!usedDeliveryLocationsOrPersons.contains(deliveryLinkPersonPair))
+						usedDeliveryLocationsOrPersons.add(deliveryLinkPersonPair);
 
 					if (demandForThisLink > 0) {
-						createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, jobDurationCalculator);
+						createSingleShipment(scenario, newDemandInformationElement, pickupLinkPersonPair.getLink(), deliveryLinkPersonPair.getLink(),
+							demandForThisLink, demandGenerationSpecification);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
 				}
 			}
 		} else { // if a certain number of shipments is selected
 
-			log.info("Number of jobs/ possible persons: "+numberOfJobs);
-
-			//MODIFICATION: Verschoben vor die for-Schleife
-			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs &&	selectedDemandDistributionOption == "noSelection") {
+			if (demandToDistribute != 0 && demandToDistribute < numberOfJobs) {
 				numberOfJobs = demandToDistribute;
 				log.warn(
 					"The resulting number of jobs is not feasible, because the demand is smaller then the number of jobs. Number of jobs is reduced to demand!");
-				log.info("New number of jobs: "+numberOfJobs);
+				log.info("New number of jobs: {}", numberOfJobs);
 			}
-			//NEW: Poisson
-			org.apache.commons.math3.distribution.PoissonDistribution poisson = new PoissonDistribution(PACKAGES_PER_RECIPIENT-1);
-			Frequency frequency = new Frequency();
-			int upsamplingFactor = 1;
-			for (int i=0; i<11; i++){
-				frequency.incrementValue((i+1)*upsamplingFactor,Math.round(poisson.probability(i)*numberOfJobs));
-			}
-			RouletteWheel rouletteWheel = RouletteWheel.Builder.newInstance(frequency).setRandom(rand).build();
-
 
 			for (int i = 0; i < numberOfJobs; i++) {
 
-				Link linkPickup = findNextUsedLink(scenario, indexShape, possibleLinksPickup,
-					numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocations,
+				LinkPersonPair pickupLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsPickup,
+					numberOfPickupLocations, areasForPickupLocations, setLocationsOfPickup, usedPickupLocationsOrPersons,
 					possiblePersonsPickup, nearestLinkPerPersonPickup, crsTransformationNetworkAndShape, i);
 
-				//MODIFICATION: find next used link for delivery if no population is used
-				Link linkDelivery = null;
-				Id<Person> personId;
-			/*	if (selectedDemandDistributionOption != "toPersonsByAge" && selectedDemandDistributionOption != "toRandomPersons") {
-					linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
-						numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-						usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
-						crsTransformationNetworkAndShape, i);
-				}
-*/
-				int demandForThisLink = 0;
-				if (selectedDemandDistributionOption != "toPersonsByAge" && selectedDemandDistributionOption != "toRandomPersons") {
-					//MODIFICATION: find next used link for delivery only if no population is used
-					linkDelivery = findNextUsedLink(scenario, indexShape, possibleLinksDelivery,
-							numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
-							usedDeliveryLocations, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
-							crsTransformationNetworkAndShape, i);
-					//get (random) demand for the link
-					if (distributedDemand != demandToDistribute) {
-						demandForThisLink = calculateDemandForThisLink(demandToDistribute, numberOfJobs, distributedDemand, i);
-					}
-				} else {
-						//NEW: find next person and not next link
-						personId = possiblePersonsDelivery.values().stream().skip(rand.nextInt(possiblePersonsDelivery.size())).findFirst().get().getId();
-						possiblePersonsDelivery.remove(personId);
-						//NEW: find demand not random but with poisson and/ or by age group
-						if (distributedDemand != demandToDistribute) {
-							demandForThisLink = calculateDemandBasedOnRouletteWheel(personId, population, rouletteWheel, demandToDistribute,
-									distributedDemand, selectedDemandDistributionOption);
-							//NEW: find link for person
-							if (demandForThisLink != 0) {
-								findLinksForPerson(scenario, nearestLinkPerPersonDelivery, population.getPersons().get(personId));
-								linkDelivery = getNearestLinkForSelectedPerson(scenario, personId, nearestLinkPerPersonDelivery);
-							}
-						}
-				}
+				LinkPersonPair deliveryLinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairsDelivery,
+					numberOfDeliveryLocations, areasForDeliveryLocations, setLocationsOfDelivery,
+					usedDeliveryLocationsOrPersons, possiblePersonsDelivery, nearestLinkPerPersonDelivery,
+					crsTransformationNetworkAndShape, i);
 
+				int demandForThisLink = demandGenerationSpecification.calculateDemandForThisLinkWithFixNumberOfJobs(demandToDistribute, numberOfJobs, distributedDemand, pickupLinkPersonPair, deliveryLinkPersonPair, i);
 
-				if (!usedPickupLocations.contains(linkPickup.getId().toString()))
-					usedPickupLocations.add(linkPickup.getId().toString());
-
-				if(demandForThisLink != 0) {
-					if (!usedDeliveryLocations.contains(linkDelivery.getId().toString()))
-						usedDeliveryLocations.add(linkDelivery.getId().toString());
-				}
-
-				if(demandForThisLink != 0) {
-					createSingleShipment(scenario, newDemandInformationElement, linkPickup, linkDelivery,
-							demandForThisLink, jobDurationCalculator);
+				if (demandToDistribute == 0 || demandForThisLink > 0) {
+					if (!usedPickupLocationsOrPersons.contains(pickupLinkPersonPair))
+						usedPickupLocationsOrPersons.add(pickupLinkPersonPair);
+					if (!usedDeliveryLocationsOrPersons.contains(deliveryLinkPersonPair))
+						usedDeliveryLocationsOrPersons.add(deliveryLinkPersonPair);
+					createSingleShipment(scenario, newDemandInformationElement, pickupLinkPersonPair.getLink(), deliveryLinkPersonPair.getLink(),
+						demandForThisLink, demandGenerationSpecification);
 					distributedDemand = distributedDemand + demandForThisLink;
-					numberOfShipments++;
 				}
-
+				// This could mean that the demand is not distributed evenly which is assumed by the number of jobs calculations.
+				// So if we have a distributed demand but this single demand is 0, we have to not count this as a job
+				else if (distributedDemand < demandToDistribute)
+					i--;
+				log.info("Distribution of demand: {}", distributedDemand);
 			}
 		}
 
-		log.info("Number of shipments: "+ numberOfShipments);
+//		//NEW: if more possible persons than demand -> add to parcelsPerPerson
+//		if (!possiblePersonsDelivery.isEmpty() && !Objects.equals(selectedDemandDistributionOption, "noSelection")) {
+//			for (Id<Person> person : possiblePersonsDelivery.keySet()) {
+//				parcelsPerPerson.put(person, new HashMap<>());
+//				int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
+//				parcelsPerPerson.get(person).put(age, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
+//			}
+//		} //TODO check if this is necessary
+	}
 
-		//NEW: if more possible persons than demand -> add to demandForEachPerson
-		if (possiblePersonsDelivery.size() != 0 && selectedDemandDistributionOption!= "noSelection") {
-			for (Id<Person> person : possiblePersonsDelivery.keySet()) {
-				demandForEachPerson.put(person, new HashMap<>());
-				int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-				demandForEachPerson.get(person).put(age, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
-			}
+	/**
+	 * Finds the next used link for a job element.
+	 *
+	 * @param scenario                         Scenario
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param LinkPersonPair                   LinkPersonPair for selection
+	 * @param usedLocationsOrPersons           Already used locations or persons
+	 * @param possibleLinkPersonPairs          Possible LinkPersonPairs
+	 * @param numberOfLocations                Number of locations
+	 * @param areasForLocations                Areas for locations
+	 * @param setLocations                     Set locations
+	 * @param possiblePersons                  Possible persons
+	 * @param nearestLinkPerPerson             Nearest link per person
+	 * @param countOfLinks                     Count of links
+	 * @return the next LinkPersonPair
+	 */
+	private static LinkPersonPair findNextLinkPersonPair(Scenario scenario, ShpOptions.Index indexShape,
+														 CoordinateTransformation crsTransformationNetworkAndShape,
+														 LinkPersonPair LinkPersonPair,
+														 ArrayList<LinkPersonPair> usedLocationsOrPersons,
+														 ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer numberOfLocations,
+														 String[] areasForLocations, String[] setLocations,
+														 HashMap<Id<Person>, Person> possiblePersons,
+														 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, int countOfLinks) {
+		while (LinkPersonPair == null || usedLocationsOrPersons.contains(LinkPersonPair)) {
+			LinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairs,
+				numberOfLocations, areasForLocations, setLocations,
+				usedLocationsOrPersons, possiblePersons, nearestLinkPerPerson,
+				crsTransformationNetworkAndShape, countOfLinks - 1);
+			if (usedLocationsOrPersons.size() == possibleLinkPersonPairs.size()
+				|| (numberOfLocations != null
+				&& usedLocationsOrPersons.size() == numberOfLocations))
+				break;
 		}
+		return LinkPersonPair;
 	}
 
 	/**
@@ -1237,10 +1119,10 @@ public final class DemandReaderFromCSV {
 	 * @param linkPickup                  Link for the pickup
 	 * @param linkDelivery                Link for the delivery
 	 * @param demandForThisLink           Demand for this link
-	 * @param jobDurationCalculator			Calculator for the job duration
+	 * @param demandGenerationSpecification			Calculator for the job duration
 	 */
 	private static void createSingleShipment(Scenario scenario, DemandInformationElement newDemandInformationElement,
-											 Link linkPickup, Link linkDelivery, int demandForThisLink, JobDurationCalculator jobDurationCalculator) {
+											 Link linkPickup, Link linkDelivery, int demandForThisLink, DemandGenerationSpecification demandGenerationSpecification) {
 
 		Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 			.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
@@ -1258,13 +1140,13 @@ public final class DemandReaderFromCSV {
 			else
 				singleDemandForThisLink = (int)largestPossibleDemandSize;
 			handledDemand = handledDemand + singleDemandForThisLink;
-			double serviceTimePickup = jobDurationCalculator.calculatePickupDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
-			double serviceTimeDelivery = jobDurationCalculator.calculateDeliveryDuration(newDemandInformationElement.getSecondJobElementTimePerUnit(), singleDemandForThisLink);
+			double serviceTimePickup = demandGenerationSpecification.calculatePickupDuration(newDemandInformationElement.getFirstJobElementTimePerUnit(), singleDemandForThisLink);
+			double serviceTimeDelivery = demandGenerationSpecification.calculateDeliveryDuration(newDemandInformationElement.getSecondJobElementTimePerUnit(), singleDemandForThisLink);
 
 			CarrierShipment thisShipment = CarrierShipment.Builder
 				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), singleDemandForThisLink)
-				.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-				.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
+				.setPickupDuration(serviceTimePickup).setPickupStartsTimeWindow(timeWindowPickup)
+				.setDeliveryDuration(serviceTimeDelivery).setDeliveryStartsTimeWindow(timeWindowDelivery)
 				.build();
 			thisCarrier.getShipments().put(thisShipment.getId(), thisShipment);
 			if (demandForThisLink == 0)
@@ -1288,7 +1170,6 @@ public final class DemandReaderFromCSV {
 		}
 		return largestVehicleCapacity;
 	}
-
 
 	/**
 	 * Creates a job Id for a new job.
@@ -1329,117 +1210,6 @@ public final class DemandReaderFromCSV {
 		return newJobId;
 	}
 
-	/** Calculates the demand for this link including checking the rounding error.
-	 * @param demandToDistribute  	Demand to distribute
-	 * @param numberOfJobs 	   		Number of jobs
-	 * @param distributedDemand 	Already Distributed demand
-	 * @param i 					Counter
-	 * @return 						Demand for this link
-	 */
-	private static int calculateDemandForThisLink(int demandToDistribute, int numberOfJobs, int distributedDemand, int i) {
-
-		int demandForThisLink = (int) Math.ceil((double) demandToDistribute / (double) numberOfJobs);
-		if (numberOfJobs == (i + 1)) {
-			demandForThisLink = demandToDistribute - distributedDemand;
-		} else {
-			roundingError = roundingError
-				+ ((double) demandForThisLink - ((double) demandToDistribute / (double) numberOfJobs));
-			if (roundingError >= 1) {
-				demandForThisLink = demandForThisLink - 1;
-				roundingError = roundingError - 1;
-			}
-		}
-		return demandForThisLink;
-	}
-
-	/**
-	 * @param countOfLinks				counter
-	 * @param distributedDemand 		Already distributed demand
-	 * @param demandToDistribute 		Demand to distribute
-	 * @param maxLinks					Maximum of possible links for demand
-	 * @param sumOfPossibleLinkLength	Sum of all lengths of the links
-	 * @param link 						this link
-	 * @return							Demand for this link
-	 */
-	private static int calculateDemandBasedOnLinkLength(int countOfLinks, int distributedDemand, Integer demandToDistribute,
-														int maxLinks, double sumOfPossibleLinkLength, Link link) {
-		int demandForThisLink;
-		if (countOfLinks == maxLinks) {
-			demandForThisLink = demandToDistribute - distributedDemand;
-		} else {
-			demandForThisLink = (int) Math
-				.ceil(link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute);
-			roundingError = roundingError + ((double) demandForThisLink
-				- (link.getLength() / sumOfPossibleLinkLength * (double) demandToDistribute));
-			if (roundingError >= 1) {
-				demandForThisLink = demandForThisLink - 1;
-				roundingError = roundingError - 1;
-			}
-		}
-		return demandForThisLink;
-	}
-
-	/** Calculates the demand for selected person based on the age //NEW METHOD
-	 * @param person				selected person
-	 * @param population 		    population
-	 * @param demandToDistribute
-	 * @param distributedDemand
-	 * @return						Demand for this link
-	 */
-	private static int calculateDemandBasedOnRouletteWheel(Id<Person> person, Population population,
-														   RouletteWheel rouletteWheel, int demandToDistribute, int distributedDemand,
-														   String demandDistributionOption){
-
-		int demandForThisLink = 0;
-		int age = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-
-		if (demandDistributionOption == "toPersonsByAge"){ //based on age
-
-			for (Object ageGroup: demandDistributionPerAgeGroup.keySet()) {
-				HashMap temp = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
-				int lower = (int) temp.get("lower");
-				int upper = (int) temp.get("upper");
-				double error = (double) temp.get("error");
-				if (age <= upper && age >= lower) {
-					int restOfDemandForThisAge = (int) temp.get("demand");
-					int restOfPersonsInThisAge = (int) temp.get("personsWithDemandInThisAgeGroup_counter");
-
-					if (restOfDemandForThisAge != 0){
-
-						//poisson demand
-						demandForThisLink = rouletteWheel.nextLong().intValue();
-						if(demandForThisLink > restOfDemandForThisAge)
-							demandForThisLink = restOfDemandForThisAge;
-
-						temp.put("demand", restOfDemandForThisAge - demandForThisLink);
-						temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
-						temp.put("error", error);
-					}
-					else {
-						temp.put("demand", restOfDemandForThisAge);
-						temp.put("personsWithDemandInThisAgeGroup_counter", restOfPersonsInThisAge - 1);
-						temp.put("error", error);
-					}
-				}
-			}
-		} else if (demandDistributionOption == "toRandomPersons") {
-
-			demandForThisLink = rouletteWheel.nextLong().intValue();
-			if(demandForThisLink > (demandToDistribute-distributedDemand))
-				demandForThisLink = (demandToDistribute-distributedDemand);
-
-		}
-
-		//add demand to list
-		demandForEachPerson.put(person, new HashMap<>());
-		demandForEachPerson.get(person).put(age,
-				demandForThisLink +"\t"+
-						getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
-
-		return demandForThisLink;
-	}
-
-
 	/**
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
@@ -1447,7 +1217,7 @@ public final class DemandReaderFromCSV {
 	 * @param scenario                    Scenario
 	 */
 	private static void combineSimilarJobs(Scenario scenario) {
-
+		//TODO: add check of possible vehicles capacity
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
@@ -1464,11 +1234,12 @@ public final class DemandReaderFromCSV {
 							if (!shipmentsToRemove.containsKey(thisShipmentId)) {
 								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
 								if (baseShipment.getId() != thisShipment.getId()
-									&& baseShipment.getFrom() == thisShipment.getFrom()
-									&& baseShipment.getTo() == thisShipment.getTo()
-									&& baseShipment.getPickupTimeWindow() == thisShipment.getPickupTimeWindow()
-									&& baseShipment.getDeliveryTimeWindow() == thisShipment.getDeliveryTimeWindow())
-									shipmentsToConnect.put(thisShipmentId, thisShipment);
+									&& baseShipment.getPickupLinkId() == thisShipment.getPickupLinkId()
+									&& baseShipment.getDeliveryLinkId() == thisShipment.getDeliveryLinkId()) {
+									if (baseShipment.getPickupStartsTimeWindow() == thisShipment.getPickupStartsTimeWindow()) {
+									if (baseShipment.getDeliveryStartsTimeWindow() == thisShipment.getDeliveryStartsTimeWindow()) shipmentsToConnect.put(thisShipmentId, thisShipment);
+								}
+								}
 							}
 						}
 						Id<CarrierShipment> idNewShipment = baseShipment.getId();
@@ -1476,17 +1247,17 @@ public final class DemandReaderFromCSV {
 						double serviceTimePickup = 0;
 						double serviceTimeDelivery = 0;
 						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-							demandForThisLink = demandForThisLink + carrierShipment.getSize();
-							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
-							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
+                            demandForThisLink = demandForThisLink + carrierShipment.getDemand();
+							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupDuration();
+							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryDuration();
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
 						}
 						CarrierShipment newShipment = CarrierShipment.Builder
-							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
-							.setPickupServiceTime(serviceTimePickup)
-							.setPickupTimeWindow(baseShipment.getPickupTimeWindow())
-							.setDeliveryServiceTime(serviceTimeDelivery)
-							.setDeliveryTimeWindow(baseShipment.getDeliveryTimeWindow()).build();
+							.newInstance(idNewShipment, baseShipment.getPickupLinkId(), baseShipment.getDeliveryLinkId(), demandForThisLink)
+							.setPickupDuration(serviceTimePickup)
+							.setPickupStartsTimeWindow(baseShipment.getPickupStartsTimeWindow())
+							.setDeliveryDuration(serviceTimeDelivery)
+							.setDeliveryStartsTimeWindow(baseShipment.getDeliveryStartsTimeWindow()).build();
 						shipmentsToAdd.add(newShipment);
 					}
 				}
@@ -1512,7 +1283,7 @@ public final class DemandReaderFromCSV {
 							if (!servicesToRemove.containsKey(thisServiceId)) {
 								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
 								if (baseService.getId() != thisService.getId()
-									&& baseService.getLocationLinkId() == thisService.getLocationLinkId() && baseService
+									&& baseService.getServiceLinkId() == thisService.getServiceLinkId() && baseService
 									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
 									servicesToConnect.put(thisServiceId, thisService);
 							}
@@ -1521,15 +1292,15 @@ public final class DemandReaderFromCSV {
 						int demandForThisLink = 0;
 						double serviceTimeService = 0;
 						for (CarrierService carrierService : servicesToConnect.values()) {
-							demandForThisLink = demandForThisLink + carrierService.getCapacityDemand();
+							demandForThisLink = demandForThisLink + carrierService.getDemand();
 							serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
 							servicesToRemove.put(carrierService.getId(), carrierService);
 						}
 						CarrierService newService = CarrierService.Builder
-							.newInstance(idNewService, baseService.getLocationLinkId())
+							.newInstance(idNewService, baseService.getServiceLinkId())
 							.setServiceDuration(serviceTimeService)
 							.setServiceStartTimeWindow(baseService.getServiceStartTimeWindow())
-							.setCapacityDemand(demandForThisLink).build();
+							.setDemand(demandForThisLink).build();
 						servicesToAdd.add(newService);
 					}
 				}
@@ -1546,23 +1317,23 @@ public final class DemandReaderFromCSV {
 	/**
 	 * Finds and returns all possible links for this job.
 	 *
-	 * @param scenario 							Scenario
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param crsTransformationNetworkAndShape	CoordinateTransformation for the network and shape file
-	 * @param numberOfLocations					Number of locations for this demand
-	 * @param areasForLocations 				Areas for the locations
-	 * @param setLocations 						Selected locations
-	 * @param possiblePersons					Persons that are possible for this demand
-	 * @param nearestLinkPerPerson 				Nearest link for each person
-	 * @return 									HashMap with all possible links
+	 * @param scenario                         Scenario
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param numberOfLocations                Number of locations for this demand
+	 * @param areasForLocations                Areas for the locations
+	 * @param setLocations                     Selected locations
+	 * @param possiblePersons                  Persons that are possible for this demand
+	 * @param nearestLinkPerPerson             Nearest link for each person
+	 * @return HashMap with all possible links
 	 */
-	private static HashMap<Id<Link>, Link> findAllPossibleLinks(Scenario scenario,
-																ShpOptions.Index indexShape, CoordinateTransformation crsTransformationNetworkAndShape,
-																Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
-																HashMap<Id<Person>, Person> possiblePersons,
-																HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
+	private static ArrayList<LinkPersonPair> findAllPossibleLinks(Scenario scenario,
+																  ShpOptions.Index indexShape, CoordinateTransformation crsTransformationNetworkAndShape,
+																  Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
+																  HashMap<Id<Person>, Person> possiblePersons,
+																  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
 		log.info("Finding possible links for the demand in the selected areas {}", Arrays.toString(areasForLocations));
-		HashMap<Id<Link>, Link> possibleLinks = new HashMap<>();
+		ArrayList<LinkPersonPair> possibleLinkPersonPairs = new ArrayList<>();
 
 		if (numberOfLocations == null) {
 			for (Link link : scenario.getNetwork().getLinks().values())
@@ -1570,60 +1341,63 @@ public final class DemandReaderFromCSV {
 					"type") || !link.getAttributes().getAsMap().get("type").toString().contains(
 					"motorway")) && FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
 					areasForLocations, crsTransformationNetworkAndShape)) {
-					possibleLinks.put(link.getId(), link);
+					possibleLinkPersonPairs.add(new LinkPersonPair(link, null));
 				}
 		} else {
-			Link newPossibleLink;
-			while (possibleLinks.size() < numberOfLocations) {
-				newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
+			LinkPersonPair newPossibleLink;
+			while (possibleLinkPersonPairs.size() < numberOfLocations) {
+				newPossibleLink = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 					crsTransformationNetworkAndShape);
-				if (!possibleLinks.containsKey(newPossibleLink.getId())){
-					possibleLinks.put(newPossibleLink.getId(), newPossibleLink);
+				if (!possibleLinkPersonPairs.contains(newPossibleLink)){
+					possibleLinkPersonPairs.add(newPossibleLink);
 					if (!possiblePersons.isEmpty() && nearestLinkPerPerson.size() == possiblePersons.size())
 						break;
 				}
 			}
 		}
-		return possibleLinks;
+		return possibleLinkPersonPairs;
 	}
 
 	/**
-	 * Finds the next link which can be used as a location.
+	 * Finds the next link or person which can be used as a location.
+	 * If persons for locations are selected, the nearest link for each person will be used and added to the return LinkPersonPair.
+	 * If no persons are selected, only a possible link will be returned.
+	 * If the maximum number of locations is reached, a random location of the already used locations will be returned, if not a new LinkPersonPair will be found.
 	 *
-	 * @param scenario  						Scenario
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param possibleLinks 					All possible links
-	 * @param selectedNumberOfLocations 		Number of locations for this demand
-	 * @param areasForLocations 				Areas for the locations
-	 * @param selectedLocations 				Selected locations
-	 * @param usedLocations 					Already used locations for this demand
-	 * @param possiblePersons 					Persons that are possible for this demand
-	 * @param nearestLinkPerPerson 				Nearest link for each person
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
-	 * @param i 								Counter for the number of locations
-	 * @return 									Next link for the demand
+	 * @param scenario                         Scenario
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param possibleLinkPersonPairs          All possible links
+	 * @param selectedNumberOfLocations        Number of locations for this demand
+	 * @param areasForLocations                Areas for the locations
+	 * @param selectedLocations                Selected locations
+	 * @param usedLocationsOrPersons           Already used locations or persons for this demand
+	 * @param possiblePersons                  Persons that are possible for this demand
+	 * @param nearestLinkPerPerson             Nearest link for each person
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @param i                                Counter for the number of locations
+	 * @return Next link for the demand
 	 */
-	private static Link findNextUsedLink(Scenario scenario, ShpOptions.Index indexShape,
-										 HashMap<Id<Link>, Link> possibleLinks, Integer selectedNumberOfLocations, String[] areasForLocations,
-										 String[] selectedLocations, ArrayList<String> usedLocations, HashMap<Id<Person>, Person> possiblePersons,
-										 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
-										 CoordinateTransformation crsTransformationNetworkAndShape, int i) {
-		Link link = null;
-		if (selectedNumberOfLocations == null || usedLocations.size() < selectedNumberOfLocations) {
+	private static LinkPersonPair findNextUsedLinkPersonPair(Scenario scenario, ShpOptions.Index indexShape,
+															 ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer selectedNumberOfLocations, String[] areasForLocations,
+															 String[] selectedLocations, ArrayList<LinkPersonPair> usedLocationsOrPersons, HashMap<Id<Person>, Person> possiblePersons,
+															 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
+															 CoordinateTransformation crsTransformationNetworkAndShape, int i) {
+		LinkPersonPair linkPersonPair = null;
+		if (selectedNumberOfLocations == null || usedLocationsOrPersons.size() < selectedNumberOfLocations) {
 			if (selectedLocations != null && selectedLocations.length > i) {
-				link = scenario.getNetwork().getLinks().get(Id.createLinkId(selectedLocations[i]));
+				linkPersonPair = new LinkPersonPair(scenario.getNetwork().getLinks().get(Id.createLinkId(selectedLocations[i])), null);
 			} else
-				while (link == null || (possibleLinks.size() > usedLocations.size()
-					&& usedLocations.contains(link.getId().toString())))
-					link = findPossibleLinkForDemand(possibleLinks, possiblePersons, nearestLinkPerPerson,
+				while (linkPersonPair == null || (possibleLinkPersonPairs.size() > usedLocationsOrPersons.size()
+					&& usedLocationsOrPersons.contains(linkPersonPair)))
+					linkPersonPair = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons, nearestLinkPerPerson,
 						indexShape, areasForLocations, selectedNumberOfLocations, scenario, selectedLocations,
 						crsTransformationNetworkAndShape);
+
 		} else {
-			link = scenario.getNetwork().getLinks()
-				.get(Id.createLinkId(usedLocations.get(rand.nextInt(usedLocations.size()))));
+			linkPersonPair = usedLocationsOrPersons.get(rand.nextInt(usedLocationsOrPersons.size()));
 		}
-		return link;
+		return linkPersonPair;
 	}
 
 	/**
@@ -1650,36 +1424,8 @@ public final class DemandReaderFromCSV {
 				areasForJobElementLocations, crsTransformationNetworkAndShape))
 				possiblePersons.put(person.getId(), person);
 		}
+		log.info("Number of possible persons for the demand: {}", possiblePersons.size());
 		return possiblePersons;
-	}
-
-	/**
-	 * Finds population with all persons that are possible for the demand. //NEW METHOD
-	 *
-	 * @param population 						Population
-	 * @param areasForJobElementLocations 		Areas for the locations
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
-	 * @return 									Population with all possible persons
-	 */
-	private static Population findPopulationWithPossiblePersons(Population population,
-																String[] areasForJobElementLocations, ShpOptions.Index indexShape,
-																CoordinateTransformation crsTransformationNetworkAndShape) {
-		ArrayList<Id<Person>> removePersons = new ArrayList<>();
-
-		for (Person person : population.getPersons().values()) {
-			Coord coord = getHomeCoord(person);
-			if (crsTransformationNetworkAndShape != null)
-				coord = crsTransformationNetworkAndShape.transform(coord);
-			if (FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape,
-				areasForJobElementLocations, crsTransformationNetworkAndShape)){
-			}else
-				removePersons.add(person.getId());
-		}
-		for (Id<Person> id: removePersons) {
-			population.removePerson(id);
-		}
-		return population;
 	}
 
 	/**
@@ -1704,7 +1450,6 @@ public final class DemandReaderFromCSV {
 					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
 				}
 			}
-
 	}
 
 	/**
@@ -1715,7 +1460,7 @@ public final class DemandReaderFromCSV {
 	 * @param person 	The person for which the home coordinate should be returned.
 	 * @return 			The home coordinate of the person.
 	 */
-	private static Coord getHomeCoord(Person person) {
+	static Coord getHomeCoord(Person person) {
 		Coord homeCoord = null;
 		if (person.getSelectedPlan() != null)
 			homeCoord = PopulationUtils.getActivities(person.getSelectedPlan(),
@@ -1732,271 +1477,72 @@ public final class DemandReaderFromCSV {
 	}
 
 	/**
-	 * Searches a possible link for the demand.
+	 * Searches a possible LinkPersonPair for the demand.
 	 *
-	 * @param possibleLinks 					HashMap with all possible links
-	 * @param possiblePersons 					HashMap with all possible persons
-	 * @param nearestLinkPerPerson				Nearest link for each person
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param areasForTheDemand 				Areas for the demand
-	 * @param selectedNumberOfLocations 		Number of locations for this demand
-	 * @param scenario 							Scenario
-	 * @param selectedLocations 				Selected locations
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
-	 * @return 									The selected link for the demand
+	 * @param possibleLinkPersonPairs          HashMap with all possible links
+	 * @param possiblePersons                  HashMap with all possible persons
+	 * @param nearestLinkPerPerson             Nearest link for each person
+	 * @param indexShape                       ShpOptions.Index for the shape file
+	 * @param areasForTheDemand                Areas for the demand
+	 * @param selectedNumberOfLocations        Number of locations for this demand
+	 * @param scenario                         Scenario
+	 * @param selectedLocations                Selected locations
+	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
+	 * @return The selected link for the demand
 	 */
-	private static Link findPossibleLinkForDemand(HashMap<Id<Link>, Link> possibleLinks,
-												  HashMap<Id<Person>, Person> possiblePersons,
-												  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
-												  ShpOptions.Index indexShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
-												  Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
-		Link selectedlink = null;
-		Link newLink;
+	private static LinkPersonPair findPossibleLinkPersonPairForDemand(ArrayList<LinkPersonPair> possibleLinkPersonPairs,
+																	  HashMap<Id<Person>, Person> possiblePersons,
+																	  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
+																	  ShpOptions.Index indexShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
+																	  Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
+		LinkPersonPair linkPersonPair = null;
+		LinkPersonPair newLinkPersonPair;
 
 		if (selectedNumberOfLocations == null)
 			selectedNumberOfLocations = 0;
-		while (selectedlink == null) {
-			if (possibleLinks.size() < selectedNumberOfLocations) {
-				if (selectedLocations != null && selectedLocations.length > possibleLinks.size()) {
-					newLink = scenario.getNetwork().getLinks()
-						.get(Id.createLinkId(selectedLocations[possibleLinks.size()]));
-					selectedlink = newLink;
+		while (linkPersonPair == null) {
+			if (possibleLinkPersonPairs.size() < selectedNumberOfLocations) {
+				if (selectedLocations != null && selectedLocations.length > possibleLinkPersonPairs.size()) {
+					Link newLink = scenario.getNetwork().getLinks()
+						.get(Id.createLinkId(selectedLocations[possibleLinkPersonPairs.size()]));
+					linkPersonPair = new LinkPersonPair(newLink, null);
 					break;
 				} else {
-					if (possiblePersons.isEmpty())
-						newLink = scenario.getNetwork().getLinks().values().stream()
+					if (possiblePersons.isEmpty()) {
+						Link newLink = scenario.getNetwork().getLinks().values().stream()
 							.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
+						newLinkPersonPair = new LinkPersonPair(newLink, null);
+					}
 					else {
-						newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
+						newLinkPersonPair = getNewPersonForDemand(possiblePersons, nearestLinkPerPerson, scenario);
 					}
 				}
 			} else {
-				if (possiblePersons.isEmpty()) {
-					newLink = possibleLinks.values().stream().skip(rand.nextInt(possibleLinks.size())).findFirst()
-						.get();
-				} else {
-					newLink = getNewLinkForPerson(possiblePersons, nearestLinkPerPerson, scenario);
-				}
+					newLinkPersonPair = possibleLinkPersonPairs.stream().skip(rand.nextInt(possibleLinkPersonPairs.size())).findFirst().get();
 			}
-			if (!newLink.getId().toString().contains("pt")
-				&& (!newLink.getAttributes().getAsMap().containsKey("type")
-				|| !newLink.getAttributes().getAsMap().get("type").toString().contains("motorway"))
-				&& (indexShape == null || FreightDemandGenerationUtils.checkPositionInShape(newLink, null,
-				indexShape, areasForTheDemand, crsTransformationNetworkAndShape)))
-				selectedlink = newLink;
+			if (!newLinkPersonPair.getLink().getId().toString().contains("pt")
+				&& (!newLinkPersonPair.getLink().getAttributes().getAsMap().containsKey("type")
+				|| !newLinkPersonPair.getLink().getAttributes().getAsMap().get("type").toString().contains("motorway"))
+				&& (indexShape == null || FreightDemandGenerationUtils.checkPositionInShape(newLinkPersonPair.getLink(), null,
+				indexShape, areasForTheDemand, crsTransformationNetworkAndShape))) {
+				linkPersonPair = newLinkPersonPair;
+			}
 		}
 
-		return selectedlink;
+		return linkPersonPair;
 	}
 
-	private static Link getNewLinkForPerson(HashMap<Id<Person>, Person> possiblePersons,
-											HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Scenario scenario) {
-		Link newLink;
-		Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
+	private static LinkPersonPair getNewPersonForDemand(HashMap<Id<Person>, Person> possiblePersons,
+														HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Scenario scenario) {
+		Person newPerson = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
 			.findFirst().get();
 
 
-		if (!nearestLinkPerPerson.containsKey(person.getId())) {
-			findLinksForPerson(scenario, nearestLinkPerPerson, person);
+		if (!nearestLinkPerPerson.containsKey(newPerson.getId())) {
+			findLinksForPerson(scenario, nearestLinkPerPerson, newPerson);
 		}
-		newLink = scenario.getNetwork().getLinks().get(
-			Id.createLinkId(nearestLinkPerPerson.get(person.getId()).values().iterator().next()));
-
-		return newLink;
+		Link newLink = scenario.getNetwork().getLinks().get(
+			Id.createLinkId(nearestLinkPerPerson.get(newPerson.getId()).values().iterator().next()));
+		return new LinkPersonPair(newLink, newPerson);
 	}
-
-	/**
-	 * Modifies the population according to the age distribution //NEW METHOD
-	 *
-	 * @param population						Population (possibly reduced to shape)
-	 * @param areasForDeliveryLocations			String of Areas for Delivery Location
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
-	 * @return 									The modified population
-	 */
-
-	private static Population modifyPopulation(Population population,String[] areasForDeliveryLocations, ShpOptions.Index indexShape,
-											   CoordinateTransformation crsTransformationNetworkAndShape){
-
-		log.info("Population is modified by age...");
-
-		//getting the age distribution of the given population (ageGroupDemandShare) and the number of available persons for delivery
-		int totalNumberOfPersonsWithDemand = getAgeDistribution(population, areasForDeliveryLocations, indexShape,
-			crsTransformationNetworkAndShape);
-
-		log.info("Population will be decreased from "+ population.getPersons().size()+" to "+totalNumberOfPersonsWithDemand+" due to age distribution ...");
-
-		//create list of population to decrease population
-		Set<Id<Person>> allPersons = new HashSet<>();
-		for (Id<Person> person : population.getPersons().keySet()) {
-			allPersons.add(person);
-		}
-
-		//remove random persons so that in each age group only the share of persons with demand will stay
-		while (allPersons.size() != 0) {
-			Id<Person> person = allPersons.stream().skip(rand.nextInt(allPersons.size())).findFirst().get();
-
-			if (totalNumberOfPersonsWithDemand == 0) {
-				//set demand = 0 for the age of this person
-				int agePerson = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-				demandForEachPerson.put(person, new HashMap<>());
-				demandForEachPerson.get(person).put(agePerson, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
-				//demandForEachPerson.get(person).put(agePerson, "0 \t 0 \t 0");
-				//remove person
-				population.removePerson(person);
-				allPersons.remove(person);
-			} else {
-				//int agePerson = (int) population.getPersons().get(person).getCustomAttributes().get("age");
-				int agePerson = (int) population.getPersons().get(person).getAttributes().getAttribute("age");
-				//determine age group of the person
-				for (Object ageGroup : ageGroupDemandShare.keySet()) {
-					HashMap tempHashMap = (HashMap) ageGroupDemandShare.get(ageGroup);
-					int lower = (int) tempHashMap.get("lower");
-					int upper = (int) tempHashMap.get("upper");
-					int personsWithDemand = (int) tempHashMap.get("possiblePersonsInThisAge_counter");
-
-					if (agePerson <= upper && agePerson >= lower) {
-						if (personsWithDemand == 0) {
-							//set demand = 0 for the age of this person
-							demandForEachPerson.put(person, new HashMap<>());
-							//demandForEachPerson.get(person).put(agePerson, "0 \t 0 \t 0");
-							demandForEachPerson.get(person).put(agePerson, "0 \t"+getHomeCoord(population.getPersons().get(person)).getX()+"\t"+getHomeCoord(population.getPersons().get(person)).getY());
-
-							//remove person
-							population.removePerson(person);
-						} else {
-							personsWithDemand -= 1;
-							totalNumberOfPersonsWithDemand -= 1;
-						}
-
-						tempHashMap.put("possiblePersonsInThisAge_counter", personsWithDemand);
-						ageGroupDemandShare.put(ageGroup, tempHashMap);
-						allPersons.remove(person);
-					}
-				}
-			}
-		}
-
-		return population;
-	}
-
-	/**
-	 * Determination of the age distribution of given population \\ new method
-	 *
-	 * @param population						Population (possibly reduced to shape)
-	 * @param areasForDeliveryLocations			String of Areas for Delivery Location
-	 * @param indexShape 						ShpOptions.Index for the shape file
-	 * @param crsTransformationNetworkAndShape 	CoordinateTransformation for the network and shape file
-	 * @return 									Number of persons which are having a demand
-	 */
-
-	private static int getAgeDistribution(Population population, String[] areasForDeliveryLocations, ShpOptions.Index indexShape,
-										  CoordinateTransformation crsTransformationNetworkAndShape) {
-
-		HashMap ageSplit = new HashMap<>();
-		int totalNumberOfPersonsWithDemand = 0;
-		HashSet<Id<Person>> personsToBeRemoved = new HashSet<>();
-
-		//each person's age is evaluated to determine the number of persons in each age group
-		for (Id<Person> personId : population.getPersons().keySet()) {
-
-			//int agePerson = (int) population.getPersons().get(personId).getCustomAttributes().get("age");
-			int agePerson = (int) population.getPersons().get(personId).getAttributes().getAttribute("age");
-
-			//add person to age group
-			for (Object ageRange : ageGroupDemandShare.keySet()) {
-				ageSplit = (HashMap) ageGroupDemandShare.get(ageRange);
-				int lower = (int) ageSplit.get("lower");
-				int upper = (int) ageSplit.get("upper");
-				int counter = (int) ageSplit.get("total"); // total number of people in this age group
-				if (agePerson <= upper && agePerson >= lower) {
-					counter += 1;
-				}
-				ageSplit.put("total", counter);
-				ageGroupDemandShare.put(ageRange, ageSplit);
-			}
-
-		}
-
-		// determine persons in the age group with share of people within each age group who have a demand
-		for (Object ageRange: ageGroupDemandShare.keySet()) {
-			ageSplit = (HashMap) ageGroupDemandShare.get(ageRange);
-			int personsWithDemandInThisAgeGroup = (int) Math.round(
-				(int) ageSplit.get("total")* (double) ageSplit.get("share") / 100);
-			ageSplit.put("possiblePersonsInThisAge_counter",personsWithDemandInThisAgeGroup);
-			ageSplit.put("possiblePersonsInThisAge",personsWithDemandInThisAgeGroup);
-			ageGroupDemandShare.put(ageRange,ageSplit);
-			totalNumberOfPersonsWithDemand += personsWithDemandInThisAgeGroup;
-		}
-
-		return totalNumberOfPersonsWithDemand;
-	}
-
-
-	/**
-	 * Determination of the age distribution of given population \\NEW METHOD
-	 *
-	 * @param population						Population (possibly reduced to shape)
-	 * @param demandToDistribute				Total number of demand
-	 */
-	public static void getDemandAndPersonsPerAgeGroup(int demandToDistribute, Population population) {
-
-		log.info("Splitting the demand per age group...");
-
-		//the demand volume is divided between the individual age groups and added to "demandDistributionPerAgeGroup"
-		double error = 0;
-		for (Object ageGroup : demandDistributionPerAgeGroup.keySet()) {
-
-			HashMap temp = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
-
-			double demandForAgeGroupAsDouble = demandToDistribute * (double) temp.get("share") / 100;
-			int demandForAgeGroupAsInt = (int) Math.round(demandToDistribute * (double) temp.get("share") / 100);
-			error += demandForAgeGroupAsDouble - demandForAgeGroupAsInt;
-
-			if (error >= 1) {
-				demandForAgeGroupAsInt += 1;
-				error -= 1;
-			}
-			else if (error<=-1) {
-				demandForAgeGroupAsInt -= 1;
-				error += 1;
-			}
-
-			temp.put("demand",demandForAgeGroupAsInt);
-			temp.put("totalDemand",demandForAgeGroupAsInt);
-			temp.put("personsWithDemandInThisAgeGroup_counter",0);
-			temp.put("error",0.0);
-			demandDistributionPerAgeGroup.put(ageGroup,temp);
-		}
-
-		//add number of persons per age
-		for (Id<Person> personId: population.getPersons().keySet()) {
-			//int agePerson = (int) population.getPersons().get(personId).getCustomAttributes().get("age");
-			int agePerson = (int) population.getPersons().get(personId).getAttributes().getAttribute("age");
-			for (Object ageGroup : demandDistributionPerAgeGroup.keySet()){
-				HashMap ageSplit = (HashMap) demandDistributionPerAgeGroup.get(ageGroup);
-				int lower = (int) ageSplit.get("lower");
-				int upper = (int) ageSplit.get("upper");
-				int counter = (int) ageSplit.get("personsWithDemandInThisAgeGroup_counter");
-				if (agePerson <= upper && agePerson >= lower){
-					ageSplit.put("personsWithDemandInThisAgeGroup_counter",counter+1);
-					ageSplit.put("personsWithDemandInThisAgeGroup",counter+1);
-
-				}
-				demandDistributionPerAgeGroup.put(ageGroup,ageSplit);
-			}
-		}
-		log.info("Finished with the demand per age group...");
-	}
-
-	//NEW METHOD
-	public static Link getNearestLinkForSelectedPerson(Scenario scenario, Id<Person> person, HashMap<Id<Person>,
-			HashMap<Double, String>> nearestLinkPerPerson) {
-
-		Link link = scenario.getNetwork().getLinks()
-			.get(Id.createLinkId(nearestLinkPerPerson.get(person).values().iterator().next()));
-
-		return link;
-	}
-
 }

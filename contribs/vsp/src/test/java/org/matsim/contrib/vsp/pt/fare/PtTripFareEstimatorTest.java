@@ -103,7 +103,7 @@ public class PtTripFareEstimatorTest {
 
 			List<Leg> trip = model.getLegs(TransportMode.pt, i);
 
-			if (trip == null) {
+			if (trip == null || !model.hasModeForTrip(TransportMode.pt, i)) {
 				continue;
 			}
 

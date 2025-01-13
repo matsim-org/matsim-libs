@@ -12,10 +12,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.ActivityEstimator;
-import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.MinMaxEstimate;
-import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.estimators.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -32,6 +29,9 @@ public final class PlanModelService implements StartupListener {
 
 	@Inject
 	private Map<String, TripEstimator> tripEstimator;
+
+	@Inject
+	private Set<TripScoreEstimator> tripScores;
 
 	@Inject
 	private Set<TripConstraint<?>> constraints;
@@ -167,8 +167,10 @@ public final class PlanModelService implements StartupListener {
 				if (!c.isUsable())
 					continue;
 
+				// All estimates are stored within the objects and modified directly here
 				double[] values = c.getEstimates();
 				double[] tValues = c.getTripEstimates();
+				boolean[] noUsage = c.getNoRealUsage();
 
 				// Collect all estimates
 				for (int i = 0; i < planModel.trips(); i++) {
@@ -181,13 +183,15 @@ public final class PlanModelService implements StartupListener {
 						continue;
 					}
 
-					TripEstimator tripEst =  tripEstimator.get(c.getMode());
+					TripEstimator tripEst = tripEstimator.get(c.getMode());
 
 					// some options may produce equivalent results, but are re-estimated
 					// however, the more expensive computation is routing and only done once
+					boolean realUsage = planModel.hasModeForTrip(c.getMode(), i);
+					noUsage[i] = !realUsage;
 
 					double estimate = 0;
-					if (tripEst != null) {
+					if (tripEst != null && realUsage) {
 						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
 						double tripEstimate = c.isMin() ? minMax.getMin() : minMax.getMax();
 
@@ -222,6 +226,10 @@ public final class PlanModelService implements StartupListener {
 
 					// early or late arrival can also have an effect on the activity scores which is potentially considered here
 					estimate += actEstimator.estimate(context, planModel.getStartTimes()[i] + tt, trip.getDestinationActivity());
+
+					for (TripScoreEstimator tripScore : tripScores) {
+						estimate += tripScore.estimate(context, c.getMode(), trip);
+					}
 
 					values[i] = estimate;
 				}

@@ -45,10 +45,12 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
-		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity))
+		if (ParkingUtils.checkIfActivityHasNoParking(followingActivity)) {
 			parkingAtEndOfLeg = false;
-		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity))
+		}
+		if (ParkingUtils.checkIfActivityHasPassengerInteraction(followingActivity)) {
 			passangerInteractionAtParkingFacilityAtEndOfLeg = true;
+		}
 	}
 
 	@Override
@@ -67,20 +69,22 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					if (hasFoundParking) {
 						this.events.processEvent(new ReserveParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, currentLinkId));
 						nextSelectedParkingLink = currentLinkId;
-					} else
+					} else {
 						((FacilityBasedParkingManager) parkingManager).registerRejectedReservation(timer.getTimeOfDay());
+					}
 				}
 			}
 		} else if (followingActivity.getLinkId().equals(newLinkId)) {
-			if (alreadyReservedParking)
+			if (alreadyReservedParking) {
 				hasFoundParking = true;
-			else {
+			} else {
 				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
 				if (hasFoundParking) {
 					this.events.processEvent(new ReserveParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, currentLinkId));
 					nextSelectedParkingLink = currentLinkId;
-				} else
+				} else {
 					((FacilityBasedParkingManager) parkingManager).registerRejectedReservation(timer.getTimeOfDay());
+				}
 			}
 		}
 	}
@@ -138,11 +142,10 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				// need to find the next link
 				double nextPickupTime;
 				double maxParkingDuration;
-				if (passangerInteractionAtParkingFacilityAtEndOfLeg){
+				if (passangerInteractionAtParkingFacilityAtEndOfLeg) {
 					nextPickupTime = 0.;
 					maxParkingDuration = followingActivity.getMaximumDuration().seconds();
-				}
-				else {
+				} else {
 					nextPickupTime = currentPlannedLeg.getDepartureTime().seconds() + followingActivity.getMaximumDuration().seconds();
 					maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
 				}
@@ -163,11 +166,12 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 						nextSelectedParkingLink = nextPlanedParkingLink;
 						if (((NearestParkingSpotSearchLogic) this.logic).canReserveParkingSlot()) {
 							alreadyReservedParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, nextSelectedParkingLink);
-							if (alreadyReservedParking)
+							if (alreadyReservedParking) {
 								this.events.processEvent(
 									new ReserveParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, nextSelectedParkingLink));
-							else
+							} else {
 								((FacilityBasedParkingManager) parkingManager).registerRejectedReservation(timer.getTimeOfDay());
+							}
 						} else {
 							this.events.processEvent(
 								new SelectNewParkingLocationEvent(timer.getTimeOfDay(), vehicleId, currentLinkId, nextSelectedParkingLink));
@@ -176,13 +180,16 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					}
 				}
 				currentAndNextParkLink = new Tuple<>(currentLinkId, nextLinkId);
-				if (((NearestParkingSpotSearchLogic) this.logic).getNextRoute() != null)
+				if (((NearestParkingSpotSearchLogic) this.logic).getNextRoute() != null) {
 					currentPlannedLeg.setRoute(((NearestParkingSpotSearchLogic) this.logic).getNextRoute());
+				}
 				return nextLinkId;
 			}
 		}
 	}
 
+	//yyyy I assume, the vehicle is removed from the link's queue and thus waiting for parking does not influence the behaviour of the mobsim?
+	// Does this make sense? paul, nov'24
 	private void createWaitingActivityUntilPassengerInteractionIsPossible(Id<Link> newLinkId, Id<Vehicle> vehicleId, double now) {
 		Activity waitingActivity = PopulationUtils.createActivityFromLinkId(ParkingUtils.WaitingForParkingActivityType, newLinkId);
 		ParkingUtils.setNoParkingForActivity(waitingActivity);
@@ -195,7 +202,8 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 		plan.getPlanElements().remove(planIndexNextActivity);
 		plan.getPlanElements().remove(planIndexNextActivity);
 //		log.info(
-//			plan.getPerson().getId().toString() + ": Parking activity after getOff point '" + ((Activity)plan.getPlanElements().get(planIndexNextActivity - 2)).getType() + "' is removed, because no parking facility was found.");
+//			plan.getPerson().getId().toString() + ": Parking activity after getOff point '" + ((Activity)plan.getPlanElements().get
+//			(planIndexNextActivity - 2)).getType() + "' is removed, because no parking facility was found.");
 	}
 
 	public boolean driveToBaseWithoutParking() {

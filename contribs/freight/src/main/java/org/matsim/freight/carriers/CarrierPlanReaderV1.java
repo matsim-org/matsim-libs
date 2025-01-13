@@ -116,19 +116,19 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
 					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
 				if( startPickup == null ){
-					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryTimeWindow(
+					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartsTimeWindow(
 						  TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) );
 				} else{
-					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
-																									 setDeliveryTimeWindow(
+					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
+						setDeliveryStartsTimeWindow(
 																										   TimeWindow.newInstance(
 																											     getDouble(
 																													 startDelivery ),
 																											     getDouble(
 																													 endDelivery ) ) );
 				}
-				if( pickupServiceTime != null ) shipmentBuilder.setPickupServiceTime( getDouble( pickupServiceTime ) );
-				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
+				if( pickupServiceTime != null ) shipmentBuilder.setPickupDuration( getDouble( pickupServiceTime ) );
+				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryDuration( getDouble( deliveryServiceTime ) );
 				CarrierShipment shipment = shipmentBuilder.build();
 				currentShipments.put( attributes.getValue( ID ), shipment );
 				CarriersUtils.addShipment(currentCarrier, shipment);
@@ -208,16 +208,16 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 					case "pickup" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getFrom());
+						finishLeg(s.getPickupLinkId());
 						currentTourBuilder.schedulePickup(s);
-						previousActLoc = s.getFrom();
+						previousActLoc = s.getPickupLinkId();
 					}
 					case "delivery" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getTo());
+						finishLeg(s.getDeliveryLinkId());
 						currentTourBuilder.scheduleDelivery(s);
-						previousActLoc = s.getTo();
+						previousActLoc = s.getDeliveryLinkId();
 					}
 					case "end" -> {
 						finishLeg(currentVehicle.getLinkId());

@@ -430,14 +430,14 @@ public class CarriersUtils {
 			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
-					carrierService.getCapacityDemand())
-				.setDeliveryServiceTime(carrierService.getServiceDuration())
+					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getServiceLinkId(),
+					carrierService.getDemand())
+				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18
-				.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
+				.setDeliveryStartsTimeWindow(carrierService.getServiceStartTimeWindow())
 				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-				.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
+				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
 				.build();
 			addShipment(carrierWS, carrierShipment);
 		}
@@ -674,8 +674,50 @@ public class CarriersUtils {
 		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
 	}
 
-	public static void writeCarriers(Carriers carriers, String filename) {
-		new CarrierPlanWriter(carriers).write(filename);
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers the carriers
+	 * @param file     the file should contain the location of the file and the name of the file (e.g. /path/to/carriers.xml)
+	 */
+	public static void writeCarriers(Carriers carriers, String file) {
+		new CarrierPlanWriter(carriers).write(file);
+		log.info("Carriers file written to: {}", file);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers   the carriers
+	 * @param pathFolder the path to the folder where the file should be written
+	 * @param filename   the name of the file including the file extension
+	 * @param prefix     the prefix of the filename being added before the filename delimited by a dot
+	 */
+	public static void writeCarriers(Carriers carriers, String pathFolder, String filename, String prefix) {
+		String pathFile;
+		if (prefix == null) {
+			pathFile = pathFolder + "/" + filename;
+		} else {
+			pathFile = pathFolder + "/" + prefix + "." + filename;
+		}
+		writeCarriers(carriers, pathFile);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param scenario 	the scenario
+	 * @param filename   the name of the file including the file extension
+	 */
+	public static void writeCarriers(Scenario scenario, String filename) {
+		String pathFile;
+		String outputPath = scenario.getConfig().controller().getOutputDirectory();
+		if (scenario.getConfig().controller().getRunId() == null) {
+			pathFile = outputPath + "/" + filename;
+		} else {
+			pathFile = outputPath + "/" + scenario.getConfig().controller().getRunId() + "." + filename;
+		}
+		writeCarriers(getCarriers(scenario), pathFile);
 	}
 
 	static class JspritCarrierTask implements Runnable {
