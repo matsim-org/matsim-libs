@@ -123,7 +123,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				double end;
 				String endString = atts.getValue("latestEnd");
 				end = parseTimeToDouble(endString);
-				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
+				serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(start, end));
 				String serviceTimeString = atts.getValue("serviceDuration");
 				if (serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 				currentService = serviceBuilder.build();

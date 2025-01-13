@@ -88,7 +88,7 @@ public final class CarrierService implements CarrierJob {
 
 
 		/**
-		 * Sets a time-window for the beginning of  the service
+		 * Sets a time-window for the beginning of the service
 		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
 		 * <p>
 		 * Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
@@ -97,9 +97,26 @@ public final class CarrierService implements CarrierJob {
 		 * @param startTimeWindow 	time-window for the beginning of the service activity
 		 * @return 					the builder
 		 */
-		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
+		public Builder setServiceStartingTimeWindow(TimeWindow startTimeWindow){
 			this.serviceStartsTimeWindow = startTimeWindow;
 			return this;
+		}
+
+		/**
+		 * Sets a time-window for the beginning of  the service
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
+		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @deprecated since jan'25, use {@link #setServiceStartingTimeWindow(TimeWindow)} instead
+		 *
+		 * @param startTimeWindow 	time-window for the beginning of the service activity
+		 * @return 					the builder
+		 */
+		@Deprecated(since = "jan'25")
+		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
+			return setServiceStartingTimeWindow(startTimeWindow);
 		}
 
 		/**

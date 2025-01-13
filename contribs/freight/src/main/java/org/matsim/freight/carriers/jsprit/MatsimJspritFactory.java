@@ -58,6 +58,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -186,8 +187,7 @@ public final class MatsimJspritFactory {
 				Id.create(jspritService.getId(), CarrierService.class), Id.create(jspritService.getLocation().getId(), Link.class));
 		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
 		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
-		serviceBuilder.setServiceStartTimeWindow(
-				org.matsim.freight.carriers.TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
+		serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
 		CarrierService carrierService = serviceBuilder.build();
 		CarriersUtils.setSkills(carrierService, jspritService.getRequiredSkills().values());
 		return carrierService;

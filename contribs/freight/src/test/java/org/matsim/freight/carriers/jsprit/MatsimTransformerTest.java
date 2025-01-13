@@ -120,10 +120,10 @@ public class MatsimTransformerTest {
 
 	@Test
 	void whenTransforming_matsimService2jspritService_isMadeCorrectly() {
-		CarrierService carrierService = CarrierService.Builder
+		CarrierService.Builder builder = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("locationId", Link.class))
-				.setCapacityDemand(50).setServiceDuration(30.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
+				.setCapacityDemand(50).setServiceDuration(30.0);
+		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
 		Service service = MatsimJspritFactory.createJspritService(carrierService, null);
 		assertNotNull(service);
 		assertEquals("locationId", service.getLocation().getId());
