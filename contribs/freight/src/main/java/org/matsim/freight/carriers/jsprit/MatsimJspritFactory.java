@@ -169,8 +169,8 @@ public final class MatsimJspritFactory {
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
 				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
-						carrierService.getServiceStartTimeWindow().getStart(),
-						carrierService.getServiceStartTimeWindow().getEnd()));
+						carrierService.getServiceStaringTimeWindow().getStart(),
+						carrierService.getServiceStaringTimeWindow().getEnd()));
 		for (String skill : CarriersUtils.getSkills(carrierService)) {
 			serviceBuilder.addRequiredSkill(skill);
 		}

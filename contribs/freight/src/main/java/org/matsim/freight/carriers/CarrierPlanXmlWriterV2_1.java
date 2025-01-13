@@ -192,8 +192,8 @@ import org.matsim.vehicles.VehicleType;
 				createTuple(ID, s.getId().toString()),
 				createTuple(TO, s.getServiceLinkId().toString()),
 				createTuple(CAPACITY_DEMAND, s.getCapacityDemand()),
-				createTuple(EARLIEST_START, getTime(s.getServiceStartTimeWindow().getStart())),
-				createTuple(LATEST_END, getTime(s.getServiceStartTimeWindow().getEnd())),
+				createTuple(EARLIEST_START, getTime(s.getServiceStaringTimeWindow().getStart())),
+				createTuple(LATEST_END, getTime(s.getServiceStaringTimeWindow().getEnd())),
 				createTuple(SERVICE_DURATION, getTime(s.getServiceDuration()))), closeElement, lineBreak
 		);
 	}

@@ -389,7 +389,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getServiceStartTimeWindow();
+			return service.getServiceStaringTimeWindow();
 		}
 
 		@Override

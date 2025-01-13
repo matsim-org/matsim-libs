@@ -39,7 +39,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			double newServiceDuration = generator.getServiceTimePerStop(carrier, carrierAttributes, additionalTravelBufferPerIterationInMinutes);
 			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId())
 				.setServiceDuration(newServiceDuration);
-			CarrierService redrawnService = builder.setServiceStartingTimeWindow(service.getServiceStartTimeWindow()).build();
+			CarrierService redrawnService = builder.setServiceStartingTimeWindow(service.getServiceStaringTimeWindow()).build();
 			carrier.getServices().put(redrawnService.getId(), redrawnService);
 		}
 	}

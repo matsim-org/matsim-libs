@@ -37,7 +37,7 @@ public final class CarrierService implements CarrierJob {
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 		//kturner dec'24
 		private final Id<Link> serviceLinkId;
-		private TimeWindow serviceStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private TimeWindow serviceStartingTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double serviceDuration = 0.0;
 
 
@@ -92,13 +92,13 @@ public final class CarrierService implements CarrierJob {
 		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
 		 * <p>
 		 * Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
-		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 * time-windows must be met) than the service is allowed to start between startingTimeWindow.getStart() and startingTimeWindow.getEnd().
 		 *
-		 * @param startTimeWindow 	time-window for the beginning of the service activity
+		 * @param startingTimeWindow 	time-window for the beginning of the service activity
 		 * @return 					the builder
 		 */
-		public Builder setServiceStartingTimeWindow(TimeWindow startTimeWindow){
-			this.serviceStartsTimeWindow = startTimeWindow;
+		public Builder setServiceStartingTimeWindow(TimeWindow startingTimeWindow){
+			this.serviceStartingTimeWindow = startingTimeWindow;
 			return this;
 		}
 
@@ -157,7 +157,7 @@ public final class CarrierService implements CarrierJob {
 	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 	//kturner dec'24
 	private final Id<Link> serviceLinkId;
-	private final TimeWindow serviceStartsTimeWindow;
+	private final TimeWindow serviceStartingTimeWindow;
 	private final double serviceDuration;
 
 	private final Attributes attributes = new AttributesImpl();
@@ -166,7 +166,7 @@ public final class CarrierService implements CarrierJob {
 		id = builder.id;
 		serviceLinkId = builder.serviceLinkId;
 		serviceDuration = builder.serviceDuration;
-		serviceStartsTimeWindow = builder.serviceStartsTimeWindow;
+		serviceStartingTimeWindow = builder.serviceStartingTimeWindow;
 		capacityDemand = builder.capacityDemand;
 	}
 
@@ -191,8 +191,16 @@ public final class CarrierService implements CarrierJob {
 		return serviceDuration;
 	}
 
+	public TimeWindow getServiceStaringTimeWindow(){
+		return serviceStartingTimeWindow;
+	}
+
+	/**
+	 * @deprecated please use {@link #getServiceStaringTimeWindow()} instead
+	 */
+	@Deprecated(since = "jan'25")
 	public TimeWindow getServiceStartTimeWindow(){
-		return serviceStartsTimeWindow;
+		return getServiceStaringTimeWindow();
 	}
 
 	/**
@@ -212,7 +220,7 @@ public final class CarrierService implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + capacityDemand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartsTimeWindow + "]";
+		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + capacityDemand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartingTimeWindow + "]";
 	}
 
 	/* (non-Javadoc)

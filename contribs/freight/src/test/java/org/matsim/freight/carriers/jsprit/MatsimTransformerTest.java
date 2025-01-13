@@ -149,7 +149,7 @@ public class MatsimTransformerTest {
 		assertEquals("locationId", service.getServiceLinkId().toString());
 		assertEquals(30.0, service.getServiceDuration(), 0.01);
 		assertEquals(50, service.getCapacityDemand());
-		assertEquals(10.0, service.getServiceStartTimeWindow().getStart(), 0.01);
+		assertEquals(10.0, service.getServiceStaringTimeWindow().getStart(), 0.01);
 
 		CarrierService service2 = MatsimJspritFactory.createCarrierService(carrierService);
 		assertNotSame(service, service2);

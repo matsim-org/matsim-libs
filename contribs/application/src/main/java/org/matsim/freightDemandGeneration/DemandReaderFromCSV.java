@@ -1238,7 +1238,7 @@ public final class DemandReaderFromCSV {
 								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
 								if (baseService.getId() != thisService.getId()
 									&& baseService.getServiceLinkId() == thisService.getServiceLinkId() && baseService
-									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
+									.getServiceStaringTimeWindow() == thisService.getServiceStaringTimeWindow())
 									servicesToConnect.put(thisServiceId, thisService);
 							}
 						}
@@ -1253,7 +1253,7 @@ public final class DemandReaderFromCSV {
 						CarrierService.Builder builder = CarrierService.Builder
 							.newInstance(idNewService, baseService.getServiceLinkId())
 							.setServiceDuration(serviceTimeService);
-						CarrierService newService = builder.setServiceStartingTimeWindow(baseService.getServiceStartTimeWindow())
+						CarrierService newService = builder.setServiceStartingTimeWindow(baseService.getServiceStaringTimeWindow())
 							.setCapacityDemand(demandForThisLink).build();
 						servicesToAdd.add(newService);
 					}

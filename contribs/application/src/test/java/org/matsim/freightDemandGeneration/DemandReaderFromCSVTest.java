@@ -478,18 +478,18 @@ public class DemandReaderFromCSVTest {
 			countDemand = countDemand + service.getCapacityDemand();
 			if (service.getCapacityDemand() == 0) {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
+				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStaringTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
 					.add(service.getServiceLinkId().toString());
 			} else if (service.getCapacityDemand() == 1) {
 				Assertions.assertEquals(100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
+				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStaringTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
 					.add(service.getServiceLinkId().toString());
 			} else {
 				if (service.getCapacityDemand() == 2) {
 					Assertions.assertEquals(200, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-					Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
+					Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStaringTimeWindow());
 					locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
 						.add(service.getServiceLinkId().toString());
 				} else
@@ -587,12 +587,12 @@ public class DemandReaderFromCSVTest {
 			countDemand = countDemand + service.getCapacityDemand();
 			if (service.getCapacityDemand() == 0) {
 				Assertions.assertEquals(180, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStartTimeWindow());
+				Assertions.assertEquals(TimeWindow.newInstance(3000, 13000), service.getServiceStaringTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement1", (k) -> new HashSet<>())
 					.add(service.getServiceLinkId().toString());
 			} else {
 				Assertions.assertEquals(service.getCapacityDemand() * 100, service.getServiceDuration(), MatsimTestUtils.EPSILON);
-				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStartTimeWindow());
+				Assertions.assertEquals(TimeWindow.newInstance(5000, 20000), service.getServiceStaringTimeWindow());
 				locationsPerServiceElement.computeIfAbsent("serviceElement2", (k) -> new HashSet<>())
 					.add(service.getServiceLinkId().toString());
 			}
