@@ -31,13 +31,13 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	private final Provider<SingleTripChoicesGenerator> generator;
 	private final Provider<PlanSelector> selector;
 
-	private final List<String> modes;
+	private final Set<String> modes;
 	private final Provider<CandidatePruner> pruner;
 
 	private final boolean requireDifferentModes;
 
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
-	                                    List<String> modes,
+	                                    Set<String> modes,
 	                                    Provider<SingleTripChoicesGenerator> generator,
 	                                    Provider<PlanSelector> selector,
 	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
@@ -81,7 +81,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		public void run(Plan plan) {
 			PlanModel model = PlanModel.newInstance(plan);
 
-			PlanCandidate c = chooseCandidate(model, null);
+			PlanCandidate c = chooseCandidate(model);
 
 			if (c != null) {
 				if (pruner != null) {
@@ -96,11 +96,10 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		/**
 		 * Choose one candidate with one single trip changed.
 		 *
-		 * @param avoidList combinations to avoid, can be null
-		 * @return true if a candidate was selected
+		 * @return selected candidate or null if no candidate is found
 		 */
 		@Nullable
-		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList) {
+		public PlanCandidate chooseCandidate(PlanModel model) {
 
 			// empty plan
 			if (model.trips() == 0)
@@ -117,33 +116,12 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 				}
 			}
 
-			if (avoidList != null) {
-				String[] current = model.getCurrentModes();
-
-				IntListIterator it = options.iterator();
-
-				outer:
-				while (it.hasNext()) {
-					int idx = it.nextInt();
-
-					for (String m : modes) {
-						current[idx] = m;
-						if (!avoidList.contains(current)) {
-							continue outer;
-						}
-					}
-
-					// if at least one option is found, idx is not removed
-					it.remove();
-				}
-			}
-
 			if (options.isEmpty())
 				return null;
 
+			// Select one random trip index
 			int idx = options.getInt(rnd.nextInt(options.size()));
-
-			// Set one trip to be modifiable
+			// Set it to be modifiable
 			mask[idx] = true;
 
 			List<PlanCandidate> candidates = generator.generate(model, modes, mask);
@@ -165,16 +143,6 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			// Remove options that are the same as the current mode
 			if (requireDifferentModes)
 				candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
-
-			// Remove avoided combinations
-			if (avoidList != null) {
-				String[] current = model.getCurrentModes();
-
-				candidates.removeIf(c -> {
-					current[idx] = c.getMode(idx);
-					return avoidList.contains(current);
-				});
-			}
 
 			PlanCandidate selected = selector.select(candidates);
 

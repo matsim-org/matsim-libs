@@ -34,6 +34,10 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private double invBeta = Double.POSITIVE_INFINITY;
 
 	@Parameter
+	@Comment("Normalize utility values when selecting")
+	private boolean normalizeUtility = false;
+
+	@Parameter
 	@Comment("Name of the candidate pruner to apply, needs to be bound with guice.")
 	private String pruning = null;
 
@@ -43,7 +47,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Require that new plan modes are always different from the current one.")
-	private boolean requireDifferentModes = true;
+	private boolean requireDifferentModes = false;
 
 	@Parameter
 	@Comment("Defines how constraint violations are handled.")
@@ -140,6 +144,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		return comments;
+	}
+
+	public boolean isNormalizeUtility() {
+		return normalizeUtility;
+	}
+
+	public void setNormalizeUtility(boolean normalizeUtility) {
+		this.normalizeUtility = normalizeUtility;
 	}
 
 	public enum Schedule {

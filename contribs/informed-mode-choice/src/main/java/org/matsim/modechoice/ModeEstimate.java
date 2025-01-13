@@ -19,6 +19,12 @@ public final class ModeEstimate {
 	private final double[] tripEst;
 
 	/**
+	 * Mark trips with no real usage. E.g pt trips that consist only of walk legs.
+	 * These trips will not be considered during estimation.
+	 */
+	private final boolean[] noRealUsage;
+
+	/**
 	 * Whether this should be for a minimum estimate. Otherwise, maximum is assumed.
 	 */
 	private final boolean min;
@@ -42,6 +48,7 @@ public final class ModeEstimate {
 		this.usable = isUsable;
 		this.est = usable ? new double[n] : null;
 		this.tripEst = storeTripEst ? new double[n] : null;
+		this.noRealUsage = usable ? new boolean[n] : null;
 	}
 
 	public String getMode() {
@@ -66,6 +73,10 @@ public final class ModeEstimate {
 
 	public double[] getTripEstimates() {
 		return tripEst;
+	}
+
+	public boolean[] getNoRealUsage() {
+		return noRealUsage;
 	}
 
 	@Override

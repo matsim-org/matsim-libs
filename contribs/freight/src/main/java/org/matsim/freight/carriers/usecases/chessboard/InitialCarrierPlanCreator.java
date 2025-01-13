@@ -169,8 +169,7 @@ final class InitialCarrierPlanCreator {
             CarrierPlan plan = new InitialCarrierPlanCreator(scenario.getNetwork()).createPlan(carrier);
             carrier.addPlan(plan);
         }
-
-        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+		CarriersUtils.writeCarriers(carriers, "input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

@@ -37,7 +37,7 @@ public final class RelaxedMassConservationConstraint implements TripConstraint<R
 	@Override
 	public Context getContext(EstimatorContext context, PlanModel model) {
 
-		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan(), coordDistance);
+		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtoursFromTrips(model.getTrips(), coordDistance);
 
 		Object2IntMap<Object> facilities = new Object2IntArrayMap<>();
 
