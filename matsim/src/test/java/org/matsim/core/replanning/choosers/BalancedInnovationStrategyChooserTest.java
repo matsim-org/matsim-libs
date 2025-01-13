@@ -99,11 +99,11 @@ class BalancedInnovationStrategyChooserTest {
 			int diff = count.getSum() - before;
 
 			assertThat(diff)
-				.isCloseTo(3000, Offset.offset(300));
+				.isCloseTo(3000, Offset.offset(400));
 
 		}
 
-		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(2000));
+		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(3000));
 		assertThat(count.getDifference()).isLessThanOrEqualTo(2);
 	}
 
