@@ -46,7 +46,7 @@ public final class CarrierShipment implements CarrierJob {
 	public static class Builder {
 
 		private final Id<CarrierShipment> id;
-		private final int demand;
+		private final int capacityDemand;
 
 		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
@@ -71,19 +71,19 @@ public final class CarrierShipment implements CarrierJob {
 		 * @param id 	the id of the shipment
 		 * @param from 	the origin
 		 * @param to 	the destination
-		 * @param demand 	demand of the shipment
+		 * @param capacityDemand 	the demand (size; capacity needed) of the shipment
 		 * @return 		the builder
 		 */
-		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int demand){
-			return new Builder(id, from, to, demand);
+		public static Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int capacityDemand){
+			return new Builder(id, from, to, capacityDemand);
 		}
 
-		private Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int demand) {
+		private Builder(Id<CarrierShipment> id, Id<Link> pickupLinkId, Id<Link> deliveryLinkId, int capacityDemand) {
 			super();
 			this.id = id;
 			this.pickupLinkId = pickupLinkId;
 			this.deliveryLinkId = deliveryLinkId;
-			this.demand = demand;
+			this.capacityDemand = capacityDemand;
 		}
 
 		/**
@@ -181,7 +181,7 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	private final Id<CarrierShipment> id;
-	private final int demand;
+	private final int capacityDemand;
 
 	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
@@ -204,7 +204,7 @@ public final class CarrierShipment implements CarrierJob {
 		id = builder.id;
 		pickupLinkId = builder.pickupLinkId;
 		deliveryLinkId = builder.deliveryLinkId;
-		demand = builder.demand;
+		capacityDemand = builder.capacityDemand;
 		pickupDuration = builder.pickupDuration;
 		deliveryDuration = builder.deliveryDuration;
 		pickupStartsTimeWindow = builder.pickupStartsTimeWindow;
@@ -261,7 +261,7 @@ public final class CarrierShipment implements CarrierJob {
 	 */
 	@Override
 	public int getCapacityDemand() {
-		return demand;
+		return capacityDemand;
 	}
 
 	public TimeWindow getPickupStartsTimeWindow() {
@@ -357,7 +357,7 @@ public final class CarrierShipment implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + pickupLinkId.toString() + "][to=" + deliveryLinkId.toString() + "][size=" + demand + "][pickupServiceTime=" + pickupDuration + "]" +
+		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + pickupLinkId.toString() + "][to=" + deliveryLinkId.toString() + "][size=" + capacityDemand + "][pickupServiceTime=" + pickupDuration + "]" +
 				"[deliveryServiceTime="+ deliveryDuration +"][pickupTimeWindow="+ pickupStartsTimeWindow +"][deliveryTimeWindow="+ deliveryStartsTimeWindow +"]";
 	}
 

@@ -31,7 +31,7 @@ public final class CarrierService implements CarrierJob {
 	public static class Builder {
 
 		private final Id<CarrierService> id;
-		private int capacityDemand = 0;
+		private int capacityDemand;
 
 		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
@@ -40,14 +40,46 @@ public final class CarrierService implements CarrierJob {
 		private TimeWindow serviceStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double serviceDuration = 0.0;
 
-		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId){
-			return new Builder(id,locationLinkId);
+
+		/**
+		 * Returns a new service builder.
+		 * <p>
+		 * The builder is init with the service's location, and with the service's demand.
+		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
+		 *<p>
+		 * The capacity demand is set by default to 0 and needs to be changed later by calling {@link #setCapacityDemand(int)}.
+		 *
+		 * @deprecated since jan'25, use {@link #newInstance(Id, Id, int)} instead
+		 *
+		 * @param id 	the id of the shipment
+		 * @param locationLinkId 	the location (link Id) where the service is performed
+		 * @return 		the builder
+		 */
+		@Deprecated(since = "jan'25")
+		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId) {
+			return newInstance(id, locationLinkId, 0);
 		}
 
-		private Builder(Id<CarrierService> id, Id<Link> serviceLinkId) {
+		/**
+		 * Returns a new service builder.
+		 * <p>
+		 * The builder is init with the service's location, and with the service's demand.
+		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
+		 *
+		 * @param id 	the id of the shipment
+		 * @param locationLinkId 	the location (link Id) where the service is performed
+		 * @param capacityDemand 	the demand (size; capacity needed) of the service
+		 * @return 		the builder
+		 */
+		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId, int capacityDemand){
+			return new Builder(id,locationLinkId, capacityDemand );
+		}
+
+		private Builder(Id<CarrierService> id, Id<Link> serviceLinkId, int capacityDemand) {
 			super();
 			this.id = id;
 			this.serviceLinkId = serviceLinkId;
+			this.capacityDemand = capacityDemand;
 		}
 
 		public CarrierService build(){
@@ -82,16 +114,17 @@ public final class CarrierService implements CarrierJob {
 			return this;
 		}
 
-
 		/**
 		* Sets the demand (size; capacity needed) of the service.
 		 * When not set, it is by default 0.
 		 * <p>
 		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 * @deprecated please use the constructor including the capacity demand {@link #newInstance(Id, Id, int)} instead
 		 *
 		 * @param capacityDemand the demand (size; capacity needed) of the service
 		 * @return the builder
 		*/
+		@Deprecated(since = "jan'25")
 		public Builder setCapacityDemand(int capacityDemand) {
 			this.capacityDemand = capacityDemand;
 			return this;
