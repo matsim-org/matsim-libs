@@ -86,7 +86,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
                                                                   // TODO This only looks at the FIRST time window. This may need revision once we handle multiple
                                                                   // time windows.
                                                                   .build();
-                    if (newShipment.getDemand() != 0) {
+                    if (newShipment.getCapacityDemand() != 0) {
                         receiverOrder.getCarrier().getShipments().put(newShipment.getId(), newShipment );
                     }
                 }

@@ -237,7 +237,7 @@ public class CollectionTrackerTest {
 						if (element instanceof ServiceActivity activity) {
 							scheduledCosts += activity.getService().getServiceDuration() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 							totalScheduledCosts += scheduledCosts;
-                            totalScheduledWeight += activity.getService().getDemand();
+                            totalScheduledWeight += activity.getService().getCapacityDemand();
 							totalNumberOfScheduledShipments++;
 						}
 					}

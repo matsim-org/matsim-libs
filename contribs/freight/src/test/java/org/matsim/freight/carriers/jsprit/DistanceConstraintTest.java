@@ -614,14 +614,14 @@ public class DistanceConstraintTest {
 		CarrierService service1 = CarrierService.Builder
 				.newInstance(Id.create("Service1", CarrierService.class), Id.createLinkId("j(3,8)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service1);
 
 		// Service 2
 		CarrierService service2 = CarrierService.Builder
 				.newInstance(Id.create("Service2", CarrierService.class), Id.createLinkId("j(0,3)R"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service2);
 
 		return carrier;
@@ -653,7 +653,7 @@ public class DistanceConstraintTest {
 		CarrierService service3 = CarrierService.Builder
 				.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service3);
 
 		return carrier;

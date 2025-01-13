@@ -117,7 +117,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				Id<Link> to = Id.create(toLocation, Link.class);
 				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 				String capDemandString = atts.getValue("capacityDemand");
-				if (capDemandString != null) serviceBuilder.setDemand(getInt(capDemandString));
+				if (capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
 				String startString = atts.getValue("earliestStart");
 				double start = parseTimeToDouble(startString);
 				double end;

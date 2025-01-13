@@ -161,7 +161,7 @@ import org.matsim.vehicles.VehicleType;
 				createTuple(ID, shipmentId.toString()),
 				createTuple(FROM, s.getPickupLinkId().toString()),
 				createTuple(TO, s.getDeliveryLinkId().toString()),
-				createTuple(SIZE, s.getDemand()),
+				createTuple(SIZE, s.getCapacityDemand()),
 				createTuple(START_PICKUP, getTime(s.getPickupStartsTimeWindow().getStart())),
 				createTuple(END_PICKUP, getTime(s.getPickupStartsTimeWindow().getEnd())),
 				createTuple(START_DELIVERY, getTime(s.getDeliveryStartsTimeWindow().getStart())),
@@ -191,7 +191,7 @@ import org.matsim.vehicles.VehicleType;
 		this.writeStartTag(SERVICE, List.of(
 				createTuple(ID, s.getId().toString()),
 				createTuple(TO, s.getServiceLinkId().toString()),
-				createTuple(CAPACITY_DEMAND, s.getDemand()),
+				createTuple(CAPACITY_DEMAND, s.getCapacityDemand()),
 				createTuple(EARLIEST_START, getTime(s.getServiceStartTimeWindow().getStart())),
 				createTuple(LATEST_END, getTime(s.getServiceStartTimeWindow().getEnd())),
 				createTuple(SERVICE_DURATION, getTime(s.getServiceDuration()))), closeElement, lineBreak

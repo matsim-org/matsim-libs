@@ -260,7 +260,7 @@ public final class CarrierShipment implements CarrierJob {
 	 * @return the demand (size; capacity needed) of the shipment.
 	 */
 	@Override
-	public int getDemand() {
+	public int getCapacityDemand() {
 		return demand;
 	}
 
@@ -280,11 +280,11 @@ public final class CarrierShipment implements CarrierJob {
 	//*** deprecated methods ***
 
 	/**
-	 * @deprecated please inline and use {@link #getDemand()} instead
+	 * @deprecated please inline and use {@link #getCapacityDemand()} instead
 	 */
 	@Deprecated(since = "dec'24")
 	public int getSize() {
-		return getDemand();
+		return getCapacityDemand();
 	}
 
 

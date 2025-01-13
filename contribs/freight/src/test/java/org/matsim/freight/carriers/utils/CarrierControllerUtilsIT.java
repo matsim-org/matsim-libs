@@ -294,7 +294,7 @@ public class CarrierControllerUtilsIT{
 
 	private static CarrierService createMatsimService(String id, String to, int size) {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setDemand(size)
+				.setCapacityDemand(size)
 				.setServiceDuration(31.0)
 				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();

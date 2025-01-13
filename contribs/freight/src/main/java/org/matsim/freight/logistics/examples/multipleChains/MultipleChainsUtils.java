@@ -59,7 +59,7 @@ class MultipleChainsUtils {
       LspShipmentUtils.LspShipmentBuilder builder =
           LspShipmentUtils.LspShipmentBuilder.newInstance(
               Id.create(shipment.getId().toString(), LspShipment.class));
-        builder.setCapacityDemand(shipment.getDemand());
+        builder.setCapacityDemand(shipment.getCapacityDemand());
       builder.setFromLinkId(shipment.getPickupLinkId());
       builder.setToLinkId(shipment.getDeliveryLinkId());
 		builder.setStartTimeWindow(shipment.getPickupStartsTimeWindow());

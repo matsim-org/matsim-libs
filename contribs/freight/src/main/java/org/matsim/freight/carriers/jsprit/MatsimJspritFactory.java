@@ -118,7 +118,7 @@ public final class MatsimJspritFactory {
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
 						carrierShipment.getPickupStartsTimeWindow().getStart(),
 						carrierShipment.getPickupStartsTimeWindow().getEnd()))
-				.addSizeDimension(0, carrierShipment.getDemand());
+				.addSizeDimension(0, carrierShipment.getCapacityDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
@@ -149,7 +149,7 @@ public final class MatsimJspritFactory {
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
 						carrierShipment.getPickupStartsTimeWindow().getStart(),
 						carrierShipment.getPickupStartsTimeWindow().getEnd()))
-				.addSizeDimension(0, carrierShipment.getDemand());
+				.addSizeDimension(0, carrierShipment.getCapacityDemand());
 		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
@@ -165,7 +165,7 @@ public final class MatsimJspritFactory {
 		Location location = locationBuilder.build();
 
 		Builder serviceBuilder = Builder.newInstance(carrierService.getId().toString());
-		serviceBuilder.addSizeDimension(0, carrierService.getDemand());
+		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
 				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
 						carrierService.getServiceStartTimeWindow().getStart(),
@@ -184,7 +184,7 @@ public final class MatsimJspritFactory {
 	static CarrierService createCarrierService(Service jspritService) {
 		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(
 				Id.create(jspritService.getId(), CarrierService.class), Id.create(jspritService.getLocation().getId(), Link.class));
-		serviceBuilder.setDemand(jspritService.getSize().get(0));
+		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
 		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(
 				org.matsim.freight.carriers.TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));

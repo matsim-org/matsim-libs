@@ -31,7 +31,7 @@ public final class CarrierService implements CarrierJob {
 	public static class Builder {
 
 		private final Id<CarrierService> id;
-		private int demand = 0;
+		private int capacityDemand = 0;
 
 		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
@@ -82,20 +82,6 @@ public final class CarrierService implements CarrierJob {
 			return this;
 		}
 
-		/**
-		 * Sets the demand (size; capacity needed) of the service.
-		 * When not set, it is by default 0.
-		 * <p>
-		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
-		 *
-		 * @param demand the demand (size; capacity needed) of the service
-		 * @return the builder
-		 */
-		public Builder setDemand(int demand) {
-			this.demand = demand;
-			return this;
-		}
-
 
 		/**
 		* Sets the demand (size; capacity needed) of the service.
@@ -103,21 +89,19 @@ public final class CarrierService implements CarrierJob {
 		 * <p>
 		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
 		 *
-		 * @deprecated please use {@link #setDemand(int)} instead
-		 *
-		 * @param value the demand (size; capacity needed) of the service
+		 * @param capacityDemand the demand (size; capacity needed) of the service
 		 * @return the builder
 		*/
-		@Deprecated(since = "dec'24")
-		public Builder setCapacityDemand(int value) {
-			return setDemand(value);
+		public Builder setCapacityDemand(int capacityDemand) {
+			this.capacityDemand = capacityDemand;
+			return this;
 		}
 
 	}
 
 
 	private final Id<CarrierService> id;
-	private final int demand;
+	private final int capacityDemand;
 
 	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
@@ -133,7 +117,7 @@ public final class CarrierService implements CarrierJob {
 		serviceLinkId = builder.serviceLinkId;
 		serviceDuration = builder.serviceDuration;
 		serviceStartsTimeWindow = builder.serviceStartsTimeWindow;
-		demand = builder.demand;
+		capacityDemand = builder.capacityDemand;
 	}
 
 	@Override
@@ -162,19 +146,11 @@ public final class CarrierService implements CarrierJob {
 	}
 
 	/**
-	 * @deprecated please inline and use {@link #getDemand()} instead
-	 */
-	@Deprecated(since = "dec'24")
-	public int getCapacityDemand() {
-		return getDemand();
-	}
-
-	/**
 	 * @return the demand (size; capacity needed) of the service.
 	 */
 	@Override
-	public int getDemand() {
-		return demand;
+	public int getCapacityDemand() {
+		return capacityDemand;
 	}
 
 
@@ -186,7 +162,7 @@ public final class CarrierService implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartsTimeWindow + "]";
+		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + capacityDemand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartsTimeWindow + "]";
 	}
 
 	/* (non-Javadoc)
