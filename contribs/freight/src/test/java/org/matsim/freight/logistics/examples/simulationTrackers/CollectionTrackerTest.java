@@ -56,7 +56,6 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -238,7 +237,7 @@ public class CollectionTrackerTest {
 						if (element instanceof ServiceActivity activity) {
 							scheduledCosts += activity.getService().getServiceDuration() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 							totalScheduledCosts += scheduledCosts;
-							totalScheduledWeight += activity.getService().getCapacityDemand();
+                            totalScheduledWeight += activity.getService().getDemand();
 							totalNumberOfScheduledShipments++;
 						}
 					}

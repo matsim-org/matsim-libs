@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -119,46 +119,46 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Creates a tsv file with the locations of all created demand elements.
 	 *
-	 * @param controler The controller to get the network from
+	 * @param controller The controller to get the network from
 	 */
-	static void createDemandLocationsFile(Controler controler) {
+	static void createDemandLocationsFile(Controller controller) {
 
-		Network network = controler.getScenario().getNetwork();
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		Network network = controller.getScenario().getNetwork();
+		File file = new File(controller.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation	size\n");
 
-			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			for (Carrier thisCarrier : CarriersUtils.getCarriers(controller.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
 					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" +
 							coord.getX()+ "	" + coord.getY() + "	" +
 							"Service" + "	" +
-							thisService.getLocationLinkId().toString() + "	"+
+							thisService.getServiceLinkId().toString() + "	"+
 							" "+ "	"+
 							" "+ "	"+
 							" "+"\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getFrom()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
 					Coord coordTo = FreightDemandGenerationUtils
-						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getTo()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
 						+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
 						"Pickup" + "	"+
 							" "+"	"+
-						thisShipment.getFrom().toString() + "	" +
-						thisShipment.getTo().toString() + "	"+
+						thisShipment.getPickupLinkId().toString() + "	" +
+						thisShipment.getDeliveryLinkId().toString() + "	"+
 						0 + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 						+ coordTo.getX() + "	" + coordTo.getY() + "	"
 						+ "Delivery" + "	"+
 							" "+"	"+
-						thisShipment.getFrom() + "	" +
-						thisShipment.getTo() + "	"+
+						thisShipment.getPickupLinkId() + "	" +
+						thisShipment.getDeliveryLinkId() + "	"+
 						thisShipment.getSize() + "\n");
 				}
 			}

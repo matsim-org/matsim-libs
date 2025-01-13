@@ -23,7 +23,6 @@ package org.matsim.freight.carriers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -31,95 +30,127 @@ public final class CarrierService implements CarrierJob {
 
 	public static class Builder {
 
+		private final Id<CarrierService> id;
+		private int demand = 0;
+
+		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+		//kturner dec'24
+		private final Id<Link> serviceLinkId;
+		private TimeWindow serviceStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private double serviceDuration = 0.0;
+
 		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId){
 			return new Builder(id,locationLinkId);
 		}
 
-		private final Id<CarrierService> id;
-		private final Id<Link> locationLinkId;
-		private String name = "service";
-
-		private double serviceTime = 0.0;
-		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
-		private int capacityDemand = 0;
-
-		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
+		private Builder(Id<CarrierService> id, Id<Link> serviceLinkId) {
 			super();
 			this.id = id;
-			this.locationLinkId = locationLinkId;
-		}
-
-		public Builder setName(String name){
-			this.name = name;
-			return this;
-		}
-
-		/**
-		 * By default, it is [0.0,Integer.MaxValue].
-		 *
-		 * @param serviceDuration 	duration of the service
-		 * @return 					the builder
-		 */
-		public Builder setServiceDuration(double serviceDuration){
-			this.serviceTime = serviceDuration;
-			return this;
-		}
-
-		/**
-		 * Sets a time-window for the service.
-		 *
-		 * <p>Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
-		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
-		 *
-		 * @param startTimeWindow 	time-window for the service
-		 * @return 					the builder
-		 */
-		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
-			this.timeWindow = startTimeWindow;
-			return this;
+			this.serviceLinkId = serviceLinkId;
 		}
 
 		public CarrierService build(){
 			return new CarrierService(this);
 		}
 
-		public Builder setCapacityDemand(int value) {
-			this.capacityDemand = value;
+
+		/**
+		 * Sets a time-window for the beginning of  the service
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
+		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @param startTimeWindow 	time-window for the beginning of the service activity
+		 * @return 					the builder
+		 */
+		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
+			this.serviceStartsTimeWindow = startTimeWindow;
 			return this;
+		}
+
+		/**
+		 *  Sets the duration for the pickup activity.
+		 *  When not set, it is by default 0.0.
+		 *
+		 * @param serviceDuration 	duration of the service
+		 * @return 					the builder
+		 */
+		public Builder setServiceDuration(double serviceDuration){
+			this.serviceDuration = serviceDuration;
+			return this;
+		}
+
+		/**
+		 * Sets the demand (size; capacity needed) of the service.
+		 * When not set, it is by default 0.
+		 * <p>
+		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 *
+		 * @param demand the demand (size; capacity needed) of the service
+		 * @return the builder
+		 */
+		public Builder setDemand(int demand) {
+			this.demand = demand;
+			return this;
+		}
+
+
+		/**
+		* Sets the demand (size; capacity needed) of the service.
+		 * When not set, it is by default 0.
+		 * <p>
+		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 *
+		 * @deprecated please use {@link #setDemand(int)} instead
+		 *
+		 * @param value the demand (size; capacity needed) of the service
+		 * @return the builder
+		*/
+		@Deprecated(since = "dec'24")
+		public Builder setCapacityDemand(int value) {
+			return setDemand(value);
 		}
 
 	}
 
 
 	private final Id<CarrierService> id;
-
-	private final Id<Link> locationId;
-
-	private final String name;
-
-	private final double serviceDuration;
-
-	private final TimeWindow timeWindow;
-
 	private final int demand;
+
+	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
+	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
+	//kturner dec'24
+	private final Id<Link> serviceLinkId;
+	private final TimeWindow serviceStartsTimeWindow;
+	private final double serviceDuration;
 
 	private final Attributes attributes = new AttributesImpl();
 
 	private CarrierService(Builder builder){
 		id = builder.id;
-		locationId = builder.locationLinkId;
-		serviceDuration = builder.serviceTime;
-		timeWindow = builder.timeWindow;
-		demand = builder.capacityDemand;
-		name = builder.name;
+		serviceLinkId = builder.serviceLinkId;
+		serviceDuration = builder.serviceDuration;
+		serviceStartsTimeWindow = builder.serviceStartsTimeWindow;
+		demand = builder.demand;
 	}
 
+	@Override
 	public Id<CarrierService> getId() {
 		return id;
 	}
 
+	public Id<Link> getServiceLinkId() {
+		return serviceLinkId;
+	}
+
+	/**
+	 * @deprecated please inline and use {@link #getServiceLinkId()} instead
+	 */
+	@Deprecated(since = "dec'24")
 	public Id<Link> getLocationLinkId() {
-		return locationId;
+		return getServiceLinkId();
 	}
 
 	public double getServiceDuration() {
@@ -127,28 +158,35 @@ public final class CarrierService implements CarrierJob {
 	}
 
 	public TimeWindow getServiceStartTimeWindow(){
-		return timeWindow;
+		return serviceStartsTimeWindow;
 	}
 
+	/**
+	 * @deprecated please inline and use {@link #getDemand()} instead
+	 */
+	@Deprecated(since = "dec'24")
 	public int getCapacityDemand() {
+		return getDemand();
+	}
+
+	/**
+	 * @return the demand (size; capacity needed) of the service.
+	 */
+	@Override
+	public int getDemand() {
 		return demand;
 	}
+
 
 	@Override
 	public Attributes getAttributes() {
 		return attributes;
 	}
 
-	/**
-	 * @return the name
-	 */
-	public String getType() {
-		return name;
-	}
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + locationId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + timeWindow + "]";
+		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartsTimeWindow + "]";
 	}
 
 	/* (non-Javadoc)

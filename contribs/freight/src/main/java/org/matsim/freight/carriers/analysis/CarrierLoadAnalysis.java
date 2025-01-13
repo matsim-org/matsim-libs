@@ -27,16 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.Carriers;
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryStartEventHandler;
@@ -44,8 +41,6 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentPickupStar
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -57,6 +52,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
 
 	public CarrierLoadAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;
@@ -72,9 +68,11 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		if (! vehicle2Load.containsKey(vehicleId)){
 			list = new LinkedList<>();
 			list.add(demand);
+			vehicle2DemandPerTour.put(vehicleId, demand);
 		} else {
 			list = vehicle2Load.get(vehicleId);
 			list.add(list.getLast() + demand);
+			vehicle2DemandPerTour.put(vehicleId, vehicle2DemandPerTour.get(vehicleId) + demand);
 		}
 		vehicle2Load.put(vehicleId, list);
 	}
@@ -101,17 +99,10 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
-			"maxUsedCapacity [%]",
+			"maxLoadPercentage",
+			"handledDemand",
 			"load state during tour"));
 		bw1.newLine();
-
-		// for calculation
-		List<Double> perc = new ArrayList();
-		List<String> types = new ArrayList();
-
-		// for capacity display
-		List<String> capPerType = new ArrayList<>();
-
 
 		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
 
@@ -121,72 +112,20 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
 			final Double capacity = vehicleType.getCapacity().getOther();
 
-			perc.add(maxLoad/capacity);
-			String cap = vehicleType.getId().toString() + delimiter + capacity;
-			if (!capPerType.contains(cap)) {
-				capPerType.add(cap);
-			}
-			if (!types.contains(vehicleType.getId().toString())) {
-				types.add(vehicleType.getId().toString());
-			}
+			final Integer demand = vehicle2DemandPerTour.get(vehicleId);
+			final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000)/100.0;;
 
 			bw1.write(vehicleId.toString());
 			bw1.write(delimiter + vehicleType.getId().toString());
 			bw1.write(delimiter + capacity);
 			bw1.write(delimiter + maxLoad);
-			bw1.write(delimiter + Math.round(100*100*maxLoad/capacity)/100);
+			bw1.write(delimiter + maxLoadPercentage);
+			bw1.write(delimiter + demand);
 			bw1.write(delimiter + load);
 			bw1.newLine();
 		}
 
 		bw1.close();
 		log.info("Output written to {}", fileName);
-
-		//Tiles with used vehicleTypes & average load and capacity per vehicle type
-
-		log.info("Writing out summary of vehicle load analysis ...");
-
-		//Write file for tiles
-		String fileName1 = analysisOutputDirectory + "Load_summary.csv";
-		BufferedWriter bw2 = new BufferedWriter(new FileWriter(fileName1));
-
-		//For calculation of average usage (%)
-		double use = Math.round(perc.stream().mapToDouble(Double::doubleValue).sum()/ perc.size()*100);
-
-		// Determination of all VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
-		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
-		//For the case that there are additional vehicle types found in the events.
-		for (Id<Vehicle> vehicleId  : vehicle2Load.keySet()) {
-			VehicleType vehicleType  = VehicleUtils.findVehicle(vehicleId, scenario).getType();
-			vehicleTypesMap.putIfAbsent(vehicleType.getId(),vehicleType);
-		}
-
-		bw2.write("Used vehicle types"+ delimiter
-				+ types.size() +"/"+vehicleTypesMap.size()+ delimiter +
-				"truck");
-		bw2.newLine();
-		bw2.write("Average use of capacity"+ delimiter
-				+ use + "%" + delimiter
-				+"chart-pie");
-		bw2.close();
-		log.info("Output written to " + fileName1);
-
-		//Capacity per vehicle type
-		String fileName2 = analysisOutputDirectory + "Capacity_summary.csv";
-		BufferedWriter bw3 = new BufferedWriter(new FileWriter(fileName2));
-
-		//Write file
-		bw3.write("vehicleTypeId"+ delimiter
-				+ "maxCapacity");
-		bw3.newLine();
-
-		for (String cap : capPerType) {
-			bw3.write(cap);
-			bw3.newLine();
-		}
-
-		bw3.close();
-		log.info("Output written to " + fileName2);
-
 	}
 }

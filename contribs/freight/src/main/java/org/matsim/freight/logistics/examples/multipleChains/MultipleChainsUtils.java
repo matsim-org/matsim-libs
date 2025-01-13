@@ -59,13 +59,13 @@ class MultipleChainsUtils {
       LspShipmentUtils.LspShipmentBuilder builder =
           LspShipmentUtils.LspShipmentBuilder.newInstance(
               Id.create(shipment.getId().toString(), LspShipment.class));
-      builder.setCapacityDemand(shipment.getSize());
-      builder.setFromLinkId(shipment.getFrom());
-      builder.setToLinkId(shipment.getTo());
-      builder.setStartTimeWindow(shipment.getPickupTimeWindow());
-      builder.setEndTimeWindow(shipment.getDeliveryTimeWindow());
-      builder.setPickupServiceTime(shipment.getPickupServiceTime());
-      builder.setDeliveryServiceTime(shipment.getDeliveryServiceTime());
+        builder.setCapacityDemand(shipment.getDemand());
+      builder.setFromLinkId(shipment.getPickupLinkId());
+      builder.setToLinkId(shipment.getDeliveryLinkId());
+		builder.setStartTimeWindow(shipment.getPickupStartsTimeWindow());
+		builder.setEndTimeWindow(shipment.getDeliveryStartsTimeWindow());
+      builder.setPickupServiceTime(shipment.getPickupDuration());
+      builder.setDeliveryServiceTime(shipment.getDeliveryDuration());
       shipmentList.add(builder.build());
     }
     return shipmentList;

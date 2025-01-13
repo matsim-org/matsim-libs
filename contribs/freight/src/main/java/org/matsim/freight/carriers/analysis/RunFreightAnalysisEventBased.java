@@ -124,6 +124,8 @@ public class RunFreightAnalysisEventBased {
 
 	private void createScenarioForFreightAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath,
 												  String globalCrs) {
+		log.info("########## Starting Freight Analysis ##########");
+
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(vehiclesPath);
 		config.network().setInputFile(networkPath);

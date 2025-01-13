@@ -1,5 +1,6 @@
 package org.matsim.freight.carriers;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -16,4 +17,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * future) It maybe gets generalized in way, that we only have one job definition with 1 or 2
  * location(s). This then defines, if jsprit takes the job as a service or as a shipment.
  */
-public interface CarrierJob extends Attributable {}
+public interface CarrierJob extends Attributable {
+	Id<? extends CarrierJob> getId();
+	int getDemand();
+}

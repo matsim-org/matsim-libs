@@ -44,10 +44,10 @@ public class CarrierShipmentDeliveryEndEvent extends AbstractCarrierEvent {
 	private final double deliveryDuration;
 	private final int capacityDemand;
 	public CarrierShipmentDeliveryEndEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
-		super(time, carrierId, shipment.getTo(), vehicleId);
+		super(time, carrierId, shipment.getDeliveryLinkId(), vehicleId);
 		this.shipmentId = shipment.getId();
-		this.deliveryDuration = shipment.getDeliveryServiceTime();
-		this.capacityDemand = shipment.getSize();
+		this.deliveryDuration = shipment.getDeliveryDuration();
+        this.capacityDemand = shipment.getDemand();
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class CarrierShipmentDeliveryEndEvent extends AbstractCarrierEvent {
 		Id<Link> shipmentTo = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		int size = Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND));
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, null, shipmentTo, size)
-				.setDeliveryServiceTime(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_DROPOFF_DURATION)))
+				.setDeliveryDuration(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_DROPOFF_DURATION)))
 				.build();
 		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
 		return new CarrierShipmentDeliveryEndEvent(time, carrierId, shipment, vehicleId);
