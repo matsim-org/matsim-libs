@@ -42,24 +42,26 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 /**
  * Processes events to create a csv file with passenger volumes, delays and similar information for each stop to stop
  * segment of a pt {@link org.matsim.pt.transitSchedule.api.Departure}.
- *
+ * <p>
  * This class is entirely based on events. In case simulated pt should deviate from the
  * {@link org.matsim.pt.transitSchedule.api.TransitSchedule} this class provides data on what the simulation really gave
  * ignoring the TransitSchedule.
- *
- * Currently there are no integrity checks, if the sequence of events is wrong or an event is missing, this class might
+ * <p>
+ * Currently, there are no integrity checks, if the sequence of events is wrong or an event is missing, this class might
  * silently produce invalid output.
  * This class was intended to be run after the last iteration and the simulation has finished and no preconditions were
  * taken for TransitVehicle fleets which might change over the course of iterations (e.g. minibus). So running this
  * class as an EventsListener during the simulation might give wrong results and might need work to get the transit
- * vehicles updated before mobsim in each iteration.
+ * vehicles updated before mobsim in each iteration. Still it could be useful to run in each iteration in special cases,
+ * such as the minibus contrib.
  *
  * @author vsp-gleich
  */
@@ -70,10 +72,16 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     private final Vehicles transitVehicles; // for vehicle capacity
     private final Map<Id<Vehicle>, PtVehicleData> transitVehicle2temporaryVehicleData = new HashMap<>();
     private final List<Stop2StopEntry> stop2StopEntriesForEachDeparture; // the output
+	private final double sampleUpscaleFactor;
     private static final Logger log = LogManager.getLogger(PtStop2StopAnalysis.class);
 
-    public PtStop2StopAnalysis(Vehicles transitVehicles) {
+	/**
+	 * @param transitVehicles needed to look up vehicle capacity
+	 * @param sampleUpscaleFactor : factor to scale up output passenger volumes to 100%
+	 */
+    public PtStop2StopAnalysis(Vehicles transitVehicles, double sampleUpscaleFactor) {
         this.transitVehicles = transitVehicles;
+		this.sampleUpscaleFactor = sampleUpscaleFactor;
         // set initial capacity to rough estimate of 30 entries by vehicle (should be sufficient)
         stop2StopEntriesForEachDeparture = new ArrayList<>(transitVehicles.getVehicles().size() * 30);
     }
@@ -95,7 +103,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     public void handleEvent(VehicleArrivesAtFacilityEvent event) {
         PtVehicleData ptVehicleData = transitVehicle2temporaryVehicleData.get(event.getVehicleId());
         if (ptVehicleData == null) {
-            log.error("Encountered a VehicleArrivesAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle " + event.getVehicleId() + " at facility " + event.getFacilityId() + " at time " + event.getTime() + ". This should not happen, this analysis might fail subsequently.");
+			log.error("Encountered a VehicleArrivesAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle {} at facility {} at time {}. This should not happen, this analysis might fail subsequently.", event.getVehicleId(), event.getFacilityId(), event.getTime());
         } else {
             ptVehicleData.lastVehicleArrivesAtFacilityEvent = event;
         }
@@ -108,16 +116,17 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     public void handleEvent(VehicleDepartsAtFacilityEvent event) {
         PtVehicleData ptVehicleData = transitVehicle2temporaryVehicleData.get(event.getVehicleId());
         if (ptVehicleData == null) {
-            log.error("Encountered a VehicleDepartsAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle " + event.getVehicleId() + " at facility " + event.getFacilityId() + " at time " + event.getTime() + ". This should not happen, this analysis might fail subsequently.");
+			log.error("Encountered a VehicleDepartsAtFacilityEvent without a previous TransitDriverStartsEvent for vehicle {} at facility {} at time {}. This should not happen, this analysis might fail subsequently.", event.getVehicleId(), event.getFacilityId(), event.getTime());
         } else {
             // produce output entry
-            stop2StopEntriesForEachDeparture.add(new Stop2StopEntry(ptVehicleData.transitLineId,
-                    ptVehicleData.transitRouteId, ptVehicleData.departureId, event.getFacilityId(),
-                    ptVehicleData.stopSequenceCounter, ptVehicleData.lastStopId,
-                    ptVehicleData.lastVehicleArrivesAtFacilityEvent.getTime() - ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(),
-                    ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(), event.getTime() - event.getDelay(),
-                    event.getDelay(), ptVehicleData.currentPax, ptVehicleData.totalVehicleCapacity,
-                    ptVehicleData.alightings, ptVehicleData.boardings, ptVehicleData.linksTravelledOnSincePreviousStop));
+			stop2StopEntriesForEachDeparture.add(new Stop2StopEntry(ptVehicleData.transitLineId,
+				ptVehicleData.transitRouteId, ptVehicleData.departureId, event.getFacilityId(),
+				ptVehicleData.stopSequenceCounter, ptVehicleData.lastStopId,
+				ptVehicleData.lastVehicleArrivesAtFacilityEvent.getTime() - ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(),
+				ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(), event.getTime() - event.getDelay(),
+				event.getDelay(), ptVehicleData.currentPax * sampleUpscaleFactor, ptVehicleData.totalVehicleCapacity,
+				ptVehicleData.alightings * sampleUpscaleFactor, ptVehicleData.boardings * sampleUpscaleFactor,
+				List.copyOf(ptVehicleData.linksTravelledOnSincePreviousStop)));
             // calculate number of passengers at departure
             // (the Stop2StopEntry before needed the number of passengers at arrival so do not move this up!)
             ptVehicleData.currentPax = ptVehicleData.currentPax - ptVehicleData.alightings + ptVehicleData.boardings;
@@ -167,8 +176,8 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 
     @Override
     public void reset(int iteration) {
-        if(transitVehicle2temporaryVehicleData.size() > 0) {
-            log.warn(transitVehicle2temporaryVehicleData.size() + " transit vehicles did not finish service in the last iteration.");
+        if(!transitVehicle2temporaryVehicleData.isEmpty()) {
+			log.warn("{} transit vehicles did not finish service in the last iteration.", transitVehicle2temporaryVehicleData.size());
         }
         transitVehicle2temporaryVehicleData.clear();
         stop2StopEntriesForEachDeparture.clear();
@@ -225,132 +234,48 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         }
     }
 
-    /**
-     * output data structure
-     */
-    static final class Stop2StopEntry {
-        final Id<TransitLine> transitLineId;// for aggregation -> set null or leave out and use Map lineId -> Stop2StopEntry?
-        final Id<TransitRoute> transitRouteId;
-        final Id<Departure> departureId;
-        final Id<TransitStopFacility> stopId;
-        final int stopSequence;
-        final Id<TransitStopFacility> stopPreviousId;
-        final double arrivalTimeScheduled;
-        final double arrivalDelay;
-        final double departureTimeScheduled;
-        final double departureDelay;
-        final int passengersAtArrival;
-        final double totalVehicleCapacity;
-        final int passengersAlighting;
-        final int passengersBoarding;
-        final List<Id<Link>> linkIdsSincePreviousStop;
-
-        Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId,
-                       Id<Departure> departureId, Id<TransitStopFacility> stopId, int stopSequence,
-                       Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
-                       double departureTimeScheduled, double departureDelay, int passengersAtArrival,
-                       double totalVehicleCapacity, int passengersAlighting, int passengersBoarding,
-                       List<Id<Link>> linkIdsSincePreviousStop) {
-            this.transitLineId = transitLineId;
-            this.transitRouteId = transitRouteId;
-            this.departureId = departureId;
-            this.stopId = stopId;
-            this.stopSequence = stopSequence;
-            this.stopPreviousId = stopPreviousId;
-            this.arrivalTimeScheduled = arrivalTimeScheduled;
-            this.arrivalDelay = arrivalDelay;
-            this.departureTimeScheduled = departureTimeScheduled;
-            this.departureDelay = departureDelay;
-            this.passengersAtArrival = passengersAtArrival;
-            this.totalVehicleCapacity = totalVehicleCapacity;
-            this.passengersAlighting = passengersAlighting;
-            this.passengersBoarding = passengersBoarding;
-            this.linkIdsSincePreviousStop = List.copyOf(linkIdsSincePreviousStop);
-        }
-
-        // getter for usage of standard Comparator implementations below and more
-        public Id<TransitLine> getTransitLineId() {
-            return transitLineId;
-        }
-
-        public Id<TransitRoute> getTransitRouteId() {
-            return transitRouteId;
-        }
-
-        public Id<Departure> getDepartureId() {
-            return departureId;
-        }
-
-        public Id<TransitStopFacility> getStopId() {
-            return stopId;
-        }
-
-        public int getStopSequence() {
-            return stopSequence;
-        }
-
-        public Id<TransitStopFacility> getStopPreviousId() {
-            return stopPreviousId;
-        }
-
-        public double getArrivalTimeScheduled() {
-            return arrivalTimeScheduled;
-        }
-
-        public double getArrivalDelay() {
-            return arrivalDelay;
-        }
-
-        public double getDepartureTimeScheduled() {
-            return departureTimeScheduled;
-        }
-
-        public double getDepartureDelay() {
-            return departureDelay;
-        }
-
-        public int getPassengersAtArrival() {
-            return passengersAtArrival;
-        }
-
-        public double getTotalVehicleCapacity() {
-            return totalVehicleCapacity;
-        }
-
-        public int getPassengersAlighting() {
-            return passengersAlighting;
-        }
-
-        public int getPassengersBoarding() {
-            return passengersBoarding;
-        }
-
-        public List<Id<Link>> getLinkIdsSincePreviousStop() {
-            return linkIdsSincePreviousStop;
-        }
-    }
+	/**
+	 * output data structure
+	 *
+	 * @param transitLineId for aggregation -> set null or leave out and use Map lineId -> Stop2StopEntry?
+	 */
+	record Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Departure> departureId, Id<TransitStopFacility> stopId,
+							  int stopSequence, Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
+							  double departureTimeScheduled, double departureDelay, double passengersAtArrival, double totalVehicleCapacity,
+							  double passengersAlighting, double passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {}
 
     static final String[] HEADER = {"transitLine", "transitRoute", "departure", "stop", "stopSequence",
             "stopPrevious", "arrivalTimeScheduled", "arrivalDelay", "departureTimeScheduled", "departureDelay",
             "passengersAtArrival", "totalVehicleCapacity", "passengersAlighting", "passengersBoarding",
             "linkIdsSincePreviousStop"};
 
-    public static Comparator<Stop2StopEntry> stop2StopEntryByTransitLineComparator =
-            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::getTransitLineId));
-    public static Comparator<Stop2StopEntry> stop2StopEntryByTransitRouteComparator =
-            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::getTransitRouteId));
-    public static Comparator<Stop2StopEntry> stop2StopEntryByDepartureComparator =
-            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::getDepartureId));
-    public static Comparator<Stop2StopEntry> stop2StopEntryByStopSequenceComparator =
-            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::getStopSequence));
+    static Comparator<Stop2StopEntry> stop2StopEntryByTransitLineComparator =
+            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::transitLineId));
+    static Comparator<Stop2StopEntry> stop2StopEntryByTransitRouteComparator =
+            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::transitRouteId));
+    static Comparator<Stop2StopEntry> stop2StopEntryByDepartureComparator =
+            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::departureId));
+    static Comparator<Stop2StopEntry> stop2StopEntryByStopSequenceComparator =
+            Comparator.nullsLast(Comparator.comparing(Stop2StopEntry::stopSequence));
 
-    public void writeStop2StopEntriesByDepartureCsv(String fileName, String columnSeparator, String listSeparatorInsideColumn) {
+	public void writeStop2StopEntriesByDepartureCsv(String fileName, String columnSeparator, String listSeparatorInsideColumn) {
+		writeStop2StopEntriesByDepartureCsv(IOUtils.getFileUrl(fileName), columnSeparator, listSeparatorInsideColumn);
+	}
+
+	public void writeStop2StopEntriesByDepartureCsv(Path path, String columnSeparator, String listSeparatorInsideColumn) {
+		writeStop2StopEntriesByDepartureCsv(IOUtils.getFileUrl(path.toString()), columnSeparator, listSeparatorInsideColumn);
+	}
+
+	public void writeStop2StopEntriesByDepartureCsv(URL url, String columnSeparator, String listSeparatorInsideColumn) {
         stop2StopEntriesForEachDeparture.sort(stop2StopEntryByTransitLineComparator.
                 thenComparing(stop2StopEntryByTransitRouteComparator).
                 thenComparing(stop2StopEntryByDepartureComparator).
                 thenComparing(stop2StopEntryByStopSequenceComparator));
-        try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(fileName),
-                CSVFormat.DEFAULT.withDelimiter(columnSeparator.charAt(0)).withHeader(HEADER))
+        try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(url),
+			CSVFormat.Builder.create()
+				.setDelimiter(columnSeparator)
+				.setHeader(HEADER)
+				.build())
         ) {
             for (Stop2StopEntry entry : stop2StopEntriesForEachDeparture) {
                 printer.print(entry.transitLineId);
@@ -367,45 +292,15 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
                 printer.print(entry.totalVehicleCapacity);
                 printer.print(entry.passengersAlighting);
                 printer.print(entry.passengersBoarding);
-                printer.print(entry.linkIdsSincePreviousStop.stream().map(id -> id.toString()).collect(Collectors.joining(listSeparatorInsideColumn)));
+                printer.print(entry.linkIdsSincePreviousStop.stream().map(Object::toString).collect(Collectors.joining(listSeparatorInsideColumn)));
                 printer.println();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+			log.error(e);
         }
     }
 
-    public List<Stop2StopEntry> getStop2StopEntriesByDeparture () {
+    List<Stop2StopEntry> getStop2StopEntriesByDeparture () {
         return List.copyOf(stop2StopEntriesForEachDeparture);
-    }
-
-    static final class Stop2StopAggregation {
-
-        private final int departures;
-        private final long passengers;
-        private final double totalVehicleCapacity;
-
-        Stop2StopAggregation (int departures, long passengers, double totalVehicleCapacity) {
-            this.departures = departures;
-            this.passengers = passengers;
-            this.totalVehicleCapacity = totalVehicleCapacity;
-        }
-
-        public int getDepartures() {
-            return departures;
-        }
-
-        public long getPassengers() {
-            return passengers;
-        }
-
-        public double getTotalVehicleCapacity() {
-            return totalVehicleCapacity;
-        }
-    }
-
-    public static BinaryOperator<Stop2StopAggregation> aggregateStop2StopAggregations() {
-        return (entry1, entry2) -> new PtStop2StopAnalysis.Stop2StopAggregation(entry1.getDepartures() + entry2.getDepartures(), entry1.getPassengers() + entry2.getPassengers(),
-                entry1.getTotalVehicleCapacity() + entry2.getTotalVehicleCapacity());
     }
 }

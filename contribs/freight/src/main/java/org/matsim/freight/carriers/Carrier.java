@@ -21,12 +21,11 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A carrier.

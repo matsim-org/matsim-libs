@@ -20,7 +20,7 @@ public class ModeChoiceWeightSchedulerTest extends ScenarioTest {
 		imc.setInvBeta(1);
 		imc.setAnneal(InformedModeChoiceConfigGroup.Schedule.linear);
 
-		ModeChoiceWeightScheduler scheduler = injector.getInstance(ModeChoiceWeightScheduler.class);
+		ModeChoiceWeightScheduler scheduler = new ModeChoiceWeightScheduler(controler.getConfig());
 		MatsimServices services = injector.getInstance(MatsimServices.class);
 		scheduler.notifyStartup(new StartupEvent(services));
 
@@ -46,7 +46,7 @@ public class ModeChoiceWeightSchedulerTest extends ScenarioTest {
 		imc.setInvBeta(1);
 		imc.setAnneal(InformedModeChoiceConfigGroup.Schedule.quadratic);
 
-		ModeChoiceWeightScheduler scheduler = injector.getInstance(ModeChoiceWeightScheduler.class);
+		ModeChoiceWeightScheduler scheduler = new ModeChoiceWeightScheduler(controler.getConfig());
 		MatsimServices services = injector.getInstance(MatsimServices.class);
 		scheduler.notifyStartup(new StartupEvent(services));
 

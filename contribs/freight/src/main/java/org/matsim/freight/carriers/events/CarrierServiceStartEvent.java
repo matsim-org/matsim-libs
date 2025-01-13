@@ -21,14 +21,13 @@
 
 package org.matsim.freight.carriers.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
 
 /**
  * An event, that informs that a Freight {@link CarrierService} activity has started.
@@ -45,10 +44,10 @@ public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 	private final int capacityDemand;
 
 	public CarrierServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
-		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		super(time, carrierId, service.getServiceLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();
-		this.capacityDemand = service.getCapacityDemand();
+        this.capacityDemand = service.getDemand();
 	}
 
 	@Override
@@ -86,7 +85,7 @@ public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 		Id<Link> locationLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		CarrierService service = CarrierService.Builder.newInstance(carrierServiceId, locationLinkId)
 				.setServiceDuration(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_SERVICE_DURATION)))
-				.setCapacityDemand(Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND)))
+				.setDemand(Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND)))
 				.build();
 		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
 		return new CarrierServiceStartEvent(time, carrierId, service, vehicleId);

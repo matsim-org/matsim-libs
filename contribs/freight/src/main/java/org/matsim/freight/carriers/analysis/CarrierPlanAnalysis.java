@@ -21,17 +21,16 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.freight.carriers.*;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.TreeMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.freight.carriers.*;
 
 /**
  * Some basic analysis / data collection for {@link Carriers}(files)
@@ -55,7 +54,7 @@ public class CarrierPlanAnalysis {
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
 	public final String delimiter;
 
-	Carriers carriers;
+	final Carriers carriers;
 
 	public CarrierPlanAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;
@@ -102,16 +101,16 @@ public class CarrierPlanAnalysis {
 				int numberOfHandledDemandSize;
 				int notHandledJobs;
 				if (numberOfPlanedShipments > 0) {
-					numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getSize).sum();
+					numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(carrierShipment -> carrierShipment.getDemand()).sum();
 					numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 						t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
-							te -> (((Tour.Pickup) te).getShipment().getSize())).sum()).sum();
+							te -> ((Tour.Pickup) te).getShipment().getDemand()).sum()).sum();
 					notHandledJobs = numberOfPlanedShipments - numberOfHandledPickups;
 				} else {
-					numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getCapacityDemand).sum();
+					numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(carrierService -> carrierService.getDemand()).sum();
 					numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 						t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
-							te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
+							te -> ((Tour.ServiceActivity) te).getService().getDemand()).sum()).sum();
 					notHandledJobs = numberOfPlanedServices - nuOfServiceHandled;
 				}
 

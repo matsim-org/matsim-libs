@@ -41,13 +41,12 @@ public interface CandidatePruner {
 		return -1;
 	}
 
-
 	/**
 	 * Calculate threshold to be applied on a single trip. Modes worse than this threshold on this trip will be discarded.
 	 *
 	 * @return positive threshold, if negative it will not be applied
 	 */
 	default double tripThreshold(PlanModel planModel, int idx) {
-		return -1;
+		return planThreshold(planModel);
 	}
 }
