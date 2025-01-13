@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -279,21 +279,21 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 	}
 
 	@Override
-	public void writeAdditionalOutputFiles(Controler controler) {
-		super.writeAdditionalOutputFiles(controler);
-		createDemandDistributionFile(controler);
-		createAgeDistributionFile(controler);
+	public void writeAdditionalOutputFiles(Controller controller) {
+		super.writeAdditionalOutputFiles(controller);
+		createDemandDistributionFile(controller);
+		createAgeDistributionFile(controller);
 	}
 
 	/**
 	 * Creates a tsv file with the age distribution.
 	 *
-	 * @param controler The controller to get the network from
+	 * @param controller The controller to get the network from
 	 */
-	private static void createAgeDistributionFile(Controler controler) {
+	private static void createAgeDistributionFile(Controller controller) {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(
-			IOUtils.getFileUrl(controler.getConfig().controller().getOutputDirectory() + "/outputDemandDistrPerAgeGroup.tsv"),
+			IOUtils.getFileUrl(controller.getConfig().controller().getOutputDirectory() + "/outputDemandDistrPerAgeGroup.tsv"),
 			StandardCharsets.UTF_8, true);
 		try {
 			// Write the header
@@ -323,7 +323,7 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 		log.info("Wrote age distribution file under " + "/outputDemandDistrPerAgeGroupFile.xml.gz");
 
 		writer = IOUtils.getBufferedWriter(
-			IOUtils.getFileUrl(controler.getConfig().controller().getOutputDirectory() + "/outputAgeGroupDemandShareFile.tsv"),
+			IOUtils.getFileUrl(controller.getConfig().controller().getOutputDirectory() + "/outputAgeGroupDemandShareFile.tsv"),
 			StandardCharsets.UTF_8, true);
 		try {
 			// Write the header
@@ -371,12 +371,12 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 	/**
 	 * Creates a tsv file with the remainingDemand distribution.
 	 *
-	 * @param controler The controller to get the network from
+	 * @param controller The controller to get the network from
 	 */
-	private static void createDemandDistributionFile(Controler controler) {
+	private static void createDemandDistributionFile(Controller controller) {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(
-			IOUtils.getFileUrl(controler.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv"),
+			IOUtils.getFileUrl(controller.getConfig().controller().getOutputDirectory() + "/outputDemandPerPersonFile.tsv"),
 			StandardCharsets.UTF_8, true);
 		try {
 			String[] header = new String[]{"personId", "age", "amountOfParcels", "xCoord", "yCoord"};
