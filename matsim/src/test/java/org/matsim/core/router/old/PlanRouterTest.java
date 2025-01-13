@@ -42,6 +42,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -107,7 +109,7 @@ public class PlanRouterTest {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
-        final DijkstraFactory leastCostAlgoFactory = new DijkstraFactory();
+        final LeastCostPathCalculatorFactory leastCostAlgoFactory = new SpeedyALTFactory();
         final OnlyTimeDependentTravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
         final FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
 
@@ -157,7 +159,7 @@ public class PlanRouterTest {
 					  TimeInterpretation.create(config),
 					  RouterUtils.getMultimodalLinkChooserDefault()
 				  ).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
-				  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
+				  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
 				  return trip;
               }
 
