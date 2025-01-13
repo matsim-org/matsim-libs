@@ -162,10 +162,10 @@ import org.matsim.vehicles.VehicleType;
 				createTuple(FROM, s.getPickupLinkId().toString()),
 				createTuple(TO, s.getDeliveryLinkId().toString()),
 				createTuple(SIZE, s.getCapacityDemand()),
-				createTuple(START_PICKUP, getTime(s.getPickupStartsTimeWindow().getStart())),
-				createTuple(END_PICKUP, getTime(s.getPickupStartsTimeWindow().getEnd())),
-				createTuple(START_DELIVERY, getTime(s.getDeliveryStartsTimeWindow().getStart())),
-				createTuple(END_DELIVERY, getTime(s.getDeliveryStartsTimeWindow().getEnd())),
+				createTuple(START_PICKUP, getTime(s.getPickupStartingTimeWindow().getStart())),
+				createTuple(END_PICKUP, getTime(s.getPickupStartingTimeWindow().getEnd())),
+				createTuple(START_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getStart())),
+				createTuple(END_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getEnd())),
 				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupDuration())),
 				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryDuration()))), closeElement, lineBreak
 		);

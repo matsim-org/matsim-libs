@@ -157,9 +157,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
 				if (startPickup != null && endPickup != null)
-					shipmentBuilder.setPickupStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+					shipmentBuilder.setPickupStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 				if (startDelivery != null && endDelivery != null)
-					shipmentBuilder.setDeliveryStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+					shipmentBuilder.setDeliveryStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
 				if (pickupServiceTime != null)
 					shipmentBuilder.setPickupDuration(parseTimeToDouble(pickupServiceTime));
 				if (deliveryServiceTime != null)

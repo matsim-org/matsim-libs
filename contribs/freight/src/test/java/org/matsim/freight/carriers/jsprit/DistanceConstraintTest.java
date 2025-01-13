@@ -633,14 +633,14 @@ public class DistanceConstraintTest {
 		// Shipment 1
 		CarrierShipment shipment1 = CarrierShipment.Builder
 				.newInstance(Id.create("Shipment1", CarrierShipment.class), Id.createLinkId("i(1,8)"), Id.createLinkId("j(3,8)"), 40)
-				.setDeliveryDuration(20).setDeliveryStartsTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.setDeliveryDuration(20).setDeliveryStartingTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
 				.build();
 		CarriersUtils.addShipment(carrier, shipment1);
 
 		// Shipment 2
 		CarrierShipment shipment2 = CarrierShipment.Builder
 				.newInstance(Id.create("Shipment2", CarrierShipment.class),Id.createLinkId("i(1,8)"), Id.createLinkId("j(0,3)R"), 40)
-				.setDeliveryDuration(20).setDeliveryStartsTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.setDeliveryDuration(20).setDeliveryStartingTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
 				.build();
 		CarriersUtils.addShipment(carrier, shipment2);
 

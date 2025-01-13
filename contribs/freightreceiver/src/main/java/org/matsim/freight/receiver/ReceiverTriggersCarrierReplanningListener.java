@@ -82,7 +82,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
                                     (int) (Math.round(order.getDailyOrderQuantity()*order.getProduct().getProductType().getRequiredCapacity())) );
                     CarrierShipment newShipment = builder
                                                                   .setDeliveryDuration( order.getServiceDuration() )
-                                                                  .setDeliveryStartsTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
+                                                                  .setDeliveryStartingTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
                                                                   // TODO This only looks at the FIRST time window. This may need revision once we handle multiple
                                                                   // time windows.
                                                                   .build();

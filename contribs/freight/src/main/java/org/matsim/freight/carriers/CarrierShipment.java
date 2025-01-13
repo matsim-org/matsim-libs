@@ -52,14 +52,14 @@ public final class CarrierShipment implements CarrierJob {
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 		//kturner dec'24
 		private final Id<Link> pickupLinkId;
-		private TimeWindow pickupStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private TimeWindow pickupStartingTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double pickupDuration = 0.0;
 
 		//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 		//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 		//kturner dec'24
 		private final Id<Link> deliveryLinkId;
-		private TimeWindow deliveryStartsTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		private TimeWindow deliveryStartingTimeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private double deliveryDuration = 0.0;
 
 		/**
@@ -93,12 +93,29 @@ public final class CarrierShipment implements CarrierJob {
 		 * Note that the time-window restricts the start-time of the shipment's pickup . If one works with hard time-windows (which means that
 		 * time-windows must be met) than the pickup is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
 		 *
-		 * @param pickupStartsTimeWindow 	time-window for the beginning of the pickup activity
+		 * @param pickupStartingTimeWindow 	time-window for the beginning of the pickup activity
 		 * @return 							the builder
 		 */
-		public Builder setPickupStartsTimeWindow(TimeWindow pickupStartsTimeWindow){
-			this.pickupStartsTimeWindow = pickupStartsTimeWindow;
+		public Builder setPickupStartingTimeWindow(TimeWindow pickupStartingTimeWindow){
+			this.pickupStartingTimeWindow = pickupStartingTimeWindow;
 			return this;
+		}
+
+		/**
+		 * Sets a time-window for the beginning of the pickup
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the shipment's pickup . If one works with hard time-windows (which means that
+		 * time-windows must be met) than the pickup is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @deprecated since jan'25, use {@link #setPickupStartingTimeWindow(TimeWindow)} instead
+		 *
+		 * @param pickupStartingTimeWindow 	time-window for the beginning of the pickup activity
+		 * @return 							the builder
+		 */
+		@Deprecated(since = "jan'25")
+		public Builder setPickupStartsTimeWindow(TimeWindow pickupStartingTimeWindow){
+			return setPickupStartingTimeWindow(pickupStartingTimeWindow);
 		}
 
 		/**
@@ -120,12 +137,29 @@ public final class CarrierShipment implements CarrierJob {
 		 * Note that the time-window restricts the start-time of the shipment's delivery . If one works with hard time-windows (which means that
 		 * time-windows must be met) than the delivery is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
 		 *
-		 * @param deliveryStartsTimeWindow 	time-window for the beginning of the delivery activity
+		 * @param deliveryStartingTimeWindow 	time-window for the beginning of the delivery activity
 		 * @return 							the builder
 		 */
-		public Builder setDeliveryStartsTimeWindow(TimeWindow deliveryStartsTimeWindow){
-			this.deliveryStartsTimeWindow = deliveryStartsTimeWindow;
+		public Builder setDeliveryStartingTimeWindow(TimeWindow deliveryStartingTimeWindow){
+			this.deliveryStartingTimeWindow = deliveryStartingTimeWindow;
 			return this;
+		}
+
+		/**
+		 * Sets a time-window for the beginning of the delivery
+		 * When not set, it is by default [0.0., Integer.MAX_VALUE].
+		 * <p>
+		 * Note that the time-window restricts the start-time of the shipment's delivery . If one works with hard time-windows (which means that
+		 * time-windows must be met) than the delivery is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 *
+		 * @deprecated since jan'25, use {@link #setDeliveryStartingTimeWindow(TimeWindow)} instead
+		 *
+		 * @param deliveryStartingTimeWindow 	time-window for the beginning of the delivery activity
+		 * @return 							the builder
+		 */
+		@Deprecated(since = "jan'25")
+		public Builder setDeliveryStartsTimeWindow(TimeWindow deliveryStartingTimeWindow){
+			return setDeliveryStartingTimeWindow(deliveryStartingTimeWindow);
 		}
 
 		/**
@@ -148,11 +182,11 @@ public final class CarrierShipment implements CarrierJob {
 
 
 		/**
-		 * @deprecated please inline and use {@link #setPickupStartsTimeWindow(TimeWindow)} instead
+		 * @deprecated please inline and use {@link #setPickupStartingTimeWindow(TimeWindow)} instead
 		 */
 		@Deprecated(since = "dec'24")
 		public Builder setPickupTimeWindow(TimeWindow pickupTW){
-			return setPickupStartsTimeWindow(pickupTW);
+			return setPickupStartingTimeWindow(pickupTW);
 		}
 
 		/**
@@ -164,11 +198,11 @@ public final class CarrierShipment implements CarrierJob {
 		}
 
 		/**
-		 * @deprecated please inline and use {@link #setDeliveryStartsTimeWindow(TimeWindow)} instead
+		 * @deprecated please inline and use {@link #setDeliveryStartingTimeWindow(TimeWindow)} instead
 		 */
 		@Deprecated(since = "dec'24")
 		public Builder setDeliveryTimeWindow(TimeWindow deliveryTW){
-			return setDeliveryStartsTimeWindow(deliveryTW);
+			return setDeliveryStartingTimeWindow(deliveryTW);
 		}
 
 		/**
@@ -187,14 +221,14 @@ public final class CarrierShipment implements CarrierJob {
 	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 	//kturner dec'24
 	private final Id<Link> pickupLinkId;
-	private final TimeWindow pickupStartsTimeWindow;
+	private final TimeWindow pickupStartingTimeWindow;
 	private double pickupDuration;
 
 	//IMO we could build a general class (CarrierActivity ???), containing the location, StartTimeWindow and Duration.
 	//This could be used for both, CarrierService and CarrierShipment (Pickup and Delivery).
 	//kturner dec'24
 	private final Id<Link> deliveryLinkId;
-	private final TimeWindow deliveryStartsTimeWindow;
+	private final TimeWindow deliveryStartingTimeWindow;
 	private double deliveryDuration;
 
 	private final Attributes attributes = new AttributesImpl();
@@ -207,8 +241,8 @@ public final class CarrierShipment implements CarrierJob {
 		capacityDemand = builder.capacityDemand;
 		pickupDuration = builder.pickupDuration;
 		deliveryDuration = builder.deliveryDuration;
-		pickupStartsTimeWindow = builder.pickupStartsTimeWindow;
-		deliveryStartsTimeWindow = builder.deliveryStartsTimeWindow;
+		pickupStartingTimeWindow = builder.pickupStartingTimeWindow;
+		deliveryStartingTimeWindow = builder.deliveryStartingTimeWindow;
 	}
 
 	//* getters and setters
@@ -264,12 +298,28 @@ public final class CarrierShipment implements CarrierJob {
 		return capacityDemand;
 	}
 
-	public TimeWindow getPickupStartsTimeWindow() {
-		return pickupStartsTimeWindow;
+	public TimeWindow getPickupStartingTimeWindow() {
+		return pickupStartingTimeWindow;
 	}
 
+	/**
+	 * @deprecated since jan'25, use {@link #getPickupStartingTimeWindow()} instead
+	 */
+	@Deprecated(since = "jan'25")
+	public TimeWindow getPickupStartsTimeWindow() {
+		return getPickupStartingTimeWindow();
+	}
+
+	public TimeWindow getDeliveryStartingTimeWindow() {
+		return deliveryStartingTimeWindow;
+	}
+
+	/**
+	 * @deprecated since jan'25, use {@link #getDeliveryStartingTimeWindow()} instead
+	 */
+	@Deprecated(since = "jan'25")
 	public TimeWindow getDeliveryStartsTimeWindow() {
-		return deliveryStartsTimeWindow;
+		return getDeliveryStartingTimeWindow();
 	}
 
 	@Override
@@ -297,11 +347,11 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	/**
-	 * @deprecated please inline and use {@link #getPickupStartsTimeWindow()} instead
+	 * @deprecated please inline and use {@link #getPickupStartingTimeWindow()} instead
 	 */
 	@Deprecated(since = "dec'24")
 	public TimeWindow getPickupTimeWindow() {
-		return getPickupStartsTimeWindow();
+		return getPickupStartingTimeWindow();
 	}
 
 	/**
@@ -330,11 +380,11 @@ public final class CarrierShipment implements CarrierJob {
 	}
 
 	/**
-	 * @deprecated please inline and use {@link #getDeliveryStartsTimeWindow()} instead
+	 * @deprecated please inline and use {@link #getDeliveryStartingTimeWindow()} instead
 	 */
 	@Deprecated(since = "dec'24")
 	public TimeWindow getDeliveryTimeWindow() {
-		return getDeliveryStartsTimeWindow();
+		return getDeliveryStartingTimeWindow();
 	}
 
 	/**
@@ -358,7 +408,7 @@ public final class CarrierShipment implements CarrierJob {
 	@Override
 	public String toString() {
 		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + pickupLinkId.toString() + "][to=" + deliveryLinkId.toString() + "][size=" + capacityDemand + "][pickupServiceTime=" + pickupDuration + "]" +
-				"[deliveryServiceTime="+ deliveryDuration +"][pickupTimeWindow="+ pickupStartsTimeWindow +"][deliveryTimeWindow="+ deliveryStartsTimeWindow +"]";
+				"[deliveryServiceTime="+ deliveryDuration +"][pickupTimeWindow="+ pickupStartingTimeWindow +"][deliveryTimeWindow="+ deliveryStartingTimeWindow +"]";
 	}
 
 	/* (non-Javadoc)

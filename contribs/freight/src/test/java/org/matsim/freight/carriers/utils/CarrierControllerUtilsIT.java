@@ -286,9 +286,9 @@ public class CarrierControllerUtilsIT{
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
 				.setDeliveryDuration(30.0)
-				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
+				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
 				.setPickupDuration(5.0)
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
 	}
 

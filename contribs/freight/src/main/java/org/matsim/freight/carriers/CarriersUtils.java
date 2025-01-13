@@ -435,9 +435,9 @@ public class CarriersUtils {
 				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18
-				.setDeliveryStartsTimeWindow(carrierService.getServiceStaringTimeWindow())
+				.setDeliveryStartingTimeWindow(carrierService.getServiceStaringTimeWindow())
 				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStaringTimeWindow().getEnd()))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStaringTimeWindow().getEnd()))
 				.build();
 			addShipment(carrierWS, carrierShipment);
 		}
