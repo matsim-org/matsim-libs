@@ -220,7 +220,7 @@ public final class CarrierService implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + serviceLinkId + "][capacityDemand=" + capacityDemand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + serviceStartingTimeWindow + "]";
+		return "[id=" + id + "][serviceLinkId=" + serviceLinkId + "][capacityDemand=" + capacityDemand + "][serviceDuration=" + serviceDuration + "][serviceStartingTimeWindow=" + serviceStartingTimeWindow + "]";
 	}
 
 	/* (non-Javadoc)

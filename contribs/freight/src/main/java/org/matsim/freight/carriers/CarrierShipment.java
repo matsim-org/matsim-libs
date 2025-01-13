@@ -407,8 +407,8 @@ public final class CarrierShipment implements CarrierJob {
 
 	@Override
 	public String toString() {
-		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + pickupLinkId.toString() + "][to=" + deliveryLinkId.toString() + "][size=" + capacityDemand + "][pickupServiceTime=" + pickupDuration + "]" +
-				"[deliveryServiceTime="+ deliveryDuration +"][pickupTimeWindow="+ pickupStartingTimeWindow +"][deliveryTimeWindow="+ deliveryStartingTimeWindow +"]";
+		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][pickupLinkId=" + pickupLinkId.toString() + "][deliveryLinkId=" + deliveryLinkId.toString() + "][capacityDemand=" + capacityDemand + "][pickupDuration=" + pickupDuration + "]" +
+				"[deliveryDuration="+ deliveryDuration +"][pickupStartingTimeWindow="+ pickupStartingTimeWindow +"][deliveryStartingTimeWindow="+ deliveryStartingTimeWindow +"]";
 	}
 
 	/* (non-Javadoc)
