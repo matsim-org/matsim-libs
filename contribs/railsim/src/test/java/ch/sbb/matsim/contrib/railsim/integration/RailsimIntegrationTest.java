@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
 import ch.sbb.matsim.contrib.railsim.RailsimModule;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.junit.jupiter.api.Assertions;
@@ -337,34 +338,21 @@ public class RailsimIntegrationTest {
 		// collect all arrivals and departures
 		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2arrivalStops = new HashMap<>();
 		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2departureStops = new HashMap<>();
+		Map<Id<Vehicle>, List<RailsimDetourEvent>> train2detours = new HashMap<>();
 
 		for (Event event : collector.getEvents()) {
-			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
-
-				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
-
-				if (train2arrivalStops.get(vehicleArrivesEvent.getVehicleId()) == null) {
-
-					List<Id<TransitStopFacility>> stops = new ArrayList<>();
-					stops.add(vehicleArrivesEvent.getFacilityId());
-					train2arrivalStops.put(vehicleArrivesEvent.getVehicleId(), stops);
-				} else {
-					train2arrivalStops.get(vehicleArrivesEvent.getVehicleId()).add(vehicleArrivesEvent.getFacilityId());
-				}
+			if (event instanceof VehicleArrivesAtFacilityEvent vehicleArrivesEvent) {
+				train2arrivalStops.computeIfAbsent(vehicleArrivesEvent.getVehicleId(), k -> new ArrayList<>())
+					.add(vehicleArrivesEvent.getFacilityId());
 			}
 
-			if (event.getEventType().equals(VehicleDepartsAtFacilityEvent.EVENT_TYPE)) {
+			if (event instanceof VehicleDepartsAtFacilityEvent vehicleDepartsEvent) {
+				train2departureStops.computeIfAbsent(vehicleDepartsEvent.getVehicleId(), k -> new ArrayList<>())
+					.add(vehicleDepartsEvent.getFacilityId());
+			}
 
-				VehicleDepartsAtFacilityEvent vehicleDepartsEvent = (VehicleDepartsAtFacilityEvent) event;
-
-				if (train2departureStops.get(vehicleDepartsEvent.getVehicleId()) == null) {
-
-					List<Id<TransitStopFacility>> stops = new ArrayList<>();
-					stops.add(vehicleDepartsEvent.getFacilityId());
-					train2departureStops.put(vehicleDepartsEvent.getVehicleId(), stops);
-				} else {
-					train2departureStops.get(vehicleDepartsEvent.getVehicleId()).add(vehicleDepartsEvent.getFacilityId());
-				}
+			if (event instanceof RailsimDetourEvent detour) {
+				train2detours.computeIfAbsent(detour.getVehicleId(), k -> new ArrayList<>()).add(detour);
 			}
 		}
 
@@ -380,7 +368,10 @@ public class RailsimIntegrationTest {
 		Assertions.assertEquals("AB", train2arrivalStops.get(Id.createVehicleId("train3")).get(0).toString(), "Wrong stop facility. This is the start stop facility.");
 
 		// The original events don't contain the re-routing. They appear to other agents as if the train drove the original schedule.
-		Assertions.assertEquals("CE", train2arrivalStops.get(Id.createVehicleId("train3")).get(1).toString(), "Wrong stop facility. This is the rerouted stop Id. Train 3 is rerouted from CE to CD.");
+		Assertions.assertEquals("CE", train2arrivalStops.get(Id.createVehicleId("train3")).get(1).toString(), "Wrong stop facility. This is the original id");
+		// Detour facility
+		Assertions.assertEquals("CD", train2detours.get(Id.createVehicleId("train3")).get(0).getNewStop().toString());
+
 
 		Assertions.assertEquals("JK", train2arrivalStops.get(Id.createVehicleId("train3")).get(2).toString(), "Wrong stop facility. This is the final stop facility.");
 	}
