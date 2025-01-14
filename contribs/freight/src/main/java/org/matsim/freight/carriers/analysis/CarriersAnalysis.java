@@ -24,6 +24,7 @@ package org.matsim.freight.carriers.analysis;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -141,7 +142,7 @@ public class CarriersAnalysis {
 		scenario = ScenarioUtils.loadScenario(config);
 
 		//load carriers according to freight config
-		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 		this.carriers = CarriersUtils.addOrGetCarriers(scenario);
 	}
 
@@ -158,18 +159,19 @@ public class CarriersAnalysis {
 		if (CarriersUtils.allCarriersWithDemandHavePlans(carriers)) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
-		}
-		else  {
+		} else {
 			log.warn("########## Not all carriers have plans. Skipping CarrierPlanAnalysis."); //TODO perhaps skipp complete analysis
 		}
 	}
+
 	public void runCompleteAnalysis() throws IOException {
 		runBasicCarriersAnalysis();
 
 		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
+		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(
+			delimiter, scenario);
 		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
 		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));

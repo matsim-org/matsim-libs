@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -108,7 +109,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	}
 
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event){
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime());
 	}
 
@@ -124,9 +125,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 	//If the vehicle leaves a link at the end, the travelTime is calculated and stored.
 	@Override
-	public void handleEvent(LinkLeaveEvent event){
+	public void handleEvent(LinkLeaveEvent event) {
 		final Id<Vehicle> vehicleId = event.getVehicleId();
-		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
+		if (vehicleEnteredLinkTime.containsKey(vehicleId)) {
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
 			vehicleId2TravelTime.merge(vehicleId, tt, Double::sum); //per vehicle
 
@@ -139,9 +140,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 	//If the vehicle leaves a link because it reached its destination, the travelTime is calculated and stored.
 	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event){
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		final Id<Vehicle> vehicleId = event.getVehicleId();
-		if (vehicleEnteredLinkTime.containsKey(vehicleId)){
+		if (vehicleEnteredLinkTime.containsKey(vehicleId)) {
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
 			vehicleId2TravelTime.merge(vehicleId, tt, Double::sum);//per vehicle
 
@@ -201,13 +202,13 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 			bw1.write(delimiter + vehicleId2TourId.get(vehicleId));
 
 			bw1.write(delimiter + durationInSeconds);
-			bw1.write(delimiter + durationInSeconds /3600);
+			bw1.write(delimiter + durationInSeconds / 3600);
 
 			bw1.write(delimiter + distanceInMeters);
-			bw1.write(delimiter + distanceInMeters/1000);
+			bw1.write(delimiter + distanceInMeters / 1000);
 
 			bw1.write(delimiter + travelTimeInSeconds);
-			bw1.write(delimiter + travelTimeInSeconds /3600);
+			bw1.write(delimiter + travelTimeInSeconds / 3600);
 
 			bw1.write(delimiter + costsPerSecond);
 			bw1.write(delimiter + costsPerMeter);

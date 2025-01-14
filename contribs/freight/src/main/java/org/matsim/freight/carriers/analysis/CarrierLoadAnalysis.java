@@ -65,7 +65,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		Integer demand = Integer.valueOf(event.getAttributes().get(ATTRIBUTE_CAPACITYDEMAND));
 
 		LinkedList<Integer> list;
-		if (! vehicle2Load.containsKey(vehicleId)){
+		if (!vehicle2Load.containsKey(vehicleId)) {
 			list = new LinkedList<>();
 			list.add(demand);
 			vehicle2DemandPerTour.put(vehicleId, demand);
@@ -95,7 +95,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
 
 		//Write headline:
-		bw1.write(String.join(delimiter,"vehicleId",
+		bw1.write(String.join(delimiter, "vehicleId",
 			"vehicleTypeId",
 			"capacity",
 			"maxLoad",
@@ -113,7 +113,7 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 			final Double capacity = vehicleType.getCapacity().getOther();
 
 			final Integer demand = vehicle2DemandPerTour.get(vehicleId);
-			final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000)/100.0;;
+			final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000) / 100.0;
 
 			bw1.write(vehicleId.toString());
 			bw1.write(delimiter + vehicleType.getId().toString());
