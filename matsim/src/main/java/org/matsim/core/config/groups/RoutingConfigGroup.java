@@ -71,7 +71,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private Double beelineDistanceFactor = 1.3 ;
 
 	public enum AccessEgressType {
-		@Deprecated none,
+		none,
 
 		/**
 		 * Euclidian distance from facility to nearest point on link; then teleported walk.  In normal cases, all activities that belong to the
@@ -92,7 +92,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 	private static final String ACCESSEGRESSTYPE = "accessEgressType";
 	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
-	private AccessEgressType accessEgressType = AccessEgressType.none;
+	private AccessEgressType accessEgressType = AccessEgressType.accessEgressModeToLink;
 
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
