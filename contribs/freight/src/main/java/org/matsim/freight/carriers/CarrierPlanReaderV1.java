@@ -116,11 +116,11 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
 					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
 				if( startPickup == null ){
-					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartsTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartingTimeWindow(
 						  TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) );
 				} else{
-					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
-						setDeliveryStartsTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
+						setDeliveryStartingTimeWindow(
 																										   TimeWindow.newInstance(
 																											     getDouble(
 																													 startDelivery ),

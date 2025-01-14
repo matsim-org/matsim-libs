@@ -229,7 +229,7 @@ import org.matsim.vehicles.VehicleType;
         Id.create(lspShipment.getId().toString(), CarrierService.class);
     CarrierService.Builder builder =
         CarrierService.Builder.newInstance(serviceId, resource.getEndLinkId());
-    builder.setDemand(lspShipment.getSize());
+    builder.setCapacityDemand(lspShipment.getSize());
     builder.setServiceDuration(lspShipment.getDeliveryServiceTime());
     return builder.build();
   }
