@@ -22,7 +22,6 @@
 package org.matsim.freight.carriers.analysis;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
@@ -149,9 +148,8 @@ public class CarriersAnalysis {
 	/**
 	 * Run the analysis of the carriers based on the carrier file.
 	 *
-	 * @throws IOException If the output file cannot be written
 	 */
-	public void runBasicCarriersAnalysis() throws IOException {
+	public void runBasicCarriersAnalysis() {
 
 		//Where to store the analysis output?
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
@@ -164,7 +162,7 @@ public class CarriersAnalysis {
 		}
 	}
 
-	public void runCompleteAnalysis() throws IOException {
+	public void runCompleteAnalysis() {
 		runBasicCarriersAnalysis();
 
 		// Prepare eventsManager - start of event based Analysis;

@@ -62,7 +62,7 @@ public class CarrierPlanAnalysis {
 		this.carriers = carriers;
 	}
 
-	public void runAnalysisAndWriteStats(String analysisOutputDirectory) throws IOException {
+	public void runAnalysisAndWriteStats(String analysisOutputDirectory) {
 		log.info("Writing out carrier analysis ...");
 		//Load per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("Carrier_stats.tsv").toString();
@@ -150,8 +150,7 @@ public class CarrierPlanAnalysis {
 			bw1.close();
 			log.info("Output written to {}", fileName);
 		} catch (IOException e) {
-			log.error("Error writing output to file: {}", fileName);
-			throw e;
+			log.error("Could not write carrier stats to file", e);
 		}
 	}
 }
