@@ -64,6 +64,9 @@ public class RailsimDetourEvent extends Event implements HasVehicleId {
 		return vehicleId;
 	}
 
+	public Id<TransitStopFacility> getNewStop() {
+		return newStop;
+	}
 
 	@Override
 	public Map<String, String> getAttributes() {

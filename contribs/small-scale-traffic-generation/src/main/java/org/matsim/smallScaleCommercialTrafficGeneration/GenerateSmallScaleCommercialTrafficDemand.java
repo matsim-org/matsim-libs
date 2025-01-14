@@ -800,8 +800,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + rnd.nextInt(10000),
 			CarrierService.class);
 
-		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
-			.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, linkId)
+			.setServiceDuration(serviceTimePerStop);
+		CarrierService thisService = builder.setServiceStartingTimeWindow(serviceTimeWindow).build();
 		newCarrier.getServices().put(thisService.getId(), thisService);
 	}
 

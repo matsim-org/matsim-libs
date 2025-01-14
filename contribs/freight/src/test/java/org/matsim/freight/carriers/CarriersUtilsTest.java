@@ -68,7 +68,7 @@ public class CarriersUtilsTest {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<CarrierService> serviceId = Id.create("testVehicle", CarrierService.class);
 		CarrierService service1 = CarrierService.Builder.newInstance(serviceId,Id.createLinkId("link0") )
-				.setDemand(15).setServiceDuration(30).build();
+				.setCapacityDemand(15).setServiceDuration(30).build();
 
 		//add Service
 		CarriersUtils.addService(carrier, service1);
@@ -105,7 +105,7 @@ public class CarriersUtilsTest {
 		Assertions.assertEquals(shipmentId, carrierShipment1b.getId());
 		Assertions.assertEquals(service1.getId(), carrierShipment1b.getId());
 		Assertions.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getPickupLinkId());
-		Assertions.assertEquals(20, carrierShipment1b.getDemand(), EPSILON);
+		Assertions.assertEquals(20, carrierShipment1b.getCapacityDemand(), EPSILON);
 	}
 
 	@Test
