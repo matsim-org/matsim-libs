@@ -431,13 +431,13 @@ public class CarriersUtils {
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
 					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getServiceLinkId(),
-					carrierService.getDemand())
+					carrierService.getCapacityDemand())
 				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18
-				.setDeliveryStartsTimeWindow(carrierService.getServiceStartTimeWindow())
+				.setDeliveryStartingTimeWindow(carrierService.getServiceStaringTimeWindow())
 				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStaringTimeWindow().getEnd()))
 				.build();
 			addShipment(carrierWS, carrierShipment);
 		}

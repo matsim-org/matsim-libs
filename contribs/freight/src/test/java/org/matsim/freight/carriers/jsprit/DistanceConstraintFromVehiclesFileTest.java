@@ -418,17 +418,19 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 	private static Carrier addTwoServicesToCarrier(Carrier carrier) {
 		// Service 1
-		CarrierService service1 = CarrierService.Builder
+		CarrierService.Builder builder1 = CarrierService.Builder
 				.newInstance(Id.create("Service1", CarrierService.class), Id.createLinkId("j(3,8)"))
-				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setServiceDuration(20);
+		CarrierService service1 = builder1.setServiceStartingTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service1);
 
 		// Service 2
-		CarrierService service2 = CarrierService.Builder
+		CarrierService.Builder builder = CarrierService.Builder
 				.newInstance(Id.create("Service2", CarrierService.class), Id.createLinkId("j(0,3)R"))
-				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setServiceDuration(20);
+		CarrierService service2 = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service2);
 
 		return carrier;
@@ -439,10 +441,11 @@ public class DistanceConstraintFromVehiclesFileTest {
 		addTwoServicesToCarrier(carrier);
 
 		// Service 3
-		CarrierService service3 = CarrierService.Builder
+		CarrierService.Builder builder = CarrierService.Builder
 				.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
-				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-				.setDemand(40).build();
+				.setServiceDuration(20);
+		CarrierService service3 = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
+				.setCapacityDemand(40).build();
 		CarriersUtils.addService(carrier, service3);
 
 		return carrier;
