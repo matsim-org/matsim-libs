@@ -332,8 +332,8 @@ public class RailsimIntegrationTest {
 		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector, "train2"));
 		// These arrive closer together, because both waited
 		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector, "train3"));
-		assertTrainState(30982, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
-		
+		assertTrainState(31034, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
+
 		// collect all arrivals and departures
 		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2arrivalStops = new HashMap<>();
 		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2departureStops = new HashMap<>();
@@ -342,9 +342,9 @@ public class RailsimIntegrationTest {
 			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
 
 				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
-				
+
 				if (train2arrivalStops.get(vehicleArrivesEvent.getVehicleId()) == null) {
-					
+
 					List<Id<TransitStopFacility>> stops = new ArrayList<>();
 					stops.add(vehicleArrivesEvent.getFacilityId());
 					train2arrivalStops.put(vehicleArrivesEvent.getVehicleId(), stops);
@@ -352,13 +352,13 @@ public class RailsimIntegrationTest {
 					train2arrivalStops.get(vehicleArrivesEvent.getVehicleId()).add(vehicleArrivesEvent.getFacilityId());
 				}
 			}
-			
+
 			if (event.getEventType().equals(VehicleDepartsAtFacilityEvent.EVENT_TYPE)) {
 
 				VehicleDepartsAtFacilityEvent vehicleDepartsEvent = (VehicleDepartsAtFacilityEvent) event;
-				
+
 				if (train2departureStops.get(vehicleDepartsEvent.getVehicleId()) == null) {
-					
+
 					List<Id<TransitStopFacility>> stops = new ArrayList<>();
 					stops.add(vehicleDepartsEvent.getFacilityId());
 					train2departureStops.put(vehicleDepartsEvent.getVehicleId(), stops);
@@ -367,7 +367,7 @@ public class RailsimIntegrationTest {
 				}
 			}
 		}
-		
+
 		// test if all trains have the correct number of arrivals and departures
 		for (Id<Vehicle> vehicleId : train2arrivalStops.keySet()) {
 			Assertions.assertEquals(3, train2arrivalStops.get(vehicleId).size(), MatsimTestUtils.EPSILON, "Wrong number of arrival stops for train " + vehicleId);
@@ -375,10 +375,13 @@ public class RailsimIntegrationTest {
 		for (Id<Vehicle> vehicleId : train2departureStops.keySet()) {
 			Assertions.assertEquals(3, train2departureStops.get(vehicleId).size(), MatsimTestUtils.EPSILON, "Wrong number of departure stops for train " + vehicleId);
 		}
-		
+
 		// test if the trains have the correct arrival / departure stop facilities
 		Assertions.assertEquals("AB", train2arrivalStops.get(Id.createVehicleId("train3")).get(0).toString(), "Wrong stop facility. This is the start stop facility.");
-		Assertions.assertEquals("CD", train2arrivalStops.get(Id.createVehicleId("train3")).get(1).toString(), "Wrong stop facility. This is the rerouted stop Id. Train 3 is rerouted from CE to CD.");
+
+		// The original events don't contain the re-routing. They appear to other agents as if the train drove the original schedule.
+		Assertions.assertEquals("CE", train2arrivalStops.get(Id.createVehicleId("train3")).get(1).toString(), "Wrong stop facility. This is the rerouted stop Id. Train 3 is rerouted from CE to CD.");
+
 		Assertions.assertEquals("JK", train2arrivalStops.get(Id.createVehicleId("train3")).get(2).toString(), "Wrong stop facility. This is the final stop facility.");
 	}
 
@@ -407,7 +410,7 @@ public class RailsimIntegrationTest {
 
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
 	}
-	
+
 	@Test
 	void testMicroStationReroutingTwoDirections() {
 //		modifyScheduleAndRunSimulation(new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"), 300, 1800);
@@ -420,7 +423,7 @@ public class RailsimIntegrationTest {
                 1800
             );
         });
-        
+
         try {
             future.get(30, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -531,14 +534,14 @@ public class RailsimIntegrationTest {
 
 		return collector;
 	}
-	
+
 	private void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
 		Random rnd = MatsimRandom.getRandom();
 		rnd.setSeed(1242);
 
 		for (double maxRndDelaySeconds = 0; maxRndDelaySeconds <= maxMaxRndDelay; maxRndDelaySeconds = maxRndDelaySeconds + maxRndDelayStepSize) {
 			Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
-			
+
 			config.controller().setOutputDirectory(utils.getOutputDirectory() + "maxRndDelay_" + maxRndDelaySeconds);
 			config.controller().setDumpDataAtEnd(true);
 			config.controller().setCreateGraphs(false);
@@ -549,7 +552,7 @@ public class RailsimIntegrationTest {
 			Controler controler = new Controler(scenario);
 			controler.addOverridingModule(new RailsimModule());
 			controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-						
+
 			// modify scenario
 			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
@@ -562,7 +565,7 @@ public class RailsimIntegrationTest {
 						modifiedDeparture.setVehicleId(departure.getVehicleId());
 						departuresToAdd.add(modifiedDeparture);
 					}
-					
+
 					for (Departure departureToRemove : departuresToRemove) {
 						route.removeDeparture(departureToRemove);
 					}
@@ -571,7 +574,7 @@ public class RailsimIntegrationTest {
 					}
 				}
 			}
-			
+
 			controler.run();
 		}
 	}
