@@ -297,6 +297,29 @@ public class CarriersUtils {
 	}
 
 	/**
+	 * Checks if all carriers with jobs have at least one plan.
+	 *
+	 * @param carriers the carriers
+	 * @return true if all carriers with jobs have at teast one plan
+	 */
+	public static boolean allCarriersWithDemandHavePlans(Carriers carriers) {
+		for (Carrier carrier : carriers.getCarriers().values())
+			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
+
+		return true;
+	}
+
+	/**
+	 * Checks is a carrier has jobs (services or shipments).
+	 *
+	 * @param carrier the carrier
+	 * @return true if a carrier has jobs (services or shipments)
+	 */
+	public static boolean hasJobs(Carrier carrier) {
+		return !carrier.getServices().isEmpty() || !carrier.getShipments().isEmpty();
+	}
+
+	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s
 	 * for creating a new VRP. As consequence of the transformation of
 	 * {@link CarrierService}s to {@link CarrierShipment}s the solution of the VRP
