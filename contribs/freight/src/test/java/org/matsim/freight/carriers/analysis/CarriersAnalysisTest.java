@@ -51,8 +51,8 @@ public class CarriersAnalysisTest {
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 		carriersAnalysis.runCompleteAnalysis();
 
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_demand.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_demand.tsv");
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_solution.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_solution.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_demand.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_demand.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_solution.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_solution.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicle.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicleType.tsv");
@@ -72,8 +72,8 @@ public class CarriersAnalysisTest {
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 		carriersAnalysis.runCompleteAnalysis();
 
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_demand.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_demand.tsv");
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_solution.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_solution.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_demand.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_demand.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_solution.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_solution.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Load_perVehicle.tsv", testUtils.getOutputDirectory() + "Load_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicle.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicle.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", testUtils.getOutputDirectory() + "TimeDistance_perVehicleType.tsv");
@@ -95,7 +95,7 @@ public class CarriersAnalysisTest {
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(carriers, testUtils.getOutputDirectory());
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_demand.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_demand.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_demand.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_demand.tsv");
 	}
 
 	@Test
@@ -113,6 +113,6 @@ public class CarriersAnalysisTest {
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(carriers, testUtils.getOutputDirectory());
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 
-		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_demand.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_demand.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "CarriersPlan_stats_demand.tsv",  testUtils.getOutputDirectory() + "CarriersPlan_stats_demand.tsv");
 	}
 }

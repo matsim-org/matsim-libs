@@ -69,8 +69,8 @@ public class CarrierPlanAnalysis {
 
 		Path path = Path.of(analysisOutputDirectory);
 		String fileName = switch (analysisType) {
-			case onlyDemand -> path.resolve("Carriers_stats_demand.tsv").toString();
-			case completeAnalysis -> path.resolve("Carriers_stats_solution.tsv").toString();
+			case onlyDemand -> path.resolve("CarriersPlan_stats_demand.tsv").toString();
+			case completeAnalysis -> path.resolve("CarriersPlan_stats_solution.tsv").toString();
 		};
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 			String headerGeneral = String.join(delimiter,
