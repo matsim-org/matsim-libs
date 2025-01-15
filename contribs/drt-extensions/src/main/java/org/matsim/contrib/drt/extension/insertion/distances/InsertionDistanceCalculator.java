@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.insertion.distances;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -12,6 +13,8 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -27,22 +30,25 @@ public class InsertionDistanceCalculator {
 		double passengerDistance = 0.0;
 
 		if (!schedule.getStatus().equals(ScheduleStatus.UNPLANNED)) {
-			int occupancy = 0;
+			DvrpLoad occupancy = vehicleEntry.vehicle.getCapacity();
+			if(!(occupancy instanceof IntegerLoad scalarVehicleLoad)) {
+				throw new IllegalStateException(String.format("Only %s instances are allowed", IntegerLoad.class));
+			}
 
 			for (Task task : schedule.getTasks()) {
 				if (task instanceof DrtStopTask) {
-					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
-					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
+					occupancy = occupancy.add(Objects.requireNonNullElse(getPassengers(((DrtStopTask) task).getPickupRequests().values()), vehicleEntry.vehicle.getCapacity().getType().getEmptyLoad()));
+					occupancy = occupancy.subtract(Objects.requireNonNullElse(getPassengers(((DrtStopTask) task).getDropoffRequests().values()), vehicleEntry.vehicle.getCapacity()));
 				}
 
 				if (task instanceof DriveTask) {
 					double taskDistance = calculateTaskDistance((DriveTask) task);
 
-					if (occupancy == 0) {
+					if (occupancy.isEmpty()) {
 						emptyDistance += taskDistance;
 					} else {
 						occupiedDistance += taskDistance;
-						passengerDistance += taskDistance * occupancy;
+						passengerDistance += scalarVehicleLoad.getLoad() * taskDistance;
 					}
 				}
 			}
@@ -51,8 +57,16 @@ public class InsertionDistanceCalculator {
 		return new VehicleDistance(occupiedDistance, emptyDistance, passengerDistance);
 	}
 
-	private int getPassengers(Collection<AcceptedDrtRequest> requests) {
-		return requests.stream().mapToInt(r -> r.getPassengerIds().size()).sum();
+	private DvrpLoad getPassengers(Collection<AcceptedDrtRequest> requests) {
+		DvrpLoad load = null;
+		for(AcceptedDrtRequest acceptedDrtRequest: requests) {
+			if(load == null) {
+				load = acceptedDrtRequest.getLoad();
+			} else {
+				load = load.add(acceptedDrtRequest.getLoad());
+			}
+		}
+		return load;
 	}
 
 	public VehicleDistance calculateInsertionDistance(Insertion insertion, DetourTimeInfo detourTimeInfo,
@@ -65,7 +79,7 @@ public class InsertionDistanceCalculator {
 		final Link pickupNewLink = insertion.pickup.newWaypoint.getLink();
 		final Link pickupToLink = insertion.pickup.nextWaypoint.getLink();
 
-		int beforePickupOccupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
+		DvrpLoad beforePickupOccupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
 
 		double beforePickupDistance = distanceEstimator
 				.calculateDistance(insertion.pickup.previousWaypoint.getDepartureTime(), pickupFromLink, pickupNewLink);
@@ -74,7 +88,7 @@ public class InsertionDistanceCalculator {
 				pickupNewLink, pickupToLink);
 
 		addedDistances.add(new DistanceEntry(beforePickupDistance, beforePickupOccupancy));
-		addedDistances.add(new DistanceEntry(afterPickupDistance, beforePickupOccupancy + 1));
+		addedDistances.add(new DistanceEntry(afterPickupDistance, beforePickupOccupancy.add(insertion.insertedLoad)));
 
 		if (insertion.pickup.previousWaypoint instanceof Waypoint.Start) {
 			Task currentTask = insertion.vehicleEntry.vehicle.getSchedule().getCurrentTask();
@@ -88,12 +102,12 @@ public class InsertionDistanceCalculator {
 					removedStartDistance += tracker.getPath().getLink(k).getLength();
 				}
 
-				int startOccupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
+				DvrpLoad startOccupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
 				removedDistances.add(new DistanceEntry(removedStartDistance, startOccupancy));
 			}
 		} else {
 			int startIndex = ((Waypoint.Stop) insertion.pickup.previousWaypoint).task.getTaskIdx();
-			int occupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
+			DvrpLoad occupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
 
 			final int endIndex;
 			if (insertion.pickup.nextWaypoint instanceof Waypoint.End) {
@@ -108,8 +122,8 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
-					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getDropoffRequests().values()));
 				}
 
 				if (task instanceof DriveTask) {
@@ -125,24 +139,24 @@ public class InsertionDistanceCalculator {
 				? insertion.dropoff.newWaypoint.getLink()
 				: insertion.dropoff.nextWaypoint.getLink();
 
-		final int beforeDropoffOccupancy;
+		final DvrpLoad beforeDropoffOccupancy;
 		if (insertion.dropoff.index > insertion.pickup.index) {
-			beforeDropoffOccupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy() + 1;
+			beforeDropoffOccupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy().add(insertion.insertedLoad);
 			double beforeDropoffDistance = distanceEstimator.calculateDistance(
 					insertion.dropoff.previousWaypoint.getDepartureTime(), dropoffFromLink, dropoffNewLink);
 
 			addedDistances.add(new DistanceEntry(beforeDropoffDistance, beforeDropoffOccupancy));
 		} else {
-			beforeDropoffOccupancy = beforePickupOccupancy + 1;
+			beforeDropoffOccupancy = beforePickupOccupancy.add(insertion.insertedLoad);
 		}
 
 		double afterDropoffDistance = distanceEstimator.calculateDistance(detourTimeInfo.dropoffDetourInfo.arrivalTime,
 				dropoffNewLink, dropoffToLink);
-		addedDistances.add(new DistanceEntry(afterDropoffDistance, beforeDropoffOccupancy - 1));
+		addedDistances.add(new DistanceEntry(afterDropoffDistance, beforeDropoffOccupancy.subtract(insertion.insertedLoad)));
 
 		if (insertion.dropoff.index > insertion.pickup.index) {
 			int startIndex = ((Waypoint.Stop) insertion.dropoff.previousWaypoint).task.getTaskIdx();
-			int occupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy();
+			DvrpLoad occupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy();
 
 			final int endIndex;
 			if (insertion.dropoff.nextWaypoint instanceof Waypoint.End) {
@@ -155,8 +169,8 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
-					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
+					occupancy = occupancy.add(getPassengers(((DrtStopTask) task).getPickupRequests().values()));
+					occupancy = occupancy.subtract(getPassengers(((DrtStopTask) task).getDropoffRequests().values()));
 				}
 
 				if (task instanceof DriveTask) {
@@ -171,20 +185,28 @@ public class InsertionDistanceCalculator {
 		double passengerDistance = 0.0;
 
 		for (var entry : addedDistances) {
-			if (entry.occupancy == 0) {
+			if (entry.occupancy.isEmpty()) {
 				emptyDriveDistance += entry.distance;
 			} else {
 				occupiedDriveDistance += entry.distance;
-				passengerDistance += entry.distance * entry.occupancy;
+				if(entry.occupancy instanceof  IntegerLoad scalarVehicleLoad) {
+					passengerDistance += scalarVehicleLoad.getLoad() * entry.distance;
+				} else {
+					throw new IllegalStateException(String.format("Only %s instances are allowed", IntegerLoad.class));
+				}
 			}
 		}
 
 		for (var entry : removedDistances) {
-			if (entry.occupancy == 0) {
+			if (entry.occupancy.isEmpty()) {
 				emptyDriveDistance -= entry.distance;
 			} else {
 				occupiedDriveDistance -= entry.distance;
-				passengerDistance -= entry.hashCode() * entry.occupancy;
+				if(entry.occupancy instanceof IntegerLoad scalarVehicleLoad) {
+					passengerDistance -= scalarVehicleLoad.getLoad() * entry.distance;
+				} else {
+					throw new IllegalStateException(String.format("Only %s instances are allowed", IntegerLoad.class));
+				}
 			}
 		}
 
@@ -208,6 +230,6 @@ public class InsertionDistanceCalculator {
 		}
 	}
 
-	private record DistanceEntry(double distance, int occupancy) {
+	private record DistanceEntry(double distance, DvrpLoad occupancy) {
 	}
 }

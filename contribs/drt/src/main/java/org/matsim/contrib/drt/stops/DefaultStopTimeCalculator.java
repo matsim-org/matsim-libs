@@ -51,7 +51,8 @@ public class DefaultStopTimeCalculator implements StopTimeCalculator {
 
 	@Override
 	public double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
-		// stop always has a fixed duration
+		// When shifting, we make sure the new duration is the same as the previous one
+		double stopDuration  = stop.getEndTime() - stop.getBeginTime();
 		return beginTime + stopDuration;
 	}
 }

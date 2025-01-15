@@ -23,6 +23,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 
@@ -51,9 +53,10 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	private final double maxRideDuration;
 
 	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
-			Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
-			double earliestDepartureTime, double latestPickupTime, double latestDropoffTime, double maxRideDuration ) {
-		super(time, mode, requestId, personIds, fromLinkId, toLinkId);
+									Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
+									double earliestDepartureTime, double latestPickupTime, double latestDropoffTime, double maxRideDuration,
+									DvrpLoad load, String serializedDvrpLoad, Id<DvrpLoadType> loadTypeId) {
+		super(time, mode, requestId, personIds, fromLinkId, toLinkId, load, serializedDvrpLoad, loadTypeId);
 		this.unsharedRideTime = unsharedRideTime;
 		this.unsharedRideDistance = unsharedRideDistance;
 		this.earliestDepartureTime = earliestDepartureTime;
@@ -126,7 +129,10 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		double latestPickupTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_PICKUP_TIME, "NaN"));
 		double latestDropoffTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_DROPOFF_TIME, "NaN"));
 		double maxRideDuration = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_MAX_RIDE_DURATION, "NaN"));
+		String serializedLoad  = attributes.get(ATTRIBUTE_LOAD);
+		Id<DvrpLoadType> loadType = Id.create(attributes.get(ATTRIBUTE_LOAD_TYPE), DvrpLoadType.class);
 		return new DrtRequestSubmittedEvent(time, mode, requestId, personIds, fromLinkId, toLinkId, unsharedRideTime,
-				unsharedRideDistance, earliestDepartureTime, latestPickupTime, latestDropoffTime, maxRideDuration);
+				unsharedRideDistance, earliestDepartureTime, latestPickupTime, latestDropoffTime, maxRideDuration,
+			null, serializedLoad, loadType);
 	}
 }
