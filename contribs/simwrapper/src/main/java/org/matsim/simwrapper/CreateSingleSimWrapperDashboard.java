@@ -32,6 +32,7 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 
 @CommandLine.Command(
@@ -114,7 +115,11 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					sw.addDashboard(new PublicTransitDashboard());
 				}
 				case impactAnalysis -> {
-					sw.addDashboard(new ImpactAnalysisDashboard());
+					HashSet<String> modes = new HashSet<>();
+					modes.add("car");
+					modes.add("freight");
+
+					sw.addDashboard(new ImpactAnalysisDashboard(modes));
 				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}

@@ -20,6 +20,7 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DashboardTests {
@@ -156,7 +157,13 @@ public class DashboardTests {
 
 	@Test
 	void impactAnalysis() {
-		ImpactAnalysisDashboard impactAnalysisDashboard = new ImpactAnalysisDashboard();
+		HashSet<String> modes = new HashSet<>();
+		modes.add("car");
+		modes.add("freight");
+
+		ImpactAnalysisDashboard impactAnalysisDashboard = new ImpactAnalysisDashboard(modes);
+
+//		run(new EmissionsDashboard("EPSG:25832"), impactAnalysisDashboard);
 		run(impactAnalysisDashboard);
 	}
 }
