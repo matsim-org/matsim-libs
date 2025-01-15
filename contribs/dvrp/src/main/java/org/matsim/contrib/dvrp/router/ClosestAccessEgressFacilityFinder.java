@@ -62,7 +62,7 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 				Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
 	}
 
-	private Facility findClosestStop(Facility facility) {
+	public Facility findClosestStop(Facility facility) {
 		Coord coord = getFacilityCoord(facility, network);
 		Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
