@@ -145,6 +145,14 @@ public class CarriersAnalysis {
 		this.carriers = CarriersUtils.addOrGetCarriers(scenario);
 	}
 
+	public void runDemandOfCarriersAnalysis() {
+		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
+		if(!folder.exists())
+			folder.mkdirs();
+		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
+		carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierPlanAnalysis.CarrierAnalysisType.onlyDemand);
+	}
+
 	/**
 	 * Run the analysis of the carriers based on the carrier file.
 	 *
@@ -156,7 +164,7 @@ public class CarriersAnalysis {
 		folder.mkdirs();
 		if (CarriersUtils.allCarriersWithDemandHavePlans(carriers)) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
-			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
+			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierPlanAnalysis.CarrierAnalysisType.completeAnalysis);
 		} else {
 			log.warn("########## Not all carriers have plans. Skipping CarrierPlanAnalysis."); //TODO perhaps skipp complete analysis
 		}

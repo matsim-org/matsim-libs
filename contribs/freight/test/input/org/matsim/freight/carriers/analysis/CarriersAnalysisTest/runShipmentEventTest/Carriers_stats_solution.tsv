@@ -1,0 +1,2 @@
+carrierId	nuOfJspritIterations	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations(input)	nuOfPickupLocations(input)	nuOfDeliveryLocations(input)	MATSimScoreSelectedPlan	jSpritScoreSelectedPlan	nuOfTours	nuOfShipments(input)	nuOfShipments(handled)	nuOfServices(input)	nuOfServices(handled)	noOfNotHandledJobs	nuOfPlanedDemandSize	nuOfHandledDemandSize	jspritComputationTime[HH:mm:ss]
+carrier1	50	1	1	0	1	5	-Infinity	-215.4666666666667	1	5	5	0	0	0	26	26	00:00:00
