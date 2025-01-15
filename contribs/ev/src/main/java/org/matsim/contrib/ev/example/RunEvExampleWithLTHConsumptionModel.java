@@ -25,6 +25,7 @@ package org.matsim.contrib.ev.example;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +54,7 @@ import org.matsim.vehicles.VehicleType;
  * The consumption maps are based on Domingues, Gabriel. / Modeling, Optimization and Analysis of Electromobility Systems. Lund : Department of Biomedical Engineering, Lund university, 2018. 169 p., PhD thesis
  */
 public class RunEvExampleWithLTHConsumptionModel {
-	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
+	static final String DEFAULT_CONFIG_FILE = "/contribs/ev/test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
 	private static final Logger log = LogManager.getLogger(RunEvExampleWithLTHConsumptionModel.class);
 
 	public static void main(String[] args) throws IOException {
@@ -61,13 +62,15 @@ public class RunEvExampleWithLTHConsumptionModel {
 			log.info("Starting simulation run with the following arguments:");
 			log.info("args=" + Arrays.toString( args ) );
 		} else {
-			File localConfigFile = new File(DEFAULT_CONFIG_FILE);
+			String workspaceFilepath = System.getProperty("user.dir");
+			String configFilePath = workspaceFilepath + DEFAULT_CONFIG_FILE;
+			File localConfigFile = new File(configFilePath);
 			if (localConfigFile.exists()) {
 				log.info("Starting simulation run with the local example config file");
-				args = new String[]{ DEFAULT_CONFIG_FILE };
+				args = new String[]{configFilePath};
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master"
 						+ DEFAULT_CONFIG_FILE };
 			}
 		}
