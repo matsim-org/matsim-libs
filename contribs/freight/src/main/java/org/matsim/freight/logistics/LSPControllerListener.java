@@ -246,8 +246,7 @@ class LSPControllerListener
   public void notifyShutdown(ShutdownEvent event) {
     new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario))
         .write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-    new CarrierPlanWriter(CarriersUtils.getCarriers(scenario))
-        .write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
+	CarriersUtils.writeCarriers(scenario,"output_carriers.xml.gz");
   }
 
 }

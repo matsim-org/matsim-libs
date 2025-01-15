@@ -654,9 +654,9 @@ public final class DemandReaderFromCSV {
 					Id<CarrierService> idNewService = Id.create(
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
-					CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-							.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
-							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
+					CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, link.getId())
+							.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime);
+					CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
 					CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
@@ -695,9 +695,9 @@ public final class DemandReaderFromCSV {
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
 						if (demandToDistribute > 0 && singleDemandForThisLink > 0) {
-							CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-								.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
-								.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
+							CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, link.getId())
+								.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime);
+							CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 								.build();
 							thisCarrier.getServices().put(thisService.getId(), thisService);
 						}
@@ -746,9 +746,9 @@ public final class DemandReaderFromCSV {
 					Id<CarrierService> idNewService = Id.create(
 						createJobId(scenario, newDemandInformationElement, link.getId(), null), CarrierService.class);
 					if ((demandToDistribute > 0 && singleDemandForThisLink > 0) || demandToDistribute == 0) {
-						CarrierService thisService = CarrierService.Builder.newInstance(idNewService, link.getId())
-							.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime)
-							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
+						CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, link.getId())
+							.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime);
+						CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
 						CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
@@ -1051,8 +1051,8 @@ public final class DemandReaderFromCSV {
 
 			CarrierShipment thisShipment = CarrierShipment.Builder
 				.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), singleDemandForThisLink)
-				.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
-				.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
+				.setPickupDuration(serviceTimePickup).setPickupStartingTimeWindow(timeWindowPickup)
+				.setDeliveryDuration(serviceTimeDelivery).setDeliveryStartingTimeWindow(timeWindowDelivery)
 				.build();
 			thisCarrier.getShipments().put(thisShipment.getId(), thisShipment);
 			if (demandForThisLink == 0)
@@ -1171,7 +1171,7 @@ public final class DemandReaderFromCSV {
 	 * @param scenario                    Scenario
 	 */
 	private static void combineSimilarJobs(Scenario scenario) {
-
+		//TODO: add check of possible vehicles capacity
 		log.warn(
 				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
@@ -1188,11 +1188,12 @@ public final class DemandReaderFromCSV {
 							if (!shipmentsToRemove.containsKey(thisShipmentId)) {
 								CarrierShipment thisShipment = thisCarrier.getShipments().get(thisShipmentId);
 								if (baseShipment.getId() != thisShipment.getId()
-									&& baseShipment.getFrom() == thisShipment.getFrom()
-									&& baseShipment.getTo() == thisShipment.getTo()
-									&& baseShipment.getPickupTimeWindow() == thisShipment.getPickupTimeWindow()
-									&& baseShipment.getDeliveryTimeWindow() == thisShipment.getDeliveryTimeWindow())
-									shipmentsToConnect.put(thisShipmentId, thisShipment);
+									&& baseShipment.getPickupLinkId() == thisShipment.getPickupLinkId()
+									&& baseShipment.getDeliveryLinkId() == thisShipment.getDeliveryLinkId()) {
+									if (baseShipment.getPickupStartingTimeWindow() == thisShipment.getPickupStartingTimeWindow()) {
+									if (baseShipment.getDeliveryStartingTimeWindow() == thisShipment.getDeliveryStartingTimeWindow()) shipmentsToConnect.put(thisShipmentId, thisShipment);
+								}
+								}
 							}
 						}
 						Id<CarrierShipment> idNewShipment = baseShipment.getId();
@@ -1200,17 +1201,17 @@ public final class DemandReaderFromCSV {
 						double serviceTimePickup = 0;
 						double serviceTimeDelivery = 0;
 						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-							demandForThisLink = demandForThisLink + carrierShipment.getSize();
-							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupServiceTime();
-							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryServiceTime();
+                            demandForThisLink = demandForThisLink + carrierShipment.getCapacityDemand();
+							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupDuration();
+							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryDuration();
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
 						}
 						CarrierShipment newShipment = CarrierShipment.Builder
-							.newInstance(idNewShipment, baseShipment.getFrom(), baseShipment.getTo(), demandForThisLink)
-							.setPickupServiceTime(serviceTimePickup)
-							.setPickupTimeWindow(baseShipment.getPickupTimeWindow())
-							.setDeliveryServiceTime(serviceTimeDelivery)
-							.setDeliveryTimeWindow(baseShipment.getDeliveryTimeWindow()).build();
+							.newInstance(idNewShipment, baseShipment.getPickupLinkId(), baseShipment.getDeliveryLinkId(), demandForThisLink)
+							.setPickupDuration(serviceTimePickup)
+							.setPickupStartingTimeWindow(baseShipment.getPickupStartingTimeWindow())
+							.setDeliveryDuration(serviceTimeDelivery)
+							.setDeliveryStartingTimeWindow(baseShipment.getDeliveryStartingTimeWindow()).build();
 						shipmentsToAdd.add(newShipment);
 					}
 				}
@@ -1236,8 +1237,8 @@ public final class DemandReaderFromCSV {
 							if (!servicesToRemove.containsKey(thisServiceId)) {
 								CarrierService thisService = thisCarrier.getServices().get(thisServiceId);
 								if (baseService.getId() != thisService.getId()
-									&& baseService.getLocationLinkId() == thisService.getLocationLinkId() && baseService
-									.getServiceStartTimeWindow() == thisService.getServiceStartTimeWindow())
+									&& baseService.getServiceLinkId() == thisService.getServiceLinkId() && baseService
+									.getServiceStaringTimeWindow() == thisService.getServiceStaringTimeWindow())
 									servicesToConnect.put(thisServiceId, thisService);
 							}
 						}
@@ -1249,10 +1250,10 @@ public final class DemandReaderFromCSV {
 							serviceTimeService = serviceTimeService + carrierService.getServiceDuration();
 							servicesToRemove.put(carrierService.getId(), carrierService);
 						}
-						CarrierService newService = CarrierService.Builder
-							.newInstance(idNewService, baseService.getLocationLinkId())
-							.setServiceDuration(serviceTimeService)
-							.setServiceStartTimeWindow(baseService.getServiceStartTimeWindow())
+						CarrierService.Builder builder = CarrierService.Builder
+							.newInstance(idNewService, baseService.getServiceLinkId())
+							.setServiceDuration(serviceTimeService);
+						CarrierService newService = builder.setServiceStartingTimeWindow(baseService.getServiceStaringTimeWindow())
 							.setCapacityDemand(demandForThisLink).build();
 						servicesToAdd.add(newService);
 					}

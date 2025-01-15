@@ -104,7 +104,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
-				PlanCandidate c = singleTrip.chooseCandidate(model, null);
+				PlanCandidate c = singleTrip.chooseCandidate(model);
 				if (c != null) {
 					c.applyTo(plan);
 					return;
@@ -129,9 +129,6 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 				List<String[]> options = new ArrayList<>();
 
-				// current mode for comparison
-				options.add(model.getCurrentModesMutable());
-
 				// generate all single mode options
 				for (String m : config.getModes()) {
 					String[] option = model.getCurrentModes();
@@ -142,30 +139,22 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 							option[i] = m;
 					}
 
-					// Current option is not added twice
-					if (!Arrays.equals(model.getCurrentModesMutable(), option))
-						options.add(option);
+					options.add(option);
 				}
 
 				List<PlanCandidate> singleModeCandidates = ctx.generator.generatePredefined(model, options);
 				singleModeCandidates.removeIf(p -> p.getUtility() == Double.NEGATIVE_INFINITY);
 
-				// if none of the single mode options are valid, no further search is needed
-				// this works in conjunction with subtour constraints, with other constraints it might be too strict
-				if (singleModeCandidates.size() <= 1) {
-					continue;
-				}
-
-				Set<PlanCandidate> candidateSet = new LinkedHashSet<>();
-
 				// Single modes are also added
-				candidateSet.addAll(singleModeCandidates);
+				Set<PlanCandidate> candidateSet = new LinkedHashSet<>(singleModeCandidates);
 
 				// one could either allow all modes here or only non chain based
 				// config switch might be useful to investigate which option is better
 
-				// execute best k modes
-				candidateSet.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
+				// execute best k modes, setting k to 0 disables this, then this strategy is similar to random subtour
+				if (config.getTopK() > 0) {
+					candidateSet.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
+				}
 
 				// candidates are unique after this
 				List<PlanCandidate> candidates = new ArrayList<>(candidateSet);
@@ -176,9 +165,13 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				// Pruning is applied based on current plan estimate
 				// best k generator applied pruning already, but the single trip options need to be checked again
 				if (ctx.pruner != null) {
-					double threshold = ctx.pruner.planThreshold(model);
-					if (!Double.isNaN(threshold) && threshold > 0) {
-						candidates.removeIf(c -> c.getUtility() < singleModeCandidates.get(0).getUtility() - threshold);
+
+					OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
+					double t = ctx.pruner.planThreshold(model);
+
+					if (max.isPresent() && t >= 0) {
+						double threshold = max.getAsDouble() - t;
+						candidates.removeIf(c -> c.getUtility() < threshold);
 					}
 
 					// Only applied at the end
