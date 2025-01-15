@@ -27,7 +27,6 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			if (!CarriersUtils.allJobsHandledBySelectedPlan(carrier))
 				carriersWithUnhandledJobs.add(carrier);
 		}
-
 		return carriersWithUnhandledJobs;
 	}
 

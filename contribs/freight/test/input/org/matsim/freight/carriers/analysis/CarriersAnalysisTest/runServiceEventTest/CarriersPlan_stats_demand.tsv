@@ -1,0 +1,2 @@
+carrierId	nuOfJspritIterations	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations(input)	nuOfPickupLocations(input)	nuOfDeliveryLocations(input)	nuOfShipments(input)	nuOfServices(input)	nuOfPlanedDemandSize
+carrier1	50	1	1	7	0	0	0	7	7

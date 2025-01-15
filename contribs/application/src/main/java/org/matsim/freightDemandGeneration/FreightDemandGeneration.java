@@ -217,8 +217,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		FreightDemandGenerationUtils.createDemandLocationsFile(controller);
 		solveSelectedSolution(selectedSolution, config, controller);
 
-		// TODO analyze results
-
 		log.info("Finished");
 		return 0;
 	}
@@ -426,7 +424,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				// use only the given demand of the read carrier file
 				boolean oneCarrierHasJobs = false;
 				for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values())
-					if (carrier.getServices().isEmpty() && carrier.getShipments().isEmpty())
+					if (!CarriersUtils.hasJobs(carrier))
 						log.warn("{} has no jobs which can be used", carrier.getId().toString());
 					else {
 						oneCarrierHasJobs = true;

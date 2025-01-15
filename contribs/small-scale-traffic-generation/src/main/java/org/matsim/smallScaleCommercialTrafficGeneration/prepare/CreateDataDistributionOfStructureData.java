@@ -1,6 +1,5 @@
 package org.matsim.smallScaleCommercialTrafficGeneration.prepare;
 
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -79,11 +78,15 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 	public CreateDataDistributionOfStructureData(LanduseDataConnectionCreator landuseDataConnectionCreator) {
 		this.landuseDataConnectionCreator = landuseDataConnectionCreator;
-		log.info("Using LanduseDataConnectionCreator {} to connect the types of the landuse data to the categories of the small scale commercial traffic generation", landuseDataConnectionCreator.getClass().getSimpleName());
+		log.info(
+			"Using LanduseDataConnectionCreator {} to connect the types of the landuse data to the categories of the small scale commercial traffic generation",
+			landuseDataConnectionCreator.getClass().getSimpleName());
 	}
+
 	public CreateDataDistributionOfStructureData() {
 		this.landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		log.info("Using default LanduseDataConnectionCreatorForOSM_Data to connect the types of the landuse data to the categories of the small scale commercial traffic generation");
+		log.info(
+			"Using default LanduseDataConnectionCreatorForOSM_Data to connect the types of the landuse data to the categories of the small scale commercial traffic generation");
 	}
 
 	public static void main(String[] args) {
@@ -115,15 +118,14 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		ShpOptions.Index indexInvestigationAreaRegions = SmallScaleCommercialTrafficUtils.getIndexRegions(shapeFileRegionsPath, shapeCRS,
 			regionsShapeRegionColumn);
 
-		if(Files.notExists(outputFacilityFile.getParent()))
+		if (Files.notExists(outputFacilityFile.getParent()))
 			new File(outputFacilityFile.toString()).mkdir();
 
 		landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
-			.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
-				usedLanduseConfiguration.toString(), indexLanduse, indexZones,
-				indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
+		LanduseBuildingAnalysis.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
+			usedLanduseConfiguration.toString(), indexLanduse, indexZones, indexBuildings, indexInvestigationAreaRegions, shapeFileZoneNameColumn,
+			buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 
@@ -141,8 +143,8 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	/**
 	 * Adds the share of the area of each facility compared to the area of the facilities of this category in this zone
 	 *
-	 * @param facilities
-	 * @param facilitiesFactory
+	 * @param facilities        The facilities
+	 * @param facilitiesFactory The facilities factory
 	 */
 	private void calculateAreaSharesOfTheFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory facilitiesFactory) {
 		for (String zone : buildingsPerZone.keySet()) {
@@ -156,8 +158,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 						if (!assignedDataType.equals("Employee"))
 							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType));
 						addShareOfAreaOfBuildingToAttributes(zone, assignedDataType, singleBuilding, facility);
-					}
-					else{
+					} else {
 						Coord coord = MGC.point2Coord(((Geometry) singleBuilding.getDefaultGeometry()).getCentroid());
 						facility = facilitiesFactory.createActivityFacility(id, coord);
 						if (!assignedDataType.equals("Employee"))
@@ -171,11 +172,13 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 		}
 	}
 
-	/** Add the share of the area of the building compared to the area of the buildings of this category in this zone to the attributes of the facility
-	 * @param zone  			The zone of the building
-	 * @param assignedDataType	The category of the building
-	 * @param singleBuilding	The building
-	 * @param facility			The new facility
+	/**
+	 * Add the share of the area of the building compared to the area of the buildings of this category in this zone to the attributes of the facility
+	 *
+	 * @param zone             The zone of the building
+	 * @param assignedDataType The category of the building
+	 * @param singleBuilding   The building
+	 * @param facility         The new facility
 	 */
 	private void addShareOfAreaOfBuildingToAttributes(String zone, String assignedDataType, SimpleFeature singleBuilding, ActivityFacility facility) {
 		String[] buildingTypes = ((String) singleBuilding.getAttribute(shapeFileBuildingTypeColumn)).split(";");
@@ -201,7 +204,8 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 
 		// if a building is commercial and the assignedDataType contains commercial buildings, the area of the commercial part is halved, because the commercial type is represented in two data types
 		int calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType;
-		if (!assignedDataType.equals("Employee") && landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(buildingTypes).contains("commercial"))
+		if (!assignedDataType.equals("Employee") && landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(
+			buildingTypes).contains("commercial"))
 			calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType - calculatedAreaPerOSMBuildingCategory / 2;
 		double shareOfTheBuildingAreaOfTheRelatedAreaOfTheZone = getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(zone,
 			calculatedAreaPerBuildingCategory, assignedDataType);
