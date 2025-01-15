@@ -46,8 +46,8 @@ public class CarriersAnalysisTest {
 			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities.xml" ).toString(),
 			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
 			testUtils.getInputDirectory() + "in/serviceBasedEvents.xml",
-			testUtils.getOutputDirectory(),
-			null);
+			testUtils.getOutputDirectory()
+		);
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 		carriersAnalysis.runCompleteAnalysis();
 
@@ -67,8 +67,8 @@ public class CarriersAnalysisTest {
 			IOUtils.extendUrl(SCENARIO_URL, "singleCarrierFiveActivities_Shipments.xml" ).toString(),
 			IOUtils.extendUrl(SCENARIO_URL, "vehicleTypes.xml" ).toString(),
 			testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml",
-			testUtils.getOutputDirectory(),
-			null);
+			testUtils.getOutputDirectory()
+		);
 		carriersAnalysis.runDemandOfCarriersAnalysis();
 		carriersAnalysis.runCompleteAnalysis();
 
