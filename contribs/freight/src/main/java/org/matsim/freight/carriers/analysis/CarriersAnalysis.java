@@ -69,7 +69,7 @@ public class CarriersAnalysis {
 	 * @param simOutputPath The output directory of the simulation run
 	 */
 	public CarriersAnalysis(String simOutputPath) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString());
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), null);
 	}
 
 	/**
