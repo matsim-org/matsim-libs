@@ -67,9 +67,20 @@ public class CarriersAnalysis {
 	 * The default folder for the analysis results is "CarriersAnalysis".
 	 *
 	 * @param simOutputPath The output directory of the simulation run
+	 * @param runId         The CRS of the simulation
+	 */
+	public CarriersAnalysis(String simOutputPath, String runId) {
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), runId, null);
+	}
+
+	/**
+	 * This constructor automatically searches for the necessary output file in a simulation run output.
+	 * The default folder for the analysis results is "CarriersAnalysis".
+	 *
+	 * @param simOutputPath The output directory of the simulation run
 	 */
 	public CarriersAnalysis(String simOutputPath) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), null);
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), null, null);
 	}
 
 	/**
@@ -79,7 +90,7 @@ public class CarriersAnalysis {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String runId, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 //		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
@@ -89,13 +100,13 @@ public class CarriersAnalysis {
 //		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
 
 		// the better version with the globFile method is not available since there is a circular dependency between the modules application and freight
-
+		String runIdWithDelimiter = runId != null ? runId + "." : "";
 		final Path path = Path.of(simOutputPath);
-		this.EVENTS_PATH = path.resolve("output_events.xml.gz").toString();
-		String vehiclesPath = path.resolve("output_allVehicles.xml.gz").toString();
-		String networkPath = path.resolve("output_network.xml.gz").toString();
-		String carriersPath = path.resolve("output_carriers.xml.gz").toString();
-		String carriersVehicleTypesPath = path.resolve("output_carriersVehicleTypes.xml.gz").toString();
+		this.EVENTS_PATH = path.resolve(runIdWithDelimiter + "output_events.xml.gz").toString();
+		String vehiclesPath = path.resolve(runIdWithDelimiter + "output_allVehicles.xml.gz").toString();
+		String networkPath = path.resolve(runIdWithDelimiter + "output_network.xml.gz").toString();
+		String carriersPath = path.resolve(runIdWithDelimiter + "output_carriers.xml.gz").toString();
+		String carriersVehicleTypesPath = path.resolve(runIdWithDelimiter + "output_carriersVehicleTypes.xml.gz").toString();
 
 		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
