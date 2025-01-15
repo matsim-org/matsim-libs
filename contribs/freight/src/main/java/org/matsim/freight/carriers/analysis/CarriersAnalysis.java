@@ -64,6 +64,16 @@ public class CarriersAnalysis {
 
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
+	 * The default folder for the analysis results is "CarriersAnalysis".
+	 *
+	 * @param simOutputPath The output directory of the simulation run
+	 */
+	public CarriersAnalysis(String simOutputPath) {
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString());
+	}
+
+	/**
+	 * This constructor automatically searches for the necessary output file in a simulation run output.
 	 *
 	 * @param simOutputPath      The output directory of the simulation run
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
