@@ -6,21 +6,21 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Table;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Dashboard with general overview.
  */
 public class ImpactAnalysisDashboard implements Dashboard {
 
-	private final Set<String> modes;
+	private final Collection<String> modes;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param modes The modes to display.
 	 */
-	public ImpactAnalysisDashboard(Set<String> modes) {
+	public ImpactAnalysisDashboard(Collection<String> modes) {
 		this.modes = modes;
 	}
 

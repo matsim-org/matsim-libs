@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 /**
  * Automatically defines input options by reading the {@link CommandSpec} annotation.
@@ -172,6 +173,7 @@ public final class InputOptions {
 	}
 
 	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
+	@SuppressWarnings("unused")
 	void setSpec(CommandLine.Model.CommandSpec command) {
 		AtomicBoolean flag = new AtomicBoolean(false);
 
@@ -183,7 +185,12 @@ public final class InputOptions {
 					command.userObject().getClass(), clazz));
 		}
 
-		for (String require : spec.requires()) {
+		Stream<String> inputFiles = Stream.concat(
+			Arrays.stream(spec.requires()),
+			Arrays.stream(spec.dependsOn()).flatMap( d-> Arrays.stream(d.files()))
+		);
+
+		inputFiles.forEach(require -> {
 			if (require.isBlank())
 				throw new IllegalArgumentException("Require argument can not be blank.");
 
@@ -195,7 +202,7 @@ public final class InputOptions {
 							return value;
 						}
 					}));
-		}
+		});
 
 		if (spec.requireNetwork()) {
 			command.add(createArg(flag, "--network", "Path to input network.", new CommandLine.Model.ISetter() {

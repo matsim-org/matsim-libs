@@ -24,7 +24,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.Set;
 
 public class EmissionsDashboardTest {
 
@@ -58,13 +58,9 @@ public class EmissionsDashboardTest {
 
 		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		HashSet<String> modes = new HashSet<>();
-		modes.add("car");
-		modes.add("freight");
-
 		SimWrapper sw = SimWrapper.create()
 			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
-			.addDashboard(new ImpactAnalysisDashboard(modes));
+			.addDashboard(new ImpactAnalysisDashboard(Set.of("car", "freight")));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 

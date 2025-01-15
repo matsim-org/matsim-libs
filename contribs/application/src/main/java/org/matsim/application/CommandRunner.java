@@ -148,32 +148,26 @@ public final class CommandRunner {
 		for (String require : spec.requires()) {
 
 			// Whether this file is produced by a dependency
-			boolean depFile = false;
 			String arg = "--input-" + InputOptions.argName(require);
 
 			boolean present = ArrayUtils.contains(existingArgs, arg);
 			if (present)
 				continue;
 
-			for (Dependency depend : spec.dependsOn()) {
-				CommandSpec dependency = ApplicationUtils.getSpec(depend.value());
-				if (ArrayUtils.contains(dependency.produces(), require)) {
+			// Look for this file on the input
+			String path = ApplicationUtils.matchInput(require, input).toString();
+			args.add(arg);
+			args.add(path);
+		}
 
-					String path = getPath(depend.value(), require);
-
+		for (Dependency depend : spec.dependsOn()) {
+			for (String file : depend.files()) {
+				String arg = "--input-" + InputOptions.argName(file);
+				if (!ArrayUtils.contains(existingArgs, arg)) {
+					String path = getPath(depend.value(), file);
 					args.add(arg);
 					args.add(path);
-
-					// Add arg for this file
-					depFile = true;
 				}
-			}
-
-			// Look for this file on the input
-			if (!depFile) {
-				String path = ApplicationUtils.matchInput(require, input).toString();
-				args.add(arg);
-				args.add(path);
 			}
 		}
 
