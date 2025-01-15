@@ -21,6 +21,7 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
+import java.io.IOException;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -126,7 +127,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controller.run();
 
-    runCarrierAnalysis(controller.getControlerIO().getOutputPath());
+    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
@@ -241,8 +242,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     return new RoadPricingSchemeUsingTollFactor(scheme, tollFactor);
   }
 
-  private static void runCarrierAnalysis(String outputPath) {
-    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/");
+  private static void runCarrierAnalysis(String outputPath, Config config) {
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
 	carriersAnalysis.runCompleteAnalysis();
   }
 

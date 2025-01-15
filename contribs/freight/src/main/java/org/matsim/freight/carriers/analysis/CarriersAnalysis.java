@@ -77,8 +77,9 @@ public class CarriersAnalysis {
 	 *
 	 * @param simOutputPath      The output directory of the simulation run
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
+	 * @param globalCrs          The CRS of the simulation
 	 */
-	public CarriersAnalysis(String simOutputPath, String analysisOutputPath) {
+	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 //		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
@@ -96,7 +97,7 @@ public class CarriersAnalysis {
 		String carriersPath = path.resolve("output_carriers.xml.gz").toString();
 		String carriersVehicleTypesPath = path.resolve("output_carriersVehicleTypes.xml.gz").toString();
 
-		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath);
+		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**
@@ -108,13 +109,14 @@ public class CarriersAnalysis {
 	 * @param carriersVehicleTypesPath Path to the carriersVehicleTypes file
 	 * @param eventsPath               Path to the events file
 	 * @param analysisOutputPath       Path to the output directory
+	 * @param globalCrs                The CRS of the simulation
 	 */
 	public CarriersAnalysis(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
-							String analysisOutputPath) {
+							String analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
-		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath);
+		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
 
 	/**
@@ -128,7 +130,8 @@ public class CarriersAnalysis {
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
 
-	private void createScenarioForFreightAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath) {
+	private void createScenarioForFreightAnalysis(String vehiclesPath, String networkPath, String carriersPath, String carriersVehicleTypesPath,
+												  String globalCrs) {
 		log.info("########## Starting Freight Analysis ##########");
 
 		Config config = ConfigUtils.createConfig();
@@ -138,6 +141,7 @@ public class CarriersAnalysis {
 		config.eventsManager().setNumberOfThreads(null);
 		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
+		config.global().setCoordinateSystem(globalCrs);
 
 		//freight settings
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
