@@ -14,10 +14,23 @@ import com.google.inject.Singleton;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargerReservationModule extends AbstractModule {
+    private final boolean bindPriority;
+
+    public ChargerReservationModule() {
+        this(true);
+    }
+
+    public ChargerReservationModule(boolean bindPriority) {
+        this.bindPriority = bindPriority;
+    }
+
     @Override
     public void install() {
         addControlerListenerBinding().to(ChargerReservationManager.class);
-        bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);
+
+        if (bindPriority) {
+            bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);
+        }
     }
 
     @Provides
