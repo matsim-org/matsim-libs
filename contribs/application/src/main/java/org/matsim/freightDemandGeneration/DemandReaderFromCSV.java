@@ -689,9 +689,9 @@ public final class DemandReaderFromCSV {
 					Id<CarrierService> idNewService = Id.create(
 						createJobId(scenario, newDemandInformationElement, linkPersonPair.getLink().getId(), null),
 						CarrierService.class);
-					CarrierService .Builder builder = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId())
-						.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime);
-						CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
+					CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId(),
+							demandForThisLink).setServiceDuration(serviceTime);
+					CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 						.build();
 					CarriersUtils.getCarriers(scenario).getCarriers()
 						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
@@ -730,8 +730,7 @@ public final class DemandReaderFromCSV {
 							createJobId(scenario, newDemandInformationElement, link.getId(), null),
 							CarrierService.class);
 						if (demandToDistribute > 0 && singleDemandForThisLink > 0) {
-							CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, link.getId())
-								.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime);
+							CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, link.getId(), singleDemandForThisLink).setServiceDuration(serviceTime);
 							CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 								.build();
 							thisCarrier.getServices().put(thisService.getId(), thisService);
@@ -781,8 +780,8 @@ public final class DemandReaderFromCSV {
 					Id<CarrierService> idNewService = Id.create(
 						createJobId(scenario, newDemandInformationElement, linkPersonPair.getLink().getId(), null), CarrierService.class);
 					if ((demandToDistribute > 0 && singleDemandForThisLink > 0) || demandToDistribute == 0) {
-						CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId())
-							.setCapacityDemand(singleDemandForThisLink).setServiceDuration(serviceTime);
+						CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, linkPersonPair.getLink().getId(),
+								singleDemandForThisLink).setServiceDuration(serviceTime);
 						CarrierService thisService = builder.setServiceStartingTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
 						CarriersUtils.getCarriers(scenario).getCarriers()
