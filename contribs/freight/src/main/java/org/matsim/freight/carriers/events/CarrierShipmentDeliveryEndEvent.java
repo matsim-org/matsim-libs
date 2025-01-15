@@ -47,7 +47,7 @@ public class CarrierShipmentDeliveryEndEvent extends AbstractCarrierEvent {
 		super(time, carrierId, shipment.getDeliveryLinkId(), vehicleId);
 		this.shipmentId = shipment.getId();
 		this.deliveryDuration = shipment.getDeliveryDuration();
-        this.capacityDemand = shipment.getDemand();
+        this.capacityDemand = shipment.getCapacityDemand();
 	}
 
 	@Override

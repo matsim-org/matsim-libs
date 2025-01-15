@@ -92,7 +92,7 @@ final class FreightScenarioCreator {
             carriers.addCarrier(carrier_);
         }
 
-        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
+		CarriersUtils.writeCarriers(carriers, "input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
     private static void createCustomers(Carrier carrier, Network network) {
@@ -101,10 +101,10 @@ final class FreightScenarioCreator {
 
         for(int i=0;i<20;i++){
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create((i + 1),CarrierService.class), drawLocationLinkId(innerCityLinks, outerCityLinks));
-            serviceBuilder.setDemand(1);
+            serviceBuilder.setCapacityDemand(1);
             serviceBuilder.setServiceDuration(5*60);
-            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
-            CarrierService carrierService = serviceBuilder.build();
+			serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
+			CarrierService carrierService = serviceBuilder.build();
             CarriersUtils.addService(carrier, carrierService);
         }
     }
