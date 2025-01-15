@@ -153,6 +153,76 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		}
 	}
 
+	void writeTravelTimeAndDistancePerCarrier(String analysisOutputDirectory, Scenario scenario) {
+		log.info("Writing out Time & Distance & Costs ... perCarrier");
+		//Travel time and distance per vehicle
+		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perCarrier.tsv").toString();
+
+		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
+			//Write headline:
+			bw1.write(String.join(delimiter,
+				"carrierId",
+				"nuOfTours",
+				"tourDurations[s]",
+				"tourDurations[h]",
+				"travelDistances[m]",
+				"travelDistances[km]",
+				"travelTimes[s]",
+				"travelTimes[h]",
+				"fixedCosts[EUR]",
+				"varCostsTime[EUR]",
+				"varCostsDist[EUR]",
+				"totalCosts[EUR]"));
+			bw1.newLine();
+			for (Id<Carrier> carrierId : vehicleId2CarrierId.values()){
+
+				final int nuOfTours = vehicleId2TourId.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToInt(entry -> 1).sum();
+				final double durationInSeconds = vehicleId2TourDuration.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+				final double distanceInMeters = vehicleId2TourLength.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+				final double travelTimeInSeconds = vehicleId2TravelTime.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+
+				bw1.write(carrierId.toString());
+				bw1.write(delimiter + nuOfTours);
+
+				bw1.write(delimiter + durationInSeconds);
+				bw1.write(delimiter + durationInSeconds / 3600);
+
+				bw1.write(delimiter + distanceInMeters);
+				bw1.write(delimiter + distanceInMeters / 1000);
+
+				bw1.write(delimiter + travelTimeInSeconds);
+				bw1.write(delimiter + travelTimeInSeconds / 3600);
+
+				double varCostsTime = 0.;
+				double varCostsDist = 0.;
+				double fixedCosts = 0.;
+				double totalVehCosts = 0.;
+			for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
+				if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
+					final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+					final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
+					final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
+					fixedCosts = fixedCosts + vehicleType.getCostInformation().getFixedCosts();
+
+					varCostsTime = varCostsTime + vehicleId2TourDuration.get(vehicleId) * costsPerSecond;
+					varCostsDist = varCostsDist + vehicleId2TourLength.get(vehicleId) * costsPerMeter;
+				}
+			}
+				totalVehCosts = fixedCosts + varCostsTime + varCostsDist;
+				bw1.write(delimiter + fixedCosts);
+				bw1.write(delimiter + varCostsTime);
+				bw1.write(delimiter + varCostsDist);
+				bw1.write(delimiter + totalVehCosts);
+				bw1.newLine();
+			}
+			bw1.close();
+			log.info("Carrier event analysis output written to {}", fileName);
+		}
+		catch (IOException e) {
+			log.error("Error writing to file: {}", fileName, e);
+		}
+	}
+
 	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
@@ -220,7 +290,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 			}
 
 			bw1.close();
-			log.info("Output written to {}", fileName);
+			log.info("Vehicle event analysis output written to {}", fileName);
 		}
 		catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
@@ -295,7 +365,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 			}
 
 			bw1.close();
-			log.info("Output written to {}", fileName);
+			log.info("VehicleType event analysis output written to {}", fileName);
 		}
 		catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
