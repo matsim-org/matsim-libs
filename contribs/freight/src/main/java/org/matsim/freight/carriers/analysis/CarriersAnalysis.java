@@ -161,7 +161,8 @@ public class CarriersAnalysis {
 
 		//Where to store the analysis output?
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
-		folder.mkdirs();
+		if(!folder.exists())
+			folder.mkdirs();
 		if (CarriersUtils.allCarriersWithDemandHavePlans(carriers)) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierPlanAnalysis.CarrierAnalysisType.completeAnalysis);
