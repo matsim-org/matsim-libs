@@ -164,7 +164,7 @@ public class ModeRestrictionTest {
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 15.
 		// But since we restricted the mode for link 6 AND 15, 20 is used as fallback.
-		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("2"), Id.createLinkId("11"), Id.createLinkId("20"));
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
 		List<Id<Link>> oldRoute = List.of(Id.createLinkId("1"), Id.createLinkId("6"), Id.createLinkId("15"));
 
 		String other = restrictedMode.equals("car") ? "bike" : "car";
@@ -192,7 +192,7 @@ public class ModeRestrictionTest {
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 6.
 		// But since we restricted the mode for link 6 AND 15, 20 is used as fallback.
-		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("2"), Id.createLinkId("11"), Id.createLinkId("20"));
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
 		List<Id<Link>> oldRoute = List.of(Id.createLinkId("1"), Id.createLinkId("6"));
 
 		String other = restrictedMode.equals("car") ? "bike" : "car";
@@ -216,7 +216,7 @@ public class ModeRestrictionTest {
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 15.
 		// But since we restricted the mode for link 15, 20 is used as fallback.
-		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("2"), Id.createLinkId("11"), Id.createLinkId("20"));
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
 		List<Id<Link>> oldRoute = List.of(Id.createLinkId("1"), Id.createLinkId("6"), Id.createLinkId("15"));
 
 		String other = restrictedMode.equals("car") ? "bike" : "car";
