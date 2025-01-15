@@ -759,7 +759,7 @@ public class QuadTree<T> implements Serializable {
 					double distanceSqr = deltaX * deltaX + deltaY * deltaY;
 					if (distanceSqr < bestDistanceSqr.value) {
 						bestDistanceSqr.value = distanceSqr;
-						closest = leaf.value != null ? leaf.value : leaf.values.getFirst();
+						closest = leaf.value != null ? leaf.value : leaf.values.get(0);
 					}
 				}
 			}
@@ -1000,7 +1000,7 @@ public class QuadTree<T> implements Serializable {
 				if (leaf == null) { leaf = this.northeast.firstLeaf(); }
 				return leaf;
 			}
-			return (this.leaves == null || this.leaves.isEmpty()) ? null : this.leaves.getFirst();
+			return (this.leaves == null || this.leaves.isEmpty()) ? null : this.leaves.get(0);
 		}
 
 		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {

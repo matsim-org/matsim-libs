@@ -64,7 +64,7 @@ public final class EmissionWriter {
 			for(Person person: population.getPersons().values()){
 				Id<Person> personId = person.getId();
 				Plan plan = person.getSelectedPlan();
-				Activity homeAct = (Activity) plan.getPlanElements().getFirst();
+				Activity homeAct = (Activity) plan.getPlanElements().get(0);
 				Coord homeCoord = homeAct.getCoord();
 				Double xHome = homeCoord.getX();
 				Double yHome = homeCoord.getY();

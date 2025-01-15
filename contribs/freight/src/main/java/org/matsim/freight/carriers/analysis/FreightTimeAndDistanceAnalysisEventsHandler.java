@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
@@ -60,6 +61,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	private final String delimiter;
 
 	private final Scenario scenario;
+	private final Carriers carriers;
 	private final Map<Id<Vehicle>, Double> vehicleId2TourDuration = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2TourLength = new LinkedHashMap<>();
 
@@ -71,6 +73,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2SumOfTourDuration = new LinkedHashMap<>();
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2Mileage = new LinkedHashMap<>();
 	private final Map<Id<VehicleType>, Double> vehicleTypeId2TravelTime = new LinkedHashMap<>();
+	private final Map<Id<Carrier>, Double> carrierId2SumOfTourDuration = new LinkedHashMap<>();
+	private final Map<Id<Carrier>, Double> carrierId2Mileage = new LinkedHashMap<>();
+	private final Map<Id<Carrier>, Double> carrierId2TravelTime = new LinkedHashMap<>();
 
 	private final Map<Id<Vehicle>, VehicleType> vehicleId2VehicleType = new TreeMap<>();
 
@@ -82,6 +87,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	public FreightTimeAndDistanceAnalysisEventsHandler(String delimiter, Scenario scenario) {
 		this.delimiter = delimiter;
 		this.scenario = scenario;
+		this.carriers = CarriersUtils.getCarriers(scenario);
 	}
 
 	@Override
@@ -223,6 +229,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		log.info("Output written to {}", fileName);
 	}
 
+
 	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) throws IOException {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
@@ -293,4 +300,132 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		bw1.close();
 		log.info("Output written to {}", fileName);
 	}
+
+	void runCarrierAnalysisAndWriteStats(String analysisOutputDirectory) throws IOException {
+		log.info("Writing out carrier analysis ...");
+		//Load per vehicle
+		String fileName = analysisOutputDirectory + "Carrier_summary.tsv";
+
+		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
+
+		//Write headline:
+		bw1.write("carrierId" + delimiter
+			+ "MATSimScoreSelectedPlan" + delimiter
+			+ "jSpritScoreSelectedPlan" + delimiter
+			+ "nuOfTours" + delimiter
+			+ "nuOfShipments(input)" + delimiter
+			+ "nuOfServices(input) "+ delimiter
+			+ "tourDuration[h]" + delimiter
+			+ "travelDuration[h]" + delimiter
+			+ "travelDistance[km]"+ delimiter
+
+		);
+		bw1.newLine();
+
+		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
+
+		for (Id<Vehicle> vehicleId : vehicleId2TravelTime.keySet()) {
+			Id<Carrier> carrier = vehicleId2CarrierId.get(vehicleId);
+			carrierId2TravelTime.merge(carrier,vehicleId2TravelTime.get(vehicleId),Double::sum); // per carrierID
+		}
+
+		for (Id<Vehicle> vehicleId : vehicleId2TourLength.keySet()) {
+			Id<Carrier> carrier = vehicleId2CarrierId.get(vehicleId);
+			carrierId2Mileage.merge(carrier,vehicleId2TourLength.get(vehicleId),Double::sum); // per carrierID
+		}
+
+
+		for (Carrier carrier : sortedCarrierMap.values()) {
+			final Double sumOfTourDurationInSeconds = carrierId2SumOfTourDuration.getOrDefault(carrier.getId(), 0.);
+			final Double sumOfDistanceInMeters = carrierId2Mileage.getOrDefault(carrier.getId(), 0.);
+			final Double sumOfTravelTimeInSeconds = carrierId2TravelTime.getOrDefault(carrier.getId(), 0.);
+
+			bw1.write(carrier.getId().toString());
+			bw1.write(delimiter + carrier.getSelectedPlan().getScore());
+			bw1.write(delimiter + carrier.getSelectedPlan().getJspritScore());
+			bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
+			bw1.write(delimiter + carrier.getShipments().size());
+			bw1.write(delimiter + carrier.getServices().size());
+			bw1.write(delimiter + sumOfTourDurationInSeconds/60/60);
+			bw1.write(delimiter + sumOfTravelTimeInSeconds/60/60);
+			bw1.write(delimiter + sumOfDistanceInMeters/1000);
+			bw1.newLine();
+		}
+
+		bw1.close();
+		log.info("Output written to " + fileName);
+	}
+
+	void writeGeneralStats(String analysisOutputDirectory) throws IOException {
+		log.info("Writing out general analysis ...");
+		//Load per vehicle
+		String fileName = analysisOutputDirectory + "General_summary.tsv";
+
+		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
+
+		//Define parameters
+		double matsimscore = 0.0;
+		double jspritscore = 0.0;
+		int carrierNr = 0;
+		int tours = 0;
+		int shipments = 0;
+		int services = 0;
+		double durationInH = 0;
+		double distanceInKm = 0;
+		double travelInH = 0;
+
+		//total distance and duration
+		for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
+
+			durationInH += vehicleId2TourDuration.get(vehicleId);
+			distanceInKm += vehicleId2TourLength.get(vehicleId);
+			travelInH += vehicleId2TravelTime.get(vehicleId);
+
+		}
+
+		//other stats
+		final TreeMap<Id<Carrier>, Carrier> sortedCarrierMap = new TreeMap<>(carriers.getCarriers());
+
+		for (Carrier carrier : sortedCarrierMap.values()) {
+			carrierNr += 1;
+			matsimscore +=  carrier.getSelectedPlan().getScore();
+			jspritscore +=  carrier.getSelectedPlan().getJspritScore();
+			tours += carrier.getSelectedPlan().getScheduledTours().size();
+			shipments += carrier.getShipments().size();
+			services += carrier.getServices().size();
+		}
+
+		bw1.write("Number of carriers"+ delimiter
+			+carrierNr+ delimiter );
+		bw1.newLine();
+		bw1.write("Total travel duration"+ delimiter
+			+Math.round(100*travelInH/60/60)/100+" h"+ delimiter);
+		bw1.newLine();
+		bw1.write("Total tour duration"+ delimiter
+			+Math.round(100*durationInH/60/60)/100+" h"+ delimiter);
+		bw1.newLine();
+		bw1.write("Total travel distance"+ delimiter
+			+Math.round(100*distanceInKm/1000)/100+" km"+ delimiter);
+		bw1.newLine();
+		bw1.write("Number of tours"+ delimiter
+			+tours+ delimiter);
+		bw1.newLine();
+		bw1.write("Number of shipments"+ delimiter
+			+shipments+delimiter);
+		bw1.newLine();
+		bw1.write("Number of services"+ delimiter
+			+services+ delimiter);
+		bw1.newLine();
+		bw1.write("Total MATSim Score"+ delimiter
+			+matsimscore+ delimiter);
+		bw1.newLine();
+		bw1.write("Total jsprit Score"+ delimiter+
+			Math.round(100*jspritscore)/100+ delimiter);
+		bw1.newLine();
+
+
+		bw1.close();
+		log.info("Output written to " + fileName);
+	}
+
 }
