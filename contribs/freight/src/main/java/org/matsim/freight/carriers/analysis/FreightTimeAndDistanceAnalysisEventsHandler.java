@@ -90,9 +90,17 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		// Save time of freight tour start
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
 		tourStartTime.put(key, event.getTime());
+
+		//Some general information for this vehicle
+		VehicleType vehType = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType();
+		vehicleId2CarrierId.putIfAbsent(event.getVehicleId(), event.getCarrierId());
+		vehicleId2TourId.putIfAbsent(event.getVehicleId(), event.getTourId());
+		vehicleId2VehicleType.putIfAbsent(event.getVehicleId(), vehType);
+		vehicleId2TourLength.putIfAbsent(event.getVehicleId(), 0.);
+		vehicleId2TourDuration.putIfAbsent(event.getVehicleId(), 0.);
+		vehicleId2TravelTime.putIfAbsent(event.getVehicleId(), 0.);
 	}
 
-	//Fix costs for vehicle usage
 	@Override
 	public void handleEvent(CarrierTourEndEvent event) {
 		final String key = event.getCarrierId().toString() + "_" + event.getTourId().toString();
@@ -100,12 +108,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		vehicleId2TourDuration.put(event.getVehicleId(), tourDuration); //TODO, check if this may overwrite old data and if this is intended to do so
 		VehicleType vehType = VehicleUtils.findVehicle(event.getVehicleId(), scenario).getType();
 		vehicleTypeId2SumOfTourDuration.merge(vehType.getId(), tourDuration, Double::sum);
-
-		//Some general information for this vehicle
-		vehicleId2CarrierId.putIfAbsent(event.getVehicleId(), event.getCarrierId());
-		vehicleId2TourId.putIfAbsent(event.getVehicleId(), event.getTourId());
-
-		vehicleId2VehicleType.putIfAbsent(event.getVehicleId(), vehType);
 	}
 
 	@Override
@@ -115,6 +117,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		// nessessary if non-carrier vehicles are in the simulation
+		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
+			return;
 		final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		vehicleId2TourLength.merge(event.getVehicleId(), distance, Double::sum);
 		vehicleEnteredLinkTime.put(event.getVehicleId(), event.getTime()); //Safe time when entering the link.
@@ -126,6 +131,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	//If the vehicle leaves a link at the end, the travelTime is calculated and stored.
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		// nessessary if non-carrier vehicles are in the simulation
+		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
+			return;
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)) {
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -141,6 +149,9 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	//If the vehicle leaves a link because it reached its destination, the travelTime is calculated and stored.
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		// nessessary if non-carrier vehicles are in the simulation
+		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
+			return;
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		if (vehicleEnteredLinkTime.containsKey(vehicleId)) {
 			double tt = event.getTime() - vehicleEnteredLinkTime.get(vehicleId);
@@ -174,12 +185,16 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 				"varCostsDist[EUR]",
 				"totalCosts[EUR]"));
 			bw1.newLine();
-			for (Id<Carrier> carrierId : vehicleId2CarrierId.values()){
+			for (Id<Carrier> carrierId : CarriersUtils.getCarriers(scenario).getCarriers().keySet()) {
 
-				final int nuOfTours = vehicleId2TourId.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToInt(entry -> 1).sum();
-				final double durationInSeconds = vehicleId2TourDuration.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
-				final double distanceInMeters = vehicleId2TourLength.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
-				final double travelTimeInSeconds = vehicleId2TravelTime.entrySet().stream().filter(entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+				final int nuOfTours = vehicleId2TourId.entrySet().stream().filter(
+					entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToInt(entry -> 1).sum();
+				final double durationInSeconds = vehicleId2TourDuration.entrySet().stream().filter(
+					entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+				final double distanceInMeters = vehicleId2TourLength.entrySet().stream().filter(
+					entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
+				final double travelTimeInSeconds = vehicleId2TravelTime.entrySet().stream().filter(
+					entry -> vehicleId2CarrierId.get(entry.getKey()).equals(carrierId)).mapToDouble(Map.Entry::getValue).sum();
 
 				bw1.write(carrierId.toString());
 				bw1.write(delimiter + nuOfTours);
@@ -197,17 +212,17 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 				double varCostsDist = 0.;
 				double fixedCosts = 0.;
 				double totalVehCosts = 0.;
-			for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
-				if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
-					final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
-					final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
-					final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
-					fixedCosts = fixedCosts + vehicleType.getCostInformation().getFixedCosts();
+				for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
+					if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
+						final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+						final Double costsPerSecond = vehicleType.getCostInformation().getCostsPerSecond();
+						final Double costsPerMeter = vehicleType.getCostInformation().getCostsPerMeter();
+						fixedCosts = fixedCosts + vehicleType.getCostInformation().getFixedCosts();
 
-					varCostsTime = varCostsTime + vehicleId2TourDuration.get(vehicleId) * costsPerSecond;
-					varCostsDist = varCostsDist + vehicleId2TourLength.get(vehicleId) * costsPerMeter;
+						varCostsTime = varCostsTime + vehicleId2TourDuration.get(vehicleId) * costsPerSecond;
+						varCostsDist = varCostsDist + vehicleId2TourLength.get(vehicleId) * costsPerMeter;
+					}
 				}
-			}
 				totalVehCosts = fixedCosts + varCostsTime + varCostsDist;
 				bw1.write(delimiter + fixedCosts);
 				bw1.write(delimiter + varCostsTime);
@@ -217,8 +232,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 			}
 			bw1.close();
 			log.info("Carrier event analysis output written to {}", fileName);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
 		}
 	}
@@ -291,8 +305,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 			bw1.close();
 			log.info("Vehicle event analysis output written to {}", fileName);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
 		}
 	}
@@ -366,8 +379,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 			bw1.close();
 			log.info("VehicleType event analysis output written to {}", fileName);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.error("Error writing to file: {}", fileName, e);
 		}
 	}
