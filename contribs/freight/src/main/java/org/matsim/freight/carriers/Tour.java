@@ -389,7 +389,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getServiceStartTimeWindow();
+			return service.getServiceStaringTimeWindow();
 		}
 
 		@Override
@@ -539,7 +539,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getPickupStartsTimeWindow();
+			return shipment.getPickupStartingTimeWindow();
 		}
 
 		@Override
@@ -592,7 +592,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getDeliveryStartsTimeWindow();
+			return shipment.getDeliveryStartingTimeWindow();
 		}
 
 		@Override

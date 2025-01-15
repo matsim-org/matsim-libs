@@ -19,5 +19,5 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  */
 public interface CarrierJob extends Attributable {
 	Id<? extends CarrierJob> getId();
-	int getDemand();
+	int getCapacityDemand();
 }
