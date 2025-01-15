@@ -73,18 +73,13 @@ public class CountsModule extends AbstractModule {
                 MatsimCountsReader counts_parser;
                 if (inputCRS == null) {
                     counts_parser = new MatsimCountsReader(counts);
-				}
-                else {
-					log.info( "re-projecting counts from "+inputCRS+" to "+internalCRS+" for import" );
-
-					final CoordinateTransformation transformation =
-							TransformationFactory.getCoordinateTransformation(
-									inputCRS,
-									internalCRS );
-
-                    counts_parser = new MatsimCountsReader( transformation , counts );
                 }
-				counts_parser.parse(config.getCountsFileURL(scenario.getConfig().getContext()));
+                else {
+                    log.info( "re-projecting counts from "+inputCRS+" to "+internalCRS+" for import" );
+
+                    counts_parser = new MatsimCountsReader( inputCRS, internalCRS, counts );
+                }
+                counts_parser.parse(config.getCountsFileURL(scenario.getConfig().getContext()));
             }
             return counts;
         }

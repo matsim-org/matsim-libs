@@ -2,6 +2,8 @@ package org.matsim.counts;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
  * to an identifiable object (links, nodes, transit stations e.g)
  * Structure is similar to regular counts, but more flexible to use.
  */
-public final class Counts<T extends Identifiable<T>> implements Attributable {
+public final class Counts<T extends Identifiable<T>> implements Attributable, MatsimToplevelContainer {
 
 	public static final String ELEMENT_NAME = "counts";
 	private final Map<Id<T>, MeasurementLocation<T>> locations = new TreeMap<>();
@@ -148,5 +150,10 @@ public final class Counts<T extends Identifiable<T>> implements Attributable {
 	@Override
 	public String toString() {
 		return "[name=" + this.name + "]" + "[nof_locations=" + this.locations.size() + "]";
+	}
+
+	@Override public MatsimFactory getFactory(){
+		throw new RuntimeException( "not implemented" );
+		// yy I need this to fulfill MatsimToplevelContainer.  Which I need to be able to use ProjectionUtils.putCRS(...) in the readers/writers.  kai, feb'24
 	}
 }
