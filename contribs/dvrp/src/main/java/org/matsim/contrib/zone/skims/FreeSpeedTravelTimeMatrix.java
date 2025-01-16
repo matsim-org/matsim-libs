@@ -46,6 +46,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.common.base.Verify;
 import com.google.common.collect.Sets;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -132,10 +133,17 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 			// fill matrix
 			freeSpeedTravelTimeMatrix = new Matrix(new HashSet<>(zoneSystem.getZones().values()));
 
-			for (var from : zoneIds) {
-				for (var to : zoneIds) {
-					Zone fromZone = zoneSystem.getZones().get(from);
-					Zone toZone = zoneSystem.getZones().get(to);
+			Zone[] zoneArray = new Zone[numberOfZones];
+			for (int i = 0; i < numberOfZones; i++) {
+				zoneArray[i] = zoneSystem.getZones().get(zoneIds.get(i));
+			}
+
+			Counter counter = new Counter("Zone ");
+			for (int i = 0; i < numberOfZones; i++) {
+				counter.incCounter();
+				Zone fromZone = zoneArray[i];
+				for (int j = 0; j < numberOfZones; j++) {
+					Zone toZone = zoneArray[j];
 					freeSpeedTravelTimeMatrix.set(fromZone, toZone, inputStream.readInt());
 				}
 			}
@@ -183,7 +191,7 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-    }
+	}
 
 	public void write(URL outputPath, Network dvrpNetwork) {
 		try (DataOutputStream outputStream = new DataOutputStream(IOUtils.getOutputStream(outputPath, false))) {

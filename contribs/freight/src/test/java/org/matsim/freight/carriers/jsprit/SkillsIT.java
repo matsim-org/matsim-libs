@@ -161,9 +161,9 @@ public class SkillsIT {
 				carrierLocation,
 				Id.createLinkId("i(10,10)R"),
 				1)
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setPickupDuration(Time.parseTime("00:05:00"))
-				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryDuration(Time.parseTime("00:05:00"))
 				.build();
 		CarriersUtils.addSkill(shipmentOne, "skill 1");
@@ -174,9 +174,9 @@ public class SkillsIT {
 				carrierLocation,
 				Id.createLinkId("i(10,10)R"),
 				1)
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setPickupDuration(Time.parseTime("00:05:00"))
-				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryDuration(Time.parseTime("00:05:00"))
 				.build();
 		CarriersUtils.addSkill(shipmentTwo, "skill 2");
@@ -190,9 +190,9 @@ public class SkillsIT {
 				carrierLocation,
 				Id.createLinkId("i(10,10)R"),
 				1)
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setPickupDuration(Time.parseTime("00:05:00"))
-				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryDuration(Time.parseTime("00:05:00"))
 				.build();
 		CarriersUtils.addSkill(shipmentOne, "skill 1");
@@ -203,9 +203,9 @@ public class SkillsIT {
 				carrierLocation,
 				Id.createLinkId("i(10,10)R"),
 				1)
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setPickupDuration(Time.parseTime("00:05:00"))
-				.setDeliveryStartsTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
+				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryDuration(Time.parseTime("00:05:00"))
 				.build();
 		CarriersUtils.addSkill(shipmentTwo, "skill 1");

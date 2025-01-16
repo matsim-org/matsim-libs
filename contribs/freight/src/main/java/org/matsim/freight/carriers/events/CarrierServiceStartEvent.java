@@ -47,7 +47,7 @@ public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 		super(time, carrierId, service.getServiceLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();
-        this.capacityDemand = service.getDemand();
+        this.capacityDemand = service.getCapacityDemand();
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public final class CarrierServiceStartEvent extends AbstractCarrierEvent {
 		Id<Link> locationLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		CarrierService service = CarrierService.Builder.newInstance(carrierServiceId, locationLinkId)
 				.setServiceDuration(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_SERVICE_DURATION)))
-				.setDemand(Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND)))
+				.setCapacityDemand(Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND)))
 				.build();
 		Id<Vehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), Vehicle.class);
 		return new CarrierServiceStartEvent(time, carrierId, service, vehicleId);

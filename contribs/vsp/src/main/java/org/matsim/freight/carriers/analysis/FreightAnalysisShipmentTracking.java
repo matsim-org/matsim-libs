@@ -57,8 +57,8 @@ class FreightAnalysisShipmentTracking {
     	for (ShipmentTracker shipment: shipments.values()){
     		if (shipment.to==activityStartEvent.getLinkId() ){
 				if(shipment.driverId == null){
-					if(shipment.shipment.getDeliveryStartsTimeWindow().getStart() <= activityStartEvent.getTime()) {
-                        if (activityStartEvent.getTime()<= shipment.shipment.getDeliveryStartsTimeWindow().getEnd()) {
+					if(shipment.shipment.getDeliveryStartingTimeWindow().getStart() <= activityStartEvent.getTime()) {
+                        if (activityStartEvent.getTime()<= shipment.shipment.getDeliveryStartingTimeWindow().getEnd()) {
                             if (shipment.possibleDrivers.contains(activityStartEvent.getPersonId().toString())) {
                                 shipment.driverIdGuess = activityStartEvent.getPersonId();
                                 shipment.deliveryTimeGuess=activityStartEvent.getTime();
@@ -77,8 +77,8 @@ class FreightAnalysisShipmentTracking {
     	for (ShipmentTracker shipmentTracker: shipments.values()){
     		if (shipmentTracker.from==activityStartEvent.getLinkId()){
     			if (shipmentTracker.driverId==null){
-					if(shipmentTracker.shipment.getPickupStartsTimeWindow().getStart() <= activityStartEvent.getTime()) {
-						if (activityStartEvent.getTime()<= shipmentTracker.shipment.getPickupStartsTimeWindow().getEnd()) {
+					if(shipmentTracker.shipment.getPickupStartingTimeWindow().getStart() <= activityStartEvent.getTime()) {
+						if (activityStartEvent.getTime()<= shipmentTracker.shipment.getPickupStartingTimeWindow().getEnd()) {
 							shipmentTracker.possibleDrivers.add(activityStartEvent.getPersonId().toString());
 						}
 					}
