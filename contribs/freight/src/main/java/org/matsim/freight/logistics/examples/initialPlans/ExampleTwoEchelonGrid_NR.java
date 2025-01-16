@@ -176,8 +176,7 @@ final class ExampleTwoEchelonGrid_NR {
     new LSPPlanXmlReader(
         LSPUtils.getLSPs(controller.getScenario()),
         CarriersUtils.getCarriers(controller.getScenario()));
-    new CarrierPlanWriter(CarriersUtils.getCarriers(controller.getScenario()))
-        .write(controller.getConfig().controller().getOutputDirectory() + "/carriers.xml");
+	CarriersUtils.writeCarriers(controller.getScenario(), "carriers.xml");
 
     log.info("Some results ....");
 

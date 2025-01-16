@@ -19,6 +19,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -207,7 +208,8 @@ public class TopKMinMaxTest {
 
 			bind(EstimateRouter.class).toInstance(new EstimateRouter(router,
 					FacilitiesUtils.createActivityFacilities(),
-					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
+					new DefaultAnalysisMainModeIdentifier()
+			));
 
 			MapBinder<String, ModeOptions> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
 			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
@@ -215,6 +217,9 @@ public class TopKMinMaxTest {
 
 
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
+			});
+
+			Multibinder<TripScoreEstimator> tEstBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
 			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {

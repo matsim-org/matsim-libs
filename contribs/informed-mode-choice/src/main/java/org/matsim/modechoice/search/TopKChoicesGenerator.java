@@ -22,11 +22,6 @@ import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
 @SuppressWarnings("unchecked")
 public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
-	/**
-	 * Maximum number of iterations. Memory usage will increase the more iterations are done.
-	 */
-	private static final int MAX_ITER = 10_000_000;
-
 	private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
 
 
@@ -116,7 +111,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 						continue m;
 				}
 
-				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
+				// Only add estimates for desired modes and those that have actual usage
+				search.addEstimates(mode.getMode(), mode.getEstimates(), mask, mode.getNoRealUsage());
 			}
 
 			if (search.isEmpty())
@@ -167,14 +163,14 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			int k = 0;
 			int n = 0;
-			DoubleIterator it = search.iter(result);
+			ModeIterator it = search.iter(result);
 			double best = Double.NEGATIVE_INFINITY;
 
 			outer:
 			while (it.hasNext() && k < topK) {
 				double estimate = preDeterminedEstimate + it.nextDouble();
 
-				if (n++ > MAX_ITER) {
+				if (n++ > it.maxIters()) {
 					log.warn("Maximum number of iterations reached for person {}", context.person.getId());
 					break;
 				}
@@ -310,7 +306,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		// reduce to single options that are usable
 		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
 			for (ModeEstimate o : e.getValue()) {
-				// check if a mode can be use at all
+				// check if a mode can be used at all
 				if (!o.isUsable() || o.isMin())
 					continue;
 
@@ -331,6 +327,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, planModel.trips()));
 
 			double estimate = 0;
+
+			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
 
 			// Collect estimates for all entries
 			for (int i = 0; i < result.length; i++) {
@@ -355,9 +353,10 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 				estimate += opt.getEstimates()[i];
 
+				// Store modes that have been used
+				if (!opt.getNoRealUsage()[i])
+					usedModes.add(mode);
 			}
-
-			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
 
 			estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, singleOptions.values());
 

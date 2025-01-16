@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -27,6 +28,10 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("Set of simple class names or fully qualified class names of dashboards to exclude")
 	public Set<String> exclude = new HashSet<>();
+
+	@Parameter
+	@Comment("Set of simple class names or fully qualified class names of dashboards to include. Any none included dashboard will be excluded.")
+	public Set<String> include = new HashSet<>();
 
 	@Parameter
 	@Comment("Sample size of the run, which may be required by certain analysis functions.")
@@ -80,6 +85,15 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 			params.put(ctx.context, ctx);
 		} else {
 			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
+		}
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (!include.isEmpty() && !exclude.isEmpty()) {
+			throw new IllegalStateException("Include and exclude option can't be set both.");
 		}
 	}
 

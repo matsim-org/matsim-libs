@@ -51,7 +51,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements GenericStrategyManager<PL, AG>{
 	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
-	
+
 	private static final Logger log = LogManager.getLogger( GenericStrategyManagerImpl.class );
 
 
@@ -90,7 +90,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 
 
 //	private String subpopulationAttributeName = null;
-	
+
 	public GenericStrategyManagerImpl() {
 		this(new WeightedStrategyChooser<>());
 	}
@@ -210,6 +210,8 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
 			final ReplanningContext replanningContext )
 	{
+		this.strategyChooser.beforeReplanning(replanningContext);
+
 		// initialize all strategies
 		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.init(replanningContext);
@@ -234,7 +236,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 			if (strategy==null) {
 				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation? Current subpopulation = " + subpopName);
 			}
-			
+
 			// ... and run the strategy:
 			strategy.run(person);
 		}
