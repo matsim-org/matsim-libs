@@ -1,6 +1,7 @@
 package org.matsim.core.router.speedy;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -89,6 +90,33 @@ public class LeastCostPathTree {
                     setData(toNode, newCost, newTime, currDistance + link.getLength());
                     this.pq.insert(toNode);
                     this.comingFrom[toNode] = nodeIdx;
+                }
+            }
+        }
+
+        if(graph.hasTurnRestrictions()) {
+            // update node values with the minimum of their colored copies, if any
+            for (int i = 0; i < data.length / 3; i++) {
+                Node uncoloredNode = graph.getNode(i);
+                if (uncoloredNode != null) {
+
+                    // the index points to a node with a different index -> colored copy
+                    if (uncoloredNode.getId().index() != i) {
+                        int uncoloredIndex = uncoloredNode.getId().index();
+                        double uncoloredCost = getCost(uncoloredIndex);
+
+                        double coloredTime = getTimeRaw(i);
+                        double coloredDistance = getDistance(i);
+                        double coloredCost = getCost(i);
+
+                        if (Double.isFinite(uncoloredCost)) {
+                            if (coloredCost < uncoloredCost) {
+                                setData(uncoloredIndex, coloredCost, coloredTime, coloredDistance);
+                            }
+                        } else {
+                            setData(uncoloredIndex, coloredCost, coloredTime, coloredDistance);
+                        }
+                    }
                 }
             }
         }
