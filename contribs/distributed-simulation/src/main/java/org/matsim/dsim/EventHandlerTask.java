@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -98,6 +100,13 @@ public final class EventHandlerTask implements SimTask {
 	 * Switching phase for the queues.
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean();
+
+	/**
+	 * Whether this task can be executed asynchronously between sim steps.
+	 */
+	@Getter
+	private final boolean async;
+
 	/**
 	 * Avg. runtime of last iterations.
 	 */
@@ -115,8 +124,16 @@ public final class EventHandlerTask implements SimTask {
 	 * Indicates if the messages need to be sorted.
 	 */
 	private volatile boolean needsSorting = false;
+
 	@Setter
 	private MessageBroker broker;
+
+	/**
+	 * If the task is executed asynchronously, the future is stored here.
+	 */
+	@Setter
+	private Future<?> future;
+
 
 	public EventHandlerTask(EventHandler handler, int partition, int totalPartitions,
 							DistributedEventsManager manager, SerializationProvider serializer,
@@ -127,6 +144,12 @@ public final class EventHandlerTask implements SimTask {
 		this.manager = manager;
 		this.counter = counter;
 		this.pattern = buildConsumers(serializer);
+
+		DistributedEventHandler ann = this.handler.getClass().getAnnotation(DistributedEventHandler.class);
+		this.async = ann != null && ann.async();
+
+		if (pattern != null && async)
+			throw new IllegalArgumentException("Message pattern and async execution together are not supported yet.");
 	}
 
 	@Override
@@ -217,6 +240,16 @@ public final class EventHandlerTask implements SimTask {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Wait for async task to finish (if set).
+	 */
+	public void waitAsync() throws ExecutionException, InterruptedException {
+		if (future != null)
+			future.get();
+
+		future = null;
 	}
 
 	@Override

@@ -23,10 +23,9 @@ public @interface DistributedEventHandler {
     boolean directProcessing() default false;
 
 	/**
-	 * If true, the sim step will not block until the event handler is finished. Only at the very end event processing is ensured.
+	 * If true, the sim step will not block until the event handler is finished. Only at the very end end of the simulation event processing is ensured.
 	 * This has major implications, because the handler must not interact with the simulation state or vice versa.
-	 * It should only be enabled for handlers that react to events and are needed at the end of the simulation.
-	 * TODO: this is not implemented and only a proposal for now
+	 * Generally, it should only be enabled for handlers that react to events and are needed at the end of the simulation.
 	 */
 	boolean async() default false;
 

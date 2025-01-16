@@ -23,7 +23,12 @@ public final class PoolExecutor implements LPExecutor {
 
     private final ExecutorService executor;
     private final SerializationProvider serializer;
+
+	/**
+	 * Executions from the current sim step.
+	 */
     private final List<Future<?>> executions = new LinkedList<>();
+
     private final List<SimTask> tasks = new ArrayList<>();
     private int step;
 
@@ -81,13 +86,20 @@ public final class PoolExecutor implements LPExecutor {
         // Prepare all tasks before executing them
         for (SimTask task : tasks) {
             task.setTime(time);
-            if (task.needsExecution())
-                task.beforeExecution();
+            if (task.needsExecution()) {
+				waitForTask(task);
+				task.beforeExecution();
+			}
         }
 
         for (SimTask task : tasks) {
-            if (task.needsExecution())
-                executions.add(executor.submit(task));
+            if (task.needsExecution()) {
+				Future<?> ft = executor.submit(task);
+				if (task instanceof EventHandlerTask et && et.isAsync()) {
+					et.setFuture(ft);
+				} else
+					executions.add(ft);
+			}
         }
 
         for (Future<?> execution : executions) {
@@ -112,7 +124,9 @@ public final class PoolExecutor implements LPExecutor {
 	@Override
 	public void runEventHandler() {
 		for (SimTask task : tasks) {
+
 			if (task instanceof EventHandlerTask) {
+				waitForTask(task);
 				task.beforeExecution();
 			}
 		}
@@ -136,5 +150,18 @@ public final class PoolExecutor implements LPExecutor {
 		}
 
 		executions.clear();
+	}
+
+	private void waitForTask(SimTask task) {
+		// Wait for async event handlers
+		if (task instanceof EventHandlerTask et) {
+			try {
+				et.waitAsync();
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Error while executing async event task", e);
+				executor.shutdown();
+				throw new RuntimeException(e.getCause());
+			}
+		}
 	}
 }
