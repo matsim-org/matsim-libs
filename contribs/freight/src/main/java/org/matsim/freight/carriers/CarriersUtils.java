@@ -302,7 +302,7 @@ public class CarriersUtils {
 	 * @param carriers the carriers
 	 * @return true if all carriers with jobs have at teast one plan
 	 */
-	public static boolean allCarriersWithDemandHavePlans(Carriers carriers) {
+	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
 		for (Carrier carrier : carriers.getCarriers().values())
 			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
 

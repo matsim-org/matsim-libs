@@ -184,7 +184,7 @@ public class CarriersAnalysis {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		if(!folder.exists())
 			folder.mkdirs();
-		if (CarriersUtils.allCarriersWithDemandHavePlans(carriers)) {
+		if (CarriersUtils.allCarriersWithJobsHavePlans(carriers)) {
 			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierPlanAnalysis.CarrierAnalysisType.completeAnalysis);
 		} else {
