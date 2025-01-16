@@ -103,7 +103,7 @@ public class RunMessagingBenchmark implements Callable<Integer> {
 			comm.recv(() -> received.size() < total - 1, (buf) -> {
 				int seq = buf.getInt(); // seq
 
-//				System.out.println("Received: " + seq);
+//				System.out.println("Received: " + seq + " at " + finalK);
 
 				if (seq == finalK) {
 					received.add(seq);

@@ -3,9 +3,11 @@ package org.matsim.core.communication;
 import io.aeron.*;
 import io.aeron.driver.MediaDriver;
 import io.aeron.logbuffer.ControlledFragmentHandler;
+import io.aeron.logbuffer.Header;
 import io.aeron.samples.SampleConfiguration;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.CloseHelper;
+import org.agrona.DirectBuffer;
 import org.agrona.concurrent.BusySpinIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.UnsafeBuffer;
@@ -31,6 +33,8 @@ public class AeronCommunicator implements Communicator {
     private final int rank;
     private final int size;
     private final String address;
+	private final ControlledFragmentAssembler fragmentAssembler;
+	private final FragmentHandler fragmentHandler;
 
     /**
      * Latch to wait for the startup of the communicator.
@@ -53,6 +57,8 @@ public class AeronCommunicator implements Communicator {
 		this.address = address;
         this.startup = new CountDownLatch(size - 1);
         this.subscriptions = new ArrayList<>(size - 1);
+		this.fragmentHandler = new FragmentHandler();
+		this.fragmentAssembler = new ControlledFragmentAssembler(fragmentHandler);
     }
 
     public void connect() throws Exception {
@@ -141,7 +147,7 @@ public class AeronCommunicator implements Communicator {
     @Override
     public void recv(MessageReceiver expectsNext, MessageConsumer handleMsg) {
 
-        ControlledFragmentAssembler fragmentHandler = new ControlledFragmentAssembler((buffer, offset, length, header) -> {
+		fragmentHandler.delegate = (buffer, offset, length, header) -> {
             ByteBuffer bb = buffer.byteBuffer();
 
             if (bb == null)
@@ -156,12 +162,12 @@ public class AeronCommunicator implements Communicator {
             }
 
             return ControlledFragmentHandler.Action.COMMIT;
-        });
+        };
 
         while (expectsNext.expectsMoreMessages()) {
             int fragments = 0;
             for (Subscription subscription : subscriptions) {
-                fragments += subscription.controlledPoll(fragmentHandler, SampleConfiguration.FRAGMENT_COUNT_LIMIT);
+                fragments += subscription.controlledPoll(fragmentAssembler, SampleConfiguration.FRAGMENT_COUNT_LIMIT);
             }
 
             idle.idle(fragments);
@@ -169,4 +175,15 @@ public class AeronCommunicator implements Communicator {
 
         idle.reset();
     }
+
+
+	private static final class FragmentHandler implements ControlledFragmentHandler {
+
+		private ControlledFragmentHandler delegate;
+
+		@Override
+		public Action onFragment(DirectBuffer buffer, int offset, int length, Header header) {
+			return delegate.onFragment(buffer, offset, length, header);
+		}
+	}
 }
