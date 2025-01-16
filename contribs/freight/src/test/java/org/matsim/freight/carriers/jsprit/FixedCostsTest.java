@@ -199,10 +199,10 @@ public class FixedCostsTest  {
 	}
 
 	private static CarrierService createMatsimService(String id, String to, int size) {
-		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-						     .setDemand(size)
-						     .setServiceDuration(31.0)
-						     .setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
+						     .setCapacityDemand(size)
+						     .setServiceDuration(31.0);
+		return builder.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 						     .build();
 	}
 
