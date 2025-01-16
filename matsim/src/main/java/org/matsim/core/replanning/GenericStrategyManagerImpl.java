@@ -212,6 +212,8 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
 			final ReplanningContext replanningContext )
 	{
+		this.strategyChooser.beforeReplanning(replanningContext);
+
 		// initialize all strategies
 		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.init(replanningContext);

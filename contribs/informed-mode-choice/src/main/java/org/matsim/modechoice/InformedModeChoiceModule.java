@@ -54,22 +54,29 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		// Copy list because it is unmodifiable
 		List<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(config.replanning().getStrategySettings());
 		List<ReplanningConfigGroup.StrategySettings> found = strategies.stream()
-			.filter(s -> s.getSubpopulation().equals(subpopulation))
+			.filter(s -> subpopulation == null || Objects.equals(s.getSubpopulation(), subpopulation))
 			.filter(s -> s.getStrategyName().equals(existing))
 			.toList();
 
 		if (found.isEmpty())
 			throw new IllegalArgumentException("No strategy %s found for subpopulation %s".formatted(existing, subpopulation));
 
-		if (found.size() > 1)
+		if (subpopulation != null && found.size() > 1)
 			throw new IllegalArgumentException("Multiple strategies %s found for subpopulation %s".formatted(existing, subpopulation));
 
-		ReplanningConfigGroup.StrategySettings old = found.getFirst();
-		old.setStrategyName(replacement);
+		found.forEach(s -> s.setStrategyName(replacement));
 
 		// reset und set new strategies
 		config.replanning().clearStrategySettings();
 		strategies.forEach(s -> config.replanning().addStrategySettings(s));
+	}
+
+	/**
+	 * Replace a strategy in the config for all subpoopulations.
+	 * @see #replaceReplanningStrategy(Config, String, String, String)
+	 */
+	public static void replaceReplanningStrategy(Config config, String existing, String replacement) {
+		replaceReplanningStrategy(config, null, existing, replacement);
 	}
 
 	public static Builder newBuilder() {
