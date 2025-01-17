@@ -39,10 +39,10 @@ import org.matsim.freight.carriers.*;
  * For all carriers it writes out the:
  * - score of the selected plan
  * - number of tours (= vehicles) of the selected plan
- * - number of Services (input)
- * - number of Services (handled)
- * - number of shipments (input)
- * - number of shipments (handled)
+ * - number of Services _input
+ * - number of Services _handled
+ * - number of shipments _input
+ * - number of shipments _handled
  * - number of not handled jobs
  * - number of planned demand size
  * - number of handled demand size
@@ -55,8 +55,6 @@ public class CarrierPlanAnalysis {
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
 	public final String delimiter;
 
-	public enum CarrierAnalysisType {onlyDemand, completeAnalysis}
-
 	final Carriers carriers;
 
 	public CarrierPlanAnalysis(String delimiter, Carriers carriers) {
@@ -64,43 +62,44 @@ public class CarrierPlanAnalysis {
 		this.carriers = carriers;
 	}
 
-	public void runAnalysisAndWriteStats(String analysisOutputDirectory, CarrierAnalysisType analysisType) {
+	public void runAnalysisAndWriteStats(String analysisOutputDirectory, CarriersAnalysis.CarrierAnalysisType analysisType) {
 		log.info("Writing out carrier analysis ...");
 
 		Path path = Path.of(analysisOutputDirectory);
 		String fileName = switch (analysisType) {
-			case onlyDemand -> path.resolve("CarriersPlan_stats_demand.tsv").toString();
-			case completeAnalysis -> path.resolve("CarriersPlan_stats_solution.tsv").toString();
+			case carriersPlans_unPlanned -> path.resolve("Carriers_stats_unPlanned.tsv").toString();
+			case carriersPlans, carriersAndEvents -> path.resolve("Carriers_stats.tsv").toString();
 		};
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 			String headerGeneral = String.join(delimiter,
 				"carrierId",
 				"nuOfJspritIterations",
+				"fleetSize",
 				"nuOfPossibleVehicleTypes",
 				"nuOfPossibleVehicles",
-				"nuOfServiceLocations(input)",
-				"nuOfPickupLocations(input)",
-				"nuOfDeliveryLocations(input)");
+				"nuOfServiceLocations_input",
+				"nuOfPickupLocations_input",
+				"nuOfDeliveryLocations_input");
 			String header = switch (analysisType) {
-				case onlyDemand -> String.join(delimiter,
+				case carriersPlans_unPlanned -> String.join(delimiter,
 					headerGeneral,
-					"nuOfShipments(input)",
-					"nuOfServices(input)",
+					"nuOfShipments_input",
+					"nuOfServices_input",
 					"nuOfPlanedDemandSize"
 				);
-				case completeAnalysis -> String.join(delimiter,
+				case carriersPlans, carriersAndEvents -> String.join(delimiter,
 					headerGeneral,
 					"MATSimScoreSelectedPlan",
 					"jSpritScoreSelectedPlan",
 					"nuOfTours",
-					"nuOfShipments(input)",
-					"nuOfShipments(handled)",
-					"nuOfServices(input)",
-					"nuOfServices(handled)",
+					"nuOfShipments_input",
+					"nuOfShipments_handled",
+					"nuOfServices_input",
+					"nuOfServices_handled",
 					"noOfNotHandledJobs",
 					"nuOfPlanedDemandSize",
 					"nuOfHandledDemandSize",
-					"jspritComputationTime[HH:mm:ss]"
+					"jspritComputationTime"
 				);
 			};
 
@@ -113,7 +112,7 @@ public class CarrierPlanAnalysis {
 			for (Carrier carrier : sortedCarrierMap.values()) {
 
 				int numberOfPossibleVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
-				int numberOfPossibleVehicleTypes = carrier.getCarrierCapabilities().getVehicleTypes().size();
+				String fleetSize = carrier.getCarrierCapabilities().getFleetSize().toString();
 				int numberOfPlanedShipments = carrier.getShipments().size();
 				int numberOfPlanedServices = carrier.getServices().size();
 				int numberJspritIterations = CarriersUtils.getJspritIterations(carrier);
@@ -134,18 +133,19 @@ public class CarrierPlanAnalysis {
 
 				bw1.write(carrier.getId().toString());
 				bw1.write(delimiter + numberJspritIterations);
+				bw1.write(delimiter + fleetSize);
 				bw1.write(delimiter + numberOfPossibleVehicleTypes);
 				bw1.write(delimiter + numberOfPossibleVehicles);
 				bw1.write(delimiter + numberOfDifferentServiceLocations_demand);
 				bw1.write(delimiter + numberOfDifferentPickupLocations_demand);
 				bw1.write(delimiter + numberOfDifferentDeliveryLocations_demand);
 				switch (analysisType) {
-					case onlyDemand -> {
+					case carriersPlans_unPlanned -> {
 						bw1.write(delimiter + numberOfPlanedShipments);
 						bw1.write(delimiter + numberOfPlanedServices);
 						bw1.write(delimiter + numberOfPlanedDemandSize);
 					}
-					case completeAnalysis -> {
+					case carriersAndEvents -> {
 						int numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
 							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
 						int numberOfHandledDeliveries = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
