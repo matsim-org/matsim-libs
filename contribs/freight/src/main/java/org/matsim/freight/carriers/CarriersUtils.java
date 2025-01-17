@@ -310,7 +310,7 @@ public class CarriersUtils {
 	}
 
 	/**
-	 * Checks is a carrier has jobs (services or shipments).
+	 * Checks if a carrier has jobs (services or shipments).
 	 *
 	 * @param carrier the carrier
 	 * @return true if a carrier has jobs (services or shipments)
