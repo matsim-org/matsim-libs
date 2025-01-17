@@ -62,6 +62,23 @@ public class CarriersAnalysis {
 	private Carriers carriers = null;
 	private final String delimiter = "\t";
 
+	public enum CarrierAnalysisType {
+		/**
+		 * Analyzes only the unplanned part of the carriers
+		 */
+		carriersPlans_unPlanned,
+		/**
+		 * Analyzes the complete carriers plans including the selected tours.
+		 */
+		carriersPlans,
+		/**
+		 * Analyzes the complete carriers plans and adds an event-based analysis of the carriers based on vehicles, vehicleTypes and carriers.
+		 */
+		carriersAndEvents
+	}
+
+	private final CarrierAnalysisType defaultAnalysisType = CarrierAnalysisType.carriersAndEvents;
+
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
 	 * The default folder for the analysis results is "CarriersAnalysis".
@@ -166,12 +183,59 @@ public class CarriersAnalysis {
 		this.carriers = CarriersUtils.addOrGetCarriers(scenario);
 	}
 
-	public void runDemandOfCarriersAnalysis() {
+	/**
+	 * Runs the carriers analysis based on the default analysis type.
+	 */
+	public void runCarrierAnalysis() {
+		log.info("No analysis type selected. Running default analysis type: {}", defaultAnalysisType);
+		runCarrierAnalysis(defaultAnalysisType);
+	}
+
+
+	/**
+	 * Runs the carriers analysis based on the selected analysis type.
+	 *
+	 * @param analysisType The type of the analysis
+	 */
+	public void runCarrierAnalysis(CarrierAnalysisType analysisType) {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
-		if(!folder.exists())
+		if (!folder.exists())
 			folder.mkdirs();
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
-		carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierPlanAnalysis.CarrierAnalysisType.onlyDemand);
+		switch (analysisType) {
+			case carriersPlans_unPlanned -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
+			}
+			case carriersPlans -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+			}
+			case carriersAndEvents -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersAndEvents);
+
+				// Prepare eventsManager - start of event based Analysis;
+				EventsManager eventsManager = EventsUtils.createEventsManager();
+
+				FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(
+					delimiter, scenario);
+				eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
+
+				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
+				eventsManager.addHandler(carrierLoadAnalysis);
+
+				eventsManager.initProcessing();
+				MatsimEventsReader matsimEventsReader = CarrierEventsReaders.createEventsReader(eventsManager);
+
+				matsimEventsReader.readFile(EVENTS_PATH);
+				eventsManager.finishProcessing();
+
+				log.info("Analysis completed.");
+				log.info("Writing output...");
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+			}
+		}
 	}
 
 	/**

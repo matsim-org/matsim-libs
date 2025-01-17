@@ -48,8 +48,8 @@ public class CarriersAnalysisTest {
 			testUtils.getInputDirectory() + "in/serviceBasedEvents.xml",
 			testUtils.getOutputDirectory(),
 			null);
-		carriersAnalysis.runDemandOfCarriersAnalysis();
-		carriersAnalysis.runCompleteAnalysis();
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_unPlanned.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_unPlanned.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats.tsv",  testUtils.getOutputDirectory() + "Carriers_stats.tsv");
@@ -69,8 +69,8 @@ public class CarriersAnalysisTest {
 			testUtils.getInputDirectory() + "in/shipmentBasedEvents.xml",
 			testUtils.getOutputDirectory(),
 			null);
-		carriersAnalysis.runDemandOfCarriersAnalysis();
-		carriersAnalysis.runCompleteAnalysis();
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
+		carriersAnalysis.runCarrierAnalysis();
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_unPlanned.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_unPlanned.tsv");
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats.tsv",  testUtils.getOutputDirectory() + "Carriers_stats.tsv");
@@ -93,7 +93,7 @@ public class CarriersAnalysisTest {
 		new CarrierPlanXmlReader(carriers, vehTypes).readURL(carriersFile);
 
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(carriers, testUtils.getOutputDirectory());
-		carriersAnalysis.runDemandOfCarriersAnalysis();
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_unPlanned.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_unPlanned.tsv");
 	}
@@ -111,7 +111,7 @@ public class CarriersAnalysisTest {
 		new CarrierPlanXmlReader(carriers, vehTypes).readURL(carriersFile);
 
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(carriers, testUtils.getOutputDirectory());
-		carriersAnalysis.runDemandOfCarriersAnalysis();
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 
 		MatsimTestUtils.assertEqualFilesLineByLine(testUtils.getInputDirectory() + "Carriers_stats_unPlanned.tsv",  testUtils.getOutputDirectory() + "Carriers_stats_unPlanned.tsv");
 	}

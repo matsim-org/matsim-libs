@@ -244,7 +244,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
     CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.controller().getRunId(), config.global().getCoordinateSystem());
-	carriersAnalysis.runCompleteAnalysis();
+	carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
   }
 
   /**
