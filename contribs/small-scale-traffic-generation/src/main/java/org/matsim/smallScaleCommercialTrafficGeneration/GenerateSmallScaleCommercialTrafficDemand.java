@@ -323,7 +323,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
 		//TODO perhaps change to complete carrier analysis
 		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis").toString());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersPlans);
 		System.out.println("Finishing Analysis of Carrier.");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controller.getScenario(),
