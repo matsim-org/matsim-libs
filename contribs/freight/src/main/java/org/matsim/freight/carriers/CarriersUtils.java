@@ -267,7 +267,7 @@ public class CarriersUtils {
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
-	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
+	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
@@ -294,6 +294,29 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Checks if all carriers with jobs have at least one plan.
+	 *
+	 * @param carriers the carriers
+	 * @return true if all carriers with jobs have at teast one plan
+	 */
+	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
+		for (Carrier carrier : carriers.getCarriers().values())
+			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
+
+		return true;
+	}
+
+	/**
+	 * Checks if a carrier has jobs (services or shipments).
+	 *
+	 * @param carrier the carrier
+	 * @return true if a carrier has jobs (services or shipments)
+	 */
+	public static boolean hasJobs(Carrier carrier) {
+		return !carrier.getServices().isEmpty() || !carrier.getShipments().isEmpty();
 	}
 
 	/**

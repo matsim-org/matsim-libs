@@ -22,8 +22,8 @@
 package org.matsim.freight.carriers.analysis;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -33,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -52,9 +51,9 @@ import org.matsim.freight.carriers.events.CarrierEventsReaders;
  *
  * @author kturner (Kai Martins-Turner)
  */
-public class RunFreightAnalysisEventBased {
+public class CarriersAnalysis {
 
-	private static final Logger log = LogManager.getLogger(RunFreightAnalysisEventBased.class);
+	private static final Logger log = LogManager.getLogger(CarriersAnalysis.class);
 
 	//Where is your simulation output, that should be analysed?
 	private String EVENTS_PATH = null;
@@ -63,7 +62,44 @@ public class RunFreightAnalysisEventBased {
 	private Carriers carriers = null;
 	private final String delimiter = "\t";
 
-	//TODO discuss renaming without EventBased. If this becomes the standard carrier output
+	public enum CarrierAnalysisType {
+		/**
+		 * Analyzes only the unplanned part of the carriers
+		 */
+		carriersPlans_unPlanned,
+		/**
+		 * Analyzes the complete carriers plans including the selected tours.
+		 */
+		carriersPlans,
+		/**
+		 * Analyzes the complete carriers plans and adds an event-based analysis of the carriers based on vehicles, vehicleTypes and carriers.
+		 */
+		carriersAndEvents
+	}
+
+	private final CarrierAnalysisType defaultAnalysisType = CarrierAnalysisType.carriersAndEvents;
+
+	/**
+	 * This constructor automatically searches for the necessary output file in a simulation run output.
+	 * The default folder for the analysis results is "CarriersAnalysis".
+	 *
+	 * @param simOutputPath The output directory of the simulation run
+	 * @param runId         The CRS of the simulation
+	 */
+	public CarriersAnalysis(String simOutputPath, String runId) {
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), runId, null);
+	}
+
+	/**
+	 * This constructor automatically searches for the necessary output file in a simulation run output.
+	 * The default folder for the analysis results is "CarriersAnalysis".
+	 *
+	 * @param simOutputPath The output directory of the simulation run
+	 */
+	public CarriersAnalysis(String simOutputPath) {
+		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), null, null);
+	}
+
 	/**
 	 * This constructor automatically searches for the necessary output file in a simulation run output.
 	 *
@@ -71,7 +107,7 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 * @param globalCrs          The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(String simOutputPath, String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String simOutputPath, String analysisOutputPath, String runId, String globalCrs) {
 
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 //		this.EVENTS_PATH = globFile(simOutputPath, "*output_events.*");
@@ -81,13 +117,13 @@ public class RunFreightAnalysisEventBased {
 //		Path carriersVehicleTypesPath = globFile(simOutputPath, "*output_carriersVehicleTypes.*");
 
 		// the better version with the globFile method is not available since there is a circular dependency between the modules application and freight
-
+		String runIdWithDelimiter = runId != null ? runId + "." : "";
 		final Path path = Path.of(simOutputPath);
-		this.EVENTS_PATH = path.resolve("output_events.xml.gz").toString();
-		String vehiclesPath = path.resolve("output_allVehicles.xml.gz").toString();
-		String networkPath = path.resolve("output_network.xml.gz").toString();
-		String carriersPath = path.resolve("output_carriers.xml.gz").toString();
-		String carriersVehicleTypesPath = path.resolve("output_carriersVehicleTypes.xml.gz").toString();
+		this.EVENTS_PATH = path.resolve(runIdWithDelimiter + "output_events.xml.gz").toString();
+		String vehiclesPath = path.resolve(runIdWithDelimiter + "output_allVehicles.xml.gz").toString();
+		String networkPath = path.resolve(runIdWithDelimiter + "output_network.xml.gz").toString();
+		String carriersPath = path.resolve(runIdWithDelimiter + "output_carriers.xml.gz").toString();
+		String carriersVehicleTypesPath = path.resolve(runIdWithDelimiter + "output_carriersVehicleTypes.xml.gz").toString();
 
 		createScenarioForFreightAnalysis(vehiclesPath, networkPath, carriersPath, carriersVehicleTypesPath, globalCrs);
 	}
@@ -103,8 +139,8 @@ public class RunFreightAnalysisEventBased {
 	 * @param analysisOutputPath       Path to the output directory
 	 * @param globalCrs                The CRS of the simulation
 	 */
-	public RunFreightAnalysisEventBased(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
-										String analysisOutputPath, String globalCrs) {
+	public CarriersAnalysis(String networkPath, String vehiclesPath, String carriersPath, String carriersVehicleTypesPath, String eventsPath,
+							String analysisOutputPath, String globalCrs) {
 		this.EVENTS_PATH = eventsPath;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 
@@ -114,10 +150,10 @@ public class RunFreightAnalysisEventBased {
 	/**
 	 * Constructor, if you only want to have the carrier analysis.
 	 *
-	 * @param carriers           The carriers to be analysed
+	 * @param carriers           The carriers to be analyzed
 	 * @param analysisOutputPath The directory where the result of the analysis should go to
 	 */
-	public RunFreightAnalysisEventBased(Carriers carriers, String analysisOutputPath) {
+	public CarriersAnalysis(Carriers carriers, String analysisOutputPath) {
 		this.carriers = carriers;
 		this.ANALYSIS_OUTPUT_PATH = analysisOutputPath;
 	}
@@ -143,52 +179,62 @@ public class RunFreightAnalysisEventBased {
 		scenario = ScenarioUtils.loadScenario(config);
 
 		//load carriers according to freight config
-		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 		this.carriers = CarriersUtils.addOrGetCarriers(scenario);
 	}
 
-	public void runCarriersAnalysis() throws IOException {
+	/**
+	 * Runs the carriers analysis based on the default analysis type.
+	 */
+	public void runCarrierAnalysis() {
+		log.info("No analysis type selected. Running default analysis type: {}", defaultAnalysisType);
+		runCarrierAnalysis(defaultAnalysisType);
+	}
 
-		//Where to store the analysis output?
+
+	/**
+	 * Runs the carriers analysis based on the selected analysis type.
+	 *
+	 * @param analysisType The type of the analysis
+	 */
+	public void runCarrierAnalysis(CarrierAnalysisType analysisType) {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
-		folder.mkdirs();
-		if (allCarriersHavePlans(carriers)) {
-			CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
-			carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH);
+		if (!folder.exists())
+			folder.mkdirs();
+		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
+		switch (analysisType) {
+			case carriersPlans_unPlanned -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
+			}
+			case carriersPlans -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
+			}
+			case carriersAndEvents -> {
+				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersAndEvents);
+
+				// Prepare eventsManager - start of event based Analysis;
+				EventsManager eventsManager = EventsUtils.createEventsManager();
+
+				FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(
+					delimiter, scenario);
+				eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
+
+				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
+				eventsManager.addHandler(carrierLoadAnalysis);
+
+				eventsManager.initProcessing();
+				MatsimEventsReader matsimEventsReader = CarrierEventsReaders.createEventsReader(eventsManager);
+
+				matsimEventsReader.readFile(EVENTS_PATH);
+				eventsManager.finishProcessing();
+
+				log.info("Analysis completed.");
+				log.info("Writing output...");
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
+				freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerCarrier(ANALYSIS_OUTPUT_PATH, scenario);
+				carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
+			}
 		}
-		else  {
-			log.warn("########## Not all carriers have plans. Skipping CarrierPlanAnalysis."); //TODO perhaps skipp complete analysis
-		}
-	}
-	public void runCompleteAnalysis() throws IOException {
-		runCarriersAnalysis();
-
-		// Prepare eventsManager - start of event based Analysis;
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-
-		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
-		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
-
-		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
-		eventsManager.addHandler(carrierLoadAnalysis);
-
-		eventsManager.initProcessing();
-		MatsimEventsReader matsimEventsReader = CarrierEventsReaders.createEventsReader(eventsManager);
-
-		matsimEventsReader.readFile(EVENTS_PATH);
-		eventsManager.finishProcessing();
-
-		log.info("Analysis completed.");
-		log.info("Writing output...");
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(ANALYSIS_OUTPUT_PATH, scenario);
-		carrierLoadAnalysis.writeLoadPerVehicle(ANALYSIS_OUTPUT_PATH, scenario);
-	}
-
-	private boolean allCarriersHavePlans(Carriers carriers) {
-		for (Carrier carrier : carriers.getCarriers().values())
-			if (carrier.getSelectedPlan() == null) return false;
-
-		return true;
 	}
 }
