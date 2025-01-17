@@ -112,6 +112,8 @@ public class CarrierPlanAnalysis {
 			for (Carrier carrier : sortedCarrierMap.values()) {
 
 				int numberOfPossibleVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
+				int numberOfPossibleVehicleTypes = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().map(
+					CarrierVehicle::getVehicleTypeId).distinct().mapToInt(vt -> 1).sum();
 				String fleetSize = carrier.getCarrierCapabilities().getFleetSize().toString();
 				int numberOfPlanedShipments = carrier.getShipments().size();
 				int numberOfPlanedServices = carrier.getServices().size();
