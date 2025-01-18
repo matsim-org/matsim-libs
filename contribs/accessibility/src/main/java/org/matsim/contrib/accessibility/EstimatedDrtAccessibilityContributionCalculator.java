@@ -175,14 +175,32 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
 
 			//TODO: replace actual person with a fake person, or find workaround.
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().get(Id.createPersonId("1213")), null);
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().values().stream().findFirst().get(), null);
 			Leg mainLeg = extractLeg(planElements, TransportMode.car);
 			double directRideDistance_m = mainLeg.getRoute().getDistance();
 
-//			drtEstimator.estimate(DrtRoute)
-			// todo: insert CL's DRT Estimator here instead of hardcoding parameters here.
-			double waitTime_s = 103.34; //TODO
-			double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
+//			getAlphaBeta(null, null, null);
+
+			//Model: Conventional DRT 50km/h 3vh seed 1
+//			double waitTime_s = 421.87;
+//			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+
+			//Model: Conventional DRT 50km/h 3vh all seeds
+//			double waitTime_s = 404.30495552731895;
+//			double rideTime_s = 101.95878208117924 + 0.10293967925399317* directRideDistance_m;
+
+//			KEXI data on demand: wait = request - vehicle arrival/departure rideTime = model1
+//			double waitTime_s = 762.1;
+//			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+
+			//KEXI data on demand: wait = last communicated departure - vehicle arrival/departure rideTime = model1
+//			double waitTime_s = 15.8;
+//			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+
+			//KEXI data on demand: wait = 20 minutes, presumed realistic for on demand in east Kelheim
+			double waitTime_s = 1200;
+			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours
@@ -239,7 +257,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		List<Leg> legList = planElementsMain.stream().filter(pe -> pe instanceof Leg && ((Leg) pe).getMode().equals(mode)).map(pe -> (Leg) pe).toList();
 
 		if (legList.size() != 1) {
-			throw new RuntimeException("for these accesibility calculations, there should be exactly one leg");
+			throw new RuntimeException("for these accessibility calculations, there should be exactly one leg");
 		}
 
 		return legList.get(0);
