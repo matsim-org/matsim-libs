@@ -8,9 +8,7 @@ import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -76,31 +74,53 @@ public final class AccessibilityFromEvents{
 
 		AbstractModule module = new AbstractModule(){
 			@Override public void install(){
-				install( new ScenarioByInstanceModule( scenario ) ) ;
-				install( new TripRouterModule() ) ;
 				install( new TimeInterpretationModule() );
-				install(new EventsManagerModule());
-				install(new DvrpModule());
-				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
-				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-					install(new DrtModeModule(drtCfg));
-					installQSimModule(new DrtModeQSimModule(drtCfg));
-					install(new DrtModeAnalysisModule(drtCfg));
-				}
+				// has to do with config
 
+				install( new ScenarioByInstanceModule( scenario ) ) ;
+				// (= scenario)
 
-//				install(new MultiModeDrtModule());
-//				install(new MultiModeDrtCompanionModule());
+//				install( new NewControlerModule() );
+				// (= some controler infrastructure because in particular dvrp wants it)
+
+				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
+
+				//TODO: Needed to bind DRT Estimator
+//				bind(DrtEstimator).toInstance()
+
+				install( new TripRouterModule() ) ;
+				// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed
+				// for: teleportation routers, network routers, pt routers.)
 
 				for( String mode : getConfig().routing().getNetworkModes() ){
 					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
 				}
+				// (= sets the network travel times which are needed for the TripRouterModule)
+
 				install( new TravelDisutilityModule() ) ;
-				final AccessibilityModule module = new AccessibilityModule();
-				for( FacilityDataExchangeInterface dataListener : dataListeners ){
-					module.addFacilityDataExchangeListener( dataListener );
+				// (= installs the travel disuility which is necessary for routing.  The travel times are constructed earlier "by hand".)
+
+				//				install(new EventsManagerModule());
+//				install(new DvrpModule());
+//				MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModeDrtConfigGroup.class);
+//				for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+//					install(new DrtModeModule(drtCfg));
+//					installQSimModule(new DrtModeQSimModule(drtCfg));
+//					install(new DrtModeAnalysisModule(drtCfg));
+//				}
+//
+//
+////				install(new MultiModeDrtModule());
+////				install(new MultiModeDrtCompanionModule());
+//
+				// install the accessiblity module:
+				{
+					final AccessibilityModule module = new AccessibilityModule();
+					for( FacilityDataExchangeInterface dataListener : dataListeners ){
+						module.addFacilityDataExchangeListener( dataListener );
+					}
+					install( module );
 				}
-				install( module ) ;
 			}
 		};
 
