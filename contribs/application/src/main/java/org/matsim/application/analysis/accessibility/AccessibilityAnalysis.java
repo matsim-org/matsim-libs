@@ -26,6 +26,7 @@ import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.io.csv.CsvWriteOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"%s.csv"
+		"%s/accessibilities_simwrapper.csv"
 	}
 )
 public class AccessibilityAnalysis implements MATSimAppCommand {
@@ -61,58 +62,72 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 
-		//CONFIG
-		// set necessary input files:
-		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
-		config.controller().setOutputDirectory(input.getRunDirectory().toString());
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile(ApplicationUtils.matchInput("output_network.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("output_transitSchedule.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-		config.transit().setVehiclesFile(null);
-		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
 
-		config.plans().setInputFile(ApplicationUtils.matchInput("output_plans.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
-		config.facilities().setInputFile(ApplicationUtils.matchInput("output_facilities.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-		config.eventsManager().setNumberOfThreads(null);
-		config.eventsManager().setEstimatedNumberOfEvents(null);
-		config.global().setNumberOfThreads(1);
-
-		for (DrtConfigGroup drtConfig : ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class).getModalElements()) {
-			drtConfig.transitStopFile = "/Users/jakob/git/matsim-libs/examples/scenarios/kelheim/drt-stops.xml"; // todo!!!
-			drtConfig.removeParameterSet(drtConfig.getZonalSystemParams().get());
-			drtConfig.plotDetailedCustomerStats = false;
-		}
-		config.routing().setRoutingRandomness(0);
-		// todo: otherwise swissRailRaptor guice bindings are neccessary. But what if we need transit accessibility?
-//		config.transit().setUseTransit(false);
-		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
-
-
-		//SCENARIO
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Set<String> activityOptions = scenario.getActivityFacilities().getFacilities().values().stream().flatMap(fac -> fac.getActivityOptions().values().stream()).map(ActivityOption::getType).collect(Collectors.toSet());
-
-		String eventsFile = ApplicationUtils.matchInput("output_events.xml.gz", input.getRunDirectory()).toString();
-
-		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, eventsFile, List.of("trainStation","cityCenter"));
-		builder.build().run();
+		// ------------ following moved to analysis class, to be complete BEFORE dashboard is generated!!
+//		//CONFIG
+//		// set necessary input files:
+//		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
+//		config.controller().setOutputDirectory(input.getRunDirectory().toString());
+//		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//		config.network().setInputFile(ApplicationUtils.matchInput("output_network.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+//		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("output_transitSchedule.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+//		config.transit().setVehiclesFile(null);
+//		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+//
+//		config.plans().setInputFile(ApplicationUtils.matchInput("output_plans.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+//		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+//		config.facilities().setInputFile(ApplicationUtils.matchInput("output_facilities.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+//		config.eventsManager().setNumberOfThreads(null);
+//		config.eventsManager().setEstimatedNumberOfEvents(null);
+//		config.global().setNumberOfThreads(1);
+//
+//		for (DrtConfigGroup drtConfig : ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class).getModalElements()) {
+//			drtConfig.transitStopFile = "/Users/jakob/git/matsim-libs/examples/scenarios/kelheim/drt-stops.xml"; // todo!!!
+//			drtConfig.removeParameterSet(drtConfig.getZonalSystemParams().get());
+//			drtConfig.plotDetailedCustomerStats = false;
+//		}
+//		config.routing().setRoutingRandomness(0);
+//		// todo: otherwise swissRailRaptor guice bindings are neccessary. But what if we need transit accessibility?
+////		config.transit().setUseTransit(false);
+//		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
+//
+//
+//		//SCENARIO
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		Set<String> activityOptions = scenario.getActivityFacilities().getFacilities().values().stream().flatMap(fac -> fac.getActivityOptions().values().stream()).map(ActivityOption::getType).collect(Collectors.toSet());
+//
+//		String eventsFile = ApplicationUtils.matchInput("output_events.xml.gz", input.getRunDirectory()).toString();
+//
+//		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, eventsFile, List.of("trainStation","cityCenter"));
+//		builder.build().run();
 
 
 		// read in, rename columns, and print out:
 
-		for (String activityOption : activityOptions) {
-			String filePath = input.getRunDirectory() + "/" + activityOption + "/accessibilities.csv";
-			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + ".csv";
+		// ------------------- FOllowing moved into Accessibility Dashboard, because the standard simwapper contrib workflow doesn't quite efficiently do what we want it to.
 
-			Path accAnalysisDirectory = Path.of(input.getRunDirectory() + "/analysis/accessibility/");
-			if (!Files.exists(accAnalysisDirectory)) {
-				try {
-					// Create the directory
-					Files.createDirectories(accAnalysisDirectory);
-				} catch (IOException e) {
-					System.out.println("Failed to create directory: " + e.getMessage());
-				}
+
+		Set<String> activityOptions = null;
+		try {
+			activityOptions = Files.list(input.getRunDirectory().resolve("analysis/accessibility/"))
+				.filter(Files::isDirectory)
+				.map(Path::getFileName)
+				.map(Path::toString).
+				collect(Collectors.toSet());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+
+
+		for (String activityOption : activityOptions) {
+			String filePath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/accessibilities.csv";
+			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/accessibilities_simwrapper.csv";
+
+			// we don't want to repeat the same operation x times.
+			if (new File(outputPath).exists()) {
+				continue;
 			}
 
 			try {
@@ -130,6 +145,7 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 				table.column("xcoord").setName("x");
 				table.column("ycoord").setName("y");
 
+				//added 10 to accessibility because grid map can't currently handle negative vals
 				List<Column<?>> modCols = new ArrayList<>();
 				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
 					Column<?> column = iterator.next();

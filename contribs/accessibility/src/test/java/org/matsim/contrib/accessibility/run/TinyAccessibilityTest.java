@@ -259,7 +259,7 @@ public class TinyAccessibilityTest {
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(min ).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max).setBoundingBoxLeft(min).setBoundingBoxRight(max);
 		acg.setUseParallelization(false);
 		acg.setTimeOfDay(congestionTime);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);

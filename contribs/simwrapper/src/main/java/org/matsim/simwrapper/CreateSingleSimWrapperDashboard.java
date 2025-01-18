@@ -127,7 +127,7 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					sw.addDashboard(new PublicTransitDashboard());
 				}
 				case accessibility -> {
-					sw.addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem()));
+					sw.addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), null));
 				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}

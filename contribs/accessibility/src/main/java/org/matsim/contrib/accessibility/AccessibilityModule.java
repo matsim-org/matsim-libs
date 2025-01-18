@@ -188,7 +188,7 @@ public final class AccessibilityModule extends AbstractModule {
 			}
 			AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 
-			String outputDirectory = scenario.getConfig().controller().getOutputDirectory() + "/" + activityType;
+			String outputDirectory = scenario.getConfig().controller().getOutputDirectory() + "/analysis/accessibility/" + activityType;
 			AccessibilityComputationShutdownListener accessibilityShutdownListener = new AccessibilityComputationShutdownListener(scenario, measuringPoints, opportunities, outputDirectory);
 
 //				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
@@ -208,7 +208,7 @@ public final class AccessibilityModule extends AbstractModule {
 				} else if ( TransportMode.pt.equals( mode ) ){
 					calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.scoring(), scenario );
 				} else if ( Modes4Accessibility.estimatedDrt.name().equals( mode )) {
-					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, drtEstimator);
+					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, this.drtEstimator);
 				} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 					throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
