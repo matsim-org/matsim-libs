@@ -19,12 +19,6 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -112,7 +106,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		Gbl.assertNotNull(measuringPoints);
 		Gbl.assertNotNull(measuringPoints.getFacilities());
 
-		// todo: should I aggregate the measuring points to the nearest drt stop. Or do we in the near future want to compare the drt routes between multiple access/egress drt stops?
+		// here we don't aggregate the measuring points to nearest stop.
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> facilityId = measuringPoint.getId();
 			if(!aggregatedMeasurePoints.containsKey(facilityId)) {
@@ -135,8 +129,9 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
 
 
-		// todo: same question as above...
-		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, scenario.getConfig());
+		// here we don't aggregate opportunites to nearest drt stop, because this would make it difficult to calculate direct walk as an alternative.
+//		this.aggregatedOpportunities = aggregateOpportunitiesWithSameNearestDrtStop(opportunities, scenario.getConfig());
+		this.aggregatedOpportunities = keepOpportunitiesDisaggregated(opportunities, scenario.getConfig());
 
 
 	}
@@ -156,11 +151,11 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		// initialize sum of utilities
 		double expSum = 0.;
 
-		// find closest stop to measuring point.
+		// find the closest stop to measuring point.
 		Assert.isTrue(stopFinder instanceof ClosestAccessEgressFacilityFinder, "So far, findClosestStop() is only implemented in ClosestAccessEgressFacilityFinder");
 		Facility nearestStopAccess = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(origin);
 
-		// use walk router to calculate access walk time. Since it is a walk trip, there should only be a single leg.
+		// UTILITY OF ACCESS
 		List<? extends PlanElement> planElementsAccess = tripRouter.calcRoute(TransportMode.walk, origin, nearestStopAccess, departureTime, null, null);
 		Leg accessLeg = extractLeg(planElementsAccess, TransportMode.walk);
 		double accessTime_h = accessLeg.getTravelTime().seconds() / 3600;
@@ -171,8 +166,9 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		// we calculate sum of utilities to travel from the origin drt stop to all drt stops that have at least one opportunity close to it
 		for (AggregationObject destination : aggregatedOpportunities.values()) {
 
-			// Calculate utility of main drt leg:
-			Facility nearestStopEgress = (Facility) destination.getNearestBasicLocation();
+			Facility opportunity = (Facility) destination.getNearestBasicLocation();
+			Facility nearestStopEgress = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
+			// UTILITY OF DRT LEG
 
 			//TODO: replace actual person with a fake person, or find workaround.
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, scenario.getPopulation().getPersons().values().stream().findFirst().get(), null);
@@ -182,8 +178,8 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //			getAlphaBeta(null, null, null);
 
 			//Model: Conventional DRT 50km/h 3vh seed 1
-//			double waitTime_s = 421.87;
-//			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+			double waitTime_s = 421.87;
+			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
 
 			//Model: Conventional DRT 50km/h 3vh all seeds
 //			double waitTime_s = 404.30495552731895;
@@ -198,42 +194,44 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 //			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
 
 			//KEXI data on demand: wait = 20 minutes, presumed realistic for on demand in east Kelheim
-			double waitTime_s = 1200;
-			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
+//			double waitTime_s = 1200;
+//			double rideTime_s = 71.82 + 0.11873288637584138 * directRideDistance_m;
 
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours
 
 			// Pre-computed effect of all opportunities reachable from destination network node
-			double sumExpVjkWalk = destination.getSum();
+//			double sumExpVjkWalk = destination.getSum();
 
+			// UTILITY OF EGRESS
+			List<? extends PlanElement> planElementsEgress = tripRouter.calcRoute(TransportMode.walk, nearestStopEgress, opportunity, departureTime, null, null);
+			Leg egressLeg = extractLeg(planElementsEgress, TransportMode.walk);
+			double egressTime_h = egressLeg.getTravelTime().seconds() / 3600;
+			double egressDist_m = egressLeg.getRoute().getDistance();
+			double utility_egress = egressTime_h * betaWalkTT_h + egressDist_m * betaWalkDist_m;
+
+			// ASC
 			double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
 
+			// SUM: DRT UTILITY
 			double drtUtility =
 				utility_access +
 				utilityDrtTime +
 				utilityDrtDistance +
-				Math.log(sumExpVjkWalk) / scoringConfigGroup.getBrainExpBeta() + // todo should this be included in the comparison?
+				utility_egress +
+//				Math.log(sumExpVjkWalk) / scoringConfigGroup.getBrainExpBeta() + // todo should this be included in the comparison?
 				utilityDrtConstant;
 
-			// Calculate utility of direct walk
-			// todo: why is sumExpVjkWalk included in drtUtility but not in directWalkUtility...
-			// should we really be aggregating around drt stops. Should we not handle each opportuninity seperately, so we can actually compare direct walk times?
-			List<? extends PlanElement> planElementsDirectWalk = tripRouter.calcRoute(TransportMode.walk, origin, (DrtStopFacilityImpl) destination.getNearestBasicLocation(), departureTime, null, null);
+
+			// SUM: DIRECT WALK UTILITY
+			List<? extends PlanElement> planElementsDirectWalk = tripRouter.calcRoute(TransportMode.walk, origin, opportunity, departureTime, null, null);
 			Leg directWalkLeg = extractLeg(planElementsDirectWalk, TransportMode.walk);
 			double directWalkTime_h = directWalkLeg.getTravelTime().seconds() / 3600;
 			double directWalkDist_m = directWalkLeg.getRoute().getDistance();
 			double directWalkUtility = directWalkTime_h * betaWalkTT_h +
 				directWalkDist_m * betaWalkDist_m +
 				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup);
-
-//			final Coord toCoord = destination.getNearestBasicLocation().getCoord();
-//			double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
-////			double directWalkUtility =
-//				directDistance_m / walkSpeed_m_h * betaWalkTT_h + // utility based on travel time
-//				directDistance_m * betaWalkDist_m + // utility based on travel distance
-//				AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.walk, scoringConfigGroup); // ASC
 
 			// Utilities for traveling are generally negative (unless there is a high ASC).
 			// We choose walk if it's utility is higher (less negative) than that of DRT
@@ -287,6 +285,16 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		return aggregatedOpportunities;
 	}
 
+
+	private Map<Id<? extends BasicLocation>, AggregationObject> keepOpportunitiesDisaggregated(final ActivityFacilities opportunities, Config config ) {
+		Map<Id<? extends BasicLocation>, AggregationObject> opportunityMap = new ConcurrentHashMap<>();
+
+		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
+			AggregationObject opportunityAsAggObj = new AggregationObject(opportunity.getId(), null, null, opportunity, 0.);
+			opportunityMap.put(opportunity.getId(), opportunityAsAggObj);
+		}
+		return opportunityMap;
+	}
 
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestDrtStop(
 		final ActivityFacilities opportunities, Config config ) {
