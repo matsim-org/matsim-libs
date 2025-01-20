@@ -1,0 +1,2 @@
+carrierId	nuOfJspritIterations	fleetSize	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations_input	nuOfPickupLocations_input	nuOfDeliveryLocations_input	nuOfShipments_input	nuOfServices_input	nuOfPlanedDemandSize
+carrier1	50	INFINITE	1	1	7	0	0	0	7	7
