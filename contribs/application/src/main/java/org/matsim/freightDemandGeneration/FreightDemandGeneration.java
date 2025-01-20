@@ -316,7 +316,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-					log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
+					log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
 						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 				}
@@ -327,7 +327,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-					log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
+					log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 				}
 			}
 			case createCarriersFromCSV ->

@@ -1221,8 +1221,8 @@ public final class DemandReaderFromCSV {
 				for (CarrierShipment carrierShipment : shipmentsToAdd) {
 					thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 				}
-
-				log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
+				if (shipmentsBeforeConnection - thisCarrier.getShipments().size() > 0)
+					log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
 			}
 			if (!thisCarrier.getServices().isEmpty()) {
 				int servicesBeforeConnection = thisCarrier.getServices().size();
@@ -1251,10 +1251,9 @@ public final class DemandReaderFromCSV {
 							servicesToRemove.put(carrierService.getId(), carrierService);
 						}
 						CarrierService.Builder builder = CarrierService.Builder
-							.newInstance(idNewService, baseService.getServiceLinkId())
+							.newInstance(idNewService, baseService.getServiceLinkId(), demandForThisLink)
 							.setServiceDuration(serviceTimeService);
-						CarrierService newService = builder.setServiceStartingTimeWindow(baseService.getServiceStaringTimeWindow())
-							.setCapacityDemand(demandForThisLink).build();
+						CarrierService newService = builder.setServiceStartingTimeWindow(baseService.getServiceStaringTimeWindow()).build();
 						servicesToAdd.add(newService);
 					}
 				}
@@ -1263,7 +1262,8 @@ public final class DemandReaderFromCSV {
 				for (CarrierService carrierService : servicesToAdd) {
 					thisCarrier.getServices().put(carrierService.getId(), carrierService);
 				}
-				log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
+				if (servicesBeforeConnection - thisCarrier.getServices().size() > 0)
+					log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
 			}
 		}
 	}
