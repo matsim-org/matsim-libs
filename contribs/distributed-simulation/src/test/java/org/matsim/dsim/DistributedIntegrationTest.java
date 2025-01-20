@@ -76,7 +76,6 @@ public class DistributedIntegrationTest {
 	 */
 	@Test
 	@Order(1)
-	@Disabled
 	void qsim() {
 
 		Config local = createScenario();
@@ -92,7 +91,6 @@ public class DistributedIntegrationTest {
 
 	@Test
 	@Order(2)
-	@Disabled
 	void runLocal() {
 
 		Config local = createScenario();
@@ -119,7 +117,6 @@ public class DistributedIntegrationTest {
 
 	@Test
 	@Order(3)
-	@Disabled
 	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
 		int size = 3;
