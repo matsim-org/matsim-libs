@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.core.v01.Message;
@@ -28,6 +29,8 @@ import java.util.function.Consumer;
 public final class DistributedEventsManager implements EventsManager {
 
 	private final MessageBroker broker;
+
+	@Getter
 	private final SimulationNode node;
 	private final LPExecutor executor;
 	private final SerializationProvider serializer;

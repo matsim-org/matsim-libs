@@ -6,10 +6,7 @@ import org.matsim.api.LP;
 import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
-import org.matsim.dsim.DistributedEventsManager;
-import org.matsim.dsim.EventHandlerTask;
-import org.matsim.dsim.LPTask;
-import org.matsim.dsim.SimTask;
+import org.matsim.dsim.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -54,7 +51,7 @@ public final class PoolExecutor implements LPExecutor {
 
     @Override
     public EventHandlerTask register(EventHandler handler, DistributedEventsManager manager, int part, int totalParts, AtomicInteger counter) {
-        EventHandlerTask task = new EventHandlerTask(handler, part, totalParts, manager, serializer, counter);
+        EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, manager, serializer, counter);
         tasks.add(task);
         return task;
     }
