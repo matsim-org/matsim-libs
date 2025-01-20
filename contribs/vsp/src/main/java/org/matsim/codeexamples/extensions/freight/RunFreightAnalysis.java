@@ -18,9 +18,8 @@
 
 package org.matsim.codeexamples.extensions.freight;
 
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 
@@ -34,13 +33,11 @@ public class RunFreightAnalysis {
 	}
 	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
 
-		var analysis = new RunFreightAnalysisEventBased(
+		CarriersAnalysis analysis = new CarriersAnalysis(
 				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\",
-				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\analysis", "EPSG:25832");
+				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\analysis", null, "EPSG:25832");
 		try {
-			analysis.runAnalysis();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			analysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -47,6 +47,7 @@ import java.io.File;
  *
  * @author kturner (Kai Martins-Turner)
  */
+@Deprecated(since = "apr23", forRemoval = true)
 public class RunFreightAnalysisEventBased {
 
 	//What are the settings?
@@ -130,8 +131,10 @@ public class RunFreightAnalysisEventBased {
 		log.info("Writing output...");
 		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(analysisOutputDirectory, scenario);
 		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
-		freightTimeAndDistanceAnalysisEventsHandler.writeGeneralStats(analysisOutputDirectory);
-		freightTimeAndDistanceAnalysisEventsHandler.runCarrierAnalysisAndWriteStats(analysisOutputDirectory);
+		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerCarrier(analysisOutputDirectory, scenario);
+		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
+		carrierPlanAnalysis.runAnalysisAndWriteStats(analysisOutputDirectory, CarriersAnalysis.CarrierAnalysisType.carriersPlans);
+
 		carrierLoadAnalysis.writeLoadPerVehicle(analysisOutputDirectory, scenario);
 	}
 
