@@ -277,7 +277,7 @@ public final class CarrierReaderFromCSV {
 				builder.setNumberOfDepotsPerType(Integer.parseInt(record.get("numberOfDepots")));
 			if (!record.get("selectedVehicleDepots").isBlank())
 				builder.setVehicleDepots(
-						new ArrayList<String>(Arrays.asList(record.get("selectedVehicleDepots").split(";"))));
+					new ArrayList<>(Arrays.asList(record.get("selectedVehicleDepots").split(";"))));
 			if (!record.get("areaOfAdditionalDepots").isBlank())
 				builder.setAreaOfAdditionalDepots(record.get("areaOfAdditionalDepots").split(";"));
 			if (!record.get("fixedNumberOfVehiclePerTypeAndLocation").isBlank())
@@ -443,7 +443,7 @@ public final class CarrierReaderFromCSV {
 				carriers.addCarrier(thisCarrier);
 			}
 			if (singleNewCarrier.getVehicleDepots() == null)
-				singleNewCarrier.setVehicleDepots(new ArrayList<String>());
+				singleNewCarrier.setVehicleDepots(new ArrayList<>());
 			Random rand = new Random(singleNewCarrier.getName().hashCode());
 			int cnt = 0;
 			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
