@@ -19,7 +19,13 @@
 
 package org.matsim.contrib.accessibility.run;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+
+import com.google.inject.multibindings.MapBinder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,19 +39,29 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.*;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -68,21 +84,227 @@ public class TinyAccessibilityTest {
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(min);
-		acg.setBoundingBoxTop(max);
-		acg.setBoundingBoxLeft(min);
-		acg.setBoundingBoxRight(max);
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
 		acg.setUseParallelization(false);
+
+		// ---
 
 		final Scenario scenario = createTestScenario(config);
 
-		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+		// ---
 
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
 		builder.addDataListener( new ResultsComparator() );
 		builder.build().run() ;
 
+	}
+	@Test
+	void fakeTestToProduceOutput() {
+
+		createCongestedEventsFile("output_events_test.xml.gz", 10 * 60 * 60);
+
+	}
+
+
+	void createCongestedEventsFile(String congestedFileName, double congestionTime){
+		final Config config = createTestConfig();
+		config.controller().setLastIteration(1);
+		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1.));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("dummy").setTypicalDuration(60));
+
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		Random rnd = new Random();
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		for (int i = 0; i < 1000; i++) {
+			Person person = pf.createPerson(Id.createPersonId(i));
+			Plan plan = pf.createPlan();
+			Activity home = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
+			home.setEndTime(congestionTime);
+			Leg leg = pf.createLeg(TransportMode.car);
+			Activity work = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
+			plan.addActivity(home);
+			plan.addLeg(leg);
+			plan.addActivity(work);
+			person.addPlan(plan);
+			scenario.getPopulation().addPerson(person);
+		}
+
+
+		Controler controler = new Controler(scenario);
+		controler.run();
+
+		try {
+			Files.copy(Path.of(utils.getOutputDirectory() + "output_events.xml.gz"),Path.of(congestedFileName), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	@Test
+	void runFromEventsCongested() {
+
+		String congestedFileName = utils.getClassInputDirectory() + "output_events_congested.xml.gz";
+		double congestionTime = 10 * 60 * 60;
+
+		//The following line creates runs one iteration with 1000 agents, created a congested network at the above time.
+		// This only has to be run once
+		if (!Files.exists(Path.of(congestedFileName))) {
+			createCongestedEventsFile(congestedFileName, congestionTime);
+		}
+
+		final Config config = createTestConfig();
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min).setBoundingBoxTop(max).setBoundingBoxLeft(min).setBoundingBoxRight(max);
+		acg.setTimeOfDay(congestionTime);
+		acg.setUseParallelization(false);
+
+		// ---
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , congestedFileName );
+//		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
+
+	@Test
+	public void runFromEventsDrt() throws IOException {
+		final Config config = createTestConfig();
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+//		drtParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(drtParams);
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min ).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
+		acg.setUseParallelization(false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+
+
+		String stopsInputFileName = utils.getClassInputDirectory() + "drtStops.xml";
+
+		if (!Files.exists(Path.of(stopsInputFileName))) {
+			createDrtStopsFile(stopsInputFileName);
+		}
+
+
+		ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
+		drtConfigGroup.transitStopFile = stopsInputFileName;
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
+
+		// ---
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
+
+	@Test
+	public void runFromEventsDrtCongested() throws IOException {
+		String stopsInputFileName = utils.getClassInputDirectory() + "drtStops.xml";
+		if (!Files.exists(Path.of(stopsInputFileName))) {
+			createDrtStopsFile(stopsInputFileName);
+		}
+
+		String congestedFileName = utils.getClassInputDirectory() + "output_events_congested.xml.gz";
+		double congestionTime = 10 * 60 * 60;
+
+		if (!Files.exists(Path.of(congestedFileName))) {
+			createCongestedEventsFile(congestedFileName, congestionTime);
+		}
+
+		final Config config = createTestConfig();
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+//		drtParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(drtParams);
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min ).setBoundingBoxTop(max ).setBoundingBoxLeft(min ).setBoundingBoxRight(max );
+		acg.setUseParallelization(false);
+		acg.setTimeOfDay(congestionTime);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+
+
+		ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
+		drtConfigGroup.transitStopFile = stopsInputFileName;
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
+
+		// ---
+
+		final Scenario scenario = createTestScenario(config);
+
+		// ---
+
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , congestedFileName );
+//		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
+
+	private void createDrtStopsFile(String stopsInputFileName) throws IOException {
+		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitScheduleFactory tf = dummyScenario.getTransitSchedule().getFactory();
+		TransitStopFacility a = tf.createTransitStopFacility(Id.create("a", TransitStopFacility.class), new Coord(120, 100), false);
+		a.setLinkId(Id.createLinkId("7"));
+		dummyScenario.getTransitSchedule().addStopFacility(a);
+
+
+		if (!Files.exists(Path.of(utils.getInputDirectory()))) {
+			Files.createDirectories(Path.of(utils.getInputDirectory()));
+		}
+
+		new TransitScheduleWriter(dummyScenario.getTransitSchedule()).writeFile(stopsInputFileName);
 	}
 
 	@Test
@@ -279,6 +501,25 @@ public class TinyAccessibilityTest {
 					}
 				}
 			}
+		}
+	}
+	static class FinderBridge extends AbstractDvrpModeModule {
+		FinderBridge( String mode ){
+			super( mode );
+		}
+		@Override public void install(){
+			// we bind modal material using the modal binders.  but how do we get it back?  The ModalProviders have methods getModalInstance(...), which return what we need ...
+			// ... however, they take it out of the injector, which means that we really need to use providers, since their getters are called _after_ the injector is created.
+
+			MapBinder<String, DvrpRoutingModule.AccessEgressFacilityFinder> mapBinder = MapBinder.newMapBinder( binder(), String.class,
+					DvrpRoutingModule.AccessEgressFacilityFinder.class );
+
+			mapBinder.addBinding( getMode() ).toProvider( this.modalProvider( getter -> getter.getModal( DvrpRoutingModule.AccessEgressFacilityFinder.class ) ) );
+			// (I think that this works as follows:
+			// * getter.getModal(...) takes whatever is needed out of the injector.
+			// * however, the provider that is bound to the mapBinder is not activated until this is really needed.
+			// I think.  kai, oct'24)
+
 		}
 	}
 }

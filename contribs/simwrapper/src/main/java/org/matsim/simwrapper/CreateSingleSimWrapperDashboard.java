@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.dashboard.*;
@@ -68,7 +69,8 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 		populationAttribute,
 		ODTrip,
 		trip,
-		publicTransit
+		publicTransit,
+		accessibility
 	}
 
 	private CreateSingleSimWrapperDashboard(){
@@ -123,6 +125,9 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 				}
 				case publicTransit -> {
 					sw.addDashboard(new PublicTransitDashboard());
+				}
+				case accessibility -> {
+					sw.addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem()));
 				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}
