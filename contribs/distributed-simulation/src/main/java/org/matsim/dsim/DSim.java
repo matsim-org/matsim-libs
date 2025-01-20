@@ -250,8 +250,8 @@ public final class DSim implements Mobsim {
 
 			writer.write("name,partition,step,runtime\n");
 			writer.write("OverallRuntime,-1,-1," + overallRuntime + "\n");
-			writer.write("BeforeListener,-1,-1," + beforeListener + "\n");
-			writer.write("AfterListener,-1,-1," + afterListener + "\n");
+			writer.write("BeforeSimStepListener,-1,-1," + beforeListener + "\n");
+			writer.write("AfterSimStepListener,-1,-1," + afterListener + "\n");
 			writer.write("SyncStep,-1,-1," + syncStep + "\n");
 
 			executor.processRuntimes(info -> {
