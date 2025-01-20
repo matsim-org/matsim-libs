@@ -67,7 +67,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
@@ -176,7 +176,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Path output;
 
 	private static Random rnd;
-	private RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 
@@ -318,13 +317,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		controller.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
 		controller.run();
-
-		//Analysis
-		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
-		//TODO perhaps change to complete carrier analysis
-		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis").toString());
-		freightAnalysis.runCarriersAnalysis();
-		System.out.println("Finishing Analysis of Carrier.");
 
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controller.getScenario(),
 			usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
@@ -560,14 +552,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		// Some files are written before the controller is created, deleting the directory is not an option
 		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
-		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 
 		rnd = MatsimRandom.getRandom();
-		rng = new MersenneTwister(config.global().getRandomSeed());
 
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");

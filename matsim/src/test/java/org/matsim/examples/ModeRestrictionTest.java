@@ -238,7 +238,8 @@ public class ModeRestrictionTest {
 
 		Id<Person> person = Id.createPersonId(restrictedMode);
 		Scenario scenario = restrictLinkAndResetRoutes(config, Id.createLinkId("15"), restrictedMode);
-		Activity act = (Activity) scenario.getPopulation().getPersons().get(person).getPlans().getFirst().getPlanElements().get(2);
+		Activity act = (Activity) scenario.getPopulation().getPersons().get(person).getPlans().get(0).getPlanElements().get(2);
+		//Activity act = (Activity) scenario.getPopulation().getPersons().get(person).getPlans().getFirst().getPlanElements().get(2);
 		act.setCoord(null);
 
 		RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> runController(scenario, new FirstLegVisitedLinksCheck()));
@@ -346,7 +347,8 @@ public class ModeRestrictionTest {
 			}
 			actual.putIfAbsent(personId, Lists.newArrayList(linkId));
 			List<Id<Link>> linkIds = actual.get(personId);
-			if (linkIds.getLast() == null || linkIds.getLast() == linkId) {
+			if (linkIds.get(linkIds.size()-1) == null || linkIds.get(linkIds.size()-1) == linkId) {
+			//if (linkIds.getLast() == null || linkIds.getLast() == linkId) {
 				return;
 			}
 			linkIds.add(linkId);
