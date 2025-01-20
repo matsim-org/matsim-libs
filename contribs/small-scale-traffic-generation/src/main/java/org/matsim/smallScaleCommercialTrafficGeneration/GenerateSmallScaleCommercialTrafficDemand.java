@@ -552,9 +552,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		// Some files are written before the controller is created, deleting the directory is not an option
 		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
-		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 

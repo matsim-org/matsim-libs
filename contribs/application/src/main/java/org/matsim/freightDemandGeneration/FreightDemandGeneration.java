@@ -253,7 +253,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		if (carrierFilePath != null)
 			freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
-
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		return config;
 	}
 
