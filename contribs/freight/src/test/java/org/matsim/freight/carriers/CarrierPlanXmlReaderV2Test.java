@@ -130,7 +130,7 @@ public class CarrierPlanXmlReaderV2Test {
 	@Test
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
-		CarrierPlan plan1 = plans.getFirst();
+		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		Assertions.assertEquals(5,tour1.getTour().getTourElements().size());
 	}

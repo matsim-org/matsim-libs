@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -214,6 +215,8 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/CarriersAnalysis").runCarrierAnalysis(
+			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
