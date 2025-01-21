@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking.logic;
 
 import java.util.Optional;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.prebooking.logic.helpers.PopulationIterator;
@@ -35,23 +36,40 @@ import com.google.common.base.Preconditions;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class AttributeBasedPrebookingLogic implements PrebookingLogic, MobsimInitializedListener {
-	static private final String SUBMISSION_TIME_ATTRIBUTE_PREFIX = "prebooking:submissionTime";
-	static private final String PLANNED_DEPARTURE_ATTRIBUTE_PREFIX = "prebooking:plannedDepartureTime";
+	static private final String SUBMISSION_TIME_ATTRIBUTE_PREFIX = "prebooking:submissionTime:";
+	static private final String PLANNED_DEPARTURE_ATTRIBUTE_PREFIX = "prebooking:plannedDepartureTime:";
 
-	static public String getSubmissionAttribute(String mode) {
+	static public String getSubmissionTimeAttribute(String mode) {
 		return SUBMISSION_TIME_ATTRIBUTE_PREFIX + mode;
 	}
 
-	static public String getPlannedDepartureAttribute(String mode) {
+	static public String getPlannedDepartureTimeAttribute(String mode) {
 		return PLANNED_DEPARTURE_ATTRIBUTE_PREFIX + mode;
 	}
 
 	static public Optional<Double> getSubmissionTime(String mode, Trip trip) {
-		return Optional.ofNullable((Double) trip.getTripAttributes().getAttribute(getSubmissionAttribute(mode)));
+		return Optional.ofNullable((Double) trip.getTripAttributes().getAttribute(getSubmissionTimeAttribute(mode)));
 	}
 
 	static public Optional<Double> getPlannedDepartureTime(String mode, Trip trip) {
-		return Optional.ofNullable((Double) trip.getTripAttributes().getAttribute(getPlannedDepartureAttribute(mode)));
+		return Optional
+				.ofNullable((Double) trip.getTripAttributes().getAttribute(getPlannedDepartureTimeAttribute(mode)));
+	}
+
+	static public void setSubmissionTime(String mode, Trip trip, double submissionTime) {
+		trip.getTripAttributes().putAttribute(getSubmissionTimeAttribute(mode), submissionTime);
+	}
+
+	static public void setPlannedDepartureTime(String mode, Trip trip, double plannedDepartureTime) {
+		trip.getTripAttributes().putAttribute(getPlannedDepartureTimeAttribute(mode), plannedDepartureTime);
+	}
+
+	static public void setSubmissionTime(String mode, Activity originActivity, double submissionTime) {
+		originActivity.getAttributes().putAttribute(getSubmissionTimeAttribute(mode), submissionTime);
+	}
+
+	static public void setPlannedDepartureTime(String mode, Activity originActivity, double plannedDepartureTime) {
+		originActivity.getAttributes().putAttribute(getPlannedDepartureTimeAttribute(mode), plannedDepartureTime);
 	}
 
 	private final PrebookingQueue prebookingQueue;

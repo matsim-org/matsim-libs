@@ -21,16 +21,15 @@
 
 package org.matsim.freight.carriers;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Stack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Stack;
 
 /**
  * A reader that reads carriers and their plans.

@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
@@ -13,6 +18,7 @@ import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -67,7 +73,8 @@ public class PrebookingTest {
 		return installPrebooking(controller, installLogic, new PrebookingParams());
 	}
 
-	static PrebookingParams installPrebooking(Controler controller, boolean installLogic, PrebookingParams prebookingParams) {
+	static PrebookingParams installPrebooking(Controler controller, boolean installLogic,
+			PrebookingParams prebookingParams) {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 		drtConfig.addParameterSet(prebookingParams);
 
@@ -647,12 +654,12 @@ public class PrebookingTest {
 				.addRequest("requestA1", 1, 1, 8, 8, 2000.0, 1.0) // forward
 				.addRequest("requestA2", 1, 1, 8, 8, 2000.0, 2.0) // forward
 				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 3.0) // backward
-				.configure(300.0, 2.0, 1800.0, 60.0) // 
+				.configure(300.0, 2.0, 1800.0, 60.0) //
 				.endTime(12.0 * 3600.0);
 
 		Controler controller = environment.build();
 		installPrebooking(controller);
-		
+
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
 			public void install() {
@@ -665,7 +672,7 @@ public class PrebookingTest {
 							return 30.0; // shorter than the dropoff duration (see below)
 						}
 					}
-					
+
 					@Override
 					public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
 						return 60.0;
@@ -673,7 +680,7 @@ public class PrebookingTest {
 				});
 			}
 		});
-		
+
 		controller.run();
 
 		{
@@ -693,13 +700,14 @@ public class PrebookingTest {
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3); // NOT 30s because we need to wait for the dropoffs
+			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3); // NOT 30s because we need to wait for the
+																		// dropoffs
 			assertEquals(2753.0 + 60.0, requestInfo.dropoffTime, 1e-3);
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
 	}
-	
+
 	@Test
 	void intraStopTiming_dropoffTooLate() {
 		/*-
@@ -715,12 +723,12 @@ public class PrebookingTest {
 				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1.0) // forward
 				.addRequest("requestB1", 8, 8, 1, 1, 2356.0, 2.0) // backward
 				.addRequest("requestB2", 8, 8, 1, 1, 2356.0, 3.0) // backward
-				.configure(300.0, 2.0, 1800.0, 60.0) // 
+				.configure(300.0, 2.0, 1800.0, 60.0) //
 				.endTime(12.0 * 3600.0);
 
 		Controler controller = environment.build();
 		installPrebooking(controller);
-		
+
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
 			public void install() {
@@ -729,7 +737,7 @@ public class PrebookingTest {
 					public double calcPickupDuration(DvrpVehicle vehicle, DrtRequest request) {
 						return 60.0;
 					}
-					
+
 					@Override
 					public double calcDropoffDuration(DvrpVehicle vehicle, DrtRequest request) {
 						if (request.getPassengerIds().get(0).toString().equals("requestA")) {
@@ -741,7 +749,7 @@ public class PrebookingTest {
 				});
 			}
 		});
-		
+
 		controller.run();
 
 		{
@@ -755,9 +763,10 @@ public class PrebookingTest {
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB1");
 			assertEquals(2.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2356.0 + 60.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A for B2 to enter
+			assertEquals(2753.0 + 60.0 + 30.0, requestInfo.dropoffTime, 1e-3); // +30 because we wait for dropoff of A
+																				// for B2 to enter
 		}
-		
+
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("requestB2");
 			assertEquals(3.0, requestInfo.submissionTime, 1e-3);
@@ -766,5 +775,63 @@ public class PrebookingTest {
 		}
 
 		assertEquals(3, environment.getTaskInfo().get("vehicleA").stream().filter(t -> t.type.equals("STOP")).count());
+	}
+
+	@Test
+	void abortAfterRejection_onActivity() {
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.setVehicleCapacity(1) //
+				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1800.0)
+				.configure(10.0, 1.0, 0.0, 5.0)
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(1800.0, requestInfo.submissionTime);
+			assertEquals(Double.NaN, requestInfo.pickupTime, 1e-3);
+			assertEquals(1, requestInfo.submissionTimes.size());
+			assertEquals(1, environment.getStuckInfo().size());
+		}
+	}
+
+	@Test
+	void abortAfterRejection_onLeg() {
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.addVehicle("vehicleA", 1, 1) //
+				.setVehicleCapacity(1) //
+				.addRequest("requestA", 1, 1, 8, 8, 2000.0, 1800.0)
+				.configure(10.0, 1.0, 0.0, 5.0)
+				.endTime(12.0 * 3600.0);
+
+		Controler controller = environment.build();
+		installPrebooking(controller);
+
+		// make sure the agent will be on a leg
+		for (Person person : controller.getScenario().getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+
+			Activity activity = PopulationUtils.createActivityFromCoord("generic", new Coord(-50000.0, -50000.0));
+			activity.setEndTime(0.0);
+			Leg leg = PopulationUtils.createLeg("walk");
+
+			plan.getPlanElements().add(0, activity);
+			plan.getPlanElements().add(1, leg);
+		}
+
+		controller.run();
+
+		{
+			RequestInfo requestInfo = environment.getRequestInfo().get("requestA");
+			assertEquals(1800.0, requestInfo.submissionTime);
+			assertEquals(Double.NaN, requestInfo.pickupTime, 1e-3);
+			assertEquals(1, requestInfo.submissionTimes.size());
+			assertEquals(1, environment.getStuckInfo().size());
+		}
 	}
 }

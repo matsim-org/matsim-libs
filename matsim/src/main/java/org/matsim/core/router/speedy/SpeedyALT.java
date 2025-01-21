@@ -115,6 +115,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 			// if turn restrictions are used, we might be on a colored node, so check for the original node
 			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
 				foundEndNode = true;
+				endNodeIndex = nodeIdx;
 				break;
 			}
 

@@ -178,7 +178,7 @@ class ReceiverControlerListener implements ScoringListener, IterationEndsListene
 
 							String shipmentId = act.getShipment().getId().toString();
 							if (act.getActivityType().equalsIgnoreCase("delivery")) {
-								Id<Link> linkId = act.getShipment().getTo();
+								Id<Link> linkId = act.getShipment().getDeliveryLinkId();
 								if (!receiverLinkMap.containsKey(linkId)) {
 									LOG.error("Woops, the carrier is delivering a shipment to an unknown receiver!");
 									throw new RuntimeException("Don't know to whom delivery is.");

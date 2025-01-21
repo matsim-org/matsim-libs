@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,8 +30,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import java.util.*;
 
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.
@@ -64,21 +63,6 @@ public class Tour {
 
 		/**
 		 * Returns a new tour builder.
-		 *
-		 * @deprecated
-		 * Please use {@link #newInstance(Id)} instead. kmt sep'22
-		 * <p>
-		 *
-		 *
-		 * @return the builder including "unknown" as tourId
-		 */
-		@Deprecated
-		public static Builder newInstance(){
-			return new Builder(Id.create("unknown", Tour.class));
-		}
-
-		/**
-		 * Returns a new tour builder.
 		 * This now also includes an Id for this tour.
 		 *
 		 * @param tourId Id of this tour
@@ -98,8 +82,8 @@ public class Tour {
 		 *
 		 * <p> Tour start should correspond to the locationId of the vehicle that runs the tour.
 		 *
-		 * @param startLinkId
-		 * @return the builder again
+		 * @param startLinkId	linkId of the start location
+		 * @return 				the builder again
 		 */
 		public Builder scheduleStart(Id<Link> startLinkId) {
 			scheduleStart(startLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
@@ -121,7 +105,7 @@ public class Tour {
 		/**
 		 * Schedules the end of the tour (in terms of locationId).
 		 *
-		 * @param endLinkId
+		 * @param endLinkId	linkId of the end location
 		 */
 		public void scheduleEnd(Id<Link> endLinkId) {
 			scheduleEnd(endLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
@@ -132,8 +116,8 @@ public class Tour {
 		 *
 		 * <p>Consider that a leg follows an activity. Otherwise, an exception occurs.
 		 *
-		 * @param leg
-		 * @throws IllegalStateException if leg is null or if previous element is not an activity.
+		 * @param leg 						the leg to be added
+		 * @throws IllegalStateException 	if leg is null or if previous element is not an activity.
 		 */
 		public Builder addLeg(Leg leg) {
 			Gbl.assertNotNull(leg);
@@ -156,23 +140,23 @@ public class Tour {
 		/**
 		 * Inserts leg at the beginning of a tour.
 		 *
-		 * @param leg
-		 * @return the builder
-		 * @throws IllegalStateException if leg is null
+		 * @param leg 						the leg to be inserted
+		 * @return 							the builder
+		 * @throws IllegalStateException 	if leg is null
 		 */
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			Gbl.assertNotNull(leg);
-			tourElements.addFirst(leg);
+			tourElements.add(0,leg);
 			return this;
 		}
 
 		/**
 		 * Schedules a pickup of the shipment right at the beginning of the tour.
 		 *
-		 * @param shipment
-		 * @return the builder
-		 * @throws IllegalStateException if shipment is null or shipment has already been picked up.
+		 * @param shipment					the shipment to be picked up
+		 * @return 							the builder
+		 * @throws IllegalStateException 	if shipment is null or shipment has already been picked up.
 		 */
 		@Deprecated
 		public Builder schedulePickupAtBeginning(CarrierShipment shipment) {
@@ -183,7 +167,7 @@ public class Tour {
 			}
 //			assertLastElementIsLeg();
 			Pickup pickup = createPickup(shipment);
-			tourElements.addFirst(pickup);
+			tourElements.add(0,pickup);
 //			previousElementIsActivity = true;
 			return this;
 		}
@@ -218,8 +202,8 @@ public class Tour {
 		/**
 		 * Schedules a delivery of a shipment, i.e. adds a delivery activity to current tour.
 		 *
-		 * @param shipment
-		 * @throws IllegalStateException if shipment is null or if shipment has not been picked up yet or if last element is not a leg.
+		 * @param shipment					the shipment to be delivered
+		 * @throws IllegalStateException 	if shipment is null or if shipment has not been picked up yet or if last element is not a leg.
 		 */
 		public void scheduleDelivery(CarrierShipment shipment) {
 			Gbl.assertNotNull(shipment);
@@ -272,10 +256,10 @@ public class Tour {
 		/**
 		 * Creates and returns a network route.
 		 *
-		 * @param startLinkId
-		 * @param linkIds
-		 * @param endLinkId
-		 * @return NetworkRoute
+		 * @param startLinkId	start link id
+		 * @param linkIds		list of link ids that form the route
+		 * @param endLinkId		end link id
+		 * @return 				NetworkRoute
 		 * @see NetworkRoute
 		 */
 		public NetworkRoute createRoute(Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId) {
@@ -390,12 +374,12 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return service.getType();
+			return CarrierConstants.SERVICE;
 		}
 
 		@Override
 		public Id<Link> getLocation() {
-			return service.getLocationLinkId();
+			return service.getServiceLinkId();
 		}
 
 		@Override
@@ -405,7 +389,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getServiceStartTimeWindow();
+			return service.getServiceStaringTimeWindow();
 		}
 
 		@Override
@@ -555,17 +539,17 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getPickupTimeWindow();
+			return shipment.getPickupStartingTimeWindow();
 		}
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getFrom();
+			return shipment.getPickupLinkId();
 		}
 
 		@Override
 		public double getDuration() {
-			return shipment.getPickupServiceTime();
+			return shipment.getPickupDuration();
 		}
 
 		@Override
@@ -608,7 +592,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getDeliveryTimeWindow();
+			return shipment.getDeliveryStartingTimeWindow();
 		}
 
 		@Override
@@ -618,12 +602,12 @@ public class Tour {
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getTo();
+			return shipment.getDeliveryLinkId();
 		}
 
 		@Override
 		public double getDuration() {
-			return shipment.getDeliveryServiceTime();
+			return shipment.getDeliveryDuration();
 		}
 
 		@Override

@@ -23,7 +23,6 @@ package org.matsim.freight.logistics.examples.multipleChains;
 
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
@@ -36,9 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -46,10 +43,10 @@ import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
@@ -118,19 +115,19 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
 
-    Controler controler = prepareControler(scenario, rpScheme);
+    Controller controller = prepareController(scenario, rpScheme);
 
     log.info("Run MATSim");
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controler
+    controller
             .getConfig()
             .vspExperimental()
             .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
+    controller.run();
 
-    runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
@@ -158,10 +155,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     return config;
   }
 
-  private static Controler prepareControler(Scenario scenario, RoadPricingScheme rpScheme) {
-    log.info("Prepare controler");
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(
+  private static Controller prepareController(Scenario scenario, RoadPricingScheme rpScheme) {
+    log.info("Prepare controller");
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(
             new AbstractModule() {
               @Override
               public void install() {
@@ -170,7 +167,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
               }
             });
 
-    controler.addOverridingModule(
+    controller.addOverridingModule(
             new AbstractModule() {
               @Override
               public void install() {
@@ -180,7 +177,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
                         .toProvider(
                                 () -> {
                                   CarrierStrategyManager strategyManager =
-                                          CarrierControlerUtils.createDefaultCarrierStrategyManager();
+                                          CarrierControllerUtils.createDefaultCarrierStrategyManager();
                                   strategyManager.addStrategy(
                                           new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                                   return strategyManager;
@@ -198,10 +195,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
               }
             });
     if (!rpScheme.getTolledLinkIds().isEmpty()) {
-      // RoadPricing.configure(controler);
-      controler.addOverridingModule( new RoadPricingModule(rpScheme) );
+      // RoadPricing.configure(controller);
+      controller.addOverridingModule( new RoadPricingModule(rpScheme) );
     }
-    return controler;
+    return controller;
   }
 
   /*
@@ -246,12 +243,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
   }
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
-    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
-    try {
-      freightAnalysis.runCompleteAnalysis();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.controller().getRunId(), config.global().getCoordinateSystem());
+	carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
   }
 
   /**

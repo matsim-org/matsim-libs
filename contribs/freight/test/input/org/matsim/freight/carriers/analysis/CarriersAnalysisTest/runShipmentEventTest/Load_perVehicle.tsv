@@ -1,0 +1,2 @@
+vehicleId	vehicleTypeId	capacity	maxLoad	maxLoadPercentage	handledDemand	load state during tour
+freight_carrier1_veh_freight_carrier1_veh_heavyVehicle_1_1	heavy	50.0	26	52.0	26	[3, 8, 18, 25, 26, 23, 13, 12, 7, 0]

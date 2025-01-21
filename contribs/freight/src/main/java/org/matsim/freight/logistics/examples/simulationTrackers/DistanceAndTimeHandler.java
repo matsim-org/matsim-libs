@@ -85,7 +85,7 @@ import org.matsim.vehicles.Vehicles;
       distanceCosts +=
           linkLength * carrierVehicle.getType().getCostInformation().getCostsPerMeter();
     }
-    // (there might not be a corresponding enter event if vehicle just entered traffic.  Could add
+    // (there might not be a corresponding enter-event if vehicle just entered traffic.  Could add
     // that as well, but then we would need to compensate for fact that this covers little distance.
     // kai, jul'22)
 

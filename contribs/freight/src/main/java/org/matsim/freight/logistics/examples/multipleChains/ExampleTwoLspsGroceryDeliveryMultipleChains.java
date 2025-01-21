@@ -44,7 +44,6 @@ package org.matsim.freight.logistics.examples.multipleChains;
 
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -55,26 +54,23 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
-import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
+import org.matsim.freight.carriers.controller.CarrierControllerUtils;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
-
 
 /**
  * This bases on {@link ExampleGroceryDeliveryMultipleChains}.
@@ -132,13 +128,13 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
     LSPUtils.addLSPs(scenario, new LSPs(lsps));
 
-    Controler controler = prepareControler(scenario);
+    Controller controller = prepareController(scenario);
 
     log.info("Run MATSim");
 
-    controler.run();
+    controller.run();
 
-    runCarrierAnalysis(controler.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
@@ -170,10 +166,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     return config;
   }
 
-  private static Controler prepareControler(Scenario scenario) {
-    log.info("Prepare controler");
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(
+  private static Controller prepareController(Scenario scenario) {
+    log.info("Prepare controller");
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(
             new AbstractModule() {
               @Override
               public void install() {
@@ -181,7 +177,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
               }
             });
 
-    controler.addOverridingModule(
+    controller.addOverridingModule(
             new AbstractModule() {
               @Override
               public void install() {
@@ -196,7 +192,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                         .toProvider(
                                 () -> {
                                   CarrierStrategyManager strategyManager =
-                                          CarrierControlerUtils.createDefaultCarrierStrategyManager();
+                                          CarrierControllerUtils.createDefaultCarrierStrategyManager();
                                   strategyManager.addStrategy(
                                           new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                                   return strategyManager;
@@ -213,16 +209,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 });
               }
             });
-    return controler;
+    return controller;
   }
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
-    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
-    try {
-      freightAnalysis.runCompleteAnalysis();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.controller().getRunId(), config.global().getCoordinateSystem());
+	carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
   }
 
   /**

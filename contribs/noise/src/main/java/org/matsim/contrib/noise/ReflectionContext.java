@@ -1,5 +1,6 @@
 package org.matsim.contrib.noise;
 
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.algorithm.Angle;
@@ -7,7 +8,6 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.matsim.core.config.Config;
 
-import jakarta.inject.Inject;
 import java.util.*;
 
 /**
@@ -15,18 +15,19 @@ import java.util.*;
  *
  * @author nkuehnel
  */
-public class ReflectionContext {
+public final class ReflectionContext {
 
     static final double SCAN_LINE_LENGTH = 1;
 
-    private final static Logger logger = LogManager.getLogger(org.matsim.contrib.noise.ShieldingContext.class);
+    private final static Logger logger = LogManager.getLogger(ReflectionContext.class);
 
     private Set<LineSegment> visibleEdges;
     private Coordinate receiver;
 
-    private BarrierContext barrierContext;
-    private GeometryFactory geomFactory = new GeometryFactory();
+    private final BarrierContext barrierContext;
+    private final GeometryFactory geomFactory = new GeometryFactory();
 
+    record ReflectionTuple(LineSegment facade, LineSegment reflectionLink) { }
 
     @Inject
     ReflectionContext(BarrierContext barrierContext) {
@@ -38,6 +39,7 @@ public class ReflectionContext {
     }
 
     void setCurrentReceiver(NoiseReceiverPoint nrp) {
+
         receiver = new Coordinate(nrp.getCoord().getX(), nrp.getCoord().getY());
 
         final Collection<NoiseBarrier> candidates =
@@ -60,7 +62,7 @@ public class ReflectionContext {
     }
 
 
-    Set<LineSegment> findVisibleEdgesOfPolygon(List<LineSegment> polygonEdges, Coordinate coordinate) {
+    private Set<LineSegment> findVisibleEdgesOfPolygon(List<LineSegment> polygonEdges, Coordinate coordinate) {
 
         Coordinate coordXinc = new Coordinate(coordinate.x + 1, coordinate.y);
 
@@ -155,13 +157,9 @@ public class ReflectionContext {
             }
         }
         return reflections;
-//        return Collections.EMPTY_SET;
     }
 
     double getMultipleReflectionCorrection(LineSegment segment) {
-        if(this.receiver.x == 1420 && this.receiver.y == 20) {
-            System.out.println("jo");
-        }
         final Coordinate coordinate = segment.midPoint();
 
         Coordinate candidateRight = getReflectionSegment(coordinate, segment, 400);
@@ -174,7 +172,7 @@ public class ReflectionContext {
         } else {
             return 0;
         }
-        if (candidateLeft != null && candidateRight != null){
+        if (candidateLeft != null){
             double w = candidateLeft.distance(candidateRight);
             return Math.min(2 * Math.min(candidateLeft.z, candidateRight.z) / w, 1.6);
         }
@@ -265,7 +263,7 @@ public class ReflectionContext {
         return true;
     }
 
-    static boolean intersects(LineSegment segment1, LineSegment segment2) {
+    private static boolean intersects(LineSegment segment1, LineSegment segment2) {
 
         double dx0 = segment1.p1.x - segment1.p0.x;
         double dx1 = segment2.p1.x - segment2.p0.x;
@@ -277,17 +275,6 @@ public class ReflectionContext {
         double p1 = dy1 * (segment2.p1.x - segment1.p1.x) - dx1 * (segment2.p1.y - segment1.p1.y);
         double p2 = dy0 * (segment1.p1.x - segment2.p0.x) - dx0 * (segment1.p1.y - segment2.p0.y);
         double p3 = dy0 * (segment1.p1.x - segment2.p1.x) - dx0 * (segment1.p1.y - segment2.p1.y);
-        return (p0 * p1 <= 0) & (p2 * p3 <= 0);
-    }
-
-
-    static class ReflectionTuple {
-        final LineSegment facade;
-        final LineSegment reflectionLink;
-
-        public ReflectionTuple(LineSegment facade, LineSegment reflectionLink) {
-            this.facade = facade;
-            this.reflectionLink = reflectionLink;
-        }
+        return (p0 * p1 <= 0) && (p2 * p3 <= 0);
     }
 }

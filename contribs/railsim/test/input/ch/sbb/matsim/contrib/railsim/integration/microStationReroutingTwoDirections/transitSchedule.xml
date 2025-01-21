@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+<transitSchedule>
+    <transitStops>
+		<stopFacility id="b_oben_start" x="0" y="710" linkRefId="0b_1b" stopAreaId="b_links"/>
+		<stopFacility id="b_oben_end" x="11000" y="710" linkRefId="6b_17b" stopAreaId="b_rechts"/>
+
+        <stopFacility id="b_unten_start" x="10000" y="700" linkRefId="15b_14b" stopAreaId="b_rechts"/>
+        <stopFacility id="b_unten_end" x="-1000" y="700" linkRefId="11b_16b" stopAreaId="b_links"/>
+		
+		<!-- links nach rechts -->
+		<stopFacility id="9b_10b" x="5000" y="705" linkRefId="9b_10b" stopAreaId="b_mitte"/>
+		<stopFacility id="7b_8b" x="5000" y="705" linkRefId="7b_8b" stopAreaId="b_mitte"/>
+		<stopFacility id="3b_4b" x="5000" y="705" linkRefId="3b_4b" stopAreaId="b_mitte"/>
+		<!-- rechts nach links -->
+		<stopFacility id="10b_9b" x="5000" y="705" linkRefId="10b_9b" stopAreaId="b_mitte"/>
+		<stopFacility id="8b_7b" x="5000" y="705" linkRefId="8b_7b" stopAreaId="b_mitte"/>
+		<stopFacility id="13b_12b" x="5000" y="705" linkRefId="13b_12b" stopAreaId="b_mitte"/>
+
+    </transitStops>
+	
+    <transitLine id="B1">
+            <transitRoute id="B1_oben_IC">
+				<transportMode>rail</transportMode>
+				<routeProfile>
+					<stop refId="b_oben_start" departureOffset="00:00:00" awaitDeparture="true"/>
+					<stop refId="b_oben_end" arrivalOffset="00:20:00" awaitDeparture="true"/>
+				</routeProfile>	
+                <route>
+                    <link refId="0b_1b"/>
+					<link refId="1b_1b_1"/>
+					<link refId="1b_1_1b_2"/>
+					<link refId="1b_2_1b_3"/>
+					<link refId="1b_3_1b_4"/>
+					<link refId="1b_4_1b_5"/>
+					<link refId="1b_5_1b_6"/>
+					<link refId="1b_6_1b_7"/>
+					<link refId="1b_7_1b_8"/>
+                    <link refId="1b_8_2b"/>
+                    <link refId="2b_3b"/>
+					<link refId="3b_4b"/>
+					<link refId="4b_5b"/>
+					<link refId="5b_5b_1"/>
+					<link refId="5b_1_5b_2"/>
+					<link refId="5b_2_5b_3"/>
+					<link refId="5b_3_5b_4"/>
+					<link refId="5b_4_5b_5"/>
+					<link refId="5b_5_5b_6"/>
+					<link refId="5b_6_5b_7"/>
+					<link refId="5b_7_5b_8"/>
+					<link refId="5b_8_6b"/>
+                    <link refId="6b_17b"/>
+					
+					<!-- 
+					
+					<link refId="0b_1b"/>
+					<link refId="1b_1b_1"/>
+					<link refId="1b_1_1b_2"/>
+					<link refId="1b_2_1b_3"/>
+					<link refId="1b_3_1b_4"/>
+					<link refId="1b_4_1b_5"/>
+					<link refId="1b_5_1b_6"/>
+					<link refId="1b_6_1b_7"/>
+					<link refId="1b_7_1b_8"/>
+                    <link refId="1b_8_2b"/>
+                    <link refId="2b_3b"/>
+					<link refId="3b_7b"/>
+					<link refId="7b_8b"/>
+					<link refId="8b_4b"/>
+					<link refId="4b_5b"/>
+					<link refId="5b_5b_1"/>
+					<link refId="5b_1_5b_2"/>
+					<link refId="5b_2_5b_3"/>
+					<link refId="5b_3_5b_4"/>
+					<link refId="5b_4_5b_5"/>
+					<link refId="5b_5_5b_6"/>
+					<link refId="5b_6_5b_7"/>
+					<link refId="5b_7_5b_8"/>
+					<link refId="5b_8_6b"/>
+                    <link refId="6b_17b"/>
+					
+					-->
+					
+                </route>
+                <departures>
+					<departure id="0" departureTime="08:05:00" vehicleRefId="IC_BO_0"/>
+					<departure id="1" departureTime="08:20:00" vehicleRefId="IC_BO_1"/>
+					<departure id="2" departureTime="08:35:00" vehicleRefId="IC_BO_2"/>
+					<departure id="3" departureTime="08:50:00" vehicleRefId="IC_BO_3"/>
+				</departures>
+            </transitRoute>
+			 <transitRoute id="B1_oben_RE">
+				<transportMode>rail</transportMode>
+				<routeProfile>
+					<stop refId="b_oben_start" departureOffset="00:00:00" awaitDeparture="true"/>
+					<stop refId="7b_8b" arrivalOffset="00:07:00" departureOffset="00:10:00" awaitDeparture="true"/>
+					<stop refId="b_oben_end" arrivalOffset="00:17:00" awaitDeparture="true"/>
+				</routeProfile>	
+                <route>
+                    <link refId="0b_1b"/>
+					<link refId="1b_1b_1"/>
+					<link refId="1b_1_1b_2"/>
+					<link refId="1b_2_1b_3"/>
+					<link refId="1b_3_1b_4"/>
+					<link refId="1b_4_1b_5"/>
+					<link refId="1b_5_1b_6"/>
+					<link refId="1b_6_1b_7"/>
+					<link refId="1b_7_1b_8"/>
+                    <link refId="1b_8_2b"/>
+                    <link refId="2b_3b"/>
+					<link refId="3b_7b"/>
+					<link refId="7b_8b"/>
+					<link refId="8b_4b"/>
+					<link refId="4b_5b"/>
+					<link refId="5b_5b_1"/>
+					<link refId="5b_1_5b_2"/>
+					<link refId="5b_2_5b_3"/>
+					<link refId="5b_3_5b_4"/>
+					<link refId="5b_4_5b_5"/>
+					<link refId="5b_5_5b_6"/>
+					<link refId="5b_6_5b_7"/>
+					<link refId="5b_7_5b_8"/>
+					<link refId="5b_8_6b"/>
+                    <link refId="6b_17b"/>
+                </route>
+                <departures>
+					<departure id="0" departureTime="08:00:00" vehicleRefId="RE_BO_0"/>
+					<departure id="1" departureTime="08:15:00" vehicleRefId="RE_BO_1"/>
+					<departure id="2" departureTime="08:30:00" vehicleRefId="RE_BO_2"/>
+					<departure id="3" departureTime="08:45:00" vehicleRefId="RE_BO_3"/>
+				</departures>
+            </transitRoute>
+			<transitRoute id="B1_unten_IC">
+				<transportMode>rail</transportMode>
+				<routeProfile>
+					<stop refId="b_unten_start" departureOffset="00:00:00" awaitDeparture="true"/>
+					<stop refId="b_unten_end" arrivalOffset="00:20:00" awaitDeparture="true"/>
+				</routeProfile>	
+                <route>
+                    <link refId="15b_14b"/>
+					<link refId="14b_14b_1"/>
+					<link refId="14b_1_14b_2"/>
+					<link refId="14b_2_14b_3"/>
+					<link refId="14b_3_14b_4"/>
+					<link refId="14b_4_14b_5"/>
+					<link refId="14b_5_14b_6"/>
+					<link refId="14b_6_14b_7"/>
+					<link refId="14b_7_14b_8"/>
+					<link refId="14b_8_13b"/>
+                    <link refId="13b_12b"/>
+					<link refId="12b_12b_1"/>
+					<link refId="12b_1_12b_2"/>
+					<link refId="12b_2_12b_3"/>
+					<link refId="12b_3_12b_4"/>
+					<link refId="12b_4_12b_5"/>
+					<link refId="12b_5_12b_6"/>
+					<link refId="12b_6_12b_7"/>
+					<link refId="12b_7_12b_8"/>
+					<link refId="12b_8_11b"/>
+                    <link refId="11b_16b"/>
+					
+					<!-- 
+					
+					<link refId="15b_14b"/>
+					<link refId="14b_14b_1"/>
+					<link refId="14b_1_14b_2"/>
+					<link refId="14b_2_14b_3"/>
+					<link refId="14b_3_14b_4"/>
+					<link refId="14b_4_14b_5"/>
+					<link refId="14b_5_14b_6"/>
+					<link refId="14b_6_14b_7"/>
+					<link refId="14b_7_14b_8"/>
+					<link refId="14b_8_13b"/>
+                    <link refId="13b_5b"/>
+					<link refId="5b_4b"/>
+					<link refId="4b_8b"/>
+					<link refId="8b_10b"/>
+					<link refId="10b_9b"/>
+					<link refId="9b_7b"/>
+					<link refId="7b_3b"/>
+					<link refId="3b_2b"/>
+					<link refId="2b_12b"/>
+					<link refId="12b_12b_1"/>
+					<link refId="12b_1_12b_2"/>
+					<link refId="12b_2_12b_3"/>
+					<link refId="12b_3_12b_4"/>
+					<link refId="12b_4_12b_5"/>
+					<link refId="12b_5_12b_6"/>
+					<link refId="12b_6_12b_7"/>
+					<link refId="12b_7_12b_8"/>
+					<link refId="12b_8_11b"/>
+                    <link refId="11b_16b"/>
+					
+					-->
+					
+                </route>
+                <departures>
+					<departure id="0" departureTime="08:05:00" vehicleRefId="IC_BU_0"/>
+					<departure id="1" departureTime="08:20:00" vehicleRefId="IC_BU_1"/>
+					<departure id="2" departureTime="08:35:00" vehicleRefId="IC_BU_2"/>
+					<departure id="3" departureTime="08:50:00" vehicleRefId="IC_BU_3"/>
+				</departures>
+            </transitRoute>
+			 <transitRoute id="B1_unten_RE">
+				<transportMode>rail</transportMode>
+				<routeProfile>
+					<stop refId="b_unten_start" departureOffset="00:00:00" awaitDeparture="true"/>
+					<stop refId="10b_9b" arrivalOffset="00:07:00" departureOffset="00:10:00" awaitDeparture="true"/>
+					<stop refId="b_unten_end" arrivalOffset="00:17:00" awaitDeparture="true"/>
+				</routeProfile>	
+				<route>
+					<link refId="15b_14b"/>
+					<link refId="14b_14b_1"/>
+					<link refId="14b_1_14b_2"/>
+					<link refId="14b_2_14b_3"/>
+					<link refId="14b_3_14b_4"/>
+					<link refId="14b_4_14b_5"/>
+					<link refId="14b_5_14b_6"/>
+					<link refId="14b_6_14b_7"/>
+					<link refId="14b_7_14b_8"/>
+					<link refId="14b_8_13b"/>
+                    <link refId="13b_5b"/>
+					<link refId="5b_4b"/>
+					<link refId="4b_8b"/>
+					<link refId="8b_10b"/>
+					<link refId="10b_9b"/>
+					<link refId="9b_7b"/>
+					<link refId="7b_3b"/>
+					<link refId="3b_2b"/>
+					<link refId="2b_12b"/>
+					<link refId="12b_12b_1"/>
+					<link refId="12b_1_12b_2"/>
+					<link refId="12b_2_12b_3"/>
+					<link refId="12b_3_12b_4"/>
+					<link refId="12b_4_12b_5"/>
+					<link refId="12b_5_12b_6"/>
+					<link refId="12b_6_12b_7"/>
+					<link refId="12b_7_12b_8"/>
+					<link refId="12b_8_11b"/>
+                    <link refId="11b_16b"/>
+				</route>
+                <departures>
+					<departure id="0" departureTime="07:50:00" vehicleRefId="RE_BU_0"/>
+					<departure id="1" departureTime="08:05:00" vehicleRefId="RE_BU_1"/>
+					<departure id="2" departureTime="08:20:00" vehicleRefId="RE_BU_2"/>
+					<departure id="3" departureTime="08:35:00" vehicleRefId="RE_BU_3"/>
+				</departures>
+            </transitRoute>
+        </transitLine>
+		
+</transitSchedule>

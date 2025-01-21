@@ -108,7 +108,7 @@ public class CollectionResourceTest {
 			assertTrue(collectionCarrier.getServices().isEmpty());
 			assertTrue(collectionCarrier.getShipments().isEmpty());
 			if (collectionCarrier.getCarrierCapabilities() == capabilities) {
-				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
+				assertSame(FleetSize.INFINITE, capabilities.getFleetSize());
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if (types.size() == 1) {

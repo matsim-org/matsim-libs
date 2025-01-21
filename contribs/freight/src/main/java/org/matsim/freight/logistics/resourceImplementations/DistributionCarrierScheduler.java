@@ -22,7 +22,6 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -49,7 +48,7 @@ import org.matsim.vehicles.VehicleType;
  */
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
-  Logger log = LogManager.getLogger(DistributionCarrierScheduler.class);
+  private static final Logger log = LogManager.getLogger(DistributionCarrierScheduler.class);
 
   private Carrier carrier;
   private DistributionCarrierResource resource;
@@ -101,8 +100,8 @@ import org.matsim.vehicles.VehicleType;
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
         var vrpLogic = CarrierSchedulerUtils.getVrpLogic(carrier);
         switch (vrpLogic) {
-          case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
-          case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments()); }
+          case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
+          case shipmentBased -> carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
           default -> throw new IllegalStateException("Unexpected value: " + vrpLogic);
         }
 
@@ -123,12 +122,11 @@ import org.matsim.vehicles.VehicleType;
       scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 
       switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
-        case serviceBased -> { carrier.getServices().putAll(auxiliaryCarrier.getServices()); }
-        case shipmentBased -> { carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
-          //TODO: When using shipmentbased, only ONE Vrp should be created and solved. -> No need for the auxiliary carrier(s). KMT'Aug 24
-          //Then we can also just pass all the vehicles over :)
-          //And need the TimeWindows for the Shipments...
-        }
+        case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
+        case shipmentBased -> //TODO: When using shipmentbased, only ONE Vrp should be created and solved. -> No need for the auxiliary carrier(s). KMT'Aug 24
+			//Then we can also just pass all the vehicles over :)
+			//And need the TimeWindows for the Shipments...
+			carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
         default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
       }
       shipmentsInCurrentTour.clear();
@@ -209,7 +207,7 @@ import org.matsim.vehicles.VehicleType;
     CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
             //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
             //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-            .setDeliveryServiceTime(lspShipment.getDeliveryServiceTime())
+            .setDeliveryDuration(lspShipment.getDeliveryServiceTime())
             .build();
     //ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
     if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
@@ -437,12 +435,8 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         DistributionServiceStartEventHandler handler;
         switch (tourActivity) {
-          case Tour.ServiceActivity serviceActivity-> {
-            handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
-          }
-          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
-            handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
-          }
+          case Tour.ServiceActivity serviceActivity-> handler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> handler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
           default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
         }
 
@@ -462,12 +456,8 @@ import org.matsim.vehicles.VehicleType;
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LSPTourStartEventHandler handler;
         switch (tourActivity) {
-          case Tour.ServiceActivity serviceActivity-> {
-            handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
-          }
-          case Tour.ShipmentBasedActivity shipmentBasedActivity-> {
-            handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
-          }
+          case Tour.ServiceActivity serviceActivity-> handler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
+          case Tour.ShipmentBasedActivity shipmentBasedActivity-> handler = new LSPTourStartEventHandler(lspShipment, null , element, resource, tour, shipmentBasedActivity.getShipment());
           default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
         }
 

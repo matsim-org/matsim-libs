@@ -21,12 +21,14 @@
 
 package org.matsim.freight.logistics.examples.simulationTrackers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,7 +38,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -53,11 +56,8 @@ import org.matsim.freight.logistics.resourceImplementations.ResourceImplementati
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionTrackerTest {
 	private static final Logger log = LogManager.getLogger(CollectionTrackerTest.class);
@@ -185,9 +185,9 @@ public class CollectionTrackerTest {
 
 		LSPUtils.addLSPs(scenario, lsps);
 
-		Controler controler = new Controler(scenario);
+		Controller controller = ControllerUtils.createController(scenario);
 
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				install(new LSPModule());
@@ -199,8 +199,8 @@ public class CollectionTrackerTest {
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-		controler.run();
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.run();
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class CollectionTrackerTest {
 			if (handler instanceof TourStartHandler startHandler) {
 				double scheduledCosts = 0;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFixedCosts();
+					scheduledCosts += scheduledTour.getVehicle().getType().getCostInformation().getFixedCosts();
 					totalScheduledCosts += scheduledCosts;
 				}
 				double trackedCosts = startHandler.getVehicleFixedCosts();
@@ -235,9 +235,9 @@ public class CollectionTrackerTest {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
 						if (element instanceof ServiceActivity activity) {
-							scheduledCosts += activity.getService().getServiceDuration() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
+							scheduledCosts += activity.getService().getServiceDuration() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 							totalScheduledCosts += scheduledCosts;
-							totalScheduledWeight += activity.getService().getCapacityDemand();
+                            totalScheduledWeight += activity.getService().getCapacityDemand();
 							totalNumberOfScheduledShipments++;
 						}
 					}
@@ -254,7 +254,7 @@ public class CollectionTrackerTest {
 					Tour tour = scheduledTour.getTour();
 					for (TourElement element : tour.getTourElements()) {
 						if (element instanceof Leg leg) {
-							scheduledTimeCosts += leg.getExpectedTransportTime() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerSecond();
+							scheduledTimeCosts += leg.getExpectedTransportTime() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerSecond();
 						}
 					}
 				}
@@ -265,17 +265,17 @@ public class CollectionTrackerTest {
 				double trackedDistanceCosts = distanceHandler.getDistanceCosts();
 				totalTrackedCosts += trackedDistanceCosts;
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 					for (TourElement element : scheduledTour.getTour().getTourElements()) {
 						System.out.println(element);
 						if (element instanceof Leg leg) {
 							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
 							for (Id<Link> linkId : linkRoute.getLinkIds()) {
-								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 							}
 						}
 						if (element instanceof ServiceActivity activity) {
-							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getCostsPerMeter();
+							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 							// (I think that we need this since the last link is not in the route.  Or is it?  kai, jul'22)
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}

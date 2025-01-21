@@ -33,7 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -341,14 +342,14 @@ import org.matsim.vehicles.VehicleUtils;
     // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
-    // set up simulation controler and LSPModule
+    // set up simulation controller and LSPModule
     ArrayList<LSP> lspList = new ArrayList<>();
     lspList.add(lsp);
     LSPs lsps = new LSPs(lspList);
     LSPUtils.addLSPs(scenario, lsps);
 
-    Controler controler = new Controler(scenario);
-    controler.addOverridingModule(
+    Controller controller = ControllerUtils.createController(scenario);
+    controller.addOverridingModule(
         new AbstractModule() {
           @Override
           public void install() {
@@ -363,11 +364,11 @@ import org.matsim.vehicles.VehicleUtils;
     config.network().setInputFile("scenarios/2regions/2regions-network.xml");
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controler
+    controller
         .getConfig()
         .vspExperimental()
         .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-    controler.run();
+    controller.run();
 
     for (LspShipment lspShipment : lsp.getLspShipments()) {
       System.out.println("Shipment: " + lspShipment.getId());

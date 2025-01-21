@@ -56,8 +56,8 @@ public class FirstReloadResourceTest {
 //		assertSame(TranshipmentHub.getClassOfResource(), TranshipmentHub.class);
 		assertNotNull(transshipmentHubResource.getClientElements());
 		assertTrue(transshipmentHubResource.getClientElements().isEmpty());
-		assertSame(transshipmentHubResource.getEndLinkId(), hubLinkId);
-		assertSame(transshipmentHubResource.getStartLinkId(), hubLinkId);
+		assertSame(hubLinkId, transshipmentHubResource.getEndLinkId());
+		assertSame(hubLinkId, transshipmentHubResource.getStartLinkId());
 		assertNotNull(transshipmentHubResource.getSimulationTrackers());
 		assertFalse(transshipmentHubResource.getSimulationTrackers().isEmpty());
 		assertEquals(1, transshipmentHubResource.getSimulationTrackers().size());
