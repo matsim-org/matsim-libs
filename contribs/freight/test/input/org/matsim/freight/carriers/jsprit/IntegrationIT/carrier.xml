@@ -3,19 +3,19 @@
 	<carrier id="MyCarrier">
 		<capabilities fleetSize="FINITE">
 			<vehicles>
-				<!--<vehicle id="truck_3_1" depotLinkId="182616-182618" typeId="3_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_6_1" depotLinkId="182616-182618" typeId="6_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_6_2" depotLinkId="182616-182618" typeId="6_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_6_3" depotLinkId="182616-182618" typeId="6_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_6_4" depotLinkId="182616-182618" typeId="6_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_7_1" depotLinkId="182616-182618" typeId="7_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_7_2" depotLinkId="182616-182618" typeId="7_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_12_1" depotLinkId="182616-182618" typeId="12_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_15_1" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_15_2" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<!--<vehicle id="truck_15_3" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
-				<vehicle id="truck_15_4" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>
-				<vehicle id="truck_15_5" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="00:00:00" latestEnd="48:00:00"/>
+				<!--<vehicle id="truck_3_1" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_6_1" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_6_2" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_6_3" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_6_4" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_7_1" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_7_2" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_12_1" depotLinkId="182616-182618" typeId="light" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_15_1" depotLinkId="182616-182618" typeId="medium" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_15_2" depotLinkId="182616-182618" typeId="medium" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<!--<vehicle id="truck_15_3" depotLinkId="182616-182618" typeId="medium" earliestStart="07:00:00" latestEnd="18:00:00"/>-->
+				<vehicle id="truck_15_4" depotLinkId="182616-182618" typeId="medium" earliestStart="07:00:00" latestEnd="18:00:00"/>
+				<vehicle id="truck_15_5" depotLinkId="182616-182618" typeId="medium" earliestStart="00:00:00" latestEnd="48:00:00"/>
 			</vehicles>
 
 		</capabilities>
@@ -197,8 +197,8 @@
 	<carrier id="MyCarrier_Shipment">
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="truck_15_4" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="07:00:00" latestEnd="18:00:00"/>
-				<vehicle id="truck_15_5" depotLinkId="182616-182618" typeId="15_tonner" earliestStart="00:00:00" latestEnd="48:00:00"/>
+				<vehicle id="truck_15_4" depotLinkId="182616-182618" typeId="medium" earliestStart="07:00:00" latestEnd="18:00:00"/>
+				<vehicle id="truck_15_5" depotLinkId="182616-182618" typeId="medium" earliestStart="00:00:00" latestEnd="48:00:00"/>
 			</vehicles>
 		</capabilities>
 		<shipments>

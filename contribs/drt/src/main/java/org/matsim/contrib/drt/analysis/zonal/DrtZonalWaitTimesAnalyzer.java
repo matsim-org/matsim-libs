@@ -37,6 +37,7 @@ import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -79,7 +80,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	}
 
 	public void write(String fileName) {
-		Map<Id<Zone>, DescriptiveStatistics> zoneStats = createZonalStats();
+		Map<Id<Zone>, ZonalStatistics> zoneStats = createZonalStats();
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
 			DecimalFormat format = new DecimalFormat();
@@ -90,7 +91,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 			String header = new StringJoiner(delimiter)
 					.add("zone").add("centerX").add("centerY").add("nRequests")
 					.add("sumWaitTime").add("meanWaitTime").add("min").add("max")
-					.add("p95").add("p90").add("p80").add("p75").add("p50").toString();
+					.add("p95").add("p90").add("p80").add("p75").add("p50")
+					.add("rejections").add("rejectionRate").toString();
 			bw.append(header);
 			// sorted output
 			SortedSet<Id<Zone>> zoneIdsAndOutside = new TreeSet<>(zones.getZones().keySet());
@@ -100,7 +102,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 				Zone drtZone = zones.getZones().get(zoneId);
 				String centerX = drtZone != null ? String.valueOf(drtZone.getCentroid().getX()) : notAvailableString;
 				String centerY = drtZone != null ? String.valueOf(drtZone.getCentroid().getY()) : notAvailableString;
-				DescriptiveStatistics stats = zoneStats.get(zoneId);
+				DescriptiveStatistics stats = zoneStats.get(zoneId).waitStats;
+				Set<Id<Request>> rejections = zoneStats.get(zoneId).rejections;
 				bw.newLine();
 				bw.append(
 						new StringJoiner(delimiter)
@@ -116,7 +119,10 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 						.add(String.valueOf(stats.getPercentile(90)))
 						.add(String.valueOf(stats.getPercentile(80)))
 						.add(String.valueOf(stats.getPercentile(75)))
-						.add(String.valueOf(stats.getPercentile(50))).toString()
+						.add(String.valueOf(stats.getPercentile(50)))
+						.add(String.valueOf(rejections.size()))
+						.add(String.valueOf(rejections.size() / (double) (rejections.size() + stats.getN())))
+						.toString()
 				);
 			}
 			bw.flush();
@@ -126,13 +132,15 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		}
 	}
 
-	private Map<Id<Zone>, DescriptiveStatistics> createZonalStats() {
-		Map<Id<Zone>, DescriptiveStatistics> zoneStats = new IdMap<>(Zone.class);
+	record ZonalStatistics(DescriptiveStatistics waitStats, Set<Id<Request>> rejections){}
+
+	private Map<Id<Zone>, ZonalStatistics> createZonalStats() {
+		Map<Id<Zone>, ZonalStatistics> zoneStats = new IdMap<>(Zone.class);
 		// prepare stats for all zones
 		for (Id<Zone> zoneId : zones.getZones().keySet()) {
-			zoneStats.put(zoneId, new DescriptiveStatistics());
+			zoneStats.put(zoneId, new ZonalStatistics(new DescriptiveStatistics(), new HashSet<>()));
 		}
-		zoneStats.put(zoneIdForOutsideOfZonalSystem, new DescriptiveStatistics());
+		zoneStats.put(zoneIdForOutsideOfZonalSystem, new ZonalStatistics(new DescriptiveStatistics(), new HashSet<>()));
 
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
 			for (Map.Entry<Id<Person>, EventSequence.PersonEvents> entry : seq.getPersonEvents().entrySet()) {
@@ -140,10 +148,17 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 					Id<Zone> zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId())
 						.map(Identifiable::getId).orElse(zoneIdForOutsideOfZonalSystem);
 					double waitTime = entry.getValue().getPickedUp().get() .getTime() - seq.getSubmitted().getTime();
-					zoneStats.get(zone).addValue(waitTime);
+					zoneStats.get(zone).waitStats.addValue(waitTime);
 				}
 			}
 		}
+
+		for (EventSequence seq : requestAnalyzer.getRejectedRequestSequences().values()) {
+			Id<Zone> zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId())
+					.map(Identifiable::getId).orElse(zoneIdForOutsideOfZonalSystem);
+			zoneStats.get(zone).rejections.add(seq.getSubmitted().getRequestId());
+		}
+
 		return zoneStats;
 	}
 
@@ -191,16 +206,19 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		simpleFeatureBuilder.add("p80", Double.class);
 		simpleFeatureBuilder.add("p75", Double.class);
 		simpleFeatureBuilder.add("p50", Double.class);
+		simpleFeatureBuilder.add("rejections", Double.class);
+		simpleFeatureBuilder.add("rejectRate", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(simpleFeatureBuilder.buildFeatureType());
 
 		Collection<SimpleFeature> features = new ArrayList<>();
 
-		Map<Id<Zone>, DescriptiveStatistics> zoneStats = createZonalStats();
+		Map<Id<Zone>, ZonalStatistics> zoneStats = createZonalStats();
 
 		for (Zone zone : zones.getZones().values()) {
-			Object[] routeFeatureAttributes = new Object[14];
+			Object[] routeFeatureAttributes = new Object[16];
 			Geometry geometry = zone.getPreparedGeometry() != null ? zone.getPreparedGeometry().getGeometry() : null;
-			DescriptiveStatistics stats = zoneStats.get(zone.getId());
+			DescriptiveStatistics stats = zoneStats.get(zone.getId()).waitStats;
+			Set<Id<Request>> rejections = zoneStats.get(zone.getId()).rejections;
 			routeFeatureAttributes[0] = geometry;
 			routeFeatureAttributes[1] = zone.getId();
 			routeFeatureAttributes[2] = zone.getCentroid().getX();
@@ -215,6 +233,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 			routeFeatureAttributes[11] = stats.getPercentile(80);
 			routeFeatureAttributes[12] = stats.getPercentile(75);
 			routeFeatureAttributes[13] = stats.getPercentile(50);
+			routeFeatureAttributes[14] = rejections.size();
+			routeFeatureAttributes[15] = rejections.size() / (double) (rejections.size() + stats.getN());
 
 			try {
 				features.add(builder.buildFeature(zone.getId().toString(), routeFeatureAttributes));

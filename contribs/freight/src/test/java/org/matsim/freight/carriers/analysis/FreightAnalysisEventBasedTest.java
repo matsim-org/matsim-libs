@@ -21,14 +21,13 @@
 
 package org.matsim.freight.carriers.analysis;
 
+import java.io.IOException;
+import java.net.URL;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.IOException;
-import java.net.URL;
 
 public class FreightAnalysisEventBasedTest {
 

@@ -46,7 +46,8 @@ public class PtStop2StopAnalysisControlerListener implements IterationStartsList
     PtStop2StopAnalysisControlerListener(Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
         this.eventsManager = eventsManager;
         this.controlerIO = controlerIO;
-        ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles());
+		// TODO: Sample size is only available in simwrapper config group which is not available here. Setting to 1, needs to be upscaled later.
+        ptStop2StopAnalysis = new PtStop2StopAnalysis(scenario.getTransitVehicles(), 1.0);
         sep = scenario.getConfig().global().getDefaultDelimiter();
         sep2 = sep.equals(";") ? "_" : ";"; // TODO: move sep2 to global config
     }

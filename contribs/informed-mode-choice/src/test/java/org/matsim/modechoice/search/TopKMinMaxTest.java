@@ -217,6 +217,9 @@ public class TopKMinMaxTest {
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
+			Multibinder<TripScoreEstimator> tEstBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
+			});
+
 			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});

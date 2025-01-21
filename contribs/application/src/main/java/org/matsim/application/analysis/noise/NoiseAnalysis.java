@@ -66,7 +66,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--consider-activities", split = ",", description = "Considered activities for noise calculation." +
 		" Use asterisk ('*') for acttype prefixes, if all such acts shall be considered.", defaultValue = "home*,work*,educ*,leisure*")
-	private Set<String> considerActivities;
+	private Set<String> consideredActivities;
 
 	@CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
 	private String noiseBarrierFile;
@@ -86,19 +86,20 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		boolean overrideParameters = ! ConfigUtils.hasModule(config, NoiseConfigGroup.class);
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
-		if(overrideParameters){
+		if (overrideParameters){
 			log.warn("no NoiseConfigGroup was configured before. Will set some standards. You should check the next lines in the log file and the output_config.xml!");
-			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(considerActivities.toArray(String[]::new));
-			noiseParameters.setConsideredActivitiesForDamageCalculationArray(considerActivities.toArray(String[]::new));
+			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities.toArray(String[]::new));
+			noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities.toArray(String[]::new));
 
 			{
-				Set<String> set = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
-				noiseParameters.setNetworkModesToIgnoreSet( set );
+				//the default settings are now actually the same as what we 'override' here, but let's leave it here for clarity.
+				Set<String> ignoredNetworkModes = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
+				noiseParameters.setNetworkModesToIgnoreSet( ignoredNetworkModes );
+
+				String[] hgvIdPrefixes = {"lkw", "truck", "freight"};
+				noiseParameters.setHgvIdPrefixesArray( hgvIdPrefixes );
 			}
-			{
-				String[] set = new String[]{"freight"};
-				noiseParameters.setHgvIdPrefixesArray( set );
-			}
+
 			//use actual speed and not freespeed
 			noiseParameters.setUseActualSpeedLevel(true);
 			//use the valid speed range (recommended by IK)

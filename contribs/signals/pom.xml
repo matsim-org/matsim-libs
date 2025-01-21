@@ -22,12 +22,12 @@
     <dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim-examples</artifactId>
-      <version>2025.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>otfvis</artifactId>
-      <version>2025.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

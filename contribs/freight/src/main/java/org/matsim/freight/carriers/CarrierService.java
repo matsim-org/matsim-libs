@@ -27,8 +27,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-
-public final class CarrierService implements Attributable {
+public final class CarrierService implements CarrierJob {
 
 	public static class Builder {
 
@@ -56,10 +55,10 @@ public final class CarrierService implements Attributable {
 		}
 
 		/**
-		 * By default it is [0.0,Integer.MaxValue].
+		 * By default, it is [0.0,Integer.MaxValue].
 		 *
-		 * @param serviceDuration
-		 * @return
+		 * @param serviceDuration 	duration of the service
+		 * @return 					the builder
 		 */
 		public Builder setServiceDuration(double serviceDuration){
 			this.serviceTime = serviceDuration;
@@ -72,8 +71,8 @@ public final class CarrierService implements Attributable {
 		 * <p>Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
 		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
 		 *
-		 * @param startTimeWindow
-		 * @return
+		 * @param startTimeWindow 	time-window for the service
+		 * @return 					the builder
 		 */
 		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
 			this.timeWindow = startTimeWindow;
