@@ -101,7 +101,9 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
     @Override
     public void setCurrentRp(NoiseReceiverPoint nrp) {
-        reflection.setCurrentReceiver(nrp);
+        if(noiseParams.isConsiderNoiseReflection()) {
+            reflection.setCurrentReceiver(nrp);
+        }
     }
 
     private double getSectionsCorrection(NoiseReceiverPoint nrp, Link link) {
@@ -127,10 +129,12 @@ public class RLS19NoiseImmission implements NoiseImmission {
             final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment, null);
             correctionTemp += Math.pow(10, 0.1*sectionCorrection);
 
-            final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(segment);
-            for(ReflectionContext.ReflectionTuple reflection: reflectionLinks) {
-                double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink.getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink, reflection.facade);
-                correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+            if(noiseParams.isConsiderNoiseReflection()) {
+                final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(segment);
+                for (ReflectionContext.ReflectionTuple reflection : reflectionLinks) {
+                    double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink().getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink(), reflection.facade());
+                    correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+                }
             }
         } else {
             double lMid = length / 2;
@@ -149,10 +153,12 @@ public class RLS19NoiseImmission implements NoiseImmission {
             final double sectionCorrection = 10 * Math.log10(central.getLength()) - calculateCorrection(nrpCoordinate, central, null);
             correctionTemp += Math.pow(10, 0.1 * sectionCorrection);
 
-            final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(central);
-            for(ReflectionContext.ReflectionTuple reflection: reflectionLinks) {
-                double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink.getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink, reflection.facade);
-                correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+            if(noiseParams.isConsiderNoiseReflection()) {
+                final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(central);
+                for (ReflectionContext.ReflectionTuple reflection : reflectionLinks) {
+                    double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink().getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink(), reflection.facade());
+                    correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+                }
             }
 
             correctionTemp += getSubSectionsCorrection(nrpCoordinate, leftRemaining);
@@ -174,7 +180,10 @@ public class RLS19NoiseImmission implements NoiseImmission {
         //to maintain the correct signs. nk, Sep'20
         double intersectionCorrection = intersection.calculateIntersectionCorrection(coordinate);
 
-        double multipleReflectionCorrection = reflection.getMultipleReflectionCorrection(segment);
+        double multipleReflectionCorrection = 0;
+        if(noiseParams.isConsiderNoiseReflection()) {
+            multipleReflectionCorrection = reflection.getMultipleReflectionCorrection(segment);
+        }
 
         double geometricDivergence = 20 * Math.log10(distance) + 10 * Math.log10(2 * Math.PI);
         double airDampeningFactor = distance / 200.;
@@ -191,11 +200,6 @@ public class RLS19NoiseImmission implements NoiseImmission {
         } else {
             return geometricDivergence + airDampeningFactor - intersectionCorrection + groundDampening ;
         }
-
-        //TODO: implement reflection - if someone is looking for a (bachelor) thesis...
-//        double firstReflectionCorrection = 0;
-//        double secondReflectionCorrection = 0;
-//        return dampeningCorrection + firstReflectionCorrection + secondReflectionCorrection;
     }
 
 

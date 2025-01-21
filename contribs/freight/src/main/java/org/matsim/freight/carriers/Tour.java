@@ -147,7 +147,7 @@ public class Tour {
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			Gbl.assertNotNull(leg);
-			tourElements.addFirst(leg);
+			tourElements.add(0,leg);
 			return this;
 		}
 
@@ -167,7 +167,7 @@ public class Tour {
 			}
 //			assertLastElementIsLeg();
 			Pickup pickup = createPickup(shipment);
-			tourElements.addFirst(pickup);
+			tourElements.add(0,pickup);
 //			previousElementIsActivity = true;
 			return this;
 		}
@@ -374,12 +374,12 @@ public class Tour {
 
 		@Override
 		public String getActivityType() {
-			return service.getType();
+			return CarrierConstants.SERVICE;
 		}
 
 		@Override
 		public Id<Link> getLocation() {
-			return service.getLocationLinkId();
+			return service.getServiceLinkId();
 		}
 
 		@Override
@@ -389,7 +389,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getServiceStartTimeWindow();
+			return service.getServiceStaringTimeWindow();
 		}
 
 		@Override
@@ -539,17 +539,17 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getPickupTimeWindow();
+			return shipment.getPickupStartingTimeWindow();
 		}
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getFrom();
+			return shipment.getPickupLinkId();
 		}
 
 		@Override
 		public double getDuration() {
-			return shipment.getPickupServiceTime();
+			return shipment.getPickupDuration();
 		}
 
 		@Override
@@ -592,7 +592,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getDeliveryTimeWindow();
+			return shipment.getDeliveryStartingTimeWindow();
 		}
 
 		@Override
@@ -602,12 +602,12 @@ public class Tour {
 
 		@Override
 		public Id<Link> getLocation() {
-			return shipment.getTo();
+			return shipment.getDeliveryLinkId();
 		}
 
 		@Override
 		public double getDuration() {
-			return shipment.getDeliveryServiceTime();
+			return shipment.getDeliveryDuration();
 		}
 
 		@Override

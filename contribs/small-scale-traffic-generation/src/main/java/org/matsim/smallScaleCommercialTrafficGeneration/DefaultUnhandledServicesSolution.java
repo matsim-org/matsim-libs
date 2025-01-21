@@ -4,10 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.CarrierVehicle;
-import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -30,7 +27,6 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			if (!CarriersUtils.allJobsHandledBySelectedPlan(carrier))
 				carriersWithUnhandledJobs.add(carrier);
 		}
-
 		return carriersWithUnhandledJobs;
 	}
 
@@ -40,8 +36,9 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	private void redrawAllServiceDurations(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
 		for (CarrierService service : carrier.getServices().values()) {
 			double newServiceDuration = generator.getServiceTimePerStop(carrier, carrierAttributes, additionalTravelBufferPerIterationInMinutes);
-			CarrierService redrawnService = CarrierService.Builder.newInstance(service.getId(), service.getLocationLinkId())
-				.setServiceDuration(newServiceDuration).setServiceStartTimeWindow(service.getServiceStartTimeWindow()).build();
+			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId())
+				.setServiceDuration(newServiceDuration);
+			CarrierService redrawnService = builder.setServiceStartingTimeWindow(service.getServiceStaringTimeWindow()).build();
 			carrier.getServices().put(redrawnService.getId(), redrawnService);
 		}
 	}

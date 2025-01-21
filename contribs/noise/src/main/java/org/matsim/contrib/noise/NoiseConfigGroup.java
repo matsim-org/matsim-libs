@@ -43,7 +43,7 @@ import java.util.*;
  * Provides the parameters required to build a simple grid with some basic spatial functionality.
  * Provides the parameters required to compute noise emissions, immissions and damages.
  *
- * @author ikaddoura
+ * @author ikaddoura, nkuehnel
  */
 public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
@@ -81,6 +81,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String RECEIVER_POINT_GAP_CMT = "horizontal and vertical distance between receiver points in x-/y-coordinate units";
 	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
+	private static final String CONSIDER_NOISE_REFLECTION = "considerNoiseReflection";
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
 	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
@@ -142,6 +143,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private double noiseTollFactor = 1.0;
 
 	private boolean considerNoiseBarriers = false;
+	private boolean considerNoiseReflection = false;
 	private String noiseBarriersFilePath = null;
 	private String noiseBarriersSourceCrs = null;
 
@@ -204,6 +206,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put(NOISE_TOLL_FACTOR, "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)");
 
 		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
+		comments.put(CONSIDER_NOISE_REFLECTION, "Set to 'true' if reflections should be considered. Otherwise set to 'false'. Has a considerable performance impact.");
 		comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
 		comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
@@ -308,6 +311,14 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 				+ " It is therefore recommended not to use speeds outside of the range of valid parameters!");
 		}
 
+		if(considerNoiseReflection) {
+			if (!this.considerNoiseBarriers) {
+				if (this.noiseBarriersFilePath == null || "".equals(this.noiseBarriersFilePath)) {
+					log.warn("Cannot consider noise reflection without a specified file path to the geojson file of barriers / buildings.");
+					this.considerNoiseBarriers = false;
+				}
+			}
+		}
 		if (this.considerNoiseBarriers) {
 			if (this.noiseBarriersFilePath == null || "".equals(this.noiseBarriersFilePath)) {
 				log.warn("Cannot consider noise barriers without a specified file path to the geojson file of barriers / buildings.");
@@ -780,6 +791,16 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(CONSIDER_NOISE_BARRIERS)
 	public void setConsiderNoiseBarriers(boolean considerNoiseBarriers) {
 		this.considerNoiseBarriers = considerNoiseBarriers;
+	}
+
+	@StringGetter(CONSIDER_NOISE_REFLECTION)
+	public boolean isConsiderNoiseReflection() {
+		return this.considerNoiseReflection;
+	}
+
+	@StringSetter(CONSIDER_NOISE_REFLECTION)
+	public void setConsiderNoiseReflection(boolean considerNoiseReflection) {
+		this.considerNoiseReflection = considerNoiseReflection;
 	}
 
 	@StringGetter(NOISE_BARRIERS_GEOJSON_FILE)

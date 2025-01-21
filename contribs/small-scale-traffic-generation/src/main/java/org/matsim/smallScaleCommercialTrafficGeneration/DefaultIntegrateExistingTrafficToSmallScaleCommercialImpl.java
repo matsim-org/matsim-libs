@@ -372,8 +372,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 							}
 						}
 						if (tourElement instanceof Tour.Pickup pickup) {
-							startZone = findZoneOfLink(linksPerZone, pickup.getShipment().getFrom());
-							String stopZone = findZoneOfLink(linksPerZone, pickup.getShipment().getTo());
+							startZone = findZoneOfLink(linksPerZone, pickup.getShipment().getPickupLinkId());
+							String stopZone = findZoneOfLink(linksPerZone, pickup.getShipment().getDeliveryLinkId());
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -395,7 +395,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					for (CarrierService service : carrier.getServices().values()) {
 						String startZone = (String) possibleStartAreas.toArray()[MatsimRandom.getRandom()
 							.nextInt(possibleStartAreas.size())];
-						String stopZone = findZoneOfLink(linksPerZone, service.getLocationLinkId());
+						String stopZone = findZoneOfLink(linksPerZone, service.getServiceLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -407,8 +407,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					}
 				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
-						String startZone = findZoneOfLink(linksPerZone, shipment.getFrom());
-						String stopZone = findZoneOfLink(linksPerZone, shipment.getTo());
+						String startZone = findZoneOfLink(linksPerZone, shipment.getPickupLinkId());
+						String stopZone = findZoneOfLink(linksPerZone, shipment.getDeliveryLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);

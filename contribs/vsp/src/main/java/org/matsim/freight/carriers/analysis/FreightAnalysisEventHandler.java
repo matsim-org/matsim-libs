@@ -391,8 +391,8 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 					if (shipmentTracker == null) {
 						continue;
 					}
-					Id<Link> from = shipment.getFrom();
-					Id<Link> toLink = shipment.getTo();
+					Id<Link> from = shipment.getPickupLinkId();
+					Id<Link> toLink = shipment.getDeliveryLinkId();
 					// if info is not certain, export the guess if that is wanted.
 					String carrierIdString = id2String(carrier.getId());
 					String shipmentIdString = id2String(shipment.getId());

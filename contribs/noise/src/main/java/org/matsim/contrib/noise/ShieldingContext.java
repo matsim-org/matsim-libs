@@ -24,8 +24,6 @@ final class ShieldingContext {
 
     private final static Logger logger = LogManager.getLogger(ShieldingContext.class);
 
-    //STRtree increases performance by ~40% by reducing the amount of potential
-    //obstruction candidates. nkuehnel, mar '20
     private final static double GROUND_HEIGHT = 0.5;
     private final ShieldingCorrection shieldingCorrection;
 
@@ -35,7 +33,6 @@ final class ShieldingContext {
     ShieldingContext(Config config, ShieldingCorrection shieldingCorrection, BarrierContext barrierContext) {
         this.shieldingCorrection = shieldingCorrection;
         this.barrierContext = barrierContext;
-        NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
     }
 
     ShieldingContext(ShieldingCorrection shieldingCorrection, BarrierContext barrierContext) {
@@ -51,83 +48,73 @@ final class ShieldingContext {
         final Coordinate midPoint = segment.midPoint();
         midPoint.z = GROUND_HEIGHT;
 
-//        final Point fromPoint = GeometryUtils.createGeotoolsPoint(link.getFromNode().getCoord());
-//        final Point toPoint = GeometryUtils.createGeotoolsPoint(link.getToNode().getCoord());
-
-        Coordinate from = segment.p0;
-        Coordinate to = segment.p1;
-
         LineString projectedLineOfSight = constructLineOfSight(rpPoint, midPoint);
-//        LineString fromLineOfSight = constructLineOfSight(rpPoint, from);
-//        LineString toLineOfSight = constructLineOfSight(rpPoint, to);
 
         NavigableMap<Double, Coordinate> edgeCandidates = getObstructionEdges(rpPoint, midPoint, projectedLineOfSight);
         edgeCandidates.put(projectedLineOfSight.getLength(), midPoint);
 
-        if (!edgeCandidates.isEmpty()) {
-            Coordinate lastFixedEdge = rpPoint;
-            Coordinate tmpEdge = rpPoint;
-            double currentHeight = GROUND_HEIGHT;
+        Coordinate lastFixedEdge = rpPoint;
+        Coordinate tmpEdge = rpPoint;
+        double currentHeight = GROUND_HEIGHT;
 
-            List<Coordinate> consideredEdges = new ArrayList<>();
+        List<Coordinate> consideredEdges = new ArrayList<>();
 
-            double distToCurrentEdge = 0;
-            while (lastFixedEdge != midPoint) {
-                if (edgeCandidates.isEmpty()) {
-                    logger.warn("Skipping obstacle as distance appears to be 0.");
-                    return correctionTermShielding;
-                }
-                Iterator<Coordinate> edgesIterator = edgeCandidates.values().iterator();
-                double maxSlope = Double.NEGATIVE_INFINITY;
-                double tmpDistance = 0;
-                while (edgesIterator.hasNext()) {
-                    Coordinate edge = edgesIterator.next();
-                    double distance = lastFixedEdge.distance(edge);
-                    double slope = (edge.z - currentHeight) / distance;
-                    if (slope >= maxSlope) {
-                        maxSlope = slope;
-                        tmpEdge = edge;
-                        tmpDistance = distance;
-                    }
-                }
-                lastFixedEdge = tmpEdge;
-                distToCurrentEdge += tmpDistance;
-                currentHeight = tmpEdge.z;
-                consideredEdges.add(lastFixedEdge);
-                edgeCandidates = edgeCandidates.tailMap(distToCurrentEdge, false);
-            }
-
-            consideredEdges.remove(midPoint);
-
-            if (consideredEdges.isEmpty()) {
+        double distToCurrentEdge = 0;
+        while (lastFixedEdge != midPoint) {
+            if (edgeCandidates.isEmpty()) {
+                logger.warn("Skipping obstacle as distance appears to be 0.");
                 return correctionTermShielding;
             }
-
-            final double firstEdgeYDiff = GROUND_HEIGHT - consideredEdges.get(0).z;
-            double firstEdgeDistance = rpPoint.distance(consideredEdges.get(0));
-            double receiverToFirstEdgeDistance
-                    = Math.sqrt(firstEdgeYDiff * firstEdgeYDiff + firstEdgeDistance * firstEdgeDistance);
-
-            double shieldingDepth = 0;
-
-            Iterator<Coordinate> it = consideredEdges.iterator();
-            Coordinate edgeTemp = it.next();
-            while (it.hasNext()) {
-                Coordinate edge = it.next();
-                double xyDiff = edgeTemp.distance(edge);
-                double zDiff = edgeTemp.z - edge.z;
-                shieldingDepth += Math.sqrt(xyDiff * xyDiff + zDiff * zDiff);
-                edgeTemp = edge;
+            Iterator<Coordinate> edgesIterator = edgeCandidates.values().iterator();
+            double maxSlope = Double.NEGATIVE_INFINITY;
+            double tmpDistance = 0;
+            while (edgesIterator.hasNext()) {
+                Coordinate edge = edgesIterator.next();
+                double distance = lastFixedEdge.distance(edge);
+                double slope = (edge.z - currentHeight) / distance;
+                if (slope >= maxSlope) {
+                    maxSlope = slope;
+                    tmpEdge = edge;
+                    tmpDistance = distance;
+                }
             }
-
-            final double lastEdgeSourceXYDiff = midPoint.distance(edgeTemp);
-            final double lastEdgeSourceZDiff = GROUND_HEIGHT - edgeTemp.z;
-            double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
-                    + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
-
-            correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
-                    rpPoint.distance(midPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
+            lastFixedEdge = tmpEdge;
+            distToCurrentEdge += tmpDistance;
+            currentHeight = tmpEdge.z;
+            consideredEdges.add(lastFixedEdge);
+            edgeCandidates = edgeCandidates.tailMap(distToCurrentEdge, false);
         }
+
+        consideredEdges.remove(midPoint);
+
+        if (consideredEdges.isEmpty()) {
+            return correctionTermShielding;
+        }
+
+        final double firstEdgeYDiff = GROUND_HEIGHT - consideredEdges.get(0).z;
+        double firstEdgeDistance = rpPoint.distance(consideredEdges.get(0));
+        double receiverToFirstEdgeDistance
+                = Math.sqrt(firstEdgeYDiff * firstEdgeYDiff + firstEdgeDistance * firstEdgeDistance);
+
+        double shieldingDepth = 0;
+
+        Iterator<Coordinate> it = consideredEdges.iterator();
+        Coordinate edgeTemp = it.next();
+        while (it.hasNext()) {
+            Coordinate edge = it.next();
+            double xyDiff = edgeTemp.distance(edge);
+            double zDiff = edgeTemp.z - edge.z;
+            shieldingDepth += Math.sqrt(xyDiff * xyDiff + zDiff * zDiff);
+            edgeTemp = edge;
+        }
+
+        final double lastEdgeSourceXYDiff = midPoint.distance(edgeTemp);
+        final double lastEdgeSourceZDiff = GROUND_HEIGHT - edgeTemp.z;
+        double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
+                + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
+
+        correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
+                rpPoint.distance(midPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
         return correctionTermShielding;
     }
 
@@ -169,7 +156,6 @@ final class ShieldingContext {
                 //direct implementation intersects() and intersection() here is up to 15x faster than
                 //using intersects() and intersection() directly on the jts geometry. nkuehnel, aug '20
                 final Set<Coordinate> intersections = intersection((Polygon) noiseBarrier.getGeometry().getGeometry(), directLineOfSight.getCoordinates());
-
 
                 for (Coordinate coordinate : intersections) {
                     coordinate.z = noiseBarrier.getHeight();
@@ -226,25 +212,7 @@ final class ShieldingContext {
 
 
     private Set<Coordinate> intersection(Polygon polygon, Coordinate[] coords) {
-
-        Set<Coordinate> externalIntersections = intersection(polygon.getExteriorRing(), coords);
-
-//        Set<Coordinate> internalIntersections = null;
-//        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-//            Set<Coordinate> intersects = intersection(polygon.getInteriorRingN(i), coords);
-//            if (!intersects.isEmpty()) {
-//                if (internalIntersections == null) {
-//                    internalIntersections = new HashSet<>();
-//                }
-//                internalIntersections.addAll(intersects);
-//            }
-//        }
-
-//        if(internalIntersections != null) {
-//            externalIntersections.addAll(internalIntersections);
-//        }
-
-        return externalIntersections;
+        return intersection(polygon.getExteriorRing(), coords);
     }
 
     private Set<Coordinate> intersection(LineString ring, Coordinate[] coords) {
@@ -285,7 +253,6 @@ final class ShieldingContext {
     }
 
 
-
     /**
      * determines the shielding value z for a receiver point for a given link emission source
      */
@@ -305,70 +272,68 @@ final class ShieldingContext {
         NavigableMap<Double, Coordinate> edgeCandidates = getObstructionEdges(rpPoint, projectedPoint, projectedLineOfSight, fromLineOfSight, toLineOfSight);
         edgeCandidates.put(projectedLineOfSight.getLength(), projectedPoint.getCoordinate());
 
-        if (!edgeCandidates.isEmpty()) {
-            Coordinate lastFixedEdge = rpPoint.getCoordinate();
-            Coordinate tmpEdge = rpPoint.getCoordinate();
-            double currentHeight = GROUND_HEIGHT;
+        Coordinate lastFixedEdge = rpPoint.getCoordinate();
+        Coordinate tmpEdge = rpPoint.getCoordinate();
+        double currentHeight = GROUND_HEIGHT;
 
-            List<Coordinate> consideredEdges = new ArrayList<>();
+        List<Coordinate> consideredEdges = new ArrayList<>();
 
-            double distToCurrentEdge = 0;
-            while (lastFixedEdge != projectedPoint.getCoordinate()) {
-                if (edgeCandidates.isEmpty()) {
-                    logger.warn("Skipping obstacle as distance appears to be 0.");
-                    return correctionTermShielding;
-                }
-                Iterator<Coordinate> edgesIterator = edgeCandidates.values().iterator();
-                double maxSlope = Double.NEGATIVE_INFINITY;
-                double tmpDistance = 0;
-                while (edgesIterator.hasNext()) {
-                    Coordinate edge = edgesIterator.next();
-                    double distance = lastFixedEdge.distance(edge);
-                    double slope = (edge.z - currentHeight) / distance;
-                    if (slope >= maxSlope) {
-                        maxSlope = slope;
-                        tmpEdge = edge;
-                        tmpDistance = distance;
-                    }
-                }
-                lastFixedEdge = tmpEdge;
-                distToCurrentEdge += tmpDistance;
-                currentHeight = tmpEdge.z;
-                consideredEdges.add(lastFixedEdge);
-                edgeCandidates = edgeCandidates.tailMap(distToCurrentEdge, false);
-            }
-
-            consideredEdges.remove(projectedPoint.getCoordinate());
-
-            if (consideredEdges.isEmpty()) {
+        double distToCurrentEdge = 0;
+        while (lastFixedEdge != projectedPoint.getCoordinate()) {
+            if (edgeCandidates.isEmpty()) {
+                logger.warn("Skipping obstacle as distance appears to be 0.");
                 return correctionTermShielding;
             }
-
-            final double firstEdgeYDiff = GROUND_HEIGHT - consideredEdges.get(0).z;
-            double firstEdgeDistance = rpPoint.getCoordinate().distance(consideredEdges.get(0));
-            double receiverToFirstEdgeDistance
-                    = Math.sqrt(firstEdgeYDiff * firstEdgeYDiff + firstEdgeDistance * firstEdgeDistance);
-
-            double shieldingDepth = 0;
-
-            Iterator<Coordinate> it = consideredEdges.iterator();
-            Coordinate edgeTemp = it.next();
-            while (it.hasNext()) {
-                Coordinate edge = it.next();
-                double xyDiff = edgeTemp.distance(edge);
-                double zDiff = edgeTemp.z - edge.z;
-                shieldingDepth += Math.sqrt(xyDiff * xyDiff + zDiff * zDiff);
-                edgeTemp = edge;
+            Iterator<Coordinate> edgesIterator = edgeCandidates.values().iterator();
+            double maxSlope = Double.NEGATIVE_INFINITY;
+            double tmpDistance = 0;
+            while (edgesIterator.hasNext()) {
+                Coordinate edge = edgesIterator.next();
+                double distance = lastFixedEdge.distance(edge);
+                double slope = (edge.z - currentHeight) / distance;
+                if (slope >= maxSlope) {
+                    maxSlope = slope;
+                    tmpEdge = edge;
+                    tmpDistance = distance;
+                }
             }
-
-            final double lastEdgeSourceXYDiff = projectedPoint.getCoordinate().distance(edgeTemp);
-            final double lastEdgeSourceZDiff = GROUND_HEIGHT - edgeTemp.z;
-            double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
-                    + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
-
-            correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
-                    rpPoint.distance(projectedPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
+            lastFixedEdge = tmpEdge;
+            distToCurrentEdge += tmpDistance;
+            currentHeight = tmpEdge.z;
+            consideredEdges.add(lastFixedEdge);
+            edgeCandidates = edgeCandidates.tailMap(distToCurrentEdge, false);
         }
+
+        consideredEdges.remove(projectedPoint.getCoordinate());
+
+        if (consideredEdges.isEmpty()) {
+            return correctionTermShielding;
+        }
+
+        final double firstEdgeYDiff = GROUND_HEIGHT - consideredEdges.getFirst().z;
+        double firstEdgeDistance = rpPoint.getCoordinate().distance(consideredEdges.getFirst());
+        double receiverToFirstEdgeDistance
+                = Math.sqrt(firstEdgeYDiff * firstEdgeYDiff + firstEdgeDistance * firstEdgeDistance);
+
+        double shieldingDepth = 0;
+
+        Iterator<Coordinate> it = consideredEdges.iterator();
+        Coordinate edgeTemp = it.next();
+        while (it.hasNext()) {
+            Coordinate edge = it.next();
+            double xyDiff = edgeTemp.distance(edge);
+            double zDiff = edgeTemp.z - edge.z;
+            shieldingDepth += Math.sqrt(xyDiff * xyDiff + zDiff * zDiff);
+            edgeTemp = edge;
+        }
+
+        final double lastEdgeSourceXYDiff = projectedPoint.getCoordinate().distance(edgeTemp);
+        final double lastEdgeSourceZDiff = GROUND_HEIGHT - edgeTemp.z;
+        double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
+                + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
+
+        correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
+                rpPoint.distance(projectedPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
         return correctionTermShielding;
     }
 }

@@ -43,7 +43,8 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 	/**
 	 * Contains the original stop if it was overwritten by a detour.
 	 */
-	private TransitStopFacility overwrittenStop;
+	private TransitStopFacility originalStop;
+	private TransitStopFacility detourStop;
 
 	private final Map<Id<TransitStopArea>, List<TransitStopFacility>> stopAreas;
 
@@ -59,7 +60,8 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 	 */
 	public TransitStopFacility addDetour(List<RailLink> original, List<RailLink> detour) {
 
-		TransitStopFacility nextStop = getNextTransitStop();
+		// The current next stop which may already be a detour
+		TransitStopFacility nextStop = detourStop != null ? detourStop : getNextTransitStop();
 
 		// Adjust the link index so that it fits to the new size
 		// the original route inside this agent is not updated because it is currently not necessary
@@ -87,7 +89,13 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 					for (RailLink d : detour) {
 
 						if (stop.getLinkId().equals(d.getLinkId())) {
-							this.overwrittenStop = nextStop;
+
+							// Always contains the stop from original schedule
+							if (originalStop == null) {
+								this.originalStop = nextStop;
+							}
+
+							this.detourStop = stop;
 							return stop;
 						}
 					}
@@ -106,10 +114,17 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 		// This function will call the API with the original stop as if no reroute has happened
 
 		// use the original stop exactly one time
-		if (overwrittenStop != null) {
-			stop = overwrittenStop;
+		if (originalStop != null) {
+			stop = originalStop;
 			double t = super.handleTransitStop(stop, now);
-			overwrittenStop = null;
+
+			// Vehicle has not yet departed and must wait, stops are not updated yet
+			if (t > 0) {
+				return t;
+			}
+
+			originalStop = null;
+			detourStop = null;
 			return t;
 		}
 

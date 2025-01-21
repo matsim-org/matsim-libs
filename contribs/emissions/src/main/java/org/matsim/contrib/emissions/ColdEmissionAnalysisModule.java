@@ -265,8 +265,8 @@ final class ColdEmissionAnalysisModule {
 						attribs2.setHbefaSizeClass("average");
 						attribs2.setHbefaEmConcept("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey={}", efkey);
-							logger.warn(" re-written to {}", efkey2);
+							logger.warn("Did not find emission factor in the detailed-table for efkey={}", efkey);
+							logger.warn("We are now trying to search in the detailed-table, but with an technology-averaged-key : efkey was re-written to {}", efkey2);
 							logger.warn("will try it with '<technology>; average; average'");
 							logger.warn(Gbl.ONLYONCE);
 							logger.warn(Gbl.FUTURE_SUPPRESSED);
@@ -278,7 +278,7 @@ final class ColdEmissionAnalysisModule {
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-						logger.error("That also did not worked ");
+						logger.error("Could not find an entry in the technology-averaged-table for <technology>; average; average. ");
 					}
 				}
 				break;
@@ -329,8 +329,8 @@ final class ColdEmissionAnalysisModule {
 						attribs2.setHbefaSizeClass("average");
 						attribs2.setHbefaEmConcept("average");
 						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey={}", efkey);
-							logger.warn(" re-written to {}", efkey2);
+							logger.warn("Did not find emission factor in the detailed-table for efkey={}", efkey);
+							logger.warn("We are now trying to search in the detailed-table, but with an technology-averaged-key : efkey was re-written to {}", efkey2);
 							logger.warn("will try it with '<technology>; average; average'");
 							logger.warn(Gbl.ONLYONCE);
 							logger.warn(Gbl.FUTURE_SUPPRESSED);
@@ -345,7 +345,7 @@ final class ColdEmissionAnalysisModule {
 					}
 				}
 				if (detailedFallbackAverageTableWarnCnt <= 1) {
-					logger.warn("That also did not work.");
+					logger.warn("Could not find a technology-averaged entry for <technology>; average; average. ");
 					logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table");
 					logger.warn(Gbl.ONLYONCE);
 					logger.warn(Gbl.FUTURE_SUPPRESSED);

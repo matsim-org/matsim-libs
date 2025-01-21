@@ -24,13 +24,17 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
 
 /**
  * @author mrieser
@@ -97,6 +101,12 @@ public class NetworkMergeDoubleLinksTest {
 		Assertions.assertEquals(1500.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(3, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+
+		// no restriction, as one of the duplicates allowed transition
+		Assertions.assertNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[0])));
+
+		// restriction remains, as both links have it
+		Assertions.assertNotNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[1])));
 	}
 
 	@Test
@@ -128,6 +138,13 @@ public class NetworkMergeDoubleLinksTest {
 		Assertions.assertEquals(1000.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+
+		// no restriction, as one of the duplicates allowed transition
+		Assertions.assertNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[0])));
+
+		// restriction remains, as both links have it
+		Assertions.assertNotNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[1])));
+
 	}
 
 	private static class Fixture {
@@ -174,6 +191,12 @@ public class NetworkMergeDoubleLinksTest {
 			l12.setLength(300); l12.setCapacity(1000.0); l12.setNumberOfLanes(1); l12.setFreespeed(80.0/3.6);
 			this.network.addLink(l2);
 			this.network.addLink(l12);
+
+			NetworkUtils.getOrCreateDisallowedNextLinks(l0).addDisallowedLinkSequence(TransportMode.car, List.of(l1.getId()));
+
+			NetworkUtils.getOrCreateDisallowedNextLinks(l1).addDisallowedLinkSequence(TransportMode.car, List.of(l12.getId()));
+			NetworkUtils.getOrCreateDisallowedNextLinks(l11).addDisallowedLinkSequence(TransportMode.car, List.of(l12.getId()));
+
 		}
 	}
 
