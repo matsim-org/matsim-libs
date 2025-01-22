@@ -36,8 +36,7 @@ import java.util.Set;
 public class ImpactAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(ImpactAnalysis.class);
-	private static final Integer DAYS_PER_YEAR = 365;
-	private static final Integer DAYS_PER_YEAR_PKW = 334;
+	private static final Integer DAYS_PER_YEAR_PKW = 334; // Also used for non-pkw.
 	private static final Integer DAYS_PER_YEAR_LKW = 302;
 	private static final Integer ONE_MILLION = 1000000;
 	private static final Integer METERS_PER_KILOMETER = 1000;
@@ -49,13 +48,16 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	private Set<String> modeArgs;
 
 	/**
-	 * Formats the value to a string with 2 decimal places and divides it by 1000 if it is greater than 1000 for gram to kilogram conversion.
+	 * Formats the value to a string with 2 decimal places and divides it by 1000000 if it is greater than 1000000 for gram to ton conversion
+	 * or divides it by 1000 if it is greater than 1000 for kilogram to ton conversion.
 	 *
 	 * @param value emission value
 	 * @return formatted emission value
 	 */
 	private static String formatValue(double value) {
-		if (value >= 1000) {
+		if (value >= 1000000) {
+			return String.format("%.2f", value / 1000000);
+		} else if (value >= 1000) {
 			return String.format("%.2f", value / 1000);
 		} else {
 			return String.format("%.2f", value);
@@ -63,13 +65,15 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	}
 
 	/**
-	 * Formats the unit to kg / Day if the value is greater than 1000, otherwise g / Day.
+	 * Formats the unit to kg / Day or t / Day if the value is greater than 1000 or 1000000, otherwise g / Day.
 	 *
 	 * @param value emission value
 	 * @return formatted emission unit
 	 */
 	private static String formatUnit(double value) {
-		if (value >= 1000) {
+		if (value >= 1000000) {
+			return "t / Day";
+		} else if (value >= 1000) {
 			return "kg / Day";
 		} else {
 			return "g / Day";
@@ -94,7 +98,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		TimeColumn waitingTime = legs.timeColumn("wait_time");
 
 		Map<String, Integer> modeCounts = new HashMap<>();
-		Map<String, Double> modeCountsByDistance = new HashMap<>();
+		Map<String, Double> vehicleOperatingTimeByDistance = new HashMap<>();
 		Map<String, Double> travelTimeMap = new HashMap<>();
 		Map<String, Double> travelAndWaitingTimeMap = new HashMap<>();
 		Map<String, Double> traveledDistanceMap = new HashMap<>();
@@ -122,7 +126,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 					// mode count by distance
 					String distanceMode = distance >= 50000 ? mode + "_more_than_fifty" : mode + "_less_than_fifty";
-					modeCountsByDistance.put(distanceMode, modeCountsByDistance.getOrDefault(distanceMode, 0.) + travelTimeConverted);
+					vehicleOperatingTimeByDistance.put(distanceMode, vehicleOperatingTimeByDistance.getOrDefault(distanceMode, 0.) + travelTimeConverted);
 
 
 					String waitingTimeStr = String.valueOf(waitingTime.get(i));
@@ -139,44 +143,35 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			}
 		}
 
-		// TODO: How should i handle non car and non freight modes? Currently i am using 365 days per year for them.
 		travelTimeMap.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / ONE_MILLION;
-			} else if ("car".equals(k)) {
-				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
 			} else {
-				return v * DAYS_PER_YEAR / ONE_MILLION;
+				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
 			}
 		});
 
 		travelAndWaitingTimeMap.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / ONE_MILLION;
-			} else if ("car".equals(k)) {
-				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
 			} else {
-				return v * DAYS_PER_YEAR / ONE_MILLION;
+				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
 			}
 		});
 
 		traveledDistanceMap.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION * METERS_PER_KILOMETER);
-			} else if ("car".equals(k)) {
-				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION * METERS_PER_KILOMETER);
 			} else {
-				return v * DAYS_PER_YEAR / (ONE_MILLION * METERS_PER_KILOMETER);
+				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION * METERS_PER_KILOMETER);
 			}
 		});
 
-		modeCountsByDistance.replaceAll((k, v) -> {
+		vehicleOperatingTimeByDistance.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION);
-			} else if ("car".equals(k)) {
-				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION);
 			} else {
-				return v * DAYS_PER_YEAR / (ONE_MILLION);
+				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION);
 			}
 		});
 
@@ -188,7 +183,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			modeMap.put(mode, m);
 		});
 
-		modeCountsByDistance.forEach((mode, count) -> {
+		vehicleOperatingTimeByDistance.forEach((mode, count) -> {
 
 			if (!modeMap.containsKey(mode.split("_")[0])) {
 				Mode m = new Mode();
@@ -197,9 +192,9 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 			Mode m = modeMap.get(mode.split("_")[0]);
 			if (mode.contains("less_than_fifty")) {
-				m.setCountByDistanceLessThanFifty(count);
+				m.setVehicleOperatingTimeByDistanceLessThanFifty(count);
 			} else if (mode.contains("more_than_fifty")) {
-				m.setCountByDistanceMoreThanFifty(count);
+				m.setVehicleOperatingTimeByDistanceLessMoreFifty(count);
 			}
 		});
 
@@ -273,8 +268,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 		modeMap.forEach((mode, m) -> {
 			int countTmp = m.getCount();
-			double countByDistanceLessThanFiftyTmp = m.getCountByDistanceLessThanFifty();
-			double countByDistanceMoreThanFiftyTmp = m.getCountByDistanceMoreThanFifty();
+			double countByDistanceLessThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessThanFifty();
+			double countByDistanceMoreThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessMoreFifty();
 			double travelTimeTmp = m.getTravelTime();
 			double traveledDistanceTmp = m.getTraveledDistance();
 			double travelAndWaitingTimeTmp = m.getTravelAndWaitingTime();
@@ -295,21 +290,21 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			generalValues.add(String.format("%.2f", countByDistanceMoreThanFiftyTmp));
 			generalValues.add(String.format("%.2f", travelTimeTmp));
 			generalValues.add(String.format("%.2f", traveledDistanceTmp));
-			generalValues.add(String.format("%.2f", travelAndWaitingTimeTmp));
+			// generalValues.add(String.format("%.2f", travelAndWaitingTimeTmp));
 
 			generalUnits.add("Vehicle / Day");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Kilometers / Year");
-			generalUnits.add("Mio. Hours / Year");
+			// generalUnits.add("Mio. Hours / Year");
 
 			generalDescriptions.add("Average Vehicle Loads");
 			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
 			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
-			generalDescriptions.add("Travel Time");
+			generalDescriptions.add("Vehicle Operating Times");
 			generalDescriptions.add("Travel Distance");
-			generalDescriptions.add("Travel And Waiting Time");
+			// generalDescriptions.add("Travel And Waiting Time");
 
 			// Emission Data
 			ArrayList<String> emissionsValues = new ArrayList<>();
@@ -361,8 +356,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 	private static class Mode {
 		private int count; // count
-		private double countByDistanceLessThanFifty; // count
-		private double countByDistanceMoreThanFifty; // count
+		private double vehicleOperatingTimeByDistanceLessThanFifty; // count
+		private double vehicleOperatingTimeByDistanceLessMoreFifty; // count
 		private double travelTime; // mio. hours / year
 		private double traveledDistance; // mio. meters / year
 		private double travelAndWaitingTime; // mio. hours / year
@@ -384,20 +379,20 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			this.count = count;
 		}
 
-		public double getCountByDistanceLessThanFifty() {
-			return countByDistanceLessThanFifty;
+		public double getVehicleOperatingTimeByDistanceLessThanFifty() {
+			return vehicleOperatingTimeByDistanceLessThanFifty;
 		}
 
-		public void setCountByDistanceLessThanFifty(double countByDistanceLessThanFifty) {
-			this.countByDistanceLessThanFifty = countByDistanceLessThanFifty;
+		public void setVehicleOperatingTimeByDistanceLessThanFifty(double vehicleOperatingTimeByDistanceLessThanFifty) {
+			this.vehicleOperatingTimeByDistanceLessThanFifty = vehicleOperatingTimeByDistanceLessThanFifty;
 		}
 
-		public double getCountByDistanceMoreThanFifty() {
-			return countByDistanceMoreThanFifty;
+		public double getVehicleOperatingTimeByDistanceLessMoreFifty() {
+			return vehicleOperatingTimeByDistanceLessMoreFifty;
 		}
 
-		public void setCountByDistanceMoreThanFifty(double countByDistanceMoreThanFifty) {
-			this.countByDistanceMoreThanFifty = countByDistanceMoreThanFifty;
+		public void setVehicleOperatingTimeByDistanceLessMoreFifty(double vehicleOperatingTimeByDistanceLessMoreFifty) {
+			this.vehicleOperatingTimeByDistanceLessMoreFifty = vehicleOperatingTimeByDistanceLessMoreFifty;
 		}
 
 		public double getTravelTime() {
@@ -428,8 +423,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		public String toString() {
 			return "Mode{" +
 				"count=" + count +
-				", countByDistanceLessThanFifty=" + countByDistanceLessThanFifty +
-				", countByDistanceMoreThanFifty=" + countByDistanceMoreThanFifty +
+				", countByDistanceLessThanFifty=" + vehicleOperatingTimeByDistanceLessThanFifty +
+				", countByDistanceMoreThanFifty=" + vehicleOperatingTimeByDistanceLessMoreFifty +
 				", travelTime=" + travelTime +
 				", traveledDistance=" + traveledDistance +
 				", travelAndWaitingTime=" + travelAndWaitingTime +

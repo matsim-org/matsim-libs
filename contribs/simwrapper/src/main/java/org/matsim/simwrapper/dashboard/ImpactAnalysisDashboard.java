@@ -74,7 +74,7 @@ public class ImpactAnalysisDashboard implements Dashboard {
 				viz.content = """
 					# Disclaimer
 
-					Die in dieser Analyse verwendeten Verkehrsdaten basieren auf einer Hochrechnung von Verkehrszahlen eines einzelnen Tages auf ein gesamtes Jahr. Die Grundlage dieser Hochrechnung stammt aus dem Bericht:
+					Die in dieser Analyse verwendeten Verkehrsdaten basieren auf einer Hochrechnung von Verkehrszahlen eines einzelnen Tages auf ein gesamtes Jahr. Die Grundlage dieser Hochrechnung stammt aus dem Bericht: \s
 
 					**Grundsätzliche Überprüfung und Weiterentwicklung der Nutzen-Kosten-Analyse im Bewertungsverfahren der Bundesverkehrswegeplanung** \s
 					FE-PROJEKTNR.: 960974/2011 \s
@@ -82,15 +82,14 @@ public class ImpactAnalysisDashboard implements Dashboard {
 					Essen, Berlin, München, 24. März 2015 \s
 
 					Die spezifischen Hochrechnungsfaktoren wurden wie folgt angewendet: \s
-					- Für PKW: **Faktor 334** \s
+					- Für PKW und alle anderen Verkehrsmittel: **Faktor 334** \s
 					- Für LKW: **Faktor 302** \s
-					- Für alle übrigen Verkehrsarten: **Faktor 365** \s
 
 					Diese Faktoren basieren auf den Angaben des genannten Berichts (Seite 172) und wurden ebenfalls im Rahmen des Bundesverkehrswegeplans 2030 verwendet. \s
 
 					# Disclaimer (English)
 
-					The traffic data used in this analysis is based on an extrapolation of single-day traffic figures to an entire year. The basis for this extrapolation is derived from the report:
+					The traffic data used in this analysis is based on an extrapolation of single-day traffic figures to an entire year. The basis for this extrapolation is derived from the report: \s
 
 					**Fundamental Review and Further Development of the Cost-Benefit Analysis in the Assessment Procedure of Federal Transport Infrastructure Planning** \s
 					FE-PROJECT NO.: 960974/2011 \s
@@ -98,11 +97,10 @@ public class ImpactAnalysisDashboard implements Dashboard {
 					Essen, Berlin, Munich, March 24, 2015 \s
 
 					The specific extrapolation factors applied are as follows: \s
-					- For passenger cars (PKW): **Factor 334** \s
+					- For passenger cars (PKW) and all other modes of transport: **Factor 334** \s
 					- For trucks (LKW): **Factor 302** \s
-					- For all other types of traffic: **Factor 365** \s
 
-					These factors are based on the data provided in the mentioned report (page 172) and were also used in the Federal Transport Infrastructure Plan 2030.
+					These factors are based on the data provided in the mentioned report (page 172) and were also used in the Federal Transport Infrastructure Plan 2030. \s
 					""";
 			});
 	}
