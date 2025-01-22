@@ -70,12 +70,9 @@ public class ChainedPtFareHandlerTest {
 		distanceBased2.setTransactionPartner(DISTANCE_BASED_TRANSACTION_PARTNER);
 		distanceBased2.setMinFare(7.0);
 
-		PtFareParams fareZoneBased1;
-		ptFareConfigGroup.addPtFareParameterSet(fareZoneBased1);
-
 		ptFareConfigGroup.addPtFareParameterSet(fareZoneBased);
-		ptFareConfigGroup.addParameterSet(distanceBased);
-		ptFareConfigGroup.addParameterSet(distanceBased2);
+		ptFareConfigGroup.addPtFareParameterSet(distanceBased);
+		ptFareConfigGroup.addPtFareParameterSet(distanceBased2);
 
 		ptFareConfigGroup.setUpperBoundFactor(2.0);
 
