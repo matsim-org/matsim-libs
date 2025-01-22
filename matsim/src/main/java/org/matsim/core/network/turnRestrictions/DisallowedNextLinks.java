@@ -1,4 +1,4 @@
-package org.matsim.core.network;
+package org.matsim.core.network.turnRestrictions;
 
 import java.util.ArrayList;
 import java.util.Collection;
