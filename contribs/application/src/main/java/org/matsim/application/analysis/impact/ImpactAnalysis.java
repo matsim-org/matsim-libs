@@ -51,8 +51,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	/**
 	 * Formats the value to a string with 2 decimal places and divides it by 1000 if it is greater than 1000 for gram to kilogram conversion.
 	 *
-	 * @param value
-	 * @return
+	 * @param value emission value
+	 * @return formatted emission value
 	 */
 	private static String formatValue(double value) {
 		if (value >= 1000) {
@@ -65,8 +65,8 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	/**
 	 * Formats the unit to kg / Day if the value is greater than 1000, otherwise g / Day.
 	 *
-	 * @param value
-	 * @return
+	 * @param value emission value
+	 * @return formatted emission unit
 	 */
 	private static String formatUnit(double value) {
 		if (value >= 1000) {
@@ -150,7 +150,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			}
 		});
 
-		// TODO: How should i handle non car and non freight modes? Currently i am using 365 days per year for them.
 		travelAndWaitingTimeMap.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / ONE_MILLION;
@@ -161,7 +160,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			}
 		});
 
-		// TODO: How should i handle non car and non freight modes? Currently i am using 365 days per year for them.
 		traveledDistanceMap.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION * METERS_PER_KILOMETER);
@@ -172,7 +170,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			}
 		});
 
-		// TODO: How should i handle non car and non freight modes? Currently i am using 365 days per year for them.
 		modeCountsByDistance.replaceAll((k, v) -> {
 			if ("freight".equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION);
@@ -182,7 +179,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 				return v * DAYS_PER_YEAR / (ONE_MILLION);
 			}
 		});
-
 
 		HashMap<String, Mode> modeMap = new HashMap<>();
 
@@ -308,12 +304,12 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			generalUnits.add("Mio. Kilometers / Year");
 			generalUnits.add("Mio. Hours / Year");
 
-			generalDescriptions.add("Average vehicle loads");
-			generalDescriptions.add("Time of trips ≤ 50 km");
-			generalDescriptions.add("Time of trips > 50 km");
-			generalDescriptions.add("Average travel time");
-			generalDescriptions.add("Average travel distance");
-			generalDescriptions.add("Average travel and waiting time");
+			generalDescriptions.add("Average Vehicle Loads");
+			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
+			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
+			generalDescriptions.add("Travel Time");
+			generalDescriptions.add("Travel Distance");
+			generalDescriptions.add("Travel And Waiting Time");
 
 			// Emission Data
 			ArrayList<String> emissionsValues = new ArrayList<>();

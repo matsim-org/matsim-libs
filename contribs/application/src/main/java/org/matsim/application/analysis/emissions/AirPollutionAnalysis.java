@@ -187,15 +187,14 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				double emissionValue = emissionMap.getDouble(pollutant);
 				emissionsCSV.print(vehicleTypeId);
 				emissionsCSV.print(pollutant);
-				emissionsCSV.print(emissionValue);
+				emissionsCSV.print(emissionValue * sample.getUpscaleFactor());
 				emissionsCSV.println();
 			}
 		}
 
 		emissionsCSV.close();
 	}
-
-	// TODO: Scaling (sample)
+	
 	private void writeEmissionsByVehicleType(EmissionsByVehicleTypeEventHandler emissionsByVehicleType) throws IOException {
 
 		log.info("Writing emissions by vehicle type...");
@@ -216,7 +215,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 				double emissionValue = emissionMap.getDouble(pollutant);
 				emissionsCSV.print(vehicleTypeId);
 				emissionsCSV.print(pollutant);
-				emissionsCSV.print(emissionValue);
+				emissionsCSV.print(emissionValue * sample.getUpscaleFactor());
 				emissionsCSV.println();
 			}
 		}
