@@ -530,6 +530,16 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
+// The following used to be
+//		for (DepartureHandler departureHandler : this.departureHandlers) {
+//			if (departureHandler.handleDeparture(now, agent, linkId)) {
+//				return;
+//			}
+//		}
+// I am now testing if more than one dp handler feels responsible.  Since the teleportation handler feels responsible in any case, it needs to be
+// treated separately.
+
+
 		DepartureHandler responsible = null;
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if ( responsible==null ) {
