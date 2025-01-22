@@ -532,15 +532,18 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 		DepartureHandler responsible = null;
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, agent, linkId) ) {
-				if ( responsible==null ){
+			if ( responsible==null ) {
+				if ( departureHandler.handleDeparture( now, agent, linkId ) ){
 					responsible = departureHandler;
-				} else {
-					StringBuilder strb = new StringBuilder();
-					strb.append( "More than one departure handler feels responsible for agent=" ).append( agent ).append( "; dpHandler1=" )
-					    .append( responsible ).append( "; dpHandler2=" ).append( departureHandler );
-					log.fatal( strb.toString() );
-					throw new RuntimeException( strb.toString() );
+				}
+			} else if ( ! ( departureHandler instanceof  DefaultTeleportationEngine) ) {
+				if ( departureHandler.handleDeparture( now, agent, linkId ) ){
+					String str = "More than one departure handler feels responsible for"
+								     + System.lineSeparator() + "agent=" + agent
+								     + System.lineSeparator() + "dpHandler1=" + responsible
+								     + System.lineSeparator() + "dpHandler2=" + departureHandler;
+					log.fatal( str );
+					throw new RuntimeException( str );
 				}
 			}
 		}
