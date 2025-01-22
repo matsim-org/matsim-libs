@@ -60,7 +60,7 @@ public class EmissionsDashboardTest {
 
 		SimWrapper sw = SimWrapper.create()
 			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
-			.addDashboard(new ImpactAnalysisDashboard(Set.of("car", "freight")));
+			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 
