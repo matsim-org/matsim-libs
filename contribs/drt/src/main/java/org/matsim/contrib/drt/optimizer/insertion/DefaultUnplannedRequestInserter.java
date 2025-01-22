@@ -67,21 +67,22 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DrtOfferAcceptor drtOfferAcceptor;
 	private final ForkJoinPool forkJoinPool;
 	private final PassengerStopDurationProvider stopDurationProvider;
+	private final RequestFleetFilter requestFleetFilter;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
-			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
-			ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
+                                           EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
+                                           VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
+                                           DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
+                                           ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool, stopDurationProvider);
+				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool, stopDurationProvider, requestFleetFilter);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
-			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
-			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
-			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
+                                    RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
+                                    DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
+                                    DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -93,7 +94,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.drtOfferAcceptor = drtOfferAcceptor;
 		this.forkJoinPool = forkJoinPool;
 		this.stopDurationProvider = stopDurationProvider;
-	}
+        this.requestFleetFilter = requestFleetFilter;
+    }
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
@@ -123,8 +125,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 	private void scheduleUnplannedRequest(DrtRequest req, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
 			double now) {
+		Collection<VehicleEntry> filteredFleet = requestFleetFilter.filter(req, vehicleEntries, now);
 		Optional<InsertionWithDetourData> best = insertionSearch.findBestInsertion(req,
-				Collections.unmodifiableCollection(vehicleEntries.values()));
+				Collections.unmodifiableCollection(filteredFleet));
 		if (best.isEmpty()) {
 			retryOrReject(req, now, NO_INSERTION_FOUND_CAUSE);
 		} else {

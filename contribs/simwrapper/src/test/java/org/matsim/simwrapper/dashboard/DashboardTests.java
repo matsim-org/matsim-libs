@@ -20,7 +20,7 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DashboardTests {
@@ -156,14 +156,18 @@ public class DashboardTests {
 	}
 
 	@Test
-	void impactAnalysis() {
-		HashSet<String> modes = new HashSet<>();
-		modes.add("car");
-		modes.add("freight");
+	void activity() {
+		ActivityDashboard ad = new ActivityDashboard("kehlheim_shape.shp");
 
-		ImpactAnalysisDashboard impactAnalysisDashboard = new ImpactAnalysisDashboard(modes);
+		ad.addActivityType(
+			"work",
+			List.of("work"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"kehlheim_ref.csv"
+		);
 
-//		run(new EmissionsDashboard("EPSG:25832"), impactAnalysisDashboard);
-		run(impactAnalysisDashboard);
+		run(ad);
 	}
+
+
 }

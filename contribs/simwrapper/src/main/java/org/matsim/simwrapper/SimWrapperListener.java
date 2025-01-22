@@ -34,8 +34,8 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	@Inject
 	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config) {
 		this.simWrapper = simWrapper;
-        this.bindings = bindings;
-        this.config = config;
+		this.bindings = bindings;
+		this.config = config;
 	}
 
 	/**
@@ -103,6 +103,9 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
 
 				if (config.exclude.contains(d.getClass().getSimpleName()) || config.exclude.contains(d.getClass().getName()))
+					continue;
+
+				if (!config.include.isEmpty() && (!config.include.contains(d.getClass().getSimpleName()) && !config.include.contains(d.getClass().getName())))
 					continue;
 
 				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {

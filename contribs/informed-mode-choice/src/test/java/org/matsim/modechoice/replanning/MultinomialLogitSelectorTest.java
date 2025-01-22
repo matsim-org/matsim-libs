@@ -5,96 +5,64 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.modechoice.PlanCandidate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MultinomialLogitSelectorTest {
-
-	private MultinomialLogitSelector selector;
+class MultinomialLogitSelectorTest {
 
 	private static final int N = 500_000;
+	private final Offset<Double> offset = Offset.offset(0.01);
+	private MultinomialLogitSelector selector;
 
 	@BeforeEach
 	public void setUp() throws Exception {
 		selector = new MultinomialLogitSelector(1, new Random(0));
 	}
 
-	@Test
-	void selection() {
+	private double[] sample(double... utils) {
+		List<PlanCandidate> candidates = new ArrayList<>();
 
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, -1),
-				new PlanCandidate(new String[]{"pt"}, -1.5),
-				new PlanCandidate(new String[]{"walk"}, -2)
-		);
+		for (int i = 0; i < utils.length; i++) {
+			candidates.add(new PlanCandidate(new String[]{"" + i}, utils[i]));
+		}
 
-
-		double[] sample = selector.sample(1000, candidates);
-
-		assertThat(sample)
-				.containsExactly(0.51, 0.306, 0.184);
-
-		candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, -50),
-				new PlanCandidate(new String[]{"pt"}, -60),
-				new PlanCandidate(new String[]{"walk"}, -70)
-		);
-
-		sample = selector.sample(1000, candidates);
-
-		assertThat(sample)
-				.containsExactly(0.491, 0.323, 0.186);
-
-
-		candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, 7),
-				new PlanCandidate(new String[]{"pt"}, 7),
-				new PlanCandidate(new String[]{"walk"}, 5)
-		);
-
-		sample = selector.sample(N, candidates);
-
-		assertThat(sample)
-				.containsExactly(0.42231, 0.42174, 0.15595);
-
+		return selector.sample(N, candidates);
 	}
 
 	@Test
-	void invariance() {
+	void probabilities() {
 
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, -1),
-				new PlanCandidate(new String[]{"pt"}, -2),
-				new PlanCandidate(new String[]{"walk"}, -3)
-		);
+		// checked with https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.softmax.html
 
+		assertThat(sample(-1, -2, -3))
+			.containsExactly(new double[]{0.66524096, 0.24472847, 0.09003057}, offset);
 
-		double[] sample1 = selector.sample(N, candidates);
+		assertThat(sample(-3, -1, -2))
+			.containsExactly(new double[]{0.09003057, 0.66524096, 0.24472847}, offset);
 
-		candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, -10),
-				new PlanCandidate(new String[]{"pt"}, -20),
-				new PlanCandidate(new String[]{"walk"}, -30)
-		);
+		assertThat(sample(-2, -4, -6))
+			.containsExactly(new double[]{0.86681333, 0.11731043, 0.01587624}, offset);
 
-		double[] sample2 = selector.sample(N, candidates);
+		assertThat(sample(-0.5, -1, -1.5))
+			.containsExactly(new double[]{0.50648039, 0.30719589, 0.18632372}, offset);
 
-		candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, 10),
-				new PlanCandidate(new String[]{"pt"}, 0),
-				new PlanCandidate(new String[]{"walk"}, -10)
-		);
+		selector = new MultinomialLogitSelector(2, new Random(0));
 
-		double[] sample3 = selector.sample(N, candidates);
+		assertThat(sample(-1, -2, -3))
+			.containsExactly(new double[]{0.50648039, 0.30719589, 0.18632372}, offset);
 
-		assertThat(sample1)
-				.containsExactly(0.50625, 0.306986, 0.186764);
-		assertThat(sample2)
-				.containsExactly(0.506194, 0.307304, 0.186502);
-		assertThat(sample3)
-				.containsExactly(0.506376, 0.30703, 0.186594);
+		selector = new MultinomialLogitSelector(0.5, new Random(0));
+
+		assertThat(sample(-1, -2, -3))
+			.containsExactly(new double[]{0.86681333, 0.11731043, 0.01587624}, offset);
+
+		selector = new MultinomialLogitSelector(10, new Random(0));
+
+		assertThat(sample(-1, -2, -3))
+			.containsExactly(new double[]{0.3671654 , 0.33222499, 0.30060961}, offset);
 
 	}
 
@@ -103,83 +71,8 @@ public class MultinomialLogitSelectorTest {
 
 		selector = new MultinomialLogitSelector(0, new Random(0));
 
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, 1.04),
-				new PlanCandidate(new String[]{"pt"}, 1.06),
-				new PlanCandidate(new String[]{"walk"}, 1.05)
-		);
-
-		double[] sample = selector.sample(N, candidates);
-
-		assertThat(sample).containsExactly(0, 1, 0);
-
-	}
-
-	@Test
-	void sameScore() {
-
-		selector = new MultinomialLogitSelector(0.01, new Random(0));
-
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, 1.),
-				new PlanCandidate(new String[]{"walk"}, 1.)
-		);
-
-		double[] sample = selector.sample(N, candidates);
-
-		assertThat(sample[0]).isCloseTo(0.5, Offset.offset(0.01));
-		assertThat(sample[1]).isCloseTo(0.5, Offset.offset(0.01));
-	}
-
-	@Test
-	void single() {
-
-
-		selector = new MultinomialLogitSelector(1, new Random(0));
-
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car"}, 1.)
-		);
-
-		double[] sample = selector.sample(N, candidates);
-
-		assertThat(sample[0]).isEqualTo(1);
-
-	}
-
-	@Test
-	void precision() {
-
-		selector = new MultinomialLogitSelector(0.01, new Random(0));
-
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car1"}, 2),
-				new PlanCandidate(new String[]{"car2"}, 10000),
-				new PlanCandidate(new String[]{"car3"}, 1)
-		);
-
-		double[] sample = selector.sample(N, candidates);
-
-		assertThat(sample[1]).isEqualTo(1);
-
-	}
-
-	@Test
-	void inf() {
-
-		selector = new MultinomialLogitSelector(10000, new Random(0));
-
-		List<PlanCandidate> candidates = List.of(
-				new PlanCandidate(new String[]{"car1"}, 2),
-				new PlanCandidate(new String[]{"car2"}, 10000),
-				new PlanCandidate(new String[]{"car3"}, 1)
-		);
-
-		double[] sample = selector.sample(N, candidates);
-
-		assertThat(sample[0]).isEqualTo(0.333, Offset.offset(0.001));
-		assertThat(sample[1]).isEqualTo(0.333, Offset.offset(0.001));
-		assertThat(sample[2]).isEqualTo(0.333, Offset.offset(0.001));
+		assertThat(sample(1.04, 1.06, 1.05))
+			.containsExactly(0, 1, 0);
 
 	}
 
@@ -187,18 +80,38 @@ public class MultinomialLogitSelectorTest {
 	void random() {
 
 		selector = new MultinomialLogitSelector(Double.POSITIVE_INFINITY, new Random(0));
+		assertThat(sample(100, 3, 1))
+			.containsExactly(new double[]{0.333, 0.333, 0.333}, offset);
 
-		List<PlanCandidate> candidates = List.of(
-			new PlanCandidate(new String[]{"car1"}, 100),
-			new PlanCandidate(new String[]{"car2"}, 3),
-			new PlanCandidate(new String[]{"car3"}, 1)
-		);
+	}
 
-		double[] sample = selector.sample(N, candidates);
+	@Test
+	void invariance() {
 
-		assertThat(sample[0]).isEqualTo(0.333, Offset.offset(0.001));
-		assertThat(sample[1]).isEqualTo(0.333, Offset.offset(0.001));
-		assertThat(sample[2]).isEqualTo(0.333, Offset.offset(0.001));
+		// Selector is invariant to shifting, but not to scale of utilities
+		assertThat(sample(-1, -2, -3))
+			.containsExactly(new double[]{0.664678, 0.244972, 0.09035}, offset);
+
+		assertThat(sample(1, 0, -1))
+			.containsExactly(new double[]{0.665126, 0.244834, 0.09004}, offset);
+
+	}
+
+	@Test
+	void smallScale() {
+
+		selector = new MultinomialLogitSelector(1 / 10000d, new Random(0));
+
+		assertThat(sample(-1e-4, -1e-4, -2e-4))
+			.containsExactly(new double[]{0.4223188, 0.4223188, 0.1553624}, offset);
+
+		assertThat(sample(-1, -1, -2))
+			.containsExactly(new double[]{1/2d, 1/2d, 0}, offset);
+
+		selector = new MultinomialLogitSelector(2e-8, new Random(0));
+
+		assertThat(sample(-1, -1.0001, -2))
+			.containsExactly(new double[]{1, 0, 0}, offset);
 
 	}
 }
