@@ -183,7 +183,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			modeMap.put(mode, m);
 		});
 
-		vehicleOperatingTimeByDistance.forEach((mode, count) -> {
+		vehicleOperatingTimeByDistance.forEach((mode, time) -> {
 
 			if (!modeMap.containsKey(mode.split("_")[0])) {
 				Mode m = new Mode();
@@ -192,9 +192,9 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 			Mode m = modeMap.get(mode.split("_")[0]);
 			if (mode.contains("less_than_fifty")) {
-				m.setVehicleOperatingTimeByDistanceLessThanFifty(count);
+				m.setVehicleOperatingTimeByDistanceLessThanFifty(time);
 			} else if (mode.contains("more_than_fifty")) {
-				m.setVehicleOperatingTimeByDistanceMoreThanFifty(count);
+				m.setVehicleOperatingTimeByDistanceMoreThanFifty(time);
 			}
 		});
 
