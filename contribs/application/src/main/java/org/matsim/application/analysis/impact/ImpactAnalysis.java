@@ -325,12 +325,12 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			emissionsUnits.add(formatUnit(PM));
 			emissionsUnits.add(formatUnit(SO2));
 
-			emissionsDescriptions.add("Nitrogen Oxides (NOx)");
-			emissionsDescriptions.add("Total Carbon Dioxide (CO2_Total)");
+			emissionsDescriptions.add("Nitrogen Oxides (NOₓ)");
+			emissionsDescriptions.add("Total Carbon Dioxide (CO₂)");
 			emissionsDescriptions.add("Carbon Monoxide (CO)");
 			emissionsDescriptions.add("Hydrocarbons (HC)");
 			emissionsDescriptions.add("Particulate Matter (PM)");
-			emissionsDescriptions.add("Sulfur Dioxide (SO2)");
+			emissionsDescriptions.add("Sulfur Dioxide (SO₂)");
 
 			Table generalTable = Table.create("General Data")
 				.addColumns(
