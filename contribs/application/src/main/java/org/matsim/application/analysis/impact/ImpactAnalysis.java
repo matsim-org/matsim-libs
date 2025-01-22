@@ -194,7 +194,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			if (mode.contains("less_than_fifty")) {
 				m.setVehicleOperatingTimeByDistanceLessThanFifty(count);
 			} else if (mode.contains("more_than_fifty")) {
-				m.setVehicleOperatingTimeByDistanceLessMoreFifty(count);
+				m.setVehicleOperatingTimeByDistanceMoreThanFifty(count);
 			}
 		});
 
@@ -269,10 +269,9 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		modeMap.forEach((mode, m) -> {
 			int countTmp = m.getCount();
 			double countByDistanceLessThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessThanFifty();
-			double countByDistanceMoreThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessMoreFifty();
+			double countByDistanceMoreThanFiftyTmp = m.getVehicleOperatingTimeByDistanceMoreThanFifty();
 			double travelTimeTmp = m.getTravelTime();
 			double traveledDistanceTmp = m.getTraveledDistance();
-			double travelAndWaitingTimeTmp = m.getTravelAndWaitingTime();
 			double NOx = m.getEmissons().getNOx();
 			double CO2_TOTAL = m.getEmissons().getCO2_TOTAL();
 			double CO = m.getEmissons().getCO();
@@ -290,21 +289,18 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			generalValues.add(String.format("%.2f", countByDistanceMoreThanFiftyTmp));
 			generalValues.add(String.format("%.2f", travelTimeTmp));
 			generalValues.add(String.format("%.2f", traveledDistanceTmp));
-			// generalValues.add(String.format("%.2f", travelAndWaitingTimeTmp));
 
 			generalUnits.add("Vehicle / Day");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Kilometers / Year");
-			// generalUnits.add("Mio. Hours / Year");
 
 			generalDescriptions.add("Average Vehicle Loads");
 			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
 			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
 			generalDescriptions.add("Vehicle Operating Times");
 			generalDescriptions.add("Travel Distance");
-			// generalDescriptions.add("Travel And Waiting Time");
 
 			// Emission Data
 			ArrayList<String> emissionsValues = new ArrayList<>();
@@ -357,7 +353,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	private static class Mode {
 		private int count; // count
 		private double vehicleOperatingTimeByDistanceLessThanFifty; // count
-		private double vehicleOperatingTimeByDistanceLessMoreFifty; // count
+		private double vehicleOperatingTimeByDistanceMoreThanFifty; // count
 		private double travelTime; // mio. hours / year
 		private double traveledDistance; // mio. meters / year
 		private double travelAndWaitingTime; // mio. hours / year
@@ -387,12 +383,12 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			this.vehicleOperatingTimeByDistanceLessThanFifty = vehicleOperatingTimeByDistanceLessThanFifty;
 		}
 
-		public double getVehicleOperatingTimeByDistanceLessMoreFifty() {
-			return vehicleOperatingTimeByDistanceLessMoreFifty;
+		public double getVehicleOperatingTimeByDistanceMoreThanFifty() {
+			return vehicleOperatingTimeByDistanceMoreThanFifty;
 		}
 
-		public void setVehicleOperatingTimeByDistanceLessMoreFifty(double vehicleOperatingTimeByDistanceLessMoreFifty) {
-			this.vehicleOperatingTimeByDistanceLessMoreFifty = vehicleOperatingTimeByDistanceLessMoreFifty;
+		public void setVehicleOperatingTimeByDistanceMoreThanFifty(double vehicleOperatingTimeByDistanceMoreThanFifty) {
+			this.vehicleOperatingTimeByDistanceMoreThanFifty = vehicleOperatingTimeByDistanceMoreThanFifty;
 		}
 
 		public double getTravelTime() {
@@ -424,7 +420,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			return "Mode{" +
 				"count=" + count +
 				", countByDistanceLessThanFifty=" + vehicleOperatingTimeByDistanceLessThanFifty +
-				", countByDistanceMoreThanFifty=" + vehicleOperatingTimeByDistanceLessMoreFifty +
+				", countByDistanceMoreThanFifty=" + vehicleOperatingTimeByDistanceMoreThanFifty +
 				", travelTime=" + travelTime +
 				", traveledDistance=" + traveledDistance +
 				", travelAndWaitingTime=" + travelAndWaitingTime +
