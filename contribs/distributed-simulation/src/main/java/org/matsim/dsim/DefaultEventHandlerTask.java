@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * This task is able to run any event handler, regardless of its specification.
+ */
 @Log4j2
 @SuppressWarnings("rawtypes")
 public final class DefaultEventHandlerTask extends EventHandlerTask {
@@ -60,19 +63,19 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
                                    DistributedEventsManager manager, SerializationProvider serializer,
                                    @Nullable AtomicInteger counter) {
-		super(handler, manager, partition, supportsAsync(handler));
+		super(handler, manager, partition, DistributedEventsManager.supportsAsync(handler));
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
 		this.pattern = buildConsumers(serializer);
 
 		if (pattern != null && async)
-			throw new IllegalArgumentException("Message pattern and async execution together are not supported yet.");
+			throw new IllegalArgumentException("Message pattern and async execution together are not supported.");
 	}
 
 	/**
 	 * Wait for async task to finish (if set).
 	 */
-	public void waitAsync() throws ExecutionException, InterruptedException {
+	public void waitAsync(boolean lastStep) throws ExecutionException, InterruptedException {
 		if (future != null)
 			future.get();
 
@@ -147,19 +150,6 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 			}
 		}
 
-		int s = (int) (time / 10);
-		// Fill with zeros
-		if (runtimes.size() < s)
-			runtimes.addElements(runtimes.size(), new long[s - runtimes.size()]);
-
-		long rt = System.nanoTime() - t;
-		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
-		sumRuntime += rt;
-
-		// Only add the runtime to the list if the time is a multiple of 10
-		if ((time % 10) == 0) {
-			runtimes.add(sumRuntime);
-			sumRuntime = 0;
-		}
+		storeRuntime(t);
 	}
 }

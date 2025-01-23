@@ -11,106 +11,120 @@ import org.matsim.dsim.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Log4j2
 public final class PoolExecutor implements LPExecutor {
 
-    private final ExecutorService executor;
-    private final SerializationProvider serializer;
+	private final ExecutorService executor;
+	private final SerializationProvider serializer;
 
 	/**
 	 * Executions from the current sim step.
 	 */
-    private final List<Future<?>> executions = new LinkedList<>();
+	private final List<Future<?>> executions = new LinkedList<>();
 
-    private final List<SimTask> tasks = new ArrayList<>();
-    private int step;
+	private final List<SimTask> tasks = new ArrayList<>();
+	private int step;
 
-    @Inject
-    public PoolExecutor(SerializationProvider serializer, SimulationNode node) {
-        this.serializer = serializer;
-        this.executor = Executors.newWorkStealingPool(node.getCores());
-    }
+	@Inject
+	public PoolExecutor(SerializationProvider serializer, SimulationNode node) {
+		this.serializer = serializer;
+		this.executor = Executors.newWorkStealingPool(node.getCores());
+	}
 
-    /**
-     * Simple modulo operation that works for powers of 2.
-     */
-    private static int mod(int x, int y) {
-        return (x & (y - 1));
-    }
+	/**
+	 * Simple modulo operation that works for powers of 2.
+	 */
+	private static int mod(int x, int y) {
+		return (x & (y - 1));
+	}
 
-    @Override
-    public LPTask register(LP lp, DistributedEventsManager manager, int part) {
-        LPTask task = new LPTask(lp, part, manager, serializer);
-        tasks.add(task);
-        return task;
-    }
+	@Override
+	public LPTask register(LP lp, DistributedEventsManager manager, int part) {
+		LPTask task = new LPTask(lp, part, manager, serializer);
+		tasks.add(task);
+		return task;
+	}
 
-    @Override
-    public EventHandlerTask register(EventHandler handler, DistributedEventsManager manager, int part, int totalParts, AtomicInteger counter) {
-        EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, manager, serializer, counter);
-        tasks.add(task);
-        return task;
-    }
+	@Override
+	public EventHandlerTask register(EventHandler handler, DistributedEventsManager manager, int part, int totalParts, AtomicInteger counter) {
+		EventHandlerTask task;
 
-    @Override
-    public void deregister(SimTask task) {
-        tasks.remove(task);
-    }
+		if (DistributedEventsManager.isGlobal(handler) && DistributedEventsManager.supportsAsync(handler)) {
 
-    @Override
-    public void processRuntimes(Consumer<SimTask.Info> f) {
-        for (SimTask task : tasks) {
-            f.accept(new SimTask.Info(task.getName(), task.getPartition(), task.getRuntime()));
-        }
-    }
+			if (manager.getNode().isDistributed())
+				task = new GlobalAsyncEventHandlerTask(handler, manager, part, serializer);
+			else
+				task = new SingleNodeAsyncEventHandlerTask(handler, manager, part, serializer);
 
-    @Override
-    public void shutdown() {
-        executor.shutdown();
-    }
+		} else
+			task = new DefaultEventHandlerTask(handler, part, totalParts, manager, serializer, counter);
 
-    @Override
-    public void doSimStep(double time) {
+		tasks.add(task);
+		return task;
+	}
 
-        // Sort by descending runtime for better load distribution
-        if (mod(step++, 128) == 0)
-            tasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
+	@Override
+	public void deregister(SimTask task) {
+		tasks.remove(task);
+	}
 
-        // Prepare all tasks before executing them
-        for (SimTask task : tasks) {
-            task.setTime(time);
-            if (task.needsExecution()) {
-				waitForTask(task);
+	@Override
+	public void processRuntimes(Consumer<SimTask.Info> f) {
+		for (SimTask task : tasks) {
+			f.accept(new SimTask.Info(task.getName(), task.getPartition(), task.getRuntime()));
+		}
+	}
+
+	@Override
+	public void shutdown() {
+		executor.shutdown();
+	}
+
+	@Override
+	public void doSimStep(double time) {
+
+		// Sort by descending runtime for better load distribution
+		if (mod(step++, 128) == 0)
+			tasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
+
+		// Prepare all tasks before executing them
+		for (SimTask task : tasks) {
+			task.setTime(time);
+			if (task.needsExecution()) {
+				waitForTask(task, false);
 				task.beforeExecution();
 			}
-        }
+		}
 
-        for (SimTask task : tasks) {
-            if (task.needsExecution()) {
+		for (SimTask task : tasks) {
+			if (task.needsExecution()) {
 				Future<?> ft = executor.submit(task);
 				if (task instanceof EventHandlerTask et && et.isAsync()) {
 					et.setFuture(ft);
 				} else
 					executions.add(ft);
 			}
-        }
+		}
 
-        for (Future<?> execution : executions) {
-            try {
-                execution.get();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error("Error while executing task", e);
-                executor.shutdown();
+		for (Future<?> execution : executions) {
+			try {
+				execution.get();
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Error while executing task", e);
+				executor.shutdown();
 				throw new RuntimeException(e.getCause());
-            }
-        }
+			}
+		}
 
-        executions.clear();
-    }
+		executions.clear();
+	}
 
 	@Override
 	public void afterSim() {
@@ -123,7 +137,7 @@ public final class PoolExecutor implements LPExecutor {
 		for (SimTask task : tasks) {
 
 			if (task instanceof EventHandlerTask) {
-				waitForTask(task);
+				waitForTask(task, true);
 				task.beforeExecution();
 			}
 		}
@@ -149,11 +163,11 @@ public final class PoolExecutor implements LPExecutor {
 		executions.clear();
 	}
 
-	private void waitForTask(SimTask task) {
+	private void waitForTask(SimTask task, boolean lastStep) {
 		// Wait for async event handlers
 		if (task instanceof EventHandlerTask et) {
 			try {
-				et.waitAsync();
+				et.waitAsync(lastStep);
 			} catch (InterruptedException | ExecutionException e) {
 				log.error("Error while executing async event task", e);
 				executor.shutdown();

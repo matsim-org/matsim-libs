@@ -93,6 +93,22 @@ public final class DistributedEventsManager implements EventsManager {
 		this.eventsDisabled = Objects.equals(System.getenv("DISABLE_EVENTS"), "1");
 	}
 
+	/**
+	 * Whether the handler supports async execution.
+	 */
+	public static boolean supportsAsync(EventHandler handler) {
+		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return ann != null && ann.async();
+	}
+
+	/**
+	 * Whether this is a global event handler.
+	 */
+	public static boolean isGlobal(EventHandler handler) {
+		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return ann == null || ann.value() == DistributedMode.GLOBAL;
+	}
+
 	@Override
 	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
 		return addInternal(provider.get(), provider);

@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 @Log4j2
-public sealed abstract class EventHandlerTask implements SimTask permits DefaultEventHandlerTask {
+public sealed abstract class EventHandlerTask implements SimTask permits DefaultEventHandlerTask, GlobalAsyncEventHandlerTask, SingleNodeAsyncEventHandlerTask {
 
 	/**
 	 * Handler to execute.
@@ -201,7 +201,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * Wait for async task to finish (if set).
 	 */
-	public abstract void waitAsync() throws ExecutionException, InterruptedException;
+	public abstract void waitAsync(boolean last) throws ExecutionException, InterruptedException;
 
 	@Override
 	public final boolean needsExecution() {
@@ -245,14 +245,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	/**
-	 * Whether the handler supports async execution.
-	 */
-	static boolean supportsAsync(EventHandler handler) {
-		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return ann != null && ann.async();
-	}
-
-	/**
 	 * Process one message / event.
 	 */
 	protected final void process(Message msg) {
@@ -269,6 +261,27 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		}
 
 		consumer.accept(msg);
+	}
+
+	/**
+	 * Store run time information.
+	 * @param t nanoseconds before current step started.
+	 */
+	protected final void storeRuntime(long t) {
+		int s = (int) (time / 10);
+		// Fill with zeros
+		if (runtimes.size() < s)
+			runtimes.addElements(runtimes.size(), new long[s - runtimes.size()]);
+
+		long rt = System.nanoTime() - t;
+		avgRuntime = 0.8f * avgRuntime + 0.2f * rt;
+		sumRuntime += rt;
+
+		// Only add the runtime to the list if the time is a multiple of 10
+		if ((time % 10) == 0) {
+			runtimes.add(sumRuntime);
+			sumRuntime = 0;
+		}
 	}
 
 	@Override
