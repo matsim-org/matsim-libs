@@ -20,7 +20,7 @@ import jakarta.validation.constraints.PositiveOrZero;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
-	public static final String GROUP_NAME = "startegic_charging";
+	public static final String GROUP_NAME = "strategic_charging";
 
 	public static StrategicChargingConfigGroup get(Config config) {
 		return (StrategicChargingConfigGroup) config.getModules().get(GROUP_NAME);
