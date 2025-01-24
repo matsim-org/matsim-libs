@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -479,35 +480,29 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	}
 
 	private void arrangeAgentActivity(final MobsimAgent agent) {
+//		This used to be:
+//		for (ActivityHandler activityHandler : this.activityHandlers) {
+//			if (activityHandler.handleActivity(agent)) {
+//				return;
+//			}
+//		}
+// I am now checking all activity handlers if they feel responsible, and throw an exception if there are two or more. kai, jan'24
+
 		ActivityHandler responsible = null;
-		ActivityEngine activityEngine = null;
 		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if ( activityHandler instanceof ActivityEngine ) {
-				// seems that only exactly one activity engine is allowed.  We use that as a fallback.
-				activityEngine = (ActivityEngine) activityHandler;
-			} else if ( activityHandler.handleActivity(agent) ) {
-				// if we are here, then the activity was already handled.
-				if ( responsible==null ){
+			if (activityHandler.handleActivity(agent)) {
+				if ( responsible==null ) {
 					responsible = activityHandler;
 				} else {
-					// in this case, the activity was handled twice.
-					StringBuilder strb = new StringBuilder();
-					strb.append( "more than one activity handler feels reponsible for agent=" ).append( agent );
-					strb.append( ".  activityHandler1=" ).append( responsible ).append( "; activityHandler2=" ).append( activityHandler );
-					log.fatal( strb.toString() );
-					throw new RuntimeException( strb.toString() );
+					String msg = "More than one activity handler feels reponsible for agent=" + agent
+								      + System.lineSeparator() + "activityHandler1=" + responsible
+								      + System.lineSeparator() + "activityHandler2=" + activityHandler ;
+					log.fatal( msg );
+					throw new RuntimeException( msg );
 				}
 			}
 		}
-		if ( responsible==null && activityEngine!=null ) {
-			// only if the activity has not been handled yet we call the activity engine.
-			activityEngine.handleActivity( agent );
-		} else {
-			StringBuilder strb = new StringBuilder();
-			strb.append( "There is no ActivityHandler that wants to handle the agent, and also no ActivityEngine." );
-			log.fatal( strb.toString() );
-			throw new RuntimeException( strb.toString() );
-		}
+
 	}
 
 	/**
@@ -536,9 +531,8 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 //				return;
 //			}
 //		}
-// I am now testing if more than one dp handler feels responsible.  Since the teleportation handler feels responsible in any case, it needs to be
-// treated separately.
-
+// I am now checking all dp handlers if they feel responsible.  Since the teleportation handler feels responsible in any case, it needs to be
+// treated separately.  Might be cleaner to register the teleportation handlers explicitly for all teleported modes. kai, jan'25
 
 		DepartureHandler responsible = null;
 		for (DepartureHandler departureHandler : this.departureHandlers) {
@@ -548,8 +542,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 				}
 			} else if ( ! ( departureHandler instanceof  DefaultTeleportationEngine) ) {
 				if ( departureHandler.handleDeparture( now, agent, linkId ) ){
-					String str = "More than one departure handler feels responsible for"
-								     + System.lineSeparator() + "agent=" + agent
+					String str = "More than one departure handler feels responsible for agent=" + agent
 								     + System.lineSeparator() + "dpHandler1=" + responsible
 								     + System.lineSeparator() + "dpHandler2=" + departureHandler;
 					log.fatal( str );
