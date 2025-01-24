@@ -135,10 +135,39 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 	private void createRouletteWheel(int demandToDistributed) {
 		PoissonDistribution poisson = new PoissonDistribution(PACKAGES_PER_RECIPIENT - 1);
 		Frequency frequency = new Frequency();
+		Map<Integer, Double> probabilities = new HashMap<>();
 		int upsamplingFactor = 1;
+		int totalRounded = 0;
+		// Step 1: Calculate raw probabilities and rounded frequencies
 		for (int j = 0; j < 11; j++) {
-			frequency.incrementValue((j + 1) * upsamplingFactor, Math.round(poisson.probability(j) * demandToDistributed));
+			int value = (j + 1) * upsamplingFactor;
+			double probability = poisson.probability(j) * demandToDistributed;
+			probabilities.put(value, probability); // Store for later adjustment
+			int roundedFrequency = (int) Math.round(probability);
+			frequency.incrementValue(value, roundedFrequency);
+			totalRounded += roundedFrequency;
 		}
+
+		// Step 2: Adjust frequencies to match the exact demandToDistributed
+		int difference = demandToDistributed - totalRounded;
+		if (difference != 0) {
+			// Sort probabilities by their fractional part to prioritize adjustment
+			List<Map.Entry<Integer, Double>> sorted = probabilities.entrySet().stream()
+				.sorted((a, b) -> Double.compare(
+					Math.abs(b.getValue() - Math.round(b.getValue())), // Descending order
+					Math.abs(a.getValue() - Math.round(a.getValue()))
+				))
+				.toList();
+
+			for (Map.Entry<Integer, Double> entry : sorted) {
+				if (difference == 0) break;
+				int value = entry.getKey();
+				int adjustment = difference > 0 ? 1 : -1;
+				frequency.incrementValue(value, adjustment);
+				difference -= adjustment;
+			}
+		}
+		// Step 3: Build the roulette wheel
 		rouletteWheel = RouletteWheel.Builder.newInstance(frequency).setRandom(random).build();
 	}
 
@@ -248,24 +277,43 @@ public class DemandGenerationSpecificationForParcelDelivery extends DefaultDeman
 		log.info("Splitting the remainingDemand per age group...");
 		createDemandDistributionPerAgeGroup();
 		//the remainingDemand volume is divided between the individual age groups and added to "demandDistributionPerAgeGroup"
-		double error = 0;
-		for (AgeGroup ageGroup : demandDistributionPerAgeGroup.keySet()) {
+		int totalDistributedDemand = 0;
+		List<AgeGroup> ageGroups = new ArrayList<>(demandDistributionPerAgeGroup.keySet());
 
-//			HashMap<String, Number> temp = demandDistributionPerAgeGroup.get(ageGroup);
-
+		// Step 1: Calculate initial demands and total distributed demand
+		Map<AgeGroup, Double> fractionalDemands = new HashMap<>();
+		for (AgeGroup ageGroup : ageGroups) {
 			double demandForAgeGroupAsDouble = demandToDistribute * demandDistributionPerAgeGroup.get(ageGroup);
 			int demandForAgeGroupAsInt = (int) Math.round(demandForAgeGroupAsDouble);
-			error += demandForAgeGroupAsDouble - demandForAgeGroupAsInt;
 
-			if (error >= 1) {
-				demandForAgeGroupAsInt += 1;
-				error -= 1;
-			} else if (error <= -1) {
-				demandForAgeGroupAsInt -= 1;
-				error += 1;
-			}
 			ageGroup.setRemainingDemand(demandForAgeGroupAsInt);
 			ageGroup.setTotalAmountParcels(demandForAgeGroupAsInt);
+			fractionalDemands.put(ageGroup, demandForAgeGroupAsDouble);
+			totalDistributedDemand += demandForAgeGroupAsInt;
+		}
+
+		// Step 2: Adjust demands to match demandToDistribute
+		int difference = demandToDistribute - totalDistributedDemand;
+		if (difference != 0) {
+			// Sort age groups by largest fractional difference
+			List<Map.Entry<AgeGroup, Double>> sortedByFraction = fractionalDemands.entrySet().stream()
+				.sorted((a, b) -> Double.compare(
+					Math.abs(b.getValue() - Math.round(b.getValue())),
+					Math.abs(a.getValue() - Math.round(a.getValue()))
+				))
+				.toList();
+
+			// Adjust demands iteratively
+			for (Map.Entry<AgeGroup, Double> entry : sortedByFraction) {
+				if (difference == 0) break;
+
+				AgeGroup ageGroup = entry.getKey();
+				int adjustment = difference > 0 ? 1 : -1;
+				ageGroup.setRemainingDemand(ageGroup.getRemainingDemand() + adjustment);
+				ageGroup.setTotalAmountParcels(ageGroup.getTotalAmountParcels() + adjustment);
+				totalDistributedDemand += adjustment;
+				difference -= adjustment;
+			}
 		}
 
 		//add number of persons per age
