@@ -235,7 +235,10 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		boolean tryBlockWithException = false;
 		try {
 			// Teleportation must be last (default) departure handler, so add it only before running:
-			this.departureHandlers.add(this.teleportationEngine);
+			if ( this.teleportationEngine!= null ){
+				this.departureHandlers.add( this.teleportationEngine );
+			}
+			// (this can be "null", in which case it makes more sense to not register the "null" into the registry.  kai, jan'25)
 
 			// ActivityEngine must be last (=default) activity handler, so add it only before running:
 			this.activityHandlers.add(this.activityEngine);
