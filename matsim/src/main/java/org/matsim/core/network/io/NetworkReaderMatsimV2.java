@@ -44,6 +44,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import static org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate.TAG_ATTRIBUTE;
+import static org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate.TAG_ATTRIBUTES;
+
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
  *
@@ -55,9 +58,6 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	private final static String LINKS = "links";
 	private final static String NODE = "node";
 	private final static String LINK = "link";
-	private final static String ATTRIBUTES = "attributes";
-	private final static String ATTRIBUTE = "attribute";
-
 	private final Network network;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
@@ -85,32 +85,22 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		switch( name ) {
-			case NODE:
-				startNode(atts);
-				break;
-			case LINK:
-				startLink(atts);
-				break;
-			case NETWORK:
-				startNetwork(atts);
-				break;
-			case LINKS:
-				startLinks(atts);
-				break;
-			case ATTRIBUTES:
-				/* fall-through */
-			case ATTRIBUTE:
-				attributesDelegate.startTag( name , atts , context , currentAttributes );
-				break;
+		switch( name ){
+			case NODE -> startNode( atts );
+			case LINK -> startLink( atts );
+			case NETWORK -> startNetwork( atts );
+			case LINKS -> startLinks( atts );
+			case TAG_ATTRIBUTES, TAG_ATTRIBUTE -> attributesDelegate.startTag( name, atts, context, currentAttributes );
+//			default -> throw new IllegalStateException( "Unexpected value: " + name );
+			// (there is at least "nodes" which just passes through.  I found it that way.  kai, dec'24)
 		}
 	}
 
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		switch( name ) {
-			case ATTRIBUTES:
-                if (context.peek().equals(NETWORK)) {
+			case TAG_ATTRIBUTES:
+				if (context.peek().equals(NETWORK)) {
 					String inputCRS = (String) network.getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
@@ -122,7 +112,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 					}
 				}
 				/* fall-through */
-			case ATTRIBUTE:
+			case TAG_ATTRIBUTE:
 				attributesDelegate.endTag(name, content, context);
 				break;
 		}

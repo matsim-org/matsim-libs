@@ -210,11 +210,19 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 	}
 
+	/**
+	 * @deprecated Coordinate System can now be set directly in file, which is the better place for this information, and thus the switch here is no longer needed.  kai, feb'24
+	 */
+	@Deprecated // set directly in file.
 	@StringGetter( INPUT_CRS )
 	public String getInputCRS() {
 		return inputCRS;
 	}
 
+	/**
+	 * @deprecated Coordinate System can now be set directly in file, which is the better place for this information, and thus the switch here is no longer needed.  kai, feb'24
+	 */
+	@Deprecated // set directly in file.
 	@StringSetter( INPUT_CRS )
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
