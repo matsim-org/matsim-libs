@@ -117,7 +117,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		// nessessary if non-carrier vehicles are in the simulation
+		// necessary if non-carrier vehicles are in the simulation
 		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
 			return;
 		final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
@@ -149,7 +149,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	//If the vehicle leaves a link because it reached its destination, the travelTime is calculated and stored.
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		// nessessary if non-carrier vehicles are in the simulation
+		// necessary if non-carrier vehicles are in the simulation
 		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
 			return;
 		final Id<Vehicle> vehicleId = event.getVehicleId();

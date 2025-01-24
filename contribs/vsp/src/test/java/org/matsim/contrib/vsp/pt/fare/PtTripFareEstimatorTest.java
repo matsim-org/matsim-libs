@@ -76,7 +76,7 @@ public class PtTripFareEstimatorTest {
 		distanceClassLongFareParams.setFareIntercept(1.0);
 		distanceClassLongFareParams.setFareSlope(0.01);
 
-		fare.addParameterSet(distanceFare);
+		fare.addPtFareParameterSet(distanceFare);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config);
 		injector = controler.getInjector();
