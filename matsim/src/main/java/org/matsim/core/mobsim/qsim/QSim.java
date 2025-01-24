@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -234,7 +235,10 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		boolean tryBlockWithException = false;
 		try {
 			// Teleportation must be last (default) departure handler, so add it only before running:
-			this.departureHandlers.add(this.teleportationEngine);
+			if ( this.teleportationEngine!= null ){
+				this.departureHandlers.add( this.teleportationEngine );
+			}
+			// (this can be "null", in which case it makes more sense to not register the "null" into the registry.  kai, jan'25)
 
 			// ActivityEngine must be last (=default) activity handler, so add it only before running:
 			this.activityHandlers.add(this.activityEngine);
@@ -479,11 +483,36 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	}
 
 	private void arrangeAgentActivity(final MobsimAgent agent) {
+//		This used to be:
+//		for (ActivityHandler activityHandler : this.activityHandlers) {
+//			if (activityHandler.handleActivity(agent)) {
+//				return;
+//			}
+//		}
+// I am now checking all activity handlers if they feel responsible, and throw an exception if there are two or more. Since the ActivityEngine feels
+// responsible in any case, the code needs to hedge against that.  kai, jan'24
+
+		ActivityHandler responsible = null;
 		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				return;
+			if ( responsible==null ){
+				if( activityHandler.handleActivity( agent ) ){
+					responsible = activityHandler;
+				}
+			} else if ( ! ( activityHandler instanceof ActivityEngine) ) {
+				if ( activityHandler.handleActivity( agent ) ) {
+					String msg = "More than one activity handler feels reponsible for agent=" + agent
+								      + System.lineSeparator() + "activityHandler1=" + responsible
+								      + System.lineSeparator() + "activityHandler2=" + activityHandler ;
+					log.fatal( msg );
+					throw new RuntimeException( msg );
+				}
 			}
 		}
+		if ( responsible==null ){
+			log.warn( "no departure handler wanted to handle the activity of agent " + agent.getId() );
+			// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
+		}
+
 	}
 
 	/**
@@ -506,13 +535,35 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
+// The following used to be
+//		for (DepartureHandler departureHandler : this.departureHandlers) {
+//			if (departureHandler.handleDeparture(now, agent, linkId)) {
+//				return;
+//			}
+//		}
+// I am now checking all dp handlers if they feel responsible.  Since the teleportation handler feels responsible in any case, it needs to be
+// treated separately.  Might be cleaner to register the teleportation handlers explicitly for all teleported modes. kai, jan'25
+
+		DepartureHandler responsible = null;
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, agent, linkId)) {
-				return;
+			if ( responsible==null ) {
+				if ( departureHandler.handleDeparture( now, agent, linkId ) ){
+					responsible = departureHandler;
+				}
+			} else if ( ! ( departureHandler instanceof  DefaultTeleportationEngine) ) {
+				if ( departureHandler.handleDeparture( now, agent, linkId ) ){
+					String str = "More than one departure handler feels responsible for agent=" + agent
+								     + System.lineSeparator() + "dpHandler1=" + responsible
+								     + System.lineSeparator() + "dpHandler2=" + departureHandler;
+					log.fatal( str );
+					throw new RuntimeException( str );
+				}
 			}
 		}
-		log.warn("no departure handler wanted to handle the departure of agent " + agent.getId());
-		// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
+		if ( responsible==null ){
+			log.warn( "no departure handler wanted to handle the departure of agent " + agent.getId() );
+			// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
+		}
 
 	}
 

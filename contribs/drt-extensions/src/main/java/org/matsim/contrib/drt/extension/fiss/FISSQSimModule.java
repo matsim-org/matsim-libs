@@ -27,20 +27,20 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class FISSQSimModule extends AbstractQSimModule {
 
-    static final public String COMPONENT_NAME = "FISS";
+	static final public String COMPONENT_NAME = "FISS";
 
-    @Override
-    protected void configureQSim() {
-	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class );
-    }
+	@Override
+	protected void configureQSim() {
+		addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class );
+	}
 
-    @Provides
-    @Singleton
-    FISS provideMultiModalDepartureHandler(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
-										   QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
-										   @Named(TransportMode.car) TravelTime travelTime) {
-        Config config = scenario.getConfig();
-        FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+	@Provides
+	@Singleton
+	FISS provideMultiModalDepartureHandler(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
+					       QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
+					       @Named(TransportMode.car) TravelTime travelTime) {
+		Config config = scenario.getConfig();
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime);
-    }
+	}
 }

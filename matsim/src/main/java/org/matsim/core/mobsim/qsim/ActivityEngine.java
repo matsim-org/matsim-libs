@@ -33,4 +33,7 @@ public interface ActivityEngine extends ActivityHandler, MobsimEngine {
 	// Suggested names: NopActivityEngine, SleepActivityEngine, IdleActivityEngine, StaticActivityEngine???
 	// michalm, mar '19
 
+ // "FallbackActivityHandler"?  I think that different from the TeleportationDepartureHandler, this one here can be replaced (with current design).
+ // But maybe that is not a design decision, but just happened.  kai, jan'25
+
 }

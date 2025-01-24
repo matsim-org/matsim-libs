@@ -48,7 +48,7 @@ public class FISSConfigurator {
         Config config = controler.getConfig();
 
         if (!config.qsim().getVehiclesSource()
-                .equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+                   .equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
             throw new IllegalArgumentException("For the time being, FISS works with vehicle types from vehicles data, please check config!");
         }
 
@@ -56,7 +56,7 @@ public class FISSConfigurator {
 
         Vehicles vehiclesContainer = scenario.getVehicles();
 
-		Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
+        Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
 
         for (String sampledMode : fissConfigGroup.sampledModes) {
             if (!config.qsim().getMainModes().contains(sampledMode)) {
