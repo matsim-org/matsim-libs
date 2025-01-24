@@ -37,7 +37,7 @@ public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
 
         for (Link link : network.getLinks().values()) {
             if (turnRestrictions.replacedLinks.containsKey(link.getId())) {
-                network.getLinks().remove(link.getId());
+                network.removeLink(link.getId());
             }
         }
 
