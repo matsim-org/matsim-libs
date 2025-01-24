@@ -1,5 +1,6 @@
 package org.matsim.dsim;
 
+import com.google.common.annotations.Beta;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.LP;
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * This event task continuously processes event handlers on the same jvm.
  * It can only be used if no events arrive from other jvms.
  */
+@Beta
 public final class SingleNodeAsyncEventHandlerTask extends EventHandlerTask {
 
 

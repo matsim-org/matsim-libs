@@ -1,5 +1,6 @@
 package org.matsim.dsim;
 
+import com.google.common.annotations.Beta;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.LP;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * This event task runs async over the whole simulation and is only waited for at the very end.
  */
+@Beta
 public final class GlobalAsyncEventHandlerTask extends EventHandlerTask {
 
 	/**
