@@ -486,14 +486,17 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 //				return;
 //			}
 //		}
-// I am now checking all activity handlers if they feel responsible, and throw an exception if there are two or more. kai, jan'24
+// I am now checking all activity handlers if they feel responsible, and throw an exception if there are two or more. Since the ActivityEngine feels
+// responsible in any case, the code needs to hedge against that.  kai, jan'24
 
 		ActivityHandler responsible = null;
 		for (ActivityHandler activityHandler : this.activityHandlers) {
-			if (activityHandler.handleActivity(agent)) {
-				if ( responsible==null ) {
+			if ( responsible==null ){
+				if( activityHandler.handleActivity( agent ) ){
 					responsible = activityHandler;
-				} else {
+				}
+			} else if ( ! ( activityHandler instanceof ActivityEngine) ) {
+				if ( activityHandler.handleActivity( agent ) ) {
 					String msg = "More than one activity handler feels reponsible for agent=" + agent
 								      + System.lineSeparator() + "activityHandler1=" + responsible
 								      + System.lineSeparator() + "activityHandler2=" + activityHandler ;
@@ -501,6 +504,10 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 					throw new RuntimeException( msg );
 				}
 			}
+		}
+		if ( responsible==null ){
+			log.warn( "no departure handler wanted to handle the activity of agent " + agent.getId() );
+			// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
 		}
 
 	}
