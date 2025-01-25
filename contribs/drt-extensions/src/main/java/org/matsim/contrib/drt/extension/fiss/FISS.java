@@ -75,7 +75,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	FISS(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
 			TravelTime travelTime) {
 		this.qNetsimEngine = qNetsimEngine;
-        this.delegate = qNetsimEngine.getDepartureHandler();
+        this.delegate = qNetsimEngine.getVehicularDepartureHandler();
 		this.fissConfigGroup = fissConfigGroup;
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		this.travelTime = travelTime;

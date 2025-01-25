@@ -33,7 +33,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
 		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in( Singleton.class );
-		// in the two lines above, I changed "asEagerSingleton" to "in( Singleton.class )", since forcing construction early often leads to problems.  kai, jun'23
+		// this is bound "after the fact", i.e. the VehicularDepartureHandler is generated through a constructor, and only _afterwards_ bound here.  ??  kai, jan'25
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
@@ -51,7 +51,12 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 //			Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding().to...
 		// yyyy maybe move as generalized syntax to AbstractQSimModule
 
+		// the following will automatically register the corresponding capabilities with the qsim:
+
 		addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class );
+		// (this will register the DepartureHandler functionality)
+
 		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
+		// (this will register the MobsimEngine functionality)
 	}
 }

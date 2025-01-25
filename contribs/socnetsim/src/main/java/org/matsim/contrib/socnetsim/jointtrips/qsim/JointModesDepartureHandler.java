@@ -63,7 +63,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	public JointModesDepartureHandler(
 			final QNetsimEngineI netsimEngine) {
 		this( new NetsimWrappingQVehicleProvider( netsimEngine ),
-				netsimEngine.getDepartureHandler() );
+				netsimEngine.getVehicularDepartureHandler() );
 	}
 
 	public JointModesDepartureHandler(

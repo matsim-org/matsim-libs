@@ -32,6 +32,6 @@ class QNetsimEngineDepartureHandlerProvider implements Provider<VehicularDepartu
 
 	@Override
 	public VehicularDepartureHandler get() {
-		return qNetsimEngine.getDepartureHandler();
+		return qNetsimEngine.getVehicularDepartureHandler();
 	}
 }
