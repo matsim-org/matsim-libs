@@ -49,4 +49,4 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v4
 
     env:
-      MAVEN_OPTS: -Xmx4g
+      MAVEN_OPTS: -Xmx6g

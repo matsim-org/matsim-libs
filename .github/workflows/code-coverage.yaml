@@ -31,4 +31,4 @@ jobs:
           files: ./matsim/target/site/jacoco/jacoco.xml
 
     env:
-      MAVEN_OPTS: -Xmx4g
+      MAVEN_OPTS: -Xmx6g
