@@ -24,14 +24,14 @@
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
-class QNetsimEngineDepartureHandlerProvider implements Provider<VehicularDepartureHandler> {
+class QNetsimEngineDepartureHandlerProvider implements Provider<NetworkModeDepartureHandler> {
 	// yyyyyy should return an interface.  Otherwise one must inherit from the implementation, which we don't like! kai, may'18
 
 	@Inject
 	QNetsimEngineI qNetsimEngine;
 
 	@Override
-	public VehicularDepartureHandler get() {
+	public NetworkModeDepartureHandler get() {
 		return qNetsimEngine.getVehicularDepartureHandler();
 	}
 }

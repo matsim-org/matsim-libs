@@ -32,7 +32,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
-		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in( Singleton.class );
+		bind( NetworkModeDepartureHandlerDefaultImpl.class ).toProvider(QNetsimEngineDepartureHandlerProvider.class ).in( Singleton.class );
 		// this is bound "after the fact", i.e. the VehicularDepartureHandler is generated through a constructor, and only _afterwards_ bound here.  ??  kai, jan'25
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
@@ -53,7 +53,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 
 		// the following will automatically register the corresponding capabilities with the qsim:
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class );
+		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkModeDepartureHandlerDefaultImpl.class );
 		// (this will register the DepartureHandler functionality)
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );

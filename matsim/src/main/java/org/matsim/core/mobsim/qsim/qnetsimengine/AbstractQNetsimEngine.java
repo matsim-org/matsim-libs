@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.A;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -81,7 +80,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
-	private final VehicularDepartureHandler dpHandler;
+	private final NetworkModeDepartureHandler dpHandler;
 //	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
 	protected final QNetwork qNetwork;
@@ -110,7 +109,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		default:
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
+		dpHandler = new NetworkModeDepartureHandlerDefaultImpl(this, vehicleBehavior, qSimConfigGroup);
 		// VehicularDepartureHandler is the generalized departure handler for vehicles routed on the network.  yyyy why is it created here
 		// manually when it is also made available via injection?  kai, jan'25
 
@@ -272,7 +271,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		return this.qNetwork;
 	}
 
-	public final VehicularDepartureHandler getVehicularDepartureHandler() {
+	public final NetworkModeDepartureHandler getVehicularDepartureHandler() {
 		return dpHandler;
 	}
 

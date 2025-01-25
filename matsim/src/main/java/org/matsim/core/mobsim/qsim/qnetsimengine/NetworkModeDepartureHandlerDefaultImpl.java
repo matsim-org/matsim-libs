@@ -31,9 +31,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
-class VehicularDepartureHandlerDefaultImpl implements VehicularDepartureHandler{
+class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler{
 
-    private static final Logger log = LogManager.getLogger( VehicularDepartureHandlerDefaultImpl.class );
+    private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
 
 	private int cntTeleportVehicle = 0;
 
@@ -43,7 +43,7 @@ class VehicularDepartureHandlerDefaultImpl implements VehicularDepartureHandler{
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
+	NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportModes =qsimConfig.getMainModes();
