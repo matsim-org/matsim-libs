@@ -8,10 +8,13 @@
  */
 package org.matsim.contrib.drt.extension.fiss;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,10 +33,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -63,7 +63,7 @@ import java.util.Random;
  * </ul>
  *
  */
-public class FISS implements DepartureHandler, MobsimEngine {
+public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	private static final Logger LOG = LogManager.getLogger(FISS.class);
 
@@ -78,8 +78,8 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	private final MatsimServices matsimServices;
 
 
-	FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-	      TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
+	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
+		      @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandlerDefaultImpl networkModeDepartureHandler ) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;

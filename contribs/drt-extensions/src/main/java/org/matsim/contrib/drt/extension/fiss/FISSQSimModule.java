@@ -20,6 +20,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandlerDefaultImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.router.util.TravelTime;
 
@@ -32,17 +33,24 @@ public class FISSQSimModule extends AbstractQSimModule {
 
     @Override
     protected void configureQSim() {
+	    bind(NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
+	    // (this binds the above since it will be needed in FISS. )
+
+	    bind( NetworkModeDepartureHandler.class ).to( FISS.class ).in( Singleton.class );
+	    // (the above will bind the FISS departure handler correctly.  But not remove the pre-existing NetworkModeDepartureHandlerDefaultImpl as a "second" departure handler.  kai, jan'25)
+
 	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class );
+	    // (this will register FISS as a departure handler)
     }
 
-    @Provides
-    @Singleton
-    FISS provideMultiModalDepartureHandler( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
-					    QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
-					    @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
-        Config config = scenario.getConfig();
-        FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime, networkModeDepartureHandler );
-    }
+//    @Provides
+//    @Singleton
+//    FISS provideMultiModalDepartureHandler( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
+//					    QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
+//					    @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
+//        Config config = scenario.getConfig();
+//        FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+//		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime, networkModeDepartureHandler );
+//    }
     // yyyyyy I am not sure if the above @Provides is really necessary.  Could as well inject the FISS class directly.  kai, jan'25
 }

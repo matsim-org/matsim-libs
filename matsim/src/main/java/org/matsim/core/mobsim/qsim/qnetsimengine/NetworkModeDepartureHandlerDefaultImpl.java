@@ -32,7 +32,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
-class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
+public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
+	// needs to be public so it can be used as a delegate.  Constructor is package-private (and should remain so).  kai, jan'25
 
 	private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
 
