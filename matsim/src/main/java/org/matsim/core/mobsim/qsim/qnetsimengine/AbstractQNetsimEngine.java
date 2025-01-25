@@ -80,7 +80,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
-	private final VehicularDepartureHandler dpHandler;
+	private final NetworkModeDepartureHandler dpHandler;
 //	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
 	protected final QNetwork qNetwork;
@@ -89,7 +89,13 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private List<A> engines;
 	private InternalInterface internalInterface = null;
 
-	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory, NetworkModeDepartureHandler dpHandler) {
+		if ( netsimNetworkFactory==null ) {
+			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
+		}
+		Gbl.assertNotNull( dpHandler );
+		this.dpHandler = dpHandler;
+
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
@@ -105,7 +111,10 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		default:
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
+
+//		this.dpHandler = new NetworkModeDepartureHandlerDefaultImpl(this, vehicleBehavior, qSimConfigGroup);
+//		// VehicularDepartureHandler is the generalized departure handler for vehicles routed on the network.  yyyy why is it created here
+//		// manually when it is also made available via injection?  kai, jan'25
 
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
@@ -114,18 +123,8 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 			}
 		}
 
-		if (netsimNetworkFactory != null){
-			qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else {
-			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
-//			Scenario scenario = sim.getScenario();
-//			EventsManager events = sim.getEventsManager() ;
-//			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-//			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-//			AgentCounter agentCounter = sim.getAgentCounter() ;
-//			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-//			qNetwork = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
-		}
+		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+
 		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
@@ -154,8 +153,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	@Override
 	public final void onPrepareSim() {
-		this.infoTime =
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
 		/*
 		 * infoTime may be < simStartTime, this ensures to print out the
 		 * info at the very first timestep already
@@ -273,12 +271,14 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	public final NetsimNetwork getNetsimNetwork() {
+		// yy isn't this available from injection? kai, jan'25
 		return this.qNetwork;
 	}
 
-	public final VehicularDepartureHandler getDepartureHandler() {
-		return dpHandler;
-	}
+//	public final NetworkModeDepartureHandler getVehicularDepartureHandler() {
+//		return dpHandler;
+//	}
+	// get from injection
 
 	public final Map<Id<Vehicle>, QVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
