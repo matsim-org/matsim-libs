@@ -19,6 +19,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.router.util.TravelTime;
 
@@ -36,11 +37,12 @@ public class FISSQSimModule extends AbstractQSimModule {
 
     @Provides
     @Singleton
-    FISS provideMultiModalDepartureHandler(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
-										   QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
-										   @Named(TransportMode.car) TravelTime travelTime) {
+    FISS provideMultiModalDepartureHandler( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine,
+					    QSimConfigGroup qsimConfig, Scenario scenario, EventsManager eventsManager,
+					    @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
         Config config = scenario.getConfig();
         FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime);
+		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime, networkModeDepartureHandler );
     }
+    // yyyyyy I am not sure if the above @Provides is really necessary.  Could as well inject the FISS class directly.  kai, jan'25
 }
