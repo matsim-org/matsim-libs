@@ -44,9 +44,9 @@ class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHand
 
 	private final Collection<String> transportModes;
 
-	@Inject NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
+	@Inject NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
-		this.vehicleBehavior = vehicleBehavior;
+		this.vehicleBehavior = qsimConfig.getVehicleBehavior();
 		this.transportModes =qsimConfig.getMainModes();
 	}
 
