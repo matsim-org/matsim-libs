@@ -89,10 +89,12 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private List<A> engines;
 	private InternalInterface internalInterface = null;
 
-	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory, NetworkModeDepartureHandler dpHandler) {
 		if ( netsimNetworkFactory==null ) {
 			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
 		}
+		Gbl.assertNotNull( dpHandler );
+		this.dpHandler = dpHandler;
 
 		this.qsim = sim;
 
@@ -109,9 +111,10 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		default:
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
-		dpHandler = new NetworkModeDepartureHandlerDefaultImpl(this, vehicleBehavior, qSimConfigGroup);
-		// VehicularDepartureHandler is the generalized departure handler for vehicles routed on the network.  yyyy why is it created here
-		// manually when it is also made available via injection?  kai, jan'25
+
+//		this.dpHandler = new NetworkModeDepartureHandlerDefaultImpl(this, vehicleBehavior, qSimConfigGroup);
+//		// VehicularDepartureHandler is the generalized departure handler for vehicles routed on the network.  yyyy why is it created here
+//		// manually when it is also made available via injection?  kai, jan'25
 
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
@@ -268,12 +271,14 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	public final NetsimNetwork getNetsimNetwork() {
+		// yy isn't this available from injection? kai, jan'25
 		return this.qNetwork;
 	}
 
-	public final NetworkModeDepartureHandler getVehicularDepartureHandler() {
-		return dpHandler;
-	}
+//	public final NetworkModeDepartureHandler getVehicularDepartureHandler() {
+//		return dpHandler;
+//	}
+	// get from injection
 
 	public final Map<Id<Vehicle>, QVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);

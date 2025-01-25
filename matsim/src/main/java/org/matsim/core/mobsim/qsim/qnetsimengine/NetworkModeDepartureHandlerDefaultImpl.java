@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +44,7 @@ class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHand
 
 	private final Collection<String> transportModes;
 
-	NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
+	@Inject NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportModes =qsimConfig.getMainModes();

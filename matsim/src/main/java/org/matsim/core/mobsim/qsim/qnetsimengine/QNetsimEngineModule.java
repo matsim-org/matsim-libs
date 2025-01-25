@@ -32,17 +32,15 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
-		bind( NetworkModeDepartureHandler.class ).toProvider(QNetsimEngineDepartureHandlerProvider.class ).in( Singleton.class );
-		// this is bound "after the fact", i.e. the VehicularDepartureHandler is generated through a constructor, and only _afterwards_ bound here.  ??  kai, jan'25
+		bind( NetworkModeDepartureHandler.class ).to(NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
 			bind( DefaultQNetworkFactory.class ).in( Singleton.class );
-			// (need this here because QLanesNetworkFactory uses it as a delegate.  maybe some other design would be better?  kai, jun'23)
+			// (need this here because QLanesNetworkFactory uses it as a delegate.)
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ).in( Singleton.class) ;
 		}
-		// I added in(Singleton.class) above.  Might cause problems with parallel implementations?  kai, jun'23
 
 		// defining this here so we do not have to hedge against null:
 		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
@@ -51,6 +49,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 //			Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding().to...
 		// yyyy maybe move as generalized syntax to AbstractQSimModule
 
+		// ---
 		// the following will automatically register the corresponding capabilities with the qsim:
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkModeDepartureHandler.class );

@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -72,10 +73,10 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	private final MatsimServices matsimServices;
 
 
-	FISS(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-			TravelTime travelTime) {
+	FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
+	      TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
 		this.qNetsimEngine = qNetsimEngine;
-        this.delegate = qNetsimEngine.getVehicularDepartureHandler();
+		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		this.travelTime = travelTime;

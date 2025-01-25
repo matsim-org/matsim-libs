@@ -27,7 +27,8 @@ public interface QNetsimEngineI extends MobsimEngine, NetsimEngine {
 
 	int getNumberOfSimulatedNodes();
 
-	NetworkModeDepartureHandler getVehicularDepartureHandler();
+//	NetworkModeDepartureHandler getVehicularDepartureHandler();
+	// get from injection
 
 	Map<Id<Vehicle>, QVehicle> getVehicles();
 
