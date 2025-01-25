@@ -29,12 +29,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
 
-class VehicularDepartureHandler implements DepartureHandler {
+class VehicularDepartureHandlerDefaultImpl implements VehicularDepartureHandler{
 
-    private static final Logger log = LogManager.getLogger(VehicularDepartureHandler.class);
+    private static final Logger log = LogManager.getLogger( VehicularDepartureHandlerDefaultImpl.class );
 
 	private int cntTeleportVehicle = 0;
 
@@ -44,14 +43,13 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandler(QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
+	VehicularDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportModes =qsimConfig.getMainModes();
 	}
 
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	@Override public boolean handleDeparture( double now, MobsimAgent agent, Id<Link> linkId ) {
 		if (this.transportModes.contains(agent.getMode())) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
