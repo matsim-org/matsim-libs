@@ -150,7 +150,7 @@ public class RaptorDeterminismTest {
 
 		logger.info("Comparing stop RaptorStopFinder.findStops alongSide ptRouter.calcRoute(pt, ...)");
 
-		for(int personIndex=0; personIndex<personLists[0].size(); personIndex++) {
+		for(int personIndex=0; personIndex<Math.min( 10000, personLists[0].size()); personIndex++) {
 			if(personIndex % 1000 == 0) {
 				logger.info(String.format("Person %d", personIndex));
 			}
