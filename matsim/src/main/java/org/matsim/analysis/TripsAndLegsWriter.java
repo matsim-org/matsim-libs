@@ -44,6 +44,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -270,8 +271,10 @@ public class TripsAndLegsWriter {
 		record.add(customTimeWriter.writeTime(waitingTime));
 		record.add(Integer.toString((int) leg.getRoute().getDistance()));
 		record.add(leg.getMode());
+
 		if (vehicleId != null && scenario.getVehicles().getVehicles().containsKey(vehicleId)) {
-			record.add(scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode());
+			VehicleType type = scenario.getVehicles().getVehicles().get(vehicleId).getType();
+			record.add(type.hasNetworkMode() ? type.getNetworkMode() : "");
 		} else {
 			record.add("");
 		}
