@@ -2,19 +2,26 @@ package org.matsim.modechoice;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -22,7 +29,7 @@ import java.util.stream.Collectors;
  * A service for working with {@link PlanModel} and creating estimates.
  */
 @SuppressWarnings("unchecked")
-public final class PlanModelService implements StartupListener {
+public final class PlanModelService implements StartupListener, IterationEndsListener {
 
 	@Inject
 	private Map<String, LegEstimator> legEstimators;
@@ -50,6 +57,11 @@ public final class PlanModelService implements StartupListener {
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Map<String, ModeOptions> options;
+
+	/**
+	 * A memory cache for plan models. This is used to avoid re-routing and re-estimation of the same plans.
+	 */
+	private final Map<Id<Person>, PlanModel> memory = new ConcurrentHashMap<>();
 
 	@Inject
 	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions> options) {
@@ -82,6 +94,20 @@ public final class PlanModelService implements StartupListener {
 				controlerListenerManager.addControlerListener(ev);
 				registered.add(v);
 			}
+		}
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+
+		if (config.getProbaEstimate() >= 1) {
+			memory.clear();
+		} else if (config.getProbaEstimate() > 0) {
+
+			Random rnd = MatsimRandom.getLocalInstance();
+
+			// Remove plans from memory with a certain probability
+			memory.keySet().removeIf(id -> rnd.nextDouble() < config.getProbaEstimate());
 		}
 	}
 
@@ -275,6 +301,22 @@ public final class PlanModelService implements StartupListener {
 	 */
 	public TripEstimator getTripEstimator(String mode) {
 		return tripEstimator.get(mode);
+	}
+
+	/**
+	 * Get a plan model from memory for a person. If not present, a new one is created.
+	 */
+	public PlanModel getPlanModel(Plan plan) {
+
+		Id<Person> id = plan.getPerson().getId();
+		PlanModel model = memory.get(id);
+		if (model == null) {
+			model = PlanModel.newInstance(plan);
+			memory.put(id, model);
+		} else
+			model.setPlan(plan);
+
+		return model;
 	}
 
 	public record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {

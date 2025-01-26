@@ -41,9 +41,10 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 		Predicate<ModeEstimate> considerMode = m -> consideredModes == null || consideredModes.contains(m.getMode());
 
-		router.routeSingleTrip(planModel, planModel.filterModes(considerMode.and(ModeEstimate::isUsable)), idx);
-
-		service.calculateEstimates(context, planModel);
+		if (!planModel.isFullyRouted()) {
+			router.routeSingleTrip(planModel, planModel.filterModes(considerMode.and(ModeEstimate::isUsable)), idx);
+			service.calculateEstimates(context, planModel);
+		}
 
 		List<PlanCandidate> candidates = new ArrayList<>();
 
