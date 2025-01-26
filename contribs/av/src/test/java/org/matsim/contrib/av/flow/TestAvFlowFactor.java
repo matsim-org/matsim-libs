@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
@@ -54,7 +55,7 @@ public class TestAvFlowFactor {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		RunAvExample.addPopulation(scenario);
 
-		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) );
+		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ), TransportMode.car );
 		avType.setFlowEfficiencyFactor(2.0);
 		scenario.getVehicles().addVehicleType(avType);
 
