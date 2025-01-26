@@ -235,7 +235,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			generalUnits.add("Mio. Hours / Year");
 			generalUnits.add("Mio. Kilometers / Year");
 
-			generalDescriptions.add("Average Vehicle Loads");
+			generalDescriptions.add("Vehicle Volume");
 			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
 			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
 			generalDescriptions.add("Vehicle Operating Times");
