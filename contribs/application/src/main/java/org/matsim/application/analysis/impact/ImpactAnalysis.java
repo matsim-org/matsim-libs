@@ -1,7 +1,8 @@
 package org.matsim.application.analysis.impact;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.Dependency;
 import org.matsim.application.MATSimAppCommand;
@@ -9,6 +10,7 @@ import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
@@ -16,12 +18,8 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-// --modes
 
 @CommandLine.Command(
 	name = "impact"
@@ -35,15 +33,25 @@ import java.util.Set;
 )
 public class ImpactAnalysis implements MATSimAppCommand {
 
-	private static final Logger log = LogManager.getLogger(ImpactAnalysis.class);
+	/**
+	 * Locale used for formatting numbers.
+	 */
+	private static final Locale L = Locale.US;
+
 	private static final Integer DAYS_PER_YEAR_PKW = 334; // Also used for non-pkw.
 	private static final Integer DAYS_PER_YEAR_LKW = 302;
 	private static final Integer ONE_MILLION = 1000000;
 	private static final Integer METERS_PER_KILOMETER = 1000;
+
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(ImpactAnalysis.class);
+
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(ImpactAnalysis.class);
+
+	@CommandLine.Mixin
+	private SampleOptions sample;
+
 	@CommandLine.Option(names = {"--modes"}, description = "Mode(s) to analyze", split = ",")
 	private Set<String> modeArgs;
 
@@ -56,11 +64,11 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	 */
 	private static String formatValue(double value) {
 		if (value >= 1000000) {
-			return String.format("%.2f", value / 1000000);
+			return String.format(L, "%.2f", value / 1000000);
 		} else if (value >= 1000) {
-			return String.format("%.2f", value / 1000);
+			return String.format(L, "%.2f", value / 1000);
 		} else {
-			return String.format("%.2f", value);
+			return String.format(L, "%.2f", value);
 		}
 	}
 
@@ -84,10 +92,13 @@ public class ImpactAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		Table legs = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("legs.csv")))
+			.columnTypesPartial(Map.of("dep_time", ColumnType.STRING, "trav_time", ColumnType.STRING))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("legs.csv"))).build());
 
 		StringColumn departureTime = legs.stringColumn("dep_time");
+
+		// Use network mode, or the trip mode if missing
 		StringColumn modes = legs.stringColumn("network_mode")
 			.set(legs.stringColumn("network_mode").isMissing(),
 				legs.stringColumn("mode"));
@@ -95,13 +106,11 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		IntColumn traveledDistance = legs.intColumn("distance");
 
 		StringColumn travelTime = legs.stringColumn("trav_time");
-		TimeColumn waitingTime = legs.timeColumn("wait_time");
 
-		Map<String, Integer> modeCounts = new HashMap<>();
-		Map<String, Double> vehicleOperatingTimeByDistance = new HashMap<>();
-		Map<String, Double> travelTimeMap = new HashMap<>();
-		Map<String, Double> travelAndWaitingTimeMap = new HashMap<>();
-		Map<String, Double> traveledDistanceMap = new HashMap<>();
+		Object2DoubleMap<String> modeCounts = new Object2DoubleLinkedOpenHashMap<>();
+		Object2DoubleMap<String> vehicleOperatingTimeByDistance = new Object2DoubleLinkedOpenHashMap<>();
+		Object2DoubleMap<String> travelTimeMap =  new Object2DoubleLinkedOpenHashMap<>();
+		Object2DoubleMap<String>traveledDistanceMap =  new Object2DoubleLinkedOpenHashMap<>();
 
 		for (int i = 0; i < legs.rowCount(); i++) {
 			String time = departureTime.get(i);
@@ -116,43 +125,27 @@ public class ImpactAnalysis implements MATSimAppCommand {
 					}
 
 					// mode count by network_mode > mode
-					modeCounts.put(mode, modeCounts.getOrDefault(mode, 0) + 1);
+					modeCounts.mergeDouble(mode, sample.getUpscaleFactor(), Double::sum);
 
 					// travel time
 					String travelTimeStr = travelTime.get(i);
-					LocalTime localTime = LocalTime.parse(time);
+					LocalTime localTime = LocalTime.parse(travelTimeStr);
 					Duration duration = Duration.between(LocalTime.MIDNIGHT, localTime);
-					double travelTimeConverted = duration.toSeconds() / 3600.0;
+					double travelTimeConverted = sample.getUpscaleFactor() * (duration.toSeconds() / 3600.0);
 
 					// mode count by distance
 					String distanceMode = distance >= 50000 ? mode + "_more_than_fifty" : mode + "_less_than_fifty";
-					vehicleOperatingTimeByDistance.put(distanceMode, vehicleOperatingTimeByDistance.getOrDefault(distanceMode, 0.) + travelTimeConverted);
+					vehicleOperatingTimeByDistance.mergeDouble(distanceMode, travelTimeConverted, Double::sum);
 
-
-					String waitingTimeStr = String.valueOf(waitingTime.get(i));
-
-					LocalTime travelTimeLocal = LocalTime.parse(travelTimeStr);
-					LocalTime waitingTimeLocal = LocalTime.parse(waitingTimeStr);
-
-					travelTimeMap.put(mode, travelTimeMap.getOrDefault(mode, 0.) + travelTimeLocal.getHour() + travelTimeLocal.getMinute() / 60.0);
-					travelAndWaitingTimeMap.put(mode, travelAndWaitingTimeMap.getOrDefault(mode, 0.) + travelTimeLocal.getHour() + travelTimeLocal.getMinute() / 60.0 + waitingTimeLocal.getHour() + waitingTimeLocal.getMinute() / 60.0);
-
-					traveledDistanceMap.put(mode, traveledDistanceMap.getOrDefault(mode, 0.) + distance);
+					travelTimeMap.merge(mode, travelTimeConverted, Double::sum);
+					traveledDistanceMap.merge(mode, sample.getUpscaleFactor() * distance, Double::sum);
 				}
 			} catch (Exception ignored) {
 			}
 		}
 
 		travelTimeMap.replaceAll((k, v) -> {
-			if ("freight".equals(k)) {
-				return v * DAYS_PER_YEAR_LKW / ONE_MILLION;
-			} else {
-				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
-			}
-		});
-
-		travelAndWaitingTimeMap.replaceAll((k, v) -> {
-			if ("freight".equals(k)) {
+			if ("freight".equals(k) || TransportMode.truck.equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / ONE_MILLION;
 			} else {
 				return v * DAYS_PER_YEAR_PKW / ONE_MILLION;
@@ -160,7 +153,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		});
 
 		traveledDistanceMap.replaceAll((k, v) -> {
-			if ("freight".equals(k)) {
+			if ("freight".equals(k) || TransportMode.truck.equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION * METERS_PER_KILOMETER);
 			} else {
 				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION * METERS_PER_KILOMETER);
@@ -168,14 +161,14 @@ public class ImpactAnalysis implements MATSimAppCommand {
 		});
 
 		vehicleOperatingTimeByDistance.replaceAll((k, v) -> {
-			if ("freight".equals(k)) {
+			if ("freight".equals(k) || TransportMode.truck.equals(k)) {
 				return v * DAYS_PER_YEAR_LKW / (ONE_MILLION);
 			} else {
 				return v * DAYS_PER_YEAR_PKW / (ONE_MILLION);
 			}
 		});
 
-		HashMap<String, Mode> modeMap = new HashMap<>();
+		Map<String, Mode> modeMap = new HashMap<>();
 
 		modeCounts.forEach((mode, count) -> {
 			Mode m = new Mode();
@@ -207,17 +200,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			m.setTravelTime(time);
 		});
 
-		travelAndWaitingTimeMap.forEach((mode, time) -> {
-
-			if (!modeMap.containsKey(mode)) {
-				Mode m = new Mode();
-				modeMap.put(mode, m);
-			}
-
-			Mode m = modeMap.get(mode);
-			m.setTravelAndWaitingTime(time);
-		});
-
 		traveledDistanceMap.forEach((mode, distance) -> {
 
 			if (!modeMap.containsKey(mode)) {
@@ -228,6 +210,54 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			Mode m = modeMap.get(mode);
 			m.setTraveledDistance(distance);
 		});
+
+		modeMap.forEach((mode, m) -> {
+			double countTmp = m.getCount();
+			double countByDistanceLessThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessThanFifty();
+			double countByDistanceMoreThanFiftyTmp = m.getVehicleOperatingTimeByDistanceMoreThanFifty();
+			double travelTimeTmp = m.getTravelTime();
+			double traveledDistanceTmp = m.getTraveledDistance();
+
+			// Other Data
+			List<String> generalValues = new ArrayList<>();
+			List<String> generalUnits = new ArrayList<>();
+			ArrayList<String> generalDescriptions = new ArrayList<>();
+
+			generalValues.add(String.valueOf(countTmp));
+			generalValues.add(String.format(L, "%.2f", countByDistanceLessThanFiftyTmp));
+			generalValues.add(String.format(L, "%.2f", countByDistanceMoreThanFiftyTmp));
+			generalValues.add(String.format(L, "%.2f", travelTimeTmp));
+			generalValues.add(String.format(L, "%.2f", traveledDistanceTmp));
+
+			generalUnits.add("Vehicle / Day");
+			generalUnits.add("Mio. Hours / Year");
+			generalUnits.add("Mio. Hours / Year");
+			generalUnits.add("Mio. Hours / Year");
+			generalUnits.add("Mio. Kilometers / Year");
+
+			generalDescriptions.add("Average Vehicle Loads");
+			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
+			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
+			generalDescriptions.add("Vehicle Operating Times");
+			generalDescriptions.add("Travel Distance");
+
+
+			Table generalTable = Table.create("General Data")
+				.addColumns(
+					StringColumn.create("Description", generalDescriptions),
+					StringColumn.create("Value", generalValues),
+					StringColumn.create("Unit", generalUnits)
+				);
+
+			generalTable.write().csv(output.getPath("general_%s.csv", mode).toFile());
+		});
+
+		writeEmissionsInfo(modeMap);
+
+		return 0;
+	}
+
+	private void writeEmissionsInfo(Map<String, Mode> modeMap) {
 
 		String emissionPath = input.getPath(AirPollutionAnalysis.class, "emissions_per_network_mode.csv");
 
@@ -252,60 +282,32 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 			Mode m = modeMap.get(vehicleType);
 
-			if (m.getEmissons() == null) {
-				m.setEmissons(new Emissons());
+			if (m.getEmissions() == null) {
+				m.setEmissions(new Emissions());
 			}
 
 			switch (pollutant) {
-				case "NOx" -> m.getEmissons().setNOx(value);
-				case "CO2_TOTAL" -> m.getEmissons().setCO2_TOTAL(value);
-				case "CO" -> m.getEmissons().setCO(value);
-				case "HC" -> m.getEmissons().setHC(value);
-				case "PM" -> m.getEmissons().setPM(value);
-				case "SO2" -> m.getEmissons().setSO2(value);
+				case "NOx" -> m.getEmissions().setNOx(value);
+				case "CO2_TOTAL" -> m.getEmissions().setCO2_TOTAL(value);
+				case "CO" -> m.getEmissions().setCO(value);
+				case "HC" -> m.getEmissions().setHC(value);
+				case "PM" -> m.getEmissions().setPM(value);
+				case "SO2" -> m.getEmissions().setSO2(value);
 			}
 		}
 
 		modeMap.forEach((mode, m) -> {
-			int countTmp = m.getCount();
-			double countByDistanceLessThanFiftyTmp = m.getVehicleOperatingTimeByDistanceLessThanFifty();
-			double countByDistanceMoreThanFiftyTmp = m.getVehicleOperatingTimeByDistanceMoreThanFifty();
-			double travelTimeTmp = m.getTravelTime();
-			double traveledDistanceTmp = m.getTraveledDistance();
-			double NOx = m.getEmissons().getNOx();
-			double CO2_TOTAL = m.getEmissons().getCO2_TOTAL();
-			double CO = m.getEmissons().getCO();
-			double HC = m.getEmissons().getHC();
-			double PM = m.getEmissons().getPM();
-			double SO2 = m.getEmissons().getSO2();
-
-			// Other Data
-			ArrayList<String> generalValues = new ArrayList<>();
-			ArrayList<String> generalUnits = new ArrayList<>();
-			ArrayList<String> generalDescriptions = new ArrayList<>();
-
-			generalValues.add(String.valueOf(countTmp));
-			generalValues.add(String.format("%.2f", countByDistanceLessThanFiftyTmp));
-			generalValues.add(String.format("%.2f", countByDistanceMoreThanFiftyTmp));
-			generalValues.add(String.format("%.2f", travelTimeTmp));
-			generalValues.add(String.format("%.2f", traveledDistanceTmp));
-
-			generalUnits.add("Vehicle / Day");
-			generalUnits.add("Mio. Hours / Year");
-			generalUnits.add("Mio. Hours / Year");
-			generalUnits.add("Mio. Hours / Year");
-			generalUnits.add("Mio. Kilometers / Year");
-
-			generalDescriptions.add("Average Vehicle Loads");
-			generalDescriptions.add("Vehicle Operating Times (≤ 50 km)");
-			generalDescriptions.add("Vehicle Operating Times (> 50 km)");
-			generalDescriptions.add("Vehicle Operating Times");
-			generalDescriptions.add("Travel Distance");
+			double NOx = m.getEmissions().getNOx();
+			double CO2_TOTAL = m.getEmissions().getCO2_TOTAL();
+			double CO = m.getEmissions().getCO();
+			double HC = m.getEmissions().getHC();
+			double PM = m.getEmissions().getPM();
+			double SO2 = m.getEmissions().getSO2();
 
 			// Emission Data
-			ArrayList<String> emissionsValues = new ArrayList<>();
-			ArrayList<String> emissionsUnits = new ArrayList<>();
-			ArrayList<String> emissionsDescriptions = new ArrayList<>();
+			List<String> emissionsValues = new ArrayList<>();
+			List<String> emissionsUnits = new ArrayList<>();
+			List<String> emissionsDescriptions = new ArrayList<>();
 
 			emissionsValues.add(formatValue(NOx));
 			emissionsValues.add(formatValue(CO2_TOTAL));
@@ -328,12 +330,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			emissionsDescriptions.add("Particulate Matter (PM)");
 			emissionsDescriptions.add("Sulfur Dioxide (SO₂)");
 
-			Table generalTable = Table.create("General Data")
-				.addColumns(
-					StringColumn.create("Description", generalDescriptions),
-					StringColumn.create("Value", generalValues),
-					StringColumn.create("Unit", generalUnits)
-				);
 
 			Table emissionsTable = Table.create("Emissions Data")
 				.addColumns(
@@ -342,36 +338,31 @@ public class ImpactAnalysis implements MATSimAppCommand {
 					StringColumn.create("Unit", emissionsUnits)
 				);
 
-			generalTable.write().csv(output.getPath("general_%s.csv", mode).toFile());
 			emissionsTable.write().csv(output.getPath("emissions_%s.csv", mode).toFile());
 		});
-
-
-		return 0;
 	}
 
 	private static class Mode {
-		private int count; // count
+		private double count; // count
 		private double vehicleOperatingTimeByDistanceLessThanFifty; // count
 		private double vehicleOperatingTimeByDistanceMoreThanFifty; // count
 		private double travelTime; // mio. hours / year
 		private double traveledDistance; // mio. meters / year
-		private double travelAndWaitingTime; // mio. hours / year
-		private Emissons emissons;
+		private Emissions emissions;
 
-		public Emissons getEmissons() {
-			return emissons;
+		public Emissions getEmissions() {
+			return emissions;
 		}
 
-		public void setEmissons(Emissons emissons) {
-			this.emissons = emissons;
+		public void setEmissions(Emissions emissions) {
+			this.emissions = emissions;
 		}
 
-		public int getCount() {
+		public double getCount() {
 			return count;
 		}
 
-		public void setCount(int count) {
+		public void setCount(double count) {
 			this.count = count;
 		}
 
@@ -407,14 +398,6 @@ public class ImpactAnalysis implements MATSimAppCommand {
 			this.traveledDistance = traveledDistance;
 		}
 
-		public double getTravelAndWaitingTime() {
-			return travelAndWaitingTime;
-		}
-
-		public void setTravelAndWaitingTime(double travelAndWaitingTime) {
-			this.travelAndWaitingTime = travelAndWaitingTime;
-		}
-
 		@Override
 		public String toString() {
 			return "Mode{" +
@@ -423,13 +406,12 @@ public class ImpactAnalysis implements MATSimAppCommand {
 				", countByDistanceMoreThanFifty=" + vehicleOperatingTimeByDistanceMoreThanFifty +
 				", travelTime=" + travelTime +
 				", traveledDistance=" + traveledDistance +
-				", travelAndWaitingTime=" + travelAndWaitingTime +
-				", emissons=" + emissons +
+				", emissons=" + emissions +
 				'}';
 		}
 	}
 
-	private class Emissons {
+	private final static class Emissions {
 		private double NOx;
 		private double CO2_TOTAL;
 		private double CO;
@@ -487,7 +469,7 @@ public class ImpactAnalysis implements MATSimAppCommand {
 
 		@Override
 		public String toString() {
-			return "Emissons{" +
+			return "Emissions{" +
 				"NOx=" + NOx +
 				", CO2_TOTAL=" + CO2_TOTAL +
 				", CO=" + CO +

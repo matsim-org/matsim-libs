@@ -18,7 +18,6 @@ import java.util.List;
  */
 public class ImpactAnalysisDashboard implements Dashboard {
 
-	private static final Logger log = LoggerFactory.getLogger(ImpactAnalysisDashboard.class);
 	private final Collection<String> modes;
 
 	/**
@@ -36,10 +35,7 @@ public class ImpactAnalysisDashboard implements Dashboard {
 		header.title = "Impact Analysis";
 		header.description = "Impact overview of the MATSim run.";
 
-		List<String> modeArgs = new ArrayList<>();
-
-		if (modes != null)
-			modeArgs.addAll(List.of("--modes", String.join(",", modes)));
+		List<String> modeArgs = new ArrayList<>(List.of("--modes", String.join(",", modes)));
 
 		String[] modeArgsArray = modeArgs.toArray(new String[0]);
 

@@ -75,10 +75,13 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	private final InputOptions input = InputOptions.ofCommand(AirPollutionAnalysis.class);
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(AirPollutionAnalysis.class);
+
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
+
 	@CommandLine.Mixin
 	private SampleOptions sample;
+
 	@CommandLine.Option(names = "--grid-size", description = "Grid size in meter", defaultValue = "100")
 	private double gridSize;
 
@@ -194,7 +197,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 		emissionsCSV.close();
 	}
-	
+
 	private void writeEmissionsByVehicleType(EmissionsByVehicleTypeEventHandler emissionsByVehicleType) throws IOException {
 
 		log.info("Writing emissions by vehicle type...");

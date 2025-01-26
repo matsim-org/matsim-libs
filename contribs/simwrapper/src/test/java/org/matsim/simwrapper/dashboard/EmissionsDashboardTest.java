@@ -44,8 +44,6 @@ public class EmissionsDashboardTest {
 		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
 
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "emissions");
-
 		Config config = TestScenario.loadConfig(utils);
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
@@ -71,12 +69,14 @@ public class EmissionsDashboardTest {
 
 		controler.run();
 
-		Assertions.assertThat(out)
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
 			.isDirectoryContaining("glob:**emissions_total.csv")
 			.isDirectoryContaining("glob:**emissions_grid_per_day.avro");
 
 
-		// TODO: add assertions for impact files
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "impact"))
+			.isDirectoryContaining("glob:**emissions_car.csv")
+			.isDirectoryContaining("glob:**general_car.csv");
 
 	}
 
