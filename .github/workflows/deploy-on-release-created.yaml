@@ -44,4 +44,4 @@ jobs:
           file: matsim/target/matsim-${{ github.event.release.tag_name }}-release.zip
           tag: ${{ github.event.release.tag_name }}
     env:
-      MAVEN_OPTS: -Xmx2g
+      MAVEN_OPTS: -Xmx6g

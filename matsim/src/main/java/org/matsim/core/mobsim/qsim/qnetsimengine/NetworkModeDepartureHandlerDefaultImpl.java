@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,12 +30,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
 
-class VehicularDepartureHandler implements DepartureHandler {
+class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
 
-    private static final Logger log = LogManager.getLogger(VehicularDepartureHandler.class);
+	private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
 
 	private int cntTeleportVehicle = 0;
 
@@ -42,19 +42,18 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private final QNetsimEngineI qNetsimEngine;
 
-	private final Collection<String> transportModes;
+	private final Collection<String> networkModes;
 
-	VehicularDepartureHandler(QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
+	@Inject /* deliberately package-private */ NetworkModeDepartureHandlerDefaultImpl( QNetsimEngineI qNetsimEngine, QSimConfigGroup qsimConfig ) {
 		this.qNetsimEngine = qNetsimEngine;
-		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes =qsimConfig.getMainModes();
+		this.vehicleBehavior = qsimConfig.getVehicleBehavior();
+		this.networkModes =qsimConfig.getMainModes();
 	}
 
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if (this.transportModes.contains(agent.getMode())) {
+	@Override public boolean handleDeparture( double now, MobsimAgent agent, Id<Link> linkId ) {
+		if (this.networkModes.contains(agent.getMode() )) {
 			if ( agent instanceof MobsimDriverAgent ) {
-				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
+				handleNetworkModeDeparture(now, (MobsimDriverAgent)agent, linkId );
 				return true;
 			} else {
 				throw new UnsupportedOperationException("wrong agent type to depart on a network mode");
@@ -63,7 +62,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		return false;
 	}
 
-	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id<Link> linkId) {
+	private void handleNetworkModeDeparture( double now, MobsimDriverAgent agent, Id<Link> linkId ) {
 		// The situation where a leg starts and ends at the same link used to be
 		// handled specially, for all agents except AbstractTransitDriverAgents.
 		// This however caused some problems in some cases, as apparently for taxicabs.
@@ -79,8 +78,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 					// log a maximum of information, to help the user identifying the cause of the problem
 					final String msg = "could not find requested vehicle "+vehicleId+" in simulation for agent "+agent+" with id "+agent.getId()+" on link "+agent.getCurrentLinkId()+" at time "+now+".";
 					log.error( msg );
-					log.error( "Note that, with AgentSource and if the agent starts on a leg, the "
-							+ "vehicle needs to be inserted BEFORE the agent!") ;
+					log.error( "Note that, with AgentSource and if the agent starts on a leg, the vehicle needs to be inserted BEFORE the agent!") ;
 					throw new RuntimeException( msg+" aborting ...") ;
 				}
 				teleportVehicleTo(vehicle, linkId);
@@ -117,7 +115,6 @@ class VehicularDepartureHandler implements DepartureHandler {
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
 			if ( result==null ) {
 				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 
-//						+ linkId
 						+ vehicle.getCurrentLink().getId()
 						+ ".  Maybe it is currently used by someone else?"
 						+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "

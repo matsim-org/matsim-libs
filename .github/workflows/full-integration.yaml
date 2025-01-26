@@ -38,7 +38,7 @@ jobs:
         run: mvn verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
 
     env:
-      MAVEN_OPTS: -Xmx2g
+      MAVEN_OPTS: -Xmx6
 
   verify-full-integration-successful:
     # always() - to ensure this job is executed (regardless of the status of the previous job)
