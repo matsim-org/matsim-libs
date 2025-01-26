@@ -11,6 +11,8 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	public static final String DESCRIPTION = "description";
 
 	private int order;
+
+	//nullable. If null, it will be ignored.
 	private String fareZoneShp;
 	private String transactionPartner;
 	private String description;
