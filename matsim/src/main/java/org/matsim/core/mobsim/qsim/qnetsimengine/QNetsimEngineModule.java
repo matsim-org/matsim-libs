@@ -33,6 +33,7 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
 		bind( NetworkModeDepartureHandler.class ).to(NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
+		// (given the "overriding" architecture, these are default bindings which may be overridden later)
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
@@ -53,9 +54,20 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 		// the following will automatically register the corresponding capabilities with the qsim:
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkModeDepartureHandler.class );
-		// (this will register the DepartureHandler functionality)
+		// (this will register the DepartureHandler functionality.  It will, however, use whatever is bound to the interface, and not
+		// necessarily the above binding.)
 
 		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
 		// (this will register the MobsimEngine functionality)
+
+		// kai, jan'25:
+
+		// I am currently thinking that the NetworkModeDepartureHandler as a separate interface is not needed.  It used to be hardwired into
+		// the QNetsimEngine, but that is no longer the case.  Technically, it just does something like
+		// qNetsimEngine.getNetsimNetwork.getNetsimLink.letVehicleDepart, so as long as all those classes have the necessary functionality, it
+		// does not have to be tightly integrated.
+
+		// Internally, it handles departures of `if (agent instanceof MobsimDriverAgent)', meaning that it does not check for actual mode.
+		// (Would need to check how this is implemented ... does the agent change its capabilities for every leg?)
 	}
 }

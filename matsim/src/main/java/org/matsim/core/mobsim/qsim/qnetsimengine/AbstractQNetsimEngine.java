@@ -80,7 +80,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
-	private final NetworkModeDepartureHandler dpHandler;
+//	private final NetworkModeDepartureHandler dpHandler;
 //	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
 	protected final QNetwork qNetwork;
@@ -93,8 +93,8 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		if ( netsimNetworkFactory==null ) {
 			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
 		}
-		Gbl.assertNotNull( dpHandler );
-		this.dpHandler = dpHandler;
+//		Gbl.assertNotNull( dpHandler );
+//		this.dpHandler = dpHandler;
 
 		this.qsim = sim;
 
@@ -126,6 +126,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 
 		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
+		// yyyy this now looks like the initialize could be integrated into the constructor?!  kai, jan'25
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
@@ -154,10 +155,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	@Override
 	public final void onPrepareSim() {
 		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
-		/*
-		 * infoTime may be < simStartTime, this ensures to print out the
-		 * info at the very first timestep already
-		 */
+		// (infoTime may be < simStartTime, this ensures to print out the * info at the very first timestep already)
 
 		this.engines = initQSimEngineRunners();
 		assignNetElementActivators();

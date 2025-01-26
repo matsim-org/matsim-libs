@@ -39,7 +39,7 @@ public class FISSQSimModule extends AbstractQSimModule {
 	    bind( NetworkModeDepartureHandler.class ).to( FISS.class ).in( Singleton.class );
 	    // (the above will bind the FISS departure handler correctly.  But not remove the pre-existing NetworkModeDepartureHandlerDefaultImpl as a "second" departure handler.  kai, jan'25)
 
-	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class );
+	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class ).in( Singleton.class );
 	    // (this will register FISS as a departure handler)
     }
 
@@ -53,4 +53,11 @@ public class FISSQSimModule extends AbstractQSimModule {
 //		return new FISS(matsimServices, qNetsimEngine, scenario, eventsManager, fissConfigGroup, travelTime, networkModeDepartureHandler );
 //    }
     // yyyyyy I am not sure if the above @Provides is really necessary.  Could as well inject the FISS class directly.  kai, jan'25
+
+	// kai, jan'25:
+
+	// with the above (which currently does not work), NetworkModeDepartureHandler is bound to FISS, which replaces the
+	// NetworkModeDepartureHandlerDefaultImpl, and has the consequence that network modes for which FISS does NOT feel responsible are no longer served.
+
+	// as stated elsewhere, I am not sure if we need NetworkModeDepartureHandler at all.
 }

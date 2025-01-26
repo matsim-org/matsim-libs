@@ -64,11 +64,9 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 	}
 
 	private void handleNetworkModeDeparture( double now, MobsimDriverAgent agent, Id<Link> linkId ) {
-		// The situation where a leg starts and ends at the same link used to be
-		// handled specially, for all agents except AbstractTransitDriverAgents.
-		// This however caused some problems in some cases, as apparently for taxicabs.
-		// Thus, such trips are now simulated normally.
-		// See MATSIM-233 for details. td apr'14
+		// The situation where a leg starts and ends at the same link used to be handled specially, for all agents except
+		// AbstractTransitDriverAgents. This however caused some problems in some cases, as apparently for taxicabs. Thus, such trips are now
+		// simulated normally. See MATSIM-233 for details. td apr'14
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
