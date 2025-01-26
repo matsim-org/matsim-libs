@@ -1,4 +1,4 @@
-package org.matsim.core.network;
+package org.matsim.core.network.turnRestrictions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  * Some methods to validate DisallowedNextLinks attributes of a network.
