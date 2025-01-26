@@ -13,10 +13,6 @@ public abstract class Viz {
 	@JsonProperty(index = 1, required = true)
 	public String title;
 
-	// TODO: Test if this is even supported by simwrapper
-	@JsonProperty(index = 2)
-	public String titleDE;
-
 	@JsonProperty(index = 3)
 	public String description;
 	public Double height;
