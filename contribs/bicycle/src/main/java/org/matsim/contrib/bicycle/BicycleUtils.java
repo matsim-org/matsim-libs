@@ -21,8 +21,6 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.bicycle.surface.Paved;
-import org.matsim.contrib.bicycle.surface.Surface;
 
 /**
  * Enumeration of frequently used labels related to bicycles.
