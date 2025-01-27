@@ -19,9 +19,19 @@
 
 package ch.sbb.matsim.contrib.railsim.integration;
 
-import ch.sbb.matsim.contrib.railsim.RailsimModule;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -35,11 +45,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -47,20 +59,16 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import ch.sbb.matsim.contrib.railsim.RailsimModule;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 
 public class RailsimIntegrationTest {
 
@@ -316,7 +324,47 @@ public class RailsimIntegrationTest {
 		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector, "train2"));
 		// These arrive closer together, because both waited
 		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector, "train3"));
-		assertTrainState(30982, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
+		assertTrainState(31034, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
+
+		// collect all arrivals and departures
+		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2arrivalStops = new HashMap<>();
+		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2departureStops = new HashMap<>();
+		Map<Id<Vehicle>, List<RailsimDetourEvent>> train2detours = new HashMap<>();
+
+		for (Event event : collector.getEvents()) {
+			if (event instanceof VehicleArrivesAtFacilityEvent vehicleArrivesEvent) {
+				train2arrivalStops.computeIfAbsent(vehicleArrivesEvent.getVehicleId(), k -> new ArrayList<>())
+					.add(vehicleArrivesEvent.getFacilityId());
+			}
+
+			if (event instanceof VehicleDepartsAtFacilityEvent vehicleDepartsEvent) {
+				train2departureStops.computeIfAbsent(vehicleDepartsEvent.getVehicleId(), k -> new ArrayList<>())
+					.add(vehicleDepartsEvent.getFacilityId());
+			}
+
+			if (event instanceof RailsimDetourEvent detour) {
+				train2detours.computeIfAbsent(detour.getVehicleId(), k -> new ArrayList<>()).add(detour);
+			}
+		}
+
+		// test if all trains have the correct number of arrivals and departures
+		for (Id<Vehicle> vehicleId : train2arrivalStops.keySet()) {
+			Assertions.assertEquals(3, train2arrivalStops.get(vehicleId).size(), MatsimTestUtils.EPSILON, "Wrong number of arrival stops for train " + vehicleId);
+		}
+		for (Id<Vehicle> vehicleId : train2departureStops.keySet()) {
+			Assertions.assertEquals(3, train2departureStops.get(vehicleId).size(), MatsimTestUtils.EPSILON, "Wrong number of departure stops for train " + vehicleId);
+		}
+
+		// test if the trains have the correct arrival / departure stop facilities
+		Assertions.assertEquals("AB", train2arrivalStops.get(Id.createVehicleId("train3")).get(0).toString(), "Wrong stop facility. This is the start stop facility.");
+
+		// The original events don't contain the re-routing. They appear to other agents as if the train drove the original schedule.
+		Assertions.assertEquals("CE", train2arrivalStops.get(Id.createVehicleId("train3")).get(1).toString(), "Wrong stop facility. This is the original id");
+		// Detour facility
+		Assertions.assertEquals("CD", train2detours.get(Id.createVehicleId("train3")).get(0).getNewStop().toString());
+
+
+		Assertions.assertEquals("JK", train2arrivalStops.get(Id.createVehicleId("train3")).get(2).toString(), "Wrong stop facility. This is the final stop facility.");
 	}
 
 	@Test
@@ -343,6 +391,32 @@ public class RailsimIntegrationTest {
 		};
 
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
+	}
+
+	@Test
+	void testMicroStationReroutingTwoDirections() {
+		modifyScheduleAndRunSimulation(new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"), 300, 900);
+
+//        ExecutorService executor = Executors.newSingleThreadExecutor();
+//        Future<?> future = executor.submit(() -> {
+//            modifyScheduleAndRunSimulation(
+//                new File(utils.getPackageInputDirectory(), "microStationReroutingTwoDirections"),
+//                300,
+//                1800
+//            );
+//        });
+//
+//        try {
+//            future.get(30, TimeUnit.SECONDS);
+//        } catch (TimeoutException e) {
+//            future.cancel(true);
+//            fail("Simulation took too long and was aborted!");
+//        } catch (ExecutionException | InterruptedException e) {
+//        	// other exceptions
+//        	fail("An error occurred during the simulation: " + e.getMessage());
+//        } finally {
+//            executor.shutdownNow();
+//        }
 	}
 
 	@Test
@@ -441,6 +515,50 @@ public class RailsimIntegrationTest {
 		controler.run();
 
 		return collector;
+	}
+
+	private void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
+		Random rnd = MatsimRandom.getRandom();
+		rnd.setSeed(1242);
+
+		for (double maxRndDelaySeconds = 0; maxRndDelaySeconds <= maxMaxRndDelay; maxRndDelaySeconds = maxRndDelaySeconds + maxRndDelayStepSize) {
+			Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
+
+			config.controller().setOutputDirectory(utils.getOutputDirectory() + "maxRndDelay_" + maxRndDelaySeconds);
+			config.controller().setDumpDataAtEnd(true);
+			config.controller().setCreateGraphs(false);
+			config.controller().setLastIteration(0);
+
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new RailsimModule());
+			controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+
+			// modify scenario
+			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					List<Departure> departuresToRemove = new ArrayList<>();
+					List<Departure> departuresToAdd = new ArrayList<>();
+					for (Departure departure : route.getDepartures().values()) {
+						departuresToRemove.add(departure);
+						double departureTime = departure.getDepartureTime() + rnd.nextDouble() * maxRndDelaySeconds;
+						Departure modifiedDeparture = scenario.getTransitSchedule().getFactory().createDeparture(departure.getId(), departureTime);
+						modifiedDeparture.setVehicleId(departure.getVehicleId());
+						departuresToAdd.add(modifiedDeparture);
+					}
+
+					for (Departure departureToRemove : departuresToRemove) {
+						route.removeDeparture(departureToRemove);
+					}
+					for (Departure departureToAdd : departuresToAdd) {
+						route.addDeparture(departureToAdd);
+					}
+				}
+			}
+
+			controler.run();
+		}
 	}
 
 	private double timeToAccelerate(double v0, double v, double a) {

@@ -21,6 +21,7 @@
 package org.matsim.contrib.dvrp.router;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
@@ -94,7 +95,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize());
 						} else {
-							File cachePath = new File(ConfigGroup.getInputFileURL(getConfig().getContext(), matrixParams.cachePath).getPath());
+							URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), matrixParams.cachePath);
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize(), cachePath);
 						}

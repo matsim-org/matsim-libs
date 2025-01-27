@@ -8,10 +8,49 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
 
 public class DisallowedNextLinksUtilsTest {
 
 	Network n = DisallowedNextLinksTest.createNetwork();
+
+	@Test
+	void testEquals1() {
+		Network n2 = DisallowedNextLinksTest.createNetwork();
+
+		Assertions.assertTrue(NetworkUtils.compare(n, n2));
+	}
+
+	@Test
+	void testEquals2() {
+
+		Network n1 = DisallowedNextLinksTest.createNetwork();
+		{
+			Link l1 = n1.getLinks().get(Id.createLinkId("1"));
+			DisallowedNextLinks dnl0 = NetworkUtils.getOrCreateDisallowedNextLinks(l1);
+			dnl0.addDisallowedLinkSequence("car", List.of(l1.getId(), Id.createLinkId("2")));
+		}
+
+		Network n2 = DisallowedNextLinksTest.createNetwork();
+		{
+			Link l1 = n2.getLinks().get(Id.createLinkId("1"));
+			DisallowedNextLinks dnl0 = NetworkUtils.getOrCreateDisallowedNextLinks(l1);
+			dnl0.addDisallowedLinkSequence("car", List.of(l1.getId(), Id.createLinkId("2")));
+		}
+
+		Assertions.assertTrue(NetworkUtils.compare(n1, n2));
+	}
+
+	@Test
+	void testNotEquals() {
+		Network n2 = DisallowedNextLinksTest.createNetwork();
+		Link l1 = n2.getLinks().get(Id.createLinkId("1"));
+		DisallowedNextLinks dnl0 = NetworkUtils.getOrCreateDisallowedNextLinks(l1);
+		dnl0.addDisallowedLinkSequence("car", List.of(l1.getId(), Id.createLinkId("2")));
+
+		Assertions.assertFalse(NetworkUtils.compare(n, n2));
+	}
 
 	@Test
 	void testNoDisallowedNextLinks() {

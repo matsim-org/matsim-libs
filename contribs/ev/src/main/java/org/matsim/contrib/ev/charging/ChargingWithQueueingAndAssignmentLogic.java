@@ -34,8 +34,8 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		implements ChargingWithAssignmentLogic {
 	private final Map<Id<Vehicle>, ChargingVehicle> assignedVehicles = new LinkedHashMap<>();
 
-	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, EventsManager eventsManager) {
-		super(charger, eventsManager);
+	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, EventsManager eventsManager, ChargingPriority priority) {
+		super(charger, eventsManager, priority);
 	}
 
 	@Override
@@ -68,14 +68,16 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 
 	static public class Factory implements ChargingLogic.Factory {
 		private final EventsManager eventsManager;
+		private final ChargingPriority.Factory priorityFactory;
 
-		public Factory(EventsManager eventsManager) {
+		public Factory(EventsManager eventsManager, ChargingPriority.Factory priorityFactory) {
 			this.eventsManager = eventsManager;
+			this.priorityFactory = priorityFactory;
 		}
 
 		@Override
 		public ChargingLogic create(ChargerSpecification charger) {
-			return new ChargingWithQueueingAndAssignmentLogic(charger, eventsManager);
+			return new ChargingWithQueueingAndAssignmentLogic(charger, eventsManager, priorityFactory.create(charger));
 		}
 	}
 }

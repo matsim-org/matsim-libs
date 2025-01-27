@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * Controller.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,9 +46,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -69,7 +67,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
@@ -178,7 +176,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Path output;
 
 	private static Random rnd;
-	private RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 
@@ -305,42 +302,23 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				if (config.controller().getRunId() == null)
-					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemand.xml");
-				else
-					new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
-							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
+				CarriersUtils.writeCarriers(scenario, "output_carriers_noPlans.xml");
 				solveSeparatedVRPs(scenario);
 			}
 		}
-		if (config.controller().getRunId() == null)
-			new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario)).write(
-				scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemandWithPlans.xml");
-		else
-			new CarrierPlanWriter(CarriersUtils.addOrGetCarriers(scenario))
-				.write(
-					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_CarrierDemandWithPlans.xml");
+		CarriersUtils.writeCarriers(scenario, "output_carriers_withPlans.xml");
 
-		Controler controler = prepareControler(scenario);
+		Controller controller = prepareController(scenario);
 
 		// Creating inject always adds check for unmaterialized config groups.
-		controler.getInjector();
+		controller.getInjector();
 
 		// Removes check after injector has been created
-		controler.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
+		controller.getConfig().removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 
-		controler.run();
+		controller.run();
 
-		//Analysis
-		System.out.println("Starting Analysis for Carriers of small scale commercial traffic.");
-		//TODO perhaps change to complete carrier analysis
-		RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(CarriersUtils.addOrGetCarriers(scenario), output.resolve("CarrierAnalysis").toString());
-		freightAnalysis.runCarriersAnalysis();
-		System.out.println("Finishing Analysis of Carrier.");
-
-		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
+		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controller.getScenario(),
 			usedSmallScaleCommercialTrafficType.toString(), output, modelName, sampleName, nameOutputPopulation, numberOfPlanVariantsPerAgent);
 
 		return 0;
@@ -574,14 +552,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		// Some files are written before the controller is created, deleting the directory is not an option
 		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
-		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 
 		rnd = MatsimRandom.getRandom();
-		rng = new MersenneTwister(config.global().getRandomSeed());
 
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
@@ -596,11 +572,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Prepares the controller.
 	 */
-	private Controler prepareControler(Scenario scenario) {
-		Controler controler = new Controler(scenario);
+	private Controller prepareController(Scenario scenario) {
+		Controller controller = ControllerUtils.createController(scenario);
 
-		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new CarrierModule());
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(CarrierStrategyManager.class).toProvider(
@@ -609,9 +585,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		});
 
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 
-		return controler;
+		return controller;
 	}
 
 	/**
@@ -814,8 +790,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + rnd.nextInt(10000),
 			CarrierService.class);
 
-		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
-			.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(idNewService, linkId)
+			.setServiceDuration(serviceTimePerStop);
+		CarrierService thisService = builder.setServiceStartingTimeWindow(serviceTimeWindow).build();
 		newCarrier.getServices().put(thisService.getId(), thisService);
 	}
 

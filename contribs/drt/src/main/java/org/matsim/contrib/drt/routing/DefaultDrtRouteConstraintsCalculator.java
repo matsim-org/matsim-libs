@@ -25,9 +25,12 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
 	/**
 	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha()
 	 * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
-	 * 
-	 * Calculates the maximum ride time defined as: drtCfg.maxDetourAlpha *
-	 * unsharedRideTime + drtCfg.maxDetourBeta
+	 *
+	 * Calculates the maximum ride time defined as:
+	 * unsharedRideTime + min(
+	 * maxAbsoluteDetour,
+	 * max(minimumAllowedDetour, unsharedRideTime * (1-drtCfg.maxDetourAlpha) + drtCfg.maxDetourBeta)
+	 * )
 	 *
 	 * @return DrtRouteConstraints constraints
 	 */
@@ -40,8 +43,8 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
 
 		if (constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultSet) {
 			double maxTravelTime = defaultSet.maxTravelTimeAlpha * unsharedRideTime + defaultSet.maxTravelTimeBeta;
-			double maxRideTime = Math.min(unsharedRideTime + defaultSet.maxAbsoluteDetour,
-					defaultSet.maxDetourAlpha * unsharedRideTime + defaultSet.maxDetourBeta);
+			double maxDetour = Math.max(defaultSet.minimumAllowedDetour, unsharedRideTime * (defaultSet.maxDetourAlpha -1) + defaultSet.maxDetourBeta);
+			double maxRideTime = unsharedRideTime + Math.min(defaultSet.maxAbsoluteDetour, maxDetour);
 			double maxWaitTime = constraintsSet.maxWaitTime;
 
 			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime);
