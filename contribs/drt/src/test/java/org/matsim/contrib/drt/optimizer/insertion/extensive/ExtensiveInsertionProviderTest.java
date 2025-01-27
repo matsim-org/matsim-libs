@@ -21,9 +21,10 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,20 +34,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolExtension;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ExtensiveInsertionProviderTest {
 
-	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@RegisterExtension
 	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
@@ -77,8 +82,8 @@ public class ExtensiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), integerLoadType.fromInt(1));
-		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), integerLoadType.fromInt(1));
+		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
+		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
 				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),

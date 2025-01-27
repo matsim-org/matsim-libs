@@ -551,10 +551,10 @@ public class PrebookingTest {
 		/*-
 		 * In this test, we have two prebooked requests:
 		 * P[A] ---------> D[A]     P[B] --------> D[B]
-		 *
-		 * The dropoff of A happens at the same place as the pickup of B. Then we dispatch a new request C
-		 * traveling the same trip as A. Without an implemented fix, inserting the dropfof between D[A] and P[B]
-		 * was not an option as P[B] was the same link as the destination of C. The only viable dropoff insertion
+		 * 
+		 * The dropoff of A happens at the same place as the pickup of B. Then we dispatch a new request C 
+		 * traveling the same trip as A. Without an implemented fix, inserting the dropfof between D[A] and P[B] 
+		 * was not an option as P[B] was the same link as the destination of C. The only viable dropoff insertion 
 		 * was after P[B], which, however, was too late.
 		 */
 
@@ -599,8 +599,8 @@ public class PrebookingTest {
 		/*-
 		 * In this test, we aprebooked requests:
 		 * P[A] ---------> D[A]
-		 *
-		 * Then we dispatch a new request C before A. The destination of C is the origin of A. Without an implemented fix,
+		 * 
+		 * Then we dispatch a new request C before A. The destination of C is the origin of A. Without an implemented fix, 
 		 * inserting the dropoff before P[A] was not allowed as it is the same link, but inserting after D[A] was too late.
 		 */
 
@@ -637,14 +637,14 @@ public class PrebookingTest {
 		/*-
 		 * In this test, we cover the intra stop timing when we use customizable stop
 		 * durations. Before the fix, there was a bug described by the following
-		 * situation:
-		 *
+		 * situation: 
+		 * 
 		 * - We look for an insertion for a pickup
 		 * - We find an existing stop that already contains some dropoffs
 		 * - Inserting the pickup overall will fit (assuming that the persons are dropped off, then picked up)
 		 * - But because of variable stop durations, the pickup happens *before* the dropoffs
 		 * - Leading to a few seconds in which the occupancy is higher than the vehicle capacity
-		 *
+		 * 
 		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
 		 */
 
@@ -711,9 +711,9 @@ public class PrebookingTest {
 	@Test
 	void intraStopTiming_dropoffTooLate() {
 		/*-
-		 * Inverse situation of the previous test: A new request is inserted, but the dropoff
+		 * Inverse situation of the previous test: A new request is inserted, but the dropoff 
 		 * happens too late compared to the pickups in the following stop task.
-		 *
+		 * 
 		 * This test led to a VerifyException in VehicleOccupancyProfileCalculator.processOccupancyChange
 		 */
 

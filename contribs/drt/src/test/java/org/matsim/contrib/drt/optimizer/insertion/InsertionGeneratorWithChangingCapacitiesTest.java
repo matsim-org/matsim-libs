@@ -1,34 +1,33 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.schedule.DefaultDrtCapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTaskWithVehicleCapacityChange;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegersLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 /**
- * @author Tarek Chouaki (tkchouaki)
+ * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
 public class InsertionGeneratorWithChangingCapacitiesTest {
 
@@ -55,12 +54,12 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@SuppressWarnings("SameParameterValue")
 	private Waypoint.Stop stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
-		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy);
+		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, customLoadType);
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	private Waypoint.StopWithCapacityChange stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
-		return new Waypoint.StopWithCapacityChange(new DefaultDrtStopTaskWithVehicleCapacityChange(beginTime, beginTime + STOP_DURATION, link, newCapacity));
+	private Waypoint.Stop stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
+		return new Waypoint.Stop(new DefaultDrtCapacityChangeTask(beginTime, beginTime + STOP_DURATION, link, newCapacity), customLoadType);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
@@ -74,40 +73,16 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
 	}
 
-	private static class TestIntegerLoadTypeA extends IntegerLoadType {
-		public TestIntegerLoadTypeA() {
-			super(Id.create("loadA", DvrpLoadType.class), "A");
-		}
+	private static IntegersLoadType customLoadType = new IntegersLoadType("A", "B");
 
-		@Override
-		public IntegerLoad fromInt(int load) {
-			return new IntegerLoad(load, this);
-		}
-	}
-
-	private static class TestIntegerLoadTypeB extends IntegerLoadType {
-
-		public TestIntegerLoadTypeB() {
-			super(Id.create("loadB", DvrpLoadType.class), "B");
-		}
-
-		@Override
-		public IntegerLoad fromInt(int load) {
-			return new IntegerLoad(load, this);
-		}
-	}
-
-	private static final TestIntegerLoadTypeA FACTORY_A = new TestIntegerLoadTypeA();
-	private static final TestIntegerLoadTypeB FACTORY_B = new TestIntegerLoadTypeB();
-
-	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = FACTORY_A.fromInt(4);
-	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = FACTORY_B.fromInt(4);
-	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).load(FACTORY_A.fromInt(1)).build();
-	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).load(FACTORY_B.fromInt(1)).build();
+	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = customLoadType.fromArray(4, 0);
+	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = customLoadType.fromArray(0, 4);
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).load(customLoadType.fromArray(1, 0)).build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).load(customLoadType.fromArray(0, 1)).build();
 
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequestA, entry,
@@ -121,7 +96,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@Test
 	void startEmpty_atCapacityChange_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(new DefaultDrtStopTaskWithVehicleCapacityChange(0, 60, link("start"), CHANGED_VEHICLE_CAPACITY), link("start"), 0, FACTORY_B.getEmptyLoad());
+		Waypoint.Start start = new Waypoint.Start(new DefaultDrtCapacityChangeTask(0, 60, link("start"), CHANGED_VEHICLE_CAPACITY), link("start"), 0, customLoadType.getEmptyLoad());
 		VehicleEntry entry = entry(start);
 		assertInsertionsOnly(drtRequestA, entry);
 		assertInsertionsOnly(drtRequestB, entry, new InsertionGenerator.Insertion(drtRequestB, entry, 0, 0));
@@ -129,9 +104,9 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@Test
 	void startOccupied_capacityChange_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
-		Waypoint.Stop stop0 = stop(0, link("stop0"), FACTORY_A.fromInt(1)); //pickup
-		Waypoint.Stop stop1 = stop(0, link("stop1"), FACTORY_A.getEmptyLoad()); // dropoff
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
+		Waypoint.Stop stop0 = stop(0, link("stop0"), customLoadType.fromArray(1, 0)); //pickup
+		Waypoint.Stop stop1 = stop(0, link("stop1"), customLoadType.getEmptyLoad()); // dropoff
 		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), CHANGED_VEHICLE_CAPACITY);
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
@@ -150,10 +125,10 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@Test
 	void startEmpty_capacityChangeThenRequest_oneRequestPerCapacityType() {
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, FACTORY_A.getEmptyLoad()); //empty
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
 		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);
-		Waypoint.Stop stop1 = stop(0, link("stop1"), FACTORY_B.fromInt(1)); //pickup
-		Waypoint.Stop stop2 = stop(0, link("stop2"), FACTORY_B.fromInt(0)); // dropoff
+		Waypoint.Stop stop1 = stop(0, link("stop1"), customLoadType.fromArray(0, 1)); //pickup
+		Waypoint.Stop stop2 = stop(0, link("stop2"), customLoadType.getEmptyLoad()); // dropoff
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 

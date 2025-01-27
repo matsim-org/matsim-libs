@@ -1,5 +1,13 @@
 package org.matsim.contrib.drt.scheduler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -16,28 +24,27 @@ import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
-import org.matsim.contrib.dvrp.fleet.*;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.Fleets;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author nkuehnel / MOIA
@@ -77,7 +84,7 @@ public class DefaultRequestInsertionSchedulerTest {
     private final DrtRequest existingRequest1 = request("r1", from1, to1, 0., R1_DO_TIME + ALLOWED_DETOUR, R1_PU_TIME, R1_PU_TIME);
     private final DrtRequest existingRequest2 = request("r2", from2, to2, 0., R2_DO_TIME + ALLOWED_DETOUR, R2_PU_TIME, R2_PU_TIME);
     private final DrtRequest newRequest = request("r3", from3, to3, CURRENT_TIME, R3_DO_TIME + ALLOWED_DETOUR, R3_PU_TIME, R3_PU_TIME);
-	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private final IntegerLoadType integerLoadType = new IntegerLoadType("persons");
     private static final String mode = "DRT_MODE";
 
 
@@ -219,7 +226,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
     private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
-        return new Waypoint.StopWithPickupAndDropoff(stopTask, outgoingOccupancy);
+        return new Waypoint.Stop(stopTask, outgoingOccupancy, integerLoadType);
     }
 
 

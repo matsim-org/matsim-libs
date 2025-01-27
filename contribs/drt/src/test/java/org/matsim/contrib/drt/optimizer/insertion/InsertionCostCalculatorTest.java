@@ -20,26 +20,28 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import com.google.common.collect.ImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -49,7 +51,7 @@ public class InsertionCostCalculatorTest {
 	private final Link toLink = link("to");
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 
-	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void testCalculate() {
@@ -84,7 +86,7 @@ public class InsertionCostCalculatorTest {
 
 		// start (0s) -----> new PU (60s) -----> existing DO (120s) -----> new DO (300s)
 
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, integerLoadType.fromInt(1));
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, loadType.fromInt(1));
 
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(120, 150, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
@@ -93,7 +95,7 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[1];
-		stops[0] = new Waypoint.StopWithPickupAndDropoff(existingDropoffTask, integerLoadType.fromInt(1));
+		stops[0] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
 		var insertion = insertion(entry, 0, 1);
@@ -135,7 +137,7 @@ public class InsertionCostCalculatorTest {
 
 		// start (0s) -----> new PU (60s) -----> existing PU (120s) -----> existing DO (200s) -----> new DO (300s)
 
-		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, integerLoadType.fromInt(1));
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, loadType.fromInt(1));
 
 		DrtStopTask existingPickupTask = new DefaultDrtStopTask(120, 150, link("scheduledPU"));
 		DrtRequest scheduledRequest = DrtRequest.newBuilder().fromLink(link("scheduledFrom")).toLink(link("scheduledTo")).build();
@@ -148,8 +150,8 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[2];
-		stops[0] = new Waypoint.StopWithPickupAndDropoff(existingPickupTask, integerLoadType.fromInt(2));
-		stops[1] = new Waypoint.StopWithPickupAndDropoff(existingDropoffTask, integerLoadType.fromInt(1));
+		stops[0] = new Waypoint.Stop(existingPickupTask, loadType.fromInt(2), loadType);
+		stops[1] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 60, 300}, ImmutableList.copyOf(stops), start);
 
@@ -196,6 +198,6 @@ public class InsertionCostCalculatorTest {
 
 	private Insertion insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx) {
 		return new Insertion(entry, new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null),
-				new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null), integerLoadType.fromInt(1));
+				new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null), loadType.fromInt(1));
 	}
 }

@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadType;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
@@ -39,22 +39,19 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
 	public static final String ATTRIBUTE_TO_LINK = "toLink";
 	public static final String ATTRIBUTE_LOAD = "load";
-	public static final String ATTRIBUTE_LOAD_TYPE = "loadType";
 
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 	private final DvrpLoad load;
 	private final String serializedLoad;
-	private final Id<DvrpLoadType> loadTypeId;
 
 	public PassengerRequestSubmittedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
-			Id<Link> fromLinkId, Id<Link> toLinkId, DvrpLoad load, String serializedDvrpLoad, Id<DvrpLoadType> loadTypeId) {
+			Id<Link> fromLinkId, Id<Link> toLinkId, DvrpLoad load, String serializedDvrpLoad) {
 		super(time, mode, requestId, personIds);
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
 		this.load = load;
 		this.serializedLoad = serializedDvrpLoad;
-		this.loadTypeId = loadTypeId;
 	}
 
 	@Override
@@ -82,7 +79,6 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
 		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		attr.put(ATTRIBUTE_LOAD, serializedLoad);
-		attr.put(ATTRIBUTE_LOAD_TYPE, loadTypeId.toString());
 		return attr;
 	}
 
@@ -101,8 +97,7 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 		Id<Link> fromLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_FROM_LINK));
 		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
 		String serializedLoad  = attributes.get(ATTRIBUTE_LOAD);
-		Id<DvrpLoadType> loadType = Id.create(attributes.get(ATTRIBUTE_LOAD_TYPE), DvrpLoadType.class);
-		return new PassengerRequestSubmittedEvent(time, mode, requestId, personIds, fromLinkId, toLinkId, null, serializedLoad, loadType);
+		return new PassengerRequestSubmittedEvent(time, mode, requestId, personIds, fromLinkId, toLinkId, null, serializedLoad);
 	}
 
 	public DvrpLoad getLoad() {
@@ -111,9 +106,5 @@ public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEven
 
 	public String getSerializedLoad() {
 		return serializedLoad;
-	}
-
-	public Id<DvrpLoadType> getLoadTypeId() {
-		return loadTypeId;
 	}
 }

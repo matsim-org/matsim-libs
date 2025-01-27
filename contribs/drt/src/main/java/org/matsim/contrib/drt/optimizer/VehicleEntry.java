@@ -25,7 +25,6 @@ import java.util.List;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -75,22 +74,12 @@ public class VehicleEntry {
 	public double getSlackTime(int index) {
 		return slackTimes[index + 1];
 	}
-
+	
 	public double getStartSlackTime() {
 		return slackTimes[0];
 	}
-
+	
 	public double getPrecedingStayTime(int index) {
 		return precedingStayTimes.get(index);
-	}
-
-	public DvrpLoad getVehicleCapacityAtStop(int stopIndex) {
-		DvrpLoad vehicleCapacity = vehicle.getCapacity();
-		for(int i=0; i<=stopIndex; i++) {
-			if(stops.get(i) instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange) {
-				vehicleCapacity = stopWithCapacityChange.getNewVehicleCapacity();
-			}
-		}
-		return vehicleCapacity;
 	}
 }

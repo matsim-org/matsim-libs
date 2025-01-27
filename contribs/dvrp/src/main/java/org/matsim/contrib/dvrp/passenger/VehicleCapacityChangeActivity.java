@@ -1,11 +1,11 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
 /**
- * @author Tarek Chouaki (tkchouaki)
+ * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
 public class VehicleCapacityChangeActivity extends FirstLastSimStepDynActivity {
 

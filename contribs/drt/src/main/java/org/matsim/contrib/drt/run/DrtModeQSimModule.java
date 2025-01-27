@@ -22,12 +22,11 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
@@ -94,9 +93,8 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);
-			DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers = getter.getModal(DvrpLoadFromDrtPassengers.class);
-			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
-			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadFromDrtPassengers, dvrpLoadSerializer);
+			DvrpLoadType dvrpLoadType = getter.getModal(DvrpLoadType.class);
+			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadType);
 		})).asEagerSingleton();
 
 		// this is not the actual selection which DynActionCreator is used, see

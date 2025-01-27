@@ -25,8 +25,8 @@ import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoad;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.MoreObjects;
@@ -134,7 +134,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 		}
 
 		public Builder capacity(int val) {
-			return this.capacity(new DefaultIntegerLoadType().fromInt(val));
+			return this.capacity(IntegerLoad.fromValue(val));
 		}
 
 		public Builder serviceBeginTime(double val) {

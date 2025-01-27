@@ -42,8 +42,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -63,7 +62,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final Link beforeDropoffLink = link("before_dropoff");
 	private final Link dropoffLink = link("dropoff");
 	private final Link afterDropoffLink = link("after_dropoff");
-	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private final IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)

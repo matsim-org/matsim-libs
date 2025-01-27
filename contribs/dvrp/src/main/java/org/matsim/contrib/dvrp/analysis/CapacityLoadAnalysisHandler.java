@@ -11,7 +11,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
@@ -45,17 +46,20 @@ public class CapacityLoadAnalysisHandler
     static public final String LOADS_FILE = "dvrp_loads_{mode}.csv";
 
     private final String mode;
-	private final FleetSpecification fleetSpecification;
+    private final FleetSpecification fleetSpecification;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
+    private final DvrpLoadType loadType;
 
-    public CapacityLoadAnalysisHandler(String mode, FleetSpecification fleetSpecification, OutputDirectoryHierarchy outputHierarchy,
-									   EventsManager eventsManager, int analysisInterval) {
+    public CapacityLoadAnalysisHandler(String mode, FleetSpecification fleetSpecification,
+            OutputDirectoryHierarchy outputHierarchy,
+            EventsManager eventsManager, int analysisInterval, DvrpLoadType loadType) {
         this.outputHierarchy = outputHierarchy;
         this.mode = mode;
-		this.fleetSpecification = fleetSpecification;
+        this.fleetSpecification = fleetSpecification;
         this.eventsManager = eventsManager;
         this.analysisInterval = analysisInterval;
+        this.loadType = loadType;
     }
 
     private class CapacityRecord {
@@ -76,9 +80,10 @@ public class CapacityLoadAnalysisHandler
 
     @Override
     public void handleEvent(VehicleCapacityChangedEvent event) {
-		if(!this.fleetSpecification.getVehicleSpecifications().containsKey(event.getVehicleId())) {
-			return;
-		}
+        if (!this.fleetSpecification.getVehicleSpecifications().containsKey(event.getVehicleId())) {
+            return;
+        }
+        
         CapacityRecord current = activeCapacities.get(event.getVehicleId());
         final double startTime;
         if (current != null) {
@@ -146,19 +151,18 @@ public class CapacityLoadAnalysisHandler
 
     private void writeCapacities(BufferedWriter writer) throws IOException {
         writer.write(String.join(";", new String[] { //
-                "vehicle_id", "start_time", "end_time", "type", "slot", "capacity"
+                "vehicle_id", "start_time", "end_time", "slot", "capacity"
         }) + "\n");
 
         for (CapacityRecord record : capacityRecords) {
-            String[] names = record.load.getType().getSlotNames();
+            List<String> names = loadType.getDimensions();
 
-            for (int k = 0; k < names.length; k++) {
+            for (int k = 0; k < names.size(); k++) {
                 writer.write(String.join(";", new String[] { //
                         record.vehicleId.toString(), //
                         String.valueOf(record.startTime), //
                         String.valueOf(record.endTime), //
-                        record.load.getType().getId().toString(), //
-                        names[k], //
+                        names.get(k), //
                         String.valueOf(record.load.getElement(k)) //
                 }) + "\n");
             }
@@ -167,20 +171,19 @@ public class CapacityLoadAnalysisHandler
 
     private void writeLoads(BufferedWriter writer) throws IOException {
         writer.write(String.join(";", new String[] { //
-                "vehicle_id", "request_id", "pickup_time", "dropoff_time", "type", "slot", "load"
+                "vehicle_id", "request_id", "pickup_time", "dropoff_time", "slot", "load"
         }) + "\n");
 
         for (LoadRecord record : loadRecords) {
-            String[] names = record.load.getType().getSlotNames();
+            List<String> names = loadType.getDimensions();
 
-            for (int k = 0; k < names.length; k++) {
+            for (int k = 0; k < names.size(); k++) {
                 writer.write(String.join(";", new String[] { //
                         String.valueOf(record.vehicleId), // may be zero when teleported
                         record.requestId.toString(), //
                         String.valueOf(record.pickupTime), //
                         String.valueOf(record.dropoffTime), //
-                        record.load.getType().getId().toString(), //
-                        names[k], //
+                        names.get(k), //
                         String.valueOf(record.load.getElement(k)) //
                 }) + "\n");
             }

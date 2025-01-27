@@ -441,7 +441,7 @@ public final class VehicleUtils {
 		if ( vehicle==null ) {
 			if ( tryStdCnt>0){
 				tryStdCnt--;
-				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying standard vehicles container ..." );
+				log.info("vehicleId={} not in allVehicles; trying standard vehicles container ...", vehicleId);
 				if ( tryStdCnt==0 ) {
 					log.info( Gbl.FUTURE_SUPPRESSED );
 				}
@@ -451,7 +451,7 @@ public final class VehicleUtils {
 		if ( vehicle==null ) {
 			if ( tryTrnCnt>0 ) {
 				tryTrnCnt--;
-				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying transit vehicles container ..." );
+				log.info("vehicleId={} not in allVehicles; trying transit vehicles container ...", vehicleId);
 				if ( tryTrnCnt==0 ) {
 					log.info(  Gbl.FUTURE_SUPPRESSED );
 				}
@@ -459,7 +459,7 @@ public final class VehicleUtils {
 			vehicle = scenario.getTransitVehicles().getVehicles().get(  vehicleId );
 		}
 		if ( vehicle==null ) {
-			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
+			log.info("unable to find vehicle for vehicleId={}; will return null", vehicleId);
 		}
 		return vehicle ;
 	}
