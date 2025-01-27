@@ -16,6 +16,11 @@ public class Table extends Viz {
 	public String dataset;
 
 	/**
+	 * Array to set the alignment of the columns. Possible values are left, center, right.
+	 */
+	public String[] alignment;
+
+	/**
 	 * This option could be used to define the style. Predefined styles are e.g. default, topsheet
 	 */
 	public String style;

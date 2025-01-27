@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -31,21 +30,18 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
 		implements ChargingWithAssignmentLogic {
-	private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ChargingVehicle> assignedVehicles = new LinkedHashMap<>();
 
-	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
-			EventsManager eventsManager) {
-		super(charger, chargingStrategy, eventsManager);
+	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, EventsManager eventsManager, ChargingPriority priority) {
+		super(charger, eventsManager, priority);
 	}
 
 	@Override
-	public void assignVehicle(ElectricVehicle ev) {
-		if (assignedVehicles.put(ev.getId(), ev) != null) {
+	public void assignVehicle(ElectricVehicle ev, ChargingStrategy strategy) {
+		ChargingVehicle cv = new ChargingVehicle(ev, strategy);
+		if (assignedVehicles.put(ev.getId(), cv) != null) {
 			throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
 		}
 	}
@@ -57,28 +53,31 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		}
 	}
 
-	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
+	@Override
+	public boolean isAssigned(ElectricVehicle ev) {
+		return assignedVehicles.containsKey(ev.getId());
+	}
+
+	private final Collection<ChargingVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
 			assignedVehicles.values());
 
 	@Override
-	public Collection<ElectricVehicle> getAssignedVehicles() {
+	public Collection<ChargingVehicle> getAssignedVehicles() {
 		return unmodifiableAssignedVehicles;
 	}
 
-	public static class FactoryProvider implements Provider<ChargingLogic.Factory> {
-		@Inject
-		private EventsManager eventsManager;
+	static public class Factory implements ChargingLogic.Factory {
+		private final EventsManager eventsManager;
+		private final ChargingPriority.Factory priorityFactory;
 
-		private final Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator;
-
-		public FactoryProvider(Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator) {
-			this.chargingStrategyCreator = chargingStrategyCreator;
+		public Factory(EventsManager eventsManager, ChargingPriority.Factory priorityFactory) {
+			this.eventsManager = eventsManager;
+			this.priorityFactory = priorityFactory;
 		}
 
 		@Override
-		public ChargingLogic.Factory get() {
-			return charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-					chargingStrategyCreator.apply(charger), eventsManager);
+		public ChargingLogic create(ChargerSpecification charger) {
+			return new ChargingWithQueueingAndAssignmentLogic(charger, eventsManager, priorityFactory.create(charger));
 		}
 	}
 }

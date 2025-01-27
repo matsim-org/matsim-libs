@@ -21,7 +21,16 @@
 
 package org.matsim.freight.carriers;
 
+import static org.matsim.freight.carriers.CarrierConstants.*;
+
 import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,16 +42,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.VehicleType;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import static org.matsim.freight.carriers.CarrierConstants.*;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.
@@ -160,15 +159,15 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 	private void writeShipment(CarrierShipment s, Id<CarrierShipment> shipmentId, boolean closeElement, boolean lineBreak) {
 		this.writeStartTag(SHIPMENT, List.of(
 				createTuple(ID, shipmentId.toString()),
-				createTuple(FROM, s.getFrom().toString()),
-				createTuple(TO, s.getTo().toString()),
-				createTuple(SIZE, s.getSize()),
-				createTuple(START_PICKUP, getTime(s.getPickupTimeWindow().getStart())),
-				createTuple(END_PICKUP, getTime(s.getPickupTimeWindow().getEnd())),
-				createTuple(START_DELIVERY, getTime(s.getDeliveryTimeWindow().getStart())),
-				createTuple(END_DELIVERY, getTime(s.getDeliveryTimeWindow().getEnd())),
-				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupServiceTime())),
-				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryServiceTime()))), closeElement, lineBreak
+				createTuple(FROM, s.getPickupLinkId().toString()),
+				createTuple(TO, s.getDeliveryLinkId().toString()),
+				createTuple(SIZE, s.getCapacityDemand()),
+				createTuple(START_PICKUP, getTime(s.getPickupStartingTimeWindow().getStart())),
+				createTuple(END_PICKUP, getTime(s.getPickupStartingTimeWindow().getEnd())),
+				createTuple(START_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getStart())),
+				createTuple(END_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getEnd())),
+				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupDuration())),
+				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryDuration()))), closeElement, lineBreak
 		);
 	}
 
@@ -191,10 +190,10 @@ import static org.matsim.freight.carriers.CarrierConstants.*;
 	private void writeService(CarrierService s, boolean closeElement, boolean lineBreak) {
 		this.writeStartTag(SERVICE, List.of(
 				createTuple(ID, s.getId().toString()),
-				createTuple(TO, s.getLocationLinkId().toString()),
+				createTuple(TO, s.getServiceLinkId().toString()),
 				createTuple(CAPACITY_DEMAND, s.getCapacityDemand()),
-				createTuple(EARLIEST_START, getTime(s.getServiceStartTimeWindow().getStart())),
-				createTuple(LATEST_END, getTime(s.getServiceStartTimeWindow().getEnd())),
+				createTuple(EARLIEST_START, getTime(s.getServiceStaringTimeWindow().getStart())),
+				createTuple(LATEST_END, getTime(s.getServiceStaringTimeWindow().getEnd())),
 				createTuple(SERVICE_DURATION, getTime(s.getServiceDuration()))), closeElement, lineBreak
 		);
 	}

@@ -21,13 +21,11 @@
 package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
-
-import java.util.*;
-
 
 /**
  * Calculator that manages and calculates vehicle type dependent road pricing schemas.

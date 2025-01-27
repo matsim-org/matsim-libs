@@ -26,6 +26,7 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,7 +43,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author jbischoff
- * This is an example how to set different flow capacity consumptions for different vehicles. 
+ * This is an example how to set different flow capacity consumptions for different vehicles.
  * Two groups of agents, one equipped with AVs (having an improved flow of factor 2), the other one using ordinary cars are traveling on two different routes in a grid network
  * , highlighting the difference between vehicles.
  * Network flow capacities are the same on all links.
@@ -54,7 +55,7 @@ public class RunAvExample {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup()));
 		addPopulation(scenario);
 
-		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) );
+		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ), TransportMode.car);
 		avType.setFlowEfficiencyFactor(2.0);
 		scenario.getVehicles().addVehicleType(avType);
 

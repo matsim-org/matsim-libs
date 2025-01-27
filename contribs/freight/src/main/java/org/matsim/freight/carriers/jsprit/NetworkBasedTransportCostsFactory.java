@@ -21,18 +21,17 @@
 
 package org.matsim.freight.carriers.jsprit;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author steffenaxer

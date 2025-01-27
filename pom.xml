@@ -468,7 +468,7 @@
                         <doCheck>false</doCheck>
                         <doUpdate>false</doUpdate>
                         <revisionOnScmFailure>unknown</revisionOnScmFailure>
-                        <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                        <timestampFormat>{yyyy-MM-dd HH:mm:ss}</timestampFormat>
                     </configuration>
                 </plugin>
             </plugins>
