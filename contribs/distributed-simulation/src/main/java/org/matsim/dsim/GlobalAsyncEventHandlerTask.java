@@ -3,7 +3,7 @@ package org.matsim.dsim;
 import com.google.common.annotations.Beta;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.matsim.api.LP;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.core.events.handler.EventHandler;

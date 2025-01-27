@@ -2,7 +2,7 @@ package org.matsim.dsim.simulation.net;
 
 import lombok.Getter;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.CountedWarning;
+import org.matsim.dsim.utils.CountedWarning;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

@@ -1,4 +1,4 @@
-package org.matsim.api;
+package org.matsim.api.core.v01;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 

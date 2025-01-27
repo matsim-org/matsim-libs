@@ -2,12 +2,13 @@ package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.LongList;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Internal interface for processes / tasks that can be executed in parallel.
- * Such task can either execute an {@link org.matsim.api.LP} or an {@link EventHandler}.
+ * Such task can either execute an {@link LP} or an {@link EventHandler}.
  */
 public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTask {
 

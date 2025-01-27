@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.matsim.api.LP;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.mobsim.framework.Steppable;

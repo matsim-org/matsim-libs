@@ -7,7 +7,7 @@ import com.google.inject.multibindings.Multibinder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.matsim.api.LPProvider;
+import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.PopulationPartition;

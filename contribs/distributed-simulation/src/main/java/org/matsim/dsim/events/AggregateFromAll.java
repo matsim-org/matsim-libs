@@ -1,7 +1,7 @@
 package org.matsim.dsim.events;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.matsim.api.LP;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.handler.AggregatingEventHandler;
 import org.matsim.core.communication.Communicator;

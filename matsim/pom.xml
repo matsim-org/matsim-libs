@@ -284,6 +284,35 @@
 			<groupId>com.fasterxml.woodstox</groupId>
 			<artifactId>woodstox-core</artifactId>
 		</dependency>
+
+		<!-- Scan classpath to find providers -->
+		<dependency>
+			<groupId>io.github.classgraph</groupId>
+			<artifactId>classgraph</artifactId>
+			<version>4.8.177</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-core</artifactId>
+			<version>${fury.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-format</artifactId>
+			<version>${fury.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.agrona</groupId>
+			<artifactId>agrona</artifactId>
+			<version>1.20.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hdrhistogram</groupId>
+			<artifactId>HdrHistogram</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<profiles>

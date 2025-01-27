@@ -8,8 +8,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import lombok.Getter;
-import lombok.SneakyThrows;
 import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.config.Language;
@@ -26,15 +24,16 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Provides serialization and deserialization of messages.
+ */
 public class SerializationProvider {
 
 	private final Int2ObjectMap<Class<? extends Message>> classes = new Int2ObjectOpenHashMap<>(128);
 	private final Object2IntMap<Class<? extends Message>> types = new Object2IntOpenHashMap<>();
 
-	@Getter
 	private final ThreadSafeFury fury;
 
-	@SneakyThrows
 	public SerializationProvider() {
 
 		// multiple serializations of different objects.
@@ -48,7 +47,13 @@ public class SerializationProvider {
 		// Manually register some allowed types
 		fury.register(Coord.class, true);
 
-		Class<?> idImpl = SerializationProvider.class.getClassLoader().loadClass("org.matsim.api.core.v01.Id$IdImpl");
+		Class<?> idImpl;
+		try {
+			idImpl = SerializationProvider.class.getClassLoader().loadClass("org.matsim.api.core.v01.Id$IdImpl");
+		} catch (ClassNotFoundException ignored) {
+			throw new IllegalStateException("Id$IdImpl not found");
+		}
+
 		fury.registerSerializer(idImpl, IdSerializer.class);
 		fury.register(idImpl, true);
 
@@ -88,7 +93,7 @@ public class SerializationProvider {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException {
 		System.out.println(new SerializationProvider());
 	}
 
@@ -160,5 +165,9 @@ public class SerializationProvider {
 
 	public Class<?> getType(int type) {
 		return type == Event.ANY_TYPE ? Event.class : classes.get(type);
+	}
+
+	public ThreadSafeFury getFury() {
+		return fury;
 	}
 }

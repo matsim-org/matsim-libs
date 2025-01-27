@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Interface for the communicator that is used to send and receive messages between processes.
+ */
 public interface Communicator extends AutoCloseable {
 
 	/**

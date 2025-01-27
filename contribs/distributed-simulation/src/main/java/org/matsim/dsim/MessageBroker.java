@@ -16,7 +16,7 @@ import org.agrona.BitUtil;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.memory.MemoryBuffer;
-import org.matsim.api.LP;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.events.Event;

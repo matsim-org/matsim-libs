@@ -24,9 +24,6 @@ public class IdSerializer extends Serializer<Id> {
     @Override
     public void write(MemoryBuffer buffer, Id value) {
 
-        // TODO: Lookup for id classes to avoid sending class name
-        // TODO: at least these id classes that are known can be sent as integers
-
         Class<?> type = value.classType();
 		// Person ids are not stable because of transit drivers which are created after simulations starts
         if (type == Person.class)

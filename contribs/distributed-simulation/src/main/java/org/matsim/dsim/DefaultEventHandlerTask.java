@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.matsim.api.LP;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.core.events.handler.EventHandler;

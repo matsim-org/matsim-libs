@@ -71,20 +71,20 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 		NetworkPartitioning partitioning = new NetworkPartitioning(node, scenario.getNetwork());
 		scenario.getNetwork().setPartitioning(partitioning);
 
-		StartUpMessage msg = StartUpMessage.builder()
-			.linkIds(Id.getAllIds(Link.class))
-			.nodeIds(Id.getAllIds(Node.class))
-			.personIds(Id.getAllIds(Person.class))
-			.build();
+		StartUpMessage msg = new StartUpMessage(
+			Id.getAllIds(Link.class),
+			Id.getAllIds(Node.class),
+			Id.getAllIds(Person.class)
+		);
 
 		log.info("Sending startup messages...");
 
 		// Check if Ids are consistent
 		List<StartUpMessage> all = comm.allGather(msg, -1, serializer);
 		for (StartUpMessage m : all) {
-			Id.check(Link.class, m.getLinkIds());
-			Id.check(Node.class, m.getNodeIds());
-			Id.check(Person.class, m.getPersonIds());
+			Id.check(Link.class, m.linkIds());
+			Id.check(Node.class, m.nodeIds());
+			Id.check(Person.class, m.personIds());
 		}
 	}
 
