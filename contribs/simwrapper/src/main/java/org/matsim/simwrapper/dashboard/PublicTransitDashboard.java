@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.application.analysis.pt.PtSupplyStatistics;
 import org.matsim.application.analysis.pt.PublicTransitAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
