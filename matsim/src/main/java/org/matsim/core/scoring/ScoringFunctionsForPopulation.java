@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -78,6 +79,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
  * @author michaz
  *
  */
+@DistributedEventHandler(async = true)
  final class ScoringFunctionsForPopulation implements BasicEventHandler {
 
 	private final Population population;

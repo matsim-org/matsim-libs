@@ -9,13 +9,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
-import org.matsim.api.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
-import org.matsim.api.core.v01.events.MessageComparator;
 import org.matsim.api.core.v01.events.handler.AggregatingEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
@@ -25,108 +22,84 @@ import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.AggregateFromAll;
 import org.matsim.dsim.events.EventMessagingPattern;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 @Log4j2
-@SuppressWarnings("rawtypes")
-public final class EventHandlerTask implements SimTask {
+public sealed abstract class EventHandlerTask implements SimTask permits DefaultEventHandlerTask, GlobalAsyncEventHandlerTask, SingleNodeAsyncEventHandlerTask {
 
 	/**
 	 * Handler to execute.
 	 */
 	@Getter
-	private final EventHandler handler;
-	/**
-	 * Pattern to use for messaging.
-	 */
-	@Nullable
-	private final EventMessagingPattern pattern;
+	protected final EventHandler handler;
 
-	private final DistributedEventsManager manager;
+	protected final DistributedEventsManager manager;
 
 	/**
 	 * Partition number.
 	 */
-	private final int partition;
-
-	/**
-	 * Total number partitions this event handler is running on. (on this node)
-	 */
-	private final int totalPartitions;
-
-	/**
-	 * Counter that is shared between all event handlers of the same type.
-	 */
-	private final AtomicInteger counter;
-
-	/**
-	 * Buffer holding incoming messages. These are switched between iterations.
-	 */
-	private final ManyToOneConcurrentLinkedQueue<Message> queueOdd = new ManyToOneConcurrentLinkedQueue<>();
-	private final ManyToOneConcurrentLinkedQueue<Message> queueEven = new ManyToOneConcurrentLinkedQueue<>();
-
-	/**
-	 * Intermediate list of message.
-	 */
-	private final List<Message> messages = new ArrayList<>();
+	protected final int partition;
 
 	/**
 	 * This maps the messages types to corresponding function on the LP used for processing.
 	 */
-	private final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
+	protected final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 
 	/**
 	 * Stores which events are accepted for each type.
 	 */
-	private final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
+	protected final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
 
 	/**
 	 * Runtimes of each iteration.
 	 */
-	private final LongList runtimes = new LongArrayList();
-	/**
-	 * Switching phase for the queues.
-	 */
-	private final AtomicBoolean phase = new AtomicBoolean();
+	protected final LongList runtimes = new LongArrayList();
+
+	@Setter
+	protected MessageBroker broker;
+
 	/**
 	 * Avg. runtime of last iterations.
 	 */
-	private float avgRuntime = 0.0f;
+	protected float avgRuntime = 0.0f;
 	/**
 	 * Run time of the last few iterations.
 	 */
-	private long sumRuntime = 0;
+	protected long sumRuntime = 0;
 	/**
 	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
 	 */
 	@Setter
-	private volatile double time;
+	protected volatile double time;
 	/**
 	 * Indicates if the messages need to be sorted.
 	 */
-	private volatile boolean needsSorting = false;
-	@Setter
-	private MessageBroker broker;
+	protected volatile boolean needsSorting = false;
 
-	public EventHandlerTask(EventHandler handler, int partition, int totalPartitions,
-							DistributedEventsManager manager, SerializationProvider serializer,
-							AtomicInteger counter) {
+	/**
+	 * Whether this task can be executed asynchronously between sim steps.
+	 */
+	@Getter
+	protected final boolean async;
+
+	/**
+	 * If the task is executed asynchronously, the future is stored here.
+	 */
+	@Setter
+	protected Future<?> future;
+
+	public EventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition, boolean async) {
 		this.handler = handler;
-		this.partition = partition;
-		this.totalPartitions = totalPartitions;
 		this.manager = manager;
-		this.counter = counter;
-		this.pattern = buildConsumers(serializer);
+		this.partition = partition;
+		this.async = async;
 	}
 
 	@Override
@@ -161,14 +134,13 @@ public final class EventHandlerTask implements SimTask {
 
 	@SneakyThrows
 	@SuppressWarnings("unchecked")
-	private EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
+	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
+
+		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		boolean node = distributed != null && distributed.value() == DistributedMode.NODE_SINGLETON;
+		boolean partition = distributed != null && (distributed.value() == DistributedMode.PARTITION_SINGLETON || distributed.value() == DistributedMode.PARTITION);
 
 		for (Class<?> ifType : handler.getClass().getInterfaces()) {
-
-			DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
-			boolean node = distributed != null && distributed.value() == DistributedMode.NODE_SINGLETON;
-			boolean partition = distributed != null && (distributed.value() == DistributedMode.PARTITION_SINGLETON || distributed.value() == DistributedMode.PARTITION);
-
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
 
 				Method[] methods = ifType.getDeclaredMethods();
@@ -206,6 +178,13 @@ public final class EventHandlerTask implements SimTask {
 				"Please explicitly implement needed EventHandler").formatted(handler.getClass().getName()));
 		}
 
+		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE_SINGLETON || distributed.value() == DistributedMode.PARTITION_SINGLETON);
+
+		// Singleton handlers on one jvm don't need to communicate
+		if (singleton && !manager.getNode().isDistributed()) {
+			return null;
+		}
+
 		// Register consumers for message patterns
 		if (handler instanceof AggregatingEventHandler<?>) {
 			AggregateFromAll<Message> h = new AggregateFromAll<>();
@@ -219,23 +198,17 @@ public final class EventHandlerTask implements SimTask {
 		return null;
 	}
 
+	/**
+	 * Wait for async task to finish (if set).
+	 */
+	public abstract void waitAsync(boolean last) throws ExecutionException, InterruptedException;
+
 	@Override
-	public boolean needsExecution() {
+	public final boolean needsExecution() {
 		return time > 0 && time % handler.getProcessInterval() == 0;
 	}
 
-	@Override
-	public void beforeExecution() {
-		phase.set(!phase.get());
-	}
-
-	public void add(Message msg) {
-		ManyToOneConcurrentLinkedQueue<Message> queue = phase.get() ? queueOdd : queueEven;
-		queue.add(msg);
-	}
-
-
-	public IntSet getSupportedMessages() {
+	public final IntSet getSupportedMessages() {
 		return consumers.keySet();
 	}
 
@@ -244,15 +217,6 @@ public final class EventHandlerTask implements SimTask {
 	 */
 	EventSource getEventSource(int type) {
 		return eventSources.get(type);
-	}
-
-	public IntSet waitForOtherRanks(double time) {
-
-		if (pattern != null && needsExecution()) {
-			return pattern.waitForOtherRanks(time);
-		}
-
-		return LP.NO_NEIGHBORS;
 	}
 
 	@Override
@@ -265,58 +229,45 @@ public final class EventHandlerTask implements SimTask {
 		return avgRuntime;
 	}
 
-	@Override
+	/**
+	 * Debug function to dump events to a file.
+	 */
 	@SneakyThrows
-	public void run() {
-		long t = System.nanoTime();
-
-		manager.setContext(partition);
-		ManyToOneConcurrentLinkedQueue<Message> queue = phase.get() ? queueEven : queueOdd;
-		Message msg;
-
-		// Sort events if needed
-		if (needsSorting) {
-			while ((msg = queue.poll()) != null) {
-				messages.add(msg);
-			}
-
-			messages.sort(MessageComparator.INSTANCE);
-
-			for (Message m : messages) {
-				try {
-					process(m);
-				} catch (Exception e) {
-					dumpEvents(Path.of("debug_event_dump.xml"), messages);
-					throw new RuntimeException("Error in %s processing message: %s".formatted(getName(), m), e);
-				}
-			}
-
-//			dumpEvents(Path.of("event_dump_%s_%.0f.xml".formatted(getName(), time)), messages);
-
-			messages.clear();
-			needsSorting = false;
-		} else
-			while ((msg = queue.poll()) != null) {
-				process(msg);
-			}
-
-		// TODO singleton handler on a single node does not need to have communication pattern
-		if (pattern != null) {
-			// TODO: these need to happen between different time steps?
-
-			// If there is a counter, only the last event handler will perform communication
-			if (counter != null) {
-				if (counter.incrementAndGet() == totalPartitions) {
-					pattern.process(handler);
-					pattern.communicate(broker, handler);
-					counter.set(0);
-				}
-			} else {
-				pattern.process(handler);
-				pattern.communicate(broker, handler);
+	static void dumpEvents(Path out, Collection<Message> messages) {
+		StringBuilder b = new StringBuilder();
+		for (Message m2 : messages) {
+			if (m2 instanceof Event ev) {
+				ev.writeAsXML(b);
 			}
 		}
 
+		Files.write(out, b.toString().getBytes());
+	}
+
+	/**
+	 * Process one message / event.
+	 */
+	protected final void process(Message msg) {
+
+		Consumer<Message> consumer = consumers.get(msg.getType());
+		if (consumer == null) {
+			Consumer<Message> any = consumers.get(Event.ANY_TYPE);
+			if (any != null) {
+				any.accept(msg);
+				return;
+			}
+
+			throw new IllegalArgumentException("No processor found for message: " + msg);
+		}
+
+		consumer.accept(msg);
+	}
+
+	/**
+	 * Store run time information.
+	 * @param t nanoseconds before current step started.
+	 */
+	protected final void storeRuntime(long t) {
 		int s = (int) (time / 10);
 		// Fill with zeros
 		if (runtimes.size() < s)
@@ -333,40 +284,8 @@ public final class EventHandlerTask implements SimTask {
 		}
 	}
 
-	/**
-	 * Debug function to dump events to a file.
-	 */
-	@SneakyThrows
-	private static void dumpEvents(Path out, Collection<Message> messages) {
-		StringBuilder b = new StringBuilder();
-		for (Message m2 : messages) {
-			if (m2 instanceof Event ev) {
-				ev.writeAsXML(b);
-			}
-		}
-
-		Files.write(out, b.toString().getBytes());
-	}
-
-
-	private void process(Message msg) {
-
-		Consumer<Message> consumer = consumers.get(msg.getType());
-		if (consumer == null) {
-			Consumer<Message> any = consumers.get(Event.ANY_TYPE);
-			if (any != null) {
-				any.accept(msg);
-				return;
-			}
-
-			throw new IllegalArgumentException("No processor found for message: " + msg);
-		}
-
-		consumer.accept(msg);
-	}
-
 	@Override
-	public String toString() {
+	public final String toString() {
 		return "EventHandlerTask{" +
 			"handler=" + handler.getClass().getName() +
 			", partition=" + partition +
