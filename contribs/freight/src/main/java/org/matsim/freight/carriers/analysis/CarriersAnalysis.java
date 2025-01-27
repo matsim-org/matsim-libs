@@ -87,7 +87,7 @@ public class CarriersAnalysis {
 	 * @param runId         The CRS of the simulation
 	 */
 	public CarriersAnalysis(String simOutputPath, String runId) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), runId, null);
+		this(simOutputPath, Path.of(simOutputPath).resolve("analysis").resolve("freight").toString(), runId, null);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class CarriersAnalysis {
 	 * @param simOutputPath The output directory of the simulation run
 	 */
 	public CarriersAnalysis(String simOutputPath) {
-		this(simOutputPath, Path.of(simOutputPath).resolve("CarriersAnalysis").toString(), null, null);
+		this(simOutputPath, Path.of(simOutputPath).resolve("analysis").resolve("freight").toString(), null, null);
 	}
 
 	/**
