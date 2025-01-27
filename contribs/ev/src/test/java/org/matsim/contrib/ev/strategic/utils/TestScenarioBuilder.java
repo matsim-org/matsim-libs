@@ -5,10 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -372,6 +369,7 @@ public class TestScenarioBuilder {
 		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 
 		VehicleType electricVehicleType = vehiclesFactory.createVehicleType(Id.create("electric", VehicleType.class));
+		electricVehicleType.setNetworkMode(TransportMode.car);
 		vehicles.addVehicleType(electricVehicleType);
 
 		VehicleUtils.setEnergyCapacity(electricVehicleType.getEngineInformation(), EvUnits.J_to_kWh(range_m));

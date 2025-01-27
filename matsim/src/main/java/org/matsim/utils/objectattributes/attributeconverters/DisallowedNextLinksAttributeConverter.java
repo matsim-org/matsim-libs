@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdDeSerializationModule;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -52,6 +52,7 @@ public class EmissionsDashboard implements Dashboard {
 				viz.display.lineColor.setColorRamp("greenRed", 10, false);
 				viz.display.lineColor.join = "linkId";
 				viz.display.lineWidth.columnName = "CO2_TOTAL [g/m]";
+				viz.display.lineWidth.scaleFactor = 2000.0;
 				viz.display.lineWidth.dataset = "emissions_per_link_per_m";
 				viz.display.lineWidth.join = "linkId";
 				viz.center = data.context().getCenter();
