@@ -34,14 +34,17 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasV
 	public static final String EVENT_TYPE = "PersonEntersVehicle";
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_WEIGHT = "weight";
 
 	private final Id<Person> personId;
 	private Id<Vehicle> vehicleId;
+	private double weight;
 
-	public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
+	public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId, final double weight) {
 		super(time);
 		this.personId = personId;
 		this.vehicleId = vehicleId;
+		this.weight = weight;
 	}
 
 	public Id<Vehicle> getVehicleId() {
@@ -55,6 +58,10 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasV
 	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
+	}
+
+	public double getWeight() {
+		return this.weight;
 	}
 
 	@Override

@@ -41,7 +41,11 @@ public interface Population extends MatsimToplevelContainer, Attributable {
 	public Map<Id<Person>,? extends Person> getPersons();
 
 	public void addPerson(final Person p);
-	
+
 	public Person removePerson( final Id<Person> personId ) ;
+
+	public double getSampleSize( final Id<Person> personId ) ;
+
+	public void setSubpopulation2SampleSize( final Map<String, Double> subpopulation2SampleSize) ;
 
 }

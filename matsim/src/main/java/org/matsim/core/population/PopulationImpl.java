@@ -31,6 +31,8 @@ import org.matsim.core.scenario.Lockable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import static org.matsim.core.scenario.SubpopulationSampleSizeUtils.getSubpopulation2SampleSize;
+
 /**
  * @author nagel
  *
@@ -44,6 +46,8 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private final PopulationFactory populationFactory;
 	private long counter = 0;
 	private long nextMsg = 1;
+	private Map<String, Double> subpopulation2SampleSize = new LinkedHashMap<>();
+
 
 	PopulationImpl(PopulationFactory populationFactory2) {
 		this.populationFactory = populationFactory2 ;
@@ -75,6 +79,11 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
 
 	@Override
+	public double getSampleSize(Id<Person> personId) {
+		return subpopulation2SampleSize.get(PopulationUtils.getSubpopulation(persons.get(personId)));
+	}
+
+	@Override
 	public final Map<Id<Person>, ? extends Person> getPersons() {
 		return persons ;
 	}
@@ -101,6 +110,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 				((Lockable)person).setLocked() ;
 			}
 		}
+		// TODO: somehow lock subpopulation2SampleSize if we cannot make it private
 	}
 
 	public void printPlansCount() {
@@ -115,5 +125,10 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	@Override
 	public Attributes getAttributes() {
 		return attributes;
+	}
+
+	@Override
+	public void setSubpopulation2SampleSize( final Map<String, Double> subpopulation2SampleSize) {
+		this.subpopulation2SampleSize = subpopulation2SampleSize;
 	}
 }

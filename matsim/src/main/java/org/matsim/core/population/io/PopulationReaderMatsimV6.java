@@ -232,7 +232,7 @@ import static org.matsim.core.scenario.SubpopulationSampleSizeUtils.getSubpopula
 							ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 						}
 
-						Map<String, Double> subpopulation2SampleSize = getSubpopulation2SampleSize(scenario.getPopulation());
+						this.plans.setSubpopulation2SampleSize(getSubpopulation2SampleSize(scenario.getPopulation()));
 
 						break;
 					case LEG:
