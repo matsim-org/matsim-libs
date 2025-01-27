@@ -8,7 +8,9 @@ import static org.matsim.contrib.bicycle.BicycleLinkSpeedCalculatorDefaultImpl.h
 
 public class BicycleParamsDefaultImpl implements BicycleParams {
 
-	// TODO Combine this with speeds?
+	// At first glance it seems like this method could be combined with method computeSurfaceFactor,
+//	but almost all values for the different surface types are different from each other
+//It is not clear, where the values for different surface types are taken from, it should be referenced here, but it is not. -sme0125
 	@Override
 	public double getComfortFactor( String surface ) {
 
@@ -64,7 +66,6 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 		}
 	}
 
-	// TODO combine this with comfort
 	@Override
 	public double computeSurfaceFactor(Link link) {
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
