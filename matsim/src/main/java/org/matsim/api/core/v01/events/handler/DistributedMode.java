@@ -16,7 +16,8 @@ public enum DistributedMode {
     PARTITION,
 
     /**
-     * One handler processes events of all partitions. Its state is effectively shared between partitions.
+     * One handler processes events on each partition, but concurrently.
+	 * Its state is shared between partitions.
      * Such handler is not thread-safe and must support concurrent processing of events.
      */
     PARTITION_SINGLETON,
