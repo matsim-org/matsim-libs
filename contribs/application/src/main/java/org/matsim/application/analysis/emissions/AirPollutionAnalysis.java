@@ -1,14 +1,7 @@
 package org.matsim.application.analysis.emissions;
 
-import it.unimi.dsi.fastutil.floats.FloatArrayList;
-import it.unimi.dsi.fastutil.floats.FloatFloatPair;
-import it.unimi.dsi.fastutil.floats.FloatList;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2FloatMap;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
@@ -25,7 +18,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.avro.AvroNetwork;
 import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -34,6 +26,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.analysis.EmissionsByVehicleTypeEventHandler;
 import org.matsim.contrib.emissions.analysis.EmissionsOnLinkEventHandler;
 import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
 import org.matsim.contrib.emissions.analysis.Raster;
@@ -48,6 +41,7 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.VehicleType;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -68,7 +62,9 @@ import java.util.*;
 		"emissions_per_link_per_m.csv",
 		"emissions_grid_per_hour.%s",
 		"emissions_vehicle_info.csv",
-		"emissions_grid_per_day.%s"
+		"emissions_grid_per_day.%s",
+		"emissions_per_vehicle_type.csv",
+		"emissions_per_network_mode.csv"
 	}
 )
 public class AirPollutionAnalysis implements MATSimAppCommand {
@@ -79,10 +75,13 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	private final InputOptions input = InputOptions.ofCommand(AirPollutionAnalysis.class);
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(AirPollutionAnalysis.class);
+
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
+
 	@CommandLine.Mixin
 	private SampleOptions sample;
+
 	@CommandLine.Option(names = "--grid-size", description = "Grid size in meter", defaultValue = "100")
 	private double gridSize;
 
@@ -126,7 +125,11 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
 		EmissionsOnLinkEventHandler emissionsEventHandler = new EmissionsOnLinkEventHandler(3600, 86400);
+		EmissionsByVehicleTypeEventHandler emissionsByVehicleType = new EmissionsByVehicleTypeEventHandler(scenario.getVehicles(), filteredNetwork);
+
 		eventsManager.addHandler(emissionsEventHandler);
+		eventsManager.addHandler(emissionsByVehicleType);
+
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
@@ -134,6 +137,9 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		log.info("Done reading the events file.");
 		log.info("Finish processing...");
 		eventsManager.finishProcessing();
+
+		writeEmissionsByVehicleType(emissionsByVehicleType);
+		writeEmissionsByNetworkMode(emissionsByVehicleType);
 
 		writeOutput(filteredNetwork, emissionsEventHandler);
 
@@ -162,6 +168,62 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		config.global().setNumberOfThreads(1);
 
 		return config;
+	}
+
+	private void writeEmissionsByNetworkMode(EmissionsByVehicleTypeEventHandler emissionsByVehicleType) throws IOException {
+
+		log.info("Writing emissions by vehicle type...");
+		Map<String, Object2DoubleMap<Pollutant>> pollutants = emissionsByVehicleType.getByNetworkMode();
+
+		CSVPrinter emissionsCSV = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_network_mode.csv")), CSVFormat.DEFAULT);
+
+		emissionsCSV.print("vehicleType");
+		emissionsCSV.print("pollutant");
+		emissionsCSV.print("value");
+		emissionsCSV.println();
+
+		for (Map.Entry<String, Object2DoubleMap<Pollutant>> entry : pollutants.entrySet()) {
+			String vehicleTypeId = entry.getKey();
+			Object2DoubleMap<Pollutant> emissionMap = entry.getValue();
+
+			for (Pollutant pollutant : Pollutant.values()) {
+				double emissionValue = emissionMap.getDouble(pollutant);
+				emissionsCSV.print(vehicleTypeId);
+				emissionsCSV.print(pollutant);
+				emissionsCSV.print(emissionValue * sample.getUpscaleFactor());
+				emissionsCSV.println();
+			}
+		}
+
+		emissionsCSV.close();
+	}
+
+	private void writeEmissionsByVehicleType(EmissionsByVehicleTypeEventHandler emissionsByVehicleType) throws IOException {
+
+		log.info("Writing emissions by vehicle type...");
+		Map<Id<VehicleType>, Object2DoubleMap<Pollutant>> pollutants = emissionsByVehicleType.getByVehicleType();
+
+		CSVPrinter emissionsCSV = new CSVPrinter(Files.newBufferedWriter(output.getPath("emissions_per_vehicle_type.csv")), CSVFormat.DEFAULT);
+
+		emissionsCSV.print("vehicleType");
+		emissionsCSV.print("pollutant");
+		emissionsCSV.print("value");
+		emissionsCSV.println();
+
+		for (Map.Entry<Id<VehicleType>, Object2DoubleMap<Pollutant>> entry : pollutants.entrySet()) {
+			Id<VehicleType> vehicleTypeId = entry.getKey();
+			Object2DoubleMap<Pollutant> emissionMap = entry.getValue();
+
+			for (Pollutant pollutant : Pollutant.values()) {
+				double emissionValue = emissionMap.getDouble(pollutant);
+				emissionsCSV.print(vehicleTypeId);
+				emissionsCSV.print(pollutant);
+				emissionsCSV.print(emissionValue * sample.getUpscaleFactor());
+				emissionsCSV.println();
+			}
+		}
+
+		emissionsCSV.close();
 	}
 
 

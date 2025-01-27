@@ -39,16 +39,18 @@
         <flowEfficiencyFactor factor="1.0"/>
     </vehicleType>
 
-    
+
     <vehicleType id="conventional_vehicle">
         <description>Conventional DRT</description>
         <capacity seats="8"/>
+		<networkMode networkMode="car"/>
     </vehicleType>
     <vehicleType id="autonomous_vehicle">
         <description>Autonomous DRT</description>
         <capacity seats="6"/>
         <!-- speed limited to 5 m/s = 18 km/h -->
         <maximumVelocity meterPerSecond="5"/>
+		<networkMode networkMode="car"/>
     </vehicleType>
 
 
@@ -87,7 +89,7 @@
             <attribute name="serviceEndTime" class="java.lang.Double">57600</attribute>
         </attributes>
     </vehicle>
-    
+
     <vehicle id="av-2" type="autonomous_vehicle">
         <attributes>
             <attribute name="dvrpMode" class="java.lang.String">av</attribute>

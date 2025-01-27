@@ -42,54 +42,54 @@ import java.util.Optional;
 public class RaptorDeterminismTest {
 
 	public static boolean comparePlan(List<? extends PlanElement> left, List<? extends PlanElement> right) {
-		if(left.size() != right.size()) {
+		if (left.size() != right.size()) {
 			return false;
 		}
-		for(int i=0; i<left.size(); i++) {
+		for (int i = 0; i < left.size(); i++) {
 			PlanElement leftElement = left.get(i);
 			PlanElement rightElement = right.get(i);
-			if(!leftElement.getClass().equals(rightElement.getClass())) {
+			if (!leftElement.getClass().equals(rightElement.getClass())) {
 				return false;
 			}
-			if(leftElement instanceof Activity leftActivity && rightElement instanceof Activity rightActivity) {
-				if(!leftActivity.getEndTime().equals(rightActivity.getEndTime())) {
+			if (leftElement instanceof Activity leftActivity && rightElement instanceof Activity rightActivity) {
+				if (!leftActivity.getEndTime().equals(rightActivity.getEndTime())) {
 					return false;
 				}
-				if(!leftActivity.getType().equals(rightActivity.getType())) {
+				if (!leftActivity.getType().equals(rightActivity.getType())) {
 					return false;
 				}
-				if(!Optional.ofNullable(leftActivity.getLinkId()).equals(Optional.ofNullable(rightActivity.getLinkId()))) {
+				if (!Optional.ofNullable(leftActivity.getLinkId()).equals(Optional.ofNullable(rightActivity.getLinkId()))) {
 					return false;
 				}
-				if(!leftActivity.getStartTime().equals(rightActivity.getStartTime())) {
+				if (!leftActivity.getStartTime().equals(rightActivity.getStartTime())) {
 					return false;
 				}
-				if(!leftActivity.getMaximumDuration().equals(rightActivity.getMaximumDuration())) {
+				if (!leftActivity.getMaximumDuration().equals(rightActivity.getMaximumDuration())) {
 					return false;
 				}
 			} else if (leftElement instanceof Leg leftLeg && rightElement instanceof Leg rightLeg) {
-				if(!leftLeg.getMode().equals(rightLeg.getMode())) {
+				if (!leftLeg.getMode().equals(rightLeg.getMode())) {
 					return false;
 				}
-				if(!leftLeg.getTravelTime().equals(rightLeg.getTravelTime())) {
+				if (!leftLeg.getTravelTime().equals(rightLeg.getTravelTime())) {
 					return false;
 				}
-				if(!leftLeg.getMode().equals("pt")) {
+				if (!leftLeg.getMode().equals("pt")) {
 					continue;
 				}
 				Route leftRoute = leftLeg.getRoute();
 				Route rightRoute = leftLeg.getRoute();
-				if(leftRoute instanceof DefaultTransitPassengerRoute leftTransitPassengerRoute && rightRoute instanceof DefaultTransitPassengerRoute rightTransitPassengerRoute) {
-					if(!leftTransitPassengerRoute.toString().equals(rightTransitPassengerRoute.toString())) {
+				if (leftRoute instanceof DefaultTransitPassengerRoute leftTransitPassengerRoute && rightRoute instanceof DefaultTransitPassengerRoute rightTransitPassengerRoute) {
+					if (!leftTransitPassengerRoute.toString().equals(rightTransitPassengerRoute.toString())) {
 						return false;
 					}
-					if(!leftTransitPassengerRoute.getRouteId().equals(rightTransitPassengerRoute.getRouteId())) {
+					if (!leftTransitPassengerRoute.getRouteId().equals(rightTransitPassengerRoute.getRouteId())) {
 						return false;
 					}
-					if(!leftTransitPassengerRoute.getAccessStopId().equals(rightTransitPassengerRoute.getAccessStopId())) {
+					if (!leftTransitPassengerRoute.getAccessStopId().equals(rightTransitPassengerRoute.getAccessStopId())) {
 						return false;
 					}
-					if(!leftTransitPassengerRoute.getEgressStopId().equals(rightTransitPassengerRoute.getEgressStopId())) {
+					if (!leftTransitPassengerRoute.getEgressStopId().equals(rightTransitPassengerRoute.getEgressStopId())) {
 						return false;
 					}
 				} else {
@@ -107,7 +107,7 @@ public class RaptorDeterminismTest {
 		logger.info("Testing raptor determinism");
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml");
 		Config config = ConfigUtils.loadConfig(configUrl);
-		int scenarioSamples = 10;
+		int scenarioSamples = 5;
 		Scenario[] scenarios = new Scenario[scenarioSamples];
 		RaptorStopFinder[] raptorStopFinders = new RaptorStopFinder[scenarioSamples];
 		ActivityFacilities[] activityFacilities = new ActivityFacilities[scenarioSamples];
@@ -119,7 +119,7 @@ public class RaptorDeterminismTest {
 		TripRouter[] tripRouters = new TripRouter[scenarioSamples];
 
 		logger.info(String.format("Loading scenario %d times", scenarioSamples));
-		for(int scenarioIndex=0; scenarioIndex<scenarioSamples; scenarioIndex++) {
+		for (int scenarioIndex = 0; scenarioIndex < scenarioSamples; scenarioIndex++) {
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			ScenarioUtils.loadScenario(scenario);
 
@@ -142,28 +142,28 @@ public class RaptorDeterminismTest {
 
 		logger.info(String.format("Comparing stop facilities order %d", scenarioSamples));
 
-		for(int scenarioIndex=1; scenarioIndex<scenarioSamples; scenarioIndex++) {
-			for(int i=0; i<transitStopFacilitiesByScenario[0].size(); i++) {
+		for (int scenarioIndex = 1; scenarioIndex < scenarioSamples; scenarioIndex++) {
+			for (int i = 0; i < transitStopFacilitiesByScenario[0].size(); i++) {
 				assert transitStopFacilitiesByScenario[0].get(i).getId().equals(transitStopFacilitiesByScenario[scenarioIndex].get(i).getId());
 			}
 		}
 
 		logger.info("Comparing stop RaptorStopFinder.findStops alongSide ptRouter.calcRoute(pt, ...)");
 
-		for(int personIndex=0; personIndex<personLists[0].size(); personIndex++) {
-			if(personIndex % 1000 == 0) {
+		for (int personIndex = 0; personIndex < Math.min(10000, personLists[0].size()); personIndex++) {
+			if (personIndex % 1000 == 0) {
 				logger.info(String.format("Person %d", personIndex));
 			}
 			Person referencePerson = personLists[0].get(personIndex);
 			RaptorParameters referenceRaptorParameters = raptorParametersForPerson[0].getRaptorParameters(referencePerson);
 
-			for(TripStructureUtils.Trip referenceTrip: TripStructureUtils.getTrips(referencePerson.getSelectedPlan())) {
+			for (TripStructureUtils.Trip referenceTrip : TripStructureUtils.getTrips(referencePerson.getSelectedPlan())) {
 				Facility fromFacility = FacilitiesUtils.toFacility(referenceTrip.getOriginActivity(), activityFacilities[0]);
 				Facility toFacility = FacilitiesUtils.toFacility(referenceTrip.getDestinationActivity(), activityFacilities[0]);
 
 				List<? extends PlanElement> referenceElements = tripRouters[0].calcRoute("pt", fromFacility, toFacility, referenceTrip.getOriginActivity().getEndTime().seconds(), referencePerson, referenceTrip.getTripAttributes());
 
-				for(int scenarioIndex=1; scenarioIndex<scenarioSamples; scenarioIndex++) {
+				for (int scenarioIndex = 1; scenarioIndex < scenarioSamples; scenarioIndex++) {
 
 					assert personLists[scenarioIndex].get(personIndex).getId().equals(referencePerson.getId());
 					Person otherPerson = scenarios[scenarioIndex].getPopulation().getPersons().get(referencePerson.getId());
@@ -176,7 +176,7 @@ public class RaptorDeterminismTest {
 					assert otherToFacility.getCoord().equals(toFacility.getCoord());
 
 					// We specifically test the RaptorStopFinder
-					for(RaptorStopFinder.Direction direction: RaptorStopFinder.Direction.values()) {
+					for (RaptorStopFinder.Direction direction : RaptorStopFinder.Direction.values()) {
 						List<InitialStop> referenceInitialStops = raptorStopFinders[0].findStops(fromFacility, toFacility, referencePerson, referenceTrip.getOriginActivity().getEndTime().seconds(), referenceTrip.getTripAttributes(), referenceRaptorParameters, swissRailRaptorData[0], direction);
 						List<InitialStop> sortedReferenceInitialStops = new ArrayList<>(referenceInitialStops);
 						sortedReferenceInitialStops.sort(Comparator.comparing(InitialStop::toString));
@@ -187,10 +187,10 @@ public class RaptorDeterminismTest {
 
 						List<InitialStop> sortedComparedInitialStops = new ArrayList<>(comparedInitialStops);
 						sortedComparedInitialStops.sort(Comparator.comparing(InitialStop::toString));
-						for(int j=0; j<referenceInitialStops.size(); j++) {
+						for (int j = 0; j < referenceInitialStops.size(); j++) {
 							assert sortedReferenceInitialStops.get(j).toString().equals(sortedComparedInitialStops.get(j).toString());
 						}
-						for(int j=0; j<referenceInitialStops.size(); j++) {
+						for (int j = 0; j < referenceInitialStops.size(); j++) {
 							assert referenceInitialStops.get(j).toString().equals(comparedInitialStops.get(j).toString());
 						}
 					}

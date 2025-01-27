@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -56,13 +57,18 @@ import java.util.Random;
  *
  * @author nkuehnel / MOIA, hrewald
  *
+ * Remarks @kainagel: <ul>
+ * <li> I have renamed the VehicularDepartureHandler to {@link NetworkModeDepartureHandler}.  Also, this is now an interface, bound against a default implementation. </li>
+ * <li>There are probably more changes to come, like _replacing_ the {@link NetworkModeDepartureHandler} rather than adding another {@link DepartureHandler} which effectively over-writes it. </li>
+ * </ul>
+ *
  */
 public class FISS implements DepartureHandler, MobsimEngine {
 
 	private static final Logger LOG = LogManager.getLogger(FISS.class);
 
 	private final QNetsimEngineI qNetsimEngine;
-    private final DepartureHandler delegate;
+	private final DepartureHandler delegate;
 	private final FISSConfigGroup fissConfigGroup;
 	private final TeleportationEngine teleport;
 	private final Network network;
@@ -72,10 +78,10 @@ public class FISS implements DepartureHandler, MobsimEngine {
 	private final MatsimServices matsimServices;
 
 
-	FISS(MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-			TravelTime travelTime) {
+	FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
+	      TravelTime travelTime, NetworkModeDepartureHandler networkModeDepartureHandler ) {
 		this.qNetsimEngine = qNetsimEngine;
-        this.delegate = qNetsimEngine.getDepartureHandler();
+		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		this.travelTime = travelTime;
@@ -84,8 +90,8 @@ public class FISS implements DepartureHandler, MobsimEngine {
 		this.matsimServices = matsimServices;
 	}
 
-    @Override
-    public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (this.fissConfigGroup.sampledModes.contains(agent.getMode())) {
 			if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
 				return delegate.handleDeparture(now, agent, linkId);
@@ -97,7 +103,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 						NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 						Person person = planAgent.getCurrentPlan().getPerson();
 						Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
-								.get(networkRoute.getVehicleId());
+										     .get(networkRoute.getVehicleId());
 
 						// update travel time with travel times of last iteration
 						double newTravelTime = 0.0;
@@ -120,7 +126,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 						if (removedVehicle == null) {
 							throw new RuntimeException(
 									"Could not remove parked vehicle with id " + vehicleId + " on the link id "
-									// + linkId
+											// + linkId
 											+ vehicle.getCurrentLink().getId()
 											+ ".  Maybe it is currently used by someone else?"
 											+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
@@ -132,7 +138,7 @@ public class FISS implements DepartureHandler, MobsimEngine {
 					if (removedVehicle != null) {
 						Id<Link> destinationLinkId = agent.getDestinationLinkId();
 						QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork()
-								.getNetsimLink(destinationLinkId);
+											      .getNetsimLink(destinationLinkId);
 						qLinkDest.addParkedVehicle(removedVehicle);
 					}
 					return result;

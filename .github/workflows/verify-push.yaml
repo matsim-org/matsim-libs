@@ -101,7 +101,7 @@ jobs:
         working-directory: ${{matrix.module}}
 
     env:
-      MAVEN_OPTS: -Xmx2g
+      MAVEN_OPTS: -Xmx6g
 
   verify-all-jobs-successful:
     # always() - to ensure this job is executed (regardless of the status of the previous job)
