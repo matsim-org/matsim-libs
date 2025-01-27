@@ -23,14 +23,13 @@ package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -46,11 +45,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.controler.*;
+import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
-
-import java.util.Map;
 
 public final class RunChessboard {
 
@@ -74,11 +71,11 @@ public final class RunChessboard {
 		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
 		CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes( scenario );
 
-		Controler controler = new Controler( scenario);
+		Controller controller = ControllerUtils.createController( scenario );
 
-		controler.addOverridingModule(new CarrierModule() );
+		controller.addOverridingModule(new CarrierModule() );
 
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new AbstractModule() {
 
 			@Override
 			public void install() {
@@ -100,7 +97,7 @@ public final class RunChessboard {
 						String dir = controlerIO.getIterationPath(event.getIteration());
 
 						//write plans
-						new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+						CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 						//write stats
 						freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");
@@ -113,7 +110,7 @@ public final class RunChessboard {
 			}
 		});
 
-		controler.run();
+		controller.run();
 
 	}
 
@@ -139,7 +136,7 @@ public final class RunChessboard {
 
 		@Override
 		public CarrierStrategyManager get() {
-			final CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+			final CarrierStrategyManager strategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
 			strategyManager.setMaxPlansPerAgent(5);
 			{
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger.Factory<CarrierPlan,Carrier>().build() );

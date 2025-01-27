@@ -50,9 +50,11 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 	private static final String PARKINGSEARCH_MANAGER = "parkingSearchManager";
 	private ParkingSearchManagerType parkingSearchManagerType = ParkingSearchManagerType.FacilityBasedParkingManager;
 
+	//yyyy this parameter is only read by the NearestParkingSpotSearchLogic. Should this really be a global parameter? paul, nov'24
 	private static final String FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED = "fractionCanCheckFreeCapacitiesInAdvanced";
 	private double fractionCanCheckFreeCapacitiesInAdvanced = 0.;
 
+	//yyyy this parameter is only read by the NearestParkingSpotSearchLogic. Should this really be a global parameter? paul, nov'24
 	private static final String FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED = "fractionCanReserveParkingInAdvanced";
 	private double fractionCanReserveParkingInAdvanced = 0.;
 
@@ -73,6 +75,7 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 		return parkDuration;
 	}
 
+	//yyyy shouldn't this parameter be facility specific? paul, nov'24
 	@StringGetter(AVGPARKINGSLOTLENGTH)
 	public double getAvgparkingslotlength() {
 		return avgParkingSlotLength;
@@ -145,14 +148,19 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 
 	@Override
 	public final Map<String, String> getComments() {
-		Map<String,String> map = super.getComments();
+		Map<String, String> map = super.getComments();
 		map.put(UNPARKDURATION, "Duration to unpark a vehicle");
 		map.put(PARKDURATION, "Duration to park a vehicle");
-		map.put(PARKINGSEARCH_STRATEGY, "The strategy to find a parking slot. Possible strategies: " + Arrays.toString(ParkingSearchStrategy.values()));
+		map.put(PARKINGSEARCH_STRATEGY,
+			"The strategy to find a parking slot. Possible strategies: " + Arrays.toString(ParkingSearchStrategy.values()));
 		map.put(PARKINGSEARCH_MANAGER, "The type of the ParkingManager, may have the values: " + Arrays.toString(ParkingSearchManagerType.values()));
-		map.put(FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED, "Fraction of agents who can check free capacities in advanced. This is currently developed for the FacilityBasedParkingManager");
-		map.put(FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED, "Fraction of agents who can reserve free capacities in advanced. This is currently developed for the FacilityBasedParkingManager\"");
-		map.put(CAN_PARK_ONLY_AT_FACILITIES, "Set if a vehicle can park only at given parking facilities or it can park freely at a link without a facility.");
+		map.put(FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED, "Fraction of agents who can check free capacities in advanced. This is currently " +
+			"developed for the FacilityBasedParkingManager");
+		map.put(FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED, "Fraction of agents who can reserve free capacities in advanced. This is currently " +
+			"developed for the FacilityBasedParkingManager\"");
+		map.put(CAN_PARK_ONLY_AT_FACILITIES, "Set if a vehicle can park only at given parking facilities or it can park freely at a link without a" +
+			" " +
+			"facility.");
 
 		return map;
 	}
@@ -162,11 +170,16 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 
 		super.checkConsistency(config);
 
-		if (getFractionCanCheckFreeCapacitiesInAdvanced() != 0. && !getParkingSearchManagerType().equals(ParkingSearchManagerType.FacilityBasedParkingManager))
-			log.warn("Fraction of agents who can check free capacities in advanced has no impact on your selected ParkingSearchManagerType, because it is only implemented for the FacilityBasedParkingManager.");
+		if (getFractionCanCheckFreeCapacitiesInAdvanced() != 0. && !getParkingSearchManagerType().equals(ParkingSearchManagerType.FacilityBasedParkingManager)) {
+			log.warn("Fraction of agents who can check free capacities in advanced has no impact on your selected ParkingSearchManagerType, " +
+				"because" +
+				" " +
+				"it is only implemented for the FacilityBasedParkingManager.");
+		}
 
-		if (getFractionCanCheckFreeCapacitiesInAdvanced() + getFractionCanReserveParkingInAdvanced() > 1.0)
-			throw new RuntimeException( "The sum of " + FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED + " and " + FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED + " is > 1.0. This should not happen.");
+		if (getFractionCanCheckFreeCapacitiesInAdvanced() + getFractionCanReserveParkingInAdvanced() > 1.0) {
+			throw new RuntimeException("The sum of " + FRACTION_CAN_RESERVE_PARKING_IN_ADVANCED + " and " + FRACTION_CAN_CHECK_FREE_CAPACITIES_IN_ADVANCED + " is > 1.0. This should not happen.");
+		}
 
 	}
 

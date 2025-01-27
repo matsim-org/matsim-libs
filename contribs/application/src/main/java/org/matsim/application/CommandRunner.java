@@ -75,12 +75,18 @@ public final class CommandRunner {
 		for (Map.Entry<Class<? extends MATSimAppCommand>, String[]> e : args.entrySet()) {
 			Class<? extends MATSimAppCommand> clazz = e.getKey();
 			graph.addVertex(clazz);
-			Class<? extends MATSimAppCommand>[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
-			for (Class<? extends MATSimAppCommand> d : depends) {
-				graph.addVertex(d);
-				graph.addEdge(d, clazz);
+			Dependency[] depends = ApplicationUtils.getSpec(clazz).dependsOn();
+
+			boolean hasDependencies = false;
+			for (Dependency d : depends) {
+				// Add dependency graph if the dependency is executed as well
+				if (args.containsKey(d.value())) {
+					graph.addVertex(d.value());
+					graph.addEdge(d.value(), clazz);
+					hasDependencies = true;
+				}
 			}
-			if (depends.length == 0)
+			if (!hasDependencies)
 				start.add(clazz);
 		}
 
@@ -142,32 +148,26 @@ public final class CommandRunner {
 		for (String require : spec.requires()) {
 
 			// Whether this file is produced by a dependency
-			boolean depFile = false;
 			String arg = "--input-" + InputOptions.argName(require);
 
 			boolean present = ArrayUtils.contains(existingArgs, arg);
 			if (present)
 				continue;
 
-			for (Class<? extends MATSimAppCommand> depend : spec.dependsOn()) {
-				CommandSpec dependency = ApplicationUtils.getSpec(depend);
-				if (ArrayUtils.contains(dependency.produces(), require)) {
+			// Look for this file on the input
+			String path = ApplicationUtils.matchInput(require, input).toString();
+			args.add(arg);
+			args.add(path);
+		}
 
-					String path = getPath(depend, require);
-
+		for (Dependency depend : spec.dependsOn()) {
+			for (String file : depend.files()) {
+				String arg = "--input-" + InputOptions.argName(file);
+				if (!ArrayUtils.contains(existingArgs, arg)) {
+					String path = getPath(depend.value(), file);
 					args.add(arg);
 					args.add(path);
-
-					// Add arg for this file
-					depFile = true;
 				}
-			}
-
-			// Look for this file on the input
-			if (!depFile) {
-				String path = ApplicationUtils.matchInput(require, input).toString();
-				args.add(arg);
-				args.add(path);
 			}
 		}
 
@@ -308,9 +308,9 @@ public final class CommandRunner {
 		CommandSpec spec = ApplicationUtils.getSpec(command);
 
 		// Add dependent classes
-		for (Class<? extends MATSimAppCommand> depends : spec.dependsOn()) {
-			if (!this.args.containsKey(depends))
-				add(depends);
+		for (Dependency depends : spec.dependsOn()) {
+			if (depends.required() && !this.args.containsKey(depends.value()))
+				add(depends.value());
 		}
 	}
 

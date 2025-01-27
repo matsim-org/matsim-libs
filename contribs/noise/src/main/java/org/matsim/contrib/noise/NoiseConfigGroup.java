@@ -26,6 +26,7 @@ package org.matsim.contrib.noise;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -42,7 +43,7 @@ import java.util.*;
  * Provides the parameters required to build a simple grid with some basic spatial functionality.
  * Provides the parameters required to compute noise emissions, immissions and damages.
  *
- * @author ikaddoura
+ * @author ikaddoura, nkuehnel
  */
 public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
@@ -80,6 +81,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String RECEIVER_POINT_GAP_CMT = "horizontal and vertical distance between receiver points in x-/y-coordinate units";
 	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
+	private static final String CONSIDER_NOISE_REFLECTION = "considerNoiseReflection";
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
 	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
@@ -134,13 +136,14 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 
 	private String[] hgvIdPrefixes = {"lkw", "truck", "freight"};
+	private Set<String> networkModesToIgnore = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
 	private Set<String> busIdIdentifier = new HashSet<>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<>();
-	private Set<String> networkModesToIgnore = new HashSet<>();
 
 	private double noiseTollFactor = 1.0;
 
 	private boolean considerNoiseBarriers = false;
+	private boolean considerNoiseReflection = false;
 	private String noiseBarriersFilePath = null;
 	private String noiseBarriersSourceCrs = null;
 
@@ -203,13 +206,14 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put(NOISE_TOLL_FACTOR, "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)");
 
 		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
+		comments.put(CONSIDER_NOISE_REFLECTION, "Set to 'true' if reflections should be considered. Otherwise set to 'false'. Has a considerable performance impact.");
 		comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
 		comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
 		comments.put(USE_DEM, "Set to 'true' if a DEM (digital elevation model) should be used for road gradients. Otherwise set to 'false'.");
 		comments.put(DEM_FILE, "Path to the geoTiff file of the DEM.");
 
-		comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
+		comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation. By default, the following modes are excluded: [bike, walk, transit_walk, non_network_walk].");
 
 		comments.put(NOISE_COMPUTATION_METHOD, "Specifies the computation method of different guidelines: " + Arrays.toString(NoiseComputationMethod.values()));
 
@@ -307,11 +311,50 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 				+ " It is therefore recommended not to use speeds outside of the range of valid parameters!");
 		}
 
+		if(considerNoiseReflection) {
+			if (!this.considerNoiseBarriers) {
+				if (this.noiseBarriersFilePath == null || "".equals(this.noiseBarriersFilePath)) {
+					log.warn("Cannot consider noise reflection without a specified file path to the geojson file of barriers / buildings.");
+					this.considerNoiseBarriers = false;
+				}
+			}
+		}
 		if (this.considerNoiseBarriers) {
 			if (this.noiseBarriersFilePath == null || "".equals(this.noiseBarriersFilePath)) {
 				log.warn("Cannot consider noise barriers without a specified file path to the geojson file of barriers / buildings.");
 				this.considerNoiseBarriers = false;
 			}
+		}
+
+		List<String> walkAndBikeModes = List.of(TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk);
+		String exclude = "[";
+		for (String mode : walkAndBikeModes){
+			exclude += mode + ",";
+		}
+		exclude = exclude.substring(0, exclude.lastIndexOf(',')) + "]";
+		String warning = "You should set networkModesToIgnore such that all of the standard walk and bike modes are included!" +
+			" These are " + exclude + ".";
+		if (this.networkModesToIgnore.isEmpty() ||
+			! this.networkModesToIgnore.containsAll(walkAndBikeModes)){
+			boolean bikeOrWalkIsNetworkMode = config.routing().getNetworkModes().stream()
+				.filter(networkMode -> networkModesToIgnore.contains(networkMode))
+				.findAny()
+				.isPresent();
+			if (bikeOrWalkIsNetworkMode){
+				//TODO: use enum for consistencyCheckLevel and replace all RunTimeExceptions thrown within this class.
+				throw new RuntimeException(warning + " You configured one of these modes as networkMode in config().routing.getNetworkModes()! This will lead to wrong results!" +
+					"Make sure ignore all network modes that do not model a car, a heavy-goods-vehicle (HGV) or a transit vehicle to be considered by the noise analysis!!! Will abort now...");
+			} else {
+				log.warn( warning +
+					" Otherwise, your results will turn wrong as soon as you are routing these modes on the network (which luckily appears not to be the case in your current setup).");
+			}
+		}
+
+		Set<String> defaultHGVIdPrefixes = Set.of("lkw", "truck", "freight");
+
+		if (! defaultHGVIdPrefixes.stream().allMatch(defaultPrefix ->
+			Arrays.stream(this.hgvIdPrefixes).anyMatch(prefix -> defaultPrefix.equals(prefix)))){
+			log.warn("You are not considering all of [lkw, truck, freight] as HGV prefixes, which you should! Especially when you use scenarios created by VSP!!");
 		}
 	}
 
@@ -748,6 +791,16 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(CONSIDER_NOISE_BARRIERS)
 	public void setConsiderNoiseBarriers(boolean considerNoiseBarriers) {
 		this.considerNoiseBarriers = considerNoiseBarriers;
+	}
+
+	@StringGetter(CONSIDER_NOISE_REFLECTION)
+	public boolean isConsiderNoiseReflection() {
+		return this.considerNoiseReflection;
+	}
+
+	@StringSetter(CONSIDER_NOISE_REFLECTION)
+	public void setConsiderNoiseReflection(boolean considerNoiseReflection) {
+		this.considerNoiseReflection = considerNoiseReflection;
 	}
 
 	@StringGetter(NOISE_BARRIERS_GEOJSON_FILE)

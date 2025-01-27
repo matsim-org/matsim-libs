@@ -234,19 +234,19 @@ public final class TripStructureUtils {
 		return getSubtours( plan.getPlanElements(), isStageActivity, 0);
 	}
 
-	// for contrib socnetsim only
-	// I think now that we should actually keep this.  kai, jan'20
-	@Deprecated
 	public static Collection<Subtour> getSubtours(
-			final List<? extends PlanElement> planElements,
-			final Predicate<String> isStageActivity, double coordDistance) {
-		final List<Subtour> subtours = new ArrayList<>();
+		final List<? extends PlanElement> planElements,
+		final Predicate<String> isStageActivity, double coordDistance) {
+		return getSubtoursFromTrips(getTrips(planElements, isStageActivity), coordDistance);
+	}
 
+	public static Collection<Subtour> getSubtoursFromTrips(List<Trip> trips, double coordDistance) {
+
+		final List<Subtour> subtours = new ArrayList<>();
 		Object destinationId = null;
 
 		// can be either id or coordinate
 		final List<Object> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements, isStageActivity );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 
 		for (Trip trip : trips) {

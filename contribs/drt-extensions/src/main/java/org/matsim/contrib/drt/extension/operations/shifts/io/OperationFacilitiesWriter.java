@@ -50,7 +50,7 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
         openFile(filename);
         writeStartTag(ROOT, Collections.emptyList());
         try {
-            writeShifts(facilities);
+            writeOperationFacilities(facilities);
         } catch( IOException e ){
             e.printStackTrace();
         }
@@ -58,7 +58,7 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
         close();
     }
 
-    private void writeShifts(Map<Id<OperationFacility>, OperationFacilitySpecification> facilities) throws UncheckedIOException, IOException {
+    private void writeOperationFacilities(Map<Id<OperationFacility>, OperationFacilitySpecification> facilities) throws UncheckedIOException, IOException {
         List<OperationFacilitySpecification> sortedFacilities = facilities.values()
                 .stream()
                 .sorted(Comparator.comparing(OperationFacilitySpecification::getId))

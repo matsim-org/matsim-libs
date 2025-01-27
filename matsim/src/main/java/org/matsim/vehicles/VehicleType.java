@@ -57,6 +57,8 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 		// For car typ default network mode is assumed, for others it needs to be set explicitly.
 		if (typeId != null && Objects.equals(typeId.toString(), TransportMode.car))
 			this.networkMode = TransportMode.car;
+		else if (typeId != null && Objects.equals(typeId.toString(), TransportMode.bike))
+			this.networkMode = TransportMode.bike;
 	}
 
 	VehicleType(Id<VehicleType> typeId, String networkMode) {
@@ -124,6 +126,14 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	public final CostInformation getCostInformation() {
 		return costInformation;
 	}
+
+	/**
+	 * Check whether network mode is set. If not, calling {@link #getNetworkMode()} will throw an exception.
+	 */
+	public final boolean hasNetworkMode() {
+		return networkMode != null;
+	}
+
 	public final String getNetworkMode() {
 		return Objects.requireNonNull(networkMode, () -> "Network mode not set for vehicle type %s. Network mode needs to be set explicitly for non car modes. You can do this in XML by adding \t<networkMode networkMode=\"%s\"/>\n".formatted(id, id));
 	}

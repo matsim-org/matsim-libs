@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.vehicles.PersonVehicleTypes;
 import org.matsim.vehicles.PersonVehicles;
 

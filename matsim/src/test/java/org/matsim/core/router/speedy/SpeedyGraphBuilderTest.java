@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.network.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
