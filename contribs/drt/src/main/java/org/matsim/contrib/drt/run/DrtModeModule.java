@@ -20,25 +20,25 @@
 
 package org.matsim.contrib.drt.run;
 
-import com.google.inject.Key;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
-import org.matsim.contrib.drt.passenger.DefaultDvrpLoadFromDrtPassengers;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.stops.*;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
+import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.DefaultDvrpLoadFromTrip;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -48,6 +48,10 @@ import org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrixModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Key;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -71,7 +75,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule));
+				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.loadParams));
 		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
@@ -117,11 +121,9 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
 		}
 
-		bindModal(DvrpLoadFromDrtPassengers.class).toProvider(modalProvider(getter -> {
-			Population population = getter.get(Population.class);
-			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
-			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
-			return new DefaultDvrpLoadFromDrtPassengers(population, dvrpLoadSerializer, integerLoadType);
+		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
+			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.loadParams.defaultRequestDimension);
 		})).asEagerSingleton();
 
 	}

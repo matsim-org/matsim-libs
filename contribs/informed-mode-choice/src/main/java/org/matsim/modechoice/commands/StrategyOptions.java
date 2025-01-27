@@ -154,8 +154,7 @@ public final class StrategyOptions {
 		strategies.forEach(s -> config.replanning().addStrategySettings(s));
 
 		if (group.forceInnovation > 0)
-			binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {
-			}).toInstance(new ForceInnovationStrategyChooser<>(group.forceInnovation, ForceInnovationStrategyChooser.Permute.yes));
+			binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).toInstance(new ForceInnovationStrategyChooser<>(group.forceInnovation, ForceInnovationStrategyChooser.Permute.yes));
 
 
 		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder();

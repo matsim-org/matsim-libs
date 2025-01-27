@@ -42,8 +42,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -53,7 +52,7 @@ public class SelectiveInsertionProviderTest {
 	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	private final BestInsertionFinder initialInsertionFinder = mock(BestInsertionFinder.class);
-	private final IntegerLoadType integerLoadType = new DefaultIntegerLoadType();
+	private final IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {

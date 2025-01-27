@@ -45,6 +45,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
@@ -190,6 +191,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
 
+	public DvrpLoadParams loadParams = new DvrpLoadParams();
+
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
@@ -250,6 +253,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
+		// load
+		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
+			() -> loadParams,
+			params -> loadParams = (DvrpLoadParams) params);
 	}
 
 	/**

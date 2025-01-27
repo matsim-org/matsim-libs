@@ -269,7 +269,6 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 					Task driveFromPickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath,
 							DrtDriveTask.TYPE); // immediate drive to dropoff
 					schedule.addTask(stopTask.getTaskIdx() + 1, driveFromPickupTask);
-					///////
 				} else {
 					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 							stopTask.getTaskIdx() + 1, stopTask.getEndTime());
@@ -436,8 +435,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 						afterDropoffTask.getTaskIdx() + 1, afterDropoffTask.getEndTime());
 			} else {
 				// may want to wait here or after driving before starting next stop
-				double earliestArrivalTime = stops.get(dropoffIdx) instanceof Waypoint.StopWithCapacityChange stopWithCapacityChange ?
-					stopWithCapacityChange.getArrivalTime()
+				double earliestArrivalTime = stops.get(dropoffIdx).getChangedCapacity() != null ?
+					stops.get(dropoffIdx).getArrivalTime()
 						: stops.get(dropoffIdx).task.getPickupRequests().values()
 						.stream()
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)

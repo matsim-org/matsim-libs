@@ -20,17 +20,15 @@
 
 package org.matsim.contrib.drt.extension.preplanned.run;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
-import org.matsim.contrib.drt.passenger.DefaultDvrpLoadFromDrtPassengers;
-import org.matsim.contrib.drt.passenger.DvrpLoadFromDrtPassengers;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.DefaultDvrpLoadFromTrip;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -64,17 +62,15 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
 
-		bindModal(DvrpLoadFromDrtPassengers.class).toProvider(modalProvider(getter -> {
-			Population population = getter.get(Population.class);
-			DvrpLoadSerializer dvrpLoadSerializer = getter.getModal(DvrpLoadSerializer.class);
-			IntegerLoadType integerLoadType = getter.getModal(IntegerLoadType.class);
-			return new DefaultDvrpLoadFromDrtPassengers(population, dvrpLoadSerializer, integerLoadType);
+		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
+			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.loadParams.defaultRequestDimension);
 		})).asEagerSingleton();
 
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule));
+				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.loadParams));
 
 		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
 				+ " It would interfere with simulation of pre-calculated vehicle schedules."

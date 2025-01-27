@@ -88,9 +88,10 @@ public class IntegrationIT {
 			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
 			// Test method if all jobs are handled
 			Assertions.assertTrue(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "Not all jobs are handled");
-			CarrierService newService = CarrierService.Builder.newInstance(Id.create(
+			CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(
 				"service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"))
-				.setServiceDuration(10.).setServiceStartTimeWindow(TimeWindow.newInstance(0,86000)).build();
+				.setServiceDuration(10.);
+			CarrierService newService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(0, 86000)).build();
 			carrier.getServices().put(newService.getId(), newService);
 			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
 		}

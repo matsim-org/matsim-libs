@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+    <nodes>
+       
+		<!-- Netz B -->
+        <node id="1b" x="0" y="710" />
+        <node id="1b_1" x="500" y="710" /> 
+        <node id="1b_2" x="1000" y="710" /> 
+        <node id="1b_3" x="1500" y="710" /> 
+        <node id="1b_4" x="2000" y="710" /> 
+        <node id="1b_5" x="2500" y="710" /> 
+        <node id="1b_6" x="3000" y="710" /> 
+        <node id="1b_7" x="3500" y="710" /> 
+        <node id="1b_8" x="4000" y="710" /> 
+        <node id="2b" x="4450" y="710" /> 
+        <node id="3b" x="4500" y="710" /> 
+        <node id="4b" x="5500" y="710" />
+		<node id="5b" x="5550" y="710" />
+		<node id="5b_1" x="6000" y="710" />
+		<node id="5b_2" x="6500" y="710" />
+		<node id="5b_3" x="7000" y="710" />
+		<node id="5b_4" x="7500" y="710" />
+		<node id="5b_5" x="8000" y="710" />
+		<node id="5b_6" x="8500" y="710" />
+		<node id="5b_7" x="9000" y="710" />
+		<node id="5b_8" x="9500" y="710" />
+		<node id="6b" x="10000" y="710" />
+
+		<node id="7b" x="4550" y="720" /> 
+        <node id="8b" x="5450" y="720" />
+		
+		<node id="9b" x="4600" y="730" /> 
+        <node id="10b" x="5400" y="730" />
+		
+		<node id="11b" x="0" y="700" />
+
+        <node id="12b" x="4400" y="700" /> 
+		<node id="12b_1" x="4000" y="700" /> 
+		<node id="12b_2" x="3500" y="700" /> 
+		<node id="12b_3" x="3000" y="700" /> 
+		<node id="12b_4" x="2500" y="700" /> 
+		<node id="12b_5" x="2000" y="700" /> 
+		<node id="12b_6" x="1500" y="700" /> 
+		<node id="12b_7" x="1000" y="700" /> 
+		<node id="12b_8" x="500" y="700" /> 
+
+        <node id="13b" x="5600" y="700" /> 
+        <node id="14b" x="10000" y="700" />
+		<node id="14b_1" x="9500" y="700" />
+		<node id="14b_2" x="9000" y="700" />
+		<node id="14b_3" x="8500" y="700" />
+		<node id="14b_4" x="8000" y="700" />
+		<node id="14b_5" x="7500" y="700" />
+		<node id="14b_6" x="7000" y="700" />
+		<node id="14b_7" x="6500" y="700" />
+		<node id="14b_8" x="6000" y="700" />
+		
+		<node id="0b" x="-1000" y="710" />
+		<node id="15b" x="11000" y="700" />
+		<node id="16b" x="-1000" y="700" />
+		<node id="17b" x="11000" y="710" />
+
+    </nodes>
+    <links>
+	
+     	<link id="15b_14b" from="15b" to="14b" length="1000" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="11b_16b" from="11b" to="16b" length="1000" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		
+		<link id="0b_1b" from="0b" to="1b" length="1000" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="6b_17b" from="6b" to="17b" length="1000" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+
+		<link id="1b_1b_1" from="1b" to="1b_1" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_1_1b_2" from="1b_1" to="1b_2" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_2_1b_3" from="1b_2" to="1b_3" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_3_1b_4" from="1b_3" to="1b_4" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_4_1b_5" from="1b_4" to="1b_5" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_5_1b_6" from="1b_5" to="1b_6" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_6_1b_7" from="1b_6" to="1b_7" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_7_1b_8" from="1b_7" to="1b_8" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="1b_8_2b" from="1b_8" to="2b" length="450" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="2b_3b" from="2b" to="3b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">2b_3b</attribute>
+			</attributes>
+		</link>
+		<link id="3b_2b" from="3b" to="2b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">2b_3b</attribute>
+			</attributes>
+		</link>
+		<link id="3b_4b" from="3b" to="4b" length="1000" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="4b_5b" from="4b" to="5b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">4b_5b</attribute>
+			</attributes>
+		</link>
+		<link id="5b_4b" from="5b" to="4b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">4b_5b</attribute>
+			</attributes>
+		</link>
+		<link id="5b_5b_1" from="5b" to="5b_1" length="450" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="5b_1_5b_2" from="5b_1" to="5b_2" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_2_5b_3" from="5b_2" to="5b_3" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_3_5b_4" from="5b_3" to="5b_4" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_4_5b_5" from="5b_4" to="5b_5" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_5_5b_6" from="5b_5" to="5b_6" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_6_5b_7" from="5b_6" to="5b_7" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_7_5b_8" from="5b_7" to="5b_8" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="5b_8_6b" from="5b_8" to="6b" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+
+		<link id="14b_14b_1" from="14b" to="14b_1" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_1_14b_2" from="14b_1" to="14b_2" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_2_14b_3" from="14b_2" to="14b_3" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_3_14b_4" from="14b_3" to="14b_4" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_4_14b_5" from="14b_4" to="14b_5" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_5_14b_6" from="14b_5" to="14b_6" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_6_14b_7" from="14b_6" to="14b_7" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_7_14b_8" from="14b_7" to="14b_8" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="14b_8_13b" from="14b_8" to="13b" length="400" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimEntry" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		
+		<link id="13b_12b" from="13b" to="12b" length="1200" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_12b_1" from="12b" to="12b_1" length="400" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimExit" class="java.lang.Boolean">true</attribute>
+			</attributes>
+		</link>
+		<link id="12b_1_12b_2" from="12b_1" to="12b_2" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_2_12b_3" from="12b_2" to="12b_3" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_3_12b_4" from="12b_3" to="12b_4" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_4_12b_5" from="12b_4" to="12b_5" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_5_12b_6" from="12b_5" to="12b_6" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_6_12b_7" from="12b_6" to="12b_7" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_7_12b_8" from="12b_7" to="12b_8" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="12b_8_11b" from="12b_8" to="11b" length="500" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+
+		<link id="7b_8b" from="7b" to="8b" length="900" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">7b_8b</attribute>				
+			</attributes>
+		</link>
+		<link id="8b_7b" from="8b" to="7b" length="900" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">7b_8b</attribute>				
+			</attributes>
+		</link>
+		<link id="9b_10b" from="9b" to="10b" length="800" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">9b_10b</attribute>				
+			</attributes>
+		</link>
+		<link id="10b_9b" from="10b" to="9b" length="800" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">9b_10b</attribute>				
+			</attributes>
+		</link>
+
+		<link id="3b_7b" from="3b" to="7b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">3b_7b</attribute>
+			</attributes>
+		</link>
+		<link id="7b_3b" from="7b" to="3b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">3b_7b</attribute>
+			</attributes>
+		</link>
+		
+		<link id="7b_9b" from="7b" to="9b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">7b_9b</attribute>
+			</attributes>
+		</link>
+		<link id="9b_7b" from="9b" to="7b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">7b_9b</attribute>
+			</attributes>
+		</link>
+
+		<link id="10b_8b" from="10b" to="8b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">8b_10b</attribute>
+			</attributes>
+		</link>
+		<link id="8b_10b" from="8b" to="10b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">8b_10b</attribute>
+			</attributes>
+		</link>
+		<link id="8b_4b" from="8b" to="4b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">4b_8b</attribute>
+			</attributes>
+		</link>
+		<link id="4b_8b" from="4b" to="8b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">4b_8b</attribute>
+			</attributes>
+		</link>
+
+		<link id="13b_5b" from="13b" to="5b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="2b_12b" from="2b" to="12b" length="50" freespeed="27.7778" capacity="999" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+
+    </links>
+</network>

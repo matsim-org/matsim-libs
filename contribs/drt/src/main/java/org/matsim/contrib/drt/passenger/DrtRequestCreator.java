@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,13 +29,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoadSerializer;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.List;
+import com.google.common.base.Preconditions;
 
 /**
  * @author michalm
@@ -42,30 +44,40 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private static final Logger log = LogManager.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
-	private final DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers;
-	private final DvrpLoadSerializer dvrpLoadSerializer;
+	private final DvrpLoadType dvrpLoadType;
+	private final DvrpLoad emptyLoad;
 
-	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadFromDrtPassengers dvrpLoadFromDrtPassengers, DvrpLoadSerializer dvrpLoadSerializer) {
+	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadType dvrpLoadType) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
-		this.dvrpLoadFromDrtPassengers = dvrpLoadFromDrtPassengers;
-		this.dvrpLoadSerializer = dvrpLoadSerializer;
+		this.dvrpLoadType = dvrpLoadType;
+		this.emptyLoad = dvrpLoadType.getEmptyLoad();
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
+	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
-		DrtRoute drtRoute = (DrtRoute)route;
-		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
-		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
-		double maxRideDuration = drtRoute.getMaxRideTime();
+		double latestDepartureTime = Double.POSITIVE_INFINITY;
+		double latestArrivalTime = Double.POSITIVE_INFINITY;
+		double maxRideDuration = Double.POSITIVE_INFINITY;
+		DvrpLoad load = emptyLoad;
 
-		DvrpLoad load = this.dvrpLoadFromDrtPassengers.getLoad(passengerIds);
-		String serializedLoad = this.dvrpLoadSerializer.serialize(load);
+		Preconditions.checkArgument(!passengerIds.isEmpty());
+		for (Route route : routes) {
+			DrtRoute drtRoute = (DrtRoute)route;
+			latestDepartureTime = Math.min(latestDepartureTime, departureTime + drtRoute.getMaxWaitTime());
+			latestArrivalTime = Math.min(latestArrivalTime, departureTime + drtRoute.getTravelTime().seconds());
+			maxRideDuration = Math.min(drtRoute.getMaxRideTime(), maxRideDuration);
+			load = load.add(drtRoute.getLoad(dvrpLoadType));
+		}
+
+		// get one representative route, we assume that distance and direct ride time are equivalent
+		DrtRoute drtRoute = (DrtRoute) routes.get(0);
+		String serializedLoad = this.dvrpLoadType.serialize(load);
 
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
-						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration, load, serializedLoad, load.getType().getId()));
+						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration, load, serializedLoad));
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
@@ -81,7 +93,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.load(load)
 				.build();
 
-		log.debug(route);
+		log.debug(drtRoute);
 		log.debug(request);
 		return request;
 	}

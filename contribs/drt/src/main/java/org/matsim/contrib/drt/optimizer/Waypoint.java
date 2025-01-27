@@ -29,10 +29,11 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTaskWithVehicleCapacityChange;
-import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
+import org.matsim.contrib.drt.schedule.DrtCapacityChangeTask;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
@@ -139,28 +140,46 @@ public interface Waypoint {
 			return MoreObjects.toStringHelper(this).add("link", link).add("arrivalTime", arrivalTime).toString();
 		}
 	}
-	abstract class Stop implements Waypoint {
+
+	class Stop implements Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
 		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
 		public final DvrpLoad outgoingOccupancy;
+		private final DvrpLoad emptyLoad;
 
-		public Stop(DrtStopTask task, DvrpLoad outgoingOccupancy) {
+		@Nullable
+		private final DvrpLoad changedCapacity;
+
+		public Stop(DrtStopTask task, DvrpLoad outgoingOccupancy, DvrpLoadType loadType) {
 			this.task = task;
 			this.outgoingOccupancy = outgoingOccupancy;
+			this.emptyLoad = loadType.getEmptyLoad();
+			this.changedCapacity = null;
 
 			// essentially the min of the latest possible arrival times at this stop
 			latestArrivalTime = calcLatestArrivalTime();
 
 			// essentially the min of the latest possible pickup times at this stop
-			latestDepartureTime = calcLatestDepartureTime();
+			latestDepartureTime = calcLatestDepartureTime();	
 		}
 
-		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy) {
+		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy, DvrpLoadType loadType) {
 			this.task = task;
 			this.latestArrivalTime = latestArrivalTime;
 			this.latestDepartureTime = latestDepartureTime;
 			this.outgoingOccupancy = outgoingOccupancy;
+			this.emptyLoad = loadType.getEmptyLoad();
+			this.changedCapacity = null;
+		}
+
+		public Stop(DrtCapacityChangeTask task, DvrpLoadType loadType) {
+			this.task = task;
+			this.latestArrivalTime = task.getBeginTime();
+			this.latestDepartureTime = task.getEndTime();
+			this.outgoingOccupancy = loadType.getEmptyLoad();
+			this.emptyLoad = loadType.getEmptyLoad();
+			this.changedCapacity = task.getChangedCapacity();
 		}
 
 		@Override
@@ -184,56 +203,26 @@ public interface Waypoint {
 		}
 
 		public DvrpLoad getOccupancyChange() {
-			DvrpLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(null);
-			DvrpLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(null);
+			DvrpLoad pickedUp = task.getPickupRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(emptyLoad);
+			DvrpLoad droppedOff = task.getDropoffRequests().values().stream().map(AcceptedDrtRequest::getLoad).reduce(DvrpLoad::add).orElse(emptyLoad);
 			if(pickedUp == null && droppedOff == null) {
 				return null;
 			} else if(pickedUp == null) {
-				return droppedOff.getType().getEmptyLoad().subtract(droppedOff);
+				return emptyLoad.subtract(droppedOff);
 			} else if(droppedOff == null) {
 				return pickedUp;
 			} else {
 				return pickedUp.subtract(droppedOff);
 			}
 		}
-
-		abstract protected double calcLatestArrivalTime();
-
-		abstract protected double calcLatestDepartureTime();
-
-		private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
-			//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
-			//thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
-			//but we cannot add a new stop before the delayed task
-			return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
-		}
-
-		@Override
-		public String toString() {
-			return "VehicleData.Stop for: " + task.toString();
-		}
-	}
-
-	class StopWithPickupAndDropoff extends Stop {
-
-		public StopWithPickupAndDropoff(DrtStopTask task, DvrpLoad outgoingOccupancy) {
-			super(task, outgoingOccupancy);
-		}
-
-		public StopWithPickupAndDropoff(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy) {
-			super(task, latestArrivalTime, latestDepartureTime, outgoingOccupancy);
-		}
-
-
-		@Override
-		public double calcLatestArrivalTime() {
+		
+		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
 				task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
 				task.getBeginTime());
 		}
 
-		@Override
-		public double calcLatestDepartureTime() {
+		private double calcLatestDepartureTime() {
 			return getMaxTimeConstraint(
 				task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
 				task.getEndTime());
@@ -245,25 +234,15 @@ public interface Waypoint {
 			//but we cannot add a new stop before the delayed task
 			return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
 		}
-	}
 
-	class StopWithCapacityChange extends Stop {
-		public StopWithCapacityChange(DrtStopTaskWithVehicleCapacityChange task) {
-			super(task, task.getNewVehicleCapacity().getType().getEmptyLoad());
-		}
-
-		public DvrpLoad getNewVehicleCapacity() {
-			return ((CapacityChangeTask) this.task).getNewVehicleCapacity();
+		@Nullable
+		public DvrpLoad getChangedCapacity() {
+			return changedCapacity;
 		}
 
 		@Override
-		protected double calcLatestArrivalTime() {
-			return task.getBeginTime();
-		}
-
-		@Override
-		protected double calcLatestDepartureTime() {
-			return task.getEndTime();
+		public String toString() {
+			return "VehicleData.Stop for: " + task.toString();
 		}
 	}
 

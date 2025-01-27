@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,8 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.IntegerLoadType;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.testcases.fakes.FakeLink;
 
@@ -85,7 +85,7 @@ public class DetourPathDataCacheTest {
 	private final DetourPathDataCache detourPathDataCache = new DetourPathDataCache(pathToPickupMap, pathFromPickupMap,
 			pathToDropoffMap, pathFromDropoffMap, ZERO_DETOUR);
 
-	private static final IntegerLoadType DEFAULT_INTEGER_LOAD_TYPE = new DefaultIntegerLoadType();
+	private static final IntegerLoadType LOAD_TYPE = new IntegerLoadType("passengers");
 
 	@Test
 	void insertion_0_0() {
@@ -133,11 +133,11 @@ public class DetourPathDataCacheTest {
 	}
 
 	private VehicleEntry entry(Link startLink, Link... stopLinks) {
-		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, DEFAULT_INTEGER_LOAD_TYPE.fromInt(0)),
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, LOAD_TYPE.fromInt(0)),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null, null, 0);
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.StopWithPickupAndDropoff(new DefaultDrtStopTask(0, 60, link), DEFAULT_INTEGER_LOAD_TYPE.getEmptyLoad());
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE);
 	}
 }

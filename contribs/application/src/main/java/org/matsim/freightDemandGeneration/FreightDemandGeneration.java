@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * Controller.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -29,9 +29,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -211,15 +209,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		// create the demand
 		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
-				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
+				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
-		Controler controler = prepareControler(scenario);
-		FreightDemandGenerationUtils.createDemandLocationsFile(controler);
-		solveSelectedSolution(selectedSolution, config, controler);
-
-		// TODO analyze results
+		Controller controller = prepareController(scenario);
+		FreightDemandGenerationUtils.createDemandLocationsFile(controller);
+		solveSelectedSolution(selectedSolution, config, controller);
 
 		log.info("Finished");
 		return 0;
@@ -428,7 +424,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				// use only the given demand of the read carrier file
 				boolean oneCarrierHasJobs = false;
 				for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values())
-					if (carrier.getServices().isEmpty() && carrier.getShipments().isEmpty())
+					if (!CarriersUtils.hasJobs(carrier))
 						log.warn("{} has no jobs which can be used", carrier.getId().toString());
 					else {
 						oneCarrierHasJobs = true;
@@ -445,18 +441,18 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * Prepares the controller.
 	 *
 	 * @param scenario 	Scenario
-	 * @return 			Controler
+	 * @return 			Controller
 	 */
-	private static Controler prepareControler(Scenario scenario) {
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new AbstractModule() {
+	private static Controller prepareController(Scenario scenario) {
+		Controller controller = ControllerUtils.createController(scenario);
+		controller.addOverridingModule(new CarrierModule());
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
 		}});
 
-		return controler;
+		return controller;
 	}
 
 	/**
@@ -464,14 +460,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 *
 	 * @param selectedSolution 			selected solution option
 	 * @param config 					Config
-	 * @param controler 				Controler
+	 * @param controller 				Controller
 	 * @throws ExecutionException 		if the execution of the jsprit fails
 	 * @throws InterruptedException 	if the execution of the jsprit is interrupted
 	 */
 	private static void solveSelectedSolution(OptionsOfVRPSolutions selectedSolution, Config config,
-			Controler controler) throws ExecutionException, InterruptedException {
-		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-			.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
+			Controller controller) throws ExecutionException, InterruptedException {
+		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersNoPlans.xml");
+
 		if (Objects.requireNonNull(selectedSolution) == OptionsOfVRPSolutions.createNoSolutionAndOnlyWriteCarrierFile) {
 			log.warn(
 				"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
@@ -485,31 +481,30 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		switch (selectedSolution) {
 			case runJspritWithDistanceConstraint, runJspritAndMATSimWithDistanceConstraint -> useDistanceConstraint = true;
 		}
-		runJsprit(controler, useDistanceConstraint);
+		runJsprit(controller, useDistanceConstraint);
 		if (runMatSim)
-			controler.run();
+			controller.run();
 		else
 			log.warn(
 					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-		new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-			.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
+		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersWithPlans.xml");
 	}
 
 	/**
 	 * Runs jsprit.
 	 *
-	 * @param controler 				Controller
+	 * @param controller 				Controller
 	 * @param usingRangeRestriction 	boolean if the range restriction is used
 	 * @throws ExecutionException 		if the execution of the jsprit fails
 	 * @throws InterruptedException 	if the execution of the jsprit is interrupted
 	 */
-	private static void runJsprit(Controler controler, boolean usingRangeRestriction)
+	private static void runJsprit(Controller controller, boolean usingRangeRestriction)
 			throws ExecutionException, InterruptedException {
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(),
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controller.getConfig(),
 				FreightCarriersConfigGroup.class);
 		if (usingRangeRestriction)
 			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(
 					FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-		CarriersUtils.runJsprit(controler.getScenario());
+		CarriersUtils.runJsprit(controller.getScenario());
 	}
 }

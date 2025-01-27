@@ -39,9 +39,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DvrpLoad;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.dvrp_load.DefaultIntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
@@ -64,12 +62,10 @@ public class DrtEventsReadersTest {
 	private final Id<DvrpVehicle> vehicle = Id.create("vehicle_1", DvrpVehicle.class);
 	private final Id<Person> driver = Id.create("driver_1", Person.class);
 
-	private final DvrpLoad load = new DefaultIntegerLoadType().fromInt(1);
-
 	//standard dvrp events are tested in DvrpEventsReadersTest
 	private final List<Event> drtEvents = List.of(
 			// We do not expect the events reader to construct the DvrpLoad attribute. So we pass null here and just keep the serialized format and the load type id.
-			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0, 555, null, "1", load.getType().getId()),//
+			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0, 555, null, "1"),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//

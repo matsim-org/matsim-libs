@@ -57,8 +57,8 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 			case DRIVE:
 				return legFactory.create(vehicle);
 			case STOP:
-				if(task instanceof CapacityChangeTask capacityChangeTask) {
-					return new VehicleCapacityChangeActivity(DRT_CAPACITY_CHANGE_NAME, vehicle, capacityChangeTask.getNewVehicleCapacity(), task.getEndTime());
+				if (task instanceof CapacityChangeTask capacityChangeTask) {
+					return new VehicleCapacityChangeActivity(DRT_CAPACITY_CHANGE_NAME, vehicle, capacityChangeTask.getChangedCapacity(), task.getEndTime());
 				} else {
 					DrtStopTask t = (DrtStopTask)task;
 					return new DrtStopActivity(passengerHandler, dynAgent, t::getEndTime, t.getDropoffRequests(), t.getPickupRequests(),
