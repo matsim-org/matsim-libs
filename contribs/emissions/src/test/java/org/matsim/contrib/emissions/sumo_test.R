@@ -62,13 +62,13 @@ ggplot(diff_out) +
 
 diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_out.csv")
 
-hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Vehcat_2020_Average.csv")
-hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
+hbefa_hot_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Vehcat_2020_Average.csv")
+hbefa_hot_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
 
-hbefa_filtered_det <- hbefa_det %>%
-  filter(VehCat == "pass. car" & Component == "NOx")
+hbefa_filtered_det <- hbefa_hot_det %>%
+  filter(VehCat == "pass. car" & Component == "NOx" & Technology == "petrol (4S)")
 
-hbefa_filtered_avg <- hbefa_avg %>%
+hbefa_filtered_avg <- hbefa_hot_avg %>%
   filter(VehCat == "pass. car" & Component == "NOx")
 
 hbefa_NOX_max_det <- max(hbefa_filtered_det$EFA)
@@ -88,20 +88,6 @@ diff_out_NOx <- diff_out %>%
   left_join(lengths, by="segment") %>%
   mutate(value = value/(length/1000))
 
-diff_out_NOx_t <- tibble(
-  segment = c(0,1,2,3,0,1,2,3),
-  model = c("NOX_min_det","NOX_min_det","NOX_min_det","NOX_min_det","NOX_max_det","NOX_max_det","NOX_max_det","NOX_max_det",
-            "NOX_min_avg","NOX_min_avg","NOX_min_avg","NOX_min_avg","NOX_max_avg","NOX_max_avg","NOX_max_avg","NOX_max_avg"),
-  value = c(hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_min_det, hbefa_NOX_max_det, hbefa_NOX_max_det, hbefa_NOX_max_det, hbefa_NOX_max_det),
-  )
-
-a <- diff_out_NOx %>%
-  bind_rows(diff_out_NOx_t)
-
-ggplot(a, aes(x=segment, y=value, color=model)) +
-  geom_line() +
-  geom_point()
-
 min_max_vals <- tibble(
   table = c("avg", "det"),
   min = c(hbefa_NOX_min_avg, hbefa_NOX_min_det),
@@ -109,7 +95,94 @@ min_max_vals <- tibble(
 )
 
 ggplot(diff_out_NOx) +
-  geom_line(aes(x=segment, y=value, color=model)) +
-  geom_point(aes(x=segment, y=value, color=model)) +
-  geom_rect(data=min_max_vals, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2)
+  geom_line(aes(x=segment, y=value, color=model), size=1.5) +
+  geom_point(aes(x=segment, y=value, color=model), size=2.5) +
+  geom_rect(data=min_max_vals, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
+  scale_color_manual(values=c("#d21717", "#17d2a4")) +
+  scale_fill_manual(values=c("#00f6ff", "#ff004c"))
 
+#------------------- Create plot for all components
+
+#Load data
+diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_out.csv")
+
+hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Vehcat_2020_Average.csv")
+hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
+
+#Create helper vars
+lengths <- tibble(
+  segment = c(0,1,2,3),
+  length = c(3095, 4756, 7158, 8254)
+)
+
+components_avg <- unique(hbefa_avg$Component)
+components_det <- unique(hbefa_det$Component)
+components <- intersect(components_avg, components_det)
+
+# TODO: Check, that components = components_avg = components_det
+
+diff_out_cleaned <- diff_out %>%
+  select(segment, "CO-SUMO", "CO-MATSIM", "CO2-SUMO", "CO2-MATSIM", "HC-SUMO", "HC-MATSIM", "PMx-SUMO", "PMx-MATSIM", "NOx-SUMO", "NOx-MATSIM") %>%
+  pivot_longer(cols = c("CO-SUMO", "CO-MATSIM",
+                        "CO2-SUMO", "CO2-MATSIM",
+                        "HC-SUMO", "HC-MATSIM",
+                        "PMx-SUMO", "PMx-MATSIM",
+                        "NOx-SUMO", "NOx-MATSIM"), names_to="model", values_to="value") %>%
+  separate(model, c("component", "model"), "-") %>%
+  left_join(lengths, by="segment") %>%
+  mutate(gPkm=value/(length/1000))
+
+hbefa_filtered_avg <- hbefa_avg %>%
+  filter(VehCat == "pass. car")
+hbefa_filtered_det <- hbefa_det %>%
+  filter(VehCat == "pass. car" & Technology == "petrol (4S)")
+
+hbefa_avg_max <- lapply(components, function(component) {
+  hbefa_avg %>%
+    filter(Component == component) %>%
+    .$EFA_weighted %>%
+    max(na.rm = TRUE)
+})
+names(hbefa_avg_max) <- components
+
+hbefa_det_max <- lapply(components, function(component) {
+  hbefa_det %>%
+    filter(Component == component) %>%
+    .$EFA_weighted %>%
+    max(na.rm = TRUE)
+})
+names(hbefa_det_max) <- components
+
+hbefa_avg_min <- lapply(components, function(component) {
+  hbefa_avg %>%
+    filter(Component == component) %>%
+    .$EFA_weighted %>%
+    min(na.rm = TRUE)
+})
+names(hbefa_avg_min) <- components
+
+hbefa_det_min <- lapply(components, function(component) {
+  hbefa_det %>%
+    filter(Component == component) %>%
+    .$EFA_weighted %>%
+    min(na.rm = TRUE)
+})
+names(hbefa_det_min) <- components
+
+min_max_vals <- tibble(
+  component = unlist(lapply(components, function(c) {c(c, c)})),
+  table = unlist(lapply(components, function(c) {c("avg", "det")})),
+  min = unlist(lapply(components, function(c) {
+    c(hbefa_avg_min[[c]], hbefa_det_min[[c]])
+  })),
+  max = unlist(lapply(components, function(c) {
+   c(hbefa_avg_max[[c]], hbefa_det_max[[c]])
+  }))
+)
+
+ggplot(diff_out_cleaned) +
+  geom_line(aes(x=segment, y=gPkm, color=model), size=1.5) +
+  geom_point(aes(x=segment, y=gPkm, color=model), size=2.5) +
+  scale_color_manual(values=c("#d21717", "#17d2a4")) +
+  scale_fill_manual(values=c("#00f6ff", "#ff004c")) +
+  facet_wrap(~component, scales="free")
