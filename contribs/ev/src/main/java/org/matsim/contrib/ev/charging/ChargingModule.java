@@ -54,15 +54,18 @@ public class ChargingModule extends AbstractModule {
 
 //		this.addMobsimListenerBinding().to( ChargingHandler.class ).in( Singleton.class );
 		// does not work since ChargingInfrastructure is not available.
+
+		// standard charging priority for all chargers
+		bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager) {
-		return new ChargingWithQueueingLogic.Factory(eventsManager);
+	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
+		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory);
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager) {
-		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager);
+	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
+		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory);
 	}
 }

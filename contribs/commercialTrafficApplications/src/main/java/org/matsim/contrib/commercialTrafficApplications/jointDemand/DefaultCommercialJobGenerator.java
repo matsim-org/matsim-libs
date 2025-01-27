@@ -331,9 +331,9 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
                     CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, PopulationUtils.decideOnLinkIdForActivity(activity,scenario));
                     serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
                     serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
-                    serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
+					serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
 
-                    Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
+					Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
                         Carrier carrier = carriers.getCarriers().get(carrierId);
                         CarrierService service = serviceBuilder.build();

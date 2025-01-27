@@ -55,7 +55,7 @@ public final class SimWrapper {
 	private SimWrapper(org.matsim.core.config.Config config) {
 		this.matsimConfig = config;
 		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
-		this.data = new Data(configGroup);
+		this.data = new Data(config.getContext(), configGroup);
 	}
 
 	/**

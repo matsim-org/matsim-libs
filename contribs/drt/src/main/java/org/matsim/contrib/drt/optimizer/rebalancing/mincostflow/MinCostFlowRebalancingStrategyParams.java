@@ -56,6 +56,19 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@NotNull
 	public RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
+
+	public enum TargetCoefficientSource {
+		Static, FromZoneAttribute, FromZoneAttributeOrStatic
+	}
+
+	@Parameter
+	@Comment("Defines whether the alpha and beta of the target function should be"
+			+ " [Static] or [FromZoneAttribute] in which case alpha and beta can be provided per zone as an attribute."
+			+ " [FromZoneAttributeOrStatic] will fall back to the static coefficients if no attribute is found for a given zone."
+			+ " Use " + MinCostFlowRebalancingStrategy.REBALANCING_ZONAL_TARGET_ALPHA + " and " + MinCostFlowRebalancingStrategy.REBALANCING_ZONAL_TARGET_BETA
+			+ " to set values accordingly.")
+	public TargetCoefficientSource targetCoefficientSource = TargetCoefficientSource.Static;
+
 	public enum ZonalDemandEstimatorType {PreviousIterationDemand, None}
 
 	@Parameter

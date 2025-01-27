@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -214,6 +215,8 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight").runCarrierAnalysis(
+			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
@@ -267,7 +270,7 @@ public class CarriersUtils {
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
-	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
+	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
@@ -294,6 +297,29 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Checks if all carriers with jobs have at least one plan.
+	 *
+	 * @param carriers the carriers
+	 * @return true if all carriers with jobs have at teast one plan
+	 */
+	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
+		for (Carrier carrier : carriers.getCarriers().values())
+			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
+
+		return true;
+	}
+
+	/**
+	 * Checks if a carrier has jobs (services or shipments).
+	 *
+	 * @param carrier the carrier
+	 * @return true if a carrier has jobs (services or shipments)
+	 */
+	public static boolean hasJobs(Carrier carrier) {
+		return !carrier.getServices().isEmpty() || !carrier.getShipments().isEmpty();
 	}
 
 	/**
@@ -430,14 +456,14 @@ public class CarriersUtils {
 			log.debug("Converting CarrierService to CarrierShipment: {}", carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
+					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getServiceLinkId(),
 					carrierService.getCapacityDemand())
-				.setDeliveryServiceTime(carrierService.getServiceDuration())
+				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18
-				.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
+				.setDeliveryStartingTimeWindow(carrierService.getServiceStaringTimeWindow())
 				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-				.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStaringTimeWindow().getEnd()))
 				.build();
 			addShipment(carrierWS, carrierShipment);
 		}
@@ -674,8 +700,50 @@ public class CarriersUtils {
 		carrier.getAttributes().putAttribute(ATTR_JSPRIT_Time, time);
 	}
 
-	public static void writeCarriers(Carriers carriers, String filename) {
-		new CarrierPlanWriter(carriers).write(filename);
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers the carriers
+	 * @param file     the file should contain the location of the file and the name of the file (e.g. /path/to/carriers.xml)
+	 */
+	public static void writeCarriers(Carriers carriers, String file) {
+		new CarrierPlanWriter(carriers).write(file);
+		log.info("Carriers file written to: {}", file);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param carriers   the carriers
+	 * @param pathFolder the path to the folder where the file should be written
+	 * @param filename   the name of the file including the file extension
+	 * @param prefix     the prefix of the filename being added before the filename delimited by a dot
+	 */
+	public static void writeCarriers(Carriers carriers, String pathFolder, String filename, String prefix) {
+		String pathFile;
+		if (prefix == null) {
+			pathFile = pathFolder + "/" + filename;
+		} else {
+			pathFile = pathFolder + "/" + prefix + "." + filename;
+		}
+		writeCarriers(carriers, pathFile);
+	}
+
+	/**
+	 * Writes the carriers to a file.
+	 *
+	 * @param scenario 	the scenario
+	 * @param filename   the name of the file including the file extension
+	 */
+	public static void writeCarriers(Scenario scenario, String filename) {
+		String pathFile;
+		String outputPath = scenario.getConfig().controller().getOutputDirectory();
+		if (scenario.getConfig().controller().getRunId() == null) {
+			pathFile = outputPath + "/" + filename;
+		} else {
+			pathFile = outputPath + "/" + scenario.getConfig().controller().getRunId() + "." + filename;
+		}
+		writeCarriers(getCarriers(scenario), pathFile);
 	}
 
 	static class JspritCarrierTask implements Runnable {
