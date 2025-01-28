@@ -8,9 +8,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
-import java.util.ArrayDeque;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,22 +40,23 @@ public interface SimLink {
 
 	enum OnLeaveQueueInstruction {MoveToBuffer, RemoveVehicle, BlockQueue}
 
+	/**
+	 * During 'doSimStep' a link will call 'OnLeaveQueue' handlers after a vehicle has left the queue, and before it enters the buffer.
+	 * It is possible to add a handler to the link, which is called during that step. The link will keep calling handlers until the
+	 * first handler returns another result than 'MoveToBuffer'. If all handlers return 'MoveToBuffer', the vehicle is moved into the buffer.
+	 * Handlers may return 'RemoveVehicle' if the vehicle should be removed from the network, for example when the vehicle is finished.
+	 * Otherwise, handlers may return 'BlockQueue' to signal that vehicles should remain in the queue. The handler is responsible for
+	 * updating the earliest exit time of the vehicle to a later time step. Otherwise, the link will attempt to call all handlers again.
+	 * <p>
+	 * A 'OnLeaveQueue' handler may specify a priority. The link will call handlers from high to low priority. If no priority is specified,
+	 * the default priority of 0.0 is applied.
+	 */
 	@FunctionalInterface
 	interface OnLeaveQueue {
 		OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now);
 
-		default OnLeaveQueue compose(OnLeaveQueue before) {
-			return (DistributedMobsimVehicle v, SimLink l, double n) -> {
-				var result = before.apply(v, l, n);
-				if (result == OnLeaveQueueInstruction.MoveToBuffer) {
-					return this.apply(v, l, n);
-				}
-				return result;
-			};
-		}
-
-		static OnLeaveQueue defaultHandler() {
-			return (_, _, _) -> OnLeaveQueueInstruction.MoveToBuffer;
+		default double getPriority() {
+			return 0.0;
 		}
 	}
 
@@ -67,10 +66,10 @@ public interface SimLink {
 		var outflowCapacity = FlowCapacity.createOutflowCapacity(link);
 		if (fromPart == toPart) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			return new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
+			return new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), activateLink, activateNode);
 		} else if (toPart == part) {
 			var q = SimQueue.create(link, config, effectiveCellSize);
-			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), OnLeaveQueue.defaultHandler(), activateLink, activateNode);
+			var localLink = new LocalLink(link, toNode, q, outflowCapacity, config.getStuckTime(), activateLink, activateNode);
 			return new SplitInLink(localLink, fromPart);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
@@ -111,20 +110,19 @@ public interface SimLink {
 		@Getter
 		private final Id<Link> id;
 		private final Consumer<SimLink> activateLink;
+		private final List<OnLeaveQueue> onLeaveHandlers = new ArrayList<>();
 
-		private OnLeaveQueue onLeaveQueue;
 		private final SimQueue q;
 		private final SimBuffer buffer;
 		private final double length;
 		private final double freespeed;
 
-		LocalLink(Link link, SimNode toNode, SimQueue q, FlowCapacity outflowCapacity, double stuckTime, OnLeaveQueue defaultOnLeaveQueue, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
+		LocalLink(Link link, SimNode toNode, SimQueue q, FlowCapacity outflowCapacity, double stuckTime, Consumer<SimLink> activateLink, Consumer<SimNode> activateNode) {
 			id = link.getId();
 			this.q = q;
 			length = link.getLength();
 			freespeed = link.getFreespeed();
 			buffer = new SimBuffer(outflowCapacity, stuckTime, toNode, activateNode);
-			this.onLeaveQueue = defaultOnLeaveQueue;
 			this.activateLink = activateLink;
 		}
 
@@ -204,11 +202,7 @@ public interface SimLink {
 				var headVehicle = q.peek();
 				if (headVehicle.getEarliestLinkExitTime() > now) break;
 
-//				if (getId().equals(Id.createLinkId(325089245)) && headVehicle.getId().equals(Id.createVehicleId("freight_1496_freight"))) {
-//					System.out.println("Debug!!!");
-//				}
-
-				var leaveResult = onLeaveQueue.apply(headVehicle, this, now);
+				var leaveResult = callLeaveHandlers(headVehicle, now);
 
 				// the vehicle should keep moving through the network. Move it to the
 				// buffer, so that it can be processed in the next intersection update
@@ -226,9 +220,18 @@ public interface SimLink {
 			return !q.isEmpty();
 		}
 
+		private OnLeaveQueueInstruction callLeaveHandlers(DistributedMobsimVehicle vehicle, double now) {
+			for (var handler : onLeaveHandlers) {
+				var result = handler.apply(vehicle, this, now);
+				if (result != OnLeaveQueueInstruction.MoveToBuffer) return result;
+			}
+			return OnLeaveQueueInstruction.MoveToBuffer;
+		}
+
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
-			this.onLeaveQueue = this.onLeaveQueue.compose(onLeaveQueue);
+			this.onLeaveHandlers.add(onLeaveQueue);
+			this.onLeaveHandlers.sort(Comparator.comparingDouble(OnLeaveQueue::getPriority).reversed());
 		}
 
 		@Override

@@ -57,6 +57,11 @@ public class DistributedIntegrationTest {
 		// Compatibility with many scenarios
 		Activities.addScoringParams(config);
 
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
+		config.qsim().setEndTime(36 * 3600);
+
 		// add dsim config
 		var dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
 		dsimConfig.setPartitioning(DSimConfigGroup.Partitioning.bisect);
@@ -83,7 +88,9 @@ public class DistributedIntegrationTest {
 	}
 
 	/**
-	 * Keep this test, because we later want to introduce comparisons with other output than events
+	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores
+	 * are not equal and there is no point in comparing it. Keep the test around though, because it is sometimes handy
+	 * for comparing with existing features.
 	 */
 	@Test
 	@Order(1)
@@ -114,19 +121,6 @@ public class DistributedIntegrationTest {
 		Controler controler = new Controler(scenario, module.getNode());
 		controler.addOverridingModule(module);
 		controler.run();
-
-		Path outputPath = Path.of(utils.getOutputDirectory());
-
-		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml");
-		var expectedPopulationPath = outputPath.resolve("..").resolve("qsim").resolve("kelheim-mini.output_plans.xml");
-
-//		var result = PopulationComparison.compare(
-//			PopulationUtils.readPopulation(expectedPopulationPath.toString()),
-//			PopulationUtils.readPopulation(actualPopulationPath.toString()),
-//			10.0
-//		);
-
-		//assertEquals(PopulationComparison.Result.equal, result);
 	}
 
 	@Test

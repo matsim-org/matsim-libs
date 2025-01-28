@@ -131,6 +131,11 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 		transitQSimEngine.afterSim();
 	}
 
+	@Override
+	public double getEnginePriority() {
+		return 1.;
+	}
+
 	private boolean moveVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
 		if (!link.isAccepting(SimLink.LinkPosition.Buffer, now)) {
