@@ -51,7 +51,6 @@
                     <!--<skipTests>${skip.surefire.tests}</skipTests>-->
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
     <dependencies>

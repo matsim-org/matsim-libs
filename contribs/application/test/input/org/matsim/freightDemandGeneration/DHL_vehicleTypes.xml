@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<vehicleTypes>
+		<vehicleType id="dhl_vehicle">
+			<description>null</description>
+			<capacity>230</capacity>
+			<engineInformation fuelType="diesel" gasConsumption="0.000112"/>  <!-- gasConsumption in liter per meter -->
+			<costInformation fix="48.78688752" perMeter="0.000370807" perSecond="0.00627778" maxSpeed="42"/>
+		</vehicleType>
+
+		<vehicleType id="dhl_bicycle">
+			<description>null</description>
+			<capacity>23</capacity>
+			<engineInformation fuelType="diesel" gasConsumption="0"/>
+			<costInformation fix="3.26732673" perMeter="0.000103" perSecond="0.003352" maxSpeed="6.94"/>
+		</vehicleType>
+
+	</vehicleTypes>
+

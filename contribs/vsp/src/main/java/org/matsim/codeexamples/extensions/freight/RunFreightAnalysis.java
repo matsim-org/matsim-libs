@@ -1,8 +1,5 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * QNetsimEngineDepartureHandlerProvider.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2019 by the members listed in the COPYING,        *
@@ -19,19 +16,31 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.codeexamples.extensions.freight;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 
-class QNetsimEngineDepartureHandlerProvider implements Provider<VehicularDepartureHandler> {
-	// yyyyyy should return an interface.  Otherwise one must inherit from the implementation, which we don't like! kai, may'18
+import java.util.concurrent.ExecutionException;
 
-	@Inject
-	QNetsimEngineI qNetsimEngine;
 
-	@Override
-	public VehicularDepartureHandler get() {
-		return qNetsimEngine.getDepartureHandler();
+/**
+ * @see org.matsim.freight.carriers
+ */
+public class RunFreightAnalysis {
+
+	public static void main(String[] args) throws ExecutionException, InterruptedException{
+		run(args, false);
 	}
+	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
+
+		CarriersAnalysis analysis = new CarriersAnalysis(
+				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\",
+				"MA_output\\byPopulationAndAge_demandPerPerson_1pt\\analysis", null, "EPSG:25832");
+		try {
+			analysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }
