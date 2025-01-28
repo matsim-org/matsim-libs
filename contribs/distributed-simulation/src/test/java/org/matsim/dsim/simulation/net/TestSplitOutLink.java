@@ -26,6 +26,28 @@ public class TestSplitOutLink {
 	}
 
 	@Test
+	public void initStorageCapIncreasedForKinematicWaves() {
+
+		var toPart = 42;
+		var link = TestUtils.createSingleLink(0, toPart);
+		link.setCapacity(1800);
+		link.setFreespeed(10);
+		link.setLength(20);
+		var node = new SimNode(link.getToNode().getId());
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+
+		var simLink = SimLink.create(link, node, config, 10, toPart, _ -> {}, _ -> {});
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
+		// simple storage capacity should be 2. With increased capacity it should be 3.4. Push a vehicle with pce=3, which would occupy
+		// the link for a simple storage capacity, but laves some space when kinematicWaves is used
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 3, 50), SimLink.LinkPosition.QStart, 0);
+		// inflow capacity should be recovered after 10 seconds. The link should accept vehicles at t=10 as there is 0.4 pce available
+		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 9));
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 10));
+	}
+
+	@Test
 	public void storageCapacityWhenUpdated() {
 
 		var link = TestUtils.createSingleLink(0, 42);
@@ -80,17 +102,17 @@ public class TestSplitOutLink {
 		// push one vehicle which consumes inflow capacity
 		var now = 0;
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
-		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, now);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 2, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
-		// inflow is restored after 4 seconds
-		now = 4;
+		// inflow is restored after 8 seconds
+		now = 8;
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
 
 		// push another vehicle
-		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, now);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
-		// inflow is restored after 4 seconds, but storage capacity is exhausted
-		now = 8;
+		// inflow is restored after 8 seconds, but storage capacity is exhausted
+		now = 16;
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, now));
 		assertEquals(2, activated.get());
 	}

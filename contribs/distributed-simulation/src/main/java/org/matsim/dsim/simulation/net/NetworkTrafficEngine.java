@@ -107,6 +107,10 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
 
+		if (link.getId().equals(Id.createLinkId("320097807"))) {
+			System.out.println("Debug!!!");
+		}
+
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
 	}
 

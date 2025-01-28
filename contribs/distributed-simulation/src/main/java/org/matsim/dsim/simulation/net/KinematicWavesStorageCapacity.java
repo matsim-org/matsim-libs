@@ -11,6 +11,26 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	final static double HOLE_SPEED = 15.0 / 3.6;
 
+	static KinematicWavesStorageCapacity create(Link link, double effectiveCellSize) {
+
+		var minCapacityForHoles = calculateMinCapacityForHoles(link);
+		var simpleStorageCapacity = SimpleStorageCapacity.calculateSimpleStorageCapacity(link, effectiveCellSize);
+		var assignedCapacity = Math.max(simpleStorageCapacity, minCapacityForHoles);
+		var holeTravelTime = link.getLength() / HOLE_SPEED;
+
+		if (simpleStorageCapacity < assignedCapacity) {
+			CountedWarning.warn("KinematicWavesStorageCapacity::init", 10,
+				"Storage capacity of link {} increased for backwards travelling holes. This changes the traffic dynamics", link.getId()
+			);
+		}
+
+		return new KinematicWavesStorageCapacity(assignedCapacity, holeTravelTime);
+	}
+
+	static double calculateMinCapacityForHoles(Link link) {
+		return link.getLength() * link.getFlowCapacityPerSec() * (link.getFreespeed() + HOLE_SPEED) / link.getFreespeed() / HOLE_SPEED;
+	}
+
 	@Getter
 	private final double max;
 	private final double holeTravelTime;
@@ -19,7 +39,12 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	private double lastUpdateTime = 0;
 
-	KinematicWavesStorageCapacity(Link link, double effectiveCellSize) {
+	KinematicWavesStorageCapacity(double capacity, double holeTravelTime) {
+		this.max = capacity;
+		this.holeTravelTime = holeTravelTime;
+	}
+
+	/*KinematicWavesStorageCapacity(Link link, double effectiveCellSize) {
 
 		// In addition to the minimal storage capacity requirements to serve slow speeds and the outflow of the link,
 		// we also need sufficient storage capacity to simulate holes and kinematic waves.
@@ -27,13 +52,9 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 		var minStorageForHoles = link.getLength() * link.getFlowCapacityPerSec() * (link.getFreespeed() + HOLE_SPEED) / link.getFreespeed() / HOLE_SPEED;
 		max = Math.max(simpleStorageCapacity.getMax(), minStorageForHoles);
 		holeTravelTime = link.getLength() / HOLE_SPEED;
-
-		if (simpleStorageCapacity.getMax() < max) {
-			CountedWarning.warn("KinematicWavesStorageCapacity::init", 10,
-				"Storage capacity of link {} increased for backwards travelling holes. This changes the traffic dynamics", link.getId()
-			);
-		}
 	}
+
+	 */
 
 	private double occupiedByVehicles;
 	private double occupiedByHoles;

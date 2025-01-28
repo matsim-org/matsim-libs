@@ -74,9 +74,22 @@ public interface SimLink {
 			return new SplitInLink(localLink, fromPart);
 		} else {
 			var inflowCapacity = FlowCapacity.createInflowCapacity(link, config, effectiveCellSize);
-			var storageCapacity = new SimpleStorageCapacity(link, effectiveCellSize);
+			var storageCapacity = createStorageCapacityForSplitOutLink(link, effectiveCellSize, config);
 			return new SplitOutLink(link, storageCapacity, inflowCapacity, activateLink);
 		}
+	}
+
+	private static SimpleStorageCapacity createStorageCapacityForSplitOutLink(Link link, double effectiveCellSize, DSimConfigGroup config) {
+		return switch (config.getTrafficDynamics()) {
+			case queue -> SimpleStorageCapacity.create(link, effectiveCellSize);
+			case kinematicWaves -> {
+				var simpleCapacity = SimpleStorageCapacity.calculateSimpleStorageCapacity(link, effectiveCellSize);
+				var capacityForHoles = KinematicWavesStorageCapacity.calculateMinCapacityForHoles(link);
+				var assignedCapacity = Math.max(simpleCapacity, capacityForHoles);
+				yield new SimpleStorageCapacity(assignedCapacity);
+			}
+			default -> throw new IllegalArgumentException("Unsupported traffic dynamics: " + config.getTrafficDynamics());
+		};
 	}
 
 	private static int getPartition(Node node) {
@@ -190,6 +203,10 @@ public interface SimLink {
 				// get a reference to the first vehicle in the queue and check whether it is time to exit.
 				var headVehicle = q.peek();
 				if (headVehicle.getEarliestLinkExitTime() > now) break;
+
+				if (getId().equals(Id.createLinkId("320097807")) && headVehicle.getId().equals(Id.createVehicleId("freight_1496_freight"))) {
+					System.out.println("Debug!!!");
+				}
 
 				var leaveResult = onLeaveQueue.apply(headVehicle, this, now);
 
