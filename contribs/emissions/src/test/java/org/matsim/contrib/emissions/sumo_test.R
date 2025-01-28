@@ -106,8 +106,8 @@ ggplot(diff_out_NOx) +
 #Load data
 diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_out.csv")
 
-hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Vehcat_2020_Average.csv")
-hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Concept_2020_detailed_perTechAverage.csv", delim = ";")
+hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Concept_2020_detailed_perTechAverage.csv")
+hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
 
 #Create helper vars
 lengths <- tibble(
@@ -122,23 +122,23 @@ components <- intersect(components_avg, components_det)
 # TODO: Check, that components = components_avg = components_det
 
 diff_out_cleaned <- diff_out %>%
-  select(segment, "CO-SUMO", "CO-MATSIM", "CO2-SUMO", "CO2-MATSIM", "HC-SUMO", "HC-MATSIM", "PMx-SUMO", "PMx-MATSIM", "NOx-SUMO", "NOx-MATSIM") %>%
+  select(segment, "CO-SUMO", "CO-MATSIM", "CO2(total)-SUMO", "CO2(total)-MATSIM", "HC-SUMO", "HC-MATSIM", "PM-SUMO", "PM-MATSIM", "NOx-SUMO", "NOx-MATSIM") %>%
   pivot_longer(cols = c("CO-SUMO", "CO-MATSIM",
-                        "CO2-SUMO", "CO2-MATSIM",
+                        "CO2(total)-SUMO", "CO2(total)-MATSIM",
                         "HC-SUMO", "HC-MATSIM",
-                        "PMx-SUMO", "PMx-MATSIM",
+                        "PM-SUMO", "PM-MATSIM",
                         "NOx-SUMO", "NOx-MATSIM"), names_to="model", values_to="value") %>%
   separate(model, c("component", "model"), "-") %>%
   left_join(lengths, by="segment") %>%
   mutate(gPkm=value/(length/1000))
 
 hbefa_filtered_avg <- hbefa_avg %>%
-  filter(VehCat == "pass. car")
-hbefa_filtered_det <- hbefa_det %>%
   filter(VehCat == "pass. car" & Technology == "petrol (4S)")
+hbefa_filtered_det <- hbefa_det %>%
+  filter(VehCat == "pass. car" & Technology == "petrol (4S)" & EmConcept == "PC P Euro-4")
 
 hbefa_avg_max <- lapply(components, function(component) {
-  hbefa_avg %>%
+  hbefa_filtered_avg %>%
     filter(Component == component) %>%
     .$EFA_weighted %>%
     max(na.rm = TRUE)
@@ -146,15 +146,15 @@ hbefa_avg_max <- lapply(components, function(component) {
 names(hbefa_avg_max) <- components
 
 hbefa_det_max <- lapply(components, function(component) {
-  hbefa_det %>%
+  hbefa_filtered_det %>%
     filter(Component == component) %>%
-    .$EFA_weighted %>%
+    .$EFA %>%
     max(na.rm = TRUE)
 })
 names(hbefa_det_max) <- components
 
 hbefa_avg_min <- lapply(components, function(component) {
-  hbefa_avg %>%
+  hbefa_filtered_avg %>%
     filter(Component == component) %>%
     .$EFA_weighted %>%
     min(na.rm = TRUE)
@@ -162,16 +162,16 @@ hbefa_avg_min <- lapply(components, function(component) {
 names(hbefa_avg_min) <- components
 
 hbefa_det_min <- lapply(components, function(component) {
-  hbefa_det %>%
+  hbefa_filtered_det %>%
     filter(Component == component) %>%
-    .$EFA_weighted %>%
+    .$EFA %>%
     min(na.rm = TRUE)
 })
 names(hbefa_det_min) <- components
 
 min_max_vals <- tibble(
   component = unlist(lapply(components, function(c) {c(c, c)})),
-  table = unlist(lapply(components, function(c) {c("avg", "det")})),
+  table = unlist(lapply(components, function(c) {c("avg", "EURO-4")})),
   min = unlist(lapply(components, function(c) {
     c(hbefa_avg_min[[c]], hbefa_det_min[[c]])
   })),
@@ -180,9 +180,53 @@ min_max_vals <- tibble(
   }))
 )
 
+min_max_vals_used <- min_max_vals %>%
+  filter(component %in% diff_out_cleaned$component)
+
 ggplot(diff_out_cleaned) +
   geom_line(aes(x=segment, y=gPkm, color=model), size=1.5) +
   geom_point(aes(x=segment, y=gPkm, color=model), size=2.5) +
   scale_color_manual(values=c("#d21717", "#17d2a4")) +
   scale_fill_manual(values=c("#00f6ff", "#ff004c")) +
-  facet_wrap(~component, scales="free")
+  facet_wrap(~component, scales="free") +
+  geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2)
+
+# Plot Euro0-Euro6 chart
+
+hbefa_filtered_det_EU <- lapply(c(0,1,2,3,4,5,6), function(eu) {
+  hbefa_det %>%
+    filter(VehCat == "pass. car" & Technology == "petrol (4S)" & EmConcept == paste0("PC P Euro-", eu))
+})
+names(hbefa_filtered_det_EU) <- c(0,1,2,3,4,5,6)
+
+min_max_vals_EU <- tibble(
+  component = unlist(lapply(components, function(c) {c(c,c,c,c,c,c,c)})),
+  concept = unlist(lapply(components, function(c) {c(0,1,2,3,4,5,6)})),
+  min = unlist(lapply(components, function(c) {
+    lapply(c(0,1,2,3,4,5,6), function(concept) {
+      hbefa_filtered_det_EU[[as.character(concept)]] %>%
+        filter(Component == c) %>%
+        summarise(min = min(EFA, na.rm = TRUE)) %>%
+        pull(min)
+    })
+  })),
+  max = unlist(lapply(components, function(c) {
+    lapply(c(0,1,2,3,4,5,6), function(concept) {
+      hbefa_filtered_det_EU[[as.character(concept)]] %>%
+        filter(Component == c) %>%
+        summarise(max = max(EFA, na.rm = TRUE)) %>%
+        pull(max)
+    })
+  }))
+)
+
+#------------------- Filter out pass.veh
+path_in <- "D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks.csv"
+path_out <- "D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"
+
+table <- read_delim(path_in, delim=";")
+table <- table %>%
+  filter(VehCat == "pass. car") %>%
+  filter(Technology == "petrol (4S)" | Technology == "diesel")
+
+write_delim(table, path_out, delim=";")
