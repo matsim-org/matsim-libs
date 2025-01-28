@@ -19,17 +19,21 @@
 
 package org.matsim.contrib.drt.extension;
 
-import java.util.Optional;
+import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
+import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
+import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 import javax.annotation.Nullable;
-
-import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author Steffen Axer
- *
+ * <p>
  * This class summarizes all optional drt parametersets and should be used while creating MultiModeDrtConfigGroup instances
  */
 public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
@@ -40,14 +44,33 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	@Nullable
 	private DrtOperationsParams drtOperationsParams;
 
+	@Nullable
+	private DrtServicesParams drtServicesParams;
+
+	@Nullable
+	private DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams;
+
 	public DrtWithExtensionsConfigGroup() {
+		this(DefaultDrtOptimizationConstraintsSet::new);
+	}
+
+	public DrtWithExtensionsConfigGroup(Supplier<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSetSupplier) {
+		super(drtOptimizationConstraintsSetSupplier);
 		// Optional
 		addDefinition(DrtCompanionParams.SET_NAME, DrtCompanionParams::new, () -> drtCompanionParams,
-				params -> drtCompanionParams = (DrtCompanionParams) params);
+			params -> drtCompanionParams = (DrtCompanionParams) params);
 
 		// Optional
 		addDefinition(DrtOperationsParams.SET_NAME, DrtOperationsParams::new, () -> drtOperationsParams,
-				params -> drtOperationsParams = (DrtOperationsParams) params);
+			params -> drtOperationsParams = (DrtOperationsParams) params);
+
+		// Optional
+		addDefinition(DrtServicesParams.SET_TYPE, DrtServicesParams::new, () -> drtServicesParams,
+			params -> drtServicesParams = (DrtServicesParams) params);
+
+		// Optional
+		addDefinition(DrtSpatialRequestFleetFilterParams.SET_NAME, DrtSpatialRequestFleetFilterParams::new, () -> drtSpatialRequestFleetFilterParams,
+			params -> drtSpatialRequestFleetFilterParams = (DrtSpatialRequestFleetFilterParams) params);
 	}
 
 	public Optional<DrtCompanionParams> getDrtCompanionParams() {
@@ -57,5 +80,12 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	public Optional<DrtOperationsParams> getDrtOperationsParams() {
 		return Optional.ofNullable(drtOperationsParams);
 	}
-	
+
+	public Optional<DrtServicesParams> getServicesParams() {
+		return Optional.ofNullable(drtServicesParams);
+	}
+
+	public Optional<DrtSpatialRequestFleetFilterParams> getSpatialRequestFleetFilterParams() {
+		return Optional.ofNullable(drtSpatialRequestFleetFilterParams);
+	}
 }

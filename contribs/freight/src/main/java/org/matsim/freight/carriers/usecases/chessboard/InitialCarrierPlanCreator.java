@@ -34,6 +34,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -43,8 +44,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
-
-import java.util.Collection;
 
 final class InitialCarrierPlanCreator {
 
@@ -166,14 +165,11 @@ final class InitialCarrierPlanCreator {
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReader(carriers, types ).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml" );
 
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-
         for(Carrier carrier : carriers.getCarriers().values()){
             CarrierPlan plan = new InitialCarrierPlanCreator(scenario.getNetwork()).createPlan(carrier);
-            carrier.setSelectedPlan(plan);
+            carrier.addPlan(plan);
         }
-
-        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+		CarriersUtils.writeCarriers(carriers, "input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
-import org.matsim.core.network.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -165,7 +165,10 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		SumoNetworkFeatureExtractor props = new SumoNetworkFeatureExtractor(handler);
 
 		try (CSVPrinter out = new CSVPrinter(IOUtils.getBufferedWriter(output), CSVFormat.DEFAULT)) {
-			out.printRecord(props.getHeader());
+			List<String> header = new ArrayList<>(props.getHeader());
+			header.addAll(handler.attributes);
+
+			out.printRecord(header);
 			props.print(out);
 
 		} catch (IOException e) {
@@ -243,7 +246,11 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
 
 		// add additional service tag
-		linkProperties.put(OsmTags.SERVICE, new LinkProperties(LinkProperties.LEVEL_LIVING_STREET, 1, 15 / 3.6, 450, false));
+		linkProperties.put(OsmTags.SERVICE, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 450, false));
+		linkProperties.put(OsmTags.PATH, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
+
+		// This is for bikes
+		linkProperties.put(OsmTags.CYCLEWAY, new LinkProperties(LinkProperties.LEVEL_PATH, 1, 15 / 3.6, 300, false));
 
 		for (SumoNetworkHandler.Edge edge : sumoHandler.edges.values()) {
 

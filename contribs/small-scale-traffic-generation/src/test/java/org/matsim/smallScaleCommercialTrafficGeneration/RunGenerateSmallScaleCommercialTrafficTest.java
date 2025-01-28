@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * Controller.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -73,7 +73,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String sample = "0.1";
 		String jspritIterations = "2";
 		String creationOption = "createNewCarrierFile";
-		String smallScaleCommercialTrafficType = "commercialPersonTraffic";
+		String smallScaleCommercialTrafficType = "completeSmallScaleCommercialTraffic";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
 		String shapeCRS = "EPSG:4326";
@@ -99,8 +99,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		Scenario scenarioWOSolution = ScenarioUtils.createScenario(config);
 		Scenario scenarioWSolution = ScenarioUtils.createScenario(config);
 		Population population = PopulationUtils.readPopulation(utils.getOutputDirectory() + "testPopulation.xml.gz");
-		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemand.xml";
-		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemandWithPlans.xml";
+		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml";
+		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_carriersVehicleTypes.xml.gz");
 

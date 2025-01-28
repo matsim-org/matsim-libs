@@ -76,7 +76,7 @@ public class PtTripFareEstimatorTest {
 		distanceClassLongFareParams.setFareIntercept(1.0);
 		distanceClassLongFareParams.setFareSlope(0.01);
 
-		fare.addParameterSet(distanceFare);
+		fare.addPtFareParameterSet(distanceFare);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config);
 		injector = controler.getInjector();
@@ -103,7 +103,7 @@ public class PtTripFareEstimatorTest {
 
 			List<Leg> trip = model.getLegs(TransportMode.pt, i);
 
-			if (trip == null) {
+			if (trip == null || !model.hasModeForTrip(TransportMode.pt, i)) {
 				continue;
 			}
 

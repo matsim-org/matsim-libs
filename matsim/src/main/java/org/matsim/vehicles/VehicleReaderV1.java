@@ -3,6 +3,7 @@ package org.matsim.vehicles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -38,6 +39,10 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 	public void startTag( final String name, final Attributes atts, final Stack<String> context ){
 		if( VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
 			this.currentVehType = this.builder.createVehicleType( Id.create( atts.getValue( VehicleSchemaV1Names.ID ), VehicleType.class ) );
+			// In the old format there is no network mode, and everything was basically a car.
+			// Vehicle type does not contain a default network mode anymore, therefore we need to set it here.
+			this.currentVehType.setNetworkMode( TransportMode.car );
+
 		} else if( VehicleSchemaV1Names.LENGTH.equalsIgnoreCase( name ) ){
 			this.currentVehType.setLength( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.METER ) ) );
 		} else if( VehicleSchemaV1Names.WIDTH.equalsIgnoreCase( name ) ){

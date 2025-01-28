@@ -21,6 +21,7 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +34,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
-
-import java.util.*;
 
 /**
  * A reader that reads carriers and their plans.
@@ -82,7 +81,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
 	 *
 	 * @param carriers which is a map that stores carriers
-	 * @param carrierVehicleTypes
+	 * @param carrierVehicleTypes which is a map that stores carrierVehicleTypes
 	 */
 	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super(ValidationType.DTD_OR_XSD);
@@ -117,19 +116,19 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
 					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
 				if( startPickup == null ){
-					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartingTimeWindow(
 						  TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) );
 				} else{
-					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
-																									 setDeliveryTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
+						setDeliveryStartingTimeWindow(
 																										   TimeWindow.newInstance(
 																											     getDouble(
 																													 startDelivery ),
 																											     getDouble(
 																													 endDelivery ) ) );
 				}
-				if( pickupServiceTime != null ) shipmentBuilder.setPickupServiceTime( getDouble( pickupServiceTime ) );
-				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
+				if( pickupServiceTime != null ) shipmentBuilder.setPickupDuration( getDouble( pickupServiceTime ) );
+				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryDuration( getDouble( deliveryServiceTime ) );
 				CarrierShipment shipment = shipmentBuilder.build();
 				currentShipments.put( attributes.getValue( ID ), shipment );
 				CarriersUtils.addShipment(currentCarrier, shipment);
@@ -188,7 +187,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			{
 				String vehicleId = attributes.getValue("vehicleId");
 				currentVehicle = vehicles.get(vehicleId);
-				currentTourBuilder = Tour.Builder.newInstance();
+				currentTourBuilder = Tour.Builder.newInstance(Id.create("unknown", Tour.class));
 				break ;
 			}
 			case "leg":
@@ -209,16 +208,16 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 					case "pickup" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getFrom());
+						finishLeg(s.getPickupLinkId());
 						currentTourBuilder.schedulePickup(s);
-						previousActLoc = s.getFrom();
+						previousActLoc = s.getPickupLinkId();
 					}
 					case "delivery" -> {
 						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getTo());
+						finishLeg(s.getDeliveryLinkId());
 						currentTourBuilder.scheduleDelivery(s);
-						previousActLoc = s.getTo();
+						previousActLoc = s.getDeliveryLinkId();
 					}
 					case "end" -> {
 						finishLeg(currentVehicle.getLinkId());

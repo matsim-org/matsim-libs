@@ -27,7 +27,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 /**
- * @author: Steffen Axer
+ * @author Steffen Axer
  */
 public interface VRPTransportCosts extends VehicleRoutingTransportCosts {
     LeastCostPathCalculator getRouter();

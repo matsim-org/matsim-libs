@@ -74,6 +74,6 @@ public class StuckAgentDashboard implements Dashboard {
 
 	@Override
 	public double priority() {
-		return -1;
+		return -10;
 	}
 }

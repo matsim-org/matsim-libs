@@ -4,85 +4,86 @@
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xml:lang="en">
-           
-<!-- Editor: Kai Martins-turner, VSP, Berlin Institute of Technology -->
-<!-- Description of the vehicleTypes to be used in the simulation of freight traffic -->
-<!-- Based on https://github.com/graphhopper/jsprit/blob/master/jsprit-io/src/main/resources/vrp_xml_schema.xsd by Graphhopper GmbH -->
 
-<xs:element name="vehicleTypes" minOccurs="1"  maxOccurs="1">
-<xs:complexType>
-    <xs:sequence>
-	  <xs:element name="type" minOccurs="1" maxOccurs="unbounded">
-         <xs:complexType>
-			 <xs:all>
-				  <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
-				  <xs:element name="capacity" type="xs:integer" minOccurs="0" maxOccurs="1"
-							  default="0"/>
-				  <xs:element name="capacity-dimensions" minOccurs="0" maxOccurs="1">
-					  <xs:complexType>
-						  <xs:sequence>
-							  <xs:element name="dimension" minOccurs="1" maxOccurs="unbounded">
-								  <xs:complexType>
-									  <xs:simpleContent>
-										  <xs:extension base="xs:integer">
-											  <xs:attribute name="index" type="xs:integer"	use="required"/>
-										  </xs:extension>
-									  </xs:simpleContent>
-								  </xs:complexType>
-							  </xs:element>
-						  </xs:sequence>
-					  </xs:complexType>
-				  </xs:element>
-				  <xs:element name="costs">
-					  <xs:complexType>
-						  <xs:all>
-							  <xs:element name="fixed" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
-							  <xs:element name="distance" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
-							  <xs:element name="time" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
-							  <xs:element name="service" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
-							  <xs:element name="wait" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
-						  </xs:all>
-					  </xs:complexType>
-				  </xs:element>
-			  </xs:all>
-			  <xs:attribute name="type" type="xs:string" use="optional"/>
-			  <xs:attribute name="penaltyFactor" type="xs:string" use="optional"/>
-		  </xs:complexType>
-	  </xs:element>
-  </xs:sequence>
-</xs:complexType>
+    <!-- Editor: Kai Martins-turner, VSP, Berlin Institute of Technology -->
+    <!-- Description of the vehicleTypes to be used in the simulation of freight traffic -->
+    <!-- Based on https://github.com/graphhopper/jsprit/blob/master/jsprit-io/src/main/resources/vrp_xml_schema.xsd by Graphhopper GmbH -->
 
-  <!-- Ende copy from Graphhopper -->
-  
-  <xs:element name="allowableWeight">
-    <xs:complexType>
-      <xs:attribute name="weight" use="required" type="xs:integer"/>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name="capacity">
-    <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:integer">
-          <xs:attribute name="unit" use="required"/>
-        </xs:extension>
-      </xs:simpleContent>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name="engineInformation">
-    <xs:complexType>
-      <xs:attribute name="fuelType" use="required" type="xs:NCName"/>
-      <xs:attribute name="gasConsumption" use="required" type="xs:decimal"/>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name="costInformation">
-    <xs:complexType>
-      <xs:attribute name="fix" use="required" type="xs:integer"/>
-      <xs:attribute name="perMeter" use="required" type="xs:decimal"/>
-      <xs:attribute name="perSecond" use="required" type="xs:decimal"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="maxVelocity" type="xs:decimal"/>
+    <xs:element name="vehicleTypes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="type" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                            <xs:element name="capacity" type="xs:integer" minOccurs="0" maxOccurs="1"
+                                        default="0"/>
+                            <xs:element name="capacity-dimensions" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="dimension" minOccurs="1" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:integer">
+                                                        <xs:attribute name="index" type="xs:integer"	use="required"/>
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="costs">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element name="fixed" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
+                                        <xs:element name="distance" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
+                                        <xs:element name="time" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
+                                        <xs:element name="service" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
+                                        <xs:element name="wait" type="xs:decimal" minOccurs="0" maxOccurs="1" default="0.0"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:all>
+                        <xs:attribute name="type" type="xs:string" use="optional"/>
+                        <xs:attribute name="penaltyFactor" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Ende copy from Graphhopper -->
+
+    <xs:element name="allowableWeight">
+        <xs:complexType>
+            <xs:attribute name="weight" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="capacity">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:integer">
+                    <xs:attribute name="unit" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="engineInformation">
+        <xs:complexType>
+            <xs:attribute name="fuelType" use="required" type="xs:NCName"/>
+            <xs:attribute name="gasConsumption" use="required" type="xs:decimal"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="costInformation">
+        <xs:complexType>
+            <xs:attribute name="fix" use="required" type="xs:integer"/>
+            <xs:attribute name="perMeter" use="required" type="xs:decimal"/>
+            <xs:attribute name="perSecond" use="required" type="xs:decimal"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="maxVelocity" type="xs:decimal"/>
 </xs:schema>

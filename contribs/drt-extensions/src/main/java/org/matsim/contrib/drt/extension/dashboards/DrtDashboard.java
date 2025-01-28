@@ -134,7 +134,7 @@ public class DrtDashboard implements Dashboard {
 				viz.title = "Spatial rejection distribution";
 				viz.description = "Requested (and rejected) origins and destinations.";
 				viz.projection = this.crs;
-				viz.file = data.output("ITERS/it." + lastIteration + "/*rejections_" + drtConfigGroup.mode + ".csv");
+				viz.file = data.output("*rejections_" + drtConfigGroup.mode + ".csv");
 				viz.addAggregation("rejections", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
@@ -222,7 +222,7 @@ public class DrtDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Vehicle occupancy"; //actually, without title the area plot won't work
 				viz.description = "Number of passengers on board at a time";
-				viz.dataset = data.output("ITERS/it." + lastIteration + "/*occupancy_time_profiles_" + drtConfigGroup.mode + ".txt");
+				viz.dataset = data.output("/*occupancy_time_profiles_" + drtConfigGroup.mode + ".txt");
 				viz.x = "time";
 				viz.xAxisName = "Time";
 				viz.yAxisName = "Vehicles [1]";

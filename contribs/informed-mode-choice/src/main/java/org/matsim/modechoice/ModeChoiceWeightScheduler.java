@@ -1,5 +1,6 @@
 package org.matsim.modechoice;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -30,14 +31,16 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 
 	private InformedModeChoiceConfigGroup.Schedule anneal;
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-
-		Config config = event.getServices().getConfig();
+	@Inject
+	public ModeChoiceWeightScheduler(Config config) {
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-
 		startBeta = currentBeta = imc.getInvBeta();
 		anneal = imc.getAnneal();
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		Config config = event.getServices().getConfig();
 
 		// The first iteration does not do any replanning
 		n = config.controller().getLastIteration() - 1;
@@ -52,7 +55,7 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		if (anneal == InformedModeChoiceConfigGroup.Schedule.off || event.getIteration() == 0)
+		if (anneal == InformedModeChoiceConfigGroup.Schedule.off || event.getIteration() == 0 || currentBeta == Double.POSITIVE_INFINITY)
 			return;
 
 		// anneal target is 0, iterations are offset by 1 because first iteration does not do replanning

@@ -1,5 +1,4 @@
 package playground.vsp.cadyts.marginals;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -63,13 +62,14 @@ public class ModalDistanceAndCountsCadytsIT {
 		return result;
 	}
 
-	private Config createConfig() {
+	private Config createConfig(String outputSuffix) {
 
 		Config config = ConfigUtils.createConfig();
 		String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		String outputDirectory = this.utils.getOutputDirectory();
+		config.controller().setOutputDirectory(outputDirectory.substring(0,outputDirectory.length()-1)+outputSuffix);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(40);
 
@@ -137,11 +137,13 @@ public class ModalDistanceAndCountsCadytsIT {
 		createPopulation(scenario.getPopulation(), scenario.getNetwork());
 
 		VehicleType car = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		car.setNetworkMode(TransportMode.car);
 		car.setMaximumVelocity(100 / 3.6);
 		car.setLength(7.5);
 
 		// make bike and car equally fast for now
 		VehicleType bike = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
+		bike.setNetworkMode(TransportMode.bike);
 		bike.setMaximumVelocity(25 / 3.6);
 		bike.setLength(7.5);
 		scenario.getVehicles().addVehicleType(car);
@@ -244,7 +246,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	@MethodSource("arguments")
 	void test(double countsWeight, double modalDistanceWeight) {
 
-		Config config = createConfig();
+		Config config = createConfig(countsWeight+"_"+modalDistanceWeight);
 		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
 		cadytsConfigGroup.setWriteAnalysisFile(true);
 		config.addModule(cadytsConfigGroup);

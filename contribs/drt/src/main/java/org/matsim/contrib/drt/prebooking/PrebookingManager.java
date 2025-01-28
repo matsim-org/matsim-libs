@@ -395,16 +395,35 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				if(abortRejectedPrebookings) {
 					for (Id<Person> passengerId : item.request.getPassengerIds()) {
 						MobsimAgent agent = internalInterface.getMobsim().getAgents().get(passengerId);
-						PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
-						if(planElement instanceof Activity activity) {
+
+						int index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
+						Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+						PlanElement planElement = plan.getPlanElements().get(index);
+
+						if (planElement instanceof Activity currentActivity) {
+							Activity activity = currentActivity;
 							activity.setEndTime(Double.POSITIVE_INFINITY);
 							activity.setMaximumDurationUndefined();
+
 							((HasModifiablePlan) agent).resetCaches();
 							internalInterface.getMobsim().rescheduleActivityEnd(agent);
+							eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
+									this.mode));
+
+							internalInterface.getMobsim().getAgentCounter().incLost();
+							internalInterface.getMobsim().getAgentCounter().decLiving();
+						} else {
+							// If the current element is a leg, the agent is walking towards the pickup location
+							// We make the agent stuck at the interaction activity
+							while (index < plan.getPlanElements().size()) {
+								if (plan.getPlanElements().get(index) instanceof Activity activity) {
+									activity.setEndTime(Double.POSITIVE_INFINITY);
+									activity.setMaximumDurationUndefined();
+								}
+
+								index++;
+							}
 						}
-						eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
-								this.mode));
-						internalInterface.getMobsim().getAgentCounter().incLost();
 					}
 				}
 			}
