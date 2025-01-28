@@ -173,14 +173,13 @@ public interface SimLink {
 		}
 
 		private double calculateExitTime(DistributedMobsimVehicle vehicle, double now) {
-			// The original QSim floors the travel time. We also do this but additionally,
-			// assume a travel time of at least one second. This is due to how messaging is
-			// implemented. Vehicles sent to the next partition can only be processed in the
-			// next. By giving each vehicle a travel time of at least one, we can ensure that
-			// travel time is the same between split and local links
+			// The original QSim floors the travel time. The behavior here diverts from the original implementation. Our implementation keeps
+			// possible fractions on the earliest exit time. This results in vehicles staying in the queue for at least one second. In contrast,
+			// in the original QSim, it is possible for a vehicle to traverse the queue of a link in 0 seconds. The distributed implementation
+			// requires vehicles to stay in the queue for at least one second, so that the SplitInLink is able to deliver the capacity update of
+			// a leaving vehicle to the upstream partition. This would not work with vehicles leaving after 0s with the current implementation.
 			var speed = Math.min(freespeed, vehicle.getMaximumVelocity());
-			var duration = Math.max(1, length / speed);
-			return Math.floor(now + duration);
+			return now + length / speed;
 		}
 
 		@Override
