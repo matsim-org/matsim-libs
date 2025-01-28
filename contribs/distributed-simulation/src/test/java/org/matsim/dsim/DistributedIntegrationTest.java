@@ -8,6 +8,7 @@ import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -56,6 +57,21 @@ public class DistributedIntegrationTest {
 		// Compatibility with many scenarios
 		Activities.addScoringParams(config);
 
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
+		config.qsim().setEndTime(36 * 3600);
+
+		// add dsim config
+		var dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
+		dsimConfig.setPartitioning(DSimConfigGroup.Partitioning.bisect);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		dsimConfig.setStuckTime(30);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		dsimConfig.setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
+		dsimConfig.setNetworkModes(Set.of("car", "freight"));
+		dsimConfig.setEndTime(36 * 3600);
+
 		return config;
 	}
 
@@ -72,10 +88,13 @@ public class DistributedIntegrationTest {
 	}
 
 	/**
-	 * Keep this test, because we later want to introduce comparisons with other output than events
+	 * This test is disabled. The DSim calculates travel times different from the QSim. Therefore events and scores
+	 * are not equal and there is no point in comparing it. Keep the test around though, because it is sometimes handy
+	 * for comparing with existing features.
 	 */
 	@Test
 	@Order(1)
+	@Disabled
 	void qsim() {
 
 		Config local = createScenario();
@@ -94,25 +113,14 @@ public class DistributedIntegrationTest {
 	void runLocal() {
 
 		Config local = createScenario();
+		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(local, DSimConfigGroup.class);
+		dsimConfig.setThreads(4);
 		Scenario scenario = prepareScenario(local);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(4));
+		DistributedSimulationModule module = new DistributedSimulationModule(dsimConfig);
 		Controler controler = new Controler(scenario, module.getNode());
 		controler.addOverridingModule(module);
 		controler.run();
-
-		Path outputPath = Path.of(utils.getOutputDirectory());
-
-		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml");
-		var expectedPopulationPath = outputPath.resolve("..").resolve("qsim").resolve("kelheim-mini.output_plans.xml");
-
-		var result = PopulationComparison.compare(
-			PopulationUtils.readPopulation(expectedPopulationPath.toString()),
-			PopulationUtils.readPopulation(actualPopulationPath.toString()),
-			10.0
-		);
-
-		assertEquals(PopulationComparison.Result.equal, result);
 	}
 
 	@Test
@@ -128,8 +136,10 @@ public class DistributedIntegrationTest {
 				.map(comm -> pool.submit(() -> {
 
 					Config local = createScenario();
+					DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(local, DSimConfigGroup.class);
+					dsimConfig.setThreads(2);
 					Scenario scenario = prepareScenario(local);
-					DistributedSimulationModule module = new DistributedSimulationModule(comm,  DSimConfigGroup.ofThreads(2));
+					DistributedSimulationModule module = new DistributedSimulationModule(comm, dsimConfig);
 					Controler controler = new Controler(scenario, module.getNode());
 
 					controler.addOverridingModule(module);
@@ -159,7 +169,7 @@ public class DistributedIntegrationTest {
 
 		// compare populations of distributed simulation and original qsim
 		var actualPopulationPath = outputPath.resolve("kelheim-mini.output_plans.xml");
-		var expectedPopulationPath = outputPath.resolve("..").resolve("qsim").resolve("kelheim-mini.output_plans.xml");
+		var expectedPopulationPath = outputPath.resolve("..").resolve("runLocal").resolve("kelheim-mini.output_plans.xml");
 
 		var result = PopulationComparison.compare(
 			PopulationUtils.readPopulation(expectedPopulationPath.toString()),

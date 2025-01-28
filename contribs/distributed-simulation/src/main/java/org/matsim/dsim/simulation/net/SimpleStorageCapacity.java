@@ -7,23 +7,39 @@ import org.matsim.utils.CountedWarning;
 @Getter
 class SimpleStorageCapacity implements StorageCapacity {
 
-	private final double max;
-	private double occupied;
+	static double calculateDefaultCapacity(Link link, double effectiveCellSize) {
+		return link.getLength() * link.getNumberOfLanes() / effectiveCellSize;
+	}
 
-	SimpleStorageCapacity(Link link, double effectiveCellSize) {
-		var defaultStorageCapacity = link.getLength() * link.getNumberOfLanes() / effectiveCellSize;
-		// We have two lower bounds for storage capacities:
-		// 1. We need as much storage capacity as we have flow capacity per time step
-		// 2. We need sufficient storage capacity to serve the flow if the link has a large travel time (slow freesepeed)
-		// NOTE: I don't understand 2. Why is that capacity not dependent on the cell size?
-		var minStorageCapacityForOutFlow = link.getFlowCapacityPerSec();
-		var minStorageCapacityForSlowSpeed = link.getLength() / link.getFreespeed() * link.getFlowCapacityPerSec();
-		max = Math.max(defaultStorageCapacity, Math.max(minStorageCapacityForOutFlow, minStorageCapacityForSlowSpeed));
+	static double calculateMinCapacityForSlowSpeed(Link link) {
+		return link.getLength() / link.getFreespeed() * link.getFlowCapacityPerSec();
+	}
 
-		if (defaultStorageCapacity < max) {
+	static double calculateSimpleStorageCapacity(Link link, double effectiveCellSize) {
+		var defaultCapacity = calculateDefaultCapacity(link, effectiveCellSize);
+		var minCapacityForOutFlow = link.getFlowCapacityPerSec();
+		var minCapacityForSlowspeed = calculateMinCapacityForSlowSpeed(link);
+		return Math.max(defaultCapacity, Math.max(minCapacityForOutFlow, minCapacityForSlowspeed));
+	}
+
+	static SimpleStorageCapacity create(Link link, double effectiveCellSize) {
+		var defaultCapacity = calculateDefaultCapacity(link, effectiveCellSize);
+		var max = calculateSimpleStorageCapacity(link, effectiveCellSize);
+
+		if (defaultCapacity < max) {
 			CountedWarning.warn("SimpleStorageCapacity::Init", 10,
 				"Storage capacity for link {} is increased to serve the outflow of the link. This changes traffic dynamics", link.getId());
 		}
+
+		return new SimpleStorageCapacity(max);
+	}
+
+	private final double max;
+	private double occupied;
+
+	SimpleStorageCapacity(double maxCapacity) {
+		this.max = maxCapacity;
+		this.occupied = 0;
 	}
 
 	@Override

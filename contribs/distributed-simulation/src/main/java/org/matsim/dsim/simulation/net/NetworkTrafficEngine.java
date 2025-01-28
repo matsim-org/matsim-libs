@@ -60,7 +60,20 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 			if (link instanceof SimLink.SplitOutLink)
 				continue;
 
-			link.addLeaveHandler(this::handleVehicleIsFinished);
+			// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
+			// also give it a low priority, to make sure that this handler is called last if more handlers
+			// are active
+			link.addLeaveHandler(new SimLink.OnLeaveQueue() {
+				@Override
+				public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+					return handleVehicleIsFinished(vehicle, link, now);
+				}
+
+				@Override
+				public double getPriority() {
+					return -10.;
+				}
+			});
 		}
 	}
 
@@ -106,7 +119,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);
-
 		link.pushVehicle(vehicle, SimLink.LinkPosition.QStart, now);
 	}
 

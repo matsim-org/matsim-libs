@@ -120,6 +120,6 @@ public class ActiveNodes implements Steppable {
 
 	@Override
 	public String toString() {
-		return "# nodes=" + activeNodes.size();
+		return "#nodes=" + activeNodes.size();
 	}
 }
