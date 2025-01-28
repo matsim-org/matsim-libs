@@ -1454,17 +1454,18 @@ public final class DemandReaderFromCSV {
 	 */
 	static void findLinksForPerson(Scenario scenario,
 								   HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson, Person person) {
-		Coord coord = getHomeCoord(person);
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), coord);
+		Coord homePoint = getHomeCoord(person);
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), homePoint);
+		// if the nearest link is not feasible, the next feasible link will be searched
 		if (checkLinkAttributesForDemand(nearestLink)) {
 			nearestLinkPerPerson.computeIfAbsent(person.getId(), k -> new TreeMap <>())
-				.put(NetworkUtils.getEuclideanDistance(coord, nearestLink.getCoord()), nearestLink.getId().toString());
+				.put(NetworkUtils.getEuclideanDistance(homePoint, nearestLink.getCoord()), nearestLink.getId().toString());
 			return;
 		}
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (checkLinkAttributesForDemand(link)) {
 				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
-				double distance = NetworkUtils.getEuclideanDistance(coord, middlePointLink);
+				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())
 					|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
 					nearestLinkPerPerson.computeIfAbsent(person.getId(), k -> new TreeMap <>())
