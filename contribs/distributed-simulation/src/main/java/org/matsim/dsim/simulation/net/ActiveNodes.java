@@ -104,7 +104,7 @@ public class ActiveNodes implements Steppable {
 		SimLink nextLink = outLinks.get(nextLinkId);
 		assert nextLink != null : "Next link %s not found in outLinks".formatted(nextLinkId);
 
-		if (inLink.getId().equals(Id.createLinkId(320097797L)) && vehicle.getId().equals(Id.createVehicleId(31919L))) {
+		if (inLink.getId().equals(Id.createLinkId(325089245)) && vehicle.getId().equals(Id.createVehicleId(39725))) {
 			System.out.println("Debug!!!");
 		}
 
@@ -113,7 +113,7 @@ public class ActiveNodes implements Steppable {
 
 	private void move(SimLink inLink, DistributedMobsimVehicle vehicle, Map<Id<Link>, SimLink> outLinks, double now) {
 
-		if (inLink.getId().equals(Id.createLinkId(320097797L)) && vehicle.getId().equals(Id.createVehicleId(31919L))) {
+		if (inLink.getId().equals(Id.createLinkId(325089245)) && vehicle.getId().equals(Id.createVehicleId(39725))) {
 			System.out.println("Debug!!!");
 		}
 		em.processEvent(new LinkLeaveEvent(now, vehicle.getId(), inLink.getId()));
@@ -121,7 +121,7 @@ public class ActiveNodes implements Steppable {
 		vehicle.getDriver().notifyMoveOverNode(nextLinkId);
 		var nextLink = outLinks.get(nextLinkId);
 
-		if (nextLink.getId().equals(Id.createLinkId(320097797L)) && vehicle.getId().equals(Id.createVehicleId(31919L))) {
+		if (nextLink.getId().equals(Id.createLinkId(325089245)) && vehicle.getId().equals(Id.createVehicleId(39725))) {
 			System.out.println("Debug!!!");
 		}
 		em.processEvent(new LinkEnterEvent(now, vehicle.getId(), nextLinkId));

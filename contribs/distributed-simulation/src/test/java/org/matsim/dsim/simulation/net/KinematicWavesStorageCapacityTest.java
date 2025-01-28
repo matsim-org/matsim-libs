@@ -21,7 +21,7 @@ class KinematicWavesStorageCapacityTest {
 	}
 
 	@Test
-	void testState() {
+	void holeSpeed() {
 
 		var link = TestUtils.createSingleLink();
 		var holeTravelTime = link.getLength() / KinematicWavesStorageCapacity.HOLE_SPEED;
@@ -41,6 +41,26 @@ class KinematicWavesStorageCapacityTest {
 		capacity.update(holeTravelTime - 1);
 		assertFalse(capacity.isAvailable());
 		capacity.update(holeTravelTime);
+		assertTrue(capacity.isAvailable());
+	}
+
+	@Test
+	void releaseMultipleHoles() {
+		var link = TestUtils.createSingleLink();
+		var holeTravelTime = link.getLength() / KinematicWavesStorageCapacity.HOLE_SPEED;
+		var capacity = KinematicWavesStorageCapacity.create(link, 10);
+		assertEquals(10, capacity.getMax(), 0.001);
+		assertTrue(capacity.isAvailable());
+
+		capacity.consume(20); // consume more capacity than available 20/10
+		capacity.release(5, 0);
+		capacity.release(4, 1);
+		capacity.release(4, 1);
+
+		assertFalse(capacity.isAvailable());
+		capacity.update(holeTravelTime);// first hole arrives. Capacity is still oversubscribed
+		assertFalse(capacity.isAvailable());
+		capacity.update(holeTravelTime + 1); // two holes arrive. Capacity is available
 		assertTrue(capacity.isAvailable());
 	}
 }

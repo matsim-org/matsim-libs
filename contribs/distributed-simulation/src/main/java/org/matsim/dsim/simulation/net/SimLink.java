@@ -204,9 +204,9 @@ public interface SimLink {
 				var headVehicle = q.peek();
 				if (headVehicle.getEarliestLinkExitTime() > now) break;
 
-				if (getId().equals(Id.createLinkId("320097807")) && headVehicle.getId().equals(Id.createVehicleId("freight_1496_freight"))) {
-					System.out.println("Debug!!!");
-				}
+//				if (getId().equals(Id.createLinkId(325089245)) && headVehicle.getId().equals(Id.createVehicleId("freight_1496_freight"))) {
+//					System.out.println("Debug!!!");
+//				}
 
 				var leaveResult = onLeaveQueue.apply(headVehicle, this, now);
 

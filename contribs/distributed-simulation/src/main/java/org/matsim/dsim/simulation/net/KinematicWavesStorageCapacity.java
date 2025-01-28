@@ -34,10 +34,11 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 	@Getter
 	private final double max;
 	private final double holeTravelTime;
-
 	private final Queue<Hole> holes = new ArrayDeque<>();
 
 	private double lastUpdateTime = 0;
+	private double occupiedByVehicles;
+	private double occupiedByHoles;
 
 	KinematicWavesStorageCapacity(double capacity, double holeTravelTime) {
 		this.max = capacity;
@@ -56,8 +57,6 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	 */
 
-	private double occupiedByVehicles;
-	private double occupiedByHoles;
 
 	@Override
 	public double getOccupied() {
@@ -71,7 +70,7 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	@Override
 	public void release(double pce, double now) {
-		occupiedByVehicles -= pce;
+		occupiedByVehicles = Math.max(0, occupiedByVehicles - pce);
 		var earliestExitTime = now + holeTravelTime;
 		holes.add(new Hole(earliestExitTime, pce));
 		occupiedByHoles += pce;
@@ -79,7 +78,11 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	@Override
 	public void update(double now) {
-		while (lastUpdateTime < now && !holes.isEmpty() && holes.peek().exitTime() <= now) {
+
+		if (lastUpdateTime >= now) return;
+
+		lastUpdateTime = now;
+		while (!holes.isEmpty() && holes.peek().exitTime() <= now) {
 			lastUpdateTime = now;
 			var hole = holes.poll();
 			occupiedByHoles -= hole.pce();
@@ -92,5 +95,10 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 	}
 
 	private record Hole(double exitTime, double pce) {
+	}
+
+	@Override
+	public String toString() {
+		return "max=" + max + ", pceVeh=" + occupiedByVehicles + ", pceHoles=" + occupiedByHoles;
 	}
 }
