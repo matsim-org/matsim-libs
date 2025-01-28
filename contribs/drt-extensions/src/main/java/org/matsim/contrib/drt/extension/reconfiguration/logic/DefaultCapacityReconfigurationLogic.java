@@ -50,7 +50,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * {@link DefaultCapacityReconfigurationLogic.CapacityChangeLinkSelection}
  * parameter to choose either a random selection or the location closest to the
  * vehicle's initial position
- * 
+ *
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
 public class DefaultCapacityReconfigurationLogic
@@ -324,6 +324,10 @@ public class DefaultCapacityReconfigurationLogic
 	}
 
 	static public void install(Controler controller, String mode, CapacitySupplier capacitySupplier) {
+		install(controller, mode, capacitySupplier, 7200, CapacityChangeLinkSelection.RANDOM);
+	}
+
+	static public void install(Controler controller, String mode, CapacitySupplier capacitySupplier, int reconfigurationInterval, DefaultCapacityReconfigurationLogic.CapacityChangeLinkSelection capacityChangeLinkSelection) {
 		controller.addOverridingModule(new AbstractDvrpModeModule(mode) {
 			@Override
 			public void install() {
@@ -336,9 +340,9 @@ public class DefaultCapacityReconfigurationLogic
 					Network network = getter.getModal(Network.class);
 
 					return new DefaultCapacityReconfigurationLogic(fleetSpecification,
-							possibleCapacities, network, network.getLinks().values(), 7200,
+							possibleCapacities, network, network.getLinks().values(), reconfigurationInterval,
 							true,
-							DefaultCapacityReconfigurationLogic.CapacityChangeLinkSelection.RANDOM);
+							capacityChangeLinkSelection);
 				})).asEagerSingleton();
 
 				bindModal(CapacityReconfigurationLogic.class).to(modalKey(DefaultCapacityReconfigurationLogic.class));
