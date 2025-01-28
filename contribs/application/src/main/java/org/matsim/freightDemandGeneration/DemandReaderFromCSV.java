@@ -1397,14 +1397,18 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 					if (linkPersonPair.getPerson() != null) {
 						// the link finding for the persons, because this was not done before
-						if (!nearestLinkPerPerson.containsKey(linkPersonPair.getPerson().getId()))
+						if (!nearestLinkPerPerson.containsKey(linkPersonPair.getPerson().getId()) || nearestLinkPerPerson.get(linkPersonPair.getPerson().getId()).size() == 1)
 							findLinksForPerson(scenario, nearestLinkPerPerson, linkPersonPair.getPerson());
-						Link linkForPerson = scenario.getNetwork().getLinks().get(
-							Id.createLinkId(nearestLinkPerPerson.get(linkPersonPair.getPerson().getId()).values().iterator().next()));
-						if (checkLinkFeasibility(indexShape, areasForLocations, crsTransformationNetworkAndShape, linkForPerson)) {
-							linkPersonPair.setLink(linkForPerson);
-						} else
+						for (String linkId : nearestLinkPerPerson.get(linkPersonPair.getPerson().getId()).values()) {
+							Link linkForPerson = scenario.getNetwork().getLinks().get(Id.createLinkId(linkId));
+							if (checkLinkAttributesForDemand(linkForPerson)) {
+								linkPersonPair.setLink(linkForPerson);
+								break;
+							}
+						}
+						if (linkPersonPair.getLink() == null) {
 							linkPersonPair = null;
+						}
 					}
 				}
 		} else {
@@ -1449,15 +1453,18 @@ public final class DemandReaderFromCSV {
 	 * @param person 				Person for which the nearest link should be found
 	 */
 	static void findLinksForPerson(Scenario scenario,
-								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
-		Coord homePoint = getHomeCoord(person);
 								   HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson, Person person) {
+		Coord coord = getHomeCoord(person);
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), coord);
+		if (checkLinkAttributesForDemand(nearestLink)) {
+			nearestLinkPerPerson.computeIfAbsent(person.getId(), k -> new TreeMap <>())
+				.put(NetworkUtils.getEuclideanDistance(coord, nearestLink.getCoord()), nearestLink.getId().toString());
+			return;
+		}
 		for (Link link : scenario.getNetwork().getLinks().values())
-			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
-				|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
-
+			if (checkLinkAttributesForDemand(link)) {
 				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
-				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
+				double distance = NetworkUtils.getEuclideanDistance(coord, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())
 					|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
 					nearestLinkPerPerson.computeIfAbsent(person.getId(), k -> new TreeMap <>())
@@ -1553,15 +1560,24 @@ public final class DemandReaderFromCSV {
 	 * @param indexShape                       ShpOptions.Index for the shape file
 	 * @param areasForTheDemand                Areas for the demand
 	 * @param crsTransformationNetworkAndShape CoordinateTransformation for the network and shape file
-	 * @param newLink                			new Link for the demand
+	 * @param newLink                          new Link for the demand
 	 * @return True if the link is feasible for the demand, false if not
 	 */
 	private static boolean checkLinkFeasibility(ShpOptions.Index indexShape, String[] areasForTheDemand,
 												CoordinateTransformation crsTransformationNetworkAndShape, Link newLink) {
-		return !newLink.getId().toString().contains("pt")
-			&& (!newLink.getAttributes().getAsMap().containsKey("type")
-			|| !newLink.getAttributes().getAsMap().get("type").toString().contains("motorway"))
+		return checkLinkAttributesForDemand(newLink)
 			&& (indexShape == null || FreightDemandGenerationUtils.checkPositionInShape(newLink, null,
 			indexShape, areasForTheDemand, crsTransformationNetworkAndShape));
+	}
+
+	/**
+	 * Checks if a link is suitable for the demand.
+	 *
+	 * @param linkForPerson Link for the person
+	 * @return True if the link is suitable for the demand, false if not
+	 */
+	private static boolean checkLinkAttributesForDemand(Link linkForPerson) {
+		return !linkForPerson.getId().toString().contains("pt") && (!linkForPerson.getAttributes().getAsMap().containsKey("type")
+			|| !linkForPerson.getAttributes().getAsMap().get("type").toString().contains("motorway"));
 	}
 }
