@@ -81,6 +81,8 @@ public interface SimLink {
 	private static SimpleStorageCapacity createStorageCapacityForSplitOutLink(Link link, double effectiveCellSize, DSimConfigGroup config) {
 		return switch (config.getTrafficDynamics()) {
 			case queue -> SimpleStorageCapacity.create(link, effectiveCellSize);
+			// for the case of kinematic waves, we need to ensure that the simple storage capacity used in the split out link mimics the increased
+			// capacity used by the slit in link on the downstream partition.
 			case kinematicWaves -> {
 				var simpleCapacity = SimpleStorageCapacity.calculateSimpleStorageCapacity(link, effectiveCellSize);
 				var capacityForHoles = KinematicWavesStorageCapacity.calculateMinCapacityForHoles(link);

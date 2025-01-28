@@ -13,6 +13,10 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 
 	static KinematicWavesStorageCapacity create(Link link, double effectiveCellSize) {
 
+		// In addition to the minimal storage capacity requirements to serve slow speeds and the outflow of the link,
+		// we also need sufficient storage capacity to simulate holes and kinematic waves.
+		// The logic implemented with kinematic waves, which also includes input flow capacities is described in this
+		// publication: https://doi.org/10.1080/23249935.2017.1364802
 		var minCapacityForHoles = calculateMinCapacityForHoles(link);
 		var simpleStorageCapacity = SimpleStorageCapacity.calculateSimpleStorageCapacity(link, effectiveCellSize);
 		var assignedCapacity = Math.max(simpleStorageCapacity, minCapacityForHoles);
@@ -44,19 +48,6 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 		this.max = capacity;
 		this.holeTravelTime = holeTravelTime;
 	}
-
-	/*KinematicWavesStorageCapacity(Link link, double effectiveCellSize) {
-
-		// In addition to the minimal storage capacity requirements to serve slow speeds and the outflow of the link,
-		// we also need sufficient storage capacity to simulate holes and kinematic waves.
-		var simpleStorageCapacity = new SimpleStorageCapacity(link, effectiveCellSize);
-		var minStorageForHoles = link.getLength() * link.getFlowCapacityPerSec() * (link.getFreespeed() + HOLE_SPEED) / link.getFreespeed() / HOLE_SPEED;
-		max = Math.max(simpleStorageCapacity.getMax(), minStorageForHoles);
-		holeTravelTime = link.getLength() / HOLE_SPEED;
-	}
-
-	 */
-
 
 	@Override
 	public double getOccupied() {
