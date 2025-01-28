@@ -8,6 +8,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.dsim.DSimConfigGroup;
 
 import java.util.Map;
@@ -21,7 +23,7 @@ public class SimNetwork {
 	private final int part;
 
 	@Inject
-	SimNetwork(Network network, DSimConfigGroup config, NetworkPartition networkPartition,
+	SimNetwork(Network network, Config config, NetworkPartition networkPartition,
 			   ActiveLinks activeLinks, ActiveNodes activeNodes) {
 
 		// collect nodes which belong to this partition
@@ -34,6 +36,7 @@ public class SimNetwork {
 			.map(node -> new SimNode(node.getId()))
 			.collect(Collectors.toMap(SimNode::getId, n -> n));
 
+		var dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
 		// convert network links into SimLinks. Since we must include SplitOutLinks, which belong to other partitions, we iterate over the localNodes
 		// and collect the in and out links from those nodes.
 		links = localNodes.values().stream()
@@ -41,7 +44,7 @@ public class SimNetwork {
 			.distinct()
 			.map(link -> {
 				var toNode = nodes.get(link.getToNode().getId());
-				return SimLink.create(link, toNode, config, network.getEffectiveCellSize(), networkPartition.getIndex(), activeLinks::activate, activeNodes::activate);
+				return SimLink.create(link, toNode, dsimConfig, network.getEffectiveCellSize(), networkPartition.getIndex(), activeLinks::activate, activeNodes::activate);
 			})
 			.collect(Collectors.toMap(SimLink::getId, l -> l));
 
