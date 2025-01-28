@@ -624,7 +624,7 @@ public final class DemandReaderFromCSV {
 		ArrayList<LinkPersonPair> usedServiceLocationsOrPersons = new ArrayList<>();
 		int numberOfLinksInNetwork = scenario.getNetwork().getLinks().size();
 		HashMap<Id<Person>, Person> possiblePersonsForService = new HashMap<>();
-		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
+		HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson = new HashMap<>();
 
 		// set number of jobs
 		if (shareOfPopulationWithThisService == null) {
@@ -826,8 +826,8 @@ public final class DemandReaderFromCSV {
 		ArrayList<LinkPersonPair> usedDeliveryLocationsOrPersons = new ArrayList<>();
 		HashMap<Id<Person>, Person> possiblePersonsPickup = new HashMap<>();
 		HashMap<Id<Person>, Person> possiblePersonsDelivery = new HashMap<>();
-		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonPickup = new HashMap<>();
-		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPersonDelivery = new HashMap<>();
+		HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPersonPickup = new HashMap<>();
+		HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPersonDelivery = new HashMap<>();
 
 		// set number of jobs part 1
 		if (shareOfPopulationWithThisPickup == null && shareOfPopulationWithThisDelivery == null){
@@ -1099,7 +1099,7 @@ public final class DemandReaderFromCSV {
 														 ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer numberOfLocations,
 														 String[] areasForLocations, String[] setLocations,
 														 HashMap<Id<Person>, Person> possiblePersons,
-														 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, int countOfLinks) {
+														 HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson, int countOfLinks) {
 		while (LinkPersonPair == null || usedLocationsOrPersons.contains(LinkPersonPair)) {
 			LinkPersonPair = findNextUsedLinkPersonPair(scenario, indexShape, possibleLinkPersonPairs,
 				numberOfLocations, areasForLocations, setLocations,
@@ -1333,7 +1333,7 @@ public final class DemandReaderFromCSV {
 																  ShpOptions.Index indexShape, CoordinateTransformation crsTransformationNetworkAndShape,
 																  Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
 																  HashMap<Id<Person>, Person> possiblePersons,
-																  HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson) {
+																  HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson) {
 		log.info("Finding possible links for the demand in the selected areas {}", Arrays.toString(areasForLocations));
 		ArrayList<LinkPersonPair> possibleLinkPersonPairs = new ArrayList<>();
 
@@ -1383,7 +1383,7 @@ public final class DemandReaderFromCSV {
 	private static LinkPersonPair findNextUsedLinkPersonPair(Scenario scenario, ShpOptions.Index indexShape,
 															 ArrayList<LinkPersonPair> possibleLinkPersonPairs, Integer selectedNumberOfLocations, String[] areasForLocations,
 															 String[] selectedLocations, ArrayList<LinkPersonPair> usedLocationsOrPersons, HashMap<Id<Person>, Person> possiblePersons,
-															 HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
+															 HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson,
 															 CoordinateTransformation crsTransformationNetworkAndShape, int i) {
 		LinkPersonPair linkPersonPair = null;
 		if (selectedNumberOfLocations == null || usedLocationsOrPersons.size() < selectedNumberOfLocations) {
@@ -1451,6 +1451,7 @@ public final class DemandReaderFromCSV {
 	static void findLinksForPerson(Scenario scenario,
 								   HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson, Person person) {
 		Coord homePoint = getHomeCoord(person);
+								   HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson, Person person) {
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey("type")
 				|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))) {
@@ -1459,8 +1460,8 @@ public final class DemandReaderFromCSV {
 				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())
 					|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
-					nearestLinkPerPerson.put(person.getId(), new HashMap<>());
-					nearestLinkPerPerson.get(person.getId()).put(distance, link.getId().toString());
+					nearestLinkPerPerson.computeIfAbsent(person.getId(), k -> new TreeMap <>())
+						.put(distance, link.getId().toString());
 				}
 			}
 	}
