@@ -341,7 +341,7 @@ public class DefaultCapacityReconfigurationLogic
 
 					return new DefaultCapacityReconfigurationLogic(fleetSpecification,
 							possibleCapacities, network, network.getLinks().values(), reconfigurationInterval,
-							true,
+							false,
 							capacityChangeLinkSelection);
 				})).asEagerSingleton();
 
