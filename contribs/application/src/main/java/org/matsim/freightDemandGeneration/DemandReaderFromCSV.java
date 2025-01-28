@@ -1397,7 +1397,7 @@ public final class DemandReaderFromCSV {
 						crsTransformationNetworkAndShape);
 					if (linkPersonPair.getPerson() != null) {
 						// the link finding for the persons, because this was not done before
-						if (!nearestLinkPerPerson.containsKey(linkPersonPair.getPerson().getId()) || nearestLinkPerPerson.get(linkPersonPair.getPerson().getId()).size() == 1)
+						if (!nearestLinkPerPerson.containsKey(linkPersonPair.getPerson().getId()))
 							findLinksForPerson(scenario, nearestLinkPerPerson, linkPersonPair.getPerson());
 						for (String linkId : nearestLinkPerPerson.get(linkPersonPair.getPerson().getId()).values()) {
 							Link linkForPerson = scenario.getNetwork().getLinks().get(Id.createLinkId(linkId));
