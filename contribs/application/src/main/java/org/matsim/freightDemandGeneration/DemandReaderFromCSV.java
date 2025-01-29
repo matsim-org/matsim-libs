@@ -664,7 +664,7 @@ public final class DemandReaderFromCSV {
 		// find possible links for the services
 		ArrayList<LinkPersonPair> possibleLinkPersonPairsForService = findAllPossibleLinks(scenario, indexShape,
 			crsTransformationNetworkAndShape, numberOfServiceLocations, areasForServiceLocations,
-			locationsOfServices, possiblePersonsForService, nearestLinkPerPerson);
+			locationsOfServices, possiblePersonsForService);
 
 		if (locationsOfServices != null)
 			for (String selectedLinkIdService : locationsOfServices)
@@ -910,12 +910,12 @@ public final class DemandReaderFromCSV {
 		// find possible Links for delivery and pickup
 		ArrayList<LinkPersonPair> possibleLinkPersonPairsPickup = findAllPossibleLinks(scenario, indexShape,
 			crsTransformationNetworkAndShape, numberOfPickupLocations, areasForPickupLocations,
-			setLocationsOfPickup, possiblePersonsPickup, nearestLinkPerPersonPickup);
+			setLocationsOfPickup, possiblePersonsPickup);
 		log.info("Possible links or persons for pickup: {}", possibleLinkPersonPairsPickup.size());
 
 		ArrayList<LinkPersonPair> possibleLinkPersonPairsDelivery = findAllPossibleLinks(scenario, indexShape,
 			crsTransformationNetworkAndShape, numberOfDeliveryLocations, areasForDeliveryLocations,
-			setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
+			setLocationsOfDelivery, possiblePersonsDelivery);
 		log.info("Possible links or persons for delivery: {}", possibleLinkPersonPairsDelivery.size());
 
 		if (possibleLinkPersonPairsPickup.isEmpty())
@@ -1328,14 +1328,12 @@ public final class DemandReaderFromCSV {
 	 * @param areasForLocations                Areas for the locations
 	 * @param setLocations                     Selected locations
 	 * @param possiblePersons                  Persons that are possible for this demand
-	 * @param nearestLinkPerPerson             Nearest link for each person
 	 * @return HashMap with all possible links
 	 */
 	private static ArrayList<LinkPersonPair> findAllPossibleLinks(Scenario scenario,
 																  ShpOptions.Index indexShape, CoordinateTransformation crsTransformationNetworkAndShape,
 																  Integer numberOfLocations, String[] areasForLocations, String[] setLocations,
-																  HashMap<Id<Person>, Person> possiblePersons,
-																  HashMap<Id<Person>, TreeMap <Double, String>> nearestLinkPerPerson) {
+																  HashMap<Id<Person>, Person> possiblePersons) {
 		log.info("Finding possible links for the demand in the selected areas {}", Arrays.toString(areasForLocations));
 		ArrayList<LinkPersonPair> possibleLinkPersonPairs = new ArrayList<>();
 
