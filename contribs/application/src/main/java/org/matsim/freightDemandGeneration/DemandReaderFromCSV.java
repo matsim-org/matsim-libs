@@ -1348,16 +1348,15 @@ public final class DemandReaderFromCSV {
 					possibleLinkPersonPairs.add(new LinkPersonPair(link, null));
 				}
 		} else {
-			LinkPersonPair newPossibleLink;
+			LinkPersonPair newPossibleLinkPersonPair;
 			while (possibleLinkPersonPairs.size() < numberOfLocations) {
-				newPossibleLink = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons,
+				newPossibleLinkPersonPair = findPossibleLinkPersonPairForDemand(possibleLinkPersonPairs, possiblePersons,
 					indexShape, areasForLocations, numberOfLocations, scenario, setLocations,
 					crsTransformationNetworkAndShape);
-				if (!possibleLinkPersonPairs.contains(newPossibleLink)){
-					possibleLinkPersonPairs.add(newPossibleLink);
-					if (!possiblePersons.isEmpty() && nearestLinkPerPerson.size() == possiblePersons.size())
+				if (!possibleLinkPersonPairs.contains(newPossibleLinkPersonPair))
+					possibleLinkPersonPairs.add(newPossibleLinkPersonPair);
+				if (!possiblePersons.isEmpty() && possibleLinkPersonPairs.size() == possiblePersons.size())
 						break;
-				}
 			}
 		}
 		return possibleLinkPersonPairs;
