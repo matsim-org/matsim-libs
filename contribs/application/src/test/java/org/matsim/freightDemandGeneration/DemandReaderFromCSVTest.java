@@ -2,10 +2,7 @@ package org.matsim.freightDemandGeneration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +43,7 @@ public class DemandReaderFromCSVTest {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
-		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
+		HashMap<Id<Person>, TreeMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 		for (Person person :  population.getPersons().values()) {
 			DemandReaderFromCSV.findLinksForPerson(scenario, nearestLinkPerPerson, person);
 		}
