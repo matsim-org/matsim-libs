@@ -918,7 +918,6 @@ public final class DemandReaderFromCSV {
 			setLocationsOfDelivery, possiblePersonsDelivery, nearestLinkPerPersonDelivery);
 		log.info("Possible links or persons for delivery: {}", possibleLinkPersonPairsDelivery.size());
 
-
 		if (possibleLinkPersonPairsPickup.isEmpty())
 			throw new RuntimeException(
 				"Not enough possible links to distribute the pickups. Select an different shapefile or check the CRS of the shapefile and network.");
@@ -1216,12 +1215,12 @@ public final class DemandReaderFromCSV {
 	 * If jobs of a carrier have the same characteristics (time window, location),
 	 * they will be combined to one job.
 	 *
-	 * @param scenario                    Scenario
+	 * @param scenario Scenario
 	 */
 	private static void combineSimilarJobs(Scenario scenario) {
 		//TODO: add check of possible vehicles capacity
 		log.warn(
-				"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
+			"The number of Jobs will be reduced if jobs have the same characteristics (e.g. time, location, carrier)");
 		for (Carrier thisCarrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			if (!thisCarrier.getShipments().isEmpty()) {
 				int shipmentsBeforeConnection = thisCarrier.getShipments().size();
@@ -1239,8 +1238,9 @@ public final class DemandReaderFromCSV {
 									&& baseShipment.getPickupLinkId() == thisShipment.getPickupLinkId()
 									&& baseShipment.getDeliveryLinkId() == thisShipment.getDeliveryLinkId()) {
 									if (baseShipment.getPickupStartingTimeWindow() == thisShipment.getPickupStartingTimeWindow()) {
-									if (baseShipment.getDeliveryStartingTimeWindow() == thisShipment.getDeliveryStartingTimeWindow()) shipmentsToConnect.put(thisShipmentId, thisShipment);
-								}
+										if (baseShipment.getDeliveryStartingTimeWindow() == thisShipment.getDeliveryStartingTimeWindow())
+											shipmentsToConnect.put(thisShipmentId, thisShipment);
+									}
 								}
 							}
 						}
@@ -1249,7 +1249,7 @@ public final class DemandReaderFromCSV {
 						double serviceTimePickup = 0;
 						double serviceTimeDelivery = 0;
 						for (CarrierShipment carrierShipment : shipmentsToConnect.values()) {
-                            demandForThisLink = demandForThisLink + carrierShipment.getCapacityDemand();
+							demandForThisLink = demandForThisLink + carrierShipment.getCapacityDemand();
 							serviceTimePickup = serviceTimePickup + carrierShipment.getPickupDuration();
 							serviceTimeDelivery = serviceTimeDelivery + carrierShipment.getDeliveryDuration();
 							shipmentsToRemove.put(carrierShipment.getId(), carrierShipment);
@@ -1270,7 +1270,8 @@ public final class DemandReaderFromCSV {
 					thisCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 				}
 				if (shipmentsBeforeConnection - thisCarrier.getShipments().size() > 0)
-					log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(), shipmentsBeforeConnection - thisCarrier.getShipments().size());
+					log.warn("Number of reduced shipments for carrier {}: {}", thisCarrier.getId().toString(),
+						shipmentsBeforeConnection - thisCarrier.getShipments().size());
 			}
 			if (!thisCarrier.getServices().isEmpty()) {
 				int servicesBeforeConnection = thisCarrier.getServices().size();
@@ -1311,7 +1312,8 @@ public final class DemandReaderFromCSV {
 					thisCarrier.getServices().put(carrierService.getId(), carrierService);
 				}
 				if (servicesBeforeConnection - thisCarrier.getServices().size() > 0)
-					log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(), servicesBeforeConnection - thisCarrier.getServices().size());
+					log.warn("Number of reduced services for carrier {}: {}", thisCarrier.getId().toString(),
+						servicesBeforeConnection - thisCarrier.getServices().size());
 			}
 		}
 	}
