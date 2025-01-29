@@ -21,12 +21,13 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
 class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
 
-  private final double startTime;
+	private final double startTime;
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
@@ -39,9 +40,7 @@ class ScheduledLspShipmentUnload implements LspShipmentPlanElement {
     }
 
   @Override
-  public String getElementType() {
-    return "UNLOAD";
-  }
+  public String getElementType() { return LSPConstants.UNLOAD; }
 
   @Override
   public double getStartTime() {

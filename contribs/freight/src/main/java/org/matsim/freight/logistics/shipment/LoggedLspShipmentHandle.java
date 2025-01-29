@@ -21,12 +21,13 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
 /*package*/ class LoggedLspShipmentHandle implements LspShipmentPlanElement {
 
-  private final double startTime;
+	private final double startTime;
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
@@ -50,7 +51,7 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
   @Override
   public String getElementType() {
-    return "HANDLE";
+    return LSPConstants.HANDLE;
   }
 
   @Override

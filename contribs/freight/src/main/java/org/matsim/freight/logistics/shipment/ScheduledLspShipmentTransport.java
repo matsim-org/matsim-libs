@@ -25,12 +25,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.CarrierShipment;
+import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
 final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 
-  private final double startTime;
+	private final double startTime;
   private final double endTime;
   private final LogisticChainElement element;
   private final Id<LSPResource> resourceId;
@@ -54,7 +55,7 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 
   @Override
   public String getElementType() {
-    return "TRANSPORT";
+    return LSPConstants.TRANSPORT;
   }
 
   @Override
