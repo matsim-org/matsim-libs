@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+	<vehicleType id="heavy">
+		<description>Medium Vehicle</description>
+		<capacity seats="0" standingRoomInPersons="0" other="30.0">
+		</capacity>
+	</vehicleType>
+
+	<vehicleType id="light">
+		<description>Light Vehicle</description>
+		<capacity seats="0" standingRoomInPersons="0" other="15.0">
+		</capacity>
+	</vehicleType>
