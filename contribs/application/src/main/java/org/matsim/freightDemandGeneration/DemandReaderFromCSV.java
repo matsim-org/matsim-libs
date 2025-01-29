@@ -1590,8 +1590,8 @@ public final class DemandReaderFromCSV {
 			if (newLinkPersonPair.getLink() != null && checkLinkFeasibility(indexShape, areasForTheDemand, crsTransformationNetworkAndShape, newLinkPersonPair.getLink())) {
 				linkPersonPair = newLinkPersonPair;
 			}
-			// the check of the related link for a person will be done late when a preson is selcted for a demand
-			else
+			// the check of the related link for a person will be done later when a prison is selected for a demand
+			else if (newLinkPersonPair.getPerson() != null)
 				linkPersonPair = newLinkPersonPair;
 		}
 
