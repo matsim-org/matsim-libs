@@ -38,6 +38,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
+import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
+
 /*package-private*/ class DistributionServiceStartEventHandler
         implements AfterMobsimListener,
         CarrierServiceStartEventHandler,
@@ -88,7 +90,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void logTransport(CarrierServiceStartEvent event) {
-    String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
+    String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
     LspShipmentPlanElement abstractPlanElement =
             lspShipment.getShipmentLog().getPlanElements().get(id);
@@ -99,7 +101,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
   private void logTransport(CarrierShipmentDeliveryStartEvent event) {
-    String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
+    String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
     LspShipmentPlanElement abstractPlanElement =
             lspShipment.getShipmentLog().getPlanElements().get(id);
