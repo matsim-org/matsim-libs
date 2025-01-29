@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +65,7 @@ public class FreightDemandGenerationUtils {
 	 * @param samplingOption 			The sampling option to be used for the population
 	 */
 	static void preparePopulation(Population population, double sampleSizeInputPopulation, double sampleTo,
-			String samplingOption) {
+								  String samplingOption) {
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		population.getAttributes().putAttribute("sampleSize", sampleSizeInputPopulation);
 		population.getAttributes().putAttribute("samplingTo", sampleTo);
@@ -72,7 +73,7 @@ public class FreightDemandGenerationUtils {
 
 		for (Person person : population.getPersons().values()) {
 			if (person.getAttributes().getAsMap().containsKey("subpopulation")
-					&& !person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
+				&& !person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
 				personsToRemove.add(person.getId());
 				continue;
 			}
@@ -118,35 +119,47 @@ public class FreightDemandGenerationUtils {
 	/**
 	 * Creates a tsv file with the locations of all created demand elements.
 	 *
-	 * @param controler The controller to get the network from
+	 * @param controller The controller to get the network from
 	 */
-	static void createDemandLocationsFile(Controler controler) {
+	static void createDemandLocationsFile(Controller controller) {
 
-		Network network = controler.getScenario().getNetwork();
-		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		Network network = controller.getScenario().getNetwork();
+		File file = new File(controller.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
-			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation\n");
+			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation	size\n");
 
-			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			for (Carrier thisCarrier : CarriersUtils.getCarriers(controller.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
-					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" + coord.getX()
-							+ "	" + coord.getY() + "	" + "Service" + "	"
-							+ thisService.getServiceLinkId().toString() + "		" + "\n");
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
+					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" +
+							coord.getX()+ "	" + coord.getY() + "	" +
+							"Service" + "	" +
+							thisService.getServiceLinkId().toString() + "	"+
+							" "+ "	"+
+							" "+ "	"+
+							" "+"\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
 					Coord coordFrom = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
 					Coord coordTo = FreightDemandGenerationUtils
-							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
+						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"
-							+ coordFrom.getX() + "	" + coordFrom.getY() + "	" + "Pickup" + "		"
-							+ thisShipment.getPickupLinkId().toString() + "	" + thisShipment.getDeliveryLinkId().toString() + "\n");
+						+ coordFrom.getX() + "	" + coordFrom.getY() + "	" +
+						"Pickup" + "	"+
+							" "+"	"+
+						thisShipment.getPickupLinkId().toString() + "	" +
+						thisShipment.getDeliveryLinkId().toString() + "	"+
+						0 + "\n");
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
-							+ coordTo.getX() + "	" + coordTo.getY() + "	" + "Delivery" + "		"
-							+ thisShipment.getPickupLinkId() + "	" + thisShipment.getDeliveryLinkId() + "\n");
+						+ coordTo.getX() + "	" + coordTo.getY() + "	"
+						+ "Delivery" + "	"+
+							" "+"	"+
+						thisShipment.getPickupLinkId() + "	" +
+						thisShipment.getDeliveryLinkId() + "	"+
+						thisShipment.getSize() + "\n");
 				}
 			}
 			writer.flush();
@@ -165,13 +178,15 @@ public class FreightDemandGenerationUtils {
 	 */
 	static void reducePopulationToShapeArea(Population population, ShpOptions.Index index) {
 
+		log.info("Population is reduced to shape area...");
+
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		for (Person person : population.getPersons().values()) {
 
 			if (!person.getAttributes().getAsMap().containsKey("homeX")
-					|| !person.getAttributes().getAsMap().containsKey("homeY"))
+				|| !person.getAttributes().getAsMap().containsKey("homeY"))
 				throw new RuntimeException(
-						"The coordinates of the home facility are not part of the attributes a person. Please check!");
+					"The coordinates of the home facility are not part of the attributes a person. Please check!");
 
 			double x = (double) person.getAttributes().getAttribute("homeX");
 			double y = (double) person.getAttributes().getAttribute("homeY");
@@ -179,7 +194,8 @@ public class FreightDemandGenerationUtils {
 			if (!index.contains(new Coord(x, y)))
 				personsToRemove.add(person.getId());
 		}
-
+		log.info("{} out of {} persons are removed because of their home location outside of the shapefile.", personsToRemove.size(),
+			population.getPersons().size());
 		for (Id<Person> id : personsToRemove)
 			population.removePerson(id);
 	}

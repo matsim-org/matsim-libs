@@ -147,7 +147,7 @@ public class Tour {
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			Gbl.assertNotNull(leg);
-			tourElements.addFirst(leg);
+			tourElements.add(0,leg);
 			return this;
 		}
 
@@ -167,7 +167,7 @@ public class Tour {
 			}
 //			assertLastElementIsLeg();
 			Pickup pickup = createPickup(shipment);
-			tourElements.addFirst(pickup);
+			tourElements.add(0,pickup);
 //			previousElementIsActivity = true;
 			return this;
 		}
@@ -389,7 +389,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getServiceStartTimeWindow();
+			return service.getServiceStaringTimeWindow();
 		}
 
 		@Override
@@ -539,7 +539,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getPickupStartsTimeWindow();
+			return shipment.getPickupStartingTimeWindow();
 		}
 
 		@Override
@@ -592,7 +592,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return shipment.getDeliveryStartsTimeWindow();
+			return shipment.getDeliveryStartingTimeWindow();
 		}
 
 		@Override

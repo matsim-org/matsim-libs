@@ -434,7 +434,7 @@ public class CompleteLSPSchedulingTest {
 			LspShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().logisticChainElement;
 			assertSame(service.getServiceLinkId(), shipment.getFrom());
-            assertEquals(service.getDemand(), shipment.getSize());
+            assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByTranshipmentHub = false;
 			for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
@@ -461,7 +461,7 @@ public class CompleteLSPSchedulingTest {
 			LspShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().logisticChainElement;
 			assertSame(service.getServiceLinkId(), toLinkId);
-            assertEquals(service.getDemand(), shipment.getSize());
+            assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByTranshipmentHub = false;
 			for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
@@ -485,10 +485,10 @@ public class CompleteLSPSchedulingTest {
 			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
-            assertEquals(endHandler.getCarrierService().getDemand(), shipment.getSize());
+            assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
-			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(0).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
@@ -503,10 +503,10 @@ public class CompleteLSPSchedulingTest {
 			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
-            assertEquals(serviceHandler.getCarrierService().getDemand(), shipment.getSize());
+            assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
-			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(0).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), planElements.get(2).getLogisticChainElement());
@@ -522,9 +522,9 @@ public class CompleteLSPSchedulingTest {
 			LSPTourStartEventHandler mainRunStartHandler = (LSPTourStartEventHandler) eventHandlers.get(2);
 			assertSame(mainRunStartHandler.getCarrierService().getServiceLinkId(), toLinkId);
 			assertEquals(mainRunStartHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-            assertEquals(mainRunStartHandler.getCarrierService().getDemand(), shipment.getSize());
-			assertEquals(0, mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
-			assertEquals(Integer.MAX_VALUE, mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+            assertEquals(mainRunStartHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, mainRunStartHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, mainRunStartHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), 0.0);
 			assertSame(mainRunStartHandler.getLogisticChainElement(), planElements.get(4).getLogisticChainElement());
 			assertSame(mainRunStartHandler.getLogisticChainElement(), planElements.get(5).getLogisticChainElement());
 			assertSame(mainRunStartHandler.getLogisticChainElement(), planElements.get(6).getLogisticChainElement());
@@ -540,9 +540,9 @@ public class CompleteLSPSchedulingTest {
 			LSPTourEndEventHandler mainRunEndHandler = (LSPTourEndEventHandler) eventHandlers.get(3);
 			assertSame(mainRunEndHandler.getCarrierService().getServiceLinkId(), toLinkId);
 			assertEquals(mainRunEndHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-            assertEquals(mainRunEndHandler.getCarrierService().getDemand(), shipment.getSize());
-			assertEquals(0, mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
-			assertEquals(Integer.MAX_VALUE, mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+            assertEquals(mainRunEndHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, mainRunEndHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, mainRunEndHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), 0.0);
 			assertSame(mainRunEndHandler.getLogisticChainElement(), planElements.get(4).getLogisticChainElement());
 			assertSame(mainRunEndHandler.getLogisticChainElement(), planElements.get(5).getLogisticChainElement());
 			assertSame(mainRunEndHandler.getLogisticChainElement(), planElements.get(6).getLogisticChainElement());
@@ -558,9 +558,9 @@ public class CompleteLSPSchedulingTest {
 			LSPTourStartEventHandler lspTourStartEventHandler = (LSPTourStartEventHandler) eventHandlers.get(4);
 			assertSame(lspTourStartEventHandler.getCarrierService().getServiceLinkId(), shipment.getTo());
 			assertEquals(lspTourStartEventHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-            assertEquals(lspTourStartEventHandler.getCarrierService().getDemand(), shipment.getSize());
-			assertEquals(0, lspTourStartEventHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
-			assertEquals(Integer.MAX_VALUE, lspTourStartEventHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+            assertEquals(lspTourStartEventHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, lspTourStartEventHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, lspTourStartEventHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), 0.0);
 			assertSame(lspTourStartEventHandler.getLogisticChainElement(), planElements.get(8).getLogisticChainElement());
 			assertSame(lspTourStartEventHandler.getLogisticChainElement(), planElements.get(9).getLogisticChainElement());
 			assertSame(lspTourStartEventHandler.getLogisticChainElement(), planElements.get(10).getLogisticChainElement());
@@ -576,9 +576,9 @@ public class CompleteLSPSchedulingTest {
 			DistributionServiceStartEventHandler distributionServiceHandler = (DistributionServiceStartEventHandler) eventHandlers.get(5);
 			assertSame(distributionServiceHandler.getCarrierService().getServiceLinkId(), shipment.getTo());
 			assertEquals(distributionServiceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-            assertEquals(distributionServiceHandler.getCarrierService().getDemand(), shipment.getSize());
-			assertEquals(0, distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
-			assertEquals(Integer.MAX_VALUE, distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+            assertEquals(distributionServiceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, distributionServiceHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, distributionServiceHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), 0.0);
 			assertSame(distributionServiceHandler.getLogisticChainElement(), planElements.get(8).getLogisticChainElement());
 			assertSame(distributionServiceHandler.getLogisticChainElement(), planElements.get(9).getLogisticChainElement());
 			assertSame(distributionServiceHandler.getLogisticChainElement(), planElements.get(10).getLogisticChainElement());

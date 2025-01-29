@@ -118,7 +118,7 @@ final class CarrierDriverAgent{
 		} else{
 			Id<Link> startLink;
 			if(!currentRoute.isEmpty()){
-				startLink = currentRoute.getFirst();
+				startLink = currentRoute.get(0);
 			} else{
 				startLink = event.getLinkId();
 			}

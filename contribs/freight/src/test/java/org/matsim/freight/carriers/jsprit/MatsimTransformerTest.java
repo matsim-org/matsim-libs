@@ -120,10 +120,10 @@ public class MatsimTransformerTest {
 
 	@Test
 	void whenTransforming_matsimService2jspritService_isMadeCorrectly() {
-		CarrierService carrierService = CarrierService.Builder
+		CarrierService.Builder builder = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("locationId", Link.class))
-				.setDemand(50).setServiceDuration(30.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
+				.setCapacityDemand(50).setServiceDuration(30.0);
+		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
 		Service service = MatsimJspritFactory.createJspritService(carrierService, null);
 		assertNotNull(service);
 		assertEquals("locationId", service.getLocation().getId());
@@ -148,8 +148,8 @@ public class MatsimTransformerTest {
 		assertNotNull(service);
 		assertEquals("locationId", service.getServiceLinkId().toString());
 		assertEquals(30.0, service.getServiceDuration(), 0.01);
-		assertEquals(50, service.getDemand());
-		assertEquals(10.0, service.getServiceStartTimeWindow().getStart(), 0.01);
+		assertEquals(50, service.getCapacityDemand());
+		assertEquals(10.0, service.getServiceStaringTimeWindow().getStart(), 0.01);
 
 		CarrierService service2 = MatsimJspritFactory.createCarrierService(carrierService);
 		assertNotSame(service, service2);
@@ -161,8 +161,8 @@ public class MatsimTransformerTest {
 		CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create("ShipmentId", CarrierShipment.class), Id.createLinkId("PickupLocationId"),
 						Id.createLinkId("DeliveryLocationId"), 50)
-				.setPickupDuration(30.0).setPickupStartsTimeWindow(TimeWindow.newInstance(10.0, 20.0))
-				.setDeliveryDuration(40.0).setDeliveryStartsTimeWindow(TimeWindow.newInstance(50.0, 60.0)).build();
+				.setPickupDuration(30.0).setPickupStartingTimeWindow(TimeWindow.newInstance(10.0, 20.0))
+				.setDeliveryDuration(40.0).setDeliveryStartingTimeWindow(TimeWindow.newInstance(50.0, 60.0)).build();
 		Shipment shipment = MatsimJspritFactory.createJspritShipment(carrierShipment);
 		assertNotNull(shipment);
 		assertEquals("PickupLocationId", shipment.getPickupLocation().getId());
@@ -195,13 +195,13 @@ public class MatsimTransformerTest {
 		assertNotNull(carrierShipment);
 		assertEquals("PickupLocationId", carrierShipment.getPickupLinkId().toString());
 		assertEquals(30.0, carrierShipment.getPickupDuration(), 0.01);
-		assertEquals(10.0, carrierShipment.getPickupStartsTimeWindow().getStart(), 0.01);
-		assertEquals(20.0, carrierShipment.getPickupStartsTimeWindow().getEnd(), 0.01);
+		assertEquals(10.0, carrierShipment.getPickupStartingTimeWindow().getStart(), 0.01);
+		assertEquals(20.0, carrierShipment.getPickupStartingTimeWindow().getEnd(), 0.01);
 		assertEquals("DeliveryLocationId", carrierShipment.getDeliveryLinkId().toString());
 		assertEquals(40.0, carrierShipment.getDeliveryDuration(), 0.01);
-		assertEquals(50.0, carrierShipment.getDeliveryStartsTimeWindow().getStart(), 0.01);
-		assertEquals(60.0, carrierShipment.getDeliveryStartsTimeWindow().getEnd(), 0.01);
-        assertEquals(50, carrierShipment.getDemand());
+		assertEquals(50.0, carrierShipment.getDeliveryStartingTimeWindow().getStart(), 0.01);
+		assertEquals(60.0, carrierShipment.getDeliveryStartingTimeWindow().getEnd(), 0.01);
+        assertEquals(50, carrierShipment.getCapacityDemand());
 
 		CarrierShipment carrierShipment2 = MatsimJspritFactory.createCarrierShipment(shipment);
 		assertNotSame(carrierShipment, carrierShipment2);
@@ -294,7 +294,7 @@ public class MatsimTransformerTest {
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
-		assertEquals("to1", route.getTourActivities().getActivities().getFirst().getLocation().getId());
+		assertEquals("to1", route.getTourActivities().getActivities().get(0).getLocation().getId());
 	}
 
 	@Test
@@ -333,10 +333,10 @@ public class MatsimTransformerTest {
 	private ScheduledTour getMatsimServiceTour() {
 		CarrierService s1 = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("to1", Link.class))
-				.setDemand(20).build();
+				.setCapacityDemand(20).build();
 		CarrierService s2 = CarrierService.Builder
 				.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("to2", Link.class))
-				.setDemand(10).build();
+				.setCapacityDemand(10).build();
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", getMatsimVehicleType());
 		double startTime = 15.0;
 		Tour.Builder sTourBuilder = Tour.Builder.newInstance(Id.create("testTour", Tour.class));
@@ -391,8 +391,8 @@ public class MatsimTransformerTest {
 		return CarrierShipment.Builder
 				.newInstance(Id.create(id, CarrierShipment.class), Id.create(from, Link.class),
 						Id.create(to, Link.class), size)
-				.setDeliveryDuration(30.0).setDeliveryStartsTimeWindow(TimeWindow.newInstance(10.0, 20.0))
-				.setPickupDuration(15.0).setPickupStartsTimeWindow(TimeWindow.newInstance(1.0, 5.0)).build();
+				.setDeliveryDuration(30.0).setDeliveryStartingTimeWindow(TimeWindow.newInstance(10.0, 20.0))
+				.setPickupDuration(15.0).setPickupStartingTimeWindow(TimeWindow.newInstance(1.0, 5.0)).build();
 	}
 
 	@Test
@@ -503,11 +503,11 @@ public class MatsimTransformerTest {
 		carrier.setCarrierCapabilities(ccBuilder.build());
 		CarrierService carrierService1 = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("i(7,4)R", Link.class))
-				.setDemand(20).setServiceDuration(10.0).build();
+				.setCapacityDemand(20).setServiceDuration(10.0).build();
 		CarriersUtils.addService(carrier, carrierService1);
 		CarrierService carrierService2 = CarrierService.Builder
 				.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("i(3,9)", Link.class))
-				.setDemand(10).setServiceDuration(20.0).build();
+				.setCapacityDemand(10).setServiceDuration(20.0).build();
 		CarriersUtils.addService(carrier, carrierService2);
 		return carrier;
 	}

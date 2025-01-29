@@ -61,6 +61,10 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 			ModeEstimate est = opt.get();
 
+			// Not actual used modes are not generated here
+			if (est.getNoRealUsage()[idx])
+				continue;
+
 			String[] modes = planModel.getCurrentModes();
 			modes[idx] = est.getMode();
 

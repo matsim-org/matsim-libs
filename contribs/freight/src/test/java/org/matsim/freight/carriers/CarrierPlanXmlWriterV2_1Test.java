@@ -114,7 +114,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	@Test
 	void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
-		CarrierPlan plan1 = plans.getFirst();
+		CarrierPlan plan1 = plans.get(0);
 		ScheduledTour tour1 = plan1.getScheduledTours().iterator().next();
 		assertEquals(5,tour1.getTour().getTourElements().size());
 	}
@@ -138,7 +138,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 	@Test
 	void test_whenReadingToursOfPlan1_SpritScoreIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<>(testCarrier.getPlans());
-		CarrierPlan plan1 = plans.getFirst();
+		CarrierPlan plan1 = plans.get(0);
 		plan1.getAttributes().getAttribute("jspritScore");
 		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), MatsimTestUtils.EPSILON);
 		assertEquals(Double.NaN, CarriersUtils.getJspritScore(plan1), MatsimTestUtils.EPSILON);
