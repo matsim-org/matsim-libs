@@ -19,10 +19,7 @@ import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.avro.XYTData;
-import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.SampleOptions;
-import org.matsim.application.options.ShpOptions;
+import org.matsim.application.options.*;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.Pollutant;
@@ -78,6 +75,9 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
+
+	@CommandLine.Mixin
+	private final ConfigOptions co = new ConfigOptions();
 
 	@CommandLine.Mixin
 	private SampleOptions sample;
@@ -155,7 +155,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	}
 
 	private Config prepareConfig() {
-		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
+		Config config = co.loadFromPath(input.getRunDirectory());
 
 		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
