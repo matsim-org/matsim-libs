@@ -21,15 +21,6 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		this.generator = generator;
 	}
 
-	public List<Carrier> createListOfCarrierWithUnhandledJobs(Scenario scenario){
-		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
-		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
-			if (!CarriersUtils.allJobsHandledBySelectedPlan(carrier))
-				carriersWithUnhandledJobs.add(carrier);
-		}
-		return carriersWithUnhandledJobs;
-	}
-
 	/**
 	 * Redraws the service-durations of all {@link CarrierService}s of the given {@link Carrier}.
 	 */
