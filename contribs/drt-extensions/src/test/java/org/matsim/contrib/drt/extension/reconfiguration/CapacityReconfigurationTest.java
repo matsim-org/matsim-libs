@@ -125,8 +125,8 @@ public class CapacityReconfigurationTest {
 
 		controller.run();
 
-		assertEquals(199, tracker.pickedUpPassengers);
-		assertEquals(57, tracker.pickedUpGoods);
+		assertEquals(186, tracker.pickedUpPassengers);
+		assertEquals(167, tracker.pickedUpGoods);
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class CapacityReconfigurationTest {
 		controller.run();
 
 		assertEquals(199, tracker.pickedUpPassengers);
-		assertEquals(124, tracker.pickedUpGoods);
+		assertEquals(189, tracker.pickedUpGoods);
 	}
 
 	private static DrtConfigGroup configureDrt(Config config, boolean useRejections) {
