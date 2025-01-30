@@ -282,7 +282,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
-          case HANDLE -> {
+          case HANDLING -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));

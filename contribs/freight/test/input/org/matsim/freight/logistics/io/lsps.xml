@@ -91,7 +91,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="3791.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="3791.0" endTime="3851.0" resourceId="distributionCarrier"/>
@@ -100,7 +100,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="3431.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="3431.0" endTime="3491.0" resourceId="distributionCarrier"/>
@@ -109,7 +109,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="4691.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="4691.0" endTime="4751.0" resourceId="distributionCarrier"/>
@@ -118,7 +118,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="5231.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="5231.0" endTime="5291.0" resourceId="distributionCarrier"/>
@@ -127,7 +127,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="3611.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="3611.0" endTime="3671.0" resourceId="distributionCarrier"/>
@@ -136,7 +136,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="3791.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="3791.0" endTime="3851.0" resourceId="distributionCarrier"/>
@@ -145,7 +145,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="5171.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="5171.0" endTime="5231.0" resourceId="distributionCarrier"/>
@@ -154,7 +154,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="4391.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="4391.0" endTime="4451.0" resourceId="distributionCarrier"/>
@@ -163,7 +163,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="3971.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="3971.0" endTime="4031.0" resourceId="distributionCarrier"/>
@@ -172,7 +172,7 @@
 						<element id="mainCarriermainCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="600.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementTRANSPORT" type="TRANSPORT" startTime="600.0" endTime="2040.0" resourceId="mainCarrier"/>
 						<element id="mainCarriermainCarrierElementUNLOAD" type="UNLOAD" startTime="2040.0" endTime="2640.0" resourceId="mainCarrier"/>
-						<element id="hubhubElementHANDLE" type="HANDLE" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
+						<element id="hubhubElementHANDLING" type="HANDLING" startTime="2640.0" endTime="2651.0" resourceId="hub"/>
 						<element id="distributionCarrierdistributionCarrierElementLOAD" type="LOAD" startTime="2651.0" endTime="2951.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementTRANSPORT" type="TRANSPORT" startTime="2951.0" endTime="5711.0" resourceId="distributionCarrier"/>
 						<element id="distributionCarrierdistributionCarrierElementUNLOAD" type="UNLOAD" startTime="5711.0" endTime="5771.0" resourceId="distributionCarrier"/>

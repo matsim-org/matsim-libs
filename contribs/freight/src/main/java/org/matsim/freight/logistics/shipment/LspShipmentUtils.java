@@ -369,7 +369,7 @@ public final class LspShipmentUtils {
     }
 
     public LspShipmentPlanElement build() {
-      return new LoggedLspShipmentHandle(this);
+      return new LoggedLspShipmentHandling(this);
     }
   }
 
@@ -533,8 +533,8 @@ public final class LspShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledLspShipmentHandle build() {
-      return new ScheduledLspShipmentHandle(this);
+    public ScheduledLspShipmentHandling build() {
+      return new ScheduledLspShipmentHandling(this);
     }
   }
 
