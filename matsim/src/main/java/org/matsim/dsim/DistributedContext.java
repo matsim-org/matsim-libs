@@ -97,7 +97,7 @@ public final class DistributedContext {
 	private static Topology createTopology(Communicator comm, int threads, SerializationProvider serializer) {
 
 		SimulationNode node = SimulationNode.builder()
-			.cores(threads)
+			.cores(threads == 0 ? Runtime.getRuntime().availableProcessors() : threads)
 			.rank(comm.getRank())
 			.build();
 

@@ -7,8 +7,6 @@ import com.google.inject.multibindings.Multibinder;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.LPProvider;
-import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.controler.AbstractModule;
@@ -37,7 +35,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		addControlerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
 		// Optional single threaded execution
-		if (ctx.getNode().getCores() > 1) {
+		if (getConfig().dsim().getThreads() > 1) {
 			bind(LPExecutor.class).to(PoolExecutor.class).in(Singleton.class);
 		} else {
 			bind(LPExecutor.class).to(SingleExecutor.class).in(Singleton.class);

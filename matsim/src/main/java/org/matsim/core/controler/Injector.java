@@ -67,6 +67,7 @@ public final class Injector {
 				binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
 				binder.install(new ExplodedConfigModule(config));
 				binder.bind(DistributedContext.class).toInstance(ctx);
+				binder.bind(SimulationNode.class).toInstance(ctx.getNode());
 			}
 		});
 		// A MATSim module needs the config at configuration time in order to decide what
