@@ -197,7 +197,7 @@ public class CollectionTrackerTest {
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+//		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
