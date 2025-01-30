@@ -28,39 +28,47 @@ import org.matsim.freight.logistics.LogisticChainElement;
 /*package*/ class LoggedLspShipmentHandle implements LspShipmentPlanElement {
 
 	private final double startTime;
-  private final double endTime;
-  private final LogisticChainElement element;
-  private final Id<LSPResource> resourceId;
+	private final double endTime;
+	private final LogisticChainElement element;
+	private final Id<LSPResource> resourceId;
 
-  LoggedLspShipmentHandle(LspShipmentUtils.LoggedShipmentHandleBuilder builder) {
-    this.startTime = builder.startTime;
-    this.endTime = builder.endTime;
-    this.element = builder.element;
-    this.resourceId = builder.resourceId;
-  }
+	LoggedLspShipmentHandle(LspShipmentUtils.LoggedShipmentHandleBuilder builder) {
+		this.startTime = builder.startTime;
+		this.endTime = builder.endTime;
+		this.element = builder.element;
+		this.resourceId = builder.resourceId;
+	}
 
-  @Override
-  public LogisticChainElement getLogisticChainElement() {
-    return element;
-  }
+	@Override
+	public LogisticChainElement getLogisticChainElement() {
+		return element;
+	}
 
-  @Override
-  public Id<LSPResource> getResourceId() {
-    return resourceId;
-  }
+	@Override
+	public Id<LSPResource> getResourceId() {
+		return resourceId;
+	}
 
-  @Override
-  public String getElementType() {
-    return LSPConstants.HANDLE;
-  }
 
-  @Override
-  public double getStartTime() {
-    return startTime;
-  }
+	/**
+	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	 * Mixing class tagging and class hierarchies is a bad idea.
+	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
+	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
+	 */
+	@Override
+	@Deprecated
+	public String getElementType() {
+		return LSPConstants.HANDLE;
+	}
 
-  @Override
-  public double getEndTime() {
-    return endTime;
-  }
+	@Override
+	public double getStartTime() {
+		return startTime;
+	}
+
+	@Override
+	public double getEndTime() {
+		return endTime;
+	}
 }

@@ -30,69 +30,76 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
 final class LoggedLspShipmentTransport implements LspShipmentLeg {
 
-  private final double startTime;
-  private final LogisticChainElement element;
-  private final Id<LSPResource> resourceId;
-  private final Id<Link> fromLinkId;
-  private double endTime;
-  private Id<Link> toLinkId;
+	private final double startTime;
+	private final LogisticChainElement element;
+	private final Id<LSPResource> resourceId;
+	private final Id<Link> fromLinkId;
+	private double endTime;
+	private Id<Link> toLinkId;
 
-  LoggedLspShipmentTransport(LspShipmentUtils.LoggedShipmentTransportBuilder builder) {
-    this.startTime = builder.getStartTime();
-    this.element = builder.getElement();
-    this.resourceId = builder.getResourceId();
-    this.fromLinkId = builder.getFromLinkId();
-    this.toLinkId = builder.getToLinkId();
-  }
+	LoggedLspShipmentTransport(LspShipmentUtils.LoggedShipmentTransportBuilder builder) {
+		this.startTime = builder.getStartTime();
+		this.element = builder.getElement();
+		this.resourceId = builder.getResourceId();
+		this.fromLinkId = builder.getFromLinkId();
+		this.toLinkId = builder.getToLinkId();
+	}
 
-  @Override
-  public LogisticChainElement getLogisticChainElement() {
-    return element;
-  }
+	@Override
+	public LogisticChainElement getLogisticChainElement() {
+		return element;
+	}
 
-  @Override
-  public Id<LSPResource> getResourceId() {
-    return resourceId;
-  }
+	@Override
+	public Id<LSPResource> getResourceId() {
+		return resourceId;
+	}
 
-  @Override
-  public String getElementType() {
-    return LSPConstants.TRANSPORT;
-  }
+	/**
+	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	 * Mixing class tagging and class hierarchies is a bad idea.
+	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
+	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
+	 */
+	@Override
+	@Deprecated
+	public String getElementType() {
+		return LSPConstants.TRANSPORT;
+	}
 
-  @Override
-  public double getStartTime() {
-    return startTime;
-  }
+	@Override
+	public double getStartTime() {
+		return startTime;
+	}
 
-  @Override
-  public double getEndTime() {
-    return endTime;
-  }
+	@Override
+	public double getEndTime() {
+		return endTime;
+	}
 
-  public void setEndTime(double endTime) {
-    this.endTime = endTime;
-  }
+	public void setEndTime(double endTime) {
+		this.endTime = endTime;
+	}
 
-  public Id<Link> getFromLinkId() {
-    return fromLinkId;
-  }
+	public Id<Link> getFromLinkId() {
+		return fromLinkId;
+	}
 
-  @Override
-  public CarrierService getCarrierService() {
-    throw new RuntimeException("not implemented");
-  }
+	@Override
+	public CarrierService getCarrierService() {
+		throw new RuntimeException("not implemented");
+	}
 
-  public Id<Link> getToLinkId() {
-    return toLinkId;
-  }
+	public Id<Link> getToLinkId() {
+		return toLinkId;
+	}
 
-  public void setToLinkId(Id<Link> toLinkId) {
-    this.toLinkId = toLinkId;
-  }
+	public void setToLinkId(Id<Link> toLinkId) {
+		this.toLinkId = toLinkId;
+	}
 
-  @Override
-  public Id<Carrier> getCarrierId() {
-    throw new RuntimeException("not implemented");
-  }
+	@Override
+	public Id<Carrier> getCarrierId() {
+		throw new RuntimeException("not implemented");
+	}
 }
