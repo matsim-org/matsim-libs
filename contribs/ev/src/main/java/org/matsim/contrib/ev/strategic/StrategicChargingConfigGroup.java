@@ -4,6 +4,7 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.ev.strategic.costs.AttributeBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.DefaultChargingCostsParameters;
+import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.core.config.Config;
 
@@ -48,6 +49,13 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 				() -> (AttributeBasedChargingCostsParameters) costs, //
 				c -> {
 					costs = (AttributeBasedChargingCostsParameters) c;
+				});
+
+		addDefinition(TariffBasedChargingCostsParameters.SET_NAME, //
+				TariffBasedChargingCostsParameters::new, //
+				() -> (TariffBasedChargingCostsParameters) costs, //
+				c -> {
+					costs = (TariffBasedChargingCostsParameters) c;
 				});
 	}
 
