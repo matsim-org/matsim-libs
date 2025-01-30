@@ -40,6 +40,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import com.google.inject.Provider;
+import org.matsim.dsim.DistributedContext;
 
 public interface MatsimServices extends IterationCounter {
 
@@ -75,7 +76,7 @@ public interface MatsimServices extends IterationCounter {
 
 	OutputDirectoryHierarchy getControlerIO();
 
-	SimulationNode getSimulationNode();
+	DistributedContext getSimulationContext();
 
 	void addControlerListener(ControlerListener controlerListener);
 

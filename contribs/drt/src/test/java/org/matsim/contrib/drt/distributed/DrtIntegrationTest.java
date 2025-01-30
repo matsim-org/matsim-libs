@@ -25,7 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.dsim.Activities;
 import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.DistributedSimulationModule;
+import org.matsim.dsim.DistributedContext;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
@@ -142,15 +142,12 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(1));
-
-		Controler controler = new Controler(scenario, module.getNode());
+		scenario.getConfig().dsim().setThreads(1);
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
 
 		prepareController(controler);
 
-		controler.addOverridingModule(module);
 		controler.run();
-
 	}
 
 	@Test
@@ -159,14 +156,12 @@ public class DrtIntegrationTest {
 
 		Scenario scenario = createScenario();
 
-		DistributedSimulationModule module = new DistributedSimulationModule(DSimConfigGroup.ofThreads(4));
-		Controler controler = new Controler(scenario, module.getNode());
+		scenario.getConfig().dsim().setThreads(4);
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
 
 		prepareController(controler);
 
-		controler.addOverridingModule(module);
 		controler.run();
-
 	}
 
 	@Test
@@ -185,12 +180,11 @@ public class DrtIntegrationTest {
 
 				Scenario scenario = createScenario();
 
-				DistributedSimulationModule module = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(2));
+				scenario.getConfig().dsim().setThreads(2);
 
-				Controler controler = new Controler(scenario, module.getNode());
+				Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig()));
 				prepareController(controler);
 
-				controler.addOverridingModule(module);
 				controler.run();
 
 				try {

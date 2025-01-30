@@ -59,6 +59,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
@@ -146,7 +147,7 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, new TimeAllocationMutatorConfigGroup());
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
-		
+
 
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
@@ -167,8 +168,10 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
+		this.modules.put(DSimConfigGroup.CONFIG_MODULE_NAME, new DSimConfigGroup());
+
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
-		
+
 		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
@@ -487,10 +490,14 @@ public final class Config implements MatsimExtensionPoint {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
+	public DSimConfigGroup dsim() {
+		return (DSimConfigGroup) this.getModule(DSimConfigGroup.CONFIG_MODULE_NAME);
+	}
+
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
 	}
-	
+
 	public PlanInheritanceConfigGroup planInheritance() {
 		return (PlanInheritanceConfigGroup) this.getModule(PlanInheritanceConfigGroup.GROUP_NAME);
 	}

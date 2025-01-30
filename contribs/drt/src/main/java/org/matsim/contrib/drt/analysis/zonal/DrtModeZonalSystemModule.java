@@ -82,7 +82,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			})).asEagerSingleton();
 
 			// Only head node performs aggregation
-			if (!getSimulationNode().isHeadNode())
+			if (!getSimulationContext().getNode().isHeadNode())
 				return;
 
 			//zonal analysis

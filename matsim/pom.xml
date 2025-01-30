@@ -298,7 +298,6 @@
 		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
-			<version>4.8.177</version>
 		</dependency>
 		<!-- These are not needed -->
 		<dependency>

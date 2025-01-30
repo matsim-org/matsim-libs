@@ -50,6 +50,7 @@ import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import com.google.inject.util.Modules;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.dsim.DistributedContext;
 
 public final class Injector {
 	private Injector(){} // namespace only, do not instantiate
@@ -57,15 +58,15 @@ public final class Injector {
 	private static final  Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config,  Module... modules) {
-		return createInjector(config, SimulationNode.SINGLE_INSTANCE, modules);
+		return createInjector(config, DistributedContext.LOCAL, modules);
 	}
-	public static com.google.inject.Injector createInjector(final Config config, final SimulationNode simulationNode,  Module... modules) {
+	public static com.google.inject.Injector createInjector(final Config config, final DistributedContext ctx,  Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
 			@Override
 			public void configure(Binder binder) {
 				binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
 				binder.install(new ExplodedConfigModule(config));
-				binder.bind(SimulationNode.class).toInstance(simulationNode);
+				binder.bind(DistributedContext.class).toInstance(ctx);
 			}
 		});
 		// A MATSim module needs the config at configuration time in order to decide what

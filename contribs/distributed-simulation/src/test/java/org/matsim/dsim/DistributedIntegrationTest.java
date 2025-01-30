@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.communication.LocalCommunicator;
+import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -113,13 +114,11 @@ public class DistributedIntegrationTest {
 	void runLocal() {
 
 		Config local = createScenario();
-		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(local, DSimConfigGroup.class);
-		dsimConfig.setThreads(4);
+		local.dsim().setThreads(4);
 		Scenario scenario = prepareScenario(local);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(dsimConfig);
-		Controler controler = new Controler(scenario, module.getNode());
-		controler.addOverridingModule(module);
+		Controler controler = new Controler(scenario, DistributedContext.create(new NullCommunicator(), local));
+		controler.addOverridingModule(new DistributedSimulationModule());
 		controler.run();
 	}
 
@@ -136,13 +135,12 @@ public class DistributedIntegrationTest {
 				.map(comm -> pool.submit(() -> {
 
 					Config local = createScenario();
-					DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(local, DSimConfigGroup.class);
-					dsimConfig.setThreads(2);
-					Scenario scenario = prepareScenario(local);
-					DistributedSimulationModule module = new DistributedSimulationModule(comm, dsimConfig);
-					Controler controler = new Controler(scenario, module.getNode());
+					local.dsim().setThreads(2);
 
-					controler.addOverridingModule(module);
+					Scenario scenario = prepareScenario(local);
+
+					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+
 					controler.run();
 
 					try {

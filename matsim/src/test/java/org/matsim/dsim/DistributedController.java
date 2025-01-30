@@ -83,9 +83,10 @@ public class DistributedController implements ControlerI {
                 .forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
 
 
-        DistributedSimulationModule simulationModule = new DistributedSimulationModule(comm, DSimConfigGroup.ofThreads(threads));
+		DistributedContext ctx = DistributedContext.create(comm, config);
+		DistributedSimulationModule simulationModule = new DistributedSimulationModule();
 
-        Controler defaultController = new Controler(scenario, simulationModule.getNode());
+        Controler defaultController = new Controler(scenario, ctx);
         defaultController.addOverridingModule(simulationModule);
 
         Injector injector = defaultController.getInjector();

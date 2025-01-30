@@ -45,6 +45,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.DistributedContext;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
@@ -82,7 +83,7 @@ public abstract class AbstractModule implements Module {
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
 
-	private SimulationNode node = SimulationNode.SINGLE_INSTANCE;
+	private DistributedContext ctx = DistributedContext.LOCAL;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -98,7 +99,7 @@ public abstract class AbstractModule implements Module {
 			this.config = bootstrapInjector.getInstance(Config.class);
 		}
 
-		this.node = bootstrapInjector.getInstance(SimulationNode.class);
+		this.ctx = bootstrapInjector.getInstance(DistributedContext.class);
 
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
@@ -127,8 +128,8 @@ public abstract class AbstractModule implements Module {
 		return config;
 	}
 
-	protected final SimulationNode getSimulationNode() {
-		return node;
+	protected final DistributedContext getSimulationContext() {
+		return ctx;
 	}
 
 	protected final void install(Module module) {

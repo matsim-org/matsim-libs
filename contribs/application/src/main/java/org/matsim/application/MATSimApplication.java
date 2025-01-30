@@ -12,8 +12,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.DistributedSimulationModule;
+import org.matsim.dsim.DistributedContext;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
@@ -200,14 +199,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			log.info("Enabling dsim with {} threads", threads);
 
 			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+			config.dsim().setThreads(threads);
 
-			DSimConfigGroup dsim = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
-			dsim.setThreads(threads);
-
-			DistributedSimulationModule d = new DistributedSimulationModule(dsim);
-			controler = new Controler(scenario, d.getNode());
-			controler.addOverridingModule(d);
-
+			controler = new Controler(scenario, DistributedContext.createLocal(config));
 		} else
 			controler = new Controler(scenario);
 
@@ -546,14 +540,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			log.info("Enabling dsim with {} threads", app.threads);
 
 			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
+			config.dsim().setThreads(app.threads);
 
-			DSimConfigGroup dsim = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
-			dsim.setThreads(app.threads);
-
-			DistributedSimulationModule d = new DistributedSimulationModule(dsim);
-			controler = new Controler(scenario, d.getNode());
-			controler.addOverridingModule(d);
-
+			controler = new Controler(scenario, DistributedContext.createLocal(config));
 		} else
 			controler = new Controler(scenario);
 

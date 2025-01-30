@@ -56,6 +56,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.DistributedContext;
 
 import java.util.*;
 
@@ -115,7 +116,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
 	private final Config config;
-	private final SimulationNode simNode;
+	private final DistributedContext simCtx;
 	private Scenario scenario;
 
 	private com.google.inject.Injector injector;
@@ -159,29 +160,29 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 *            the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null, null, null, SimulationNode.SINGLE_INSTANCE);
+		this(args.length > 0 ? args[0] : null, null, null, DistributedContext.LOCAL);
 	}
 
 	public Controler(final String configFileName) {
-		this(configFileName, null, null, SimulationNode.SINGLE_INSTANCE);
+		this(configFileName, null, null, DistributedContext.LOCAL);
 	}
 
 	public Controler(final Config config) {
-		this(null, config, null, SimulationNode.SINGLE_INSTANCE);
+		this(null, config, null, DistributedContext.LOCAL);
 	}
 
 	public Controler(final Scenario scenario) {
-		this(null, null, scenario, SimulationNode.SINGLE_INSTANCE);
+		this(null, null, scenario, DistributedContext.LOCAL);
 	}
 
 	/**
 	 * This constructor is required for distributed simulations.
 	 */
-	public Controler(Scenario scenario, SimulationNode node) {
-		this(null, null, scenario, node);
+	public Controler(Scenario scenario, DistributedContext ctx) {
+		this(null, null, scenario, ctx);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario, final SimulationNode simNode) {
+	private Controler(final String configFileName, final Config config, final Scenario scenario, final DistributedContext ctx) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
 			this.config = scenario.getConfig();
@@ -205,7 +206,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		}
 		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
-		this.simNode = simNode;
+		this.simCtx = ctx;
 		this.overrides = scenario == null ?
 						 new ScenarioByConfigModule() :
 						 new ScenarioByInstanceModule(this.scenario);
@@ -246,7 +247,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 						}
 					}
 			);
-			this.injector = Injector.createInjector( config, simNode, AbstractModule.override( standardModules, overrides ) );
+			this.injector = Injector.createInjector( config, simCtx, AbstractModule.override( standardModules, overrides ) );
 		}
 	}
 
@@ -442,8 +443,8 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public SimulationNode getSimulationNode() {
-		return simNode;
+	public DistributedContext getSimulationContext() {
+		return simCtx;
 	}
 
 	@Override
