@@ -30,7 +30,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.24.0</log4j.version>
+        <log4j.version>2.24.2</log4j.version>
         <geotools.version>31.3</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
@@ -260,7 +260,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.2</version>
             </dependency>
 
             <dependency>
@@ -468,7 +468,7 @@
                         <doCheck>false</doCheck>
                         <doUpdate>false</doUpdate>
                         <revisionOnScmFailure>unknown</revisionOnScmFailure>
-                        <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                        <timestampFormat>{yyyy-MM-dd HH:mm:ss}</timestampFormat>
                     </configuration>
                 </plugin>
             </plugins>

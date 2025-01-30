@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -56,7 +57,7 @@ final class LoggedLspShipmentTransport implements LspShipmentLeg {
 
   @Override
   public String getElementType() {
-    return "TRANSPORT";
+    return LSPConstants.TRANSPORT;
   }
 
   @Override
