@@ -3,7 +3,7 @@ package org.matsim.core.communication;
 import java.lang.foreign.MemorySegment;
 
 /**
- * Envelope is a sample container used for sending to multiple recipients.
+ * Envelope is a simple container used for sending to multiple recipients.
  */
 public record Envelope(int receiver, MemorySegment data, long offset, long length) {
 

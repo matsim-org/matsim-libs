@@ -1,11 +1,11 @@
 package org.matsim.core.communication;
 
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.BackoffIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Communicator that works exclusively in the same process. It's main use is for testing purposes.
  */
-@Log4j2
 public class LocalCommunicator implements Communicator {
 
     private final int rank;
@@ -86,7 +85,6 @@ public class LocalCommunicator implements Communicator {
         }
     }
 
-    @SneakyThrows
     @Override
     public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
 
@@ -99,8 +97,13 @@ public class LocalCommunicator implements Communicator {
                 continue;
             }
 
-            handleReceive.consume(poll);
-            idle.reset();
+			try {
+				handleReceive.consume(poll);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			idle.reset();
         }
     }
 
