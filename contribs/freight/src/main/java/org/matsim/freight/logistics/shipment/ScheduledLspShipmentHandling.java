@@ -25,14 +25,15 @@ import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-class ScheduledLspShipmentHandle implements LspShipmentPlanElement {
+//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
+class ScheduledLspShipmentHandling implements LspShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
 
-	ScheduledLspShipmentHandle(LspShipmentUtils.ScheduledShipmentHandleBuilder builder) {
+	ScheduledLspShipmentHandling(LspShipmentUtils.ScheduledShipmentHandleBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
@@ -48,7 +49,7 @@ class ScheduledLspShipmentHandle implements LspShipmentPlanElement {
 	@Override
 	@Deprecated
 	public String getElementType() {
-		return LSPConstants.HANDLE;
+		return LSPConstants.HANDLING;
 	}
 
 	@Override

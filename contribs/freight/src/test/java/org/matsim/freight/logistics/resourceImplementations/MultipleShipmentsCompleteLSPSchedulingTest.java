@@ -338,7 +338,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 			assertTrue(planElements.get(8).getStartTime() >= planElements.get(7).getEndTime() / 1.0001 + 300);
 
-			assertEquals("HANDLE", planElements.get(7).getElementType());
+			assertEquals("HANDLING", planElements.get(7).getElementType());
 			assertTrue(planElements.get(7).getEndTime() >= (0));
 			assertTrue(planElements.get(7).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(7).getStartTime() <= planElements.get(7).getEndTime());
@@ -382,7 +382,7 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 
 			assertTrue(planElements.get(4).getStartTime() >= planElements.get(3).getEndTime() / (1.0001) + 300);
 
-			assertEquals("HANDLE", planElements.get(3).getElementType());
+			assertEquals("HANDLING", planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
