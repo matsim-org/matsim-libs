@@ -1,8 +1,6 @@
 package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
@@ -22,7 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This task is able to run any event handler, regardless of its specification.
  */
-@Log4j2
 @SuppressWarnings("rawtypes")
 public final class DefaultEventHandlerTask extends EventHandlerTask {
 
@@ -61,8 +58,8 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
-                                   DistributedEventsManager manager, SerializationProvider serializer,
-                                   @Nullable AtomicInteger counter) {
+								   DistributedEventsManager manager, SerializationProvider serializer,
+								   @Nullable AtomicInteger counter) {
 		super(handler, manager, partition, DistributedEventsManager.supportsAsync(handler));
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
@@ -102,7 +99,6 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	}
 
 	@Override
-	@SneakyThrows
 	public void run() {
 		long t = System.nanoTime();
 

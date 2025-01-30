@@ -31,7 +31,7 @@ public class TestUtils {
 
 	public static SimLink createLink(Link link, DSimConfigGroup config, int part) {
 		var simNode = new SimNode(link.getToNode().getId());
-		return SimLink.create(link, simNode, config, 7.5, part, _ -> {}, _ -> {});
+		return SimLink.create(link, simNode, config, 7.5, part, x -> {}, x -> {});
 	}
 
 	public static Link createSingleLink() {

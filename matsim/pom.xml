@@ -46,6 +46,14 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration combine.children="append">
+					<!-- Distributed Sim uses preview features -->
+					<compilerArgs>--enable-preview</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 			</plugin>
@@ -292,15 +300,18 @@
 			<artifactId>classgraph</artifactId>
 			<version>4.8.177</version>
 		</dependency>
+		<!-- These are not needed -->
 		<dependency>
 			<groupId>org.apache.fury</groupId>
 			<artifactId>fury-core</artifactId>
 			<version>${fury.version}</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.fury</groupId>
 			<artifactId>fury-format</artifactId>
 			<version>${fury.version}</version>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -312,6 +323,13 @@
 			<groupId>org.hdrhistogram</groupId>
 			<artifactId>HdrHistogram</artifactId>
 			<version>2.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.32</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

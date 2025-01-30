@@ -70,7 +70,7 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	 */
 	float getAvgRuntime();
 
-	record Info(String name, int partition, LongList runtime) {
-	}
+    record Info(String name, int partition, LongList runtime) {
+    }
 
 }
