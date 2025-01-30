@@ -45,7 +45,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		}
 
 		// If there are multiple nodes, we need to partition the population
-		if (ctx.getTopology().getNodesCount() > 1) {
+		if (ctx.isDistributed()) {
 			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 
 			addControlerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);

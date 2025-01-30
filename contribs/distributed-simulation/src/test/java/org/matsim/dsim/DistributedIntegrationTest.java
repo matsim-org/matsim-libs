@@ -118,7 +118,6 @@ public class DistributedIntegrationTest {
 		Scenario scenario = prepareScenario(local);
 
 		Controler controler = new Controler(scenario, DistributedContext.create(new NullCommunicator(), local));
-		controler.addOverridingModule(new DistributedSimulationModule());
 		controler.run();
 	}
 

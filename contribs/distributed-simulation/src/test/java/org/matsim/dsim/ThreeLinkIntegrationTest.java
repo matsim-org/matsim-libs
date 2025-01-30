@@ -39,7 +39,7 @@ public class ThreeLinkIntegrationTest {
 	@Order(1)
 	void qsim() {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
-		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var config = ConfigUtils.loadConfig(configPath);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setMobsim("qsim");
@@ -53,7 +53,7 @@ public class ThreeLinkIntegrationTest {
 	void oneAgentOneThread() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
-		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var config = ConfigUtils.loadConfig(configPath);
 		var outputDir = Paths.get(utils.getOutputDirectory());
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 
@@ -90,7 +90,7 @@ public class ThreeLinkIntegrationTest {
 	void oneAgentThreeThreads() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
-		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var config = ConfigUtils.loadConfig(configPath);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		var controller = new DistributedController(new NullCommunicator(), config, 3);
 		controller.run();
@@ -114,7 +114,7 @@ public class ThreeLinkIntegrationTest {
 	void twoAgentsThreeThreads() {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
-		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var config = ConfigUtils.loadConfig(configPath);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.plans().setInputFile("three-links-plans-2.xml");
 		var controller = new DistributedController(new NullCommunicator(), config, 3);
@@ -139,7 +139,7 @@ public class ThreeLinkIntegrationTest {
 		try (var pool = Executors.newFixedThreadPool(size)) {
 			var futures = comms.stream()
 				.map(comm -> pool.submit(() -> {
-					Config config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+					Config config = ConfigUtils.loadConfig(configPath);
 					config.controller().setOutputDirectory(outputDirectory);
 					config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 					DistributedController c = new DistributedController(comm, config, 1);
@@ -171,7 +171,7 @@ public class ThreeLinkIntegrationTest {
 	void storageCapacityThreeNodes() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
-		var config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
+		var config = ConfigUtils.loadConfig(configPath);
 		config.plans().setInputFile("three-links-plans-storage-cap.xml");
 		var outputDir = utils.getOutputDirectory();
 

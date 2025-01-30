@@ -56,8 +56,8 @@ public final class ScenarioByInstanceModule extends AbstractModule {
 			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
 		}
 
-		// Partition for the whole population, may be overwritten by other modules
-		bind(PopulationPartition.class).toInstance(PopulationPartition.SINGLE_INSTANCE);
+		if (!getSimulationContext().isDistributed())
+			bind(PopulationPartition.class).toInstance(PopulationPartition.SINGLE_INSTANCE);
 	}
 
 	@Provides Network provideNetwork(Scenario scenario) {
