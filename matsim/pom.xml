@@ -65,7 +65,6 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
-					<!-- Distributed Sim uses preview features -->
 					<!-- avoid out of memory errors: -->
 					<argLine>@{argLine} -Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true --enable-preview</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.

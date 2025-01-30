@@ -362,7 +362,7 @@
 				<version>1.15.1</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>io.github.classgraph</groupId>
 				<artifactId>classgraph</artifactId>
@@ -415,6 +415,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Distributed Sim uses preview features -->
+					<argLine>@{argLine} -Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true --enable-preview</argLine>
+				</configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
