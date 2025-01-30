@@ -29,10 +29,8 @@ public class DistributedSimulationModule extends AbstractModule {
 		DistributedContext ctx = getSimulationContext();
 
 		bind(Communicator.class).toInstance(ctx.getComm());
-		bind(Topology.class).toInstance(ctx.getTopology());
 		bind(MessageBroker.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(ctx.getSerializer());
-		bind(SimulationNode.class).toInstance(ctx.getNode());
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
