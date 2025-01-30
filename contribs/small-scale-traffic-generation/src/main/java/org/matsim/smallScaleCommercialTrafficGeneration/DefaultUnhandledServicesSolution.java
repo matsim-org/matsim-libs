@@ -57,7 +57,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			}
 
 
-			nonCompleteSolvedCarriers = createListOfCarrierWithUnhandledJobs(scenario);
+			nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(scenario));
 			log.info(
 				"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
 				i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
