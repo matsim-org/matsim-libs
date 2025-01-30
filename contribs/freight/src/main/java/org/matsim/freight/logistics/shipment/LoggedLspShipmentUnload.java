@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
@@ -50,7 +51,7 @@ class LoggedLspShipmentUnload implements LspShipmentPlanElement {
 
   @Override
   public String getElementType() {
-    return "UNLOAD";
+    return LSPConstants.UNLOAD;
   }
 
   @Override
