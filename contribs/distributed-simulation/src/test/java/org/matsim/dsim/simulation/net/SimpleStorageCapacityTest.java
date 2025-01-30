@@ -12,7 +12,7 @@ class SimpleStorageCapacityTest {
 
 		var link = TestUtils.createSingleLink();
 		link.setNumberOfLanes(42);
-		var capacity = new SimpleStorageCapacity(link, 7.5);
+		var capacity = SimpleStorageCapacity.create(link, 7.5);
 
 		assertEquals(link.getLength() * link.getNumberOfLanes() / 7.5, capacity.getMax());
 	}
@@ -22,7 +22,7 @@ class SimpleStorageCapacityTest {
 		var link = TestUtils.createSingleLink();
 		link.setCapacity(36000);
 		link.setFreespeed(1000);
-		var capacity = new SimpleStorageCapacity(link, 50);
+		var capacity = SimpleStorageCapacity.create(link, 50);
 
 		assertEquals(10, capacity.getMax());
 	}
@@ -32,7 +32,7 @@ class SimpleStorageCapacityTest {
 		var link = TestUtils.createSingleLink();
 		link.setCapacity(36000);
 		link.setFreespeed(1);
-		var capacity = new SimpleStorageCapacity(link, 50);
+		var capacity = SimpleStorageCapacity.create(link, 50);
 
 		assertEquals(1000, capacity.getMax());
 	}
@@ -41,7 +41,7 @@ class SimpleStorageCapacityTest {
 	void state() {
 
 		var link = TestUtils.createSingleLink();
-		var capacity = new SimpleStorageCapacity(link, 10);
+		var capacity = SimpleStorageCapacity.create(link, 10);
 
 		assertTrue(capacity.isAvailable());
 		capacity.consume(11);

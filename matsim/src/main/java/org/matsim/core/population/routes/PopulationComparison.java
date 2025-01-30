@@ -85,9 +85,7 @@ public class PopulationComparison {
 						}
 					}
 
-					log.warn("");
 					log.warn("selected scores different: personId=" + person1.getId() + "; score1=" + plan1.getScore() + "; score2=" + plan2.getScore() + "; maxScore2=" + maxScore);
-					log.warn("");
 					scoreCounter++;
 
 					result = Result.notEqual;

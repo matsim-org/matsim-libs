@@ -19,36 +19,28 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import jakarta.inject.Inject;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.dsim.DistributedActivityEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.dsim.DistributedActivityEngine;
+
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 class ActivityEngineDefaultImpl implements DistributedActivityEngine {
-	private static final Logger log = LogManager.getLogger( ActivityEngineDefaultImpl.class ) ;
 
 	private final EventsManager eventsManager;
 
 	@Inject
-	ActivityEngineDefaultImpl( EventsManager eventsManager ) {
+	ActivityEngineDefaultImpl(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
-
-//	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
-//		this.eventsManager = eventsManager;
-//	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -60,10 +52,11 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	 * cdobler, apr'12
 	 */
 	private static class AgentEntry {
-		AgentEntry( MobsimAgent agent, double activityEndTime ) {
+		AgentEntry(MobsimAgent agent, double activityEndTime) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
+
 		private final MobsimAgent agent;
 		private final double activityEndTime;
 	}
@@ -139,14 +132,12 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 
 
 	/**
-	 *
 	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
 	 * through the internalInterface.
-	 *
+	 * <p>
 	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
 	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
 	 * the next Activity.
-	 *
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
@@ -158,7 +149,7 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
 			agent.endActivityAndComputeNextState(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
-			internalInterface.arrangeNextAgentState(agent) ;
+			internalInterface.arrangeNextAgentState(agent);
 		} else {
 			// The agent commences an activity on this link.
 			final AgentEntry agentEntry = new AgentEntry(agent, agent.getActivityEndTime());
@@ -188,8 +179,8 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 	 */
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
-		if ( agent.getState()!=State.ACTIVITY ) {
-			return ;
+		if (agent.getState() != State.ACTIVITY) {
+			return;
 		}
 
 
@@ -220,6 +211,11 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 			 */
 			activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 		}
+	}
+
+	@Override
+	public double getEnginePriority() {
+		return 10.;
 	}
 
 	private AgentEntry removeAgentFromQueue(MobsimAgent agent) {

@@ -54,7 +54,7 @@ class SimQueue {
 		storageCapacity.consume(vehicle.getSizeInEquivalents());
 		switch (position) {
 			case QStart -> {
-				// if a vehicle is added from upstream we also want to enfore the inflow capacity constraint
+				// if a vehicle is added from upstream we also want to enforce the inflow capacity constraint
 				internalQ.addLast(vehicle);
 				inflowCapacity.consume(vehicle.getSizeInEquivalents());
 			}
@@ -89,10 +89,10 @@ class SimQueue {
 
 	static StorageCapacity createStorageCapacity(Link link, DSimConfigGroup config, double effectiveCellSize) {
 		return switch (config.getTrafficDynamics()) {
-			case queue -> new SimpleStorageCapacity(link, effectiveCellSize);
-			case kinematicWaves -> new KinematicWavesStorageCapacity(link, effectiveCellSize);
-			case withHoles ->
-				throw new RuntimeException("Config:qsim.trafficDynamics = 'withHoles' is not supported. options are 'queue' and 'kinematicWaves'");
+			case queue -> SimpleStorageCapacity.create(link, effectiveCellSize);
+			case kinematicWaves -> KinematicWavesStorageCapacity.create(link, effectiveCellSize);
+			default ->
+				throw new RuntimeException("Config:qsim.trafficDynamics = " + config.getTrafficDynamics() + " is not supported. Options are 'queue' and 'kinematicWaves'");
 		};
 	}
 }

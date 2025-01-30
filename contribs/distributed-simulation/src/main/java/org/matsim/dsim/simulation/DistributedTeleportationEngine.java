@@ -96,6 +96,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		}
 	}
 
+	@Override
+	public double getEnginePriority() {
+		return -10.; // this engine should handle things last.
+	}
+
 	private boolean firstPersonReady(double now) {
 		return !personsTeleporting.isEmpty() && personsTeleporting.peek().exitTime() <= now;
 	}
