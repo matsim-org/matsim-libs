@@ -27,7 +27,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	private void redrawAllServiceDurations(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
 		for (CarrierService service : carrier.getServices().values()) {
 			double newServiceDuration = generator.getServiceTimePerStop(carrier, carrierAttributes, additionalTravelBufferPerIterationInMinutes);
-			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId())
+			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId(), 0)
 				.setServiceDuration(newServiceDuration);
 			CarrierService redrawnService = builder.setServiceStartingTimeWindow(service.getServiceStaringTimeWindow()).build();
 			carrier.getServices().put(redrawnService.getId(), redrawnService);
