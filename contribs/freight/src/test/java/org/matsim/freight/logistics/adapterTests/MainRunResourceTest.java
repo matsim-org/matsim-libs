@@ -55,7 +55,7 @@ public class MainRunResourceTest {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
         scenario.getNetwork();
 
 
