@@ -47,39 +47,49 @@ public class FISSConfigurator {
         Scenario scenario = controler.getScenario();
         Config config = controler.getConfig();
 
-        if (!config.qsim().getVehiclesSource()
-                .equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
-            throw new IllegalArgumentException("For the time being, FISS works with vehicle types from vehicles data, please check config!");
+        if (!config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+            throw new IllegalArgumentException("For the time being, FISS only works with mode vehicle types from vehicles data, please check config!");
         }
+        // (yy the above could be moved into the QSimConfigGroup consistency checker. kai, jan'25)
 
         FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 
         Vehicles vehiclesContainer = scenario.getVehicles();
 
-		Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
+        Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
 
         for (String sampledMode : fissConfigGroup.sampledModes) {
+
             if (!config.qsim().getMainModes().contains(sampledMode)) {
                 LOG.warn("{} is not a qsim mode, can and will not apply FISS.", sampledMode);
                 finalFissModes.remove(sampledMode);
 
                 continue;
             }
+            // (yy the above could be moved into the QSimConfigGroup consistency checker. kai, jan'25)
+
             final Id<VehicleType> vehicleTypeId = Id.create(sampledMode, VehicleType.class);
             VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get(vehicleTypeId);
+
             if (vehicleType == null) {
                 vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
                 vehiclesContainer.addVehicleType(vehicleType);
                 LOG.info("Created explicit default vehicle type for mode '{}'", sampledMode);
+                throw new RuntimeException( "I do not understand how this can happen if we are enforcing mode vehicle types from vehicles data.  kai, jan'25" );
             }
+
             final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
             LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu);
             vehicleType.setPcuEquivalents(pcu);
         }
 
         fissConfigGroup.sampledModes = finalFissModes;
+        // (yy If we move the above into the FISS config consistency checker, we could just abort if the modes are not consistent instead of trying to
+        // fix them. kai, jan'25)
+
         controler.addOverridingQSimModule(new FISSQSimModule());
         // controler.configureQSimComponents(activateModes(MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList())));
+
     }
 
     public static QSimComponentsConfigurator activateModes() {
@@ -91,11 +101,13 @@ public class FISSConfigurator {
             if (!dvrpModes.isEmpty()) {
                 components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
                 components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+                // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
             }
 
             components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
             components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
             components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+            // (the above does, I think, put the FISS departure handler "before" the QNetsimEngine departure handler.)
 
             additionalNamedComponents.forEach(components::addNamedComponent);
 
@@ -107,6 +119,8 @@ public class FISSConfigurator {
                     components.addComponent(DvrpModes.mode(m));
                 }
             }
+            // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
+
         };
     }
 }

@@ -153,8 +153,7 @@ public class RunFissDrtScenarioIT {
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 
-		if (!config.qsim().getVehiclesSource()
-				.equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+		if (!config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		}
 

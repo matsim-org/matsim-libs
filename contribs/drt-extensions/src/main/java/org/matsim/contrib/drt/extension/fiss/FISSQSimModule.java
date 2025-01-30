@@ -41,6 +41,7 @@ public class FISSQSimModule extends AbstractQSimModule {
 
 	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class ).in( Singleton.class );
 	    // (this will register FISS as a departure handler)
+
     }
 
 //    @Provides
@@ -57,7 +58,8 @@ public class FISSQSimModule extends AbstractQSimModule {
 	// kai, jan'25:
 
 	// with the above (which currently does not work), NetworkModeDepartureHandler is bound to FISS, which replaces the
-	// NetworkModeDepartureHandlerDefaultImpl, and has the consequence that network modes for which FISS does NOT feel responsible are no longer served.
+	// NetworkModeDepartureHandlerDefaultImpl, and has the consequence that network modes for which FISS does NOT feel responsible are no longer
+	// served.
 
 	// as stated elsewhere, I am not sure if we need NetworkModeDepartureHandler at all.
 }
