@@ -55,7 +55,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.dsim.DistributedContext;
+import org.matsim.dsim.LocalContext;
+import org.matsim.dsim.SimulationContext;
 
 import java.util.*;
 
@@ -115,7 +116,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
 	private final Config config;
-	private final DistributedContext simCtx;
+	private final SimulationContext simCtx;
 	private Scenario scenario;
 
 	private com.google.inject.Injector injector;
@@ -159,29 +160,29 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 *            the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null, null, null, DistributedContext.LOCAL);
+		this(args.length > 0 ? args[0] : null, null, null, LocalContext.INSTANCE);
 	}
 
 	public Controler(final String configFileName) {
-		this(configFileName, null, null, DistributedContext.LOCAL);
+		this(configFileName, null, null, LocalContext.INSTANCE);
 	}
 
 	public Controler(final Config config) {
-		this(null, config, null, DistributedContext.LOCAL);
+		this(null, config, null, LocalContext.INSTANCE);
 	}
 
 	public Controler(final Scenario scenario) {
-		this(null, null, scenario, DistributedContext.LOCAL);
+		this(null, null, scenario, LocalContext.INSTANCE);
 	}
 
 	/**
 	 * This constructor is required for distributed simulations.
 	 */
-	public Controler(Scenario scenario, DistributedContext ctx) {
+	public Controler(Scenario scenario, SimulationContext ctx) {
 		this(null, null, scenario, ctx);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario, final DistributedContext ctx) {
+	private Controler(final String configFileName, final Config config, final Scenario scenario, final SimulationContext ctx) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
 			this.config = scenario.getConfig();
@@ -442,7 +443,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public DistributedContext getSimulationContext() {
+	public SimulationContext getSimulationContext() {
 		return simCtx;
 	}
 

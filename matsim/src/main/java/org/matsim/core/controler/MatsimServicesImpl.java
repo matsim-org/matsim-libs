@@ -46,7 +46,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import jakarta.inject.Inject;
-import org.matsim.dsim.DistributedContext;
+import org.matsim.dsim.SimulationContext;
 
 import java.util.Map;
 
@@ -135,8 +135,8 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public DistributedContext getSimulationContext() {
-		return injector.getInstance(DistributedContext.class);
+	public SimulationContext getSimulationContext() {
+		return injector.getInstance(SimulationContext.class);
 	}
 
 	@Override

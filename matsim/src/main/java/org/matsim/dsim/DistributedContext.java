@@ -15,23 +15,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
-/**
- * Class to hold information and communication needed for distributed simulation.
- */
 @Getter
 @Log4j2
-public final class DistributedContext {
-
-	/**
-	 * Local distributed context with a single partition.
-	 */
-	public final static DistributedContext LOCAL = new DistributedContext(
-		new NullCommunicator(),
-		Topology.builder()
-			.totalPartitions(1)
-			.nodes(List.of(SimulationNode.SINGLE_INSTANCE))
-			.build(),
-		null);
+public final class DistributedContext implements SimulationContext {
 
 	private final Communicator comm;
 
@@ -85,13 +71,6 @@ public final class DistributedContext {
 			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
 
 		return new DistributedContext(comm, topology, serializer);
-	}
-
-	/**
-	 * Whether the simulation is distributed across multiple nodes.
-	 */
-	public boolean isDistributed() {
-		return topology.isDistributed();
 	}
 
 	private static Topology createTopology(Communicator comm, int threads, SerializationProvider serializer) {

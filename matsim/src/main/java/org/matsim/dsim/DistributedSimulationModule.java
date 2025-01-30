@@ -24,11 +24,14 @@ public class DistributedSimulationModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		DistributedContext ctx = getSimulationContext();
+		SimulationContext ctx = getSimulationContext();
 
-		bind(Communicator.class).toInstance(ctx.getComm());
+		if (!(ctx instanceof DistributedContext dtx))
+			throw new RuntimeException("DistributedSimulationModule requires a DistributedContext");
+
+		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageBroker.class).in(Singleton.class);
-		bind(SerializationProvider.class).toInstance(ctx.getSerializer());
+		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
@@ -43,7 +46,7 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		// If there are multiple nodes, we need to partition the population
 		if (ctx.getTopology().getNodesCount() > 1) {
-			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(ctx.getComm().getRank()));
+			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 
 			addControlerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
