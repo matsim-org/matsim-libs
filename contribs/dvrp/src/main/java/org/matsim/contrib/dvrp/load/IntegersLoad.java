@@ -85,6 +85,17 @@ public class IntegersLoad implements DvrpLoad {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+
+        for (int k = 0; k < values.length; k++) {
+            hashCode += k * 1000 + values[k];
+        }
+
+        return hashCode;
+    }
+
     private IntegersLoad check(DvrpLoad load) {
         if (load instanceof IntegersLoad otherLoad) {
             Preconditions.checkArgument(values.length == otherLoad.values.length,
