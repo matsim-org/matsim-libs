@@ -36,6 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -171,7 +172,7 @@ import org.matsim.vehicles.VehicleUtils;
     config.addCoreModules();
     Scenario scenario = ScenarioUtils.createScenario(config);
     new MatsimNetworkReader(scenario.getNetwork())
-        .readFile("scenarios/2regions/2regions-network.xml");
+        .readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
     Network network = scenario.getNetwork();
 
     // Create LSP and lspShipments
@@ -198,7 +199,7 @@ import org.matsim.vehicles.VehicleUtils;
     config.controller().setFirstIteration(0);
     config.controller().setLastIteration(0);
     config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+    config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
     controler
