@@ -19,6 +19,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -168,8 +169,8 @@ public class RunFissDrtScenarioIT {
 			fissConfigGroup.switchOffFISSLastIteration = true;
 			FISSConfigurator.configure(run);
 
-			QSimComponentsConfigurator qSimComponentsConfigurator = FISSConfigurator
-					.activateModes(List.of(), MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList()));
+			QSimComponentsConfigurator qSimComponentsConfigurator =
+					DvrpQSimComponents.activateModes(List.of(), MultiModeDrtConfigGroup.get(config ).modes().collect(Collectors.toList() ) );
 
 			run.configureQSimComponents(qSimComponentsConfigurator);
 

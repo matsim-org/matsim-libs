@@ -92,35 +92,35 @@ public class FISSConfigurator {
 
     }
 
-    public static QSimComponentsConfigurator activateModes() {
-        return activateModes(List.of(), List.of()); // no dvrp modes
-    }
-
-    public static QSimComponentsConfigurator activateModes(List<String> additionalNamedComponents,List<String> dvrpModes) {
-        return components -> {
-            if (!dvrpModes.isEmpty()) {
-                components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
-                components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-                // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
-            }
-
-//            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-//            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
-//            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-            // (the above does, I think, put the FISS departure handler "before" the QNetsimEngine departure handler.)
-
-            additionalNamedComponents.forEach(components::addNamedComponent);
-
-
-            if (!dvrpModes.isEmpty()) {
-                // activate all DvrpMode components
-                MultiModals.requireAllModesUnique(dvrpModes);
-                for (String m : dvrpModes) {
-                    components.addComponent(DvrpModes.mode(m));
-                }
-            }
-            // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
-
-        };
-    }
+//    public static QSimComponentsConfigurator activateModes() {
+//        return activateModes(List.of(), List.of()); // no dvrp modes
+//    }
+//
+//    public static QSimComponentsConfigurator activateModes(List<String> additionalNamedComponents,List<String> dvrpModes) {
+//        return components -> {
+//            if (!dvrpModes.isEmpty()) {
+//                components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
+//                components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+//                // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
+//            }
+//
+////            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+////            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
+////            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+//            // (the above does, I think, put the FISS departure handler "before" the QNetsimEngine departure handler.)
+//
+//            additionalNamedComponents.forEach(components::addNamedComponent);
+//
+//
+//            if (!dvrpModes.isEmpty()) {
+//                // activate all DvrpMode components
+//                MultiModals.requireAllModesUnique(dvrpModes);
+//                for (String m : dvrpModes) {
+//                    components.addComponent(DvrpModes.mode(m));
+//                }
+//            }
+//            // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
+//
+//        };
+//    }
 }

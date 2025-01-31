@@ -73,7 +73,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	private final DepartureHandler delegate;
 	private final FISSConfigGroup fissConfigGroup;
 	private final TeleportationEngine teleport;
-	private final Network network;
+	@Inject private Network network;
 	private final TravelTime travelTime;
 	private final Random random;
 
@@ -89,7 +89,6 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		this.fissConfigGroup = fissConfigGroup;
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		this.travelTime = travelTime;
-		this.network = scenario.getNetwork();
 		this.random = MatsimRandom.getLocalInstance();
 		this.matsimServices = matsimServices;
 		this.qsimConfig = scenario.getConfig().qsim();
@@ -113,22 +112,14 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		// This updates the travel time.  Teleportation departure is handled further down.
 		if (agent instanceof PlanAgent planAgent) {
 			Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
-//			Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
-			// given what we have above, I cannot see how this coud happen.
 			NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 			Person person = planAgent.getCurrentPlan().getPerson();
 			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
-			// update travel time with travel times of last iteration
-//			double newTravelTime = 0.0;
-//			// start and end link are not considered in NetworkRoutingModule for travel time
-//			for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
-//				newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-//						now + newTravelTime, person, vehicle);
-//			}
 			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
 			// yyyy This _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
+
 			networkRoute.setTravelTime(newTravelTime);
 		}
 
@@ -137,6 +128,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 		// remove vehicle of teleported agent from parking spot
 		// yy the following functionality is in NetworkModeDpHandlerDefaultImpl in a private method.  Make public?  Maybe make static?
+		// --> It is not the same since this here is teleportation-push whereas there it would be teleportation-pull.
 		QVehicle removedVehicle = null;
 		if (agent instanceof MobsimDriverAgent driverAgent) {
 			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
