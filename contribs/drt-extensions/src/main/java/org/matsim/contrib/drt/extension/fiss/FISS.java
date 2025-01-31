@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -76,6 +77,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	private final Random random;
 
 	private final MatsimServices matsimServices;
+	private final QSimConfigGroup qsimConfig;
 
 
 	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
@@ -88,64 +90,72 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		this.network = scenario.getNetwork();
 		this.random = MatsimRandom.getLocalInstance();
 		this.matsimServices = matsimServices;
+		this.qsimConfig = scenario.getConfig().qsim();
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if (this.fissConfigGroup.sampledModes.contains(agent.getMode())) {
-			if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
-				return delegate.handleDeparture(now, agent, linkId);
-			} else {
-				if (!(agent instanceof DynAgent)) {
-					if (agent instanceof PlanAgent planAgent) {
-						Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
-						Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
-						NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
-						Person person = planAgent.getCurrentPlan().getPerson();
-						Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
-										     .get(networkRoute.getVehicleId());
+		if ( !this.qsimConfig.getMainModes().contains( agent.getMode() ) ) {
+			return false ;
+		} else if ( agent instanceof DynAgent ) {
+			return delegate.handleDeparture( now,agent, linkId );
+		} else if ( !this.fissConfigGroup.sampledModes.contains( agent.getMode() ) ) {
+			return delegate.handleDeparture( now,agent, linkId ); // not covered by test
+			// (the earlier design would have such agents fall through, in which case they would be treated by the standard network mode
+			// dp handler)
+		} else if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
+			return delegate.handleDeparture(now, agent, linkId);
+		}
 
-						// update travel time with travel times of last iteration
-						double newTravelTime = 0.0;
-						// start and end link are not considered in NetworkRoutingModule for travel time
-						for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
-							newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-									now + newTravelTime, person, vehicle);
-						}
-						LOG.debug("New travelTime: {}, was {}", newTravelTime,
-								networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
-						networkRoute.setTravelTime(newTravelTime);
-					}
-					// remove vehicle of teleported agent from parking spot
-					QVehicle removedVehicle = null;
-					if (agent instanceof MobsimDriverAgent driverAgent) {
-						Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
-						QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
-						QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
-						removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
-						if (removedVehicle == null) {
-							throw new RuntimeException(
-									"Could not remove parked vehicle with id " + vehicleId + " on the link id "
-											// + linkId
-											+ vehicle.getCurrentLink().getId()
-											+ ".  Maybe it is currently used by someone else?"
-											+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
-											+ "Maybe was never placed onto a link?");
-						}
-					}
-					boolean result = teleport.handleDeparture(now, agent, linkId);
-					// teleport vehicle right after agent
-					if (removedVehicle != null) {
-						Id<Link> destinationLinkId = agent.getDestinationLinkId();
-						QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork()
-											      .getNetsimLink(destinationLinkId);
-						qLinkDest.addParkedVehicle(removedVehicle);
-					}
-					return result;
-				}
+		// This updates the travel time.  Teleportation departure is handled further down.
+		if (agent instanceof PlanAgent planAgent) {
+			Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
+			Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
+			NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
+			Person person = planAgent.getCurrentPlan().getPerson();
+			Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
+							     .get(networkRoute.getVehicleId());
+
+			// update travel time with travel times of last iteration
+			double newTravelTime = 0.0;
+			// start and end link are not considered in NetworkRoutingModule for travel time
+			for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
+				newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
+						now + newTravelTime, person, vehicle);
+			}
+			LOG.debug("New travelTime: {}, was {}", newTravelTime,
+					networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
+			networkRoute.setTravelTime(newTravelTime);
+		}
+		// remove vehicle of teleported agent from parking spot
+		QVehicle removedVehicle = null;
+		if (agent instanceof MobsimDriverAgent driverAgent) {
+			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
+			QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
+			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+			removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
+			if (removedVehicle == null) {
+				throw new RuntimeException(
+						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
+								// + linkId
+								+ vehicle.getCurrentLink().getId()
+								+ ".  Maybe it is currently used by someone else?"
+								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
+								+ "Maybe was never placed onto a link?");
 			}
 		}
-		return false;
+		boolean result = teleport.handleDeparture(now, agent, linkId);
+		Gbl.assertIf( result ); // otherwise we are confused
+
+		// teleport vehicle right after agent
+		if (removedVehicle != null) {
+			Id<Link> destinationLinkId = agent.getDestinationLinkId();
+			QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(destinationLinkId);
+			qLinkDest.addParkedVehicle(removedVehicle);
+		}
+
+		return result;
+
 	}
 
 	@Override

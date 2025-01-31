@@ -42,6 +42,9 @@ public class FISSQSimModule extends AbstractQSimModule {
 	    addQSimComponentBinding( COMPONENT_NAME ).to( FISS.class ).in( Singleton.class );
 	    // (this will register FISS as a departure handler)
 
+	    // The reason why this is not working right now is, I think, that it falls through onto teleportation with a mode that should be a network
+	    // mode.
+
     }
 
 //    @Provides
