@@ -37,7 +37,7 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 
 	private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
 
-	private int cntTeleportVehicle = 0;
+	private static int cntTeleportVehicle = 0;
 
 	private final VehicleBehavior vehicleBehavior;
 
@@ -80,7 +80,7 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 					log.error( "Note that, with AgentSource and if the agent starts on a leg, the vehicle needs to be inserted BEFORE the agent!") ;
 					throw new RuntimeException( msg+" aborting ...") ;
 				}
-				teleportVehicleTo(vehicle, linkId);
+				teleportVehicleTo(vehicle, linkId, qNetsimEngine);
 
 				vehicle.setDriver(agent);
 				agent.setVehicle(vehicle) ;
@@ -101,8 +101,9 @@ public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepart
 		}
 	}
 
-	private void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId) {
+	public static void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId, QNetsimEngineI qNetsimEngine ) {
 		if (vehicle.getCurrentLink() != null) {
+
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;
 				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);

@@ -110,7 +110,8 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		// This updates the travel time.  Teleportation departure is handled further down.
 		if (agent instanceof PlanAgent planAgent) {
 			Leg currentLeg = (Leg) planAgent.getCurrentPlanElement();
-			Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
+//			Gbl.assertIf(this.fissConfigGroup.sampledModes.contains(currentLeg.getMode()));
+			// given what we have above, I cannot see how this coud happen.
 			NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 			Person person = planAgent.getCurrentPlan().getPerson();
 			Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
@@ -128,10 +129,13 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			networkRoute.setTravelTime(newTravelTime);
 		}
 		// remove vehicle of teleported agent from parking spot
+		// yy the following functionality is in NetworkModeDpHandlerDefaultImpl in a private method.  Make public?  Maybe make static?
 		QVehicle removedVehicle = null;
 		if (agent instanceof MobsimDriverAgent driverAgent) {
 			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
 			QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
+//			NetworkModeDepartureHandlerDefaultImpl.teleportVehicleTo( vehicle, linkId, qNetsimEngine );
+			// is not working, but I dunno why
 			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 			removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
 			if (removedVehicle == null) {
@@ -145,7 +149,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			}
 		}
 		boolean result = teleport.handleDeparture(now, agent, linkId);
-		Gbl.assertIf( result ); // otherwise we are confused
+		Gbl.assertIf( result ); // otherwise we are now confused
 
 		// teleport vehicle right after agent
 		if (removedVehicle != null) {
