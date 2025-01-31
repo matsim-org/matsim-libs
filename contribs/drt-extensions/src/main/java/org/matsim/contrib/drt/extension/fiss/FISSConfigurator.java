@@ -75,7 +75,7 @@ public class FISSConfigurator {
                 vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
                 vehiclesContainer.addVehicleType(vehicleType);
                 LOG.info("Created explicit default vehicle type for mode '{}'", sampledMode);
-                throw new RuntimeException( "I do not understand how this can happen if we are enforcing mode vehicle types from vehicles data.  kai, jan'25" );
+//                throw new RuntimeException( "I do not understand how this can happen if we are enforcing mode vehicle types from vehicles data.  kai, jan'25" );
             }
 
             final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
