@@ -20,12 +20,6 @@
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>distributed-simulation</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

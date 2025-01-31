@@ -52,8 +52,7 @@ public class DrtIntegrationTest {
 
 		URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config-with-drt.xml");
 
-		DSimConfigGroup dsimConfig = new DSimConfigGroup();
-		Config config = ConfigUtils.loadConfig(kelheim, dsimConfig);
+		Config config = ConfigUtils.loadConfig(kelheim);
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -65,15 +64,15 @@ public class DrtIntegrationTest {
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		// copy qsim config from scenario into dsimconfig
-		dsimConfig.setLinkDynamics(config.qsim().getLinkDynamics());
-		dsimConfig.setTrafficDynamics(config.qsim().getTrafficDynamics());
-		dsimConfig.setStuckTime(config.qsim().getStuckTime());
-		dsimConfig.setNetworkModes(new HashSet<>(config.qsim().getMainModes()));
-		dsimConfig.setStartTime(config.qsim().getStartTime().orElse(0));
-		dsimConfig.setEndTime(config.qsim().getEndTime().orElse(86400));
-		dsimConfig.setVehicleBehavior(config.qsim().getVehicleBehavior());
+		config.dsim().setLinkDynamics(config.qsim().getLinkDynamics());
+		config.dsim().setTrafficDynamics(config.qsim().getTrafficDynamics());
+		config.dsim().setStuckTime(config.qsim().getStuckTime());
+		config.dsim().setNetworkModes(new HashSet<>(config.qsim().getMainModes()));
+		config.dsim().setStartTime(config.qsim().getStartTime().orElse(0));
+		config.dsim().setEndTime(config.qsim().getEndTime().orElse(86400));
+		config.dsim().setVehicleBehavior(config.qsim().getVehicleBehavior());
 		// use bisect to partition scenario
-		dsimConfig.setPartitioning(DSimConfigGroup.Partitioning.bisect);
+		config.dsim().setPartitioning(DSimConfigGroup.Partitioning.bisect);
 
 		// Compatibility with many scenarios
 		Activities.addScoringParams(config);
