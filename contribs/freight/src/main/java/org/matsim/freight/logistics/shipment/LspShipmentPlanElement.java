@@ -26,16 +26,23 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
 public interface LspShipmentPlanElement {
 
-  LogisticChainElement getLogisticChainElement();
+	LogisticChainElement getLogisticChainElement();
 
-  Id<LSPResource> getResourceId();
+	Id<LSPResource> getResourceId();
 
-  // yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
-  // 2018, Item 23).  It is, however, probably not
-  // used as a type, but rather as a description.  Rename?
-  String getElementType();
+	// yyyy "type" feels like this makes it a tagged class.  These should be avoided (Effective Java
+	// 2018, Item 23).  It is, however, probably not
+	// used as a type, but rather as a description.  Rename?
+	/**
+	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	 * Mixing class tagging and class hierarchies is a bad idea.
+	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
+	 * So maybe better use something like getActivityType() | getElementDescription -- analogous to e.g. PersonEntersVehicleEvent.class. kmt/kn jan'25
+	 */
+	@Deprecated
+	String getElementType();
 
-  double getStartTime();
+	double getStartTime();
 
-  double getEndTime();
+	double getEndTime();
 }

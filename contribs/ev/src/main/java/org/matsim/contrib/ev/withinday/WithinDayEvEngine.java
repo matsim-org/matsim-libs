@@ -851,7 +851,8 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 			ChargingProcess process = iterator.next();
 
 			// remove vehicle from charger, but may already be done
-			if (process.currentSlot.charger().getLogic().getPluggedVehicles().contains(process.vehicle)) {
+			if (process.currentSlot.charger().getLogic().getPluggedVehicles().stream()
+					.anyMatch(candiate -> process.vehicle.getId().equals(candiate.ev().getId()))) {
 				process.currentSlot.charger().getLogic().removeVehicle(process.vehicle, now);
 			} else {
 				logger.warn(String.format(
