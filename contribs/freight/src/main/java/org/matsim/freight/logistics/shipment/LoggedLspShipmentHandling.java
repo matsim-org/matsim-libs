@@ -26,6 +26,8 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
 //"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
+//Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
+//This would be clother to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
 /*package*/ class LoggedLspShipmentHandling implements LspShipmentPlanElement {
 
 	private final double startTime;
