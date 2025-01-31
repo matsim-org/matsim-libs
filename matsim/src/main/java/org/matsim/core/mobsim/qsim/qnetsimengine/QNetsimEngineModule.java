@@ -57,6 +57,10 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 		}
 
 		// === LinkSpeedCalculator(s):
+
+		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
+		// (initialize this here so we do not have to hedge against "null".)
+
 //		addLinkSpeedCalculatorBinding().to(...);
 
 		// === departure handler:
