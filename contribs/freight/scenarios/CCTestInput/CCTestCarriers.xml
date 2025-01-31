@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<carrier id="ccCarrier1">
-	<capabilities fleetSize="INFINITE">
-		<vehicles>
-			<vehicle id="light" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="18:00:00"/>
-			<vehicle id="heavy" depotLinkId="2" typeId="heavy" earliestStart="06:00:00" latestEnd="18:00:00"/>
-		</vehicles>
-	</capabilities>
-	<shipments>
-		<shipment id="1" from="1" to="5" size="16" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:12:00" deliveryServiceTime="00:12:00"/>
-		<shipment id="2" from="2" to="6" size="11" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
-		<shipment id="3" from="3" to="7" size="31" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
-		<shipment id="4" from="4" to="8" size="9" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
-	</shipments>
-	<services> </services>
-</carrier>
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="ccCarrier1">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="light" depotLinkId="1" typeId="light" earliestStart="06:00:00" latestEnd="18:00:00"/>
+				<vehicle id="heavy" depotLinkId="2" typeId="heavy" earliestStart="06:00:00" latestEnd="18:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="1" from="1" to="5" size="16" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:12:00" deliveryServiceTime="00:12:00"/>
+			<shipment id="2" from="2" to="6" size="11" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
+			<shipment id="3" from="3" to="7" size="31" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
+			<shipment id="4" from="4" to="8" size="9" startPickup="09:00:00" endPickup="19:00:00" startDelivery="09:00:00" endDelivery="19:00:00" pickupServiceTime="00:06:00" deliveryServiceTime="00:06:00"/>
+		</shipments>
+	</carrier>
+</carriers>
