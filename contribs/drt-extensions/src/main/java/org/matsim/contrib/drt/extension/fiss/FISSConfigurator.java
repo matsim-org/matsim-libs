@@ -104,9 +104,9 @@ public class FISSConfigurator {
                 // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
             }
 
-            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
-            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+//            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+//            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
+//            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
             // (the above does, I think, put the FISS departure handler "before" the QNetsimEngine departure handler.)
 
             additionalNamedComponents.forEach(components::addNamedComponent);

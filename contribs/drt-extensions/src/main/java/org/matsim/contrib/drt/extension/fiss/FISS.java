@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2022 MOIA GmbH - All Rights Reserved
  *
  * You may use, distribute and modify this code under the terms
@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -78,6 +79,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	private final MatsimServices matsimServices;
 	private final QSimConfigGroup qsimConfig;
+	private final Scenario scenario;
 
 
 	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
@@ -91,6 +93,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		this.random = MatsimRandom.getLocalInstance();
 		this.matsimServices = matsimServices;
 		this.qsimConfig = scenario.getConfig().qsim();
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -114,20 +117,24 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			// given what we have above, I cannot see how this coud happen.
 			NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
 			Person person = planAgent.getCurrentPlan().getPerson();
-			Vehicle vehicle = this.matsimServices.getScenario().getVehicles().getVehicles()
-							     .get(networkRoute.getVehicleId());
+			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
 			// update travel time with travel times of last iteration
-			double newTravelTime = 0.0;
-			// start and end link are not considered in NetworkRoutingModule for travel time
-			for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
-				newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-						now + newTravelTime, person, vehicle);
-			}
-			LOG.debug("New travelTime: {}, was {}", newTravelTime,
-					networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
+//			double newTravelTime = 0.0;
+//			// start and end link are not considered in NetworkRoutingModule for travel time
+//			for (Id<Link> routeLinkId : networkRoute.getLinkIds()) {
+//				newTravelTime += this.travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
+//						now + newTravelTime, person, vehicle);
+//			}
+			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
+			// yyyy This _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
+			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 			networkRoute.setTravelTime(newTravelTime);
 		}
+
+		// !!!! The following is not a teleportation-pull (as it is in NetworkModeDpHandler...),
+		// but a teleportation-push.
+
 		// remove vehicle of teleported agent from parking spot
 		// yy the following functionality is in NetworkModeDpHandlerDefaultImpl in a private method.  Make public?  Maybe make static?
 		QVehicle removedVehicle = null;
@@ -141,8 +148,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			if (removedVehicle == null) {
 				throw new RuntimeException(
 						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
-								// + linkId
-								+ vehicle.getCurrentLink().getId()
+ 								+ vehicle.getCurrentLink().getId()
 								+ ".  Maybe it is currently used by someone else?"
 								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
 								+ "Maybe was never placed onto a link?");
