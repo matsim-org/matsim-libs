@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.distributed;
+package org.matsim.dsim;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -23,9 +23,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.dsim.Activities;
-import org.matsim.dsim.DSimConfigGroup;
-import org.matsim.dsim.DistributedContext;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
