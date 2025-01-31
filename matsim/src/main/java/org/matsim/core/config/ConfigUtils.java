@@ -25,7 +25,6 @@ import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -53,7 +52,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 		return config;
 	}
 
-	public static Controler.DefaultFiles createConfig() {
+	public static Config createConfig() {
 		Config config = new Config();
 		config.addCoreModules();
 		return config;
