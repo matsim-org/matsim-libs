@@ -48,13 +48,17 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	 * A memory cache for plan models. This is used to avoid re-routing and re-estimation of the same plans.
 	 */
 	private final Map<Id<Person>, PlanModel> memory = new ConcurrentHashMap<>();
-
 	private final Map<Id<Person>, DoubleList> diffs = new ConcurrentHashMap<>();
 
 	/**
 	 * Write estimate statistics.
 	 */
 	private final BufferedWriter out;
+
+	/**
+	 * Store which plans have already been analyzed.
+	 */
+	private final WeakHashMap<Plan, Boolean> seenPlans = new WeakHashMap<>();
 
 	@Inject
 	private Map<String, LegEstimator> legEstimators;
@@ -145,6 +149,11 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 			Plan executedPlan = person.getSelectedPlan();
 
+			// Only newly generated plans are considered
+			if (seenPlans.containsKey(executedPlan)) {
+				continue;
+			}
+
 			Object estimate = executedPlan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR);
 			Double score = executedPlan.getScore();
 
@@ -177,6 +186,8 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 				correctedMae.addValue(sumDiff / diffs.size());
 			}
+
+			seenPlans.put(executedPlan, true);
 		}
 
 		this.writeStats(event.getIteration(), mae, correctedMae, bias);
