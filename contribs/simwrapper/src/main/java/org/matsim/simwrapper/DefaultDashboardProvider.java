@@ -33,6 +33,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		if (ConfigUtils.hasModule(config, EmissionsConfigGroup.class)) {
 			result.add(new EmissionsDashboard(config.global().getCoordinateSystem()));
+			result.add(new ImpactAnalysisDashboard(config.qsim().getMainModes()));
 		}
 
 		if (ConfigUtils.hasModule(config, NoiseConfigGroup.class)) {

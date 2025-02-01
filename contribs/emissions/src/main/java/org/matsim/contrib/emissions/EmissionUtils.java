@@ -180,9 +180,9 @@ public abstract class EmissionUtils {
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 
-		Gbl.assertNotNull(vehicleType);
-		Gbl.assertNotNull(vehicleType.getEngineInformation());
-		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+		Objects.requireNonNull(vehicleType);
+		Objects.requireNonNull(vehicleType.getEngineInformation(), () -> "VehicleType " + vehicleType.getId() + " does not have an engine information set.");
+		Objects.requireNonNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()), () -> "VehicleType " + vehicleType.getId() + " does not have a HBEFA vehicle category set.");
 
 		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
