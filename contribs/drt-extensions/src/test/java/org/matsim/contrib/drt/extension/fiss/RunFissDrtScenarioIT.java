@@ -43,6 +43,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
+import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
 public class RunFissDrtScenarioIT {
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -105,10 +107,8 @@ public class RunFissDrtScenarioIT {
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
-		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-		config.scoring().addModeParams(scoreParams);
-		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-		config.scoring().addModeParams(scoreParams2);
+		config.scoring().addModeParams( new ModeParams("drt") );
+		config.scoring().addModeParams( new ModeParams("walk") );
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -119,33 +119,18 @@ public class RunFissDrtScenarioIT {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
 
-		final ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
-		home.setTypicalDuration(8 * 3600);
-		final ScoringConfigGroup.ActivityParams other = new ScoringConfigGroup.ActivityParams("other");
-		other.setTypicalDuration(4 * 3600);
-		final ScoringConfigGroup.ActivityParams education = new ScoringConfigGroup.ActivityParams("education");
-		education.setTypicalDuration(6 * 3600);
-		final ScoringConfigGroup.ActivityParams shopping = new ScoringConfigGroup.ActivityParams("shopping");
-		shopping.setTypicalDuration(2 * 3600);
-		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
-		work.setTypicalDuration(2 * 3600);
+		config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration(8 * 3600 ) );
+		config.scoring().addActivityParams( new ActivityParams("other").setTypicalDuration(4 * 3600 ) );
+		config.scoring().addActivityParams( new ActivityParams("education").setTypicalDuration(6 * 3600 ) );
+		config.scoring().addActivityParams( new ActivityParams("shopping").setTypicalDuration(2 * 3600 ) );
+		config.scoring().addActivityParams( new ActivityParams("work").setTypicalDuration(2 * 3600 ) );
 
-		config.scoring().addActivityParams(home);
-		config.scoring().addActivityParams(other);
-		config.scoring().addActivityParams(education);
-		config.scoring().addActivityParams(shopping);
-		config.scoring().addActivityParams(work);
-
-		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
-		stratSets.setWeight(1);
-		stratSets.setStrategyName("ChangeExpBeta");
-		config.replanning().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(1 ) );
 
 		config.controller().setLastIteration(1);
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-//		config.controller().setOutputDirectory("test/output/RunFissDrtScenarioIT");
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
