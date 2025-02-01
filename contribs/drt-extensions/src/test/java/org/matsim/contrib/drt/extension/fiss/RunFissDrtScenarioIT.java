@@ -175,11 +175,6 @@ public class RunFissDrtScenarioIT {
 			fissConfigGroup.switchOffFISSLastIteration = true;
 			FISSConfigurator.configure(controler);
 
-			QSimComponentsConfigurator qSimComponentsConfigurator =
-					DvrpQSimComponents.activateModes(List.of(), MultiModeDrtConfigGroup.get(config ).modes().collect(Collectors.toList() ) );
-
-			controler.configureQSimComponents(qSimComponentsConfigurator);
-
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
