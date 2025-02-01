@@ -2,24 +2,35 @@ package org.matsim.modechoice;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.*;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -29,50 +40,62 @@ import java.util.stream.Collectors;
  * A service for working with {@link PlanModel} and creating estimates.
  */
 @SuppressWarnings("unchecked")
-public final class PlanModelService implements StartupListener, IterationEndsListener {
-
-	@Inject
-	private Map<String, LegEstimator> legEstimators;
-
-	@Inject
-	private Map<String, TripEstimator> tripEstimator;
-
-	@Inject
-	private Set<TripScoreEstimator> tripScores;
-
-	@Inject
-	private Set<TripConstraint<?>> constraints;
-
-	@Inject
-	private ActivityEstimator actEstimator;
-
-	@Inject
-	private TimeInterpretation timeInterpretation;
-
-	@Inject
-	private EventsManager eventsManager;
-
-	@Inject
-	private ControlerListenerManager controlerListenerManager;
+public final class PlanModelService implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Map<String, ModeOptions> options;
-
 	/**
 	 * A memory cache for plan models. This is used to avoid re-routing and re-estimation of the same plans.
 	 */
 	private final Map<Id<Person>, PlanModel> memory = new ConcurrentHashMap<>();
 
+	private final Map<Id<Person>, DoubleList> diffs = new ConcurrentHashMap<>();
+
+	/**
+	 * Write estimate statistics.
+	 */
+	private final BufferedWriter out;
+
 	@Inject
-	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions> options) {
+	private Map<String, LegEstimator> legEstimators;
+	@Inject
+	private Map<String, TripEstimator> tripEstimator;
+	@Inject
+	private Set<TripScoreEstimator> tripScores;
+	@Inject
+	private Set<TripConstraint<?>> constraints;
+	@Inject
+	private ActivityEstimator actEstimator;
+	@Inject
+	private TimeInterpretation timeInterpretation;
+	@Inject
+	private EventsManager eventsManager;
+	@Inject
+	private ControlerListenerManager controlerListenerManager;
+
+	@Inject
+	private PlanModelService(InformedModeChoiceConfigGroup config, OutputDirectoryHierarchy io,
+							 Map<String, ModeOptions> options) {
 		this.config = config;
 		this.options = options;
 
 		for (String mode : config.getModes()) {
-
 			if (!options.containsKey(mode))
 				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));
 		}
+
+		this.out = IOUtils.getBufferedWriter(io.getOutputFilename("score_estimates_stats.csv"));
+		try {
+			this.out.write("iteration,mean_estimate_mae,std_estimate_mae,mean_corrected_estimate_mae,std_corrected_estimate_mae,mean_estimate_bias\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override
+	public double priority() {
+		// Run after scoring listeners
+		return -10;
 	}
 
 	@Override
@@ -108,6 +131,79 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 			// Remove plans from memory with a certain probability
 			memory.keySet().removeIf(id -> rnd.nextDouble() < config.getProbaEstimate());
+		}
+
+		Population population = event.getServices().getScenario().getPopulation();
+
+		SummaryStatistics bias = new SummaryStatistics();
+		SummaryStatistics mae = new SummaryStatistics();
+
+		// The corrected mae subtracts the systematically bias from the estimate
+		SummaryStatistics correctedMae = new SummaryStatistics();
+
+		for (Person person : population.getPersons().values()) {
+
+			Plan executedPlan = person.getSelectedPlan();
+
+			Object estimate = executedPlan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR);
+			Double score = executedPlan.getScore();
+
+			DoubleList diffs = this.diffs.computeIfAbsent(person.getId(), k -> new DoubleArrayList());
+
+			if (estimate instanceof Double est && score != null) {
+				double diff = est - score;
+				bias.addValue(diff);
+				mae.addValue(Math.abs(diff));
+
+				diffs.add(diff);
+
+				if (diffs.size() > event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
+					diffs.removeDouble(0);
+				}
+			}
+
+			if (diffs.size() >= event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
+
+				double minDiff = Double.POSITIVE_INFINITY;
+				for (double d : diffs) {
+					if (d < minDiff)
+						minDiff = d;
+				}
+
+				double sumDiff = 0;
+				for (double d : diffs) {
+					sumDiff += Math.abs(d - minDiff);
+				}
+
+				correctedMae.addValue(sumDiff / diffs.size());
+			}
+		}
+
+		this.writeStats(event.getIteration(), mae, correctedMae, bias);
+	}
+
+	private void writeStats(int iteration, SummaryStatistics mae, SummaryStatistics correctedMae, SummaryStatistics bias) {
+		try {
+			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f\n",
+				iteration,
+				mae.getMean(),
+				mae.getStandardDeviation(),
+				correctedMae.getMean(),
+				correctedMae.getStandardDeviation(),
+				bias.getMean()
+			));
+			out.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		try {
+			out.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -151,9 +247,9 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	 */
 	public List<String> modesForEstimator(LegEstimator est) {
 		return legEstimators.entrySet().stream().filter(e -> e.getValue().equals(est))
-				.map(Map.Entry::getKey)
-				.distinct()
-				.collect(Collectors.toList());
+			.map(Map.Entry::getKey)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -272,6 +368,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 	/**
 	 * Check whether all registered constraints are met.
+	 *
 	 * @param modes array of used modes for each trip of the day
 	 */
 	public boolean isValidOption(PlanModel model, String[] modes) {
@@ -284,8 +381,8 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 		for (TripConstraint<?> c : this.constraints) {
 			ConstraintHolder<?> h = new ConstraintHolder<>(
-					(TripConstraint<Object>) c,
-					c.getContext(context, model)
+				(TripConstraint<Object>) c,
+				c.getContext(context, model)
 			);
 
 			if (!h.test(modes))
