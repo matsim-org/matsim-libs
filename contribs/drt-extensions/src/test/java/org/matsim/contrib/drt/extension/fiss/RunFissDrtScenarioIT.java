@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.fiss;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -30,18 +31,23 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunFissDrtScenarioIT {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-	@Test
-	void test() {
+public class RunFissDrtScenarioIT {
+	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@Test void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new);
 
@@ -92,8 +98,7 @@ public class RunFissDrtScenarioIT {
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
-			dvrpConfigGroup);
+		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup, dvrpConfigGroup);
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
@@ -140,7 +145,8 @@ public class RunFissDrtScenarioIT {
 		config.controller().setWriteEventsInterval(1);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory("test/output/RunFissDrtScenarioIT");
+//		config.controller().setOutputDirectory("test/output/RunFissDrtScenarioIT");
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);
@@ -158,7 +164,7 @@ public class RunFissDrtScenarioIT {
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		}
 
-		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
+		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
 
 		//FISS part
 		LinkCounter linkCounter = new LinkCounter();
@@ -167,14 +173,14 @@ public class RunFissDrtScenarioIT {
 			fissConfigGroup.sampleFactor = 0.1;
 			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
 			fissConfigGroup.switchOffFISSLastIteration = true;
-			FISSConfigurator.configure(run);
+			FISSConfigurator.configure(controler);
 
 			QSimComponentsConfigurator qSimComponentsConfigurator =
 					DvrpQSimComponents.activateModes(List.of(), MultiModeDrtConfigGroup.get(config ).modes().collect(Collectors.toList() ) );
 
-			run.configureQSimComponents(qSimComponentsConfigurator);
+			controler.configureQSimComponents(qSimComponentsConfigurator);
 
-			run.addOverridingModule(new AbstractModule() {
+			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					addEventHandlerBinding().toInstance(linkCounter);
@@ -183,8 +189,22 @@ public class RunFissDrtScenarioIT {
 
 		}
 
-		run.run();
-		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);
+		controler.run();
+		{
+			String expected = utils.getInputDirectory() + "0.events.xml.gz" ;
+			String actual = utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz" ;
+			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+		}
+		{
+			String expected = utils.getInputDirectory() + "output_events.xml.gz" ;
+			String actual = utils.getOutputDirectory() + "output_events.xml.gz" ;
+			ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+			assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+		}
+		Assertions.assertEquals(20000, linkCounter.getLinkLeaveCount(), 2000);// yy why a delta of 2000?  kai, jan'25
+
+
 	}
 
 	static class LinkCounter implements LinkLeaveEventHandler {
