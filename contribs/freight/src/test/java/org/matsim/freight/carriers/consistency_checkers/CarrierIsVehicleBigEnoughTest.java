@@ -66,7 +66,7 @@ public class CarrierIsVehicleBigEnoughTest {
 		}
 
 		//determine capacity demand of all shipments
-		//Shipment ID (key as string) and capacity demand (value as double) are beeing stored in HashMap 'shipmentSizes'
+		//Shipment ID (key as string) and capacity demand (value as double) are being stored in HashMap 'shipmentSizes'
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				double shipmentSize = shipment.getCapacityDemand();

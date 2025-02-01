@@ -11,4 +11,10 @@
 		<capacity seats="0" standingRoomInPersons="0" other="15.0">
 		</capacity>
 	</vehicleType>
+
+	<vehicleType id="very_light">
+		<description>Cargo Bike</description>
+		<capacity seats="0" standingRoomInPersons="0" other="2.0">
+		</capacity>
+	</vehicleType>
 </vehicleDefinitions>
