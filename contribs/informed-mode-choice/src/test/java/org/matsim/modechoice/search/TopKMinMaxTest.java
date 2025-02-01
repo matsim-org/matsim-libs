@@ -175,7 +175,6 @@ public class TopKMinMaxTest {
 
 		public TestModule() {
 			config = TestScenario.loadConfig(utils);
-			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		}
 
 		@Override
@@ -185,6 +184,7 @@ public class TopKMinMaxTest {
 
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
