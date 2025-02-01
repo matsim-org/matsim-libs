@@ -1,10 +1,13 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
+import com.google.errorprone.annotations.Var;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
+
+import java.util.*;
 
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
@@ -14,20 +17,21 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  *
  */
 public class CarrierIsVehicleBigEnoughTest {
-	public static void main(String[] args){
+
+		static class Pair<T, U> {
+			T first;
+			U second;
+
+			public Pair(T first, U second) {
+				this.first = first;
+				this.second = second;
+			}}
+
+		public static void main(String[] args){
 
 		// Relativer Pfad zu Freight/Scenarios/CCTestInput/
 		String pathToInput = "contribs/freight/scenarios/CCTestInput/"; //Ich zeige dir später, wie wir das in als Input für die Tests ablegen und dann entsprechend nutzen können.
 
-		/** Einlesen der Konfigurationsdatei
-		 * @KMT: hier wird folgender Fehler geworfen:
-		 *
-		 * C:\Users\anton\Desktop\AdvancedMATSim\matsim\src\main\java\org\matsim\core\config\ConfigUtils.java:51:37
-		 * java: Inkompatible Typen: org.matsim.core.controler.Controler.DefaultFiles kann nicht in org.matsim.core.config.Config konvertiert werden
-		 *
-		 * Die Art und Weise, die Config zu deklarieren habe ich von hier ab Zeile 47: https://github.com/matsim-org/matsim-code-examples/blob/2024.x/src/main/java/org/matsim/codeexamples/config/RunFromConfigfileExample.java
-		 * Alternativen funktionieren auch nicht, es kommt immer zu einem Fehler innerhalb der ConfigUtils.java...
-		 * */
 		/**
 		 * @Anton:
 		 * 1.) Ich habe oben mal den Pfad korrigert. Das ist nicht relativ zu der aktuellen Klasse, sondern relativ zum Projekt. Das sollte so funktionieren. (mir tut es das)
@@ -40,7 +44,6 @@ public class CarrierIsVehicleBigEnoughTest {
 		 */
 
 		Config config = ConfigUtils.createConfig();
-
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
@@ -56,11 +59,34 @@ public class CarrierIsVehicleBigEnoughTest {
 
 		System.out.println("Starting 'IsVehicleBigEnoughTest'...");
 
-		for (Carrier carrier : carriers.getCarriers().values()) {
+		List<Double> vehicleCapacityList = new ArrayList<>();
+
+		//Ermitteln der 'other' capacity aller vehicle types
+			for (Carrier carrier : carriers.getCarriers().values()) {
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+				//In CCTestVeh XML: 'vehicle id'
+				var vehicleType = carrierVehicle.getType().getId();
+				//In CCTestVeh XML: 'capacity other'
 				var capacity = carrierVehicle.getType().getCapacity().getOther();
-				System.out.println("Carrier ID: " + carrier.getId() + " Other Vehicle capacity: " + capacity);
+				//#### Test Output:
+				System.out.println("Carrier ID: '" + vehicleType + "'. Vehicle capacity: " + capacity);
+				vehicleCapacityList.add(capacity);
 			}
 		}
-	}
+		//Fahrzeugkapazität wird aufsteigend sortiert (Kleinstes -> Größtes)
+		Collections.sort(vehicleCapacityList);
+		//#### Test Output:
+		System.out.println("Kapa Liste: "+vehicleCapacityList);
+
+		//Ermitteln der größten Sendung aus CCTestCarriers
+
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			for (CarrierShipment shipment : carrier.getShipments().values()) {
+				double shipmentSize = shipment.getSize();
+				String shipmentID = shipment.getId().toString();
+				System.out.println("Shipment ID: '" + shipmentID + "'. Shipment size: " + shipmentSize);
+			}
+		}
+		}
 }
+
