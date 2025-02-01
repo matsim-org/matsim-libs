@@ -169,6 +169,8 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 				if (diffs.size() > event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
 					diffs.removeDouble(0);
 				}
+
+				seenPlans.put(executedPlan, true);
 			}
 
 			if (diffs.size() >= event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
@@ -186,8 +188,6 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 				correctedMae.addValue(sumDiff / diffs.size());
 			}
-
-			seenPlans.put(executedPlan, true);
 		}
 
 		this.writeStats(event.getIteration(), mae, correctedMae, bias);
