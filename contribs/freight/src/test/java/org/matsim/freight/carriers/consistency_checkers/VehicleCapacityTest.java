@@ -1,6 +1,5 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
-import com.google.errorprone.annotations.Var;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -14,32 +13,26 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 /**
  *
  *  @author antonstock
- *
+ *	This class will check if the given vehicles have enough capacity to meet the capacity demand (size) of given shipments.
+ *	Please change the input path and names of xml files below.
  */
-public class CarrierIsVehicleBigEnoughTest {
+public class VehicleCapacityTest {
 
 	public static void main(String[] args){
 
-		// Relativer Pfad zu Freight/Scenarios/CCTestInput/
-		String pathToInput = "contribs/freight/scenarios/CCTestInput/"; //Ich zeige dir später, wie wir das in als Input für die Tests ablegen und dann entsprechend nutzen können.
-
-		/**
-		 * @Anton:
-		 * 1.) Ich habe oben mal den Pfad korrigert. Das ist nicht relativ zu der aktuellen Klasse, sondern relativ zum Projekt. Das sollte so funktionieren. (mir tut es das)
-		 * 2.) Ich habe die ConfigUtils.createConfig() Methode verwendet, um eine Config zu erstellen. Lesen ja eh nichts über die Kommandozeile als Argument ein und brauchen auch keine vorgefertigte Config.
-		 * 3.) Dein o.g. FEHLER kam daher, dass du aus Versehen in den ConfigUtils den Rückgabetyp verändert hattest von Config auf DefaultFiles.  -> Habe ich rückgängig gemacht.
-		 * 4.) unten habe ich noch das CarrierUtils.loadCarriersAccordingToFreightConfig( scenario ); hinzugefügt, damit die Carrier geladen werden. Das fehlte bisher (ist aber auch in den Code-Examples so drin
-		 * 5.) Ich habe die verbliebenen XML Dateien (Carrier und vehicleTypes) mal von einigen Fehlern befreit, u.a.
-		 *  - vehicleTypes: Es fehlte die schließende Klammer </vehicleDefinitions>
-		 *  - carriers: es fehltes das übergreifende <carriers>  ... </carriers> tag (Plural
-		 */
+		// relative path to Freight/Scenarios/CCTestInput/
+		String pathToInput = "contribs/freight/scenarios/CCTestInput/";
+		//names of xml-files
+		String carriersXML = "CCTestCarriers.xml";
+		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriers.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
+
+		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
+		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
