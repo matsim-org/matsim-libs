@@ -1,5 +1,6 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -14,14 +15,14 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 	/**
 	 *
 	 *  @author antonstock
-	 *	This class will check if the given vehicles are in operation while the shipments have to be collected, shipped and/or droped.
+	 *	This class will check if at least one of the given vehicles are in operation while the shipments have to be picked up or delivered.
 	 *
 	 */
 
 public class VehicleScheduleTest {
 
-	//if function returns true: given time windows overlap
 	public static boolean doTimeWindowsOverlap(TimeWindow tw1, TimeWindow tw2) {
+		//if function returns true: given time windows overlap
 		//System.out.println("Do time windows overlap: " + tw1 + " and " + tw2);
 		//System.out.println(tw1.getStart() <= tw2.getEnd() && tw2.getStart() <= tw1.getEnd());
 		return tw1.getStart() <= tw2.getEnd() && tw2.getStart() <= tw1.getEnd();
@@ -53,12 +54,69 @@ public class VehicleScheduleTest {
 		 * System.out.println("Starting 'IsVehicleBigEnoughTest'...");
 		 */
 
-
 		Map<String, TimeWindow> vehicleOperationWindows = new HashMap<>();
 
 		Map<String, TimeWindow> shipmentPickupWindows = new HashMap<>();
 
 		Map<String, TimeWindow> shipmentDeliveryWindows = new HashMap<>();
+
+		Map<String, Double> vehicleCapacities = new HashMap<>();
+
+		Map<String, Double> shipmentCapacityDemands = new HashMap<>();
+
+		/** Als erstes werden Hash Maps für Vehicle und Shipments erstellt (jeweils ID + Kapazität/Größe
+		 *
+		 *
+		 *
+		 */
+
+		//Vehicle ID (key as string) and capacity (value as double) are being stored in HashMap
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+				//In CCTestVeh XML: 'vehicle id'
+				var vehicleID = carrierVehicle.getType().getId().toString();
+				//In CCTestVeh XML: 'capacity other'
+				var capacity = carrierVehicle.getType().getCapacity().getOther();
+				vehicleCapacities.put(vehicleID, capacity);
+			}
+		}
+
+		//determine capacity demand of all shipments
+		//Shipment ID (key as string) and capacity demand (value as double) are being stored in HashMap
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			for (CarrierShipment shipment : carrier.getShipments().values()) {
+				double shipmentSize = shipment.getCapacityDemand();
+				String shipmentID = shipment.getId().toString();
+				shipmentCapacityDemands.put(shipmentID, shipmentSize);
+			}
+		}
+		//Erstellen von Kategorien für Demand der Shipments auf Basis der Kapazität der Fahrzeuge
+		List<Double> capacityCategories = new ArrayList<>(new HashSet<>(vehicleCapacities.values()));
+		Collections.sort(capacityCategories);
+		capacityCategories.add(Double.MAX_VALUE);
+
+		//Erstellt Liste mit allen HashMaps der Kategorien
+		List<Map<String, Double>> shipmentCategories = new ArrayList<>();
+		for (int i = 0; i <= capacityCategories.size(); i++) {
+			shipmentCategories.add(new HashMap<>());
+		}
+		//Geht alle Shipments durch und sortiert sie in die passende Kategorie
+		for (Map.Entry<String, Double> entry : shipmentCapacityDemands.entrySet()) {
+			String shipmentID = entry.getKey();
+			double shipmentCapacityDemand = entry.getValue();
+
+			for (int i = 0; i < capacityCategories.size(); i++) {
+				if (shipmentCapacityDemand <= capacityCategories.get(i)) {
+					shipmentCategories.get(i).put(shipmentID, shipmentCapacityDemand);
+				}
+			}
+		}
+
+		/**
+		 *
+		 * Ab hier simple Prüfung ob irgendein Fahrzeug im nötigen Zeitfenster aktiv ist.
+		 *
+		 */
 
 		//determine the operating hours of all available vehicles
 		for (Carrier carrier : carriers.getCarriers().values()) {
@@ -84,6 +142,7 @@ public class VehicleScheduleTest {
 				shipmentPickupWindows.put(shipmentID, shipmentPickupWindow);
 			}
 		}
+
 		//System.out.println("Pickup Times HashMap"+shipmentPickupWindows);
 		//determine delivery hours of shipments
 		//Shipment ID (key as string) and times (value as double) are being stored in HashMaps
@@ -94,8 +153,6 @@ public class VehicleScheduleTest {
 				shipmentDeliveryWindows.put(shipmentID, shipmentDeliveryWindow);
 			}
 		}
-		//System.out.println("Delivery Times Hashmap"+shipmentDeliveryWindows);
-
 
 		//check if operating hours of vehicles overlap with pickup hours of shipments
 		Iterator<Map.Entry<String, TimeWindow>> iteratorP = shipmentPickupWindows.entrySet().iterator();
@@ -104,12 +161,14 @@ public class VehicleScheduleTest {
 			Map.Entry<String, TimeWindow> shipmentEntry = iteratorP.next();
 			TimeWindow shipmentTimeWindow = shipmentEntry.getValue();
 			//use doTimeWindowsOverlap function (see above)
+			//if windows overlap, shipment can be picked up
 			boolean isOverlaping = vehicleOperationWindows.values().stream().anyMatch(vehicleTimeWindow -> doTimeWindowsOverlap(vehicleTimeWindow, shipmentTimeWindow));
-			//if windows overlap, shipment is covered and can be removed from map
+			//vehicle in operation must be large enough to carry shipment
 			if (isOverlaping) {
 				iteratorP.remove();
 			}
 		}
+
 		//check if operating hours of vehicles overlap with delivery hours of shipments
 		Iterator<Map.Entry<String, TimeWindow>> iteratorD = shipmentDeliveryWindows.entrySet().iterator();
 		//iteration trough whole HashMap
@@ -123,8 +182,5 @@ public class VehicleScheduleTest {
 				iteratorD.remove();
 			}
 		}
-		System.out.println("WARNING! At least one shipment cannot be picked up (Pick up windows while no vehicle is in operation). Affected shipment(s): "+shipmentPickupWindows.keySet());
-		System.out.println("WARNING! At least one shipment cannot be delivered (Delivery windows while no vehicle is in operation). Affected shipment(s): "+shipmentDeliveryWindows.keySet());
 	}
 }
-

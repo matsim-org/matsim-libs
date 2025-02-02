@@ -50,8 +50,6 @@ public class VehicleCapacityTest {
 		//determine the capacity of all available vehicles
 			for (Carrier carrier : carriers.getCarriers().values()) {
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-				//In CCTestVeh XML: 'vehicle id'
-				var vehicleType = carrierVehicle.getType().getId();
 				//In CCTestVeh XML: 'capacity other'
 				var capacity = carrierVehicle.getType().getCapacity().getOther();
 				 vehicleCapacityList.add(capacity);
