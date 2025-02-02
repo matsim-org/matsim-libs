@@ -3,20 +3,13 @@
 	<carrier id="ccCarrier1">
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="cargo_bike" depotLinkId="2" typeId="Cargo_Bike" earliestStart="00:00:00" latestEnd="18:00:00"/>
-				<vehicle id="small_van" depotLinkId="1" typeId="Van" earliestStart="09:00:00" latestEnd="12:00:00"/>
-				<vehicle id="heavy_truck" depotLinkId="2" typeId="Lorry" earliestStart="11:30:00" latestEnd="15:00:00"/>
+				<vehicle id="cargo_bike" depotLinkId="1" typeId="cargo_bike" earliestStart="00:00:00" latestEnd="06:00:00"/>
+				<vehicle id="small_van" depotLinkId="1" typeId="small_van" earliestStart="00:00:00" latestEnd="23:00:00"/>
 			</vehicles>
 		</capabilities>
 		<shipments>
-			<shipment id="smallItem_1" from="1" to="5" size="5" startPickup="03:00:00" endPickup="04:00:00" startDelivery="04:30:00" endDelivery="05:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
-
-			<shipment id="mediumItem_1" from="2" to="6" size="15" startPickup="04:00:00" endPickup="05:00:00" startDelivery="05:30:00" endDelivery="05:55:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
-
-			<shipment id="largeItem_1" from="3" to="7" size="30" startPickup="03:00:00" endPickup="03:30:00" startDelivery="03:00:00" endDelivery="03:30:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
-
-			<shipment id="tooBigItem_1" from="3" to="7" size="31" startPickup="03:00:00" endPickup="03:30:00" startDelivery="03:00:00" endDelivery="03:30:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
-
+			<shipment id="Paket_A" from="1" to="2" size="02" startPickup="00:00:00" endPickup="06:00:00" startDelivery="00:00:00" endDelivery="06:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="Paket_B" from="1" to="2" size="9" startPickup="00:00:00" endPickup="12:00:00" startDelivery="07:30:00" endDelivery="09:30:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
 		</shipments>
 	</carrier>
 </carriers>
