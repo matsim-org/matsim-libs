@@ -266,7 +266,7 @@ public class TopKMinMaxTest {
 		}
 
 		@Override
-		public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+		public double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 
 			double est = 0;
 			for (String m : modes) {

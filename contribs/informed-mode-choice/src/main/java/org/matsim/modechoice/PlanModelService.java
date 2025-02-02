@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -22,11 +21,11 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.*;
+import org.matsim.modechoice.estimators.LegEstimator;
+import org.matsim.modechoice.estimators.TripEstimator;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A service for working with {@link PlanModel} and creating estimates.
@@ -61,21 +59,22 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	private final WeakHashMap<Plan, Boolean> seenPlans = new WeakHashMap<>();
 
 	@Inject
-	private Map<String, LegEstimator> legEstimators;
-	@Inject
-	private Map<String, TripEstimator> tripEstimator;
-	@Inject
-	private Set<TripScoreEstimator> tripScores;
-	@Inject
-	private Set<TripConstraint<?>> constraints;
-	@Inject
-	private ActivityEstimator actEstimator;
-	@Inject
-	private TimeInterpretation timeInterpretation;
-	@Inject
 	private EventsManager eventsManager;
+
 	@Inject
 	private ControlerListenerManager controlerListenerManager;
+
+	@Inject
+	private ScoringParametersForPerson params;
+
+	@Inject
+	private Map<String, TripEstimator> tripEstimator;
+
+	@Inject
+	private Map<String, LegEstimator> legEstimators;
+
+	@Inject
+	private Set<TripConstraint<?>> constraints;
 
 	@Inject
 	private PlanModelService(InformedModeChoiceConfigGroup config, OutputDirectoryHierarchy io,
@@ -219,9 +218,28 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	}
 
 	/**
+	 * Get a plan model from memory for a person. If not present, a new one is created.
+	 */
+	public PlanModel getPlanModel(Plan plan) {
+
+		Id<Person> id = plan.getPerson().getId();
+		PlanModel model = memory.get(id);
+		if (model == null) {
+			model = PlanModel.newInstance(plan);
+			initEstimates(model);
+			memory.put(id, model);
+		} else
+			model.setPlan(plan);
+
+		return model;
+	}
+
+	/**
 	 * Initialized {@link ModeEstimate} for all available options in the {@link PlanModel}. No routing or estimation is performed yet.
 	 */
-	public void initEstimates(EstimatorContext context, PlanModel planModel) {
+	void initEstimates(PlanModel planModel) {
+
+		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
 		for (String mode : config.getModes()) {
 
@@ -244,23 +262,13 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 				} else {
 
-					c.add(new ModeEstimate(mode, modeOption, planModel.trips(), usable, false, false));
+					c.add(new ModeEstimate(mode, modeOption, planModel.trips(), usable, te != null, false));
 
 				}
 			}
 
 			planModel.putEstimate(mode, c);
 		}
-	}
-
-	/**
-	 * Return the modes an estimator was registered for.
-	 */
-	public List<String> modesForEstimator(LegEstimator est) {
-		return legEstimators.entrySet().stream().filter(e -> e.getValue().equals(est))
-			.map(Map.Entry::getKey)
-			.distinct()
-			.collect(Collectors.toList());
 	}
 
 	/**
@@ -288,89 +296,6 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	}
 
 	/**
-	 * Calculate the estimates for all options. Note that plan model has to be routed before computing estimates.
-	 */
-	@SuppressWarnings("rawtypes")
-	public void calculateEstimates(EstimatorContext context, PlanModel planModel) {
-
-		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
-
-			for (ModeEstimate c : e.getValue()) {
-
-				if (!c.isUsable())
-					continue;
-
-				// All estimates are stored within the objects and modified directly here
-				double[] values = c.getEstimates();
-				double[] tValues = c.getTripEstimates();
-				boolean[] noUsage = c.getNoRealUsage();
-
-				// Collect all estimates
-				for (int i = 0; i < planModel.trips(); i++) {
-
-					List<Leg> legs = planModel.getLegs(c.getMode(), i);
-
-					// This mode could not be applied
-					if (legs == null) {
-						values[i] = Double.NEGATIVE_INFINITY;
-						continue;
-					}
-
-					TripEstimator tripEst = tripEstimator.get(c.getMode());
-
-					// some options may produce equivalent results, but are re-estimated
-					// however, the more expensive computation is routing and only done once
-					boolean realUsage = planModel.hasModeForTrip(c.getMode(), i);
-					noUsage[i] = !realUsage;
-
-					double estimate = 0;
-					if (tripEst != null && realUsage) {
-						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
-						double tripEstimate = c.isMin() ? minMax.getMin() : minMax.getMax();
-
-						// Only store if required
-						if (tValues != null)
-							tValues[i] = tripEstimate;
-
-						estimate += tripEstimate;
-					}
-
-					double tt = 0;
-
-					for (Leg leg : legs) {
-						String legMode = leg.getMode();
-
-						tt += timeInterpretation.decideOnLegTravelTime(leg).orElse(0);
-
-						// Already scored with the trip estimator
-						if (tripEst != null && legMode.equals(c.getMode()))
-							continue;
-
-						LegEstimator legEst = legEstimators.get(legMode);
-
-						if (legEst == null)
-							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);
-
-						// TODO: add delay estimate? (e.g waiting time for drt, currently not respected)
-						estimate += legEst.estimate(context, legMode, leg, c.getOption());
-					}
-
-					TripStructureUtils.Trip trip = planModel.getTrip(i);
-
-					// early or late arrival can also have an effect on the activity scores which is potentially considered here
-					estimate += actEstimator.estimate(context, planModel.getStartTimes()[i] + tt, trip.getDestinationActivity());
-
-					for (TripScoreEstimator tripScore : tripScores) {
-						estimate += tripScore.estimate(context, c.getMode(), trip);
-					}
-
-					values[i] = estimate;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Return whether any constraints are registered.
 	 */
 	public boolean hasConstraints() {
@@ -391,7 +316,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 		EstimatorContext context = new EstimatorContext(model.getPerson(), null);
 
 		for (TripConstraint<?> c : this.constraints) {
-			ConstraintHolder<?> h = new ConstraintHolder<>(
+			PlanModelService.ConstraintHolder<?> h = new PlanModelService.ConstraintHolder<>(
 				(TripConstraint<Object>) c,
 				c.getContext(context, model)
 			);
@@ -409,22 +334,6 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	 */
 	public TripEstimator getTripEstimator(String mode) {
 		return tripEstimator.get(mode);
-	}
-
-	/**
-	 * Get a plan model from memory for a person. If not present, a new one is created.
-	 */
-	public PlanModel getPlanModel(Plan plan) {
-
-		Id<Person> id = plan.getPerson().getId();
-		PlanModel model = memory.get(id);
-		if (model == null) {
-			model = PlanModel.newInstance(plan);
-			memory.put(id, model);
-		} else
-			model.setPlan(plan);
-
-		return model;
 	}
 
 	public record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
