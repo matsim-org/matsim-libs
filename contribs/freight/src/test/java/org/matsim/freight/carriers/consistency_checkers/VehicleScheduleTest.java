@@ -64,12 +64,10 @@ public class VehicleScheduleTest {
 
 		Map<String, Double> shipmentCapacityDemands = new HashMap<>();
 
-		/** Als erstes werden Hash Maps für Vehicle und Shipments erstellt (jeweils ID + Kapazität/Größe
+		/** Vermutlich unnötig
 		 *
 		 *
 		 *
-		 */
-
 		//Vehicle ID (key as string) and capacity (value as double) are being stored in HashMap
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
@@ -93,7 +91,6 @@ public class VehicleScheduleTest {
 		//Erstellen von Kategorien für Demand der Shipments auf Basis der Kapazität der Fahrzeuge
 		List<Double> capacityCategories = new ArrayList<>(new HashSet<>(vehicleCapacities.values()));
 		Collections.sort(capacityCategories);
-		capacityCategories.add(Double.MAX_VALUE);
 
 		//Erstellt Liste mit allen HashMaps der Kategorien
 		List<Map<String, Double>> shipmentCategories = new ArrayList<>();
@@ -112,7 +109,9 @@ public class VehicleScheduleTest {
 			}
 		}
 
-		/**
+		for (int i = 0; i < capacityCategories.size(); i++) {
+			System.out.println("Kategorie: "+capacityCategories.get(i)+": "+shipmentCategories.get(i));
+		}
 		 *
 		 * Ab hier simple Prüfung ob irgendein Fahrzeug im nötigen Zeitfenster aktiv ist.
 		 *
