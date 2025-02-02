@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -47,7 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,16 +70,7 @@ public final class EventsToLegs
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
 	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
-	private static class PendingTransitTravel {
-		final Id<Vehicle> vehicleId;
-		final Id<TransitStopFacility> accessStop;
-		final double boardingTime;
-
-		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop, double boardingTime) {
-			this.vehicleId = vehicleId;
-			this.accessStop = accessStop;
-			this.boardingTime = boardingTime;
-		}
+	private record PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop, double boardingTime) {
 	}
 
 	private static class LineAndRoute {
@@ -131,7 +122,7 @@ public final class EventsToLegs
 		void handleLeg(PersonExperiencedLeg leg);
 	}
 
-	private Network network;
+	private final Network network;
 	private TransitSchedule transitSchedule = null;
 
 	@Inject(optional = true)
@@ -139,19 +130,19 @@ public final class EventsToLegs
 		this.transitSchedule = transitSchedule;
 	}
 
-	private Map<Id<Person>, Leg> legs = new HashMap<>();
-	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
-	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new HashMap<>();
-	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new HashMap<>();
+	private final Map<Id<Person>, Leg> legs = new IdMap<>(Person.class);
+	private final Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new IdMap<>(Person.class);
+	private final Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new IdMap<>(Person.class);
+	private final Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new IdMap<>(Person.class);
 
-	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
-	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
-	private Map<Id<Person>, PendingVehicleTravel> vehicleTravels = new HashMap<>();
+	private final Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new IdMap<>(Person.class);
+	private final Map<Id<Person>, PendingTransitTravel> transitTravels = new IdMap<>(Person.class);
+	private final Map<Id<Person>, PendingVehicleTravel> vehicleTravels = new IdMap<>(Person.class);
 
-	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
-	private Map<Id<Vehicle>, VehicleRoute> vehicle2route = new HashMap<>();
+	private final Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new IdMap<>(Vehicle.class);
+	private final Map<Id<Vehicle>, VehicleRoute> vehicle2route = new IdMap<>(Vehicle.class);
 
-	private List<LegHandler> legHandlers = new ArrayList<>();
+	private final List<LegHandler> legHandlers = new ArrayList<>();
 
 	public EventsToLegs(Scenario scenario) {
 		this.network = scenario.getNetwork();
@@ -269,7 +260,7 @@ public final class EventsToLegs
 				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
-		assert experiencedRoute.size() >= 1;
+		assert !experiencedRoute.isEmpty();
 		PendingTransitTravel pendingTransitTravel;
 		PendingVehicleTravel pendingVehicleTravel;
 		if (experiencedRoute.size() > 1) { // different links processed
@@ -323,7 +314,7 @@ public final class EventsToLegs
 					vehicleRoute.links.size());
 			Route route;
 			if (traveledLinks.isEmpty()) {//special case: enter and leave vehicle without entering traffic
-				route = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
+				route = RouteUtils.createGenericRouteImpl(experiencedRoute.getFirst(), event.getLinkId());
 				route.setDistance(0.0);
 			} else {
 				route = RouteUtils.createNetworkRoute(traveledLinks );
@@ -339,7 +330,7 @@ public final class EventsToLegs
 		} else {
 			// i.e. experiencedRoute.size()==1 and no pendingTransitTravel
 			TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
-			Route genericRoute = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
+			Route genericRoute = RouteUtils.createGenericRouteImpl(experiencedRoute.getFirst(), event.getLinkId());
 			genericRoute.setTravelTime(travelTime);
 			if (travelEvent != null) {
 				genericRoute.setDistance(travelEvent.getDistance());
@@ -349,8 +340,9 @@ public final class EventsToLegs
 			leg.setRoute(genericRoute);
 		}
 
+		PersonExperiencedLeg personExperiencedLeg = new PersonExperiencedLeg(event.getPersonId(), leg);
 		for (LegHandler legHandler : legHandlers) {
-			legHandler.handleLeg(new PersonExperiencedLeg(event.getPersonId(), leg));
+			legHandler.handleLeg(personExperiencedLeg);
 		}
 	}
 
