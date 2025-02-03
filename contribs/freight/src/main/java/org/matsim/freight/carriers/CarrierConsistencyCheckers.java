@@ -3,6 +3,11 @@ package org.matsim.freight.carriers;
 import java.util.*;
 
 public class CarrierConsistencyCheckers {
+	/**
+	 * @author antonstock
+	 *
+	 *
+	 */
 	public static void capacityCheck(Carriers carriers) {
 		List<Double> vehicleCapacityList = new ArrayList<>();
 		Map<String, Double> shipmentSizes = new HashMap<>();
@@ -41,4 +46,10 @@ public class CarrierConsistencyCheckers {
 			}
 		}
 	}
+	public static void scheduleTest(Carriers carriers) {
+		//TODO
+	}
+
+
+
 }
