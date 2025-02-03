@@ -467,7 +467,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			CarriersUtils.runJsprit(originalScenario);
 			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
 			if (!nonCompleteSolvedCarriers.isEmpty()) {
-				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".carriers_notCompletelySolved.xml.gz");
+				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
 					unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
 			}
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());

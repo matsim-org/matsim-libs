@@ -99,17 +99,18 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					try {
 						Files.deleteIfExists(Path.of(
 							scenario.getConfig().controller().getOutputDirectory(),
-							scenario.getConfig().controller().getRunId() + ".carriers_notCompletelySolved_it_" + (i - 1) + ".xml.gz"));
+							scenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved_it_" + (i - 1) + ".xml.gz"));
 					} catch (IOException e) {
-						log.warn("Could not delete file: {}/{}.carriers_notCompletelySolved_it_{}.xml.gz",
+						log.warn("Could not delete file: {}/{}.output_carriers_notCompletelySolved_it_{}.xml.gz",
 							scenario.getConfig().controller().getOutputDirectory(), scenario.getConfig().controller().getRunId(), i);
 					}
 				}
-				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(scenario),
-					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".carriers_notCompletelySolved_it_" + i + ".xml.gz"
-				);
 
 				if (nonCompleteSolvedCarriers.isEmpty()) break;
+				else
+					CarriersUtils.writeCarriers(CarriersUtils.getCarriers(scenario),
+						scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved_it_" + i + ".xml.gz"
+					);
 			}
 
 			if (!nonCompleteSolvedCarriers.isEmpty()) {
