@@ -145,6 +145,8 @@ public final class LspShipmentUtils {
 
   //-----------------------------
   // LoggedShipment<..> builders
+  // Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
+  //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   //-----------------------------
 
   @SuppressWarnings("ClassEscapesDefinedScope")
