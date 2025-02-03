@@ -21,63 +21,25 @@
 package org.matsim.freight.logistics.shipment;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.logistics.LSPConstants;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
 
-final class ScheduledLspShipmentTransport implements LspShipmentLeg {
+//"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
+//Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
+//This would be clother to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
+/*package*/ class LoggedLspShipmentHandling implements LspShipmentPlanElement {
 
 	private final double startTime;
 	private final double endTime;
 	private final LogisticChainElement element;
 	private final Id<LSPResource> resourceId;
-	private final Id<Carrier> carrierId;
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
-	private final CarrierService carrierService;
-	private final CarrierShipment carrierShipment; //TODO: Put CarrierShipment and CarrieTask behind one interface and use that here (CarrierTask...)
 
-	ScheduledLspShipmentTransport(LspShipmentUtils.ScheduledShipmentTransportBuilder builder) {
+	LoggedLspShipmentHandling(LspShipmentUtils.LoggedShipmentHandleBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
-		this.carrierId = builder.carrierId;
-		this.fromLinkId = builder.fromLinkId;
-		this.toLinkId = builder.toLinkId;
-		this.carrierService = builder.carrierService;
-		this.carrierShipment = builder.carrierShipment;
-	}
-
-	/**
-	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
-	 * Mixing class tagging and class hierarchies is a bad idea.
-	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
-	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
-	 */
-	@Override
-	@Deprecated
-	public String getElementType() {
-		return LSPConstants.TRANSPORT;
-	}
-
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
-	@Override
-	public void setEndTime(double time) {
-		throw new RuntimeException("not implemented");
 	}
 
 	@Override
@@ -90,32 +52,26 @@ final class ScheduledLspShipmentTransport implements LspShipmentLeg {
 		return resourceId;
 	}
 
+
+	/**
+	 * @deprecated //see bloch item 23: Prefer class hierarchies to tagged classes.
+	 * Mixing class tagging and class hierarchies is a bad idea.
+	 * Getting the type is ok for writing it somewhere, but do NOT use it for specifying the type within a decision logic!
+	 * So maybe better use something like getActivityType() -- analogous to e.g. PersonEntersVehicleEvent.class) kmt/kn jan'25
+	 */
 	@Override
-	public Id<Link> getToLinkId() {
-		return toLinkId;
+	@Deprecated
+	public String getElementType() {
+		return LSPConstants.HANDLING;
 	}
 
 	@Override
-	public void setToLinkId(Id<Link> endLinkId) {
-		throw new RuntimeException("not implemented");
+	public double getStartTime() {
+		return startTime;
 	}
 
 	@Override
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	@Override
-	public Id<Link> getFromLinkId() {
-		return fromLinkId;
-	}
-
-	@Override
-	public CarrierService getCarrierService() {
-		return carrierService;
-	}
-
-	public CarrierShipment getCarrierShipment() {
-		return carrierShipment;
+	public double getEndTime() {
+		return endTime;
 	}
 }
