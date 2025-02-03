@@ -53,11 +53,6 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 	 */
 	private final BufferedWriter out;
 
-	/**
-	 * Store which plans have already been analyzed.
-	 */
-	private final WeakHashMap<Plan, Boolean> seenPlans = new WeakHashMap<>();
-
 	@Inject
 	private EventsManager eventsManager;
 
@@ -148,12 +143,8 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 			Plan executedPlan = person.getSelectedPlan();
 
-			// Only newly generated plans are considered
-			if (seenPlans.containsKey(executedPlan)) {
-				continue;
-			}
-
-			Object estimate = executedPlan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR);
+			// Remove the estimate so it is only used once
+			Object estimate = executedPlan.getAttributes().removeAttribute(PlanCandidate.ESTIMATE_ATTR);
 			Double score = executedPlan.getScore();
 
 			DoubleList diffs = this.diffs.computeIfAbsent(person.getId(), k -> new DoubleArrayList());
@@ -168,8 +159,6 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 				if (diffs.size() > event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
 					diffs.removeDouble(0);
 				}
-
-				seenPlans.put(executedPlan, true);
 			}
 
 			if (diffs.size() >= event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
