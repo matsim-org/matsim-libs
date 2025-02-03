@@ -1,11 +1,12 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
-import com.graphhopper.jsprit.core.problem.job.Shipment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
+
 import org.matsim.freight.carriers.*;
 
 import java.util.*;
@@ -21,7 +22,9 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
 public class VehicleScheduleTest {
 
-	public static boolean doTimeWindowsOverlap(TimeWindow tw1, TimeWindow tw2) {
+		private static final Logger log = LogManager.getLogger(VehicleScheduleTest.class);
+
+		public static boolean doTimeWindowsOverlap(TimeWindow tw1, TimeWindow tw2) {
 		//if function returns true: given time windows overlap
 		//System.out.println("Do time windows overlap: " + tw1 + " and " + tw2);
 		//System.out.println(tw1.getStart() <= tw2.getEnd() && tw2.getStart() <= tw1.getEnd());
@@ -103,7 +106,6 @@ public class VehicleScheduleTest {
 		/**
 		 * System.out.println("Starting 'IsVehicleBigEnoughTest'...");
 		 */
-
 		Map<String, VehicleInfo> vehicleOperationWindows = new HashMap<>();
 
 		Map<String, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
@@ -160,13 +162,19 @@ public class VehicleScheduleTest {
 			boolean vehicleIsSufficient = vehicleOperationWindows.values().stream().map(VehicleInfo::getCapacity).anyMatch(capacity -> doesShipmentFitInVehicle(capacity, demand));
 			//use doTimeWindowsOverlap function (see above)
 			//if windows overlap, shipment can be picked up
-			boolean isOverlaping = vehicleOperationWindows.values().stream().map(VehicleInfo::getOperationWindow).anyMatch(vehicleTimeWindow -> doTimeWindowsOverlap(vehicleTimeWindow, shipmentTimeWindow));
+			boolean timeWindowsAreOverlapping = vehicleOperationWindows.values().stream().map(VehicleInfo::getOperationWindow).anyMatch(vehicleTimeWindow -> doTimeWindowsOverlap(vehicleTimeWindow, shipmentTimeWindow));
 			//vehicle in operation must be large enough to carry shipment
-			if (vehicleIsSufficient && isOverlaping) {
+			if (vehicleIsSufficient && timeWindowsAreOverlapping) {
+				//TODO: nicht remove sondern nicht transportierbare in neue Map hinzufügen, ID + Grund?
 				iteratorP.remove();
 			}else {
-				System.out.println("---->>>>WARNING: Shipment cannot be picked up! Shipment ID: "+shipmentPickupWindows.keySet()+"| Sufficient capacity: *"+vehicleIsSufficient+"* | Matching time slot: *"+isOverlaping+"*");
-			}
+				//hier sollte festgehalten werden, wenn ein Shipment nicht abgeholt werden kann, z.B.:
+				//noPickUpPossible++;
+				}
+			//Nur letzte Ausgabe zählt!
+			//Hier sollte die Anzahl der noPickUpPossible ausgegeben werden (falls != 0) und die Shipment IDs
+			//Umbauen auf neue Syntax:
+			log.warn("Shipment(s) '{}' may not be picked up! | Sufficient capacity: *{}* | Matching time slot: *{}*", shipmentPickupWindows.keySet(), vehicleIsSufficient, timeWindowsAreOverlapping);
 		}
 
 		//check if operating hours of vehicles overlap with delivery hours of shipments
@@ -180,13 +188,18 @@ public class VehicleScheduleTest {
 			//check if shipment fits in vehicle
 			boolean vehicleIsSufficient = vehicleOperationWindows.values().stream().map(VehicleInfo::getCapacity).anyMatch(capacity -> doesShipmentFitInVehicle(capacity, demand));
 			//use doTimeWindowsOverlap function (see above)
-			boolean isOverlaping = vehicleOperationWindows.values().stream().map(VehicleInfo::getOperationWindow).anyMatch(vehicleTimeWindow -> doTimeWindowsOverlap(vehicleTimeWindow, shipmentTimeWindow));
+			boolean timeWindowsAreOverlapping = vehicleOperationWindows.values().stream().map(VehicleInfo::getOperationWindow).anyMatch(vehicleTimeWindow -> doTimeWindowsOverlap(vehicleTimeWindow, shipmentTimeWindow));
 			//if windows overlap, shipment is covered and can be removed from map
-			if (vehicleIsSufficient && isOverlaping) {
+			if (vehicleIsSufficient && timeWindowsAreOverlapping) {
+				//TODO: siehe oben
 				iteratorD.remove();
 			} else {
-				System.out.println("---->>>>WARNING: Shipment cannot be delivered! Shipment ID: "+shipmentDeliveryWindows.keySet()+"| Sufficient capacity: *"+vehicleIsSufficient+"* | Matching time slot: *"+isOverlaping+"*");
+				//hier sollte festgehalten werden, wenn ein Shipment nicht geliefert werden kann, z.B.:
+				//noDeliveryPossible++
 			}
+			//Nur letzte Ausgabe zählt!
+			//Hier sollte die Anzahl der noDeliveryPossible ausgegeben werden (falls != 0) und die Shipment IDs
+			System.out.println("---->>>>WARNING: Shipment(s) '"+shipmentDeliveryWindows.keySet()+"' may not be delivered! | Sufficient capacity: *"+vehicleIsSufficient+"* | Matching time slot: *"+timeWindowsAreOverlapping+"*");
 		}
 	}
 }
