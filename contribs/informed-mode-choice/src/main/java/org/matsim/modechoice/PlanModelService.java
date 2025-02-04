@@ -85,7 +85,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 		this.out = IOUtils.getBufferedWriter(io.getOutputFilename("score_estimates_stats.csv"));
 		try {
-			this.out.write("iteration,mean_estimate_mae,median_estimate_mae,p95_estimate_mae,p99_estimate_mae,mean_corrected_estimate_mae,p95_corrected_estimate_mae,mean_estimate_bias\n");
+			this.out.write("iteration,mean_estimate_mae,median_estimate_mae,p95_estimate_mae,p99_estimate_mae,mean_corrected_estimate_mae,p95_corrected_estimate_mae,p99_corrected_estimate_mae,mean_estimate_bias\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -184,7 +184,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 	private void writeStats(int iteration, DescriptiveStatistics mae, DescriptiveStatistics correctedMae, SummaryStatistics bias) {
 		try {
-			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f,%f,%f\n",
+			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
 				iteration,
 				mae.getMean(),
 				mae.getPercentile(50),
@@ -192,6 +192,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 				mae.getPercentile(99),
 				correctedMae.getMean(),
 				correctedMae.getPercentile(95),
+				correctedMae.getPercentile(99),
 				bias.getMean()
 			));
 			out.flush();
