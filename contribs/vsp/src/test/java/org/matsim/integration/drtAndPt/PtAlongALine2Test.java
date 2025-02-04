@@ -231,8 +231,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
 				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
@@ -248,8 +248,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
 				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
@@ -264,8 +264,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
 				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;

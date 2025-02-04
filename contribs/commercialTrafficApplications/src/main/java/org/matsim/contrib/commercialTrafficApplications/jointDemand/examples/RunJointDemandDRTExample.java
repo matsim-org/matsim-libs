@@ -143,7 +143,7 @@ class RunJointDemandDRTExample {
 
         DrtConfigGroup drtCfg = new DrtConfigGroup();
         DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                (DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
+                drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
         defaultConstraintsSet.maxWaitTime = 2 * 3600;
 		defaultConstraintsSet.maxTravelTimeAlpha = 5;

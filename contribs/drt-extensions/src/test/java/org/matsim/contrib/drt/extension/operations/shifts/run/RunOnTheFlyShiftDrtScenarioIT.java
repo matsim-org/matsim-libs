@@ -55,7 +55,7 @@ public class RunOnTheFlyShiftDrtScenarioIT {
 
         drtWithShiftsConfigGroup.mode = TransportMode.drt;
         DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
         drtWithShiftsConfigGroup.stopDuration = 30.;
         defaultConstraintsSet.maxTravelTimeAlpha = 1.5;

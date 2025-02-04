@@ -240,7 +240,7 @@ public class PrebookingTestEnvironment {
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
 		modeConfig.mode = "drt";
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = (DefaultDrtOptimizationConstraintsSet) modeConfig
+		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = modeConfig
 				.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = maximumWaitTime;
