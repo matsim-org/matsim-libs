@@ -262,6 +262,11 @@ class SpeedyALTData {
 				}
 			}
 		}
+
+		if(graph.hasTurnRestrictions()) {
+			consolidateColoredNodes(data);
+		}
+
 		return data;
 	}
 
@@ -296,7 +301,36 @@ class SpeedyALTData {
 				}
 			}
 		}
+
+		if(graph.hasTurnRestrictions()) {
+			consolidateColoredNodes(data);
+		}
+
 		return data;
+	}
+
+	private void consolidateColoredNodes(double[] data) {
+		// update node values with the minimum of their colored copies, if any
+		for (int i = 0; i < graph.nodeCount; i++) {
+			Node uncoloredNode = graph.getNode(i);
+			if (uncoloredNode != null) {
+
+				// the index points to a node with a different index -> colored copy
+				if (uncoloredNode.getId().index() != i) {
+					int uncoloredIndex = uncoloredNode.getId().index();
+					double uncoloredCost = data[uncoloredIndex];
+					double coloredCost = data[i];
+
+					if (Double.isFinite(uncoloredCost)) {
+						if (coloredCost < uncoloredCost) {
+							data[uncoloredIndex] = coloredCost;
+						}
+					} else {
+						data[uncoloredIndex] = coloredCost;
+					}
+				}
+			}
+		}
 	}
 
 	int getNodeDeadend(int nodeIndex) {

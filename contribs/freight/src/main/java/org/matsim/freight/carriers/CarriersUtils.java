@@ -313,6 +313,21 @@ public class CarriersUtils {
 	}
 
 	/**
+	 * Creates a list of carriers with unhandled jobs.
+	 *
+	 * @param carriers the carriers
+	 * @return list of carriers with unhandled jobs
+	 */
+	public static List<Carrier> createListOfCarrierWithUnhandledJobs(Carriers carriers) {
+		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			if (!allJobsHandledBySelectedPlan(carrier))
+				carriersWithUnhandledJobs.add(carrier);
+		}
+		return carriersWithUnhandledJobs;
+	}
+
+	/**
 	 * Checks if a carrier has jobs (services or shipments).
 	 *
 	 * @param carrier the carrier
