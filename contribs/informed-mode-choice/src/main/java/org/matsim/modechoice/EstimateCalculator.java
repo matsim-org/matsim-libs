@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
@@ -18,6 +19,9 @@ import java.util.function.Predicate;
  * Provides methods for computing estimates.
  */
 public final class EstimateCalculator {
+
+	@Inject
+	private QSimConfigGroup qsim;
 
 	@Inject
 	private EstimateRouter router;
@@ -174,6 +178,19 @@ public final class EstimateCalculator {
 
 			TripStructureUtils.Trip trip = planModel.getTrip(i);
 
+			for (TripScoreEstimator tripScore : tripScores) {
+				estimate += tripScore.estimate(context, mode, trip);
+			}
+
+			// Try to estimate aborted plans
+			if (qsim.getEndTime().isDefined() && tt.getTime().seconds() > qsim.getEndTime().seconds()) {
+				estimate += context.scoring.abortedPlanScore;
+
+				// Estimate the first activity, because the overnight estimation will not be performed
+				estimate += actEstimator.estimate(context, 0, planModel.getTrip(0).getOriginActivity());
+				break;
+			}
+
 			// Estimate overnight scoring if applicable
 			if (modes.length > 1 && i == modes.length - 1) {
 				estimate += actEstimator.estimateLastAndFirstOfDay(context, tt.getTime().seconds(), trip.getDestinationActivity(), planModel.getTrip(0).getOriginActivity());
@@ -181,10 +198,6 @@ public final class EstimateCalculator {
 				estimate += actEstimator.estimate(context, tt.getTime().seconds(), trip.getDestinationActivity());
 
 			tt.addActivity(trip.getDestinationActivity());
-
-			for (TripScoreEstimator tripScore : tripScores) {
-				estimate += tripScore.estimate(context, mode, trip);
-			}
 		}
 
 		// Add the fixed costs estimate if a mode has been used
