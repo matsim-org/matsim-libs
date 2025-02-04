@@ -37,12 +37,12 @@ public class PHEMTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	//TODO Check if the used hbefa files are correct
-	private final static String HBEFA_4_1_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-	private final static String HBEFA_HOT_AVERAGE = HBEFA_4_1_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
-	private final static String HBEFA_COLD_AVERAGE = HBEFA_4_1_PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc";
-	private final static String HBEFA_HOT_TECHAVG = HBEFA_4_1_PATH + "f5b276f41a0531ed740a81f4615ec00f4ff7a28d.enc";
-	private final static String HBEFA_COLD_TECHAVG = HBEFA_4_1_PATH + "b63f949211b7c93776cdce8a7600eff4e36460c8.enc";
+	// TODO Files were changed to local for debugging purposes. CHange them back to the svn entries, when fixed hbefa tables are available
+	private final static String HBEFA_4_1_PATH = "D:/Projects/VSP/MATSim/PHEM/hbefa/";
+	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
+	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
+	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
+	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
 	// TODO DEBUG ONLY
 	static CSVPrinter csvPrinter = null;
@@ -246,10 +246,11 @@ public class PHEMTest {
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //TODO Check that this is correct
-		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVERAGE);
-		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVERAGE);
-		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_TECHAVG);
-		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_TECHAVG);
+		ecg.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
+		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
+		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
+		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
+		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
 
 		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
