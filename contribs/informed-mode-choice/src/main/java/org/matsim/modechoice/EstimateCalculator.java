@@ -174,7 +174,11 @@ public final class EstimateCalculator {
 
 			TripStructureUtils.Trip trip = planModel.getTrip(i);
 
-			estimate += actEstimator.estimate(context, tt.getTime().seconds(), trip.getDestinationActivity());
+			// Estimate overnight scoring if applicable
+			if (modes.length > 1 && i == modes.length - 1) {
+				estimate += actEstimator.estimateLastAndFirstOfDay(context, tt.getTime().seconds(), trip.getDestinationActivity(), planModel.getTrip(0).getOriginActivity());
+			} else
+				estimate += actEstimator.estimate(context, tt.getTime().seconds(), trip.getDestinationActivity());
 
 			tt.addActivity(trip.getDestinationActivity());
 

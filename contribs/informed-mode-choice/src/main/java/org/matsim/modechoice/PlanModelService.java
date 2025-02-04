@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -84,7 +85,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 
 		this.out = IOUtils.getBufferedWriter(io.getOutputFilename("score_estimates_stats.csv"));
 		try {
-			this.out.write("iteration,mean_estimate_mae,std_estimate_mae,mean_corrected_estimate_mae,std_corrected_estimate_mae,mean_estimate_bias\n");
+			this.out.write("iteration,mean_estimate_mae,median_estimate_mae,p95_estimate_mae,std_estimate_mae,mean_corrected_estimate_mae,std_corrected_estimate_mae,mean_estimate_bias\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -134,7 +135,7 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 		Population population = event.getServices().getScenario().getPopulation();
 
 		SummaryStatistics bias = new SummaryStatistics();
-		SummaryStatistics mae = new SummaryStatistics();
+		DescriptiveStatistics mae = new DescriptiveStatistics();
 
 		// The corrected mae subtracts the systematically bias from the estimate
 		SummaryStatistics correctedMae = new SummaryStatistics();
@@ -181,11 +182,13 @@ public final class PlanModelService implements StartupListener, IterationEndsLis
 		this.writeStats(event.getIteration(), mae, correctedMae, bias);
 	}
 
-	private void writeStats(int iteration, SummaryStatistics mae, SummaryStatistics correctedMae, SummaryStatistics bias) {
+	private void writeStats(int iteration, DescriptiveStatistics mae, SummaryStatistics correctedMae, SummaryStatistics bias) {
 		try {
-			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f\n",
+			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f,%f,%f\n",
 				iteration,
 				mae.getMean(),
+				mae.getPercentile(50),
+				mae.getPercentile(95),
 				mae.getStandardDeviation(),
 				correctedMae.getMean(),
 				correctedMae.getStandardDeviation(),
