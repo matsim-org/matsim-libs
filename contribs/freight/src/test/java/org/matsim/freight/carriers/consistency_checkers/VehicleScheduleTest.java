@@ -85,7 +85,7 @@ public class VehicleScheduleTest {
 			 * TODO: Ab hier Umzug zu CarrierConsistencyCheckers
 			 *
 			 */
-
+			//TODO: Alle drei Maps umstellen von String auf Vehicle/Job id
 			Map<String, VehicleInfo> vehicleOperationWindows = new HashMap<>();
 
 			Map<String, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
