@@ -264,7 +264,7 @@ public class PHEMTest {
 			new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"),
 			new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"),
 			new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"),
-			new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/>130"),
+			new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"),
 		};
 
 		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_output.csv");
@@ -272,7 +272,9 @@ public class PHEMTest {
 
 		// Define vehicle
 		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
-		vehicleAttributes.setHbefaEmConcept("petrol (4S)");
+		vehicleAttributes.setHbefaTechnology("petrol (4S)");
+		vehicleAttributes.setHbefaSizeClass("not specified"); // TODO FIx table for final tests
+		vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
 			vehicleAttributes);
@@ -321,18 +323,18 @@ public class PHEMTest {
 			"CO-MATSIM",
 			"CO-Diff",
 			"CO-Factor",
-			"CO2-SUMO",
-			"CO2-MATSIM",
-			"CO2-Diff",
-			"CO2-Factor",
+			"CO2(total)-SUMO",
+			"CO2(total)-MATSIM",
+			"CO2(total)-Diff",
+			"CO2(total)-Factor",
 			"HC-SUMO",
 			"HC-MATSIM",
 			"HC-Diff",
 			"HC-Factor",
-			"PMx-SUMO",
-			"PMx-MATSIM",
-			"PMx-Diff",
-			"PMx-Factor",
+			"PM-SUMO",
+			"PM-MATSIM",
+			"PM-Diff",
+			"PM-Factor",
 			"NOx-SUMO",
 			"NOx-MATSIM",
 			"NOx-Diff",
