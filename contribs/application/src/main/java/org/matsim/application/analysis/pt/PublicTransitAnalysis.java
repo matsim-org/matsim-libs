@@ -19,14 +19,17 @@
 
 package org.matsim.application.analysis.pt;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.pt.stop2stop.PtStop2StopAnalysis;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.SampleOptions;
@@ -36,7 +39,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
 import picocli.CommandLine;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @CommandLine.Command(
 	name = "transit", description = "General public transit analysis.",
@@ -45,6 +54,7 @@ import picocli.CommandLine;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"pt_pax_volumes.csv.gz",
+		"pt_pax_per_day_and_vehicle_type.csv"
 	}
 )
 public class PublicTransitAnalysis implements MATSimAppCommand {
@@ -53,8 +63,10 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(PublicTransitAnalysis.class);
+
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(PublicTransitAnalysis.class);
+
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
@@ -72,7 +84,11 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
 		PtStop2StopAnalysis ptStop2StopEventHandler = new PtStop2StopAnalysis(scenario.getTransitVehicles(), sample.getUpscaleFactor());
+		PtPassengerCountsEventHandler passengerCountsHandler = new PtPassengerCountsEventHandler(scenario.getTransitVehicles());
+
 		eventsManager.addHandler(ptStop2StopEventHandler);
+		eventsManager.addHandler(passengerCountsHandler);
+
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
@@ -84,7 +100,25 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		ptStop2StopEventHandler.writeStop2StopEntriesByDepartureCsv(output.getPath("pt_pax_volumes.csv.gz"),
 			",", ";");
 
+		writePassengerCounts(passengerCountsHandler);
+
 		return 0;
+	}
+
+	private void writePassengerCounts(PtPassengerCountsEventHandler handler) {
+
+		Path path = output.getPath("pt_pax_per_day_and_vehicle_type.csv");
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("vehicle_type", "passenger_count");
+			for (Object2IntMap.Entry<Id<VehicleType>> kv : handler.getCounts().object2IntEntrySet()) {
+				csv.printRecord(kv.getKey(), kv.getIntValue() * sample.getUpscaleFactor());
+			}
+
+		} catch (IOException e) {
+			log.error("Error writing passenger counts.", e);
+		}
 	}
 
 	private Config prepareConfig() {
