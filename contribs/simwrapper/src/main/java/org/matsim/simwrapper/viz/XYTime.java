@@ -61,18 +61,18 @@ public class XYTime extends Viz {
 	 * <p>
 	 * The number of colors must be one less than the number of values.
 	 */
-	public XYTime setBreakpoints(String[] colors, Double[] values) {
+	public XYTime setBreakpoints(String[] colors, Double... values) {
 		this.breakpoints = Map.of(
 			"colors", colors,
 			"values", values
 		);
 		return this;
 	}
-	
+
 	/**
 	 * Set breakpoints as a simple list.
 	 */
-	public XYTime setBreakpoints(Double[] values) {
+	public XYTime setBreakpoints(Double... values) {
 		this.breakpoints = List.of(values);
 		return this;
 	}
