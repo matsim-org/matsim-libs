@@ -12,4 +12,16 @@
 			<shipment id="big_item_1" from="1" to="2" size="29" startPickup="00:00:00" endPickup="15:30:00" startDelivery="00:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
 		</shipments>
 	</carrier>
+	<carrier id="ccCarrier2">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="medium_van" depotLinkId="1" typeId="medium_van" earliestStart="11:00:00" latestEnd="15:00:00"/>
+				<vehicle id="medium_truck" depotLinkId="1" typeId="medium_truck" earliestStart="12:00:00" latestEnd="23:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="small_item_1" from="1" to="2" size="4" startPickup="08:00:00" endPickup="10:30:00" startDelivery="08:00:00" endDelivery="10:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="big_item_1" from="1" to="2" size="29" startPickup="00:00:00" endPickup="15:30:00" startDelivery="00:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+		</shipments>
+	</carrier>
 </carriers>

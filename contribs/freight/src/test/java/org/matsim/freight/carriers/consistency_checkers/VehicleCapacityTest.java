@@ -34,6 +34,7 @@ public class VehicleCapacityTest {
 
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory() ;
+		System.out.println("Input directory: " + pathToInput);
 		//names of xml-files
 		String carriersXML = "CCTestCarriers.xml";
 		String vehicleXML = "CCTestVeh.xml";
