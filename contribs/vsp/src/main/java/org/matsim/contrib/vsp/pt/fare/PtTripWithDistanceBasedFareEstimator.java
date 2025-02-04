@@ -74,7 +74,7 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
 	@Override
 	@SuppressWarnings("StringEquality")
-	public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+	public double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 
 		double utility = 0;
 		DoubleList fares = new DoubleArrayList();
