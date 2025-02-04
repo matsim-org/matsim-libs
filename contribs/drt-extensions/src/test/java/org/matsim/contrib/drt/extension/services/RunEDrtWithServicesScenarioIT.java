@@ -15,7 +15,12 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.ev.charging.*;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -72,8 +77,9 @@ public class RunEDrtWithServicesScenarioIT {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
 			@Override
 			public void install() {
-				bind(EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-					new EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider(MINIMUM_RELATIVE_SOC));
+				bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
+					new EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider(getMode(), MINIMUM_RELATIVE_SOC)
+				);
 			}
 		});
 

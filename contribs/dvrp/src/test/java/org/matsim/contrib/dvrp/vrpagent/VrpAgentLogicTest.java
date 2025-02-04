@@ -24,7 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE;
 import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,10 +34,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dynagent.DynAction;
@@ -81,7 +84,7 @@ public class VrpAgentLogicTest {
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, startLink);
 
 	private final DynAgentLogic dynAgentLogic = new VrpAgentLogic(optimizer, VrpAgentLogicTest::createAction, vehicle,
-			DVRP_MODE, eventsManager);
+			DVRP_MODE, eventsManager, new IntegerLoadType("passengers"));
 	private final DynAgent dynAgent = new DynAgent(Id.createPersonId(vehicleSpecification.getId()), startLink.getId(),
 			null, dynAgentLogic);
 

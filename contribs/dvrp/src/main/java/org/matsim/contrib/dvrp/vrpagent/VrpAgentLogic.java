@@ -20,7 +20,9 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.schedule.CapacityChangeTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dynagent.DynAction;
@@ -47,14 +49,18 @@ public final class VrpAgentLogic implements DynAgentLogic {
 	private final String dvrpMode;
 	private final EventsManager eventsManager;
 	private DynAgent agent;
+	private final DvrpLoadType dvrpLoadType;
+	private boolean firstTaskStarted;
 
 	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle,
-			String dvrpMode, EventsManager eventsManager) {
+						 String dvrpMode, EventsManager eventsManager, DvrpLoadType dvrpLoadType) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
 		this.vehicle = vehicle;
 		this.dvrpMode = dvrpMode;
 		this.eventsManager = eventsManager;
+		this.dvrpLoadType = dvrpLoadType;
+		this.firstTaskStarted = false;
 	}
 
 	@Override
@@ -85,6 +91,11 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 				case STARTED:
 					Task task = schedule.getCurrentTask();
+					
+					if (task instanceof CapacityChangeTask capacityChangeTask) {
+						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, dvrpMode, vehicle.getId(), capacityChangeTask.getChangedCapacity(), dvrpLoadType.serialize(capacityChangeTask.getChangedCapacity())));
+					}
+
 					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					break;
 
@@ -103,6 +114,10 @@ public final class VrpAgentLogic implements DynAgentLogic {
 					Task task = schedule.getCurrentTask();
 					eventsManager.processEvent(
 							new TaskStartedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
+					if(!firstTaskStarted) {
+						eventsManager.processEvent(new VehicleCapacityChangedEvent(now, dvrpMode, vehicle.getId(), vehicle.getCapacity(), dvrpLoadType.serialize(vehicle.getCapacity())));
+					}
+					firstTaskStarted = true;
 					return dynActionCreator.createAction(agent, vehicle, now);
 
 				case COMPLETED:

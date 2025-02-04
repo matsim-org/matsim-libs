@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -95,7 +96,7 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 			bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleOccupancyProfileCalculator(getMode(),
 							getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),
-							passengerServingTaskTypes))).asEagerSingleton();
+							passengerServingTaskTypes, getter.getModal(DvrpLoadType.class)))).asEagerSingleton();
 			addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
 			addControlerListenerBinding().toProvider(modalProvider(getter -> {

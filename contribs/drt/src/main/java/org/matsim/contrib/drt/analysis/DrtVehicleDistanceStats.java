@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
@@ -76,7 +78,10 @@ public class DrtVehicleDistanceStats
 				totalOccupiedDistance += linkLength;
 				totalPassengerTraveledDistance += linkLength * occupancy;
 			}
-			totalDistanceByOccupancy[occupancy] += linkLength;
+
+			if (occupancy < totalDistanceByOccupancy.length) {
+				totalDistanceByOccupancy[occupancy] += linkLength;
+			}
 		}
 	}
 
@@ -86,11 +91,13 @@ public class DrtVehicleDistanceStats
 	private final String mode;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
+	private final DvrpLoadType loadType;
 
-	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
+	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification, DvrpLoadType loadType) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		this.fleetSpecification = fleetSpecification;
+		this.loadType = loadType;
 		initializeVehicles();
 	}
 
@@ -101,7 +108,7 @@ public class DrtVehicleDistanceStats
 	}
 
 	private void initializeVehicles() {
-		int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
+		int maxCapacity = VehicleOccupancyProfileCalculator.findMaxVehicleCapacity(fleetSpecification, loadType);
 		fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
