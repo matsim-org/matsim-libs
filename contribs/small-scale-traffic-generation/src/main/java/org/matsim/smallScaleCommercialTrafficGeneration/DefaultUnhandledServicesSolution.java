@@ -1,16 +1,24 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
+import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class DefaultUnhandledServicesSolution implements UnhandledServicesSolution {
 	private static final Logger log = LogManager.getLogger(DefaultUnhandledServicesSolution.class);
+	private static final Joiner JOIN = Joiner.on("\t");
+
 
 	// Generation data
 	Random rnd;
@@ -21,22 +29,13 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		this.generator = generator;
 	}
 
-	public List<Carrier> createListOfCarrierWithUnhandledJobs(Scenario scenario){
-		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
-		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
-			if (!CarriersUtils.allJobsHandledBySelectedPlan(carrier))
-				carriersWithUnhandledJobs.add(carrier);
-		}
-		return carriersWithUnhandledJobs;
-	}
-
 	/**
 	 * Redraws the service-durations of all {@link CarrierService}s of the given {@link Carrier}.
 	 */
 	private void redrawAllServiceDurations(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
 		for (CarrierService service : carrier.getServices().values()) {
 			double newServiceDuration = generator.getServiceTimePerStop(carrier, carrierAttributes, additionalTravelBufferPerIterationInMinutes);
-			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId())
+			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId(), 0)
 				.setServiceDuration(newServiceDuration);
 			CarrierService redrawnService = builder.setServiceStartingTimeWindow(service.getServiceStaringTimeWindow()).build();
 			carrier.getServices().put(redrawnService.getId(), redrawnService);
@@ -47,36 +46,78 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	public void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers) {
 		int startNumberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 		log.info("Starting with carrier-replanning loop.");
-		for (int i = 0; i < generator.getMaxReplanningIterations(); i++) {
-			log.info("carrier-replanning loop iteration: {}", i);
-			int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
-			for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
-				//Delete old plan of carrier
-				nonCompleteSolvedCarrier.clearPlans();
-				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
 
-				// Generate new services. The new service batch should have a smaller sum of serviceDurations than before (or otherwise it will not change anything)
-				redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes, (i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
-				log.info("Carrier should be changed...");
-			}
-			try {
-				CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
-			} catch (ExecutionException | InterruptedException e) {
-				throw new RuntimeException(e);
+		Path outputPath = Path.of(scenario.getConfig().controller().getOutputDirectory(),
+			"analysis/freight/Carriers_SolvingLoop_stats.tsv");
+
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputPath.toString())) {
+			// Write header only if the file is newly created
+			if (Files.size(outputPath) == 0) {
+				String[] header = {"iteration", "carriersWithUnhandledJobs", "carriersSolvedInIteration",
+					"carriersNotSolvedInIteration", "additionalBuffer"};
+				JOIN.appendTo(writer, header);
+				writer.newLine();
 			}
 
+			for (int i = 1; i <= generator.getMaxReplanningIterations(); i++) {
+				log.info("carrier-replanning loop iteration: {}", i);
+				int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 
-			nonCompleteSolvedCarriers = createListOfCarrierWithUnhandledJobs(scenario);
-			log.info(
-				"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
-				i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
-				numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(), (i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
-			if (nonCompleteSolvedCarriers.isEmpty()) break;
-		}
+				for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
+					// Delete old plan of carrier
+					nonCompleteSolvedCarrier.clearPlans();
+					GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes =
+						generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
 
-		// Final check
-		if (!nonCompleteSolvedCarriers.isEmpty()) {
-			log.warn("Not all services were handled!");
+					// Generate new services
+					redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes,
+						(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+				}
+
+				try {
+					CarriersUtils.runJsprit(scenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
+				} catch (ExecutionException | InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+
+				nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(scenario));
+
+				// Write iteration results to file
+				JOIN.appendTo(writer, new String[]{String.valueOf(i), String.valueOf(numberOfCarriersWithUnhandledJobs),
+					String.valueOf(numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size()),
+					String.valueOf(nonCompleteSolvedCarriers.size()),
+					String.valueOf((i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
+				writer.newLine();
+				writer.flush();  // Ensure it's written immediately
+
+				log.info("End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
+					i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
+					numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(),
+					(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+
+				if (i != 1) {
+					try {
+						Files.deleteIfExists(Path.of(
+							scenario.getConfig().controller().getOutputDirectory(),
+							scenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved_it_" + (i - 1) + ".xml.gz"));
+					} catch (IOException e) {
+						log.warn("Could not delete file: {}/{}.output_carriers_notCompletelySolved_it_{}.xml.gz",
+							scenario.getConfig().controller().getOutputDirectory(), scenario.getConfig().controller().getRunId(), i);
+					}
+				}
+
+				if (nonCompleteSolvedCarriers.isEmpty()) break;
+				else
+					CarriersUtils.writeCarriers(CarriersUtils.getCarriers(scenario),
+						scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved_it_" + i + ".xml.gz"
+					);
+			}
+
+			if (!nonCompleteSolvedCarriers.isEmpty()) {
+				log.warn("Not all services were handled!");
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
