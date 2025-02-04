@@ -17,36 +17,22 @@ public class CarrierConsistencyCheckers {
 
 	public static void capacityCheck(Carriers carriers) {
 		List<Double> vehicleCapacityList = new ArrayList<>();
-		Map<Id, Integer> shipmentsTooBigForVehicle = new HashMap<>();  //@Anton: Warum speicherst du die Id als String und nicht als Id? -> @KMT: Keine Ahnung :D. Fixed.
-
-
-		// @Anton: Wenn ich es richtig sehe, prüfst du nun gerade Carrier-übergreifend, weil du dir alle Fahrzeuge aus allen Carriern holst und
-		// dann die Kapazitäten aus allen aufträgen aller Carrier vergleichst.
-		// mMn müsstest du die Prüfung (und Ausgabe) bitte je Carrier machen.
-		// Denn 1) hat jeder Carrier SEINE Aufträge und SEINE Fahrzeuge und nur da muss es passen und
-		// 2.) können sich die Ids der Fahrzeuge und Aufträge in verschiedenen Carriern wiederholen.
-
-		//@KMT: Done. Code wird jetzt nacheinander für alle vorhandenen Carrier ausgeführt, nicht einmal für alle Carrier auf einen Schlag. Ausgabe erfolgt je Carrier.
+		Map<Id, Integer> shipmentsTooBigForVehicle = new HashMap<>(); // Todo @Anton: Hinter die Id sollte immer noch ein Typ also z.b. Id<CarrierShipment>...
+		// wenn du meinen Kommentar unten siehst, würde ich es aber eh zu einer Liste umbauen:
+		//ArrayList<CarrierJob> shipmentsTooBigForVehicleList = new LinkedList<>(); // CarrierJob ist das Interface, das von CarrierShipment und CarrierService implementiert wird. Daher kann die Liste beides speichern.
 
 		//determine the capacity of all available vehicles (carrier after carrier)
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				//In CCTestVeh XML: 'capacity other'
-				var capacity = carrierVehicle.getType().getCapacity().getOther();
-				vehicleCapacityList.add(capacity);
+				vehicleCapacityList.add(carrierVehicle.getType().getCapacity().getOther());
 			}
 
-			double maxVehicleCapacity = Collections.max(vehicleCapacityList);
+		final double maxVehicleCapacity = Collections.max(vehicleCapacityList);
 
 		//determine shipments with capacity demand > maxVehicleCapacity
 		//Shipment ID (key as string) and capacity demand (value as double) are being stored in HashMap 'shipmentsTooBigForVehicle'
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				//double shipmentSize = shipment.getCapacityDemand();
-				//Id shipmentID = shipment.getId(); //@Anton: Variablen-Name: Wenn der auf ID endet, würde ich auch eine Id und keine String erwarten -> @KMT: Done.
-				//@Anton: Die genutzen Variablen sind so kurz, dass du diese nicht extra erstellen musst, sondern einfach hier direkt verwenden kannst.
-				// --> Hier könntest du auch einfach shipmentsTooBigForVehicle.put(shipment.getId().toString(), shipment.getCapacityDemand());
-				// Bitte auch meinen Kommentar oben zur Id vs String beachten
-				// @KMT: Done.
 				//shipmentsTooBigForVehicle.put(shipment.getId(), shipment.getCapacityDemand());
 				// Todo: @Anton: siehe unten: Musst du wirklich alle Sendungen speichern oder reicht es nicht, nur die zu speichern, die zu groß sind?
 				System.out.println(shipment.getCapacityDemand());
@@ -62,11 +48,18 @@ public class CarrierConsistencyCheckers {
 		// Dann brauchst du auch keine große Map etc.
 			// @KMT: Wenn man das so macht, kann man aber nicht ausgeben, wie viele Sendungen zu groß sind. Ich habe die Logik ein bisschen verändert, es wird sofort geprüft, ob die Sendung passt und nur gespeichert, wenn nicht.
 			// Gibt bestimmt noch eine andere Möglichkeit, fällt mir gerade nicht ein. -> to be done
+				// @Anton: Wenn die nur eine Liste machst, wo du die Sendungen speicherst, dann kannst du am Ende dennoch über liste.size() schauen, wieviele Einträge es sind.
+			    // Also ne Liste statt der Map. Und die Liste nimmt Objelkte vom Typ <CarrierJob> auf. Dass sind dann Shipments oder Services.
+				// Und dann kannst du zur Ausgabe über die Liste iterieren (for schleife) und dann .getId bzw .getCapacityDemand als Ausgabe nutzen.
 
 
 		//Todo: @Anton: Bitte noch dran denken, dass der Test auch für Services (als alternative Auftragsdefinition) funktionieren muss.
 		// Hinweis CarrierShipment und CarrierJob haben ein gemeinsames Interface, das du nutzen kannst, um nur einen "Container" für beide zu haben.
 			//@KMT: Hier brauche ich bitte nochmal eine genauere/andere Erklärung. -> to be done
+			  // @Anton: Es gibt zwei mögliche Arten von Aufträgen für die Carrier: Services und Shipments. Dein Checker muss für beides funktionieren,
+			  // wobei immer jeder Carrier nur Services oder Shipments hat.
+			  // Das "nette" ist aber, dass beide das Interface "CarrierJob" implementieren. und du damit eine Liste von CarrierJobs machen kannst. (s. auch Kommentar weiter oben).
+
 
 		//if map is empty, there is a sufficient vehicle for every shipment
 		if (shipmentsTooBigForVehicle.isEmpty()) {
@@ -76,10 +69,6 @@ public class CarrierConsistencyCheckers {
 			//if map is not empty, these shipments are too large for the existing fleet.
 			for (Map.Entry<Id, Integer> entry : shipmentsTooBigForVehicle.entrySet()) {
 				log.warn("Shipment '{}' is too big for the largest available vehicle (capacity: '{}').", entry.getKey().toString(),maxVehicleCapacity);
-				//@Anton: Wäre auch gut, die CarrierId mit auszugeben, oder (noch einfacher) eine Zeile vorher einmalig zu schreiben, um welchen Carrier es gerade geht.
-				// Gerade weil verschiedene Carrier ja die gleiche Carrier Id haben können.
-				// @Anton: Wäre gut, wenn du auhc die Göße des größte Fahrzeugs gleich mit raus schreiben würdest als Service für den Nutzer.
-				// @KMT: Done & Done
 			}
 		}
 	vehicleCapacityList.clear();
