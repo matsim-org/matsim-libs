@@ -68,14 +68,7 @@ public class XYTime extends Viz {
 		);
 		return this;
 	}
-
-	/**
-	 * Get breakpoints.
-	 */
-	public Object getBreakpoints() {
-		return breakpoints;
-	}
-
+	
 	/**
 	 * Set breakpoints as a simple list.
 	 */
