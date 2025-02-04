@@ -34,6 +34,9 @@ import java.util.Map;
 
 public class PHEMTest {
 
+	// TODO Rename CO to CO(total)
+	// TODO Rename PMx to PM
+
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -202,7 +205,8 @@ public class PHEMTest {
 			double sumFuel = 0;
 			double sumElectricity = 0;
 
-			for(int i = currentSecond; i < currentSecond + wltpLink.time; i++){
+			int i = currentSecond;
+			for(; i < currentSecond + wltpLink.time; i++){
 				sumVelocity += sumoSeconds.get(i).velocity;
 				sumAcceleration += sumoSeconds.get(i).acceleration;
 				sumSlope += sumoSeconds.get(i).slope;
@@ -215,7 +219,7 @@ public class PHEMTest {
 				sumElectricity += sumoSeconds.get(i).electricity;
 			}
 
-			currentSecond = wltpLink.time;
+			currentSecond = i;
 
 			sumoSegments.add(new SumoEntry(
 				SumoEntry.Type.SEGMENT,
