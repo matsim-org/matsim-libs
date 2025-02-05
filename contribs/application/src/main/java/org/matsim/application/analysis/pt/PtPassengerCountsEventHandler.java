@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Event handler to count the number of passengers using public transport services.
- *
+ * Event handler to count the number of passengers using public transport services differentiated by vehicle type.
  * Passenger will be counted once per vehicle type per trip.
  */
 public class PtPassengerCountsEventHandler implements PersonEntersVehicleEventHandler, ActivityEndEventHandler {
