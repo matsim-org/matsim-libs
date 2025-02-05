@@ -20,8 +20,8 @@ import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.messages.Empty;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.messages.EmptyMessage;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.MessageConsumer;
@@ -148,7 +148,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		this.addresses = new int[topology.getTotalPartitions()];
 		for (int i = 0; i < topology.getNodesCount(); i++) {
-			SimulationNode n = topology.getNode(i);
+			ComputeNode n = topology.getNode(i);
 			for (int p : n.getParts()) {
 				addresses[p] = n.getRank();
 			}
@@ -314,7 +314,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	public void addNullMessage(int partition) {
 		// This is inefficient, but should be a small loop
-		for (SimulationNode node : topology) {
+		for (ComputeNode node : topology) {
 			if (node.getParts().contains(partition)) {
 				sendNullMsgs.add(node.getRank());
 			}
@@ -327,7 +327,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	private void sendLocal(Message msg, int receiverPartition) {
 
 		// Empty messages are not sent anywhere
-		if (msg instanceof Empty)
+		if (msg instanceof EmptyMessage)
 			return;
 
 		List<SimTask> list;
@@ -376,7 +376,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			int length = dataSize[rank + 1].get();
 			if (length == 0) {
 //                log.info("Node {} sending null message to {}", comm.getRank(), rank);
-				send(Empty.INSTANCE, rank);
+				send(EmptyMessage.INSTANCE, rank);
 			}
 		}
 

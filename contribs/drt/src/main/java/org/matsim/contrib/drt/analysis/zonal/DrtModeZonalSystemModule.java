@@ -58,11 +58,11 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			bindModal(ZoneSystem.class).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
 				Predicate<Zone> zoneFilter;
-				if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+				if (drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
 					List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
-							ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.drtServiceAreaShapeFile));
+						ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.drtServiceAreaShapeFile));
 					zoneFilter = zone -> serviceAreaGeoms.stream()
-                            .anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
+						.anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
 				} else {
 					zoneFilter = zone -> true;
 				}
@@ -82,7 +82,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			})).asEagerSingleton();
 
 			// Only head node performs aggregation
-			if (!getSimulationContext().getNode().isHeadNode())
+			if (!getSimulationContext().getComputeNode().isHeadNode())
 				return;
 
 			//zonal analysis

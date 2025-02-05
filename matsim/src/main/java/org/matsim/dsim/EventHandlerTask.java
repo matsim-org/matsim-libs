@@ -181,7 +181,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE_SINGLETON || distributed.value() == DistributedMode.PARTITION_SINGLETON);
 
 		// Singleton handlers on one jvm don't need to communicate
-		if (singleton && !manager.getNode().isDistributed()) {
+		if (singleton && !manager.getComputeNode().isDistributed()) {
 			return null;
 		}
 
@@ -265,6 +265,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 	/**
 	 * Store run time information.
+	 *
 	 * @param t nanoseconds before current step started.
 	 */
 	protected final void storeRuntime(long t) {

@@ -4,8 +4,10 @@ package org.matsim.api.core.v01.messages;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.matsim.api.core.v01.Message;
 
+import java.util.Objects;
+
 /**
- * Holds messages types that need to be sent to one node.
+ * Holds messages types that need to be sent to a particular compute node.
  */
 public class EventRegistry implements Message {
 
@@ -38,15 +40,13 @@ public class EventRegistry implements Message {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof EventRegistry)) return false;
-		final EventRegistry other = (EventRegistry) o;
-		if (!other.canEqual((Object) this)) return false;
+		if (!(o instanceof EventRegistry other)) return false;
+		if (!other.canEqual(this)) return false;
 		if (this.getRank() != other.getRank()) return false;
 		final Object this$eventTypes = this.getEventTypes();
 		final Object other$eventTypes = other.getEventTypes();
-		if (this$eventTypes == null ? other$eventTypes != null : !this$eventTypes.equals(other$eventTypes)) return false;
-		if (Double.compare(this.getSyncStep(), other.getSyncStep()) != 0) return false;
-		return true;
+		if (!Objects.equals(this$eventTypes, other$eventTypes)) return false;
+		return Double.compare(this.getSyncStep(), other.getSyncStep()) == 0;
 	}
 
 	protected boolean canEqual(final Object other) {

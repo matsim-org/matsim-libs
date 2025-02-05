@@ -26,27 +26,10 @@ import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasPersonId;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.PersonScoreEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
-import org.matsim.api.core.v01.messages.SimulationNode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -77,10 +60,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
  * It is not independently useful. Please do not make public.
  *
  * @author michaz
- *
  */
 @DistributedEventHandler(async = true)
- final class ScoringFunctionsForPopulation implements BasicEventHandler {
+final class ScoringFunctionsForPopulation implements BasicEventHandler {
 
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -94,18 +76,18 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
 
 	private final Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
-	private final SimulationNode simNode;
+	private final ComputeNode computeNode;
 
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 								  Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
-		this(controlerListenerManager, SimulationNode.SINGLE_INSTANCE, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, config);
+		this(controlerListenerManager, ComputeNode.SINGLE_INSTANCE, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, config);
 	}
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, SimulationNode simNode,
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, ComputeNode computeNode,
 								  EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-								   Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
-		this.simNode = simNode;
+								  Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
+		this.computeNode = computeNode;
 		ControllerConfigGroup controllerConfigGroup = config.controller();
 
 		if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
@@ -129,11 +111,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private void init() {
 
 		// Only the head node performs scoring in the current implementation
-		if (!simNode.isHeadNode())
+		if (!computeNode.isHeadNode())
 			return;
 
 		for (Person person : this.population.getPersons().values()) {
-			this.agentScorers.put(person.getId(), this.scoringFunctionFactory.createNewScoringFunction(person ) );
+			this.agentScorers.put(person.getId(), this.scoringFunctionFactory.createNewScoringFunction(person));
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
@@ -178,9 +160,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		 * kai, mar'17)
 		 */
 		if (o instanceof LinkEnterEvent) {
-			Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId();
+			Id<Vehicle> vehicleId = ((LinkEnterEvent) o).getVehicleId();
 			Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId);
-			ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
+			ScoringFunction scoringFunction = getScoringFunctionForAgent(driverId);
 			// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
 			if (scoringFunction != null) {
 				scoringFunction.handleEvent(o);
@@ -210,7 +192,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	private void handleActivityStart(ActivityStartEvent event) {
 		this.actsDelegate.handleEvent(event);
-		if (!StageActivityTypeIdentifier.isStageActivity( event.getActType() ) ) {
+		if (!StageActivityTypeIdentifier.isStageActivity(event.getActType())) {
 			this.callTripScoring(event);
 		}
 	}
@@ -249,9 +231,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
-		Plan plan = this.tripRecords.get( agentId ) ; // as container for trip
-		if ( plan!=null ) {
-			plan.addLeg( leg );
+		Plan plan = this.tripRecords.get(agentId); // as container for trip
+		if (plan != null) {
+			plan.addLeg(leg);
 		}
 	}
 
@@ -265,9 +247,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
 
-		Plan plan = this.tripRecords.get( agentId ); // as container for trip
-		if ( plan!= null ) {
-			plan.addActivity( activity );
+		Plan plan = this.tripRecords.get(agentId); // as container for trip
+		if (plan != null) {
+			plan.addActivity(activity);
 		}
 	}
 
@@ -275,8 +257,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	 * Returns the scoring function for the specified agent. If the agent
 	 * already has a scoring function, that one is returned.
 	 *
-	 * @param agentId
-	 *            The id of the agent the scoring function is requested for.
+	 * @param agentId The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
 	ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
@@ -309,7 +290,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	}
 
 	void writePartialScores(String iterationFilename) {
-		try ( BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename) ) {
+		try (BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename)) {
 			for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
 				out.write(entry.getKey().toString());
 				TDoubleIterator iterator = entry.getValue().iterator();

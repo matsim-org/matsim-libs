@@ -10,7 +10,7 @@ import org.HdrHistogram.Histogram;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.config.Config;
@@ -71,7 +71,7 @@ public final class DSim implements Mobsim {
 	@Override
 	public void run() {
 
-		SimulationNode node = injector.getInstance(SimulationNode.class);
+		ComputeNode computeNode = injector.getInstance(ComputeNode.class);
 		Topology topology = injector.getInstance(Topology.class);
 		Config config = injector.getInstance(Config.class);
 		DSimConfigGroup dsimConfig = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
@@ -83,7 +83,7 @@ public final class DSim implements Mobsim {
 		Set<MobsimListener> listeners = new HashSet<>();
 
 		for (LPProvider lpp : lps) {
-			for (int part : node.getParts()) {
+			for (int part : computeNode.getParts()) {
 
 				LP lp = lpp.create(part);
 
@@ -91,7 +91,7 @@ public final class DSim implements Mobsim {
 				if (lp == null)
 					continue;
 
-				log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), node.getRank(), part);
+				log.info("Creating lp {} rank:{} partition:{}", lpp.getClass().getName(), computeNode.getRank(), part);
 
 				LPTask task = executor.register(lp, manager, part);
 				broker.register(task, part);
@@ -117,7 +117,7 @@ public final class DSim implements Mobsim {
 		manager.syncEventRegistry(comm);
 
 		// Event handler without partition may be executed within the context of the first one
-		manager.setContext(node.getParts().getFirst());
+		manager.setContext(computeNode.getParts().getFirst());
 
 		manager.initProcessing();
 
@@ -200,8 +200,8 @@ public final class DSim implements Mobsim {
 
 		listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
-		writeRuntimeStats(topology.getTotalPartitions(), node.getRank(), runtime, rtr);
-		writeRuntimes(node, histogram, broker.getRuntime(), broker.getSizes(), executor,
+		writeRuntimeStats(topology.getTotalPartitions(), computeNode.getRank(), runtime, rtr);
+		writeRuntimes(computeNode, histogram, broker.getRuntime(), broker.getSizes(), executor,
 			runtime, beforeListener, afterListener, syncStep);
 
 		// Simulation tasks are deregistered after execution
@@ -225,7 +225,7 @@ public final class DSim implements Mobsim {
 	}
 
 	@SneakyThrows
-	private void writeRuntimes(SimulationNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
+	private void writeRuntimes(ComputeNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
 							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
