@@ -54,6 +54,10 @@ added.
 
 At this point, the controller can be run as usual or other custom modules can be installed.
 
+## Example MATSim run class
+
+An example how to integrate different communicators within a MATSim run class can be found in the [RunDistributedSim](src/main/java/org/matsim/dsim/RunDistributedSim.java) example.
+
 ## Building executable jar
 
 This contrib also contains some utility classes to test and benchmark the network communication. See `RunMessagingBenchmark.java` for more information.
