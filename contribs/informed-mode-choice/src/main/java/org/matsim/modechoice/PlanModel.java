@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
@@ -44,16 +45,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	private final Map<String, List<ModeEstimate>> estimates;
 
 	/**
-	 * Flag to indicate all routes have been computed;
-	 */
-	private boolean fullyRouted;
-
-	/**
-	 * Original plan.
-	 */
-	private Plan plan;
-
-	/**
 	 * Create a new plan model instance from an existing plan.
 	 */
 	public static PlanModel newInstance(Plan plan) {
@@ -66,7 +57,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		List<TripStructureUtils.Trip> tripList = TripStructureUtils.getTrips(plan);
 
 		this.trips = tripList.toArray(new TripStructureUtils.Trip[0]);
-		this.plan = plan;
 		this.legs = new HashMap<>();
 		this.estimates = new HashMap<>();
 		this.currentModes = new String[trips.length];
@@ -78,11 +68,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	@Override
 	public Person getPerson() {
 		return person;
-	}
-
-	public Plan getPlan() {
-		// TODO: This should better be removed, memory usage by keeping these plans is increased
-		return plan;
 	}
 
 	public int trips() {
@@ -123,8 +108,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 * Update current plan an underlying modes.
 	 */
 	public void setPlan(Plan plan) {
-		this.plan = plan;
-
 		List<TripStructureUtils.Trip> newTrips = TripStructureUtils.getTrips(plan);
 
 		if (newTrips.size() != this.trips.length)
@@ -223,27 +206,11 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return trips[i];
 	}
 
-	void setLegs(String mode, List<Leg>[] legs) {
-		mode = mode.intern();
-
-		List<Leg>[] existing = this.legs.putIfAbsent(mode, legs);
-
-		if (existing != null) {
-
-			if (legs.length != existing.length)
-				throw new IllegalArgumentException(String.format("Existing legs have different length than the newly provided: %d vs. %d", existing.length, legs.length));
-
-			// Copy existing non-null legs
-			for (int i = 0; i < legs.length; i++) {
-				List<Leg> l = legs[i];
-				if (l != null)
-					existing[i] = l;
-			}
-		}
-	}
-
-	void setFullyRouted(boolean value) {
-		this.fullyRouted = value;
+	/**
+	 * Get all trips of the day.
+	 */
+	public List<TripStructureUtils.Trip> getTrips() {
+		return Arrays.asList(trips);
 	}
 
 	void putEstimate(String mode, List<ModeEstimate> options) {
@@ -257,6 +224,9 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return estimates;
 	}
 
+	/**
+	 * Iterate over estimates and collect modes that match the predicate.
+	 */
 	public Set<String> filterModes(Predicate<? super ModeEstimate> predicate) {
 		Set<String> modes = new HashSet<>();
 		for (Map.Entry<String, List<ModeEstimate>> e : estimates.entrySet()) {
@@ -265,17 +235,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		}
 
 		return modes;
-	}
-
-	/**
-	 * Check io estimates are present. Otherwise call {@link PlanModelService}
-	 */
-	public boolean hasEstimates() {
-		return !this.estimates.isEmpty();
-	}
-
-	public boolean isFullyRouted() {
-		return fullyRouted;
 	}
 
 	/**
@@ -300,13 +259,31 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return legs[i];
 	}
 
+	@SuppressWarnings("unchecked")
+	List<Leg>[] getLegs(String mode, List<Leg> def) {
+		return this.legs.computeIfAbsent(mode.intern(), k -> IntStream.range(0, trips.length).mapToObj(i -> def).toArray(List[]::new));
+	}
+
+	/**
+	 * Check whether a mode is available for a trip.
+	 * If for instance not pt option is found in the legs this will return false.
+	 */
+	public boolean hasModeForTrip(String mode, int i) {
+
+		List<Leg>[] legs = this.legs.get(mode);
+		if (legs == null)
+			return false;
+
+		List<Leg> ll = legs[i];
+		return ll.stream().anyMatch(l -> l.getMode().equals(mode));
+	}
+
 	/**
 	 * Delete stored routes and estimates.
 	 */
 	public void reset() {
 		legs.clear();
 		estimates.clear();
-		fullyRouted = false;
 	}
 
 	@Override

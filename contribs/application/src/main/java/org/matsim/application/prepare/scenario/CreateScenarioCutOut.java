@@ -590,9 +590,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		// Remove all unselected plans because these are not handled
-		person.getPlans().stream()
-			.filter(p -> p != person.getSelectedPlan())
-			.forEach(person::removePlan);
+		List<Plan> plans = new ArrayList<>(person.getPlans());
+		for(Plan p : plans){
+			if (p != person.getSelectedPlan()){
+				person.removePlan(p);
+			}
+		}
 	}
 
 

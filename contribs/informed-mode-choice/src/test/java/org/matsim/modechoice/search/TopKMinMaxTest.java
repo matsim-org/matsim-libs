@@ -18,7 +18,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -182,6 +184,7 @@ public class TopKMinMaxTest {
 
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
@@ -207,7 +210,8 @@ public class TopKMinMaxTest {
 
 			bind(EstimateRouter.class).toInstance(new EstimateRouter(router,
 					FacilitiesUtils.createActivityFacilities(),
-					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
+					new DefaultAnalysisMainModeIdentifier()
+			));
 
 			MapBinder<String, ModeOptions> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
 			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
@@ -215,6 +219,9 @@ public class TopKMinMaxTest {
 
 
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
+			});
+
+			Multibinder<TripScoreEstimator> tEstBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
 			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
@@ -259,7 +266,7 @@ public class TopKMinMaxTest {
 		}
 
 		@Override
-		public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+		public double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 
 			double est = 0;
 			for (String m : modes) {

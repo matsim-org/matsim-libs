@@ -1,9 +1,10 @@
 package org.matsim.modechoice;
 
 import com.google.inject.Inject;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -12,54 +13,83 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Router responsible for routing all possible modes between trips.
  */
 public final class EstimateRouter {
 
+	/**
+	 * Initial value for unrouted trips.
+	 */
+	static final List<Leg> UN_ROUTED = List.of();
+
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
+	private final AnalysisMainModeIdentifier mmi;
 	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public EstimateRouter(TripRouter tripRouter, ActivityFacilities facilities,
-	                      TimeInterpretation timeInterpretation) {
+						  AnalysisMainModeIdentifier mmi) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
-		this.timeInterpretation = timeInterpretation;
+		this.mmi = mmi;
+		// ignore the travel times of individual legs
+		this.timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration,
+			PlansConfigGroup.TripDurationHandling.ignoreDelays);
 	}
 
 	/**
 	 * Route all modes that are relevant with all possible options.
 	 */
-	public void routeModes(PlanModel model, Collection<String> modes) {
+	public void routeModes(PlanModel model, Collection<String> modes, TripModeFilter filter) {
 
 		double[] startTimes = model.getStartTimes();
 
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 		calcStartTimes(model, timeTracker, startTimes, model.trips());
 
-		for (String mode : modes) {
+		String[] currentMode = model.getCurrentModesMutable();
 
-			List<Leg>[] legs = new List[model.trips()];
+		List<String> considerModes = Stream.concat(Arrays.stream(currentMode), modes.stream())
+			.filter(Objects::nonNull)
+			.distinct()
+			.toList();
+
+
+		for (String mode : considerModes) {
+
+			// Null may be put into the collection, which will just be ignored here
+			if (mode == null)
+				continue;
+
+			// Legs will be updated in-place
+			List<Leg>[] legs = model.getLegs(mode, UN_ROUTED);
 
 			int i = 0;
-
 			for (TripStructureUtils.Trip oldTrip : model) {
 
-				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
-
-				timeTracker.setTime(startTimes[i]);
-
-				// Ignored mode
-				if (!modes.contains(routingMode)) {
-					legs[i++] = null;
+				// The current modes are always routed, regardless of filter.
+				// they are always needed to score whole plan
+				if (!filter.accept(mode, i) && !mode.equals(currentMode[i])) {
+					i++;
 					continue;
 				}
+
+				// Skip entries that are already routed
+				if (legs[i] != UN_ROUTED) {
+					i++;
+					continue;
+				}
+
+				timeTracker.setTime(startTimes[i]);
 
 				Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
 				Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
@@ -73,7 +103,6 @@ public final class EstimateRouter {
 				}
 				 */
 
-				// Use the end-time of an activity or the time tracker if not available
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 						mode, from, to,
 						oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
@@ -81,6 +110,7 @@ public final class EstimateRouter {
 						oldTrip.getTripAttributes()
 				);
 
+				// update time tracker, however it will be updated before each iteration
 				timeTracker.addElements(newTrip);
 
 				// store and increment
@@ -89,73 +119,9 @@ public final class EstimateRouter {
 						.map(el -> (Leg) el)
 						.collect(Collectors.toList());
 
-				// The PT router can return walk only trips that don't actually use pt
-				// this one special case is handled here, it is unclear if similar behaviour might be present in other modes
-				if (mode.equals(TransportMode.pt) && ll.stream().noneMatch(l -> l.getMode().equals(TransportMode.pt))) {
-					legs[i++] = null;
-					continue;
-				}
-
-				// TODO: might consider access agress walk modes
-
-				// Filters all kind of modes that did return only walk legs when they could not be used (e.g. drt)
-				if (!mode.equals(TransportMode.walk) && ll.stream().allMatch(l -> l.getMode().equals(TransportMode.walk))) {
-					legs[i++] = null;
-					continue;
-				}
-
 				legs[i++] = ll;
 
 			}
-
-			model.setLegs(mode, legs);
-		}
-
-		model.setFullyRouted(true);
-	}
-
-	/**
-	 * Route a single trip with certain index.
-	 */
-	public void routeSingleTrip(PlanModel model, Collection<String> modes, int idx) {
-
-		double[] startTimes = model.getStartTimes();
-		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-
-		// Plus one so that start time idx is calculated
-		calcStartTimes(model, timeTracker, startTimes, idx + 1);
-
-		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
-
-		Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
-		Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
-
-		for (String mode : modes) {
-
-			timeTracker.setTime(startTimes[idx]);
-
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
-					mode, from, to,
-					oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
-					model.getPerson(),
-					oldTrip.getTripAttributes()
-			);
-
-			List<Leg> ll = newTrip.stream()
-					.filter(el -> el instanceof Leg)
-					.map(el -> (Leg) el)
-					.collect(Collectors.toList());
-
-			// not a real pt trip, see reasoning above
-			if (mode.equals(TransportMode.pt) && ll.stream().noneMatch(l -> l.getMode().equals(TransportMode.pt))) {
-				model.setLegs(mode, new List[model.trips()]);
-				continue;
-			}
-
-			List<Leg>[] legs = new List[model.trips()];
-			legs[idx] = ll;
-
-			model.setLegs(mode, legs);
 		}
 	}
 
@@ -183,10 +149,13 @@ public final class EstimateRouter {
 		List<Leg> oldLegs = oldTrip.getLegsOnly();
 		boolean undefined = oldLegs.stream().anyMatch(l -> timeInterpretation.decideOnLegTravelTime(l).isUndefined());
 
-		// If no time is known the previous trips need to be routed
+		// If no time is known the previous trips needs to be routed
 		if (undefined) {
-			String routingMode = TripStructureUtils.getRoutingMode(oldLegs.get(0));
-			List<? extends PlanElement> legs = routeTrip(oldTrip, plan, routingMode != null ? routingMode : oldLegs.get(0).getMode(), timeTracker);
+			String routingMode = TripStructureUtils.getRoutingMode(oldLegs.getFirst());
+			if (routingMode == null)
+				routingMode = mmi.identifyMainMode(oldLegs);
+
+			List<? extends PlanElement> legs = routeTrip(oldTrip, plan, routingMode, timeTracker);
 			timeTracker.addElements(legs);
 
 		} else

@@ -15,8 +15,10 @@ import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
+import java.util.HashSet;
+
 /**
- * Provider for {@link SelectFromGeneratorStrategy}.
+ * Provider for {@link SelectSingleTripModeStrategy}.
  */
 public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrategy> {
 
@@ -31,7 +33,7 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 	private TimeInterpretation timeInterpretation;
 
 	@Inject
-	private Provider<SingleTripChoicesGenerator> generator;
+	private Provider<GeneratorContext> ctx;
 
 	@Inject
 	private InformedModeChoiceConfigGroup config;
@@ -47,7 +49,7 @@ public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrate
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSingleTripModeStrategy(globalConfigGroup,  config.getModes(), generator, selector, pruner, config.isRequireDifferentModes()));
+		builder.addStrategyModule(new SelectSingleTripModeStrategy(globalConfigGroup,  new HashSet<>(config.getModes()), ctx, selector, pruner, config.isRequireDifferentModes()));
 
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 

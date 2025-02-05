@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
@@ -90,18 +90,18 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
 		</dependency>
 
