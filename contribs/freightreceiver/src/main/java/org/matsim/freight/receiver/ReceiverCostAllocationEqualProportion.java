@@ -31,7 +31,7 @@ import java.util.*;
  * A cost allocation model where the {@link Carrier} distributes its cost
  * equally among the {@link Receiver}s it services.
  */
-class ReceiverCostAllocationEqualProportion implements ReceiverCostAllocation{
+public class ReceiverCostAllocationEqualProportion implements ReceiverCostAllocation{
 	final Map<Id<Carrier>, Map<Id<Receiver>, Double>> costMap;
 
 	@Inject
@@ -46,7 +46,7 @@ class ReceiverCostAllocationEqualProportion implements ReceiverCostAllocation{
 		if(!costMap.containsKey(carrier.getId())){
 			/* This carrier has not been processed before. */
 			Map<Id<Receiver>, Double> carrierMap = new TreeMap<>();
-			double carrierScore = carrier.getSelectedPlan().getScore();
+			Double carrierScore = carrier.getSelectedPlan().getJspritScore();
 
 			/* Find all the receivers. */
 			List<Id<Receiver>> receiversServiced = findAllReceiversServicedByThisCarrier(carrier.getId());
@@ -84,6 +84,4 @@ class ReceiverCostAllocationEqualProportion implements ReceiverCostAllocation{
 		}
 		return receiversServiced;
 	}
-
-
 }

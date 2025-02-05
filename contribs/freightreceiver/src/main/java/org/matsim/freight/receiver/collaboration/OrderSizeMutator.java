@@ -31,21 +31,18 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
  * for the receiver.
  *
  * @author wlbean
- *
  */
 
 public class OrderSizeMutator implements GenericPlanStrategyModule<ReceiverPlan> {
-	private boolean increase;
+	private final boolean increase;
 
 	/**
 	 * This class changes the delivery frequency of a receiver by either
-	 * increasing (if increase is true) or decreasing (if increase
-	 * is false) the weekly delivery frequency with one day.
-	 *
-	 * @param increase
+	 * increasing (if increase is <code>true</code>) or decreasing (if
+	 * increase is <code>false</code>) the weekly delivery frequency with
+	 * one day.
 	 */
-
-	public OrderSizeMutator(boolean increase){
+	public OrderSizeMutator(boolean increase) {
 		this.increase = increase;
 	}
 
@@ -57,51 +54,41 @@ public class OrderSizeMutator implements GenericPlanStrategyModule<ReceiverPlan>
 	@Override
 	public void handlePlan(ReceiverPlan receiverPlan) {
 
-
 		/* Create list of receiver orders. */
-		for (ReceiverOrder ro : receiverPlan.getReceiverOrders()){
+		for (ReceiverOrder ro : receiverPlan.getReceiverOrders()) {
 
-			/* Increase or decrease the number of deliveries per week with specified value until either 1 day (in case of decrease) or 5 days (in case of increase) is reached.*/
-			for(Order order: ro.getReceiverProductOrders()){
+			/* Increase or decrease the number of deliveries per week with
+			 * specified value until either 1 day (in case of decrease) or
+			 * 5 days (in case of increase) is reached.*/
+			for (Order order : ro.getReceiverProductOrders()) {
 
 				double numDel = order.getNumberOfWeeklyDeliveries();
 				double sdemand;
 				double random = MatsimRandom.getLocalInstance().nextDouble();
 				double newNumDel;
 				double weekdemand = order.getOrderQuantity();
-				double pdeliver = numDel/5;
+				double pdeliver;
 
-			if (increase == true){
-					if (numDel + 1 <= 5){
+				if (increase) {
+					if (numDel + 1 <= 5) {
 						newNumDel = numDel + 1;
-						pdeliver = newNumDel/5;
 					} else {
 						newNumDel = numDel;
-						pdeliver = newNumDel/5;
 					}
-
-					if (random <= pdeliver){
-						sdemand = weekdemand/newNumDel;
-					} else sdemand = 0;
-
-			} else {
-
-				if (numDel - 1 >= 1){
-					newNumDel = numDel - 1;
-					pdeliver = newNumDel/5;
 				} else {
-					newNumDel = numDel;
-					pdeliver = newNumDel/5;
+					if (numDel - 1 >= 1) {
+						newNumDel = numDel - 1;
+					} else {
+						newNumDel = numDel;
+					}
 				}
-
-
-				if (random <= pdeliver){
-					sdemand = weekdemand/newNumDel;
+				pdeliver = newNumDel / 5.0;
+				if (random <= pdeliver) {
+					sdemand = weekdemand / newNumDel;
 				} else sdemand = 0;
-			}
 
-			order.setNumberOfWeeklyDeliveries(newNumDel);
-			order.setDailyOrderQuantity(sdemand);
+				order.setNumberOfWeeklyDeliveries(newNumDel);
+				order.setDailyOrderQuantity(sdemand);
 
 			}
 		}

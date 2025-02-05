@@ -24,13 +24,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.receiver.*;
-import org.matsim.freight.receiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -39,13 +36,16 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.receiver.*;
+import org.matsim.freight.receiver.collaboration.CollaborationUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -98,9 +98,7 @@ public class ReceiverChessboardScenario {
         URL context = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
         Config config = ConfigUtils.createConfig();
-
         config.setContext(context);
-
 		config.controller().setOutputDirectory(outputFolder);
         config.controller().setFirstIteration(0);
         config.controller().setLastIteration(ReceiverChessboardParameters.NUM_ITERATIONS);
@@ -109,7 +107,7 @@ public class ReceiverChessboardScenario {
         config.global().setRandomSeed(seed);
         config.network().setInputFile("grid9x9.xml");
 
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
         return config;
     }
@@ -138,7 +136,7 @@ public class ReceiverChessboardScenario {
 
 
     /**
-     * Creates the product orders for the receiver agents in the simulation. Currently (28/08/2018) all the receivers have the same orders
+     * Creates the product orders for the receiver agents in the simulation. Currently, (28/08/2018) all the receivers have the same orders
      * for experiments, but this must be adapted in the future to accept other parameters as inputs to enable different orders per receiver.
      */
     private static void createReceiverOrders(Scenario sc) {
@@ -146,15 +144,9 @@ public class ReceiverChessboardScenario {
         Receivers receivers = ReceiverUtils.getReceivers(sc);
         Carrier carrierOne = carriers.getCarriers().get(Id.create("Carrier1", Carrier.class));
 
-        /* Try and get the first Carrier vehicle so that we can get its origina link.
-         * FIXME We want the carrier's location to rather be an attribute of the
-         * Carrier, but currently (Feb 19, JWJ) Carrier is not Attributable.
-         */
-        Iterator<CarrierVehicle> vehicles = carrierOne.getCarrierCapabilities().getCarrierVehicles().values().iterator();
-        if (!vehicles.hasNext()) {
-            throw new RuntimeException("Must have vehicles to get origin link!");
-        }
-        Id<Link> carrierOriginLinkId = vehicles.next().getLinkId();
+		Object o = carrierOne.getAttributes().getAttribute(ReceiverChessboardParameters.ATTR_CARRIER_ORIGIN_LINK_ID);
+		assert o != null;
+        Id<Link> carrierOriginLinkId = Id.create(o.toString(), Link.class);
 
         /* Create generic product types with a description and required capacity (in kg per item). */
         ProductType productTypeOne = ReceiverUtils.createAndGetProductType(receivers, Id.create("P1", ProductType.class), carrierOriginLinkId);
@@ -229,7 +221,7 @@ public class ReceiverChessboardScenario {
             }
 
             CarrierShipment shipment = shpBuilder.setDeliveryDuration(order.getServiceDuration())
-                    .setDeliveryStartingTimeWindow(receiverPlan.getTimeWindows().get(0))
+                    .setDeliveryStartingTimeWindow(receiverPlan.getTimeWindows().getFirst())
                     .build();
             carriers.getCarriers().get(receiverOrder.getCarrierId()).getShipments().put(shipment.getId(), shipment);
         }
@@ -266,6 +258,7 @@ public class ReceiverChessboardScenario {
         Id<Carrier> carrierId = Id.create("Carrier1", Carrier.class);
         Carrier carrier = CarriersUtils.createCarrier(carrierId);
         Id<Link> carrierLocation = selectRandomLink(sc.getNetwork());
+		carrier.getAttributes().putAttribute(ReceiverChessboardParameters.ATTR_CARRIER_ORIGIN_LINK_ID, carrierLocation);
 
         CarrierCapabilities.Builder capBuilder = CarrierCapabilities.Builder.newInstance();
         CarrierCapabilities carrierCap = capBuilder.setFleetSize(FleetSize.INFINITE).build();
@@ -273,9 +266,9 @@ public class ReceiverChessboardScenario {
         LOG.info("Created a carrier with capabilities.");
 
         /*
-         * Create the carrier vehicle types.
-         * TODO This might, potentially, be read from XML file.
-         */
+         * Create the carrier vehicle types. This might, potentially, be read
+         * from an XML file. I prefer to have code that shows how it can be
+         * scripted programmatically. */
 
         /* Heavy vehicle. */
         CarrierVehicleType.Builder typeBuilderHeavy = CarrierVehicleType.Builder.newInstance(Id.create("heavy", VehicleType.class));
@@ -285,6 +278,10 @@ public class ReceiverChessboardScenario {
                 .setCostPerDistanceUnit(7.34E-3)
                 .setCostPerTimeUnit(0.171)
                 .build();
+		/* TODO Is it correct to set the network mode to 'car' (JWJ'25)?
+		 * If not, we need to adjust the network and add the mode to each link. */
+		typeHeavy.setNetworkMode(TransportMode.car);
+
         CarrierVehicle.Builder carrierHVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("heavy"), carrierLocation, typeHeavy);
         CarrierVehicle heavy = carrierHVehicleBuilder
                 .setEarliestStart(Time.parseTime("06:00:00"))
@@ -299,6 +296,9 @@ public class ReceiverChessboardScenario {
                 .setCostPerDistanceUnit(4.22E-3)
                 .setCostPerTimeUnit(0.089)
                 .build();
+		/* TODO Same as above: changing the network mode. */
+		typeLight.setNetworkMode(TransportMode.car);
+
         CarrierVehicle.Builder carrierLVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("light"), carrierLocation, typeLight);
         CarrierVehicle light = carrierLVehicleBuilder
                 .setEarliestStart(Time.parseTime("06:00:00"))
@@ -318,7 +318,6 @@ public class ReceiverChessboardScenario {
 
         Carriers carriers = CarriersUtils.addOrGetCarriers(sc);
         carriers.addCarrier(carrier);
-
     }
 
 

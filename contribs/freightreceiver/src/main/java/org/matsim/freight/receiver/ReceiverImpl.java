@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author wlbean, jwjoubert
  */
-class ReceiverImpl implements Receiver {
+final class ReceiverImpl implements Receiver {
 	final private Logger log = LogManager.getLogger(Receiver.class);
 
 	private final Attributes attributes = new AttributesImpl();

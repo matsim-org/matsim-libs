@@ -55,7 +55,7 @@ public class RunReceiverChessboardWithEqualProportionCost {
 		/* Prepare the scenario. */
 		String folder = String.format(Locale.US, "%s/run_%03d/", ReceiverChessboardParameters.OUTPUT_FOLDER, run);
 		boolean created = new File(folder).mkdirs();
-		if (!created) {
+		if (!created && !new File(folder).exists()) {
 			LOG.error("Could not create output folder. This may cause code to crash down the line.");
 		}
 		Scenario scenario = ReceiverChessboardScenario.createChessboardScenario(
@@ -81,6 +81,7 @@ public class RunReceiverChessboardWithEqualProportionCost {
 	/**
 	 * This method ensures that the {@link Carriers}' scores are also updated in the output.
 	 * TODO This is less elegant than the embedded score stats for the receiver.
+	 * FIXME This also does not seem to work (Feb'25) as it only produces NAs.
 	 */
 	static void prepareFreightOutputDataAndStats(MatsimServices controler) {
 		CarrierScoreStats scoreStats = new CarrierScoreStats(CarriersUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controller().getOutputDirectory() + "/carrier_scores", true);

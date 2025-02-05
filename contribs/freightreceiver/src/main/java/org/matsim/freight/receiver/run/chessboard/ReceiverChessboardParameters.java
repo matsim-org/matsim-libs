@@ -54,4 +54,6 @@ class ReceiverChessboardParameters {
 	static String DAY_END = "18:00:00";
 
 	static double TIME_WINDOW_HOURLY_COST = 0.0;
+
+	static String ATTR_CARRIER_ORIGIN_LINK_ID = "originLinkId";
 }

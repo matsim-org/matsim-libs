@@ -69,9 +69,9 @@ public class RunReceiverChessboardWithFixedCarrierCost {
 
 		/* Set up the receiver module. */
 		ReceiverModule receiverModule = new ReceiverModule(ReceiverUtils.createFixedReceiverCostAllocation(100.0));
-//		receiverModule.setReplanningType(ReceiverReplanningType.serviceTime);
+		receiverModule.setReplanningType(ReceiverReplanningType.serviceTime);
 //		receiverModule.setReplanningType(ReceiverReplanningType.timeWindow);
-		receiverModule.setReplanningType(ReceiverReplanningType.orderFrequency);
+//		receiverModule.setReplanningType(ReceiverReplanningType.orderFrequency);
 		controler.addOverridingModule(receiverModule);
 
 		/* Carrier statistics. */

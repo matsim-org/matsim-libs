@@ -26,7 +26,7 @@ import org.matsim.freight.carriers.Carrier;
  * A simple implementation where the cost allocated by the {@link Carrier} to
  * the {@link Receiver} is a fixed value.
  */
-class ReceiverCostAllocationFixed implements ReceiverCostAllocation {
+public class ReceiverCostAllocationFixed implements ReceiverCostAllocation {
 
 	private final double cost;
 
