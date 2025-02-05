@@ -29,7 +29,7 @@ public class VehicleCapacityTest {
 	 *  1.) Wie er an die Daten kommt : MATSimTestUtils genutzt...
 	 *  2.) statt public static void main (...) habe ich eine die MEhtode umgenannt in testVehicleCapacity und mit @Test annotiert. So weiß JUnit, dass es sich um einen Test handelt.
 	 */
-	@Test
+	@Test //TODO hier Kopien anlegen (verschiedene Ausgänge etc)
 	void testVehicleCapacity_passes() {
 
 		Config config = ConfigUtils.createConfig();
