@@ -25,17 +25,17 @@ public class VehicleCapacityTest {
 
 	/**
 	 * TODO: @Anton: Bitte noch kurze Javadoc hier ergänzen.
-	 *  Und bitte beachten, dass ich 2 Sachen umgebaut habe:
-	 *  1.) Wie er an die Daten kommt : MATSimTestUtils genutzt...
-	 *  2.) statt public static void main (...) habe ich eine die MEhtode umgenannt in testVehicleCapacity und mit @Test annotiert. So weiß JUnit, dass es sich um einen Test handelt.
+	 *
 	 */
 	@Test //TODO hier Kopien anlegen (verschiedene Ausgänge etc)
 	void testVehicleCapacity_passes() {
-
+	/*
+	* This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return TRUE.
+ 	*/
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriers.xml");
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipments.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -44,9 +44,6 @@ public class VehicleCapacityTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		/**
-		* System.out.println("Starting 'IsVehicleBigEnoughTest'...");
-		*/
 
 		CarrierConsistencyCheckers.capacityCheck(carriers);
     // TODO: @Anton: Wäre dann vielleicht schön, wenn der Test mindestens einen Boolean - Wert
