@@ -15,7 +15,6 @@ public class CarrierConsistencyCheckers {
 	 * This method checks if every carrier is able to handle every given shipment (TODO: services) with the available fleet. This method doesnot check the vehicle's schedule but the capacity only.
 	 */
 	public static void capacityCheck(Carriers carriers) {
-
 		//determine the capacity of all available vehicles (carrier after carrier)
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			List<Double> vehicleCapacityList = new ArrayList<>();

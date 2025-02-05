@@ -32,20 +32,11 @@ public class VehicleCapacityTest {
 	@Test
 	void testVehicleCapacity_passes() {
 
-		// relative path to Freight/Scenarios/CCTestInput/
-		String pathToInput = utils.getPackageInputDirectory() ;
-		System.out.println("Input directory: " + pathToInput);
-		//names of xml-files
-		String carriersXML = "CCTestCarriers.xml";
-		String vehicleXML = "CCTestVeh.xml";
-
 		Config config = ConfigUtils.createConfig();
 
-		FreightCarriersConfigGroup freightConfigGroup;
-		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-
-		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriers.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
