@@ -1,7 +1,7 @@
 package org.matsim.dsim;
 
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 
 /**
  * Class to hold information and communication needed for distributed simulation.
@@ -13,7 +13,7 @@ public sealed interface SimulationContext permits DistributedContext, LocalConte
 
 	Topology getTopology();
 
-	SimulationNode getNode();
+	ComputeNode getComputeNode();
 
 	/**
 	 * Whether the simulation is distributed across multiple nodes.

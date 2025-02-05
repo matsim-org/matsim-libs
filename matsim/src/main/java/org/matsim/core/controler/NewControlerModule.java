@@ -19,14 +19,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
-
-import java.util.List;
 
 public final class NewControlerModule extends AbstractModule {
 	@Override

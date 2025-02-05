@@ -1,7 +1,7 @@
 package org.matsim.dsim;
 
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ public final class LocalContext implements SimulationContext {
 	public final static LocalContext INSTANCE = new LocalContext(
 		Topology.builder()
 			.totalPartitions(1)
-			.nodes(List.of(SimulationNode.SINGLE_INSTANCE))
+			.computeNodes(List.of(ComputeNode.SINGLE_INSTANCE))
 			.build()
-		);
+	);
 
 	private final Topology topology;
 
@@ -29,7 +29,7 @@ public final class LocalContext implements SimulationContext {
 	}
 
 	@Override
-	public SimulationNode getNode() {
+	public ComputeNode getComputeNode() {
 		return topology.getNode(0);
 	}
 }

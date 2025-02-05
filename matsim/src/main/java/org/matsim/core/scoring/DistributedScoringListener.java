@@ -2,8 +2,8 @@ package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.messages.ScoringMessage;
-import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationPartition;
@@ -25,7 +25,7 @@ public class DistributedScoringListener implements ScoringListener {
 	private Communicator comm;
 
 	@Inject
-	private SimulationNode simNode;
+	private ComputeNode computeNode;
 
 	@Inject
 	private SerializationProvider serializer;
@@ -50,7 +50,7 @@ public class DistributedScoringListener implements ScoringListener {
 	@Override
 	public void notifyScoring(ScoringEvent event) {
 
-		if (simNode.isHeadNode()) {
+		if (computeNode.isHeadNode()) {
 
 			// The head node is responsible for scoring the entire population
 

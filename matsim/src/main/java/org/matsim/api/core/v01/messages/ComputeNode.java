@@ -7,14 +7,15 @@ import org.matsim.api.core.v01.Topology;
 import java.util.Objects;
 
 /**
- * Information about one computing node within a {@link Topology}.
+ * Information about one computing node within a {@link Topology}, such as the node's rank, the number of compute cores available, the number of
+ * simulation partitions managed by the node, as well as its hostname.
  */
-public class SimulationNode implements Message {
+public class ComputeNode implements Message {
 
 	/**
 	 * A instance of a node that is used for single instance simulations.
 	 */
-	public static final SimulationNode SINGLE_INSTANCE = SimulationNode.builder().parts(IntList.of(0)).rank(0).cores(1).hostname("localhost").build();
+	public static final ComputeNode SINGLE_INSTANCE = ComputeNode.builder().parts(IntList.of(0)).rank(0).cores(1).hostname("localhost").build();
 
 	private final int rank;
 	private final int cores;
@@ -22,7 +23,7 @@ public class SimulationNode implements Message {
 	private final IntList parts;
 	private final String hostname;
 
-	SimulationNode(NodeBuilder builder) {
+	ComputeNode(NodeBuilder builder) {
 		this.rank = builder.rank;
 		this.cores = builder.cores;
 		this.parts = builder.parts;
@@ -82,7 +83,7 @@ public class SimulationNode implements Message {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof SimulationNode other)) return false;
+		if (!(o instanceof ComputeNode other)) return false;
 		if (!other.canEqual(this)) return false;
 		if (this.getRank() != other.getRank()) return false;
 		if (this.getCores() != other.getCores()) return false;
@@ -95,7 +96,7 @@ public class SimulationNode implements Message {
 	}
 
 	protected boolean canEqual(final Object other) {
-		return other instanceof SimulationNode;
+		return other instanceof ComputeNode;
 	}
 
 	public int hashCode() {
@@ -153,8 +154,8 @@ public class SimulationNode implements Message {
 			return this;
 		}
 
-		public SimulationNode build() {
-			return new SimulationNode(this);
+		public ComputeNode build() {
+			return new ComputeNode(this);
 		}
 
 		public String toString() {

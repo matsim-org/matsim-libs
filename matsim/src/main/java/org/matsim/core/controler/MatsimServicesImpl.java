@@ -19,20 +19,20 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import jakarta.inject.Inject;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -44,8 +44,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
-import jakarta.inject.Inject;
 import org.matsim.dsim.SimulationContext;
 
 import java.util.Map;
@@ -59,7 +57,8 @@ class MatsimServicesImpl implements MatsimServices {
 
 	@Override
 	public final TravelTime getLinkTravelTimes() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {})).get(TransportMode.car);
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {
+		})).get(TransportMode.car);
 	}
 
 	@Override
@@ -97,7 +96,9 @@ class MatsimServicesImpl implements MatsimServices {
 		return this.injector.getInstance(EventsManager.class);
 	}
 
-	@Inject Injector injector;
+	@Inject
+	Injector injector;
+
 	@Override
 	public Injector getInjector() {
 		return injector;
@@ -120,8 +121,9 @@ class MatsimServicesImpl implements MatsimServices {
 
 	@Override
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-				.get(TransportMode.car);
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {
+			}))
+			.get(TransportMode.car);
 	}
 
 	@Override

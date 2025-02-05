@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.messages.EventRegistry;
-import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.events.handler.EventHandler;
@@ -31,7 +31,7 @@ public final class DistributedEventsManager implements EventsManager {
 	private final MessageBroker broker;
 
 	@Getter
-	private final SimulationNode node;
+	private final ComputeNode computeNode;
 	private final LPExecutor executor;
 	private final SerializationProvider serializer;
 
@@ -85,9 +85,9 @@ public final class DistributedEventsManager implements EventsManager {
 	private double lastSync = -1;
 
 	@Inject
-	DistributedEventsManager(MessageBroker broker, SimulationNode node, LPExecutor executor, SerializationProvider serializer) {
+	DistributedEventsManager(MessageBroker broker, ComputeNode computeNode, LPExecutor executor, SerializationProvider serializer) {
 		this.broker = broker;
-		this.node = node;
+		this.computeNode = computeNode;
 		this.executor = executor;
 		this.serializer = serializer;
 		this.eventsDisabled = Objects.equals(System.getenv("DISABLE_EVENTS"), "1");
@@ -135,8 +135,8 @@ public final class DistributedEventsManager implements EventsManager {
 		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
 
 		if (partition != null && partition.value() == DistributedMode.NODE_SINGLETON) {
-			log.info("Registering event handler {} for node {}", name, node.getRank());
-			Integer part = node.getParts().getFirst();
+			log.info("Registering event handler {} for node {}", name, computeNode.getRank());
+			Integer part = computeNode.getParts().getFirst();
 			EventHandlerTask task = executor.register(handler, this, part, 1, null);
 			addTask(task, part);
 			handlers.add(handler);
@@ -145,8 +145,8 @@ public final class DistributedEventsManager implements EventsManager {
 			log.info("Registering event handler {} for each partition", name);
 
 			AtomicInteger partitionCounter = new AtomicInteger();
-			for (int part : node.getParts()) {
-				EventHandlerTask task = executor.register(handler, this, part, node.getParts().size(), partitionCounter);
+			for (int part : computeNode.getParts()) {
+				EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
 
 				addTask(task, part);
 				handlers.add(handler);
@@ -159,9 +159,9 @@ public final class DistributedEventsManager implements EventsManager {
 					handler = next;
 				}
 			}
-		} else if (node.getRank() == 0) {
+		} else if (computeNode.getRank() == 0) {
 			log.warn("Registering global event handler {}", name);
-			Integer part = node.getParts().getFirst();
+			Integer part = computeNode.getParts().getFirst();
 			EventHandlerTask task = executor.register(handler, this, part, 1, null);
 			addTask(task, part);
 			handlers.add(handler);
@@ -190,7 +190,7 @@ public final class DistributedEventsManager implements EventsManager {
 
 			// Store handler as listener for all partitions
 			if (source == EventSource.GLOBAL || source == EventSource.NODE) {
-				for (Integer p : node.getParts()) {
+				for (Integer p : computeNode.getParts()) {
 					long address = MessageBroker.address(p, type);
 					if (task.isDirect())
 						directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));

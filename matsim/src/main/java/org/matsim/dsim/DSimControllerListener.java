@@ -6,8 +6,8 @@ import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.Topology;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.messages.ShutDownMessage;
-import org.matsim.api.core.v01.messages.SimulationNode;
 import org.matsim.api.core.v01.messages.StartUpMessage;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
@@ -44,7 +44,7 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 	private Topology topology;
 
 	@Inject
-	private SimulationNode node;
+	private ComputeNode computeNode;
 
 	@Inject
 	private Communicator comm;
@@ -68,7 +68,7 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 		// TODO: one lp provider may want to access partition information of another lp
 		NetworkDecomposition.partition(scenario.getNetwork(), scenario.getPopulation(), scenario.getConfig(), topology.getTotalPartitions());
 
-		NetworkPartitioning partitioning = new NetworkPartitioning(node, scenario.getNetwork());
+		NetworkPartitioning partitioning = new NetworkPartitioning(computeNode, scenario.getNetwork());
 		scenario.getNetwork().setPartitioning(partitioning);
 
 		StartUpMessage msg = new StartUpMessage(
@@ -97,7 +97,7 @@ public class DSimControllerListener implements StartupListener, ShutdownListener
 			}
 		}
 
-		log.info("Partition #{} contains {} persons", node.getRank(), population.size());
+		log.info("Partition #{} contains {} persons", computeNode.getRank(), population.size());
 	}
 
 	@Override

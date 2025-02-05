@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.LPProvider;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.config.Config;
@@ -32,7 +32,7 @@ public class SimProvider implements LPProvider {
 
 	private final Network network;
 	private final Config config;
-	private final SimulationNode node;
+	private final ComputeNode node;
 	private final IterationCounter iterationCounter;
 	private final Collection<AbstractQSimModule> modules;
 	private final List<AbstractQSimModule> overridingModules;
@@ -59,7 +59,7 @@ public class SimProvider implements LPProvider {
 		// (these are the implementations)
 		this.config = injector.getInstance(Config.class);
 		this.network = injector.getInstance(Network.class);
-		this.node = injector.getInstance(SimulationNode.class);
+		this.node = injector.getInstance(ComputeNode.class);
 		this.iterationCounter = injector.getInstance(IterationCounter.class);
 		this.components = injector.getInstance(QSimComponentsConfig.class);
 		this.overridingModules = overridingModules;
@@ -78,13 +78,13 @@ public class SimProvider implements LPProvider {
 	public SimProcess create(NetworkPartition partition) {
 
 		modules.forEach(m -> m.setConfig(config));
-		modules.forEach(m -> m.setSimNode(node));
+		modules.forEach(m -> m.setComputeNode(node));
 
 		// Remove modules that are known to be incompatible and are not needed
 		modules.removeIf(m -> m instanceof QNetsimEngineModule);
 
 		overridingModules.forEach(m -> m.setConfig(config));
-		overridingModules.forEach(m -> m.setSimNode(node));
+		overridingModules.forEach(m -> m.setComputeNode(node));
 
 		int iterationNumber = iterationCounter.getIterationNumber();
 		modules.forEach(m -> m.setIterationNumber(iterationNumber));
@@ -94,13 +94,13 @@ public class SimProvider implements LPProvider {
 
 		for (AbstractQSimModule override : overridingModulesFromAbstractModule) {
 			override.setConfig(config);
-			override.setSimNode(node);
+			override.setComputeNode(node);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 
 		for (AbstractQSimModule override : overridingModules) {
 			override.setConfig(config);
-			override.setSimNode(node);
+			override.setComputeNode(node);
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 

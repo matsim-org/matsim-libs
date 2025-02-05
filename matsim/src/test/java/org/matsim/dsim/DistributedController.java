@@ -9,7 +9,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.communication.Communicator;
@@ -35,37 +35,37 @@ import java.util.stream.Stream;
 public class DistributedController implements ControlerI {
 
 
-    private final Communicator comm;
-    private final Config config;
-    private final int threads;
+	private final Communicator comm;
+	private final Config config;
+	private final int threads;
 
-    public DistributedController(Communicator comm, Config config, int threads) {
-        this.comm = comm;
-        this.config = config;
-        this.threads = threads;
-    }
+	public DistributedController(Communicator comm, Config config, int threads) {
+		this.comm = comm;
+		this.config = config;
+		this.threads = threads;
+	}
 
-    @Override
-    @SneakyThrows
-    public void run() {
+	@Override
+	@SneakyThrows
+	public void run() {
 
-        // TODO: always loads whole scenario
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		// TODO: always loads whole scenario
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        // index modes and activity types as ids, as we are using those later in the simulation and in the wire types
-        scenario.getPopulation().getPersons().values().parallelStream()
-                .flatMap(person -> person.getPlans().stream())
-                .flatMap(plan -> plan.getPlanElements().stream())
-                .forEach(e -> {
-                    if (e instanceof Activity a) {
-                        Id.create(a.getType(), String.class);
-                    } else if (e instanceof Leg l) {
-                        if (l.getMode() != null)
-                            Id.create(l.getMode(), String.class);
-                        if (l.getRoutingMode() != null)
-                            Id.create(l.getRoutingMode(), String.class);
-                    }
-                });
+		// index modes and activity types as ids, as we are using those later in the simulation and in the wire types
+		scenario.getPopulation().getPersons().values().parallelStream()
+			.flatMap(person -> person.getPlans().stream())
+			.flatMap(plan -> plan.getPlanElements().stream())
+			.forEach(e -> {
+				if (e instanceof Activity a) {
+					Id.create(a.getType(), String.class);
+				} else if (e instanceof Leg l) {
+					if (l.getMode() != null)
+						Id.create(l.getMode(), String.class);
+					if (l.getRoutingMode() != null)
+						Id.create(l.getRoutingMode(), String.class);
+				}
+			});
 
 		// Automatically set the network mode which is now required
 		for (VehicleType value : scenario.getVehicles().getVehicleTypes().values()) {
@@ -76,56 +76,56 @@ public class DistributedController implements ControlerI {
 			}
 		}
 
-        log.warn("Adding freight and ride as modes to all car links. As we need this in some scenarios. Ideally, this would be encoded in the network already.");
+		log.warn("Adding freight and ride as modes to all car links. As we need this in some scenarios. Ideally, this would be encoded in the network already.");
 
-        scenario.getNetwork().getLinks().values().parallelStream()
-                .filter(l -> l.getAllowedModes().contains(TransportMode.car))
-                .forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(Stream.concat(l.getAllowedModes().stream(), Stream.of("freight")).collect(Collectors.toSet())));
 
 		config.dsim().setThreads(threads);
 
 		DistributedContext ctx = DistributedContext.create(comm, config);
-        Controler defaultController = new Controler(scenario, ctx);
+		Controler defaultController = new Controler(scenario, ctx);
 
-        Injector injector = defaultController.getInjector();
+		Injector injector = defaultController.getInjector();
 
-        SimulationNode node = injector.getInstance(SimulationNode.class);
+		ComputeNode computeNode = injector.getInstance(ComputeNode.class);
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
 		ControlerListenerManagerImpl listenerManager = (ControlerListenerManagerImpl) injector.getInstance(ControlerListenerManager.class);
 
 		addCoreControllers(listenerManager, injector);
 
-        listenerManager.fireControlerStartupEvent();
+		listenerManager.fireControlerStartupEvent();
 
-        PrepareForSim prepareForSim = injector.getInstance(PrepareForSim.class);
-        prepareForSim.run();
+		PrepareForSim prepareForSim = injector.getInstance(PrepareForSim.class);
+		prepareForSim.run();
 
 		injector.getInstance(IterationStopWatch.class).beginIteration(0);
 		io.createIterationDirectory(0);
 
 		listenerManager.fireControlerIterationStartsEvent(0, false);
 
-        listenerManager.fireControlerBeforeMobsimEvent(0, false);
+		listenerManager.fireControlerBeforeMobsimEvent(0, false);
 
-        // Run the mobsim
-        DSim dsim = injector.getInstance(DSim.class);
-        dsim.run();
+		// Run the mobsim
+		DSim dsim = injector.getInstance(DSim.class);
+		dsim.run();
 
-        listenerManager.fireControlerAfterMobsimEvent(0, false);
-        listenerManager.fireControlerScoringEvent(0, false);
-        listenerManager.fireControlerIterationEndsEvent(0, false);
+		listenerManager.fireControlerAfterMobsimEvent(0, false);
+		listenerManager.fireControlerScoringEvent(0, false);
+		listenerManager.fireControlerIterationEndsEvent(0, false);
 
-        listenerManager.fireControlerShutdownEvent(false, 0);
+		listenerManager.fireControlerShutdownEvent(false, 0);
 
-		if (node.getRank() == 0) {
-            // TODO: hard-coded to write network output for easier testing
-            NetworkUtils.writeNetwork(scenario.getNetwork(), io.getOutputFilename(Controler.DefaultFiles.network));
+		if (computeNode.getRank() == 0) {
+			// TODO: hard-coded to write network output for easier testing
+			NetworkUtils.writeNetwork(scenario.getNetwork(), io.getOutputFilename(Controler.DefaultFiles.network));
 
 //            String prefix = out.getOutputFilename("events_node");
 //            IOHandler.mergeEvents(prefix, out.getOutputFilename("output_events.xml"));
-        }
-    }
+		}
+	}
 
 	/**
 	 * Add some default controllers to replicate behaviour of {@link NewControler}.
@@ -137,7 +137,8 @@ public class DistributedController implements ControlerI {
 		listenerManager.addControlerListener(injector.getInstance(PlansDumping.class));
 		listenerManager.addControlerListener(injector.getInstance(EventsHandling.class));
 
-		Set<ControlerListener> listeners = injector.getInstance(Key.get(new TypeLiteral<>() {}));
+		Set<ControlerListener> listeners = injector.getInstance(Key.get(new TypeLiteral<>() {
+		}));
 		for (ControlerListener l : listeners) {
 			listenerManager.addControlerListener(l);
 		}

@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +44,7 @@ class SimNetworkTest {
 		network.addLink(l2);
 		network.addLink(l3);
 
-		NetworkPartitioning partitioning = new NetworkPartitioning(SimulationNode.SINGLE_INSTANCE, network);
+		NetworkPartitioning partitioning = new NetworkPartitioning(ComputeNode.SINGLE_INSTANCE, network);
 
 		var config = ConfigUtils.createConfig();
 		var simNetwork = new SimNetwork(network, config, partitioning.getPartition(part),
@@ -66,7 +66,7 @@ class SimNetworkTest {
 		NetworkDecomposition.scattered(network, 2);
 
 		var localNetwork = new SimNetwork(network, config, NetworkPartition.SINGLE_INSTANCE, mock(ActiveLinks.class), mock(ActiveNodes.class));
-		var simulationNode = SimulationNode.builder()
+		var simulationNode = ComputeNode.builder()
 			.rank(0)
 			.parts(new IntArrayList(new int[]{0, 1}))
 			.cores(2)

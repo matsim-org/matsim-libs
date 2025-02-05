@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Topology;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
@@ -23,7 +23,7 @@ public final class DistributedContext implements SimulationContext {
 
 	private final Topology topology;
 
-	private final SimulationNode node;
+	private final ComputeNode computeNode;
 
 	private final SerializationProvider serializer;
 
@@ -31,7 +31,7 @@ public final class DistributedContext implements SimulationContext {
 		this.comm = comm;
 		this.topology = topology;
 		this.serializer = serializer;
-		this.node = topology.getNode(comm.getRank());
+		this.computeNode = topology.getNode(comm.getRank());
 	}
 
 	/**
@@ -75,27 +75,27 @@ public final class DistributedContext implements SimulationContext {
 
 	private static Topology createTopology(Communicator comm, int threads, SerializationProvider serializer) {
 
-		SimulationNode node = SimulationNode.builder()
+		ComputeNode node = ComputeNode.builder()
 			.cores(threads == 0 ? Runtime.getRuntime().availableProcessors() : threads)
 			.rank(comm.getRank())
 			.build();
 
 		// Receive node information from all ranks
-		List<SimulationNode> nodes = comm.allGather(node, 0, serializer);
-		nodes.sort(Comparator.comparingInt(SimulationNode::getRank));
+		List<ComputeNode> computeNodes = comm.allGather(node, 0, serializer);
+		computeNodes.sort(Comparator.comparingInt(ComputeNode::getRank));
 
 		Topology.TopologyBuilder topology = Topology.builder();
-		List<SimulationNode> topoNodes = new ArrayList<>();
+		List<ComputeNode> topoNodes = new ArrayList<>();
 
 
 		int total = 0;
-		for (SimulationNode value : nodes) {
+		for (ComputeNode computeNode : computeNodes) {
 
-			SimulationNode.NodeBuilder n = value.toBuilder();
-			int parts = Math.max(1, value.getCores());
+			ComputeNode.NodeBuilder n = computeNode.toBuilder();
+			int parts = Math.max(1, computeNode.getCores());
 
 			n.parts(IntStream.range(total, total + parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
-			n.distributed(nodes.size() > 1);
+			n.distributed(computeNodes.size() > 1);
 
 			total += parts;
 			topoNodes.add(n.build());
@@ -103,7 +103,7 @@ public final class DistributedContext implements SimulationContext {
 
 		// head nodes needs to build topology with all partition info
 		return topology
-			.nodes(topoNodes)
+			.computeNodes(topoNodes)
 			.totalPartitions(total)
 			.build();
 	}
