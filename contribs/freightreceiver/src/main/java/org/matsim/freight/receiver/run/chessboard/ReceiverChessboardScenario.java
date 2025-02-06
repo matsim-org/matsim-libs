@@ -69,7 +69,7 @@ public class ReceiverChessboardScenario {
 
         createChessboardCarriersAndAddToScenario(sc);
 
-        ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).setReceiverReplanningInterval(5);
+        ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).setReceiverReplanningInterval(ReceiverChessboardParameters.REPLAN_INTERVAL);
 
         /* Create the grand coalition receiver members and allocate orders. */
         createAndAddChessboardReceivers(sc, numberOfReceivers);
@@ -284,8 +284,8 @@ public class ReceiverChessboardScenario {
 
         CarrierVehicle.Builder carrierHVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("heavy"), carrierLocation, typeHeavy);
         CarrierVehicle heavy = carrierHVehicleBuilder
-                .setEarliestStart(Time.parseTime("06:00:00"))
-                .setLatestEnd(Time.parseTime("18:00:00"))
+                .setEarliestStart(Time.parseTime(ReceiverChessboardParameters.DAY_START))
+                .setLatestEnd(Time.parseTime(ReceiverChessboardParameters.DAY_END))
                 .build();
 
         /* Light vehicle. */
@@ -301,8 +301,8 @@ public class ReceiverChessboardScenario {
 
         CarrierVehicle.Builder carrierLVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("light"), carrierLocation, typeLight);
         CarrierVehicle light = carrierLVehicleBuilder
-                .setEarliestStart(Time.parseTime("06:00:00"))
-                .setLatestEnd(Time.parseTime("18:00:00"))
+                .setEarliestStart(Time.parseTime(ReceiverChessboardParameters.DAY_START))
+                .setLatestEnd(Time.parseTime(ReceiverChessboardParameters.DAY_END))
                 .build();
 
         /* Assign vehicles to carrier. */
@@ -312,7 +312,7 @@ public class ReceiverChessboardScenario {
         carrier.getCarrierCapabilities().getVehicleTypes().add(typeLight);
         LOG.info("Added different vehicle types to the carrier.");
 
-        CarrierVehicleTypes types = new CarrierVehicleTypes();
+        CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes(sc);
         types.getVehicleTypes().put(typeLight.getId(), typeLight);
         types.getVehicleTypes().put(typeHeavy.getId(), typeHeavy);
 
@@ -369,7 +369,6 @@ public class ReceiverChessboardScenario {
     static TimeWindow selectRandomTimeStart(int tw) {
         int min = 6;
         int max = 18;
-//		Random randomTime = new Random();
         Random randomTime = MatsimRandom.getLocalInstance(); // overkill, but easiest to retrofit.  kai, jan'19
         int randomStart = (min +
                 randomTime.nextInt(max - tw - min + 1));

@@ -1,4 +1,4 @@
-package org.matsim.freight.receiver;
+package org.matsim.freight.receiver.run.chessboard;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -18,17 +18,17 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashSet;
 import java.util.Set;
 
-/*
- * This is a sample carrier scoring function factory implementation (CarrierScoringFunctionImpl.class) developed by sschroeder,
- * I just changed the penalty cost and time parameter, etc.
+/**
+ * This is a sample carrier {@link CarrierScoringFunctionFactory} implementation
+ * based on earlier examples in the freight contrib.
  */
-public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {
+public class ChessboardCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {
 
-	private static Logger log = LogManager.getLogger(UsecasesCarrierScoringFunctionFactory.class);
+	private static final Logger LOG = LogManager.getLogger(ChessboardCarrierScoringFunctionFactory.class);
 
 	private final Network network;
 
-	public UsecasesCarrierScoringFunctionFactory( Network network ) {
+	public ChessboardCarrierScoringFunctionFactory(Network network ) {
 		this.network = network;
 	}
 
@@ -104,7 +104,7 @@ public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunc
 	            if(selectedPlan == null) return 0.;
 	            for(ScheduledTour tour : selectedPlan.getScheduledTours()){
 	                if(!tour.getTour().getTourElements().isEmpty()){
-						score += (-1)* ((Vehicle) tour.getVehicle()).getType().getCostInformation().getFix();
+						score += (-1)* ((Vehicle) tour.getVehicle()).getType().getCostInformation().getFixedCosts();
 	                }
 	            }
 	            return score;
@@ -125,7 +125,7 @@ public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunc
 	        public DriversLegScoring(Carrier carrier, Network network) {
 	            this.network = network;
 	            this.carrier = carrier;
-	            employedVehicles = new HashSet<CarrierVehicle>();
+	            employedVehicles = new HashSet<>();
 	        }
 
 
@@ -154,7 +154,7 @@ public class UsecasesCarrierScoringFunctionFactory implements CarrierScoringFunc
 				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
 					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
 				}
-				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+				LOG.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
 				return null;
 	        }
 

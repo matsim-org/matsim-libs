@@ -44,7 +44,7 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     private String CARRIERS_FILE = "./carriers.xml.gz";
     // (I converted this from "default" & static to private and non-static: static non-final non-private variables often eventually cause problems.  kai, apr'23)
     private String costSharing = "proportional";
-    private boolean createPNG = true;
+    private createPng createPNG = createPng.yes;
     private ReceiverReplanningType replanningType = ReceiverReplanningType.serviceTime;
     private int receiverReplanningInterval = 1;
 
@@ -56,7 +56,7 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
         comments.put(ELEMENT_RECEIVER_FILE, "Path to the file containing the receivers.");
         comments.put(ELEMENT_CARRIERS_FILE, "Path to the file containing the carriers.");
         comments.put(ELEMENT_NONCOLLABORATING_FEE, "The fixed fee charged per receiver NOT collaborating in a coalition.");
-        comments.put(ELEMENT_CREATE_PNG, "Should PNG output be created? Default is 'true'");
+        comments.put(ELEMENT_CREATE_PNG, "Should PNG output be created? Available values are 'yes' (default) or 'no'.");
         comments.put(ELEMENT_REPLANNING_TYPE, "Replanning strategy used. Available values are 'serviceTime' (default), " +
                 "'timeWindow' and 'deliveryFrequency'.");
         return comments;
@@ -96,11 +96,10 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     }
 
 //    @StringGetter(ELEMENT_CREATE_PNG)
-    public boolean isCreatePNG() { return createPNG; }
+    public createPng getCreatePNG() { return createPNG; }
 
 //    @StringSetter(ELEMENT_CREATE_PNG)
-    public void setCreatePNG(boolean createPNG) { this.createPNG = createPNG; }
-    // I would prefer to have "createPNG" as an enum ... allows to add options later (such als "createLotsOfPngs", "createSomePngs" etc.)
+    public void setCreatePNG(createPng createPNG) { this.createPNG = createPNG; }
 
 //    @StringGetter(ELEMENT_REPLANNING_TYPE)
     public ReceiverReplanningType getReplanningType() { return replanningType; }
@@ -117,4 +116,10 @@ public final class ReceiverConfigGroup extends ReflectiveConfigGroup {
     public void setReceiverReplanningInterval(int receiverReplanningInterval) {
         this.receiverReplanningInterval = receiverReplanningInterval;
     }
+
+
+	public enum createPng{
+		yes, no;
+	}
+
 }

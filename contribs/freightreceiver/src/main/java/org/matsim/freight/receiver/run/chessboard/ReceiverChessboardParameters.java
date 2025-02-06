@@ -38,7 +38,7 @@ class ReceiverChessboardParameters {
 
 	static int STAT_INTERVAL = 1;
 
-	static int REPLAN_INTERVAL = 10;
+	static int REPLAN_INTERVAL = 5;
 
 	static long SEED_BASE = 12345L;
 	static int NUMBER_OF_RECEIVERS = 5;

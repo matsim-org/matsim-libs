@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
@@ -123,6 +125,11 @@ public final class CarrierImpl implements Carrier {
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
+		//FIXME Remove after debugging
+		if(this.selectedPlan.getScore() == null){
+			LogManager.getLogger(CarrierImpl.class).error("Score is null!");
+		}
+
 		CarrierPlan newPlan = CarriersUtils.copyPlan(this.selectedPlan ) ;
 		this.addPlan( newPlan ) ;
 		this.setSelectedPlan( newPlan ) ;

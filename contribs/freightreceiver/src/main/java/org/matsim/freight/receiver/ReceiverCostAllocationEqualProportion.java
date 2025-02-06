@@ -46,7 +46,9 @@ public class ReceiverCostAllocationEqualProportion implements ReceiverCostAlloca
 		if(!costMap.containsKey(carrier.getId())){
 			/* This carrier has not been processed before. */
 			Map<Id<Receiver>, Double> carrierMap = new TreeMap<>();
-			Double carrierScore = carrier.getSelectedPlan().getJspritScore();
+			/* FIXME The carrier score is supposed to be 'more than' just the Jsprit score. */
+//			Double carrierScore = carrier.getSelectedPlan().getJspritScore();
+			Double carrierScore = carrier.getSelectedPlan().getScore();
 
 			/* Find all the receivers. */
 			List<Id<Receiver>> receiversServiced = findAllReceiversServicedByThisCarrier(carrier.getId());

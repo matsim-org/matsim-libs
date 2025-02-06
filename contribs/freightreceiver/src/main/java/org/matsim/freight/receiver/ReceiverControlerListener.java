@@ -145,8 +145,7 @@ class ReceiverControlerListener implements ScoringListener, IterationEndsListene
         try {
             linkReceiverTimeWindowToCarrierTourPosition();
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot write receiver output, linking them to tour positions.");
+            throw new RuntimeException("Cannot write receiver output, linking them to tour positions.", e);
         }
 
     }

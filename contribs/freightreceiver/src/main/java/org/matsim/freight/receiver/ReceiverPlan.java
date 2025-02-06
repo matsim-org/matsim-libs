@@ -58,14 +58,6 @@ public final class ReceiverPlan implements BasicPlan, Attributable {
 	}
 
 
-//	public void addReceiverOrder(final ReceiverOrder ro) {
-//		if(orderMap.containsKey(ro.getCarrierId())) {
-//			throw new IllegalArgumentException("Receiver '" + this.receiver.getId().toString()
-//					+ "' already has an order with carrier '" + ro.getCarrierId().toString() + "'");
-//		}
-//		orderMap.put(ro.getCarrierId(), ro);
-//	}
-
 	@Override
 	public void setScore(final Double score) {
 		this.score = score;
@@ -99,7 +91,7 @@ public final class ReceiverPlan implements BasicPlan, Attributable {
 	/**
 	 * Returns the {@link ReceiverOrder} for a given {@link Carrier}.
 	 */
-	public final ReceiverOrder getReceiverOrder(Id<Carrier> carriedId) {
+	public ReceiverOrder getReceiverOrder(Id<Carrier> carriedId) {
 		if(!orderMap.containsKey(carriedId)) {
 			log.warn("Receiver '" + this.receiver.getId().toString() +
 					"' does not have an order with carrier '" +
@@ -149,7 +141,7 @@ public final class ReceiverPlan implements BasicPlan, Attributable {
 		return strb.toString() + "]" ;
 	}
 
-	public final Collection<ReceiverOrder> getReceiverOrders(){
+	public Collection<ReceiverOrder> getReceiverOrders(){
 		return this.orderMap.values();
 	}
 
@@ -207,7 +199,7 @@ public final class ReceiverPlan implements BasicPlan, Attributable {
 	 * @author jwjoubert
 	 */
 	public static class Builder{
-		private Receiver receiver = null;
+		private final Receiver receiver;
 		private final Map<Id<Carrier>, ReceiverOrder> map = new HashMap<>();
 		private boolean selected = false;
 		private Double score = null;
@@ -249,7 +241,7 @@ public final class ReceiverPlan implements BasicPlan, Attributable {
 			plan.receiver = this.receiver;
 			plan.selected = this.selected;
 			plan.attributes.putAttribute(CollaborationUtils.ATTR_COLLABORATION_STATUS, this.status );
-			if(this.map.size() > 0) {
+			if(!this.map.isEmpty()) {
 				plan.orderMap.putAll(this.map);
 			} else {
 				plan.orderMap = this.map;

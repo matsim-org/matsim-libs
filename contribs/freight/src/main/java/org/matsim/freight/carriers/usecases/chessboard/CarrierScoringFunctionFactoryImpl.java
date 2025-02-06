@@ -193,7 +193,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 					distance += startLink.getLength();
 					for(Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
 						distance += network.getLinks().get(linkId).getLength();
-
 					}
 					distance += network.getLinks().get(leg.getRoute().getEndLinkId()).getLength();
 
@@ -205,7 +204,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
 				if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
 				score += (-1) * timeCosts;
-
 			}
 		}
 

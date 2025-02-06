@@ -24,4 +24,5 @@ package org.matsim.freight.receiver;
  * The supported ways in which the carrier's cost is spread among the receivers.
  */
 public enum ReceiverCostAllocationType {
+	//TODO Implement
 }

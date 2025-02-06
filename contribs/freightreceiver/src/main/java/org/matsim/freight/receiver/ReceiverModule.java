@@ -18,11 +18,18 @@
 
 package org.matsim.freight.receiver;
 
-import org.apache.logging.log4j.Logger;
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
-import org.matsim.freight.carriers.Carrier;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
+import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
+import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
 import org.matsim.freight.receiver.replanning.ReceiverReplanningUtils;
 import org.matsim.freight.receiver.replanning.ReceiverStrategyManager;
 
@@ -31,6 +38,9 @@ public final class ReceiverModule extends AbstractModule {
     private ReceiverReplanningType replanningType = null;
     private Boolean createPNG = true;
 	final private ReceiverCostAllocation costAllocation;
+	private CarrierScoringFunctionFactory scoringFunctionFactory;
+	private Provider<CarrierStrategyManager> strategyManagerProvider;
+	private CarrierScoreStats carrierScoreStats;
 
 	/**
 	 * Creating the module that deals with freight receivers.
@@ -50,8 +60,20 @@ public final class ReceiverModule extends AbstractModule {
 
         /* Carrier */
         this.addControlerListenerBinding().to(ReceiverTriggersCarrierReplanningListener.class);
+		/* Bind all the necessary infrastructure for the carrier. Based on
+		 * org.matsim.freight.carriers.usecases.chessboard.RunChessboard
+		 * ... taken out again. */
+		if(strategyManagerProvider != null){
+			bind(CarrierStrategyManager.class).toProvider(strategyManagerProvider);
+		}
+		if(scoringFunctionFactory != null){
+			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+		}
+		if(carrierScoreStats != null) {
+			addControlerListenerBinding().toInstance(carrierScoreStats);
+		}
 
-        bind(ReceiverScoringFunctionFactory.class).toInstance(new ReceiverScoringFunctionFactoryMoneyOnly());
+		bind(ReceiverScoringFunctionFactory.class).toInstance(new ReceiverScoringFunctionFactoryMoneyOnly());
 		bind(ReceiverCostAllocation.class).toInstance(costAllocation);
 
         /* Check defaults */
@@ -83,7 +105,31 @@ public final class ReceiverModule extends AbstractModule {
         /* Statistics and output */
 //        CarrierScoreStats scoreStats = new CarrierScoreStats( ReceiverUtils.getCarriers( controler.getScenario() ), controler.getScenario().getConfig().controler().getOutputDirectory() + "/carrier_scores", this.createPNG);
         addControlerListenerBinding().to(ReceiverScoreStats.class);
-    }
+
+		/* Carrier scoring stats. */
+		addControlerListenerBinding().toInstance((IterationEndsListener) event -> {
+
+			//TODO Only write out the plans and stats if required. */
+            String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+
+            // write plans
+            CarriersUtils.writeCarriers(CarriersUtils.getCarriers(event.getServices().getScenario()), dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
+
+            //write stats
+            final LegHistogram freightOnly = new LegHistogram(900).setInclPop(false);
+            addEventHandlerBinding().toInstance(freightOnly);
+
+            final LegHistogram withoutFreight = new LegHistogram(900);
+            addEventHandlerBinding().toInstance(withoutFreight);
+
+            freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");
+            freightOnly.reset(event.getIteration());
+
+            withoutFreight.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_withoutFreight.png");
+            withoutFreight.reset(event.getIteration());
+        });
+
+	}
 
 
     public boolean isCreatingPNG() {
@@ -97,6 +143,35 @@ public final class ReceiverModule extends AbstractModule {
     public void setReplanningType(ReceiverReplanningType type) {
         this.replanningType = type;
     }
+
+	/**
+	 * It is necessary to provide the Receiver module with a description of how
+	 * the carriers will score themselves. During the <code>install()</code>
+	 * stage, the code will try to check if there is already a
+	 * {@link CarrierScoringFunctionFactory} set.
+	 *
+	 * TODO Implement this check!!
+	 */
+	public void setScoringFunctionFactory(CarrierScoringFunctionFactory factory){
+		this.scoringFunctionFactory = factory;
+	}
+
+	/**
+	 * It is necessary to provide the Receiver module with a description of how
+	 * the carriers will replan. During the <code>install()</code> stage, the
+	 * code will try to check if there is already a
+	 * {@link CarrierScoringFunctionFactory} set.
+	 *
+	 * TODO Implement this check!!
+	 */
+	public void setCarrierStrategyManagerProvider(Provider<CarrierStrategyManager> strategyManagerProvider){
+		this.strategyManagerProvider = strategyManagerProvider;
+	}
+
+	public void setCarrierScoreStats(CarrierScoreStats carrierScoreStats){
+		this.carrierScoreStats = carrierScoreStats;
+	}
+
 }
 
 

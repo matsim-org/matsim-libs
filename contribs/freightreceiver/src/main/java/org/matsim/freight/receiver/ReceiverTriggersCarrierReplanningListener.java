@@ -17,6 +17,7 @@
  * *********************************************************************** */
 package org.matsim.freight.receiver;
 
+import com.google.inject.Inject;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -25,7 +26,10 @@ import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -35,8 +39,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Inject;
-
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -44,6 +46,12 @@ import java.util.Map;
 class ReceiverTriggersCarrierReplanningListener implements IterationStartsListener {
 	@Inject
 	private Scenario sc;
+
+	@Inject
+	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
+	@Inject
+	private CarrierStrategyManager carrierStrategyManager;
+
 
 	ReceiverTriggersCarrierReplanningListener() {
 	}
@@ -53,7 +61,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
 		ReceiverConfigGroup receiverConfig = ConfigUtils.addOrGetModule(event.getServices().getScenario().getConfig(), ReceiverConfigGroup.class);
 		/* Replan the carrier at iteration zero, and one iteration after the receivers have replanned. */
 		if (event.getIteration() > 0 &&
-			(event.getIteration() + 1) % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
+			event.getIteration() % ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval() != 0) {
 			return;
 		}
 		LogManager.getLogger(ReceiverTriggersCarrierReplanningListener.class).info("--> Receiver triggering carrier to replan.");
@@ -61,12 +69,13 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
 		CollaborationUtils.setCoalitionFromReceiverAttributes(sc);
 
 		// clean out plans, services, shipments from carriers:
+		// FIXME This ignores the carrier's learning strategies.
 		Map<Id<Carrier>, Carrier> carriers = CarriersUtils.getCarriers(sc).getCarriers();
-		for (Carrier carrier : carriers.values()) {
-			carrier.clearPlans();
-			carrier.getShipments().clear();
-			carrier.getServices().clear();
-		}
+//		for (Carrier carrier : carriers.values()) {
+//			carrier.clearPlans();
+//			carrier.getShipments().clear();
+//			carrier.getServices().clear();
+//		}
 
 		// re-fill the carriers from the receiver orders:
 		Map<Id<Receiver>, Receiver> receivers = ReceiverUtils.getReceivers(sc).getReceivers();
@@ -115,15 +124,27 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
 			//route plan
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 
-			//assign this plan now to the carrier and make it the selected carrier plan
-			carrier.addPlan(newPlan);
+			//TODO Can we score the plan as well?
+			//FIXME Just use the Jsprit score as the score now.
+			newPlan.setScore(newPlan.getJspritScore());
 
+			/* Right now (Feb'25, JWJ), we use (only) the Jsprit score as the
+			 * the carrier's MATSim score. */
+//			newPlan.setScore(newPlan.getScore());
+//			newPlan.setScore(newPlan.getJspritScore());
+//			carrierScoringFunctionFactory.createScoringFunction(carrier).addScore(newPlan.getJspritScore());
+//			carrierScoringFunctionFactory.createScoringFunction(carrier).addScore(newPlan.getJspritScore());
+
+			/* Add the new plan to the Carrier, or replace the one according to
+			 * the selector, and set it as the selected plan.
+			 * TODO The plan is currently just added, and no check for removal is done. */
+			carrier.addPlan(newPlan);
+			carrier.setSelectedPlan(newPlan);
 		}
+
 		String outputdirectory = sc.getConfig().controller().getOutputDirectory();
 		outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
-//        new CarrierPlanWriter(CarrierControlerUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
 		new CarrierPlanWriter(CarriersUtils.getCarriers(sc)).write(outputdirectory + receiverConfig.getCarriersFile());
-//        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
 		new ReceiversWriter(ReceiverUtils.getReceivers(sc)).write(outputdirectory + receiverConfig.getReceiversFile());
 	}
 }

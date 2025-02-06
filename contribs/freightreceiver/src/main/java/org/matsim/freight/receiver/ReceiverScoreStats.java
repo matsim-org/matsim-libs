@@ -41,7 +41,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 
 	private BufferedWriter out;
 
-	private final boolean createPNG;
+	private final ReceiverConfigGroup.createPng createPNG;
 	private double[][] history = null;
 	private int minIteration = 0;
 
@@ -52,8 +52,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 	 * Creates a new ScoreStats instance.
 	 */
 	public ReceiverScoreStats() throws UncheckedIOException {
-		/*FIXME Incorporate into ConfigGroup. */
-		this.createPNG = true;
+		createPNG = ReceiverConfigGroup.createPng.yes;
 	}
 
 	@Override
@@ -123,6 +122,9 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 			 * And also, it should just aggregate the plan's score from
 			 * the ReceiverOrder scores, right... that's what I've done
 			 * here for now.
+			 *
+			 * Update (Feb'25-JWJ): I think this is correct, or I don't
+			 * understand the FIXME.
 			 */
 			for (ReceiverPlan plan : receiver.getPlans()) {
 				Double score = plan.getScore();
@@ -182,7 +184,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 				(sumScoreWorst / nofScoreWorst) + "\t" + (sumAvgScores / nofAvgScores) + "\t" + (sumScoreBest / nofScoreBest) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Why would there be an exception?!", e);
 		}
 
 		if (this.history != null) {
@@ -192,24 +194,33 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 			this.history[INDEX_AVERAGE][index] = (sumAvgScores / nofAvgScores);
 			this.history[INDEX_EXECUTED][index] = (sumExecutedScores / nofExecutedScores);
 
-			if (this.createPNG && event.getIteration() != this.minIteration) {
-				// create chart when data of more than one iteration is available.
-				XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
-				double[] iterations = new double[index + 1];
-				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + this.minIteration;
+			if (event.getIteration() != this.minIteration) {
+				switch (createPNG) {
+					case yes:
+						// create chart when data of more than one iteration is available.
+						XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
+						double[] iterations = new double[index + 1];
+						for (int i = 0; i <= index; i++) {
+							iterations[i] = i + this.minIteration;
+						}
+						double[] values = new double[index + 1];
+						System.arraycopy(this.history[INDEX_WORST], 0, values, 0, index + 1);
+						chart.addSeries("avg. worst score", iterations, values);
+						System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
+						chart.addSeries("avg. best score", iterations, values);
+						System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
+						chart.addSeries("avg. of plans' average score", iterations, values);
+						System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
+						chart.addSeries("avg. executed score", iterations, values);
+						chart.addMatsimLogo();
+						chart.saveAsPng(fileName + ".png", 1000, 600);
+						break;
+					case no:
+						log.info("No PNGs created for the receiver statistics.");
+						break;
+					default:
+						throw new IllegalArgumentException("Don't know what to do with createPng option for " + createPNG);
 				}
-				double[] values = new double[index + 1];
-				System.arraycopy(this.history[INDEX_WORST], 0, values, 0, index + 1);
-				chart.addSeries("avg. worst score", iterations, values);
-				System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
-				chart.addSeries("avg. best score", iterations, values);
-				System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
-				chart.addSeries("avg. of plans' average score", iterations, values);
-				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
-				chart.addSeries("avg. executed score", iterations, values);
-				chart.addMatsimLogo();
-				chart.saveAsPng(fileName + ".png", 1000, 600);
 			}
 			if (index == (this.history[0].length - 1)) {
 				// we cannot store more information, so disable the graph feature.
@@ -223,12 +234,12 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		try {
 			this.out.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException. This will probably crash downstream.", e);
 		}
 	}
 
 	static void writeHeadings(Scenario sc) {
-		try(BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
 			bw.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
 				"iteration",
 				"receiver_id",
@@ -244,8 +255,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 				"grandCoalitionMember"));
 			bw.newLine();
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write initial headings");
+			throw new RuntimeException("Cannot write initial headings", e);
 		}
 	}
 
@@ -254,8 +264,8 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 			for (ReceiverOrder rorder : receiver.getSelectedPlan().getReceiverOrders()) {
 				for (Order order : rorder.getReceiverProductOrders()) {
 					String score = receiver.getSelectedPlan().getScore().toString();
-					float start = (float) receiver.getSelectedPlan().getTimeWindows().get(0).getStart();
-					float end = (float) receiver.getSelectedPlan().getTimeWindows().get(0).getEnd();
+					float start = (float) receiver.getSelectedPlan().getTimeWindows().getFirst().getStart();
+					float end = (float) receiver.getSelectedPlan().getTimeWindows().getFirst().getEnd();
 					float duration = (end - start) / 3600;
 					float size = (float) (order.getDailyOrderQuantity() * order.getProduct().getProductType().getRequiredCapacity());
 					float freq = (float) order.getNumberOfWeeklyDeliveries();
@@ -281,8 +291,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 						bw1.newLine();
 
 					} catch (IOException e) {
-						e.printStackTrace();
-						throw new RuntimeException("Cannot write receiver stats");
+						throw new RuntimeException("Cannot write receiver stats", e);
 					}
 				}
 			}
@@ -290,6 +299,4 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 	}
 
 }
-
-
 
