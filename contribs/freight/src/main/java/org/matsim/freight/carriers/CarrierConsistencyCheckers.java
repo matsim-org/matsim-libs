@@ -3,7 +3,7 @@ package org.matsim.freight.carriers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
@@ -37,8 +37,8 @@ public class CarrierConsistencyCheckers {
 		//TODO @Anton: JavaDoc bitte über die Methode. Da wo aktuell schon dein @author steht. Dann wird einem auch korrekt angezeigt.
 		boolean isVehicleSufficient = false;
 		//Todo @Anton: Sollte das nicht auch besser in die for (carrier) Schleife? Sonst ist das ja wieder Carrier-Übergreifend...
-		// Weiter nachgedacht: Macht Sinn, dass generell die Rückgabe über alle Carrier erfolgt. Aber dann muss die Logik sein, dass es True ist, wenn
-		// für alle Carrier die Bedingung erfüllt ist. Wenn nur ein Carrier nicht erfüllt ist, dann False. Oder?
+		// Weiter nachgedacht: Es macht total Sinn, dass generell die Rückgabe über alle Carrier erfolgt. Aber dann muss die Logik sein, dass es True ist, wenn
+		// für alle(!) Carrier die Bedingung erfüllt ist. Wenn nur ein Carrier nicht erfüllt ist, dann False. Oder?
 
 
 		//determine the capacity of all available vehicles (carrier after carrier)
@@ -89,7 +89,7 @@ public class CarrierConsistencyCheckers {
 
 		//determine the operating hours of all available vehicles
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			Map<Id<CarrierVehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
+			Map<Id<Vehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
 
 			Map<Id<CarrierShipment>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
 
@@ -99,11 +99,8 @@ public class CarrierConsistencyCheckers {
 
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				//read vehicle ID
-				//TODO: @KMT: ich würde gerne die Id noch spezifizieren (zB Id<CarrierVehicle, das ist aber inkompatibel), aber ich kann mich nicht entscheiden,
-				// was richtig ist, IntelliJ schlägt mir <VehicleType> vor...
-				// @Anton: Ich kümmere ich mal drum.
-				Id vehicleID = carrierVehicle.getType().getId();
-				//read earliest start and end of vehicle in seconds after midnight (21600 = 06:00:00 (am), 64800 = 18:00:00
+				Id<Vehicle> vehicleID = carrierVehicle.getId();  //@Anton: Teil der Lösung war, dass du hier den VehicleType hattest....
+				//read earliest start and end of vehicle in seconds after midnight (21600 = 06:00:00 (am), 64800 = 18:00:00)
 				var vehicleOperationStart = carrierVehicle.getEarliestStartTime();
 				var vehicleOperationEnd = carrierVehicle.getLatestEndTime();
 				var vehicleCapacity = carrierVehicle.getType().getCapacity().getOther();
@@ -148,7 +145,7 @@ public class CarrierConsistencyCheckers {
 				boolean pickupOverlap = false;
 				boolean deliveryOverlap = false;
 
-				for (Id<CarrierVehicle> vehicleID : vehicleOperationWindows.keySet()) {
+				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
 					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
 
 					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), pickupInfo.capacityDemand());
@@ -183,7 +180,7 @@ public class CarrierConsistencyCheckers {
 				boolean capacityFits = false;
 				boolean serviceOverlap = false;
 
-				for (Id<CarrierVehicle> vehicleID : vehicleOperationWindows.keySet()) {
+				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
 					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
 
 					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), serviceInfo.capacityDemand());
@@ -223,7 +220,7 @@ public class CarrierConsistencyCheckers {
 						serviceActivity.getService().getId(); //TODO abspeichern in Liste...
 					}
 					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity){
-						shipmentBasedActivity.getShipment().getId(); //Todo absperichern
+						shipmentBasedActivity.getShipment().getId(); //Todo abspeichern
 					}
 				}
 			}
