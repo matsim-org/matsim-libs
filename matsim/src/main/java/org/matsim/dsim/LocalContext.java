@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.messages.ComputeNode;
 
 import java.util.List;
 
-public final class LocalContext implements SimulationContext {
+public final class LocalContext implements ExecutionContext {
 
 	/**
 	 * Local context with a single partition.

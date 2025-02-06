@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 @Getter
 @Log4j2
-public final class DistributedContext implements SimulationContext {
+public final class DistributedContext implements ExecutionContext {
 
 	private final Communicator comm;
 

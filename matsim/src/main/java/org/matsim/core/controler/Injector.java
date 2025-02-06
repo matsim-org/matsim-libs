@@ -43,8 +43,8 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.dsim.ExecutionContext;
 import org.matsim.dsim.LocalContext;
-import org.matsim.dsim.SimulationContext;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -58,13 +58,13 @@ public final class Injector {
 		return createInjector(config, LocalContext.INSTANCE, modules);
 	}
 
-	public static com.google.inject.Injector createInjector(final Config config, final SimulationContext ctx, Module... modules) {
+	public static com.google.inject.Injector createInjector(final Config config, final ExecutionContext ctx, Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
 			@Override
 			public void configure(Binder binder) {
 				binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
 				binder.install(new ExplodedConfigModule(config));
-				binder.bind(SimulationContext.class).toInstance(ctx);
+				binder.bind(ExecutionContext.class).toInstance(ctx);
 				binder.bind(ComputeNode.class).toInstance(ctx.getComputeNode());
 			}
 		});

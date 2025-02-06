@@ -48,8 +48,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.ExecutionContext;
 import org.matsim.dsim.LocalContext;
-import org.matsim.dsim.SimulationContext;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
@@ -79,7 +79,7 @@ public abstract class AbstractModule implements Module {
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
 
-	private SimulationContext ctx = LocalContext.INSTANCE;
+	private ExecutionContext ctx = LocalContext.INSTANCE;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -95,7 +95,7 @@ public abstract class AbstractModule implements Module {
 			this.config = bootstrapInjector.getInstance(Config.class);
 		}
 
-		this.ctx = bootstrapInjector.getInstance(SimulationContext.class);
+		this.ctx = bootstrapInjector.getInstance(ExecutionContext.class);
 
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
@@ -124,7 +124,7 @@ public abstract class AbstractModule implements Module {
 		return config;
 	}
 
-	protected final SimulationContext getSimulationContext() {
+	protected final ExecutionContext getSimulationContext() {
 		return ctx;
 	}
 

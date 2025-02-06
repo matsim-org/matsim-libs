@@ -44,7 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.dsim.SimulationContext;
+import org.matsim.dsim.ExecutionContext;
 
 import java.util.Map;
 
@@ -137,8 +137,8 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public SimulationContext getSimulationContext() {
-		return injector.getInstance(SimulationContext.class);
+	public ExecutionContext getSimulationContext() {
+		return injector.getInstance(ExecutionContext.class);
 	}
 
 	@Override

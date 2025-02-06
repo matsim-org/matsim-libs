@@ -55,8 +55,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.ExecutionContext;
 import org.matsim.dsim.LocalContext;
-import org.matsim.dsim.SimulationContext;
 
 import java.util.*;
 
@@ -67,7 +67,7 @@ import java.util.*;
  *
  * @author mrieser
  */
-public final class Controler implements Controller, ControlerI, MatsimServices, AllowsConfiguration{
+public final class Controler implements Controller, ControlerI, MatsimServices, AllowsConfiguration {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -97,8 +97,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		personscsv("persons.csv"),
 		legscsv("legs.csv"),
 		linkscsv("links.csv"),
-		activitiescsv("activities.csv")
-        ;
+		activitiescsv("activities.csv");
 
 		final String filename;
 
@@ -116,8 +115,8 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
 	private final Config config;
-	private final SimulationContext simCtx;
-	private Scenario scenario;
+	private final ExecutionContext simCtx;
+	private final Scenario scenario;
 
 	private com.google.inject.Injector injector;
 	private boolean injectorCreated = false;
@@ -135,7 +134,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
 	private AbstractModule overrides = AbstractModule.emptyModule();
 
-	private List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
+	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -152,12 +151,11 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
-	 * @param args
-	 *            The arguments to initialize the services with.
-	 *            <code>args[0]</code> is expected to contain the path to a
-	 *            configuration file, <code>args[1]</code>, if set, is expected
-	 *            to contain the path to a local copy of the DTD file used in
-	 *            the configuration file.
+	 * @param args The arguments to initialize the services with.
+	 *             <code>args[0]</code> is expected to contain the path to a
+	 *             configuration file, <code>args[1]</code>, if set, is expected
+	 *             to contain the path to a local copy of the DTD file used in
+	 *             the configuration file.
 	 */
 	public Controler(final String[] args) {
 		this(args.length > 0 ? args[0] : null, null, null, LocalContext.INSTANCE);
@@ -178,11 +176,11 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	/**
 	 * This constructor is required for distributed simulations.
 	 */
-	public Controler(Scenario scenario, SimulationContext ctx) {
+	public Controler(Scenario scenario, ExecutionContext ctx) {
 		this(null, null, scenario, ctx);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario, final SimulationContext ctx) {
+	private Controler(final String configFileName, final Config config, final Scenario scenario, final ExecutionContext ctx) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
 			this.config = scenario.getConfig();
@@ -208,8 +206,8 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		this.scenario = scenario;
 		this.simCtx = ctx;
 		this.overrides = scenario == null ?
-						 new ScenarioByConfigModule() :
-						 new ScenarioByInstanceModule(this.scenario);
+			new ScenarioByConfigModule() :
+			new ScenarioByInstanceModule(this.scenario);
 
 		this.config.qsim().setLocked();
 		// yy this is awfully ad-hoc.  kai, jul'18
@@ -229,25 +227,25 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 			});
 
 			// check config consistency just before creating injector; sometimes, we can provide better error messages there:
-			config.removeConfigConsistencyChecker( UnmaterializedConfigGroupChecker.class );
+			config.removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
 			config.checkConsistency();
-			config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
+			config.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
 
 			final Set<AbstractModule> standardModules = Collections.singleton(
-					new AbstractModule(){
-						@Override
-						public void install(){
-							install( new NewControlerModule() );
-							install( new ControlerDefaultCoreListenersModule() );
-							for( AbstractModule module : modules ){
-								install( module );
-							}
-							// should not be necessary: created in the controler
-							//install(new ScenarioByInstanceModule(scenario));
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install(new NewControlerModule());
+						install(new ControlerDefaultCoreListenersModule());
+						for (AbstractModule module : modules) {
+							install(module);
 						}
+						// should not be necessary: created in the controler
+						//install(new ScenarioByInstanceModule(scenario));
 					}
+				}
 			);
-			this.injector = Injector.createInjector( config, simCtx, AbstractModule.override( standardModules, overrides ) );
+			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overrides));
 		}
 	}
 
@@ -255,7 +253,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 * Starts the iterations.
 	 */
 	@Override
-	public final void run() {
+	public void run() {
 		// It is better to keep this line before actually creating the injector, because:
 		// - it actually means "fail if adding new Guice modules"
 		// - adding Guice modules to the Controler from other Guice modules is too late.
@@ -277,9 +275,9 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	// ******** --------- *******
 
 	@Override
-	public final TravelTime getLinkTravelTimes() {
+	public TravelTime getLinkTravelTimes() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
-					  .get(TransportMode.car);
+			.get(TransportMode.car);
 	}
 
 	/**
@@ -290,45 +288,45 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 * You get a Provider (and not an instance directly) because your code may want to later
 	 * create more than one instance. A TripRouter is not guaranteed to be thread-safe, so
 	 * you must get() an instance for each thread if you plan to write multi-threaded code.
-	 *
+	 * <p>
 	 * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
 	 */
 	@Override
-	public final Provider<TripRouter> getTripRouterProvider() {
+	public Provider<TripRouter> getTripRouterProvider() {
 		return this.injector.getProvider(TripRouter.class);
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutilityCalculator() {
+	public TravelDisutility createTravelDisutilityCalculator() {
 		return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
 	}
 
 	@Override
-	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
 	}
 
 	@Override
-	public final ScoringFunctionFactory getScoringFunctionFactory() {
+	public ScoringFunctionFactory getScoringFunctionFactory() {
 		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
 	@Override
-	public final Config getConfig() {
+	public Config getConfig() {
 		return config;
 	}
 
 	@Override
-	public final Scenario getScenario() {
+	public Scenario getScenario() {
 		if (this.injectorCreated) {
 			Gbl.assertNotNull(this.injector);
 			return this.injector.getInstance(Scenario.class);
 		} else {
-			if ( scenario == null ) {
-				log.error( "Trying to get Scenario before it was instanciated.");
-				log.error( "When passing a config file or a config file path to the Controler constructor," );
-				log.error( "Scenario will be loaded first when the run() method is invoked." );
-				throw new IllegalStateException( "Trying to get Scenario before is was instanciated." );
+			if (scenario == null) {
+				log.error("Trying to get Scenario before it was instanciated.");
+				log.error("When passing a config file or a config file path to the Controler constructor,");
+				log.error("Scenario will be loaded first when the run() method is invoked.");
+				throw new IllegalStateException("Trying to get Scenario before is was instanciated.");
 			}
 			return this.scenario;
 		}
@@ -336,7 +334,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 
 	@Override
-	public final EventsManager getEvents() {
+	public EventsManager getEvents() {
 		if (this.injector != null) {
 			return this.injector.getInstance(EventsManager.class);
 		} else {
@@ -385,7 +383,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public final com.google.inject.Injector getInjector() {
+	public com.google.inject.Injector getInjector() {
 		createInjector();
 		return this.injector;
 	}
@@ -393,39 +391,39 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	/**
 	 * Reset injector flag, so it will be re-created if the scenario is run again.
 	 */
-	public final void resetInjector() {
+	public void resetInjector() {
 		this.injectorCreated = false;
 	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every
-	 *             iteration
+	 * iteration
 	 */
 	@Override
 	@Deprecated
-	public final CalcLinkStats getLinkStats() {
+	public CalcLinkStats getLinkStats() {
 		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
 	@Override
-	public final VolumesAnalyzer getVolumes() {
+	public VolumesAnalyzer getVolumes() {
 		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
 	@Override
-	public final ScoreStats getScoreStats() {
+	public ScoreStats getScoreStats() {
 		return this.injector.getInstance(ScoreStats.class);
 	}
 
 	@Override
-	public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-					  .get(TransportMode.car);
+	public TravelDisutilityFactory getTravelDisutilityFactory() {
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {}))
+			.get(TransportMode.car);
 	}
 
 	/**
 	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
-	 *         used for the replanning of plans.
+	 * used for the replanning of plans.
 	 * @deprecated -- try to use services.addPlanStrategyFactory or services.addPlanSelectoryFactory.
 	 * There are cases when this does not work, which is in particular necessary if you need to re-configure the StrategyManager
 	 * during the iterations, <i>and</i> you cannot do this before the iterations start.  In such cases, using this
@@ -433,7 +431,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 */
 	@Override
 	@Deprecated // see javadoc above
-	public final StrategyManager getStrategyManager() {
+	public StrategyManager getStrategyManager() {
 		return this.injector.getInstance(StrategyManager.class);
 	}
 
@@ -443,7 +441,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public SimulationContext getSimulationContext() {
+	public ExecutionContext getSimulationContext() {
 		return simCtx;
 	}
 
@@ -466,8 +464,8 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		});
 	}
 
-	public final void setScoringFunctionFactory(
-		  final ScoringFunctionFactory scoringFunctionFactory) {
+	public void setScoringFunctionFactory(
+		final ScoringFunctionFactory scoringFunctionFactory) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -476,7 +474,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		});
 	}
 
-	public final void setTerminationCriterion(final TerminationCriterion terminationCriterion) {
+	public void setTerminationCriterion(final TerminationCriterion terminationCriterion) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -486,15 +484,15 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public final Controler addOverridingModule( AbstractModule abstractModule ) {
+	public Controler addOverridingModule(AbstractModule abstractModule) {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
 		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
-		return this ;
+		return this;
 	}
 
-	public final void setModules(AbstractModule... modules) {
+	public void setModules(AbstractModule... modules) {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
@@ -502,29 +500,30 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public final Controler addOverridingQSimModule( AbstractQSimModule qsimModule ) {
+	public Controler addOverridingQSimModule(AbstractQSimModule qsimModule) {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
 		overridingQSimModules.add(qsimModule);
-		return this ;
+		return this;
 	}
+
 	@Override
-	public final Controler addQSimModule(AbstractQSimModule qsimModule) {
+	public Controler addQSimModule(AbstractQSimModule qsimModule) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				installQSimModule(qsimModule);
 			}
 		});
-		return this ;
+		return this;
 	}
 
-    /**
-     * @deprecated  -- Only use if you know what you are doing, for experts only.
-     */
+	/**
+	 * @deprecated -- Only use if you know what you are doing, for experts only.
+	 */
 	@Override
-	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
+	public Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -534,6 +533,6 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 				bind(QSimComponentsConfig.class).toInstance(components);
 			}
 		});
-		return this ;
+		return this;
 	}
 }

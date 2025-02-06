@@ -24,7 +24,7 @@ public class DistributedSimulationModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		SimulationContext ctx = getSimulationContext();
+		ExecutionContext ctx = getSimulationContext();
 
 		if (!(ctx instanceof DistributedContext dtx))
 			throw new RuntimeException("DistributedSimulationModule requires a DistributedContext");
