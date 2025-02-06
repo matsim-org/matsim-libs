@@ -98,11 +98,10 @@ import org.matsim.vehicles.VehicleType;
                         createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
                         scenario);
         scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
-        var vrpLogic = CarrierSchedulerUtils.getVrpLogic(carrier);
-        switch (vrpLogic) {
+		switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
           case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
           case shipmentBased -> carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
-          default -> throw new IllegalStateException("Unexpected value: " + vrpLogic);
+          default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
         }
 
         cumulatedLoadingTime = 0;
