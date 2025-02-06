@@ -40,13 +40,15 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * Ähnlich zu CollectionCarrierScheduler: Nun werden Sendungen verteilt statt eingesammelt.
+ * Similar to the CollectionCarrierScheduler: But here the jobs are delivery instead of collected.
  *
  * <p>BUT: scheduleResource() is different from the one used in the case of collection. The
  * LSPShipments are not simply handed over to jsprit which calculates the vehicle tours, but rather
  * loaded into a waiting distribution vehicle in the order of their arrival at the depot. Once this
  * vehicle is full, the tour for this single one is planned by jsprit. All vehicles are thus filled
- * and scheduled consecutively.
+ * and scheduled consecutively. (Service-based approach by Tilmann Matteis)
+ * <p>
+ * There is now also the Shipment-based approach: Add all jobs and run one VRP.   (KMT)
  */
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
@@ -60,7 +62,7 @@ import org.matsim.vehicles.VehicleType;
 
 	/**
 	 * Constructor for the DistributionCarrierScheduler.
-	 * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
+	 * TODO: In the future, the scenario should come via injection(?) This here is only a (dirty) workaround. KMT'Aug'24
 	 *
 	 * @param scenario the scenario
 	 */
