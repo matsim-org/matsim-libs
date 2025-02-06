@@ -83,8 +83,8 @@ import org.matsim.vehicles.VehicleType;
 	protected void scheduleResource() {
 		ArrayList<LspShipment> copyOfShipmentsToSchedule = new ArrayList<>(lspShipmentsToSchedule);
 		switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
-			case serviceBased -> schedulerCarrierBasedOnServices(copyOfShipmentsToSchedule);
-			case shipmentBased -> schedulerCarrierBasedOnShipments(copyOfShipmentsToSchedule);
+			case serviceBased -> scheduleCarrierBasedOnServices(copyOfShipmentsToSchedule);
+			case shipmentBased -> scheduleCarrierBasedOnShipments(copyOfShipmentsToSchedule);
 			default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
 		}
 	}
@@ -139,7 +139,7 @@ import org.matsim.vehicles.VehicleType;
 	 * It is the design by Tilmann Matteis.
 	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
 	 */
-	private void schedulerCarrierBasedOnServices(ArrayList<LspShipment> shipmentsToSchedule) {
+	private void scheduleCarrierBasedOnServices(ArrayList<LspShipment> shipmentsToSchedule) {
 		int load = 0;
 		double cumulatedLoadingTime = 0;
 		double availabilityTimeOfLastShipment = 0;
@@ -155,7 +155,7 @@ import org.matsim.vehicles.VehicleType;
 				load = 0;
 				Carrier auxiliaryCarrier =
 					CarrierSchedulerUtils.solveVrpWithJsprit(
-						createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+						createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
 						scenario);
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				carrier.getServices().putAll(auxiliaryCarrier.getServices());
@@ -171,7 +171,7 @@ import org.matsim.vehicles.VehicleType;
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			Carrier auxiliaryCarrier =
 				CarrierSchedulerUtils.solveVrpWithJsprit(
-					createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+					createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
 					scenario);
 			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			carrier.getServices().putAll(auxiliaryCarrier.getServices());
@@ -180,14 +180,14 @@ import org.matsim.vehicles.VehicleType;
 
 		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
 		/*This method unifies the tourIds of the CollectionCarrier.
-	 	*
-	 	* <p>It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in
-		* each Carrier the Tour has the id 1. In a second step all of that tours were put together in one
-		* single carrier {@link #scheduleResource()} But now, this carrier can have several tours, all
-		* with the same id (1).
-		*
-		* <p>In this method all tours copied but with a new (unique) TourId.
-		*/
+		 *
+		 * <p>It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in
+		 * each Carrier the Tour has the id 1. In a second step all of that tours were put together in one
+		 * single carrier {@link #scheduleResource()} But now, this carrier can have several tours, all
+		 * with the same id (1).
+		 *
+		 * <p>In this method all tours copied but with a new (unique) TourId.
+		 */
 		{
 			int tourIdIndex = 1;
 			for (CarrierPlan carrierPlan : scheduledPlans) {
@@ -218,9 +218,27 @@ import org.matsim.vehicles.VehicleType;
 	 * <p>
 	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
 	 */
-	private void schedulerCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
+	private void scheduleCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
 		//Todo: implement it.
-		throw new NotImplementedException("This method is not implemented yet. KMT feb'2");
+		throw new NotImplementedException("This method is not implemented yet. KMT feb'25");
+
+		//Das ist ein erster Versuch den Rahmen anzugeben.
+//		Carrier auxCarrier = CarriersUtils.createCarrier(Id.create("auxCarrier", Carrier.class));
+//		CarrierVehicle carrierVehicle = null; //Todo: Add CarrierVehicle
+//		CarrierCapabilities cc = CarrierCapabilities.Builder.newInstance()
+//			.addVehicle(carrierVehicle)
+//			.setFleetSize(FleetSize.INFINITE)
+//			.build();
+//		auxCarrier.setCarrierCapabilities(cc);
+//
+//		//add all shipments.
+//		for (LspShipment lspShipment : shipmentsToSchedule) {
+//			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
+//			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+//		}
+//
+//		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
+
 	}
 
 
@@ -396,7 +414,7 @@ import org.matsim.vehicles.VehicleType;
 			.addPlanElement(id, unload);
 	}
 
-	private Carrier createAuxiliaryCarrier(ArrayList<LspShipment> shipmentsInCurrentTour, double startTime) {
+	private Carrier createAuxiliaryCarrierServiceBased(ArrayList<LspShipment> shipmentsInCurrentTour, double startTime) {
 		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
 		carrierCnt++;
 
@@ -410,22 +428,10 @@ import org.matsim.vehicles.VehicleType;
 		auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 		auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 
-		switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
-			case serviceBased -> {
-				for (LspShipment lspShipment : shipmentsInCurrentTour) {
-					CarrierService carrierService = convertToCarrierService(lspShipment);
-					auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
-				}
-			}
-			case shipmentBased -> {
-				for (LspShipment lspShipment : shipmentsInCurrentTour) {
-					CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
-					auxiliaryCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
-				}
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
+		for (LspShipment lspShipment : shipmentsInCurrentTour) {
+			CarrierService carrierService = convertToCarrierService(lspShipment);
+			auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
 		}
-
 
 		return auxiliaryCarrier;
 	}
