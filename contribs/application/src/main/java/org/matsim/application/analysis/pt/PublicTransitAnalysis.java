@@ -19,6 +19,7 @@
 
 package org.matsim.application.analysis.pt;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -54,7 +55,7 @@ import java.nio.file.Path;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"pt_pax_volumes.csv.gz",
-		"pt_pax_per_day_and_vehicle_type.csv"
+		"pt_pax_per_hour_and_vehicle_type.csv"
 	}
 )
 public class PublicTransitAnalysis implements MATSimAppCommand {
@@ -107,13 +108,15 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 
 	private void writePassengerCounts(PtPassengerCountsEventHandler handler) {
 
-		Path path = output.getPath("pt_pax_per_day_and_vehicle_type.csv");
+		Path path = output.getPath("pt_pax_per_hour_and_vehicle_type.csv");
 
 		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
 
-			csv.printRecord("vehicle_type", "passenger_count");
-			for (Object2IntMap.Entry<Id<VehicleType>> kv : handler.getCounts().object2IntEntrySet()) {
-				csv.printRecord(kv.getKey(), kv.getIntValue() * sample.getUpscaleFactor());
+			csv.printRecord("vehicle_type", "hour", "passenger_count");
+			for (Int2ObjectMap.Entry<Object2IntMap<Id<VehicleType>>> kv : handler.getCounts().int2ObjectEntrySet()) {
+				for (Object2IntMap.Entry<Id<VehicleType>> vc : kv.getValue().object2IntEntrySet()) {
+					csv.printRecord(vc.getKey(), kv.getIntKey(), vc.getIntValue() * sample.getUpscaleFactor());
+				}
 			}
 
 		} catch (IOException e) {
