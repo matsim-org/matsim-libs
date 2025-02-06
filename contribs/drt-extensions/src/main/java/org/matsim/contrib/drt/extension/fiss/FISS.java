@@ -59,17 +59,18 @@ import java.util.Random;
  *
  * @author nkuehnel / MOIA, hrewald
  *
+ * <p>
  * Remarks @kainagel: <ul>
  * <li> I have renamed the VehicularDepartureHandler to {@link NetworkModeDepartureHandler}.  Also, this is now an interface, bound against a default implementation. </li>
  * <li>There are probably more changes to come, like _replacing_ the {@link NetworkModeDepartureHandler} rather than adding another {@link DepartureHandler} which effectively over-writes it. </li>
+ * <li> yyyy I have changed a fair amount of things so I am not sure how much of the above text is still correct. </li>
  * </ul>
- *
+ * </p>
  */
 public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	private static final Logger LOG = LogManager.getLogger(FISS.class);
 
-	private final QNetsimEngineI qNetsimEngine;
 	private final DepartureHandler delegate;
 	private final FISSConfigGroup fissConfigGroup;
 	private final TeleportationEngine teleport;
@@ -84,10 +85,12 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
 		      @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandlerDefaultImpl networkModeDepartureHandler ) {
-		this.qNetsimEngine = qNetsimEngine;
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
+
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
+		// yyyy should be replaced by using the binding.  kai, feb'25
+
 		this.travelTime = travelTime;
 		this.random = MatsimRandom.getLocalInstance();
 		this.matsimServices = matsimServices;

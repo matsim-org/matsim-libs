@@ -1,8 +1,11 @@
 package org.matsim.contrib.drt.extension.fiss;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -20,33 +23,32 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
 import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
 public class RunFissDrtScenarioIT {
+	private static final Logger LOG = LogManager.getLogger( RunFissDrtScenarioIT.class );
+
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test void test() {
@@ -151,6 +153,7 @@ public class RunFissDrtScenarioIT {
 
 		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
 
+
 		//FISS part
 		LinkCounter linkCounter = new LinkCounter();
 		{
@@ -158,7 +161,21 @@ public class RunFissDrtScenarioIT {
 			fissConfigGroup.sampleFactor = 0.1;
 			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
 			fissConfigGroup.switchOffFISSLastIteration = true;
-			FISSConfigurator.configure(controler);
+
+			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
+			for( String sampledMode : fissConfigGroup.sampledModes ){
+				final Id<VehicleType> vehicleTypeId = Id.create( sampledMode, VehicleType.class );
+				VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get( vehicleTypeId );
+
+				if( vehicleType == null ){
+						vehicleType = VehicleUtils.createVehicleType( vehicleTypeId );
+						vehiclesContainer.addVehicleType( vehicleType );
+						LOG.info( "Created explicit default vehicle type for mode '{}'", sampledMode );
+				}
+			}
+
+
+			controler.addOverridingModule( new FISSModule() );
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
