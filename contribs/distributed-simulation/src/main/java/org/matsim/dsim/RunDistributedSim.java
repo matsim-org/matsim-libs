@@ -106,15 +106,13 @@ public class RunDistributedSim implements Callable<Integer> {
 		// Randomness might cause differences on different nodes
 		config.routing().setRoutingRandomness(0);
 
-		DSimConfigGroup dSimConfigGroup = ConfigUtils.addOrGetModule(config, DSimConfigGroup.class);
-		dSimConfigGroup.setThreads(threads);
+		config.dsim().setThreads(threads);
 
 		Scenario s = ScenarioUtils.loadScenario(config);
 
-		DistributedSimulationModule module = new DistributedSimulationModule(comm, dSimConfigGroup);
-		Controler controler = new Controler(s, module.getNode());
+		Controler controler = new Controler(s, DistributedContext.create(comm, config));
 
-		controler.addOverridingModule(module);
+		controler.addOverridingModule(new DistributedSimulationModule());
 
 		controler.getInjector();
 		// Removes check after injector has been created, just a workaround to avoid exceptions

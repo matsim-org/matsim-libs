@@ -12,6 +12,7 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>distributed-simulation</artifactId>
 	<name>Distributed MATSim</name>
+	<description>Provides communication implementations for distributed simulations on multiple jvms.</description>
 
 	<properties>
 		<aeron.version>1.44.1</aeron.version>
@@ -42,6 +43,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.aeron</groupId>
+			<artifactId>aeron-all</artifactId>
+			<version>${aeron.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.fury</groupId>
 			<artifactId>fury-core</artifactId>
 			<version>${fury.version}</version>
@@ -53,33 +65,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.aeron</groupId>
-			<artifactId>aeron-all</artifactId>
-			<version>${aeron.version}</version>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>drt</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
-			<version>${hazelcast.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.agrona</groupId>
-			<artifactId>agrona</artifactId>
-			<version>1.20.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hdrhistogram</groupId>
-			<artifactId>HdrHistogram</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-
-		<!-- Scan classpath to find providers -->
-		<dependency>
-			<groupId>io.github.classgraph</groupId>
-			<artifactId>classgraph</artifactId>
-			<version>4.8.177</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>

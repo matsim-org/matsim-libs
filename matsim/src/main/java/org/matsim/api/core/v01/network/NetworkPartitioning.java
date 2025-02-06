@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
-import org.matsim.api.core.v01.messages.SimulationNode;
+import org.matsim.api.core.v01.messages.ComputeNode;
 
 /**
  * Data class describing how the network is partitioned.
@@ -23,22 +23,22 @@ public final class NetworkPartitioning {
 	private final Int2ObjectMap<NetworkPartition> partitions = new Int2ObjectOpenHashMap<>();
 
 
-	private final SimulationNode node;
+	private final ComputeNode computeNode;
 
 	/**
 	 * Empty partition.
 	 */
 	public NetworkPartitioning() {
-		node = null;
+		computeNode = null;
 		linksOnNode = null;
 		link2partition = null;
 	}
 
 	/**
-	 * Constructor to read partition information from a {@link SimulationNode}.
+	 * Constructor to read partition information from a {@link ComputeNode}.
 	 */
-	public NetworkPartitioning(SimulationNode node, Network network) {
-		this.node = node;
+	public NetworkPartitioning(ComputeNode computeNode, Network network) {
+		this.computeNode = computeNode;
 		this.linksOnNode = new IdSet<>(Link.class);
 		this.link2partition = new Object2IntOpenHashMap<>();
 		for (Link link : network.getLinks().values()) {
@@ -47,7 +47,7 @@ public final class NetworkPartitioning {
 			if (partition != null) {
 				partitions.computeIfAbsent(partition, k -> new NetworkPartition(partition)).addLink(link);
 				link2partition.put(link.getId(), (int) partition);
-				if (node.getParts().contains((int) partition))
+				if (computeNode.getParts().contains((int) partition))
 					linksOnNode.add(link.getId());
 			}
 		}
@@ -86,7 +86,7 @@ public final class NetworkPartitioning {
 	 * Check whether link id is on the current node.
 	 */
 	public boolean isLinkOnCurrentNode(Id<Link> linkId) {
-		if (node == null || linksOnNode == null) {
+		if (computeNode == null || linksOnNode == null) {
 			return true;
 		}
 

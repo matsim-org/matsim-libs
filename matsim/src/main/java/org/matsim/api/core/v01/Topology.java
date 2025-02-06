@@ -1,24 +1,28 @@
 package org.matsim.api.core.v01;
 
-import org.matsim.api.core.v01.messages.SimulationNode;
+import lombok.Getter;
+import org.matsim.api.core.v01.messages.ComputeNode;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * Describes the computing topology of the simulation.
+ * Describes the computing topology of the simulation. The topology is defined by the following attributes:
+ * - The number of total partitions into which the simulation domain is divided
+ * - A list of {@link ComputeNode}s which are responsible for the execution of one or more parts of the simulation
  */
-public class Topology implements Message, Iterable<SimulationNode> {
+public class Topology implements Message, Iterable<ComputeNode> {
 
+	@Getter
 	private final int totalPartitions;
 
 	@Nonnull
-	private final List<SimulationNode> nodes;
+	private final List<ComputeNode> computeNodes;
 
-	Topology(int totalPartitions, @Nonnull List<SimulationNode> nodes) {
+	Topology(int totalPartitions, @Nonnull List<ComputeNode> computeNodes) {
 		this.totalPartitions = totalPartitions;
-		this.nodes = nodes;
+		this.computeNodes = computeNodes;
 	}
 
 	public static TopologyBuilder builder() {
@@ -26,32 +30,29 @@ public class Topology implements Message, Iterable<SimulationNode> {
 	}
 
 	public int getNodesCount() {
-		return nodes.size();
+		return computeNodes.size();
 	}
 
-	public SimulationNode getNode(int index) {
-		return nodes.get(index);
+	public ComputeNode getNode(int index) {
+		return computeNodes.get(index);
 	}
 
 	/**
 	 * Return whether the simulation runs in distributed setup.
 	 */
 	public boolean isDistributed() {
-		return nodes.size() > 1;
-	}
-
-	public int getTotalPartitions() {
-		return this.totalPartitions;
+		return computeNodes.size() > 1;
 	}
 
 	@Override
-	public Iterator<SimulationNode> iterator() {
-		return nodes.iterator();
+	@Nonnull
+	public Iterator<ComputeNode> iterator() {
+		return computeNodes.iterator();
 	}
 
 	public static class TopologyBuilder {
 		private int totalPartitions;
-		private List<SimulationNode> nodes;
+		private List<ComputeNode> computeNodes;
 
 		TopologyBuilder() {
 		}
@@ -61,17 +62,17 @@ public class Topology implements Message, Iterable<SimulationNode> {
 			return this;
 		}
 
-		public TopologyBuilder nodes(List<SimulationNode> nodes) {
-			this.nodes = nodes;
+		public TopologyBuilder computeNodes(List<ComputeNode> computeNodes) {
+			this.computeNodes = computeNodes;
 			return this;
 		}
 
 		public Topology build() {
-			return new Topology(this.totalPartitions, this.nodes);
+			return new Topology(this.totalPartitions, this.computeNodes);
 		}
 
 		public String toString() {
-			return "Topology.TopologyBuilder(totalPartitions=" + this.totalPartitions + ", nodes=" + this.nodes + ")";
+			return "Topology.TopologyBuilder(totalPartitions=" + this.totalPartitions + ", nodes=" + this.computeNodes + ")";
 		}
 	}
 }

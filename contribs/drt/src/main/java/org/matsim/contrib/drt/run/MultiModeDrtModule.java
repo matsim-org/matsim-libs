@@ -45,7 +45,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
 
-		if (getSimulationNode().isDistributed()) {
+		if (getSimulationContext().isDistributed()) {
 			install(new DistributedDrtSupportModule());
 		}
 
