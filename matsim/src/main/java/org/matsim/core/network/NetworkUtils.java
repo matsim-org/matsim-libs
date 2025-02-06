@@ -1010,7 +1010,7 @@ public final class NetworkUtils {
 		return result;
 	}
 
-	private static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
+	public static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
 
 	@Nullable
 	public static DisallowedNextLinks getDisallowedNextLinks(Link link) {
