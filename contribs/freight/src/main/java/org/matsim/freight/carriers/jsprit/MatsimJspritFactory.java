@@ -183,12 +183,13 @@ public final class MatsimJspritFactory {
 	 * @return CarrierService
 	 */
 	static CarrierService createCarrierService(Service jspritService) {
-		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(
-				Id.create(jspritService.getId(), CarrierService.class), Id.create(jspritService.getLocation().getId(), Link.class));
-		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
-		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
-		serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
-		CarrierService carrierService = serviceBuilder.build();
+		CarrierService carrierService = CarrierService.Builder.newInstance(
+				Id.create(jspritService.getId(), CarrierService.class),
+				Id.create(jspritService.getLocation().getId(), Link.class),
+				jspritService.getSize().get(0))
+			.setServiceDuration(jspritService.getServiceDuration())
+			.setServiceStartingTimeWindow(TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()))
+			.build();
 		CarriersUtils.setSkills(carrierService, jspritService.getRequiredSkills().values());
 		return carrierService;
 	}
