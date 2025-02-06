@@ -3,6 +3,7 @@ package org.matsim.freight.carriers.consistency_checkers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.util.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -15,27 +16,23 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 /**
  *
  *  @author antonstock
- *	This class will check if the given vehicles have enough capacity to meet the capacity demand (size) of given shipments.
- *	Please change the input path and names of xml files below.
+ *	VehicleCapacityTest checks, if all carriers have at least one vehicle with sufficient capacity for every job. If the capacity demand of a job
+ * 	 * is higher than the highest vehicle capacity, capacityCheck will return false and a log warning with details about the affected carrier(s) and job(s).
  */
 public class VehicleCapacityTest {
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * TODO: @Anton: Bitte noch kurze Javadoc hier ergänzen.
-	 *
-	 */
-	@Test //TODO hier Kopien anlegen (verschiedene Ausgänge etc)
-	void testVehicleCapacity_passes() {
+	@Test
+	void testVehicleCapacityShipments_passes() {
 	/*
-	* This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return TRUE.
+	* This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given SHIPMENTS. This test should return TRUE.
  	*/
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipments.xml");
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipmentsPASS.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -45,18 +42,82 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.capacityCheck(carriers);
-    // TODO: @Anton: Wäre dann vielleicht schön, wenn der Test mindestens einen Boolean - Wert
-    // (TRUE, FALSE) zurückgäbe mit dem Ergebenis.
-    // Dann könntest du nun hier gegen diesen Wert prüfen, ob der Test erfolgreich war oder nicht. ! Das ist nur um zu sehen, dass deine Tests das machen was sie sollen
-	// und wird nicht später im Produktiveinsatz ausgegeben. Ist nur die Rückversicherung, dass da niemand deine Checks umgebaut hat und sie nun nicht mehr funktionieren.
-    // Assert.isTrue( wertDesTests ); // Ohne weitere Ausgabe von Hinweisen, was mit dem Test ist.
-	// Assert.isTrue( wertDesTests , "Fehlermeldung"); // Ohne weitere Ausgabe von Hinweisen, was mit dem Test ist.
+		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assert.isTrue(areCarriersCapable, "At least one vehicle of every carrier has enough capacity for the largest job.");
+
 	}
 
-	//Todo: @Anton: Wenn du das mit der Rückmeldung hast, kannst du natürlich das nochmal analog mit nem Carrier / Vehicle machen, wo der Check nicht erfolgreich ist.
-	//-> Eigene Test Methode
-	// Wäre dann die Abfrage Assert.isFalse( wertDesTests );
+	@Test
+	void testVehicleCapacityShipments_failes() {
+		/*
+		 * This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return FALSE.
+		 * ccCarrierWithShipments1: shipment "large_shipment" capacity demand of 33 is too high
+		 * ccCarrierWithShipments2: shipment "large_shipment" capacity demand of 16 is too high
+		 */
+		Config config = ConfigUtils.createConfig();
 
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipmentsFAIL.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//load carriers according to freight config
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
+
+		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
+		//TODO: @KMT: Assert.isFalse kann leider nicht gefunden werden, ich habe aber in der Bibliothek von junit "Assertions.assertFalse" gefunden, kann/darf ich das auch benutzen?
+		Assertions.assertFalse(areCarriersCapable, "At least one shipment's capacity demand is too high.");
+	}
+
+	@Test
+	void testVehicleCapacityServices_passes() {
+		/*
+		 * This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given SERVICES. This test should return TRUE.
+		 */
+		Config config = ConfigUtils.createConfig();
+
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersServicesPASS.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//load carriers according to freight config
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
+
+		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assert.isTrue(areCarriersCapable, "At least one vehicle of every carrier has enough capacity for the largest job.");
+
+	}
+
+	@Test
+	void testVehicleCapacityServices_failes() {
+		/*
+		 * This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return FALSE.
+		 * ccCarrierWithServices1: services "very_large_service" & "extra_large_service" capacity demand of 31/42 is too high
+		 * ccCarrierWithServices2: shipment "medium_large_service" & "large_service" capacity demand of 16/22 is too high
+		 */
+		Config config = ConfigUtils.createConfig();
+
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersServicesFAIL.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//load carriers according to freight config
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
+
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
+
+		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
+		//TODO: siehe oben
+		Assertions.assertFalse(areCarriersCapable, "At least one shipment's capacity demand is too high.");
+	}
 }
 

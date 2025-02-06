@@ -26,19 +26,21 @@ public class CarrierConsistencyCheckers {
 	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand){}
 	/**
 	 * @author antonstock
+	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
+	 * capacityCheck returns boolean isVehicleSufficient:
+	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
+	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
 	 */
 	public static boolean capacityCheck(Carriers carriers) {
-		/**
-		 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
-		 * capacityCheck returns boolean isVehicleSufficient:
-		 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
-		 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
-		 */
-		//TODO @Anton: JavaDoc bitte über die Methode. Da wo aktuell schon dein @author steht. Dann wird einem auch korrekt angezeigt.
-		boolean isVehicleSufficient = false;
-		//Todo @Anton: Sollte das nicht auch besser in die for (carrier) Schleife? Sonst ist das ja wieder Carrier-Übergreifend...
+
+		//Map, in der CarrierID und true (=Kapazität reicht)/false(=Kapazität reicht nicht) gespeichert wird. Sind alle values = true, return true. Min. 1 value = false, return false.
+		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
+		//@Anton: Sollte das nicht auch besser in die for (carrier) Schleife? Sonst ist das ja wieder Carrier-Übergreifend...
 		// Weiter nachgedacht: Es macht total Sinn, dass generell die Rückgabe über alle Carrier erfolgt. Aber dann muss die Logik sein, dass es True ist, wenn
 		// für alle(!) Carrier die Bedingung erfüllt ist. Wenn nur ein Carrier nicht erfüllt ist, dann False. Oder?
+		//@KMT: na klar, da habe ich gestern gar nicht dran gedacht... wie findet du diese Umsetzung? Map wird mit CarrierID + true/false bestückt,
+		// am Ende wird die Map ausgewertet und ein gemeinsamer boolean (oder wofür wir uns am Ende entscheiden) zurückgegeben.
+		// TODO -> Kommentare können weg, wenn es so passt.
 
 
 		//determine the capacity of all available vehicles (carrier after carrier)
@@ -71,22 +73,30 @@ public class CarrierConsistencyCheckers {
 			//if map is empty, there is a sufficient vehicle for every job
 			if (jobTooBigForVehicle.isEmpty()) {
 				log.info("Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity); //TODO: kann weg, wenn alles funktioniert.
-				isVehicleSufficient = true;
+				isCarrierCapable.put(carrier.getId(), true);
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
-				isVehicleSufficient = false;
+				isCarrierCapable.put(carrier.getId(), false);
+				//@KMT: Die Mischung aus .warn und .info bringt leider die Reihenfolge in der Ausgabe durcheinander (bei zwei Carriern und je 2 zu großen Jobs kommt 1x warn -> 1x info -> 1x warn -> 3x info
+				//gibts dafür eine Lösung außer alles in .warn/.info zu wandeln?
 				log.warn("Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
 				for (CarrierJob job : jobTooBigForVehicle) {
 					log.info("Demand of Job '{}' is too high: '{}'", job.getId().toString(),job.getCapacityDemand());
 				}
 			}
 		}
-		return isVehicleSufficient;
+		//if every carrier has at least one vehicle with sufficient capacity for all jobs, allCarriersCapable will be true
+		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen
+		//theoretisch könnte man den Ausdruck kürzen (s. IntelliJ Vorschlag), ich lasse es aber erstmal so, bis entschieden ist, was capacityCheck zurückgeben soll.
+		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v->v);
+		return allCarriersCapable;
 	}
 
-	public static void vehicleScheduleTest(Carriers carriers) {
-		//TODO: Alle drei Maps umstellen von String auf Vehicle/Job id
-
+	public static boolean vehicleScheduleTest(Carriers carriers) {
+		//isCarrierCapable saves carrierIDs and check result (true/false)
+		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
+		//nonFeasibleJob saves JobIDs and reason why a job can not be handled by a carrier (not enough capacity, no vehicle in operation)
+		Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
 		//determine the operating hours of all available vehicles
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			Map<Id<Vehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
@@ -109,39 +119,24 @@ public class CarrierConsistencyCheckers {
 				//write vehicle ID (key as Id) and time window of operation (value as TimeWindow) in HashMap
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
+			/**
+			* SHIPMENTS PART
+			*/
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				//@Anton: Ich kümmere mich mal mit einer übergeordneten Änderung darum, dass diese Ids sich spezifizieren lassen.
-				Id<CarrierShipment> shipmentID = shipment.getId();
-				TimeWindow shipmentPickupWindow = shipment.getPickupStartingTimeWindow();
-				shipmentPickupWindows.put(shipmentID, new ShipmentPickupInfo(shipmentPickupWindow, shipment.getCapacityDemand()));
+				shipmentPickupWindows.put(shipment.getId(), new ShipmentPickupInfo(shipment.getPickupStartingTimeWindow(), shipment.getCapacityDemand()));
 			}
 
 			//determine delivery hours of shipments
 			//Shipment ID (key as Id) and times (value as double) are being stored in HashMaps
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				Id<CarrierShipment> shipmentID = shipment.getId();
-				TimeWindow shipmentDeliveryWindow = shipment.getDeliveryStartingTimeWindow();
-				shipmentDeliveryWindows.put(shipmentID, new ShipmentDeliveryInfo(shipmentDeliveryWindow, shipment.getCapacityDemand()));
+				shipmentDeliveryWindows.put(shipment.getId(), new ShipmentDeliveryInfo(shipment.getDeliveryStartingTimeWindow(), shipment.getCapacityDemand()));
 			}
 
-			//determine delivery hours of services
-			//Service ID (key as Id) and times (value as double) are being stored in HashMaps
-			for (CarrierService service : carrier.getServices().values()) {
-				Id<CarrierService> shipmentID = service.getId();
-				TimeWindow serviceTimeWindow = service.getServiceStaringTimeWindow();
-				shipmentDeliveryWindows.put(shipmentID, new ShipmentDeliveryInfo(serviceTimeWindow, service.getCapacityDemand()));
-			}
-
-			//Todo: @Anton: Habe das nun zu einer gemeinsamen Liste gemacht  -egal ob SHipments oder Services... Müsstest dann das weitere bitte entsprechend anpassen.
-			// Da dürften nun paar Abfragen überflüssig geworden sein.  (bzw. doppelt, weil ich die alten Maps erst umbenannt hatte ^^).
-			Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
-
-			//a carrier has only one job type: shipments OR services
 			//checks if a vehicle is in operation and has enough capacity to fit given shipment
 			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
 				ShipmentPickupInfo pickupInfo = shipmentPickupWindows.get(shipmentID);
 				ShipmentDeliveryInfo deliveryInfo = shipmentDeliveryWindows.get(shipmentID);
-				boolean shipmentCanBeTransported = false;
 				boolean capacityFits = false;
 				boolean pickupOverlap = false;
 				boolean deliveryOverlap = false;
@@ -155,64 +150,71 @@ public class CarrierConsistencyCheckers {
 
 					deliveryOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), deliveryInfo.deliveryWindow());
 
+					//if vehicle has enough capacity and is in operation during pickup + delivery times, the carrier is capable of handling the shipment
 					if (capacityFits && pickupOverlap && deliveryOverlap) {
-						shipmentCanBeTransported = true;
-					}
-				}
-				System.out.println(capacityFits + "" + pickupOverlap + "" + deliveryOverlap);
-
-				if (!shipmentCanBeTransported) {
-					if (!capacityFits) {
-						nonFeasibleJob.put(shipmentID, "Vehicle(s) in operation is too small.");
-					} else if (!pickupOverlap) {
-						nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
-					} else if (!deliveryOverlap) {
-						nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
+						isCarrierCapable.put(carrier.getId(), true);
 					} else {
-						throw new RuntimeException("Unexpected."); //TODO
+						isCarrierCapable.put(carrier.getId(), false);
+						if (!capacityFits) {
+							nonFeasibleJob.put(shipmentID, "Vehicle(s) in operation is too small.");
+						} else if (!pickupOverlap) {
+							nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
+						} else if (!deliveryOverlap) {
+							nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
+						} else {
+							throw new RuntimeException("Unexpected outcome: vehicleScheduleTest, Line 160.");
+						}
 					}
 				}
 			}
-			//checks if a vehicle is in operation and has enough capacity to fit given service
-			for (Id<? extends CarrierJob> serviceID : serviceWindows.keySet()) {
-				ServiceInfo serviceInfo = serviceWindows.get(serviceID);
 
-				boolean shipmentCanBeTransported = false;
+			/**
+			 * SERVICES PART
+			 */
+			//determine delivery hours of services
+			//Service ID (key as Id) and times (value as double) are being stored in HashMaps
+			for (CarrierService service : carrier.getServices().values()) {
+				serviceWindows.put(service.getId(), new ServiceInfo(service.getServiceStaringTimeWindow(), service.getCapacityDemand()));
+			}
+
+			//checks if a vehicle is in operation and has enough capacity to fit given service
+			for (Id<? extends CarrierJob> serviceId : serviceWindows.keySet()) {
+				ServiceInfo serviceInfo = serviceWindows.get(serviceId);
 				boolean capacityFits = false;
-				boolean serviceOverlap = false;
+				boolean serviceWindow = false;
 
 				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
 					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
 
 					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), serviceInfo.capacityDemand());
 
-					serviceOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), serviceInfo.serviceWindow);
+					serviceWindow = doTimeWindowsOverlap(vehicleInfo.operationWindow(), serviceInfo.serviceWindow());
 
-					if (capacityFits && serviceOverlap) {
-						shipmentCanBeTransported = true;
-					}
-				}
-
-				if (!shipmentCanBeTransported) {
-					if (!capacityFits) {
-						//TODO: @KMT: Kannst du mir erklären, wieso er hier meckert? In der capacityCheck-Methode funktioniert es in meinen Augen fast genauso...
-						// wieso ist shipmentID vom Typ <CarrierShipment> und nicht <CarrierJob>?
-						// @Anton: Ich kümmere mich darum. Vermutlich beim nachträglichen Einführen des CarrierJobs als übergeordnetes Interface übersehen. :(
-						// Lösung ist, dass die Ids nicht komptibel sind. Habe das nun geändert indem die Maps/Liste nun Ids com Typ "? exteds CarrierJob" aufnehmen.
-						// Also beliebeige Typen, die das CarrierJob Interface implemntieren.
-						nonFeasibleJob.put(serviceID, "Vehicle(s) in operation is too small.");
-					} else if (!serviceOverlap) {
-						nonFeasibleJob.put(serviceID, "No sufficient vehicle in operation");
+					//if vehicle has enough capacity and is in operation during pickup + delivery times, the carrier is capable of handling the shipment
+					if (capacityFits && serviceWindow) {
+						isCarrierCapable.put(carrier.getId(), true);
 					} else {
-						throw new RuntimeException("Unexpected outcome."); //TODO
+						isCarrierCapable.put(carrier.getId(), false);
+						if (!capacityFits) {
+							nonFeasibleJob.put(serviceId, "Vehicle(s) in operation is too small.");
+						} else if (!serviceWindow) {
+							nonFeasibleJob.put(serviceId, "No sufficient vehicle in operation");
+						} else {
+							throw new RuntimeException("Unexpected outcome: vehicleScheduleTest, Line 160.");
+						}
 					}
 				}
 			}
+			//issues warning if a carrier can not handle at least one job with carrierIDs, affected jobs and reasons
 			if (!nonFeasibleJob.isEmpty()) {
-				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleJob.size(), carrier.getId().toString(), nonFeasibleJob.keySet(), nonFeasibleJob.values());
-				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleJob.size(), carrier.getId().toString(), nonFeasibleJob.keySet(), nonFeasibleJob.values());
+				log.warn("A total of '{}' jobs(s) cannot be transported by carrier '{}'. Affected jobs(s): '{}' Reason(s): '{}'", nonFeasibleJob.size(), carrier.getId().toString(), nonFeasibleJob.keySet(), nonFeasibleJob.values());
 			}
 		}
+		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
+		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen
+		//theoretisch könnte man den Ausdruck kürzen (s. IntelliJ Vorschlag), ich lasse es aber erstmal so, bis entschieden ist, was vehicleScheduleTest zurückgeben soll.
+		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v->v);
+		return allCarriersCapable;
 	}
 	public static void allJobsInTours(Carriers carriers) {
 		for (Carrier carrier : carriers.getCarriers().values()) {

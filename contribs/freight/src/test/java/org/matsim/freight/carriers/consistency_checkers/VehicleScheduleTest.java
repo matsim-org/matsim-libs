@@ -45,7 +45,7 @@ public class VehicleScheduleTest {
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
 		//names of xml-files
-		String carriersXML = "CCTestCarriersShipments.xml";
+		String carriersXML = "CCTestCarriersShipmentsPASS.xml";
 		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
