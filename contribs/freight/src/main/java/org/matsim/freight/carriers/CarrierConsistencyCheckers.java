@@ -3,6 +3,7 @@ package org.matsim.freight.carriers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
@@ -33,7 +34,12 @@ public class CarrierConsistencyCheckers {
 		 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
 		 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
 		 */
+		//TODO @Anton: JavaDoc bitte über die Methode. Da wo aktuell schon dein @author steht. Dann wird einem auch korrekt angezeigt.
 		boolean isVehicleSufficient = false;
+		//Todo @Anton: Sollte das nicht auch besser in die for (carrier) Schleife? Sonst ist das ja wieder Carrier-Übergreifend...
+		// Weiter nachgedacht: Macht Sinn, dass generell die Rückgabe über alle Carrier erfolgt. Aber dann muss die Logik sein, dass es True ist, wenn
+		// für alle Carrier die Bedingung erfüllt ist. Wenn nur ein Carrier nicht erfüllt ist, dann False. Oder?
+
 
 		//determine the capacity of all available vehicles (carrier after carrier)
 		for (Carrier carrier : carriers.getCarriers().values()) {
@@ -95,6 +101,7 @@ public class CarrierConsistencyCheckers {
 				//read vehicle ID
 				//TODO: @KMT: ich würde gerne die Id noch spezifizieren (zB Id<CarrierVehicle, das ist aber inkompatibel), aber ich kann mich nicht entscheiden,
 				// was richtig ist, IntelliJ schlägt mir <VehicleType> vor...
+				// @Anton: Ich kümmere ich mal drum.
 				Id vehicleID = carrierVehicle.getType().getId();
 				//read earliest start and end of vehicle in seconds after midnight (21600 = 06:00:00 (am), 64800 = 18:00:00
 				var vehicleOperationStart = carrierVehicle.getEarliestStartTime();
@@ -106,6 +113,7 @@ public class CarrierConsistencyCheckers {
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
+				//@Anton: Ich kümmere mich mal mit einer übergeordneten Änderung darum, dass diese Ids sich spezifizieren lassen.
 				Id shipmentID = shipment.getId();
 				TimeWindow shipmentPickupWindow = shipment.getPickupStartingTimeWindow();
 				shipmentPickupWindows.put(shipmentID, new ShipmentPickupInfo(shipmentPickupWindow, shipment.getCapacityDemand()));
@@ -191,6 +199,7 @@ public class CarrierConsistencyCheckers {
 					if (!capacityFits) {
 						//TODO: @KMT: Kannst du mir erklären, wieso er hier meckert? In der capacityCheck-Methode funktioniert es in meinen Augen fast genauso...
 						// wieso ist shipmentID vom Typ <CarrierShipment> und nicht <CarrierJob>?
+						// @Anton: Ich kümmere mich darum. Vermutlich beim nachträglichen Einführen des CarrierJobs als übergeordnetes Interface übersehen. :(
 						nonFeasibleService.put(serviceID, "Vehicle(s) in operation is too small.");
 					} else if (!serviceOverlap) {
 						nonFeasibleService.put(serviceID, "No sufficient vehicle in operation");
