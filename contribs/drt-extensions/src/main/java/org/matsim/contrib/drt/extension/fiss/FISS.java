@@ -95,8 +95,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		this.scenario = scenario;
 	}
 
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	@Override public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if ( !this.qsimConfig.getMainModes().contains( agent.getMode() ) ) {
 			return false ;
 		} else if ( agent instanceof DynAgent ) {
@@ -117,58 +116,53 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
 			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
-			// yyyy This _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
+			// yyyy This travel time _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 
 			networkRoute.setTravelTime(newTravelTime);
 		}
 
-		// !!!! The following is not a teleportation-pull (as it is in NetworkModeDpHandler...),
-		// but a teleportation-push.
+		// !!!! The following is not a teleportation-pull (as it is in NetworkModeDpHandler...), but a teleportation-push.  yyyy Are we sure
+		// that these are the same?  E.g. if the vehicle needs to be made available for the next driver?  kai, feb'25
 
-		// remove vehicle of teleported agent from parking spot
-		// yy the following functionality is in NetworkModeDpHandlerDefaultImpl in a private method.  Make public?  Maybe make static?
-		// --> It is not the same since this here is teleportation-push whereas there it would be teleportation-pull.
-		QVehicle removedVehicle = null;
-		if (agent instanceof MobsimDriverAgent driverAgent) {
-			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
-			QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
-//			NetworkModeDepartureHandlerDefaultImpl.teleportVehicleTo( vehicle, linkId, qNetsimEngine );
-			// is not working, but I dunno why
-			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
-			removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
-			if (removedVehicle == null) {
-				throw new RuntimeException(
-						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
- 								+ vehicle.getCurrentLink().getId()
-								+ ".  Maybe it is currently used by someone else?"
-								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
-								+ "Maybe was never placed onto a link?");
-			}
-		}
+//		// remove vehicle of teleported agent from parking spot
+//		QVehicle removedVehicle = null;
+//		if (agent instanceof MobsimDriverAgent driverAgent) {
+//			Id<Vehicle> vehicleId = driverAgent.getPlannedVehicleId();
+//			QLinkI qLinkI = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+//			removedVehicle = qLinkI.removeParkedVehicle(vehicleId);
+//			if (removedVehicle == null) {
+//				throw new RuntimeException(
+//						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
+// 								+ qNetsimEngine.getVehicles().get(vehicleId).getCurrentLink().getId()
+//								+ ".  Maybe it is currently used by someone else?"
+//								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
+//								+ "Maybe was never placed onto a link?");
+//			}
+//			// yyyy need to check how this is handled elsewhere.  I think that with some config settings we wait until the vehicle becomes available--???
+//		}
 		boolean result = teleport.handleDeparture(now, agent, linkId);
 		Gbl.assertIf( result ); // otherwise we are now confused
 
 		// teleport vehicle right after agent
-		if (removedVehicle != null) {
-			Id<Link> destinationLinkId = agent.getDestinationLinkId();
-			QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(destinationLinkId);
-			qLinkDest.addParkedVehicle(removedVehicle);
-		}
+//		if (removedVehicle != null) {
+//			Id<Link> destinationLinkId = agent.getDestinationLinkId();
+//			QLinkI qLinkDest = (QLinkI) this.qNetsimEngine.getNetsimNetwork().getNetsimLink(destinationLinkId);
+//			qLinkDest.addParkedVehicle(removedVehicle);
+//		}
 
 		return result;
 
 	}
 
-	@Override
-	public void doSimStep(double time) {
+	@Override public void doSimStep(double time) {
 		teleport.doSimStep(time);
 	}
 
-	@Override
-	public void onPrepareSim() {
+	@Override public void onPrepareSim() {
 		if (switchOffFISS()) {
 			deflateVehicleTypes(matsimServices.getScenario(), this.fissConfigGroup);
+			// (This is before the QVehicles are generated, so it wil be taken into account when generating them.)
 		}
 		teleport.onPrepareSim();
 	}
@@ -180,17 +174,18 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		}
 	}
 
-	@Override
-	public void afterSim() {
+	@Override public void afterSim() {
 		teleport.afterSim();
 	}
 
 	private boolean switchOffFISS() {
 		return (this.fissConfigGroup.switchOffFISSLastIteration && this.matsimServices.getConfig().controller().getLastIteration() == this.matsimServices.getIterationNumber());
+		// yyyy note that with current implementation one canNOT change this to "switchOffFISS every x timesteps", since the pces are
+		// deflated to their original values in onPrepareSim, and there is nothing in the code that multiply them to the FISS values
+		// afterwards again.
 	}
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
+	@Override public void setInternalInterface(InternalInterface internalInterface) {
 		teleport.setInternalInterface(internalInterface);
 	}
 }

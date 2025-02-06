@@ -341,8 +341,7 @@ abstract class AbstractQLink implements QLinkI {
 		final boolean thereIsDriverWaiting = driversWaitingForCar != null && !driversWaitingForCar.isEmpty();
 		if ( thereIsDriverWaiting ) {
 			MobsimDriverAgent driverWaitingForPassengers =
-				driversWaitingForPassengers.get(
-						driversWaitingForCar.element().getId());
+				driversWaitingForPassengers.get( driversWaitingForCar.element().getId());
 			if (driverWaitingForPassengers != null) return;
 		}
 

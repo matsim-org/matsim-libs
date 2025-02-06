@@ -93,28 +93,22 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		if ( netsimNetworkFactory==null ) {
 			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
 		}
-//		Gbl.assertNotNull( dpHandler );
-//		this.dpHandler = dpHandler;
 
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qSimConfigGroup = config.qsim();
 
-		// configuring the car departure hander (including the vehicle behavior)
-		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
-		switch(vehicleBehavior) {
-		case exception:
-		case teleport:
-		case wait:
-			break;
-		default:
-			throw new RuntimeException("Unknown vehicle behavior option.");
-		}
-
-//		this.dpHandler = new NetworkModeDepartureHandlerDefaultImpl(this, vehicleBehavior, qSimConfigGroup);
-//		// VehicularDepartureHandler is the generalized departure handler for vehicles routed on the network.  yyyy why is it created here
-//		// manually when it is also made available via injection?  kai, jan'25
+//		// configuring the car departure hander (including the vehicle behavior)
+//		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
+//		switch(vehicleBehavior) {
+//		case exception:
+//		case teleport:
+//		case wait:
+//			break;
+//		default:
+//			throw new RuntimeException("Unknown vehicle behavior option.");
+//		}
 
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");

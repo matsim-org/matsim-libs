@@ -192,6 +192,7 @@ public class RouteUtils {
 		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
 			return 0.;
 		}
+		double startTime = now;
 
 		// add relative distance of departure link
 		now += (1.0 - relPosOnDepartureLink) * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getStartLinkId() ), now, person, vehicle );
@@ -202,7 +203,7 @@ public class RouteUtils {
 		// add time on arrival link
 		now += relPosOnArrivalLink * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getEndLinkId() ), now, person, vehicle );
 
-		return now;
+		return now - startTime;
 	}
 
 	public static double calcDistance( final LeastCostPathCalculator.Path path ) {

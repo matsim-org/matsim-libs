@@ -8,119 +8,94 @@
  */
 package org.matsim.contrib.drt.extension.fiss;
 
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.MultiModals;
-import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandlerDefaultImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author nkuehnel / MOIA, hrewald
  */
-public class FISSConfigurator {
+public class FISSConfigurator{
 
-    private static final Logger LOG = LogManager.getLogger(FISSConfigurator.class);
+	private static final Logger LOG = LogManager.getLogger( FISSConfigurator.class );
 
-    private FISSConfigurator() {
-        throw new IllegalStateException("Utility class");
-    }
+	private FISSConfigurator(){
+		throw new IllegalStateException( "Utility class" );
+	}
+	private static class FISSModule extends AbstractModule{
+		private final Scenario scenario;
+		private final FISSConfigGroup fissConfigGroup;
+		public FISSModule( Scenario scenario, FISSConfigGroup fissConfigGroup ){
+			this.scenario = scenario;
+			this.fissConfigGroup = fissConfigGroup;
+		}
+		@Override public void install(){
 
-    // Should be called late in the setup process (at least after DRT/DVRP modules)
-    public static void configure(Controler controler) {
+			this.addControlerListenerBinding().toInstance( new StartupListener(){
+				@Override public void notifyStartup( StartupEvent event ){
+					Vehicles vehiclesContainer = scenario.getVehicles();
 
-        Scenario scenario = controler.getScenario();
-        Config config = controler.getConfig();
+					for( String sampledMode : fissConfigGroup.sampledModes ){
 
-        if (!config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
-            throw new IllegalArgumentException("For the time being, FISS only works with mode vehicle types from vehicles data, please check config!");
-        }
-        // (yy the above could be moved into the QSimConfigGroup consistency checker. kai, jan'25)
+						final Id<VehicleType> vehicleTypeId = Id.create( sampledMode, VehicleType.class );
+						VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get( vehicleTypeId );
 
-        FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
+						if( vehicleType == null ){
+							vehicleType = VehicleUtils.createVehicleType( vehicleTypeId );
+							vehiclesContainer.addVehicleType( vehicleType );
+							LOG.info( "Created explicit default vehicle type for mode '{}'", sampledMode );
+//				throw new RuntimeException( "I do not understand how this can happen if we are enforcing mode vehicle types from vehicles data.  kai, jan'25" );
+						}
 
-        Vehicles vehiclesContainer = scenario.getVehicles();
+						final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
+						LOG.info( "Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu );
+						vehicleType.setPcuEquivalents( pcu );
+					}
 
-        Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
+				}
+			} );
 
-        for (String sampledMode : fissConfigGroup.sampledModes) {
+			this.installOverridingQSimModule( new AbstractQSimModule(){
+				@Override protected void configureQSim(){
+					bind( NetworkModeDepartureHandler.class ).to( FISS.class ).in( Singleton.class );
+					bind( NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
+					// (dependency of FISS.java)
+				}
+			} );
+		}
+	}
 
-            if (!config.qsim().getMainModes().contains(sampledMode)) {
-                LOG.warn("{} is not a qsim mode, can and will not apply FISS.", sampledMode);
-                finalFissModes.remove(sampledMode);
+	// Should be called late in the setup process (at least after DRT/DVRP modules)
+	public static void configure( Controler controler ){
 
-                continue;
-            }
-            // (yy the above could be moved into the QSimConfigGroup consistency checker. kai, jan'25)
+		Scenario scenario = controler.getScenario();
+		Config config = controler.getConfig();
 
-            final Id<VehicleType> vehicleTypeId = Id.create(sampledMode, VehicleType.class);
-            VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get(vehicleTypeId);
+		FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule( config, FISSConfigGroup.class );
 
-            if (vehicleType == null) {
-                vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
-                vehiclesContainer.addVehicleType(vehicleType);
-                LOG.info("Created explicit default vehicle type for mode '{}'", sampledMode);
-//                throw new RuntimeException( "I do not understand how this can happen if we are enforcing mode vehicle types from vehicles data.  kai, jan'25" );
-            }
+		// a challenge with the above is that it needs the scenario, but should run before controler start or at least before the first mobsim run.
+		// (Maybe it would make sense to put it as a StartupListener, since this is really not a scenario property but a property that belongs
+		// to the iterations.  As we can see by the fact that with some of the execution paths the pces are set back to their original values.
 
-            final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
-            LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu);
-            vehicleType.setPcuEquivalents(pcu);
-        }
+		// yyyyyy Question: Are we writing the changed pces into output_(all)Vehicles if they are not set back to their original values in the
+		// final iteration?
 
-        fissConfigGroup.sampledModes = finalFissModes;
-        // (yy If we move the above into the FISS config consistency checker, we could just abort if the modes are not consistent instead of trying to
-        // fix them. kai, jan'25)
+		controler.addOverridingModule( new FISSModule( scenario, fissConfigGroup ) );
 
-        controler.addOverridingQSimModule(new FISSQSimModule());
-        // controler.configureQSimComponents(activateModes(MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList())));
+	}
 
-    }
-
-//    public static QSimComponentsConfigurator activateModes() {
-//        return activateModes(List.of(), List.of()); // no dvrp modes
-//    }
-//
-//    public static QSimComponentsConfigurator activateModes(List<String> additionalNamedComponents,List<String> dvrpModes) {
-//        return components -> {
-//            if (!dvrpModes.isEmpty()) {
-//                components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
-//                components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-//                // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
-//            }
-//
-////            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-////            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
-////            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-//            // (the above does, I think, put the FISS departure handler "before" the QNetsimEngine departure handler.)
-//
-//            additionalNamedComponents.forEach(components::addNamedComponent);
-//
-//
-//            if (!dvrpModes.isEmpty()) {
-//                // activate all DvrpMode components
-//                MultiModals.requireAllModesUnique(dvrpModes);
-//                for (String m : dvrpModes) {
-//                    components.addComponent(DvrpModes.mode(m));
-//                }
-//            }
-//            // yyyy I find it very odd that FISS interacts in this way with the dvrp config.  Is this really necessary?  kai, jan'25
-//
-//        };
-//    }
 }
