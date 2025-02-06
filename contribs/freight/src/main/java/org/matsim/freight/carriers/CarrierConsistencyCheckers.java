@@ -91,11 +91,11 @@ public class CarrierConsistencyCheckers {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			Map<Id<Vehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
 
-			Map<Id<CarrierShipment>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
+			Map<Id<? extends CarrierJob>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
 
-			Map<Id<CarrierShipment>, ShipmentDeliveryInfo> shipmentDeliveryWindows = new HashMap<>();
+			Map<Id<? extends CarrierJob>, ShipmentDeliveryInfo> shipmentDeliveryWindows = new HashMap<>();
 
-			Map<Id<CarrierService>, ServiceInfo> serviceWindows = new HashMap<>();
+			Map<Id<? extends CarrierJob>, ServiceInfo> serviceWindows = new HashMap<>();
 
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				//read vehicle ID
@@ -111,7 +111,7 @@ public class CarrierConsistencyCheckers {
 			}
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				//@Anton: Ich kümmere mich mal mit einer übergeordneten Änderung darum, dass diese Ids sich spezifizieren lassen.
-				Id shipmentID = shipment.getId();
+				Id<CarrierShipment> shipmentID = shipment.getId();
 				TimeWindow shipmentPickupWindow = shipment.getPickupStartingTimeWindow();
 				shipmentPickupWindows.put(shipmentID, new ShipmentPickupInfo(shipmentPickupWindow, shipment.getCapacityDemand()));
 			}
@@ -119,7 +119,7 @@ public class CarrierConsistencyCheckers {
 			//determine delivery hours of shipments
 			//Shipment ID (key as Id) and times (value as double) are being stored in HashMaps
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				Id shipmentID = shipment.getId();
+				Id<CarrierShipment> shipmentID = shipment.getId();
 				TimeWindow shipmentDeliveryWindow = shipment.getDeliveryStartingTimeWindow();
 				shipmentDeliveryWindows.put(shipmentID, new ShipmentDeliveryInfo(shipmentDeliveryWindow, shipment.getCapacityDemand()));
 			}
@@ -127,17 +127,18 @@ public class CarrierConsistencyCheckers {
 			//determine delivery hours of services
 			//Service ID (key as Id) and times (value as double) are being stored in HashMaps
 			for (CarrierService service : carrier.getServices().values()) {
-				Id shipmentID = service.getId();
+				Id<CarrierService> shipmentID = service.getId();
 				TimeWindow serviceTimeWindow = service.getServiceStaringTimeWindow();
 				shipmentDeliveryWindows.put(shipmentID, new ShipmentDeliveryInfo(serviceTimeWindow, service.getCapacityDemand()));
 			}
 
-			Map<Id<CarrierShipment>, String> nonFeasibleShipment = new HashMap<>();
-			Map<Id<CarrierService>, String> nonFeasibleService = new HashMap<>();
+			//Todo: @Anton: Habe das nun zu einer gemeinsamen Liste gemacht  -egal ob SHipments oder Services... Müsstest dann das weitere bitte entsprechend anpassen.
+			// Da dürften nun paar Abfragen überflüssig geworden sein.  (bzw. doppelt, weil ich die alten Maps erst umbenannt hatte ^^).
+			Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
 
 			//a carrier has only one job type: shipments OR services
 			//checks if a vehicle is in operation and has enough capacity to fit given shipment
-			for (Id<CarrierShipment> shipmentID : shipmentPickupWindows.keySet()) {
+			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
 				ShipmentPickupInfo pickupInfo = shipmentPickupWindows.get(shipmentID);
 				ShipmentDeliveryInfo deliveryInfo = shipmentDeliveryWindows.get(shipmentID);
 				boolean shipmentCanBeTransported = false;
@@ -162,18 +163,18 @@ public class CarrierConsistencyCheckers {
 
 				if (!shipmentCanBeTransported) {
 					if (!capacityFits) {
-						nonFeasibleShipment.put(shipmentID, "Vehicle(s) in operation is too small.");
+						nonFeasibleJob.put(shipmentID, "Vehicle(s) in operation is too small.");
 					} else if (!pickupOverlap) {
-						nonFeasibleShipment.put(shipmentID, "No sufficient vehicle in operation");
+						nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
 					} else if (!deliveryOverlap) {
-						nonFeasibleShipment.put(shipmentID, "No sufficient vehicle in operation");
+						nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
 					} else {
 						throw new RuntimeException("Unexpected."); //TODO
 					}
 				}
 			}
 			//checks if a vehicle is in operation and has enough capacity to fit given service
-			for (Id<CarrierService> serviceID : serviceWindows.keySet()) {
+			for (Id<? extends CarrierJob> serviceID : serviceWindows.keySet()) {
 				ServiceInfo serviceInfo = serviceWindows.get(serviceID);
 
 				boolean shipmentCanBeTransported = false;
@@ -197,23 +198,25 @@ public class CarrierConsistencyCheckers {
 						//TODO: @KMT: Kannst du mir erklären, wieso er hier meckert? In der capacityCheck-Methode funktioniert es in meinen Augen fast genauso...
 						// wieso ist shipmentID vom Typ <CarrierShipment> und nicht <CarrierJob>?
 						// @Anton: Ich kümmere mich darum. Vermutlich beim nachträglichen Einführen des CarrierJobs als übergeordnetes Interface übersehen. :(
-						nonFeasibleService.put(serviceID, "Vehicle(s) in operation is too small.");
+						// Lösung ist, dass die Ids nicht komptibel sind. Habe das nun geändert indem die Maps/Liste nun Ids com Typ "? exteds CarrierJob" aufnehmen.
+						// Also beliebeige Typen, die das CarrierJob Interface implemntieren.
+						nonFeasibleJob.put(serviceID, "Vehicle(s) in operation is too small.");
 					} else if (!serviceOverlap) {
-						nonFeasibleService.put(serviceID, "No sufficient vehicle in operation");
+						nonFeasibleJob.put(serviceID, "No sufficient vehicle in operation");
 					} else {
 						throw new RuntimeException("Unexpected outcome."); //TODO
 					}
 				}
 			}
-			if (!nonFeasibleShipment.isEmpty()||!nonFeasibleService.isEmpty()) {
-				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleShipment.size(), carrier.getId().toString(), nonFeasibleShipment.keySet(), nonFeasibleShipment.values());
-				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleService.size(), carrier.getId().toString(), nonFeasibleService.keySet(), nonFeasibleService.values());
+			if (!nonFeasibleJob.isEmpty()) {
+				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleJob.size(), carrier.getId().toString(), nonFeasibleJob.keySet(), nonFeasibleJob.values());
+				log.warn("A total of '{}' shipment(s) cannot be transported by carrier '{}'. Affected shipment(s): '{}' Reason(s): '{}'", nonFeasibleJob.size(), carrier.getId().toString(), nonFeasibleJob.keySet(), nonFeasibleJob.values());
 			}
 		}
 	}
 	public static void allJobsInTours(Carriers carriers) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			List<Id<CarrierJob>> liste = new LinkedList<>();
+			List<Id<? extends CarrierJob>> liste = new LinkedList<>();
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 					if (tourElement instanceof Tour.ServiceActivity serviceActivity){
