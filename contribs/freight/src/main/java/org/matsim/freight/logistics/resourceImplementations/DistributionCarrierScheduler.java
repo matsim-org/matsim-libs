@@ -22,6 +22,8 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
+
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -79,144 +81,12 @@ import org.matsim.vehicles.VehicleType;
 
 	@Override
 	protected void scheduleResource() {
-
 		ArrayList<LspShipment> copyOfShipmentsToSchedule = new ArrayList<>(lspShipmentsToSchedule);
-
-//	  switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
-//		  case serviceBased -> carrier.getServices().putAll(auxiliaryCarrier.getServices());
-//		  case shipmentBased -> carrier.getShipments().putAll(auxiliaryCarrier.getShipments());
-//		  default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
-
-		List<CarrierPlan> scheduledPlans = buildServiceBasedTours(copyOfShipmentsToSchedule);
-
-		CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
-		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
-		plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
-		carrier.addPlan(plan);
-		carrier.setSelectedPlan(plan);
-	}
-
-
-	/**
-	 * This method builds the tours based on the {@link CarrierService}s.
-	 * So everytime a vehicle is full, it gets planned by jsprit - based on services.
-	 * In the end all of these tours are just added and returned as List of CarrierPlans.
-	 * <p>
-	 * It is the design by Tilmann Matteis.
-	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.
-	 * @return List of CarrierPlans with the planned tours
-	 */
-	private List<CarrierPlan> buildServiceBasedTours(ArrayList<LspShipment> shipmentsToSchedule) {
-		int load = 0;
-		double cumulatedLoadingTime = 0;
-		double availabilityTimeOfLastShipment = 0;
-		ArrayList<LspShipment> shipmentsInCurrentTour = new ArrayList<>();
-
-		List<CarrierPlan> scheduledPlans = new LinkedList<>();
-		for (LspShipment lspShipment : shipmentsToSchedule) {
-			// TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach
-			// das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere
-			// gibt???
-			VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
-			if ((load + lspShipment.getSize()) > vehicleType.getCapacity().getOther().intValue()) {
-				load = 0;
-				Carrier auxiliaryCarrier =
-					CarrierSchedulerUtils.solveVrpWithJsprit(
-						createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-						scenario);
-				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
-				carrier.getServices().putAll(auxiliaryCarrier.getServices());
-				cumulatedLoadingTime = 0;
-				shipmentsInCurrentTour.clear();
-			}
-			shipmentsInCurrentTour.add(lspShipment);
-			load += lspShipment.getSize();
-			cumulatedLoadingTime += lspShipment.getDeliveryServiceTime();
-			availabilityTimeOfLastShipment = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
+		switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
+			case serviceBased -> schedulerCarrierBasedOnServices(copyOfShipmentsToSchedule);
+			case shipmentBased -> schedulerCarrierBasedOnShipments(copyOfShipmentsToSchedule);
+			default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
 		}
-		//Restliche Sendungen in einem letzten Vrp planen
-		if (!shipmentsInCurrentTour.isEmpty()) {
-			Carrier auxiliaryCarrier =
-				CarrierSchedulerUtils.solveVrpWithJsprit(
-					createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
-					scenario);
-			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
-			carrier.getServices().putAll(auxiliaryCarrier.getServices());
-			shipmentsInCurrentTour.clear();
-		}
-		return scheduledPlans;
-	}
-
-	/**
-	 * This method unifies the tourIds of the CollectionCarrier.
-	 *
-	 * <p>It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in
-	 * each Carrier the Tour has the id 1. In a second step all of that tours were put together in one
-	 * single carrier {@link #scheduleResource()} But now, this carrier can have several tours, all
-	 * with the same id (1).
-	 *
-	 * <p>In this method all tours copied but with a new (unique) TourId.
-	 *
-	 * <p>This is a workaround. In my (KMT, sep'22) opinion it would be better to switch so {@link
-	 * CarrierShipment}s instead of {@link CarrierService} and use only on DistributionCarrier with
-	 * only one VRP and only one jsprit-Run. This would avoid this workaround and also improve the
-	 * solution, because than the DistributionCarrier can decide on it one which shipments will go
-	 * into which tours
-	 *
-	 * @param carrierPlans Collection of CarrierPlans
-	 * @return Collection<ScheduledTour> the scheduledTours with unified tour Ids.
-	 */
-	//	private Collection<ScheduledTour> unifyTourIds(Collection<ScheduledTour> scheduledTours) {
-	private Collection<ScheduledTour> unifyTourIds(Collection<CarrierPlan> carrierPlans) {
-		int tourIdIndex = 1;
-		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
-
-		for (CarrierPlan carrierPlan : carrierPlans) {
-			for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
-				var newTour = scheduledTour.getTour().duplicateWithNewId(Id.create("dist_" + tourIdIndex, Tour.class));
-				tourIdIndex++;
-				var newScheduledTour = ScheduledTour.newInstance(newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
-				scheduledToursUnified.add(newScheduledTour);
-			}
-		}
-		return scheduledToursUnified;
-	}
-
-	private CarrierService convertToCarrierService(LspShipment lspShipment) {
-		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-		CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo(), lspShipment.getSize())
-			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
-			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-			.setServiceDuration(lspShipment.getDeliveryServiceTime())
-			.build();
-		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
-		if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
-			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
-				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
-		}
-		return carrierService;
-	}
-
-	/**
-	 * This method converts a LspShipment to a CarrierShipment.
-	 * Please note: This method may get removed in the future, in case that the LSPShipment and the CarrierShipment are merged. KMT'Aug'24
-
-	 * @param lspShipment the LspShipment to convert
-	 * @return a CarrierShipment
-	 */
-	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
-		Id<CarrierShipment> serviceId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
-		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
-			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
-			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
-			.build();
-		//ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
-		if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
-			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
-				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
-		}
-		return carrierShipment;
 	}
 
 
@@ -260,6 +130,139 @@ import org.matsim.vehicles.VehicleType;
 			}
 		}
 	}
+
+	/**
+	 * This method builds the tours based on the {@link CarrierService}s.
+	 * So everytime a vehicle is full, it gets planned by jsprit - based on services.
+	 * In the end all of these tours are just added unified, and added to the carrier
+	 * <p>
+	 * It is the design by Tilmann Matteis.
+	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
+	 */
+	private void schedulerCarrierBasedOnServices(ArrayList<LspShipment> shipmentsToSchedule) {
+		int load = 0;
+		double cumulatedLoadingTime = 0;
+		double availabilityTimeOfLastShipment = 0;
+		ArrayList<LspShipment> shipmentsInCurrentTour = new ArrayList<>();
+
+		List<CarrierPlan> scheduledPlans = new LinkedList<>();
+		for (LspShipment lspShipment : shipmentsToSchedule) {
+			// TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach
+			// das erste/nächste(?) und schaut ob es da rein passt... Aber was ist, wenn es mehrere
+			// gibt???
+			VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
+			if ((load + lspShipment.getSize()) > vehicleType.getCapacity().getOther().intValue()) {
+				load = 0;
+				Carrier auxiliaryCarrier =
+					CarrierSchedulerUtils.solveVrpWithJsprit(
+						createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+						scenario);
+				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
+				carrier.getServices().putAll(auxiliaryCarrier.getServices());
+				cumulatedLoadingTime = 0;
+				shipmentsInCurrentTour.clear();
+			}
+			shipmentsInCurrentTour.add(lspShipment);
+			load += lspShipment.getSize();
+			cumulatedLoadingTime += lspShipment.getDeliveryServiceTime();
+			availabilityTimeOfLastShipment = LspShipmentUtils.getTimeOfLspShipment(lspShipment);
+		}
+		//Restliche Sendungen in einem letzten Vrp planen
+		if (!shipmentsInCurrentTour.isEmpty()) {
+			Carrier auxiliaryCarrier =
+				CarrierSchedulerUtils.solveVrpWithJsprit(
+					createAuxiliaryCarrier(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime),
+					scenario);
+			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
+			carrier.getServices().putAll(auxiliaryCarrier.getServices());
+			shipmentsInCurrentTour.clear();
+		}
+
+		List<ScheduledTour> scheduledToursUnified = new LinkedList<>();
+		/*This method unifies the tourIds of the CollectionCarrier.
+	 	*
+	 	* <p>It is done because in the current setup, there is one (auxiliary) Carrier per Tour. ---> in
+		* each Carrier the Tour has the id 1. In a second step all of that tours were put together in one
+		* single carrier {@link #scheduleResource()} But now, this carrier can have several tours, all
+		* with the same id (1).
+		*
+		* <p>In this method all tours copied but with a new (unique) TourId.
+		*/
+		{
+			int tourIdIndex = 1;
+			for (CarrierPlan carrierPlan : scheduledPlans) {
+				for (ScheduledTour scheduledTour : carrierPlan.getScheduledTours()) {
+					Tour newTour =
+						scheduledTour
+							.getTour()
+							.duplicateWithNewId(Id.create("dist_" + tourIdIndex, Tour.class));
+					tourIdIndex++;
+					ScheduledTour newScheduledTour =
+						ScheduledTour.newInstance(
+							newTour, scheduledTour.getVehicle(), scheduledTour.getDeparture());
+					scheduledToursUnified.add(newScheduledTour);
+				}
+			}
+		}
+
+		CarrierPlan plan = new CarrierPlan(carrier, scheduledToursUnified); //TODO: Why do we need the carrier here to create the CarrierPlan? KMT feb'25
+		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
+		plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
+		carrier.addPlan(plan);
+		carrier.setSelectedPlan(plan);
+	}
+
+	/**
+	 * This method builds the tours based on the {@link CarrierShipment}s.
+	 * This is the new (KMT) approach: Add all jobs and run one VRP.
+	 * <p>
+	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
+	 */
+	private void schedulerCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
+		//Todo: implement it.
+		throw new NotImplementedException("This method is not implemented yet. KMT feb'2");
+	}
+
+
+	private CarrierService convertToCarrierService(LspShipment lspShipment) {
+		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
+		CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo(), lspShipment.getSize())
+			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
+			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+			.setServiceDuration(lspShipment.getDeliveryServiceTime())
+			.build();
+		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
+		if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
+			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
+				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+		}
+		return carrierService;
+	}
+
+	/**
+	 * This method converts a LspShipment to a CarrierShipment.
+	 * Please note: This method may get removed in the future, in case that the LSPShipment and the CarrierShipment are merged. KMT'Aug'24
+
+	 * @param lspShipment the LspShipment to convert
+	 * @return a CarrierShipment
+	 */
+	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
+		Id<CarrierShipment> serviceId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
+		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
+			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
+			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
+			.build();
+		//ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
+		if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
+			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
+				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+		}
+		return carrierShipment;
+	}
+
+
+
 
 	private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
 		LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
