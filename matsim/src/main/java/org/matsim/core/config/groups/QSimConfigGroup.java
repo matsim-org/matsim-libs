@@ -58,6 +58,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
 	private static final String NOTIFY_ABOUT_STUCK_VEHICLES = "notifyAboutStuckVehicles";
+	private static final String MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION = "maxNumberOfLogStatementsReCapacityAdaption";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
@@ -91,6 +92,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private boolean removeStuckVehicles = false;
 	private boolean notifyAboutStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
+	@Positive
+	private int maxNumberOfLogStatementsReCapacityAdaption = 10;
 	@Positive
 	private int numberOfThreads = 1;
 	//	private static final String CREATING_VEHICLES_FOR_ALL_NETWORK_MODES = "creatingVehiclesForAllNetworkModes";
@@ -481,6 +484,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(TRAFFIC_DYNAMICS)
 	public TrafficDynamics getTrafficDynamics() {
 		return this.trafficDynamics;
+	}
+
+	@StringGetter(MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION)
+	public int getMaxNumberOfLogStatementsReCapacityAdaption() {
+		return this.maxNumberOfLogStatementsReCapacityAdaption;
+	}
+
+	@StringSetter(MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION)
+	public void setMaxNumberOfLogStatementsReCapacityAdaption(final int maxNumberOfLogStatementsReCapacityAdaption) {
+		if ( maxNumberOfLogStatementsReCapacityAdaption < 1 ) {
+			throw new IllegalArgumentException( "Number of log statements must be strictly positive, got "+maxNumberOfLogStatementsReCapacityAdaption );
+		}
+		this.maxNumberOfLogStatementsReCapacityAdaption = maxNumberOfLogStatementsReCapacityAdaption;
 	}
 
 	@StringGetter(NUMBER_OF_THREADS)

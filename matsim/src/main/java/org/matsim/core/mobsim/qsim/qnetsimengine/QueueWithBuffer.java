@@ -400,13 +400,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
 
 				if(inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE){
-					if (wrnCnt<10) {
+					if (wrnCnt<context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 						wrnCnt++ ;
 						log.warn("you are using the maximum capacity for one lane as the inflow capacity. This is the old standard behavior of the qsim and probably leads to wrong results " +
 								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
 								"InflowCapacitySetting.INCREASE_NUMBER_OF_LANES or InflowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
 					}
-					if ( wrnCnt==5 ) { //this verbose warning is only given 5 times
+					if ( wrnCnt==context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption() ) {
 						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 					}
 
@@ -416,7 +416,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 				} else  {
 					if ( maxFlowFromFdiag < flowCapacityPerTimeStep ){ //warnings
-						if (wrnCnt<10) {
+						if (wrnCnt<context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 							wrnCnt++ ;
 							log.warn( "max flow from fdiag < flow cap in network file; linkId=" + qLinkInternalInterface.getId() +
 									"; network file flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
@@ -426,16 +426,16 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 									"; number of lanes in network file=" + this.effectiveNumberOfLanes +
 									"; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag ) ;
 
-							if ( wrnCnt==10 ) {
+							if ( wrnCnt==context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption() ) {
 								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 							}
 						}
 						if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
-							if (wrnCnt<10) {
+							if (wrnCnt<context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 								log.warn("The flow capacity will be reduced. See link attribute 'maxInflowUsedInQsim' written into the output network.");
 							}
 						} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
-							if (wrnCnt<10) {
+							if (wrnCnt<context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 								log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
 							}
 						}
@@ -495,10 +495,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
 		if (storageCapacity < tempStorageCapacity) {
-			if (QueueWithBuffer.spaceCapWarningCount <= 10) {
+			if (QueueWithBuffer.spaceCapWarningCount <= context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 				log.warn("Link " + this.id + " too small: enlarge storage capacity from: " + storageCapacity
 						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-				if (QueueWithBuffer.spaceCapWarningCount == 10) {
+				if (QueueWithBuffer.spaceCapWarningCount == context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption()) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
 				QueueWithBuffer.spaceCapWarningCount++;
@@ -534,8 +534,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// I just removed the factor of 2 ... seems to work now without.  kai, may'16
 				// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
 				if ( storageCapacity < minStorCapForHoles ) {
-					if ( spaceCapWarningCount <= 10 ) {
-						log.warn("storage capacity not sufficient for holes; increasing from " + storageCapacity + " to " + minStorCapForHoles ) ;
+					if ( spaceCapWarningCount <= context.qsimConfig.getMaxNumberOfLogStatementsReCapacityAdaption() ) {
+						log.warn("storage capacity not sufficient for holes; increasing on link " + this.id + "from " + storageCapacity + " to " + minStorCapForHoles ) ;
 						QueueWithBuffer.spaceCapWarningCount++;
 					}
 					storageCapacity = minStorCapForHoles ;
