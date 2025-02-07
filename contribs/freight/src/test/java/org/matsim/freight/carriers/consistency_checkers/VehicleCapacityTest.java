@@ -18,7 +18,8 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  *  @author antonstock
  *	VehicleCapacityTest checks, if all carriers have at least one vehicle with sufficient capacity for every job. If the capacity demand of a job
  * 	 * is higher than the highest vehicle capacity, capacityCheck will return false and a log warning with details about the affected carrier(s) and job(s).
- */
+ *
+ * 	 */
 public class VehicleCapacityTest {
 
 	@RegisterExtension

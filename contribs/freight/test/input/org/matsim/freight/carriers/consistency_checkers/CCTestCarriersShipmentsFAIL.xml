@@ -8,7 +8,7 @@
 			</vehicles>
 		</capabilities>
 		<shipments>
-			<shipment id="small_shipment" from="1" to="2" size="12" startPickup="08:00:00" endPickup="10:30:00" startDelivery="08:00:00" endDelivery="10:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="small_shipment" from="1" to="2" size="12" startPickup="08:00:00" endPickup="10:30:00" startDelivery="08:00:00" endDelivery="13:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
 			<shipment id="large_shipment" from="1" to="2" size="33" startPickup="00:00:00" endPickup="15:30:00" startDelivery="00:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
 		</shipments>
 	</carrier>
