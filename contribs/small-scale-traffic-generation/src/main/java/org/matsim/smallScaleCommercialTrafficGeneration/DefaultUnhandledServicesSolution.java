@@ -71,7 +71,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 
 					// Generate new services
 					redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes,
-						(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+						(i) * generator.getAdditionalTravelBufferPerIterationInMinutes());
 				}
 
 				try {
@@ -86,7 +86,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				JOIN.appendTo(writer, new String[]{String.valueOf(i), String.valueOf(numberOfCarriersWithUnhandledJobs),
 					String.valueOf(numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size()),
 					String.valueOf(nonCompleteSolvedCarriers.size()),
-					String.valueOf((i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
+					String.valueOf((i) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
 				writer.newLine();
 				writer.flush();  // Ensure it's written immediately
 
