@@ -52,12 +52,8 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
 
-  DistributionServiceStartEventHandler(
-          CarrierService carrierService,
-          LspShipment lspShipment,
-          LogisticChainElement element,
-          LSPCarrierResource resource,
-          CarrierShipment carrierShipment) {
+  DistributionServiceStartEventHandler(CarrierService carrierService, LspShipment lspShipment, LogisticChainElement element,
+									   LSPCarrierResource resource, CarrierShipment carrierShipment) {
     this.carrierShipment = carrierShipment;
     this.carrierService = carrierService;
     this.lspShipment = lspShipment;
@@ -68,7 +64,6 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
   @Override
   public void reset(int iteration) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
