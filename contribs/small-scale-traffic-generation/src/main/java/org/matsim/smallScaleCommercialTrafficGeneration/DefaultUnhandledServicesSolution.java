@@ -53,8 +53,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputPath.toString())) {
 			// Write header only if the file is newly created
 			if (Files.size(outputPath) == 0) {
-				String[] header = {"iteration", "carriersWithUnhandledJobs", "carriersSolvedInIteration",
-					"carriersNotSolvedInIteration", "additionalBuffer"};
+				String[] header = {"iteration", "carriersWithUnhandledJobsBeforeLoopIteration", "carriersSolvedInIteration",
+					"carriersNotSolvedInIteration", "additionalBufferInMinutes"};
 				JOIN.appendTo(writer, header);
 				writer.newLine();
 			}
@@ -71,7 +71,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 
 					// Generate new services
 					redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes,
-						(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+						(i) * generator.getAdditionalTravelBufferPerIterationInMinutes());
 				}
 
 				try {
@@ -86,7 +86,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				JOIN.appendTo(writer, new String[]{String.valueOf(i), String.valueOf(numberOfCarriersWithUnhandledJobs),
 					String.valueOf(numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size()),
 					String.valueOf(nonCompleteSolvedCarriers.size()),
-					String.valueOf((i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
+					String.valueOf((i) * generator.getAdditionalTravelBufferPerIterationInMinutes())});
 				writer.newLine();
 				writer.flush();  // Ensure it's written immediately
 
@@ -136,7 +136,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 										int additionalTravelBufferPerIterationInMinutes) {
 
 		double maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
-		int usedTravelTimeBuffer = additionalTravelBufferPerIterationInMinutes * 60; // buffer for the driving time; for unsolved carriers the buffer will be increased over time
+		int usedTravelTimeBufferInSeconds = additionalTravelBufferPerIterationInMinutes * 60; // buffer for the driving time; for unsolved carriers the buffer will be increased over time
+		CarrierVehicle newCarrierVehicle = null;
 		for (int j = 0; j < 200; j++) {
 			if (generator.getServiceDurationTimeSelector().get(key) == null) {
 				System.out.println("key: " + key);
@@ -151,12 +152,16 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
 				int possibleValue = rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
 				// checks if the service duration will not exceed the vehicle availability including the buffer
-				if (possibleValue + usedTravelTimeBuffer <= maxVehicleAvailability)
+				if (possibleValue + usedTravelTimeBufferInSeconds <= maxVehicleAvailability) {
+					if (newCarrierVehicle != null)
+						log.info("New maxVehicleAvailability of vehicle '{}' of carrier '{}': {}", newCarrierVehicle.getId(), carrier.getId(), maxVehicleAvailability);
+					else
+						log.info("Changed service duration for carrier '{}' to fit vehicle duration with usedTravelTimeBufferInMinutes {}.", carrier.getId(), additionalTravelBufferPerIterationInMinutes);
 					return possibleValue;
+				}
 			}
 			if (j > 100){
 				CarrierVehicle carrierVehicleToChange = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().sorted(Comparator.comparingDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime())).toList().getFirst();
-				log.info("Changing vehicle availability for carrier {}. Old maxVehicleAvailability: {}", carrier.getId(), maxVehicleAvailability);
 				int tourDuration = 0;
 				int vehicleStartTime = 0;
 				int vehicleEndTime = 0;
@@ -166,12 +171,11 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					tourDuration = t.getVehicleTourDuration();
 					vehicleEndTime = vehicleStartTime + tourDuration;
 				}
-				CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(carrierVehicleToChange.getId(), carrierVehicleToChange.getLinkId(),
+				newCarrierVehicle = CarrierVehicle.Builder.newInstance(carrierVehicleToChange.getId(), carrierVehicleToChange.getLinkId(),
 					carrierVehicleToChange.getType()).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
 				carrier.getCarrierCapabilities().getCarrierVehicles().remove(carrierVehicleToChange.getId());
 				carrier.getCarrierCapabilities().getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
 				maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
-				log.info("New maxVehicleAvailability: {}", maxVehicleAvailability);
 			}
 		}
 
