@@ -53,8 +53,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputPath.toString())) {
 			// Write header only if the file is newly created
 			if (Files.size(outputPath) == 0) {
-				String[] header = {"iteration", "carriersWithUnhandledJobs", "carriersSolvedInIteration",
-					"carriersNotSolvedInIteration", "additionalBuffer"};
+				String[] header = {"iteration", "carriersWithUnhandledJobsBeforeLoopIteration", "carriersSolvedInIteration",
+					"carriersNotSolvedInIteration", "additionalBufferInMinutes"};
 				JOIN.appendTo(writer, header);
 				writer.newLine();
 			}
