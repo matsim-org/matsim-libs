@@ -84,7 +84,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
             }
           }
           case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierService.getId().toString())) {
+            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierShipment.getId().toString())) {
               logLoadAndTransport(event);
             }
           }
