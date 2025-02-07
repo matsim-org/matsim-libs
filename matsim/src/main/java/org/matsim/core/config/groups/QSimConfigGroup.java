@@ -57,6 +57,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
+	private static final String NOTIFY_ABOUT_STUCK_VEHICLES = "notifyAboutStuckVehicles";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
@@ -88,6 +89,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
+	private boolean notifyAboutStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
 	@Positive
 	private int numberOfThreads = 1;
@@ -406,6 +408,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(REMOVE_STUCK_VEHICLES)
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
+	}
+
+	@StringSetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public void setNotifyAboutStuckVehicles(final boolean notifyAboutStuckVehicles) {
+		this.notifyAboutStuckVehicles = notifyAboutStuckVehicles;
+	}
+
+	@StringGetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public boolean isNotifyAboutStuckVehicles() {
+		return this.notifyAboutStuckVehicles;
 	}
 
 	@StringSetter(FAST_CAPACITY_UPDATE)
