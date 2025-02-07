@@ -432,8 +432,8 @@ import org.matsim.vehicles.VehicleType;
 	                }
 	                default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
 	            }
+				lspShipment.addSimulationTracker(tourHandler);
 	            lspShipment.addSimulationTracker(serviceHandler);
-	            lspShipment.addSimulationTracker(tourHandler);
 	            break;
 	        }
 	    }
