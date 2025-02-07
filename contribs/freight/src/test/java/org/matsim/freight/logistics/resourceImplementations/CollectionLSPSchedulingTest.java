@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.matsim.freight.logistics.LSPConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -164,7 +165,7 @@ public class CollectionLSPSchedulingTest {
 		for (LspShipment shipment : collectionLSP.getLspShipments()) {
 			assertEquals(3, LspShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
-			assertEquals("UNLOAD", planElements.get(2).getElementType());
+			assertEquals(UNLOAD, planElements.get(2).getElementType());
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
@@ -172,7 +173,7 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(planElements.get(2).getStartTime() <= (24*3600));
 			assertSame(planElements.get(2).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(2).getLogisticChainElement(), collectionElement);
-			assertEquals("TRANSPORT", planElements.get(1).getElementType());
+			assertEquals(TRANSPORT, planElements.get(1).getElementType());
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertEquals(planElements.get(2).getStartTime(), planElements.get(1).getEndTime(), 0.0);
@@ -181,7 +182,7 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(planElements.get(1).getStartTime() <= (24*3600));
 			assertSame(planElements.get(1).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(1).getLogisticChainElement(), collectionElement);
-			assertEquals("LOAD", planElements.get(0).getElementType());
+			assertEquals(LOAD, planElements.get(0).getElementType());
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.get(0).getEndTime() <= (24*3600));
 			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
