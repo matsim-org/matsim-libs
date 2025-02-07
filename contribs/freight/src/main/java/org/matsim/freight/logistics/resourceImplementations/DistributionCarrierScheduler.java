@@ -112,18 +112,20 @@ import org.matsim.vehicles.VehicleType;
 						}
 					}
 					case shipmentBased -> {
-						log.error("This is not implemented properly at the moment!");
+						log.warn("Not sure, if assind of the shipment<load|transport|Unload> element is not implemented properly at the moment for the shipment-based VRP.!");
 						//TODO needs to get fixed. KMT'Aug'24
-//						for (TourElement element : tour.getTourElements()) {
-//							if (element instanceof Tour.Delivery deliveryActivity) {
-//								if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
-//									addShipmentLoadElement(lspShipment, tour);
-//									addShipmentTransportElement(lspShipment, tour, deliveryActivity);
-//									addShipmentUnloadElement(lspShipment, deliveryActivity);
-//									addDistributionEventHandlers(serviceActivity, lspShipment, resource, tour);
-//								}
-//							}
-//						}
+						for (TourElement element : tour.getTourElements()) {
+							if (element instanceof Tour.Delivery deliveryActivity) {
+								if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
+									//Todo: Nachdenken, was hier nun wie eingetragen werden muss. Nutzung Pickup und Delivery?
+									// Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
+									addShipmentLoadElement(lspShipment, tour);
+									addShipmentTransportElement(lspShipment, tour, deliveryActivity);
+									addShipmentUnloadElement(lspShipment, deliveryActivity);
+									addDistributionEventHandlers(deliveryActivity, lspShipment, resource, tour);
+								}
+							}
+						}
 					}
 					default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
 				}
@@ -279,8 +281,8 @@ import org.matsim.vehicles.VehicleType;
 			.build();
 		//ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
 		if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
-			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
-				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+			log.error("Id of LspShipment: {} and CarrierShipment: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
+				new IllegalStateException("Id of LspShipment and CarrierShipment do not match"));
 		}
 		return carrierShipment;
 	}
