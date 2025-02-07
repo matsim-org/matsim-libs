@@ -23,7 +23,6 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
@@ -425,12 +424,12 @@ import org.matsim.vehicles.VehicleType;
 	            LSPTourStartEventHandler tourHandler;
 	            switch (tourActivity) {
 	                case Tour.ServiceActivity serviceActivity -> {
-	                    serviceHandler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource, null);
-	                    tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, null);
+	                    serviceHandler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource);
+	                    tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
 	                }
 	                case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-	                    serviceHandler = new DistributionServiceStartEventHandler(null, lspShipment, element, resource, shipmentBasedActivity.getShipment());
-	                    tourHandler = new LSPTourStartEventHandler(lspShipment, null, element, resource, tour, shipmentBasedActivity.getShipment());
+	                    serviceHandler = new DistributionServiceStartEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
+	                    tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
 	                }
 	                default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
 	            }

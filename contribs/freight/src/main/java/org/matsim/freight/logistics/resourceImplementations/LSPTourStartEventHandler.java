@@ -24,10 +24,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 import java.util.Objects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.CarrierShipment;
-import org.matsim.freight.carriers.Tour;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
@@ -41,27 +38,17 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
-/*package-private*/ class LSPTourStartEventHandler
-        implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
+/*package-private*/ class LSPTourStartEventHandler implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final Tour tour;
-  private final CarrierService carrierService;
-  private final CarrierShipment carrierShipment;
+  private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
 
-  public LSPTourStartEventHandler(
-          LspShipment lspShipment,
-          CarrierService carrierService,
-          LogisticChainElement logisticChainElement,
-          LSPCarrierResource resource,
-          Tour tour,
-          CarrierShipment carrierShipment)
-  {
+  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour) {
     this.lspShipment = lspShipment;
-    this.carrierService = carrierService;
-    this.carrierShipment = carrierShipment;
+    this.carrierJob = carrierJob;
     this.logisticChainElement = logisticChainElement;
     this.resource = resource;
     this.tour = tour;
@@ -79,12 +66,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
         switch (tourElement) {
           //This could even be short, if the Id would be available already on the level of Tour.TourActivity. KMT Oct'24
           case ServiceActivity serviceActivity -> {
-            if (serviceActivity.getService().getId() == carrierService.getId()) {
+            if (serviceActivity.getService().getId() == carrierJob.getId()) {
               logLoadAndTransport(event);
             }
           }
           case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierShipment.getId().toString())) {
+            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierJob.getId().toString())) {
               logLoadAndTransport(event);
             }
           }
@@ -150,8 +137,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     return cumulatedLoadingTime;
   }
 
-  public CarrierService getCarrierService() {
-    return carrierService;
+  public CarrierJob getCarrierJob() {
+    return carrierJob;
   }
 
   public LspShipment getLspShipment() {

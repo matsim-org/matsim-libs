@@ -360,7 +360,7 @@ import org.matsim.vehicles.VehicleType;
     for (LogisticChainElement element : this.resource.getClientElements()) {
       if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
         LSPTourStartEventHandler handler =
-            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour, null);
+            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
         lspShipment.addSimulationTracker(handler);
         break;
       }

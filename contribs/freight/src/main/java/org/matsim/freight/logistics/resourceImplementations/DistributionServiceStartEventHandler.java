@@ -24,8 +24,8 @@ package org.matsim.freight.logistics.resourceImplementations;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.CarrierJob;
 import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
@@ -46,16 +46,13 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
         CarrierShipmentDeliveryStartEventHandler,
         LSPSimulationTracker<LspShipment> {
 
-  private final CarrierService carrierService;
-  private final CarrierShipment carrierShipment;
+  private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
 
-  DistributionServiceStartEventHandler(CarrierService carrierService, LspShipment lspShipment, LogisticChainElement element,
-									   LSPCarrierResource resource, CarrierShipment carrierShipment) {
-    this.carrierShipment = carrierShipment;
-    this.carrierService = carrierService;
+  DistributionServiceStartEventHandler(CarrierJob carrierJob, LspShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
+    this.carrierJob = carrierJob;
     this.lspShipment = lspShipment;
     this.logisticChainElement = element;
     this.resource = resource;
@@ -68,7 +65,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierServiceStartEvent event) {
-    if (event.getServiceId() == carrierService.getId()
+    if (event.getServiceId() == carrierJob.getId()
             && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
@@ -77,7 +74,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-    if (event.getShipmentId() == this.carrierShipment.getId()
+    if (event.getShipmentId() == this.carrierJob.getId()
             && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
@@ -146,9 +143,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   //Todo: Wird das auch inhaltlich irgendwo genutzt,oder ist das nur für die Tests da?
   //todo ctd. Brauchen wir den CarrierService hier eigentlich wirklich oder kann das zurück gebaut werden? KMT Okt'24
-  public CarrierService getCarrierService() {
-    return carrierService;
-  }
+  public CarrierJob getCarrierJob() {return carrierJob;  }
 
   public LspShipment getLspShipment() {
     return lspShipment;
