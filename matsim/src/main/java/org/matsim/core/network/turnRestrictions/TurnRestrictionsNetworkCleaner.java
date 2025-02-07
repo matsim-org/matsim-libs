@@ -141,12 +141,8 @@ public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
                     link.getCapacity(),
                     link.getNumberOfLanes()
             );
-            for (Map.Entry<String, Object> attribute : coloredLink.link.getAttributes().getAsMap().entrySet()) {
-                // copy all attributes except initial turn restrictions
-                if (!attribute.getKey().equals(NetworkUtils.DISALLOWED_NEXT_LINKS_ATTRIBUTE)) {
-                    linkCopy.getAttributes().putAttribute(attribute.getKey(), attribute.getValue());
-                }
-            }
+            // copy all attributes except initial turn restrictions
+            NetworkUtils.copyAttributesExceptDisallowedNextLinks(coloredLink.link, linkCopy);
             network.addLink(linkCopy);
         }
     }

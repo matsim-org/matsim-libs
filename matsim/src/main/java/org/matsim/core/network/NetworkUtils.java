@@ -46,6 +46,7 @@ import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -1010,7 +1011,7 @@ public final class NetworkUtils {
 		return result;
 	}
 
-	public static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
+	private static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
 
 	@Nullable
 	public static DisallowedNextLinks getDisallowedNextLinks(Link link) {
@@ -1037,6 +1038,10 @@ public final class NetworkUtils {
 
 	public static void removeDisallowedNextLinks(Link link) {
 		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static void copyAttributesExceptDisallowedNextLinks(Link from, Link to) {
+		AttributesUtils.copyAttributesFromToExcept(from, to, DISALLOWED_NEXT_LINKS_ATTRIBUTE);
 	}
 
 	public static void addAllowedMode(Link link, String mode) {
