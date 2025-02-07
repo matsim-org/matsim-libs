@@ -211,25 +211,40 @@ import org.matsim.vehicles.VehicleType;
 	 */
 	private void scheduleCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
 		//Todo: implement it.
-		throw new NotImplementedException("This method is not implemented yet. KMT feb'25");
+//		throw new NotImplementedException("This method is not implemented yet. KMT feb'25");
 
-		//Das ist ein erster Versuch den Rahmen anzugeben.
-//		Carrier auxCarrier = CarriersUtils.createCarrier(Id.create("auxCarrier", Carrier.class));
-//		CarrierVehicle carrierVehicle = null; //Todo: Add CarrierVehicle
-//		CarrierCapabilities cc = CarrierCapabilities.Builder.newInstance()
-//			.addVehicle(carrierVehicle)
-//			.setFleetSize(FleetSize.INFINITE)
-//			.build();
-//		auxCarrier.setCarrierCapabilities(cc);
-//
-//		//add all shipments.
-//		for (LspShipment lspShipment : shipmentsToSchedule) {
-//			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
-//			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
-//		}
-//
-//		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
+		Carrier auxCarrier = CarriersUtils.createCarrier(Id.create("auxCarrier", Carrier.class));
+		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance();
+		ccBuilder.setFleetSize(FleetSize.INFINITE);
 
+		//copy all vehicles from the original carrier to the auxiliary carrier.
+		var startTime = 0.0; //Todo set to something meaningful, e.g. arrivalTime of the first shipment.
+		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			var cv = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
+				.setEarliestStart(startTime)
+				.setLatestEnd(24 * 60 * 60)
+				.build();
+			ccBuilder.addVehicle(carrierVehicle);
+		}
+
+		auxCarrier.setCarrierCapabilities(ccBuilder.build());
+
+		//add all shipments.
+		for (LspShipment lspShipment : shipmentsToSchedule) {
+			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
+			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+		}
+
+		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
+
+		//Copy infos over to the Carrier.
+
+		CarrierPlan plan = new CarrierPlan(carrier, auxCarrier.getSelectedPlan().getScheduledTours()); //TODO: Why do we need the carrier here to create the CarrierPlan? KMT feb'25
+		plan.setScore(auxCarrier.getSelectedPlan().getScore());
+   		plan.setJspritScore(auxCarrier.getSelectedPlan().getJspritScore());
+		carrier.getShipments().putAll(auxCarrier.getShipments());
+		carrier.addPlan(plan);
+		carrier.setSelectedPlan(plan);
 	}
 
 
@@ -269,8 +284,6 @@ import org.matsim.vehicles.VehicleType;
 		}
 		return carrierShipment;
 	}
-
-
 
 
 	private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
