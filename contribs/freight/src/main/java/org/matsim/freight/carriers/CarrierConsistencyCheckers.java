@@ -33,30 +33,32 @@ public class CarrierConsistencyCheckers {
 	 */
 	public static boolean capacityCheck(Carriers carriers) {
 
-		//Map, in der CarrierID und true (=Kapazität reicht)/false(=Kapazität reicht nicht) gespeichert wird. Sind alle values = true, return true. Min. 1 value = false, return false.
+		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 
-		//determine the capacity of all available vehicles (carrier after carrier)
+		//go through all carriers after one another
 		for (Carrier carrier : carriers.getCarriers().values()) {
+			//List with all vehicle capacities of the current carrier
 			List<Double> vehicleCapacityList = new ArrayList<>();
+			//List with all jobs with a higher capacity demand than the largest vehicle's capacity
 			List<CarrierJob> jobTooBigForVehicle = new LinkedList<>();
-
+			//iterates through all vehicles of the current carrier and determines the vehicle capacities
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				vehicleCapacityList.add(carrierVehicle.getType().getCapacity().getOther());
 			}
-			//determine the vehicle with the highest capacity
+			//determine the highest capacity
 			final double maxVehicleCapacity = Collections.max(vehicleCapacityList);
 
 			//a carrier has only one job type: shipments OR services
-			//checks if the largest vehicle is sufficient for all jobs (=shipment)
-			//if not, job is added to the jobTooBigForVehicle-List.
+			//checks if the largest vehicle is sufficient for all shipments
+			//if not, shipment is added to the jobTooBigForVehicle-List.
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				if (shipment.getCapacityDemand() > maxVehicleCapacity) {
 					jobTooBigForVehicle.add(shipment);
 				}
 			}
-			//checks if the largest vehicle is sufficient for all jobs (=service)
-			//if not, job is added to the jobTooBigForVehicle-List.
+			//checks if the largest vehicle is sufficient for all services
+			//if not, service is added to the jobTooBigForVehicle-List.
 			for (CarrierService service : carrier.getServices().values()) {
 				if (service.getCapacityDemand() > maxVehicleCapacity) {
 					jobTooBigForVehicle.add(service);
@@ -65,7 +67,7 @@ public class CarrierConsistencyCheckers {
 
 			//if map is empty, there is a sufficient vehicle for every job
 			if (jobTooBigForVehicle.isEmpty()) {
-				log.info("Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity); //TODO: kann weg, wenn alles funktioniert.
+				log.info("Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity);
 				isCarrierCapable.put(carrier.getId(), true);
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
@@ -91,33 +93,34 @@ public class CarrierConsistencyCheckers {
 	public static boolean vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
-		//determine the operating hours of all available vehicles
+		//go through all carriers
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			//vehicleOperationWindows saves vehicle's ID along with its operation hours
 			Map<Id<Vehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
-			//these three maps save the job's ID along with its time window.
+			//these three maps save the job's ID along with its time window (pickup, delivery, service)
 			Map<Id<? extends CarrierJob>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ShipmentDeliveryInfo> shipmentDeliveryWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ServiceInfo> serviceWindows = new HashMap<>();
-			//feasibleJob saves jobID and vehicle ID of feasible Jobs
+			//feasibleJob saves job ID and vehicle ID of all feasible Jobs
 			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
-			//nonFeasibleJob saves JobIDs and reason why a job can not be handled by a carrier -> not enough capacity at all (=job is too big for all existing vehicles) OR no sufficient vehicle in operation
+			//nonFeasibleJob saves Job ID and reason why a job can not be handled by a carrier -> not enough capacity at all (=job is too big for all existing vehicles) OR no sufficient vehicle in operation
 			Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
-
+			//go through all vehicles of the current carrier and determine vehicle ID, operation time window & capacity
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				//read vehicle ID
 				Id<Vehicle> vehicleID = carrierVehicle.getId();
-				//read earliest start and end of vehicle in seconds after midnight (21600 = 06:00:00 (am), 64800 = 18:00:00)
+				//get the start and end times of vehicle
 				var vehicleOperationStart = carrierVehicle.getEarliestStartTime();
 				var vehicleOperationEnd = carrierVehicle.getLatestEndTime();
+				//get vehicle capacity
 				var vehicleCapacity = carrierVehicle.getType().getCapacity().getOther();
 				//create TimeWindow with start and end of operation
 				TimeWindow operationWindow = TimeWindow.newInstance(vehicleOperationStart, vehicleOperationEnd);
-				//write vehicle ID (key as Id) and time window of operation (value as TimeWindow) in HashMap
+				//write in Map: vehicle ID and Map VehicleInfo (time window of operation & capacity)
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
 			/**
-			* SHIPMENTS PART
+			* SHIPMENTS PART - Pickup
 			*/
 			//collects information about all existing shipments: IDs, times for pickup, capacity demand
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
@@ -157,7 +160,9 @@ public class CarrierConsistencyCheckers {
 					nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup");
 				}
 			}
-
+			/**
+			 * SHIPMENTS PART - Delivery
+			 */
 			//see for-loop above. This loop does the same but for delivery instead of pickup
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentDeliveryWindows.put(shipment.getId(), new ShipmentDeliveryInfo(shipment.getDeliveryStartingTimeWindow(), shipment.getCapacityDemand()));
@@ -225,17 +230,23 @@ public class CarrierConsistencyCheckers {
 			}
 			if(nonFeasibleJob.isEmpty()) {
 				isCarrierCapable.put(carrier.getId(), true);
-				log.info("Carrier " + carrier.getId() + " is able to handle all given jobs.");
 			} else {
 				isCarrierCapable.put(carrier.getId(), false);
-				log.warn("Carrier " + carrier.getId() + " is NOT able to handle given jobs.");
 			}
-
+			//TODO: Debug only, kann weg wenn alles läuft.
+			log.warn(nonFeasibleJob.toString());
 		}
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen
 		//theoretisch könnte man den Ausdruck kürzen (s. IntelliJ Vorschlag), ich lasse es aber erstmal so, bis entschieden ist, was vehicleScheduleTest zurückgeben soll.
 		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v->v);
+		isCarrierCapable.forEach((key, value) -> {
+			if (value) {
+				log.info("Carrier " + key + " can handle all jobs.");
+			} else {
+				log.warn("Carrier " + key + " can not handle all jobs.");
+			}
+		});
 		return allCarriersCapable;
 	}
 
