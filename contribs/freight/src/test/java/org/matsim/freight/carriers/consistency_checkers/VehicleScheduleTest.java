@@ -1,7 +1,5 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -23,8 +21,6 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  *
  */
 public class VehicleScheduleTest {
-
-	private static final Logger log = LogManager.getLogger(VehicleScheduleTest.class);
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
@@ -57,6 +53,7 @@ public class VehicleScheduleTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
+		System.out.println(areCarriersCapable);
 		Assert.isTrue(areCarriersCapable, "All jobs can be handled.");
 	}
 	@Test
@@ -64,8 +61,13 @@ public class VehicleScheduleTest {
 		/**
 		 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 		 * This test should return false, because:
-		 * - carrier "ccCarrierWithShipments1"'s vehicle "cargo_bike" is not in operation when shipment "small_shipment" needs to be picked up.
-		 * - carrier "ccCarrierWithShipment2"'s vehicle "medium_truck" is not in operation when shipment "large_shipment" needs to be delivered.
+		 * - carrier "ccCarrierWithShipments1":
+		 * 		no vehicle is in operation when shipment "small_shipment_1" needs to be delivered
+		 * 		shipment "large_shipment_1" is too big for all vehicles
+		 *
+		 * - carrier "ccCarrierWithShipment2":
+		 * 		no vehicle is not in operation when shipment "small_shipment_2" needs to be picked up
+		 * 		shipment "large_shipment_2" is too big for all vehicles
 		 */
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
@@ -127,8 +129,12 @@ public class VehicleScheduleTest {
 		/**
 		 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 		 * This test should return false, because:
-		 * - carrier "ccCarrierWithShipments1"'s vehicle "cargo_bike" is not in operation when shipment "small_shipment" needs to be picked up.
-		 * - carrier "ccCarrierWithShipment2"'s vehicle "medium_truck" is not in operation when shipment "large_shipment" needs to be delivered.
+		 * - carrier "ccCarrierWithShipments1":
+		 * 		small_service_1: no vehicle in operation
+		 * 		medium_service_1: vehicle in operation is too small
+		 *		extra_large_service_1: vehicle in operation is too small
+		 * - carrier "ccCarrierWithShipment2":
+		 *		extra_large_service_2: vehicles are too small
 		 */
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();

@@ -35,13 +35,6 @@ public class CarrierConsistencyCheckers {
 
 		//Map, in der CarrierID und true (=Kapazität reicht)/false(=Kapazität reicht nicht) gespeichert wird. Sind alle values = true, return true. Min. 1 value = false, return false.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
-		//@Anton: Sollte das nicht auch besser in die for (carrier) Schleife? Sonst ist das ja wieder Carrier-Übergreifend...
-		// Weiter nachgedacht: Es macht total Sinn, dass generell die Rückgabe über alle Carrier erfolgt. Aber dann muss die Logik sein, dass es True ist, wenn
-		// für alle(!) Carrier die Bedingung erfüllt ist. Wenn nur ein Carrier nicht erfüllt ist, dann False. Oder?
-		//@KMT: na klar, da habe ich gestern gar nicht dran gedacht... wie findet du diese Umsetzung? Map wird mit CarrierID + true/false bestückt,
-		// am Ende wird die Map ausgewertet und ein gemeinsamer boolean (oder wofür wir uns am Ende entscheiden) zurückgegeben.
-		// TODO -> Kommentare können weg, wenn es so passt.
-
 
 		//determine the capacity of all available vehicles (carrier after carrier)
 		for (Carrier carrier : carriers.getCarriers().values()) {
@@ -94,17 +87,22 @@ public class CarrierConsistencyCheckers {
 	/**
 	* this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
 	*/
+	//@KMT: ich habe hier einiges umgebaut, beim Erstellen der verschiedenen Tests ist mir ein Logikfehler aufgefallen.
 	public static boolean vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
-		//nonFeasibleJob saves JobIDs and reason why a job can not be handled by a carrier -> not enough capacity at all (=job is too big for all existing vehicles) OR no sufficient vehicle in operation
-		Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
 		//determine the operating hours of all available vehicles
 		for (Carrier carrier : carriers.getCarriers().values()) {
+			//vehicleOperationWindows saves vehicle's ID along with its operation hours
 			Map<Id<Vehicle>, VehicleInfo> vehicleOperationWindows = new HashMap<>();
+			//these three maps save the job's ID along with its time window.
 			Map<Id<? extends CarrierJob>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ShipmentDeliveryInfo> shipmentDeliveryWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ServiceInfo> serviceWindows = new HashMap<>();
+			//feasibleJob saves jobID and vehicle ID of feasible Jobs
+			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
+			//nonFeasibleJob saves JobIDs and reason why a job can not be handled by a carrier -> not enough capacity at all (=job is too big for all existing vehicles) OR no sufficient vehicle in operation
+			Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
 
 			for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 				//read vehicle ID
@@ -126,92 +124,113 @@ public class CarrierConsistencyCheckers {
 				shipmentPickupWindows.put(shipment.getId(), new ShipmentPickupInfo(shipment.getPickupStartingTimeWindow(), shipment.getCapacityDemand()));
 			}
 
-			//collects information about all existing shipments: IDs, times for delivery, capacity demand
+			//run through all existing shipments
+			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
+				//determine pickup time window
+				ShipmentPickupInfo pickupInfo = shipmentPickupWindows.get(shipmentID);
+				//possibleVehicles will save all sufficient vehicles (only needed for debug but should remain here)
+				List<Id<Vehicle>> possibleVehicles = new ArrayList<>();
+				//isTransportable will be true if the current shipment can be transported by at least one vehicle
+				boolean isTransportable = false;
+				boolean capacityFits = false;
+				boolean pickupOverlap = false;
+
+				//runs through all vehicles
+				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
+					//determines operation hours of current vehicle
+					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
+					//determines if the capacity of the current vehicle is sufficient for the shipment's demand
+					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), pickupInfo.capacityDemand());
+					//determines if the operation hours overlap with shipment's time window
+					pickupOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), pickupInfo.pickupWindow());
+
+						//if the shipment fits in the current vehicle and the vehicle is in operation: shipment is transportable
+						if (capacityFits && pickupOverlap) {
+						isTransportable = true;
+						possibleVehicles.add(vehicleID);
+					}
+				}
+				//if shipment is transportable => job is feasible
+				if (isTransportable) {
+					feasibleJob.put(shipmentID, possibleVehicles);
+				} else {
+					nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup");
+				}
+			}
+
+			//see for-loop above. This loop does the same but for delivery instead of pickup
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentDeliveryWindows.put(shipment.getId(), new ShipmentDeliveryInfo(shipment.getDeliveryStartingTimeWindow(), shipment.getCapacityDemand()));
 			}
-
-			//checks if a vehicle with enough capacity is in operation to handle given shipments
-			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
-				ShipmentPickupInfo pickupInfo = shipmentPickupWindows.get(shipmentID);
+			for (Id<? extends CarrierJob> shipmentID : shipmentDeliveryWindows.keySet()) {
 				ShipmentDeliveryInfo deliveryInfo = shipmentDeliveryWindows.get(shipmentID);
+				List<Id<Vehicle>> possibleVehicles = new ArrayList<>();
+				boolean isTransportable = false;
 				boolean capacityFits = false;
-				boolean pickupOverlap = false;
 				boolean deliveryOverlap = false;
 
 				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
 					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
-
-					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), pickupInfo.capacityDemand());
-
-					pickupOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), pickupInfo.pickupWindow());
-
+					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), deliveryInfo.capacityDemand());
 					deliveryOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), deliveryInfo.deliveryWindow());
 
-					//if vehicle has enough capacity and is in operation during pickup + delivery times, the carrier is capable of handling the shipment
-					//@KMT: Aktuell muss EIN Fahrzeug pickup & delivery machen können, ist es theoretisch möglich, dass Fzg A einsammelt und Fzg B ausliefert? Dann müsste ich für die shipments nochmal was an der Logik ändern
-					//-> die services betrifft das ja nicht, weil es nur ein Zeitfenster gibt.
-					if (capacityFits && pickupOverlap && deliveryOverlap) {
-						isCarrierCapable.put(carrier.getId(), true);
-					} else {
-						//TODO: Logikproblem: Es wird nicht beachtet, ob der Job von einem anderen Fahrzeug erledigt werden kann. Wenn eine der
-						// Voraussetzungen nicht erfüllt wird, kommt es in nonFeasibleJob, obwohl es vllt von einem anderen Fzg befördert werden kann
-						// Test Ergebnis ist korrekt, weil isCarrierCapable wie vorgesehen funktioniert, aber Fehlermeldungen sind falsch.
-						isCarrierCapable.put(carrier.getId(), false);
-						if (!capacityFits) {
-							nonFeasibleJob.put(shipmentID, "Vehicle(s) in operation is too small.");
-						} else if (!pickupOverlap) {
-							nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
-						} else if (!deliveryOverlap) {
-							nonFeasibleJob.put(shipmentID, "No sufficient vehicle in operation");
-						} else {
-							throw new RuntimeException("Unexpected outcome: vehicleScheduleTest, Line 160.");
-						}
+					if (capacityFits && deliveryOverlap) {
+						isTransportable = true;
+						possibleVehicles.add(vehicleID);
 					}
+				}
+				if (isTransportable) {
+					feasibleJob.put(shipmentID, possibleVehicles);
+				} else {
+					//if current shipment is already saved in nonFeasibleJob, the shipment can neither be picked up nor delivered
+					if (nonFeasibleJob.containsKey(shipmentID)) {
+						nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup and delivery");
+					} else {
+						nonFeasibleJob.put(shipmentID, "No sufficient vehicle for delivery");
+					}
+
 				}
 			}
 
 			/**
 			 * SERVICES PART
 			 */
-			//collects information about all existing services: IDs, time window, capacity demand
+			//see for-loop above. This loop does the same but for services instead of shipments
 			for (CarrierService service : carrier.getServices().values()) {
 				serviceWindows.put(service.getId(), new ServiceInfo(service.getServiceStaringTimeWindow(), service.getCapacityDemand()));
 			}
 
-			//checks if a vehicle with enough capacity is in operation to handle given services
-			for (Id<? extends CarrierJob> serviceId : serviceWindows.keySet()) {
-				ServiceInfo serviceInfo = serviceWindows.get(serviceId);
+			for (Id<? extends CarrierJob> serviceID : serviceWindows.keySet()) {
+				ServiceInfo serviceInfo = serviceWindows.get(serviceID);
+				List<Id<Vehicle>> possibleVehicles = new ArrayList<>();
+				boolean isTransportable = false;
 				boolean capacityFits = false;
-				boolean serviceWindow = false;
+				boolean serviceOverlap = false;
 
 				for (Id<Vehicle> vehicleID : vehicleOperationWindows.keySet()) {
 					VehicleInfo vehicleInfo = vehicleOperationWindows.get(vehicleID);
-
 					capacityFits = doesShipmentFitInVehicle(vehicleInfo.capacity(), serviceInfo.capacityDemand());
+					serviceOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), serviceInfo.serviceWindow());
 
-					serviceWindow = doTimeWindowsOverlap(vehicleInfo.operationWindow(), serviceInfo.serviceWindow());
-
-					//if vehicle has enough capacity and is in operation during service time, the carrier is capable of handling the shipment
-					if (capacityFits && serviceWindow) {
-						isCarrierCapable.put(carrier.getId(), true);
-					} else {
-						//TODO: Logikproblem: Es wird nicht beachtet, ob der Job von einem anderen Fahrzeug erledigt werden kann. Wenn eine der
-						// Voraussetzungen nicht erfüllt wird, kommt es in nonFeasibleJob, obwohl es vllt von einem anderen Fzg befördert werden kann
-						// Test Ergebnis ist korrekt, weil isCarrierCapable wie vorgesehen funktioniert, aber Fehlermeldungen sind falsch.
-						isCarrierCapable.put(carrier.getId(), false);
-						if (!capacityFits) {
-							log.warn(serviceId + ": Vehicle(s) in operation is too small. " + vehicleID);
-							nonFeasibleJob.put(serviceId, "Vehicle(s) in operation is too small.");
-						} else if (!serviceWindow) {
-							log.warn(serviceId + ": No sufficient vehicle in operation "+vehicleID);
-							nonFeasibleJob.put(serviceId, "No sufficient vehicle in operation");
-						} else {
-							throw new RuntimeException("Unexpected outcome: vehicleScheduleTest, Line 160.");
-						}
+					if (capacityFits && serviceOverlap) {
+						isTransportable = true;
+						possibleVehicles.add(vehicleID);
 					}
 				}
+				if (isTransportable) {
+					feasibleJob.put(serviceID, possibleVehicles);
+				} else {
+					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service");
+				}
 			}
+			if(nonFeasibleJob.isEmpty()) {
+				isCarrierCapable.put(carrier.getId(), true);
+				log.info("Carrier " + carrier.getId() + " is able to handle all given jobs.");
+			} else {
+				isCarrierCapable.put(carrier.getId(), false);
+				log.warn("Carrier " + carrier.getId() + " is NOT able to handle given jobs.");
+			}
+
 		}
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen

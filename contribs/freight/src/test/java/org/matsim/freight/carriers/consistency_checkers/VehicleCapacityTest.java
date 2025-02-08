@@ -50,7 +50,7 @@ public class VehicleCapacityTest {
 
 	@Test
 	void testVehicleCapacityShipments_failes() {
-		/*
+		/**
 		 * This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return FALSE.
 		 * ccCarrierWithShipments1: shipment "large_shipment" capacity demand of 33 is too high
 		 * ccCarrierWithShipments2: shipment "large_shipment" capacity demand of 16 is too high
@@ -98,10 +98,10 @@ public class VehicleCapacityTest {
 
 	@Test
 	void testVehicleCapacityServices_failes() {
-		/*
+		/**
 		 * This test will check if the vehicles of carriers c1 and c2 have enough capacity to handle the given jobs. This test should return FALSE.
-		 * ccCarrierWithServices1: services "very_large_service" & "extra_large_service" capacity demand of 31/42 is too high
-		 * ccCarrierWithServices2: shipment "medium_large_service" & "large_service" capacity demand of 16/22 is too high
+		 * ccCarrierWithServices1: service "extra_large_service" capacity demand of 31 is too high
+		 * ccCarrierWithServices2: service "extra_large_service" capacity demand of 33 is too high
 		 */
 		Config config = ConfigUtils.createConfig();
 
