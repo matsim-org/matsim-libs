@@ -2,7 +2,6 @@ package org.matsim.freight.carriers.consistency_checkers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.locationtech.jts.util.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -20,6 +19,9 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  * 	 * is higher than the highest vehicle capacity, capacityCheck will return false and a log warning with details about the affected carrier(s) and job(s).
  *
  * 	 */
+
+//@KMT: hier ist schon alles auf enum als return geändert, kannst du dir das kurz ansehen, bevor ich es auch für den ScheduleTest ändere?
+
 public class VehicleCapacityTest {
 
 	@RegisterExtension
@@ -44,9 +46,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
-		Assertions.assertTrue(areCarriersCapable, "At least one vehicle of every carrier has enough capacity for the largest job.");
-
+		CarrierConsistencyCheckers.CapacityCheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CapacityCheckResult.CAPACITY_SUFFICIENT, testResult, "At least one carrier has no sufficient vehicle!");
 	}
 
 	/**
@@ -70,13 +71,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
-		//TODO: @KMT: Assert.isFalse kann leider nicht gefunden werden, ich habe aber in der Bibliothek von junit "Assertions.assertFalse" gefunden, kann/darf ich das auch benutzen?
-		// @Anton: Jo, passt. Habe das oben auch angepasst auf Assertions.
-		Assertions.assertFalse(areCarriersCapable, "At least one shipment's capacity demand is too high.");
-		//@Todo @Anton: Die Fehlermeldungen in der Assertion sind so gemeint, dass diese ausgegeben werden, wenn die Überprüfung fehlschlägt.
-		// d.h., du müsstest mMn jeweils den Text umdrehen. --> Bitte auch bei den anderen Tests schauen.
-		// (Kannst du auch ausprobieren, wenn du mal den Test umdrehst oder den Input vertauschst ;) )
+		CarrierConsistencyCheckers.CapacityCheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CapacityCheckResult.CAPACITY_INSUFFICIENT, testResult, "At least one vehicle of every carrier has enough capacity for the largest job!");
 	}
 
 	/**
@@ -98,9 +94,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
-		Assert.isTrue(areCarriersCapable, "At least one vehicle of every carrier has enough capacity for the largest job.");
-
+		CarrierConsistencyCheckers.CapacityCheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CapacityCheckResult.CAPACITY_SUFFICIENT, testResult, "At least one carrier has no sufficient vehicle!");
 	}
 
 	/**
@@ -124,8 +119,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.capacityCheck(carriers);
-		Assertions.assertFalse(areCarriersCapable, "At least one shipment's capacity demand is too high.");
+		CarrierConsistencyCheckers.CapacityCheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CapacityCheckResult.CAPACITY_INSUFFICIENT, testResult, "At least one vehicle of every carrier has enough capacity for the largest job.");
 	}
 }
 

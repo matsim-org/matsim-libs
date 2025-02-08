@@ -8,7 +8,9 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 
 public class CarrierConsistencyCheckers {
-
+	public enum CapacityCheckResult {
+		CAPACITY_SUFFICIENT, CAPACITY_INSUFFICIENT
+	}
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
 
 	private static boolean doesShipmentFitInVehicle(Double capacity, Double demand) {
@@ -31,7 +33,7 @@ public class CarrierConsistencyCheckers {
 	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
 	 */
-	public static boolean capacityCheck(Carriers carriers) {
+	public static CapacityCheckResult capacityCheck(Carriers carriers) {
 
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
@@ -72,6 +74,7 @@ public class CarrierConsistencyCheckers {
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
 				isCarrierCapable.put(carrier.getId(), false);
+				//TODO: Für Montag: Wieso kommen .info und .warn durcheinander?
 				//@KMT: Die Mischung aus .warn und .info bringt leider die Reihenfolge in der Ausgabe durcheinander (bei zwei Carriern und je 2 zu großen Jobs kommt 1x warn -> 1x info -> 1x warn -> 3x info
 				//gibts dafür eine Lösung außer alles in .warn/.info zu wandeln?
 				//@Anton: Das ist ja komisch und mir noch nie unter gekommen. Kannst das eventuell am Montag mit in der Runde vorstellen. Vlt hat da wer ne Idee..
@@ -81,19 +84,20 @@ public class CarrierConsistencyCheckers {
 				}
 			}
 		}
-		//if every carrier has at least one vehicle with sufficient capacity for all jobs, allCarriersCapable will be true
-		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen
-		//theoretisch könnte man den Ausdruck kürzen (s. IntelliJ Vorschlag), ich lasse es aber erstmal so, bis entschieden ist, was capacityCheck zurückgeben soll.
-		// @Anton: Ja gerne, haben die Tendenz, dass man da mittlerweile Enum-Werte zurückgibt. Dann kann sich das sehr gut erweitern lassen.
-		// Das Enum kann ja auch erstmal nur 2 Werte haben: ... z.B. {CAPACITY_SUFFICIENT, CAPACITY_INSUFFICIENT}.
-		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v->v);
-		return allCarriersCapable;
+		//if every carrier has at least one vehicle with sufficient capacity for all jobs, return CAPACITY_SUFFICIENT
+		if (isCarrierCapable.values().stream().allMatch(v->v)) {
+			return CapacityCheckResult.CAPACITY_SUFFICIENT;
+		} else {
+			return CapacityCheckResult.CAPACITY_INSUFFICIENT;
+		}
 	}
+
 	/**
 	* this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
 	*/
 	//@KMT: ich habe hier einiges umgebaut, beim Erstellen der verschiedenen Tests ist mir ein Logikfehler aufgefallen.
 	//@Anton: Muss ich mal in Ruhe ansehen -> eher Montag vormittag ;)
+	//KMT: Jetzt macht der Code für meine Begriffe was er soll, bin gespannt, was du so findest ;-)
 	public static boolean vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
