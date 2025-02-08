@@ -25,6 +25,13 @@ public class VehicleScheduleTest {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
+	//Todo: @ Anton: Habe hier auch noch nit im Detail rein geschaut. Was mir sofort auffällt: Bitte analog zum anderen Test:
+	// 1.) Beschreibung / JavaDoc vor dei Methode
+	// 2.) Versuche die Inputs per Inlinign wie im anderen Test einzukürzen
+	// 3.) Assertions statt Assert
+	// 4.) Weg mit System.out.println
+	// 5.) Schauen, dass die Textaussage bei den Assertions so ist, dass sie einem weiterhilft, wenn der Test **fehlschlägt**.
+
 	@Test
 	void testVehicleScheduleShipment_passes() {
 	/**
