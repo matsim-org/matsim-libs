@@ -34,6 +34,9 @@ public class TourTest {
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		//@KMT: Hier meckert er leider. Ich glaube der Fehler liegt in der Art und Weise, wie die XML aufgebaut ist, allerdings habe ich den
 		// Aufbau von den Beispielen, selbst mit einer 1:1 Kopie der Beispiele kommt der gleiche Fehler...
+		//@Anton: Aus meiner sicht ist das soweit ok. Wenn ich innerhalbt des Checks schauen, dann kann ich da eingelesene Daten sehen.
+		// Die Warnung mit Reader kommt, weil da eine Kopfzeile nicht da ist. Und er nun sagt, welche Version des Readers nimmt.
+		// → Wie ich das sehe, also absolut in Ordnung und du kannst damit erstmal weiterarbeiten.
 		freightConfigGroup.setCarriersFile(pathToInput+"CCPlansCarrierWithServicesPASS.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput+"CCTestVeh.xml");
 
