@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers>
+	<carrier id="ccCarrier1withServices">
+		<attributes>
+			<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="heavy_truck_1" depotLinkId="1" typeId="heavy_truck" earliestStart="06:00:00" latestEnd="12:30:00"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="small_service_1" to="2" capacityDemand="3" earliestStart="00:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+			<service id="medium_service_1" to="3" capacityDemand="4" earliestStart="00:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+			<service id="large_service_1" to="4" capacityDemand="16" earliestStart="00:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+			<service id="extra_large_service_1" to="5" capacityDemand="29" earliestStart="00:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+		</services>
+		<plan score="-210.81333333333333" selected="true">
+			<tour vehicleId="heavy_truck_1">
+				<act type="start" end_time="08:00:00"/>
+				<leg expected_dep_time="08:00:00" expected_transp_time="00:15:00">
+				</leg>
+				<act type="service" serviceId="small_service_1" />
+				<leg expected_dep_time="08:30:00" expected_transp_time="00:15:00">
+				</leg>
+				<act type="service" serviceId="large_service_1" />
+				<leg expected_dep_time="09:00:00" expected_transp_time="00:15:00">
+				</leg>
+				<act type="service" serviceId="medium_service_1" />
+				<leg expected_dep_time="90:30:00" expected_transp_time="00:15:00">
+				</leg>
+				<act type="service" serviceId="extra_large_service_1" />
+				<leg expected_dep_time="10:00:00" expected_transp_time="00:15:00">
+				</leg>
+				<act type="end"/>
+			</tour>
+		</plan>
+	</carrier>
+</carriers>

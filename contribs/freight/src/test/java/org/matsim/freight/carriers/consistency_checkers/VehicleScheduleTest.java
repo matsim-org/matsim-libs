@@ -25,32 +25,30 @@ public class VehicleScheduleTest {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
-	//Todo: @ Anton: Habe hier auch noch nit im Detail rein geschaut. Was mir sofort auffällt: Bitte analog zum anderen Test:
-	// 1.) Beschreibung / JavaDoc vor dei Methode
-	// 2.) Versuche die Inputs per Inlinign wie im anderen Test einzukürzen
-	// 3.) Assertions statt Assert
-	// 4.) Weg mit System.out.println
-	// 5.) Schauen, dass die Textaussage bei den Assertions so ist, dass sie einem weiterhilft, wenn der Test **fehlschlägt**.
+	//@ Anton: Habe hier auch noch nit im Detail rein geschaut. Was mir sofort auffällt: Bitte analog zum anderen Test:
+	// -> bis auf 3. erledigt
+	//
+	// 3.) Assertions statt Assert -> TODO: Umbau mache ich zusammen mit der Umstellung auf Enum
+	//
+	//
 
 	@Test
-	void testVehicleScheduleShipment_passes() {
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return true.
 	 */
+	void testVehicleScheduleShipment_passes() {
+
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
-		//names of xml-files
-		String carriersXML = "CCTestCarriersShipmentsPASS.xml";
-		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 
-		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
+		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersShipmentsPASS.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -60,35 +58,32 @@ public class VehicleScheduleTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		System.out.println(areCarriersCapable);
-		Assert.isTrue(areCarriersCapable, "All jobs can be handled.");
+		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
 	}
 	@Test
+	/**
+	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
+	 * This test should return false, because:
+	 * - carrier "ccCarrierWithShipments1":
+	 * 		no vehicle is in operation when shipment "small_shipment_1" needs to be delivered
+	 * 		shipment "large_shipment_1" is too big for all vehicles
+	 *
+	 * - carrier "ccCarrierWithShipment2":
+	 * 		no vehicle is not in operation when shipment "small_shipment_2" needs to be picked up
+	 * 		shipment "large_shipment_2" is too big for all vehicles
+	 */
 	void testVehicleScheduleShipment_failes() {
-		/**
-		 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-		 * This test should return false, because:
-		 * - carrier "ccCarrierWithShipments1":
-		 * 		no vehicle is in operation when shipment "small_shipment_1" needs to be delivered
-		 * 		shipment "large_shipment_1" is too big for all vehicles
-		 *
-		 * - carrier "ccCarrierWithShipment2":
-		 * 		no vehicle is not in operation when shipment "small_shipment_2" needs to be picked up
-		 * 		shipment "large_shipment_2" is too big for all vehicles
-		 */
+
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
-		//names of xml-files
-		String carriersXML = "CCTestCarriersShipmentsFAIL.xml";
-		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 
-		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
+		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersShipmentsFAIL.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -98,28 +93,26 @@ public class VehicleScheduleTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertFalse(areCarriersCapable, "At least one job can not be handled.");
+		Assertions.assertFalse(areCarriersCapable, "All jobs can be handled.");
 	}
 
 	@Test
+	/**
+	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
+	 * This test should return true.
+	 */
 	void testVehicleScheduleService_passes() {
-		/**
-		 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-		 * This test should return true.
-		 */
+
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
-		//names of xml-files
-		String carriersXML = "CCTestCarriersServicesPASS.xml";
-		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 
-		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
+		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersServicesPASS.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -129,33 +122,31 @@ public class VehicleScheduleTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assert.isTrue(areCarriersCapable, "All jobs can be handled.");
+		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
 	}
 	@Test
+	/**
+	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
+	 * This test should return false, because:
+	 * - carrier "ccCarrierWithShipments1":
+	 * 		small_service_1: no vehicle in operation
+	 * 		medium_service_1: vehicle in operation is too small
+	 *		extra_large_service_1: vehicle in operation is too small
+	 * - carrier "ccCarrierWithShipment2":
+	 *		extra_large_service_2: vehicles are too small
+	 */
 	void testVehicleScheduleService_failes() {
-		/**
-		 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-		 * This test should return false, because:
-		 * - carrier "ccCarrierWithShipments1":
-		 * 		small_service_1: no vehicle in operation
-		 * 		medium_service_1: vehicle in operation is too small
-		 *		extra_large_service_1: vehicle in operation is too small
-		 * - carrier "ccCarrierWithShipment2":
-		 *		extra_large_service_2: vehicles are too small
-		 */
+
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
-		//names of xml-files
-		String carriersXML = "CCTestCarriersServicesFAIL.xml";
-		String vehicleXML = "CCTestVeh.xml";
 
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
 		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 
-		freightConfigGroup.setCarriersFile(pathToInput + carriersXML);
-		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + vehicleXML);
+		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersServicesFAIL.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -165,7 +156,7 @@ public class VehicleScheduleTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertFalse(areCarriersCapable, "At least one job can not be handled.");
+		Assertions.assertFalse(areCarriersCapable, "All jobs can be handled.");
 	}
 
 }

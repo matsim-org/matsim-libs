@@ -8,24 +8,39 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 
 public class CarrierConsistencyCheckers {
-	public enum CapacityCheckResult {
+	public enum capacityCheckResult {
 		CAPACITY_SUFFICIENT, CAPACITY_INSUFFICIENT
 	}
+	public enum scheduleCheckResult {
+		VEHICLE_AVAILABLE, NO_VEHICLE_AVAILABLE
+	}
+
+	public enum allJobsInTourCheckResult {
+		ALL_JOBS_IN_TOURS, NOT_ALL_JOBS_IN_TOURS, JOBS_IN_TOUR_MORE_THAN_ONCE, ERROR
+	}
+
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
 
 	private static boolean doesShipmentFitInVehicle(Double capacity, Double demand) {
 		return demand <= capacity;
 	}
+
 	private static boolean doTimeWindowsOverlap(TimeWindow tw1, TimeWindow tw2) {
 		return tw1.getStart() <= tw2.getEnd() && tw2.getStart() <= tw1.getEnd();
 	}
-	private record VehicleInfo(TimeWindow operationWindow, double capacity){}
 
-	private record ShipmentPickupInfo(TimeWindow pickupWindow, double capacityDemand) {}
+	private record VehicleInfo(TimeWindow operationWindow, double capacity) {
+	}
 
-	private record ShipmentDeliveryInfo(TimeWindow deliveryWindow, double capacityDemand){}
+	private record ShipmentPickupInfo(TimeWindow pickupWindow, double capacityDemand) {
+	}
 
-	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand){}
+	private record ShipmentDeliveryInfo(TimeWindow deliveryWindow, double capacityDemand) {
+	}
+
+	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand) {
+	}
+
 	/**
 	 * @author antonstock
 	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
@@ -33,7 +48,7 @@ public class CarrierConsistencyCheckers {
 	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
 	 */
-	public static CapacityCheckResult capacityCheck(Carriers carriers) {
+	public static capacityCheckResult capacityCheck(Carriers carriers) {
 
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
@@ -80,21 +95,21 @@ public class CarrierConsistencyCheckers {
 				//@Anton: Das ist ja komisch und mir noch nie unter gekommen. Kannst das eventuell am Montag mit in der Runde vorstellen. Vlt hat da wer ne Idee..
 				log.warn("Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
 				for (CarrierJob job : jobTooBigForVehicle) {
-					log.info("Demand of Job '{}' is too high: '{}'", job.getId().toString(),job.getCapacityDemand());
+					log.info("Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
 				}
 			}
 		}
 		//if every carrier has at least one vehicle with sufficient capacity for all jobs, return CAPACITY_SUFFICIENT
-		if (isCarrierCapable.values().stream().allMatch(v->v)) {
-			return CapacityCheckResult.CAPACITY_SUFFICIENT;
+		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
+			return capacityCheckResult.CAPACITY_SUFFICIENT;
 		} else {
-			return CapacityCheckResult.CAPACITY_INSUFFICIENT;
+			return capacityCheckResult.CAPACITY_INSUFFICIENT;
 		}
 	}
 
 	/**
-	* this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
-	*/
+	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
+	 */
 	//@KMT: ich habe hier einiges umgebaut, beim Erstellen der verschiedenen Tests ist mir ein Logikfehler aufgefallen.
 	//@Anton: Muss ich mal in Ruhe ansehen -> eher Montag vormittag ;)
 	//KMT: Jetzt macht der Code für meine Begriffe was er soll, bin gespannt, was du so findest ;-)
@@ -128,8 +143,8 @@ public class CarrierConsistencyCheckers {
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
 			/**
-			* SHIPMENTS PART - Pickup
-			*/
+			 * SHIPMENTS PART - Pickup
+			 */
 			//collects information about all existing shipments: IDs, times for pickup, capacity demand
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentPickupWindows.put(shipment.getId(), new ShipmentPickupInfo(shipment.getPickupStartingTimeWindow(), shipment.getCapacityDemand()));
@@ -155,8 +170,8 @@ public class CarrierConsistencyCheckers {
 					//determines if the operation hours overlap with shipment's time window
 					pickupOverlap = doTimeWindowsOverlap(vehicleInfo.operationWindow(), pickupInfo.pickupWindow());
 
-						//if the shipment fits in the current vehicle and the vehicle is in operation: shipment is transportable
-						if (capacityFits && pickupOverlap) {
+					//if the shipment fits in the current vehicle and the vehicle is in operation: shipment is transportable
+					if (capacityFits && pickupOverlap) {
 						isTransportable = true;
 						possibleVehicles.add(vehicleID);
 					}
@@ -236,7 +251,7 @@ public class CarrierConsistencyCheckers {
 					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service");
 				}
 			}
-			if(nonFeasibleJob.isEmpty()) {
+			if (nonFeasibleJob.isEmpty()) {
 				isCarrierCapable.put(carrier.getId(), true);
 			} else {
 				isCarrierCapable.put(carrier.getId(), false);
@@ -247,7 +262,7 @@ public class CarrierConsistencyCheckers {
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		//TODO: hier könnte man statt eines boolean auch ein anderes/besser geeignetes return nutzen
 		//theoretisch könnte man den Ausdruck kürzen (s. IntelliJ Vorschlag), ich lasse es aber erstmal so, bis entschieden ist, was vehicleScheduleTest zurückgeben soll.
-		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v->v);
+		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v -> v);
 		isCarrierCapable.forEach((key, value) -> {
 			if (value) {
 				log.info("Carrier " + key + " can handle all jobs.");
@@ -258,21 +273,70 @@ public class CarrierConsistencyCheckers {
 		return allCarriersCapable;
 	}
 
-	public static void allJobsInTours(Carriers carriers) {
+	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
+		Map<Id<Carrier>, String> isCarrierCapable = new HashMap<>();
+		boolean jobInToursMoreThanOnce = false;
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			List<Id<? extends CarrierJob>> liste = new LinkedList<>();
+			List<Id<? extends CarrierJob>> jobInTour = new LinkedList<>();
+			List<Id<? extends CarrierJob>> jobList = new LinkedList<>();
+			Map<Id<? extends CarrierJob>, Integer> jobCount = new HashMap<>();
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
-					if (tourElement instanceof Tour.ServiceActivity serviceActivity){
-						serviceActivity.getService().getId(); //TODO abspeichern in Liste...
+					//carrier only has one job-type: services or shipments
+					if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
+						jobInTour.add(serviceActivity.getService().getId());
 					}
-					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity){
-						shipmentBasedActivity.getShipment().getId(); //Todo abspeichern
+					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
+						jobInTour.add(shipmentBasedActivity.getShipment().getId());
 					}
 				}
 			}
-			//todo Vergleich
+			//save all jobs the current carrier should do
+			//shipments
+			for (CarrierShipment shipment : carrier.getShipments().values()) {
+				jobList.add(shipment.getId());
+			}
+			//services
+			for (CarrierService service : carrier.getServices().values()) {
+				jobList.add(service.getId());
+			}
+
+			for (Id<? extends CarrierJob> jobId : jobInTour) {
+				jobCount.put(jobId, jobCount.getOrDefault(jobId, 0) + 1);
+			}
+
+			Iterator<Id<? extends CarrierJob>> jobIterator = jobList.iterator();
+			while (jobIterator.hasNext()) {
+				Id<? extends CarrierJob> jobId = jobIterator.next();
+				int count = jobCount.getOrDefault(jobId,0);
+					if (count == 1) {
+						jobIterator.remove();
+					} else if (count > 1){
+						log.warn("Carrier: {} Job {} is scheduled {} times!", carrier.getId(), jobId, count);
+						jobInToursMoreThanOnce = true;
+					} else {
+						log.warn("Carrier: {} Job {} is not part of a tour!", carrier.getId(), jobId);
+					}
+			}
+			if(!jobList.isEmpty()) {
+				if (jobInToursMoreThanOnce) {
+					isCarrierCapable.put(carrier.getId(), "SCHEDULED_MORE_THAN_ONCE");
+				} else  {
+					isCarrierCapable.put(carrier.getId(), "NOT_SCHEDULED");
+				}
+			} else {
+				isCarrierCapable.put(carrier.getId(), "SCHEDULED_ONCE");
+			}
+		}
+		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) {
+			return allJobsInTourCheckResult.JOBS_IN_TOUR_MORE_THAN_ONCE;
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("NOT_SCHEDULED"))) {
+			return allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS;
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_ONCE"))) {
+			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
+		} else {
+			log.warn("How did we get here?");
+			return allJobsInTourCheckResult.ERROR;
 		}
 	}
-
 }
