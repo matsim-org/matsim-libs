@@ -80,6 +80,15 @@ import org.matsim.vehicles.Vehicles;
  */
 public class SBBTransitQSimEngine extends TransitQSimEngine /*implements DepartureHandler, MobsimEngine, AgentSource*/ {
 
+    // yy https://github.com/google/guice/wiki/KeepConstructorsHidden argues that with injection constructors should remain non-public, and I find the
+    // argument plausible. This would mean to use delegation rather than inheritance.
+    //
+    // I find it increasingly plausible to bind the base implementation (i.e. TransitQSimEngine, which means to leave the class public, but NOT the
+    // constructore), and then inject the delegate.  See FISS.java for an example.
+    //
+    // kai, feb'25
+
+
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngine.class);
 
     private final SBBTransitConfigGroup config;
@@ -122,11 +131,11 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
         }
     }
 
-    @Override
-    @Inject
-    public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-        this.stopHandlerFactory = stopHandlerFactory;
-    }
+//    @Override
+//    @Inject
+//    public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
+//        this.stopHandlerFactory = stopHandlerFactory;
+//    }
 
     @Override
     public void setInternalInterface(InternalInterface internalInterface) {

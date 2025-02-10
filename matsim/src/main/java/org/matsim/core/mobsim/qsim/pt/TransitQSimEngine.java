@@ -202,13 +202,17 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return false ;
 	}
 
-	public TransitStopAgentTracker getAgentTracker() {
+	@Override public TransitStopAgentTracker getAgentTracker() {
 		return agentTracker;
 	}
 
-	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-		this.stopHandlerFactory = stopHandlerFactory;
-	}
+//	/**
+//	 * @deprecated -- yyyyyy my intuition is that this should be addressed by injection.  kai, feb'25
+//	 */
+//	@Deprecated
+//	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
+//		this.stopHandlerFactory = stopHandlerFactory;
+//	}
 
 	@Override
 	public void doSimStep(double time) {
