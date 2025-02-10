@@ -270,6 +270,9 @@ public class CarrierConsistencyCheckers {
 		return allCarriersCapable;
 	}
 
+	/**
+	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once (if the job is a shipment, pickup and delivery are two different jobs).
+	 */
 	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
 		Map<Id<Carrier>, String> isCarrierCapable = new HashMap<>();
 		boolean jobInToursMoreThanOnce = false;
@@ -277,35 +280,37 @@ public class CarrierConsistencyCheckers {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			List<Id<? extends CarrierJob>> serviceInTour = new LinkedList<>();
 			List<String> shipmentInTour = new LinkedList<>();
+
 			List<Id<? extends CarrierJob>> serviceList = new LinkedList<>();
 			List<String> shipmentList = new LinkedList<>();
+
 			Map<Id<? extends CarrierJob>, Integer> serviceCount = new HashMap<>();
 			Map<String, Integer> shipmentCount = new HashMap<>();
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 					//carrier only has one job-type: services or shipments
+					//service is saved as an Id
 					if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
 						serviceInTour.add(serviceActivity.getService().getId());
-
 					}
+					//shipment is saved as a string: jobId + activity type
 					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
 						shipmentInTour.add(shipmentBasedActivity.getShipment().getId()+" | "+shipmentBasedActivity.getActivityType());
-
 					}
 				}
 			}
 
 			//save all jobs the current carrier should do
-			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList,
+			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix " | pickup" or " | delivery"
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentList.add(shipment.getId()+" | pickup");
 				shipmentList.add(shipment.getId()+" | delivery");
 			}
-			//services
+			//services are saved with id only
 			for (CarrierService service : carrier.getServices().values()) {
 				serviceList.add(service.getId());
 			}
-
+			//count appearance of job ids
 			for (Id<? extends CarrierJob> serviceId : serviceInTour) {
 				serviceCount.put(serviceId, serviceCount.getOrDefault(serviceId, 0) + 1);
 			}
@@ -325,7 +330,7 @@ public class CarrierConsistencyCheckers {
 						jobIsMissing = true;
 					}
 			}
-
+			//count appearance of job ids
 			for (String shipmentId : shipmentInTour) {
 				System.out.println(shipmentId);
 				shipmentCount.put(shipmentId, shipmentCount.getOrDefault(shipmentId, 0) + 1);
@@ -345,7 +350,7 @@ public class CarrierConsistencyCheckers {
 					jobIsMissing = true;
 				}
 			}
-
+			//if serviceList or shipmentList is NOT empty, at least one job is scheduled multiple times or not at all.
 			if(!serviceList.isEmpty()||!shipmentList.isEmpty()) {
 				if (jobInToursMoreThanOnce && !jobIsMissing) {
 					isCarrierCapable.put(carrier.getId(), "SCHEDULED_MORE_THAN_ONCE");
@@ -354,16 +359,20 @@ public class CarrierConsistencyCheckers {
 				} else if (jobInToursMoreThanOnce && jobIsMissing)  {
 					isCarrierCapable.put(carrier.getId(), "BOTH");
 				}
+			//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
 				isCarrierCapable.put(carrier.getId(), "SCHEDULED_ONCE");
 			}
 		}
-		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) {
-			return allJobsInTourCheckResult.JOBS_SCHEDULED_MULTIPLE_TIMES;
+		//determine which return value is apprpriate, based on the value(s) of isCarrierCapable. Only Return SCHEDULED_ONCE, if all values are SCHEDULED_ONCE.
+		//@KMT: Es kann natürlich nur einen Rückgabewert geben, wäre es theoretisch nötig, Kombinationen zurückgeben zu können?
+		//-> zwei Carrier haben nicht SCHEDULED_ONCE sondern zwei verschiedene andere, dann wird aktuell nur einer der beiden returned...
+		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_ONCE"))) {
+			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("NOT_SCHEDULED"))) {
 			return allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS;
-		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_ONCE"))) {
-			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) {
+			return allJobsInTourCheckResult.JOBS_SCHEDULED_MULTIPLE_TIMES;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("BOTH"))) {
 			return allJobsInTourCheckResult.JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED;
 		} else {
