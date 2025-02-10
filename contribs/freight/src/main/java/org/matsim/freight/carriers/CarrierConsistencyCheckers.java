@@ -261,11 +261,11 @@ public class CarrierConsistencyCheckers {
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		//TODO: Umstellung auf enum
 		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v -> v);
-		isCarrierCapable.forEach((key, value) -> {
+		isCarrierCapable.forEach((carrierId, value) -> {
 			if (value) {
-				log.info("Carrier " + key + " can handle all jobs.");
+				log.info("Carrier " + carrierId + " can handle all jobs.");
 			} else {
-				log.warn("Carrier " + key + " can not handle all jobs.");
+				log.warn("Carrier " + carrierId + " can not handle all jobs.");
 			}
 		});
 		return allCarriersCapable;
@@ -276,12 +276,6 @@ public class CarrierConsistencyCheckers {
 	 */
 	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
 		Map<Id<Carrier>, allJobsInTourCheckResult> isCarrierCapable = new HashMap<>();
-		//TODO: @Anton: Warum speicherst du hier Strings dazu, wenn du eigentlich den Enumwert inhaltlich nimmst?
-		// Auf jeden Fall solltest du vermeiden unten dann einen hardgecodeten String zu verwenden. Wenn man da sonst was minimal verändert, ist das sehr fehleranfällig.
-		// Option 1) Lass dir den Enum-Wert (namen) direkt als String geben (und greife das zum Abgleich auf) -->  z.B. allJobsInTourCheckResult.JOBS_IN_TOUR_BUT_NOT_LISTED.name()
-		// Option 2) Speichere den Enumwert direkt in der Map --> isCarrierCapable.put(carrier.getId(), allJobsInTourCheckResult.JOBS_IN_TOUR_BUT_NOT_LISTED)
-
-		//Weiteres TODO: Umbau auf CarrierConstants
 
 		boolean jobInToursMoreThanOnce = false;
 		boolean jobIsMissing = false;
@@ -309,11 +303,11 @@ public class CarrierConsistencyCheckers {
 			}
 
 			//save all jobs the current carrier should do
-			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix " | pickup" or " | delivery"
+			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix CarrierConstants.PICKUP /.DELIVERY
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentList.add(shipment.getId()+" | " + CarrierConstants.PICKUP);
-				// Falls sonst da mal was geändert wird, passt der Code sonst hier nicht mehr.. -> Vermeidung herd gecodeder Strings für irgendwelche Art von identifiern / Konstanten .
-				shipmentList.add(shipment.getId()+" | delivery"); //TODO: @Anton: Wo möglich bitte bereits definierte Konstanten benutzen:  "delivery" -> CarrierConstants.DELIVERY
+
+				shipmentList.add(shipment.getId()+" | " + CarrierConstants.DELIVERY);
 			}
 			//services are saved with id only
 			for (CarrierService service : carrier.getServices().values()) {
@@ -341,7 +335,6 @@ public class CarrierConsistencyCheckers {
 			}
 			//count appearance of job ids
 			for (String shipmentId : shipmentInTour) {
-				System.out.println(shipmentId);
 				shipmentCount.put(shipmentId, shipmentCount.getOrDefault(shipmentId, 0) + 1);
 			}
 			Iterator<String> shipmentIterator = shipmentList.iterator();
@@ -349,13 +342,13 @@ public class CarrierConsistencyCheckers {
 				String shipmentId = shipmentIterator.next();
 				int count = shipmentCount.getOrDefault(shipmentId,0);
 				if (count == 1) {
-					log.info("Carrier: {} | Job {} is scheduled once.", carrier.getId(), shipmentId);
+					log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), shipmentId);
 					shipmentIterator.remove();
 				} else if (count > 1){
-					log.warn("Carrier: {} | Job {} is scheduled {} times!", carrier.getId(), shipmentId, count);
+					log.warn("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), shipmentId, count);
 					jobInToursMoreThanOnce = true;
 				} else {
-					log.warn("Carrier: {} | Job {} is not part of a tour!", carrier.getId(), shipmentId);
+					log.warn("Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), shipmentId);
 					jobIsMissing = true;
 				}
 			}
