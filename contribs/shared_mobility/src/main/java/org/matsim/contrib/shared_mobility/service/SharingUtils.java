@@ -12,6 +12,7 @@ import org.matsim.contrib.shared_mobility.service.events.SharingFailedPickupEven
 import org.matsim.contrib.shared_mobility.service.events.SharingPickupEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingVehicleEvent;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 import com.google.common.base.Verify;

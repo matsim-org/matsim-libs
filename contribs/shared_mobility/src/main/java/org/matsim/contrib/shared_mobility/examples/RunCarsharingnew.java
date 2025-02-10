@@ -1,9 +1,5 @@
 package org.matsim.contrib.shared_mobility.examples;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.contrib.shared_mobility.run.Activities;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
@@ -17,19 +13,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
-import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
- * This is an example of a station-based bike-sharing service
+ * This is an example of a station-based oneway car-sharing service
  * siouxfalls-2014 can be used to run the simulation with the provided example
- * input file
- *
+ * input file in the resources/example *
  */
-public class RunTeleportationBikesharing {
+public class RunCarsharingnew {
 	static public void main(String[] args) throws ConfigurationException {
 		CommandLine cmd = new CommandLine.Builder(args) //
 				.requireOptions("config-path") //
@@ -37,54 +35,12 @@ public class RunTeleportationBikesharing {
 
 		Config config = ConfigUtils.loadConfig(cmd.getOptionStrict("config-path"));
 		config.addModule(new SimWrapperConfigGroup());
-		Activities.addScoringParams(config, true);
-		// We define bike to be routed based on Euclidean distance.
-		RoutingConfigGroup.TeleportedModeParams bikeRoutingParams = new RoutingConfigGroup.TeleportedModeParams("bike");
-		bikeRoutingParams.setTeleportedModeSpeed(5.0);
-		bikeRoutingParams.setBeelineDistanceFactor(1.3);
-		config.routing().addTeleportedModeParams(bikeRoutingParams);
-
-		// Walk is deleted by adding bike here, we need to re-add it ...
-		//RoutingConfigGroup.TeleportedModeParams walkRoutingParams = new RoutingConfigGroup.TeleportedModeParams("walk");
-		//walkRoutingParams.setTeleportedModeSpeed(2.0);
-		//walkRoutingParams.setBeelineDistanceFactor(1.3);
-		//config.routing().addTeleportedModeParams(walkRoutingParams);
-
-		// By default, "bike" will be simulated using teleportation.
+		//System.out.println(config.getModules());
 
 		// We need to add the sharing config group
 		SharingConfigGroup sharingConfig = new SharingConfigGroup();
 		config.addModule(sharingConfig);
-
-		// We need to define a service ...
-		SharingServiceConfigGroup serviceConfig = new SharingServiceConfigGroup();
-		sharingConfig.addService(serviceConfig);
-
-		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.setId("velib");
-
-		// ... with freefloating characteristics
-		serviceConfig.setMaximumAccessEgressDistance(100000);
-		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
-		serviceConfig.setServiceAreaShapeFile(null);
-
-		// ... with a number of available vehicles and their initial locations
-		// the following file is an example and it works with the siouxfalls-2014 scenario
-		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
-
-		// ... and, we need to define the underlying mode, here "bike".
-		serviceConfig.setMode("bike");
-
-		// Finally, we need to make sure that the service mode (sharing:velib) is
-		// considered in mode choice.
-		List<String> modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
-		modes.add(SharingUtils.getServiceMode(serviceConfig));
-		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
-
-
-         // Required for all calibration strategies
-
-
+		Activities.addScoringParams(config, true);
 		for (String subpopulation : List.of("person", "freight", "goodsTraffic", "commercialPersonTraffic", "commercialPersonTraffic_service")) {
 			config.replanning().addStrategySettings(
 				new ReplanningConfigGroup.StrategySettings()
@@ -115,6 +71,30 @@ public class RunTeleportationBikesharing {
 				.setSubpopulation("person")
 		);
 
+		// We need to define a service ...
+		SharingServiceConfigGroup serviceConfig = new SharingServiceConfigGroup();
+		sharingConfig.addService(serviceConfig);
+
+		// ... with a service id. The respective mode will be "sharing:velib".
+		serviceConfig.setId("mobility");
+
+		// ... with freefloating characteristics
+		serviceConfig.setMaximumAccessEgressDistance(100000);
+		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
+		serviceConfig.setServiceAreaShapeFile(null);
+
+		// ... with a number of available vehicles and their initial locations
+		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
+
+		// ... and, we need to define the underlying mode, here "car".
+		serviceConfig.setMode("car");
+
+		// Finally, we need to make sure that the service mode (sharing:velib) is
+		// considered in mode choice.
+		List<String> modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
+		modes.add(SharingUtils.getServiceMode(serviceConfig));
+		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
+
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
@@ -128,14 +108,14 @@ public class RunTeleportationBikesharing {
 		bookingParams.setScoringThisActivityAtAll(false);
 		config.scoring().addActivityParams(bookingParams);
 
-		// We need to score bike
-		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.scoring().addModeParams(bikeScoringParams);
+		// We need to score car
+		ModeParams carScoringParams = new ModeParams("car");
+		config.scoring().addModeParams(carScoringParams);
 
 		// Write out all events (DEBUG)
 		config.controller().setWriteEventsInterval(1);
 		config.controller().setWritePlansInterval(1);
-		config.controller().setLastIteration(10);
+		config.controller().setLastIteration(5);
 
 		// Set up controller (no specific settings needed for scenario)
 		Controler controller = new Controler(config);

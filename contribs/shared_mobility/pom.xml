@@ -23,6 +23,12 @@
 			<artifactId>common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>simwrapper</artifactId>
+            <version>2025.0-PR3653</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>
