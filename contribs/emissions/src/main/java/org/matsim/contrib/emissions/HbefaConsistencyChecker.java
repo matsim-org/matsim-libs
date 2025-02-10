@@ -12,7 +12,7 @@ public class HbefaConsistencyChecker {
 	 * Tests the read-in hbefa-maps and makes sure that:
 	 * 	(1) Technology-column contains petrol or diesel
 	 * 	(2) EmissionConcept contains neither petrol nor diesel
-	 * 	(3) EmissionConcept contains "average" as fallback (used in technology-average-lookup)
+	 * 	(3) EmissionConcept and SizeClass contains "average" as fallback (used in technology-average-lookup)
 	 * 	(4) Average table contain only average entries in VehicleAttributes
 	 *
 	 * 	Background of this consistency check is an error in the hbefa database, which causes the column names to be named wrong.
@@ -25,12 +25,14 @@ public class HbefaConsistencyChecker {
 								 @Nullable Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaDetCold) throws IllegalArgumentException {
 
 		Set<String> technologies = new HashSet<>();
+		Set<String> sizeClass = new HashSet<>();
 		Set<String> emConcepts = new HashSet<>();
 
 		if(hbefaAvgWarm != null){
 			// Test for the average warm tables
 			for (var key : hbefaAvgWarm.keySet()){
 				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClass.add(key.getVehicleAttributes().getHbefaSizeClass());
 				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
 			}
 
@@ -40,12 +42,18 @@ public class HbefaConsistencyChecker {
 			if(!technologies.contains("average"))
 				throw new IllegalArgumentException("average warm table contains " + technologies.iterator().next() + " key in technology-column. It should contain only \"average\"");
 
+			if(sizeClass.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + sizeClass.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClass);
+			if(!sizeClass.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + sizeClass.iterator().next() + " key in size-class-column. It should contain only \"average\"");
+
 			if(emConcepts.size() != 1)
 				throw new IllegalArgumentException("average warm table contains " + emConcepts.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologies);
 			if(!emConcepts.contains("average"))
 				throw new IllegalArgumentException("average warm table contains " + emConcepts.iterator().next() + " key in emission-concept-column. It should contain only \"average\"");
 
 			technologies.clear();
+			sizeClass.clear();
 			emConcepts.clear();
 		}
 
@@ -54,6 +62,7 @@ public class HbefaConsistencyChecker {
 			// Test for the average warm tables
 			for (var key : hbefaAvgCold.keySet()){
 				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClass.add(key.getVehicleAttributes().getHbefaSizeClass());
 				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
 			}
 
@@ -62,6 +71,11 @@ public class HbefaConsistencyChecker {
 				throw new IllegalArgumentException("average cold table contains " + technologies.size() + " entries in technology-column. It should contain only \"average\". Technologies in table:" + technologies);
 			if(!technologies.contains("average"))
 				throw new IllegalArgumentException("average cold table contains " + technologies.iterator().next() + " key in technology-column. It should contain only \"average\"");
+
+			if(sizeClass.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + sizeClass.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClass);
+			if(!sizeClass.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + sizeClass.iterator().next() + " key in size-class-column. It should contain only \"average\"");
 
 			if(emConcepts.size() != 1)
 				throw new IllegalArgumentException("average cold table contains " + emConcepts.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologies);
@@ -93,7 +107,16 @@ public class HbefaConsistencyChecker {
 
 			// Test (3)
 			if( !emConcepts.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. This may cause problems with some of the lookup-behaviors. Make sure that an average entry exists!");
+				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
+					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
+					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
+					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+
+			if( !sizeClass.contains("average") )
+				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
+					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
+					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
+					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
 
 			technologies.clear();
 			emConcepts.clear();
@@ -118,7 +141,16 @@ public class HbefaConsistencyChecker {
 
 			// Test (3)
 			if( !emConcepts.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of cold detailed table does not contain average as key. This may cause problems with some of the lookup-behaviors. Make sure that an average entry exists!");
+				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
+					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
+					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
+					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+
+			if( !sizeClass.contains("average") )
+				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
+					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
+					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
+					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
 
 			technologies.clear();
 			emConcepts.clear();
