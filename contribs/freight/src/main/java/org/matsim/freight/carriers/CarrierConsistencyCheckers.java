@@ -310,7 +310,7 @@ public class CarrierConsistencyCheckers {
 			//save all jobs the current carrier should do
 			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix " | pickup" or " | delivery"
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				shipmentList.add(shipment.getId()+" | pickup"); //TODO: @Anton: Wo möglich bitte bereits definierte Konstanten benutzen:  "pickup" -> CarrierConstants.PICKUP.
+				shipmentList.add(shipment.getId()+" | " + CarrierConstants.PICKUP);
 				// Falls sonst da mal was geändert wird, passt der Code sonst hier nicht mehr.. -> Vermeidung herd gecodeder Strings für irgendwelche Art von identifiern / Konstanten .
 				shipmentList.add(shipment.getId()+" | delivery"); //TODO: @Anton: Wo möglich bitte bereits definierte Konstanten benutzen:  "delivery" -> CarrierConstants.DELIVERY
 			}
