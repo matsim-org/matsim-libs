@@ -191,6 +191,15 @@ ggplot(diff_out_cleaned) +
   facet_wrap(~component, scales="free") +
   geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2)
 
+min_max_vals_used.EURO_4 <- min_max_vals_used %>%
+  filter(table=="EURO-4")
+
+ggplot(diff_out_cleaned) +
+  geom_rect(data=min_max_vals_used.EURO_4, aes(xmin=-0.5, xmax=3.5, ymin=min, ymax=max, fill=table), alpha=0.2) +
+  geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
+  scale_fill_manual(values=c("#ff004c", "#d21717", "#17d2a4")) +
+  facet_wrap(~component, scales="free")
+
 # Plot Euro0-Euro6 chart
 
 hbefa_filtered_det_EU <- lapply(c(0,1,2,3,4,5,6), function(eu) {
@@ -230,3 +239,60 @@ table <- table %>%
   filter(Technology == "petrol (4S)" | Technology == "diesel")
 
 write_delim(table, path_out, delim=";")
+
+#----- SUMO Plot
+
+sumo_out <- read_delim("D:/Projects/VSP/MATSim/matsim-libs/contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/sumo_output.csv", delim = ';')
+names(sumo_out) <- c("second", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity")
+
+#Create helper vars
+lengths <- tibble(
+  segment = c(0,1,2,3),
+  time = c(589, 433, 455, 323),
+  length = c(3095, 4756, 7158, 8254)
+)
+
+sumo_out <- sumo_out %>%
+  mutate(CO2_m = ifelse(velocity <= 1, 0, CO2/velocity))
+
+ggplot(sumo_out, aes(x=second)) +
+  geom_line(aes(y=as.numeric(CO2)/100), color="red") +
+  # geom_line(aes(y=CO2_m/100), color="blue") +
+  geom_line(aes(y=velocity), color="black")
+  # geom_line(aes(y=acceleration*10), color="orange")
+
+# Absolute emissionen pro segment und dann mit java code vergleichen
+segments <- c(sum(sumo_out$CO[1:589]), sum(sumo_out$CO[590:1022]), sum(sumo_out$CO[1023:1477]), sum(sumo_out$CO[1478:1800]))
+segments <- segments/1000
+
+# ---- HBEFA NOx > 0,08g discussion
+
+hbefa_detailed.EU4_NOx <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv") %>%
+  filter(Component=="NOx" & EmConcept=="PC P Euro-4")
+
+ggplot(data=hbefa_detailed.EU4_NOx) +
+  geom_histogram(aes(x=EFA, fill = EFA > 0.08), binwidth = 0.002, boundary = 0) +
+  scale_fill_manual(values = c("blue", "red"))
+
+ggplot(data=hbefa_detailed.EU4_NOx) +
+  geom_point(aes(x=V, y=EFA, color = EFA > 0.08)) +
+  scale_color_manual(values = c("blue", "red"))
+
+# ----
+
+segment_freespeeds <- tibble(
+  segment = c(0,1,2,3),
+  freespeed = c(50, 80, 100, 130),
+)
+
+diff_out_CO2 <- diff_out_cleaned %>%
+  filter(component=="CO2(total)") %>%
+  merge(segment_freespeeds)
+
+ggplot() +
+  geom_function(fun = function(x) 0.0165 * x^2 - 2.3481 * x + 211.68, xlim = c(80, 200)) +
+  geom_function(fun = function(x) 0.0928 * x * x - 9.2601 * x + 358.7, xlim = c(0, 50)) +
+  geom_function(fun = function(x) 130, xlim = c(50, 80)) +
+  geom_line(data=diff_out_CO2, aes(x=freespeed, y=gPkm, color=model)) +
+  geom_point(data=diff_out_CO2, aes(x=freespeed, y=gPkm, color=model))
+
