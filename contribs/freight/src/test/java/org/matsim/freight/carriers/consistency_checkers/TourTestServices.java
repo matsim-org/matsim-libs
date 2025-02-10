@@ -34,10 +34,11 @@ public class TourTestServices {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+
 	/**
 	 * This test is supposed to return ALL_JOBS_IN_TOURS.
 	 */
+	@Test
 	void testTour_services_passes() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -78,11 +79,12 @@ public class TourTestServices {
 				Assertions.fail("Unexpected test result: " + testResult);
 		}
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return JOBS_SCHEDULED_MULTIPLE_TIMES, because pickup of "parcel_2" is scheduled two times.
 	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
+	@Test
 	void testTour_services_failes_1() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -124,10 +126,11 @@ public class TourTestServices {
 		}
 
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return NOT_ALL_JOBS_IN_TOURS, because jobs "parcel_8" is not scheduled.
 	 */
+	@Test
 	void testTour_services_failes_2() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -169,10 +172,11 @@ public class TourTestServices {
 		}
 
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, because jobs "parcel_8" is not scheduled and job "parcel_3" is scheduled twice.
 	 */
+	@Test
 	void testTour_services_failes_3() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -213,10 +217,11 @@ public class TourTestServices {
 				Assertions.fail("Unexpected test result: " + testResult);
 		}
 	}
-	@Test
+
 	/**
 	 * This test is supposed to catch a UncheckedIOException, because the tour of carrier1 has service "parcel_ab" scheduled, but not listed as a service.
 	 */
+	@Test
 	void testTour_services_failes_4() {
 		//@KMT: Diese Lösung ist nicht besonders elegant, gibt es da vielleicht eine bessere Option?
 

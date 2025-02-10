@@ -33,10 +33,11 @@ public class TourTestShipments {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+
 	/**
 	 * This test is supposed to return ALL_JOBS_IN_TOURS.
 	 */
+	@Test
 	void testTour_shipment_passes() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -77,10 +78,11 @@ public class TourTestShipments {
 				Assertions.fail("Unexpected test result: " + testResult);
 		}
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return JOBS_SCHEDULED_MULTIPLE_TIMES, because job "parcel_2" is scheduled twice.
 	 */
+	@Test
 	void testTour_shipment_failes_1() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -122,11 +124,12 @@ public class TourTestShipments {
 		}
 
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return NOT_ALL_JOBS_IN_TOURS, because both pickup and delivery of "parcel_5" are not scheduled.
 	 * NOTE: If pickup of a shipment is missing but the delivery is part of a tour, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
+	@Test
 	void testTour_shipment_failes_2() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -168,11 +171,12 @@ public class TourTestShipments {
 		}
 
 	}
-	@Test
+
 	/**
 	 * This test is supposed to return JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, because both pickup and delivery of "parcel_5" are not scheduled and pickup of "parcel_1" is scheduled twice.
 	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
+	@Test
 	void testTour_shipment_failes_3() {
 		String pathToInput = utils.getPackageInputDirectory();
 
@@ -213,10 +217,11 @@ public class TourTestShipments {
 				Assertions.fail("Unexpected test result: " + testResult);
 		}
 	}
-	@Test
+
 	/**
 	 * This test is supposed to catch a NullPointerException, because the tour of carrier1 has "parcel_ab"'s pickup and delivery scheduled, but not listed as a shipment.
 	 */
+	@Test
 	void testTour_shipment_failes_4() {
 		//@KMT: Diese Lösung ist nicht besonders elegant, gibt es da vielleicht eine bessere Option?
 

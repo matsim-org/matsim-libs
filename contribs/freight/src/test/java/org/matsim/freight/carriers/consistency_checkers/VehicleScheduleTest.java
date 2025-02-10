@@ -32,11 +32,12 @@ public class VehicleScheduleTest {
 	//
 	//
 
-	@Test
+
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return true.
 	 */
+	@Test
 	void testVehicleScheduleShipment_passes() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
@@ -60,7 +61,7 @@ public class VehicleScheduleTest {
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
 		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
 	}
-	@Test
+
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return false, because:
@@ -72,6 +73,7 @@ public class VehicleScheduleTest {
 	 * 		no vehicle is not in operation when shipment "small_shipment_2" needs to be picked up
 	 * 		shipment "large_shipment_2" is too big for all vehicles
 	 */
+	@Test
 	void testVehicleScheduleShipment_failes() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
@@ -96,11 +98,12 @@ public class VehicleScheduleTest {
 		Assertions.assertFalse(areCarriersCapable, "All jobs can be handled.");
 	}
 
-	@Test
+
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return true.
 	 */
+	@Test
 	void testVehicleScheduleService_passes() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
@@ -124,7 +127,7 @@ public class VehicleScheduleTest {
 		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
 		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
 	}
-	@Test
+
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return false, because:
@@ -135,6 +138,7 @@ public class VehicleScheduleTest {
 	 * - carrier "ccCarrierWithShipment2":
 	 *		extra_large_service_2: vehicles are too small
 	 */
+	@Test
 	void testVehicleScheduleService_failes() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
