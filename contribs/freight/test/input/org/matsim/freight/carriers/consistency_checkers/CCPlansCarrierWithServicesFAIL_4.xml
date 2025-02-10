@@ -44,8 +44,12 @@
 					<route>i(9,7)R i(8,7)R</route>
 				</leg>
 				<act type="service" serviceId="parcel_5" />
-				<leg expected_dep_time="07:24:59" expected_transp_time="00:08:53">
+				<leg expected_dep_time="07:24:59" expected_transp_time="00:06:53">
 					<route>i(6,7)R i(5,7)R j(4,7)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_ab" />
+				<leg expected_dep_time="07:30:13" expected_transp_time="00:01:06">
+					<route>j(9,3) j(9,4) j(9,5) j(9,6)</route>
 				</leg>
 				<act type="service" serviceId="parcel_6" />
 				<leg expected_dep_time="07:38:53" expected_transp_time="00:08:53">

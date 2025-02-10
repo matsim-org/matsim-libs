@@ -43,6 +43,10 @@
 				<leg expected_dep_time="07:13:19" expected_transp_time="00:06:39">
 					<route>i(9,7)R i(8,7)R</route>
 				</leg>
+				<act type="service" serviceId="parcel_2" />
+				<leg expected_dep_time="07:20:19" expected_transp_time="00:01:00">
+					<route>i(9,7)R i(8,7)R</route>
+				</leg>
 				<act type="service" serviceId="parcel_5" />
 				<leg expected_dep_time="07:24:59" expected_transp_time="00:08:53">
 					<route>i(6,7)R i(5,7)R j(4,7)R</route>
@@ -53,6 +57,10 @@
 				</leg>
 				<act type="service" serviceId="parcel_7" />
 				<leg expected_dep_time="07:52:46" expected_transp_time="00:19:59">
+					<route>i(2,7)R i(1,7)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_2" />
+				<leg expected_dep_time="08:03:46" expected_transp_time="00:01:59">
 					<route>i(2,7)R i(1,7)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R</route>
 				</leg>
 				<act type="end"/>

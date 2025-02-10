@@ -16,7 +16,7 @@ public class CarrierConsistencyCheckers {
 	}
 
 	public enum allJobsInTourCheckResult {
-		ALL_JOBS_IN_TOURS, NOT_ALL_JOBS_IN_TOURS, JOBS_IN_TOUR_MORE_THAN_ONCE, ERROR
+		ALL_JOBS_IN_TOURS, NOT_ALL_JOBS_IN_TOURS, JOBS_SCHEDULED_MULTIPLE_TIMES, JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, JOBS_IN_TOUR_BUT_NOT_LISTED, ERROR
 	}
 
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
@@ -90,9 +90,6 @@ public class CarrierConsistencyCheckers {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
 				isCarrierCapable.put(carrier.getId(), false);
 				//TODO: Für Montag: Wieso kommen .info und .warn durcheinander?
-				//@KMT: Die Mischung aus .warn und .info bringt leider die Reihenfolge in der Ausgabe durcheinander (bei zwei Carriern und je 2 zu großen Jobs kommt 1x warn -> 1x info -> 1x warn -> 3x info
-				//gibts dafür eine Lösung außer alles in .warn/.info zu wandeln?
-				//@Anton: Das ist ja komisch und mir noch nie unter gekommen. Kannst das eventuell am Montag mit in der Runde vorstellen. Vlt hat da wer ne Idee..
 				log.warn("Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
 				for (CarrierJob job : jobTooBigForVehicle) {
 					log.info("Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
@@ -276,66 +273,101 @@ public class CarrierConsistencyCheckers {
 	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
 		Map<Id<Carrier>, String> isCarrierCapable = new HashMap<>();
 		boolean jobInToursMoreThanOnce = false;
+		boolean jobIsMissing = false;
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			List<Id<? extends CarrierJob>> jobInTour = new LinkedList<>();
-			List<Id<? extends CarrierJob>> jobList = new LinkedList<>();
-			Map<Id<? extends CarrierJob>, Integer> jobCount = new HashMap<>();
+			List<Id<? extends CarrierJob>> serviceInTour = new LinkedList<>();
+			List<String> shipmentInTour = new LinkedList<>();
+			List<Id<? extends CarrierJob>> serviceList = new LinkedList<>();
+			List<String> shipmentList = new LinkedList<>();
+			Map<Id<? extends CarrierJob>, Integer> serviceCount = new HashMap<>();
+			Map<String, Integer> shipmentCount = new HashMap<>();
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 					//carrier only has one job-type: services or shipments
 					if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
-						jobInTour.add(serviceActivity.getService().getId());
+						serviceInTour.add(serviceActivity.getService().getId());
+
 					}
 					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
-						jobInTour.add(shipmentBasedActivity.getShipment().getId());
+						shipmentInTour.add(shipmentBasedActivity.getShipment().getId()+" | "+shipmentBasedActivity.getActivityType());
+
 					}
 				}
 			}
+
 			//save all jobs the current carrier should do
-			//shipments
+			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList,
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				jobList.add(shipment.getId());
+				shipmentList.add(shipment.getId()+" | pickup");
+				shipmentList.add(shipment.getId()+" | delivery");
 			}
 			//services
 			for (CarrierService service : carrier.getServices().values()) {
-				jobList.add(service.getId());
+				serviceList.add(service.getId());
 			}
 
-			for (Id<? extends CarrierJob> jobId : jobInTour) {
-				jobCount.put(jobId, jobCount.getOrDefault(jobId, 0) + 1);
+			for (Id<? extends CarrierJob> serviceId : serviceInTour) {
+				serviceCount.put(serviceId, serviceCount.getOrDefault(serviceId, 0) + 1);
 			}
 
-			Iterator<Id<? extends CarrierJob>> jobIterator = jobList.iterator();
-			while (jobIterator.hasNext()) {
-				Id<? extends CarrierJob> jobId = jobIterator.next();
-				int count = jobCount.getOrDefault(jobId,0);
+			Iterator<Id<? extends CarrierJob>> serviceIterator = serviceList.iterator();
+			while (serviceIterator.hasNext()) {
+				Id<? extends CarrierJob> serviceId = serviceIterator.next();
+				int count = serviceCount.getOrDefault(serviceId,0);
 					if (count == 1) {
-						jobIterator.remove();
+						log.info("Carrier: {} | Job {} is scheduled once.", carrier.getId(), serviceId);
+						serviceIterator.remove();
 					} else if (count > 1){
-						log.warn("Carrier: {} Job {} is scheduled {} times!", carrier.getId(), jobId, count);
+						log.warn("Carrier: {} | Job {} is scheduled {} times!", carrier.getId(), serviceId, count);
 						jobInToursMoreThanOnce = true;
 					} else {
-						log.warn("Carrier: {} Job {} is not part of a tour!", carrier.getId(), jobId);
+						log.warn("Carrier: {} | Job {} is not part of a tour!", carrier.getId(), serviceId);
+						jobIsMissing = true;
 					}
 			}
-			if(!jobList.isEmpty()) {
-				if (jobInToursMoreThanOnce) {
+
+			for (String shipmentId : shipmentInTour) {
+				System.out.println(shipmentId);
+				shipmentCount.put(shipmentId, shipmentCount.getOrDefault(shipmentId, 0) + 1);
+			}
+			Iterator<String> shipmentIterator = shipmentList.iterator();
+			while (shipmentIterator.hasNext()) {
+				String shipmentId = shipmentIterator.next();
+				int count = shipmentCount.getOrDefault(shipmentId,0);
+				if (count == 1) {
+					log.info("Carrier: {} | Job {} is scheduled once.", carrier.getId(), shipmentId);
+					shipmentIterator.remove();
+				} else if (count > 1){
+					log.warn("Carrier: {} | Job {} is scheduled {} times!", carrier.getId(), shipmentId, count);
+					jobInToursMoreThanOnce = true;
+				} else {
+					log.warn("Carrier: {} | Job {} is not part of a tour!", carrier.getId(), shipmentId);
+					jobIsMissing = true;
+				}
+			}
+
+			if(!serviceList.isEmpty()||!shipmentList.isEmpty()) {
+				if (jobInToursMoreThanOnce && !jobIsMissing) {
 					isCarrierCapable.put(carrier.getId(), "SCHEDULED_MORE_THAN_ONCE");
-				} else  {
+				} else if (!jobInToursMoreThanOnce && jobIsMissing)  {
 					isCarrierCapable.put(carrier.getId(), "NOT_SCHEDULED");
+				} else if (jobInToursMoreThanOnce && jobIsMissing)  {
+					isCarrierCapable.put(carrier.getId(), "BOTH");
 				}
 			} else {
 				isCarrierCapable.put(carrier.getId(), "SCHEDULED_ONCE");
 			}
 		}
 		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) {
-			return allJobsInTourCheckResult.JOBS_IN_TOUR_MORE_THAN_ONCE;
+			return allJobsInTourCheckResult.JOBS_SCHEDULED_MULTIPLE_TIMES;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("NOT_SCHEDULED"))) {
 			return allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_ONCE"))) {
 			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("BOTH"))) {
+			return allJobsInTourCheckResult.JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED;
 		} else {
-			log.warn("How did we get here?");
+			log.warn("Unexpected outcome! Please check all input files.");
 			return allJobsInTourCheckResult.ERROR;
 		}
 	}
