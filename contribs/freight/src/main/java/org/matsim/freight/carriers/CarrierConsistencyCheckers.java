@@ -139,7 +139,8 @@ public class CarrierConsistencyCheckers {
 				//write in Map: vehicle ID and Map VehicleInfo (time window of operation & capacity)
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
-			/**
+
+			/*
 			 * SHIPMENTS PART - Pickup
 			 */
 			//collects information about all existing shipments: IDs, times for pickup, capacity demand
@@ -180,7 +181,8 @@ public class CarrierConsistencyCheckers {
 					nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup");
 				}
 			}
-			/**
+
+			/*
 			 * SHIPMENTS PART - Delivery
 			 */
 			//see for-loop above. This loop does the same but for delivery instead of pickup
@@ -217,7 +219,7 @@ public class CarrierConsistencyCheckers {
 				}
 			}
 
-			/**
+			/*
 			 * SERVICES PART
 			 */
 			//see for-loop above. This loop does the same but for services instead of shipments
@@ -275,6 +277,11 @@ public class CarrierConsistencyCheckers {
 	 */
 	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
 		Map<Id<Carrier>, String> isCarrierCapable = new HashMap<>();
+		//TODO: @Anton: Warum speicherst du hier Strings dazu, wenn du eigentlich den Enumwert inhaltlich nimmst?
+		// Auf jeden Fall solltest du vermeiden unten dann einen hardgecodeten String zu verwenden. Wenn man da sonst was minimal verändert, ist das sehr fehleranfällig.
+		// Option 1) Lass dir den Enum-Wert (namen) direkt als String geben (und greife das zum Abgleich auf) -->  z.B. allJobsInTourCheckResult.JOBS_IN_TOUR_BUT_NOT_LISTED.name()
+		// Option 2) Speichere den Enumwert direkt in der Map --> isCarrierCapable.put(carrier.getId(), allJobsInTourCheckResult.JOBS_IN_TOUR_BUT_NOT_LISTED)
+
 		boolean jobInToursMoreThanOnce = false;
 		boolean jobIsMissing = false;
 		for (Carrier carrier : carriers.getCarriers().values()) {
@@ -303,8 +310,9 @@ public class CarrierConsistencyCheckers {
 			//save all jobs the current carrier should do
 			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix " | pickup" or " | delivery"
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
-				shipmentList.add(shipment.getId()+" | pickup");
-				shipmentList.add(shipment.getId()+" | delivery");
+				shipmentList.add(shipment.getId()+" | pickup"); //TODO: @Anton: Wo möglich bitte bereits definierte Konstanten benutzen:  "pickup" -> CarrierConstants.PICKUP.
+				// Falls sonst da mal was geändert wird, passt der Code sonst hier nicht mehr.. -> Vermeidung herd gecodeder Strings für irgendwelche Art von identifiern / Konstanten .
+				shipmentList.add(shipment.getId()+" | delivery"); //TODO: @Anton: Wo möglich bitte bereits definierte Konstanten benutzen:  "delivery" -> CarrierConstants.DELIVERY
 			}
 			//services are saved with id only
 			for (CarrierService service : carrier.getServices().values()) {
@@ -353,27 +361,31 @@ public class CarrierConsistencyCheckers {
 			//if serviceList or shipmentList is NOT empty, at least one job is scheduled multiple times or not at all.
 			if(!serviceList.isEmpty()||!shipmentList.isEmpty()) {
 				if (jobInToursMoreThanOnce && !jobIsMissing) {
-					isCarrierCapable.put(carrier.getId(), "SCHEDULED_MORE_THAN_ONCE");
+					isCarrierCapable.put(carrier.getId(), "SCHEDULED_MORE_THAN_ONCE"); //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 				} else if (!jobInToursMoreThanOnce && jobIsMissing)  {
-					isCarrierCapable.put(carrier.getId(), "NOT_SCHEDULED");
+					isCarrierCapable.put(carrier.getId(), "NOT_SCHEDULED"); //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 				} else if (jobInToursMoreThanOnce && jobIsMissing)  {
-					isCarrierCapable.put(carrier.getId(), "BOTH");
+					isCarrierCapable.put(carrier.getId(), "BOTH"); //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 				}
 			//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
-				isCarrierCapable.put(carrier.getId(), "SCHEDULED_ONCE");
+				isCarrierCapable.put(carrier.getId(), "SCHEDULED_ONCE"); //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 			}
 		}
 		//determine which return value is apprpriate, based on the value(s) of isCarrierCapable. Only Return SCHEDULED_ONCE, if all values are SCHEDULED_ONCE.
 		//@KMT: Es kann natürlich nur einen Rückgabewert geben, wäre es theoretisch nötig, Kombinationen zurückgeben zu können?
 		//-> zwei Carrier haben nicht SCHEDULED_ONCE sondern zwei verschiedene andere, dann wird aktuell nur einer der beiden returned...
-		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_ONCE"))) {
+		// TODO  @Anton: Das könnt ihr heute gerne mal diskutieren, wie man es am besten macht.
+		// Dadurch, dass die einzelnen Checks ja dennoch hier ihre Warnungen ausgeben, könnte ich mir vorstellen, dass es einfach reicht,
+		// einen Fehler zurückzugeben, wenn einer der Checks fehlschlägt. Und dann an geeigneter Stelle.. drauf hinzuweisen, dass es noch mehr issues geben kann und man das Logfile lesen muss.
+		// Ist aber jetzt nicht originäre Aufgabe des Tests.
+		if (isCarrierCapable.values().stream().allMatch(v -> v.equals("SCHEDULED_ONCE"))) { //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
-		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("NOT_SCHEDULED"))) {
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("NOT_SCHEDULED"))) { //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 			return allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS;
-		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) {
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("SCHEDULED_MORE_THAN_ONCE"))) { //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 			return allJobsInTourCheckResult.JOBS_SCHEDULED_MULTIPLE_TIMES;
-		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("BOTH"))) {
+		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals("BOTH"))) { //TODO: @Anton: Siehe meinen Kommentar ganz oben, wo die Map definiert wird.
 			return allJobsInTourCheckResult.JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED;
 		} else {
 			log.warn("Unexpected outcome! Please check all input files.");
