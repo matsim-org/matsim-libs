@@ -11,6 +11,7 @@ public class CarrierConsistencyCheckers {
 	public enum capacityCheckResult {
 		CAPACITY_SUFFICIENT, CAPACITY_INSUFFICIENT
 	}
+	//TODO: ScheduleTest auf enum umstellen
 	public enum scheduleCheckResult {
 		VEHICLE_AVAILABLE, NO_VEHICLE_AVAILABLE
 	}
@@ -110,6 +111,7 @@ public class CarrierConsistencyCheckers {
 	//@KMT: ich habe hier einiges umgebaut, beim Erstellen der verschiedenen Tests ist mir ein Logikfehler aufgefallen.
 	//@Anton: Muss ich mal in Ruhe ansehen -> eher Montag vormittag ;)
 	//KMT: Jetzt macht der Code für meine Begriffe was er soll, bin gespannt, was du so findest ;-)
+	//TODO: Umstellung von boolean auf enum
 	public static boolean vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
@@ -323,13 +325,14 @@ public class CarrierConsistencyCheckers {
 				Id<? extends CarrierJob> serviceId = serviceIterator.next();
 				int count = serviceCount.getOrDefault(serviceId,0);
 					if (count == 1) {
-						log.info("Carrier: {} | Job {} is scheduled once.", carrier.getId(), serviceId);
+						//TODO: Dieser Logger entfällt, wenn der Code fertig ist -> Erwartetes Ergebnis muss nicht für jeden Job einzeln ausgegeben werden.
+						//log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), serviceId);
 						serviceIterator.remove();
 					} else if (count > 1){
-						log.warn("Carrier: {} | Job {} is scheduled {} times!", carrier.getId(), serviceId, count);
+						log.warn("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), serviceId, count);
 						jobInToursMoreThanOnce = true;
 					} else {
-						log.warn("Carrier: {} | Job {} is not part of a tour!", carrier.getId(), serviceId);
+						log.warn("Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), serviceId);
 						jobIsMissing = true;
 					}
 			}
@@ -342,7 +345,8 @@ public class CarrierConsistencyCheckers {
 				String shipmentId = shipmentIterator.next();
 				int count = shipmentCount.getOrDefault(shipmentId,0);
 				if (count == 1) {
-					log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), shipmentId);
+					//TODO: Dieser Logger entfällt, wenn der Code fertig ist -> Erwartetes Ergebnis muss nicht für jeden Job einzeln ausgegeben werden.
+					//log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), shipmentId);
 					shipmentIterator.remove();
 				} else if (count > 1){
 					log.warn("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), shipmentId, count);
@@ -363,6 +367,7 @@ public class CarrierConsistencyCheckers {
 				}
 			//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
+				log.info("Carrier '{}': All jobs are scheduled once.", carrier.getId());
 				isCarrierCapable.put(carrier.getId(), allJobsInTourCheckResult.ALL_JOBS_IN_TOURS);
 			}
 		}
