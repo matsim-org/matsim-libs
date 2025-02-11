@@ -206,7 +206,7 @@ public class LeastCostPathTree {
 
 
     public int getComingFrom(int nodeIndex) {
-        if(graph.hasTurnRestrictions()) {
+        if (graph.hasTurnRestrictions()) {
             // always make sure to only expose uncolored node indices. nkuehnel Feb'25
             return graph.getNode(comingFrom[nodeIndex]).getId().index();
         } else {
