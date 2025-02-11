@@ -3,6 +3,7 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -32,6 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.math.IEEE754rUtils.max;
+import static org.apache.commons.lang3.math.IEEE754rUtils.min;
+
 public class PHEMTest {
 
 	// TODO Rename CO to CO(total)
@@ -50,6 +54,8 @@ public class PHEMTest {
 	// TODO DEBUG ONLY
 	static CSVPrinter csvPrinter = null;
 	FileWriter fileWriter = null;
+
+	// ----- Helper methods -----
 
 	private static List<DrivingCycleSecond> readCycle(Path path){
 		List<DrivingCycleSecond> drivingCycleSeconds = new ArrayList<>();
@@ -184,7 +190,7 @@ public class PHEMTest {
 	 * @param wltpLinkAttributes Array of records, containing the information of each WLTP-test-segment
 	 * @return a {@link SumoEntry} for each WLTP-test-segment
 	 */
-	private static List<SumoEntry> readSumoEmissionsForLinks(Path path, WLTPLinkAttributes[] wltpLinkAttributes){
+	private static List<SumoEntry> readSumoEmissionsForLinks(Path path, List<WLTPLinkAttributes> wltpLinkAttributes){
 		List<SumoEntry> sumoSeconds = readSumoFile(path);
 		List<SumoEntry> sumoSegments = new ArrayList<>();
 
@@ -238,11 +244,116 @@ public class PHEMTest {
 		}
 
 		//Make sure, that everything went right
-		assert sumoSegments.size() == wltpLinkAttributes.length;
+		assert sumoSegments.size() == wltpLinkAttributes.size();
 
 		return sumoSegments;
 	}
 
+	private static List<WLTPLinkComparison> readReferenceComparison(Path path){
+		List<WLTPLinkComparison> refComparison = new ArrayList<>();
+
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(",")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
+
+		try (var reader = Files.newBufferedReader(path); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				refComparison.add(new WLTPLinkComparison(
+					Integer.parseInt(record.get(0)),
+					Integer.parseInt(record.get(1)),
+					Integer.parseInt(record.get(2)),
+
+					new double[]{
+						Double.parseDouble(record.get(3)),
+						Double.parseDouble(record.get(4)),
+						Double.parseDouble(record.get(5)),
+						Double.parseDouble(record.get(6))
+					},
+
+					new double[]{
+						Double.parseDouble(record.get(7)),
+						Double.parseDouble(record.get(8)),
+						Double.parseDouble(record.get(9)),
+						Double.parseDouble(record.get(10))
+					},
+
+					new double[]{
+						Double.parseDouble(record.get(11)),
+						Double.parseDouble(record.get(12)),
+						Double.parseDouble(record.get(13)),
+						Double.parseDouble(record.get(14))
+					},
+
+					new double[]{
+						Double.parseDouble(record.get(15)),
+						Double.parseDouble(record.get(16)),
+						Double.parseDouble(record.get(17)),
+						Double.parseDouble(record.get(18))
+					},
+
+					new double[]{
+						Double.parseDouble(record.get(19)),
+						Double.parseDouble(record.get(20)),
+						Double.parseDouble(record.get(21)),
+						Double.parseDouble(record.get(22))
+					}
+				));
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+
+		return refComparison;
+	}
+
+	// ----- Sub-Test methods -----
+
+	/**
+	 * Tests if the values match the HBEFA v4.1 reference values exactly.
+	 * <i>NOTE: This test will most likely fail if a new HBEFA version is used. The purpose if this test is to remind you of any result-changes
+	 * when switching to a new version. If the new results seem reasonable, you can override the reference file.</i>
+	 */
+	private void testHbefaV4_1(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison) {
+		 Assertions.assertEquals(refComparison.size(), testComparison.size(), "It seems like you are comparing two different setups. Maybe the reference-file was changed improperly?");
+
+		for (int i = 0; i < refComparison.size(); i++){
+			Assertions.assertEquals(refComparison.get(i).CO[1], testComparison.get(i).CO[1], "MATSim values changed for CO");
+			Assertions.assertEquals(refComparison.get(i).CO2[1], testComparison.get(i).CO2[1], "MATSim values changed for CO2");
+			Assertions.assertEquals(refComparison.get(i).HC[1], testComparison.get(i).HC[1], "MATSim values changed for HC");
+			Assertions.assertEquals(refComparison.get(i).PMx[1], testComparison.get(i).PMx[1], "MATSim values changed for PMx");
+			Assertions.assertEquals(refComparison.get(i).NOx[1], testComparison.get(i).NOx[1], "MATSim values changed for NOx");
+		}
+	}
+
+	/**
+	 * Tests if the results lie in the allowed deviation interval, which is the range between the reference SUMO and MATSim emissions.
+	 * TODO CHeck if this test-setup is really useful. What if the deviation-factor decreases, but the sign of difference switches, so it lies outside?
+	 * @param refComparison original reference values
+	 * @param testComparison test values
+	 */
+	private void testValueDeviation(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison){
+		for (int i = 0; i < refComparison.size(); i++){
+			// Check CO interval
+			Assertions.assertTrue(testComparison.get(i).CO[1] >= min(refComparison.get(i).CO[0], refComparison.get(i).CO[1]));
+			Assertions.assertTrue(testComparison.get(i).CO[1] <= max(refComparison.get(i).CO[0], refComparison.get(i).CO[1]));
+			// Check CO2 interval
+			Assertions.assertTrue(testComparison.get(i).CO2[1] >= min(refComparison.get(i).CO2[0], refComparison.get(i).CO2[1]));
+			Assertions.assertTrue(testComparison.get(i).CO2[1] <= max(refComparison.get(i).CO2[0], refComparison.get(i).CO2[1]));
+			// Check HC interval
+			Assertions.assertTrue(testComparison.get(i).HC[1] >= min(refComparison.get(i).HC[0], refComparison.get(i).HC[1]));
+			Assertions.assertTrue(testComparison.get(i).HC[1] <= max(refComparison.get(i).HC[0], refComparison.get(i).HC[1]));
+			// Check PMx interval
+			Assertions.assertTrue(testComparison.get(i).PMx[1] >= min(refComparison.get(i).PMx[0], refComparison.get(i).PMx[1]));
+			Assertions.assertTrue(testComparison.get(i).PMx[1] <= max(refComparison.get(i).PMx[0], refComparison.get(i).PMx[1]));
+			// Check NOx interval
+			Assertions.assertTrue(testComparison.get(i).NOx[1] >= min(refComparison.get(i).NOx[0], refComparison.get(i).NOx[1]));
+			Assertions.assertTrue(testComparison.get(i).NOx[1] <= max(refComparison.get(i).NOx[0], refComparison.get(i).NOx[1]));
+		}
+	}
+
+	// TODO Petrol and diesel
 	@Test
 	public void test() throws IOException, URISyntaxException {
 		// Prepare emission-config
@@ -250,7 +361,7 @@ public class PHEMTest {
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //TODO Check that this is correct
-		ecg.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
+		ecg.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip); // TODO Remove this
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
@@ -260,14 +371,13 @@ public class PHEMTest {
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define Test-case (WLTP Class 3b) -> Creates a link for each wltp-segment
-		WLTPLinkAttributes[] wltpLinkAttributes = new WLTPLinkAttributes[]{
-			new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"),
-			new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"),
-			new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"),
-			new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"),
-		};
+		List<WLTPLinkAttributes> wltpLinkAttributes = new ArrayList<>();
+		wltpLinkAttributes.add(new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"));
+		wltpLinkAttributes.add(new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"));
+		wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
+		wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
 
-		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_output.csv");
+		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_petrol_output.csv");
 		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
 
 		// Define vehicle
@@ -286,16 +396,16 @@ public class PHEMTest {
 		// Calculate MATSim-emissions
 		EmissionModule module = new EmissionModule(scenario, manager);
 		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
-		for(int i = 0; i < wltpLinkAttributes.length; i++){
+		for(int i = 0; i < wltpLinkAttributes.size(); i++){
 			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-				wltpLinkAttributes[i].time,
-				wltpLinkAttributes[i].hbefaStreetType,
-				wltpLinkAttributes[i].freespeed,
-				wltpLinkAttributes[i].length,
+				wltpLinkAttributes.get(i).time,
+				wltpLinkAttributes.get(i).hbefaStreetType,
+				wltpLinkAttributes.get(i).freespeed,
+				wltpLinkAttributes.get(i).length,
 				vehHbefaInfo));
 		}
 
-		var file = Paths.get("/Users/janek/Desktop/aggregate.csv");
+		/*var file = Paths.get("C:\\Users\\aleks\\Desktop\\aggregate.csv");
 		try(var bufWriter = Files.newBufferedWriter(file); var csv = CSVFormat.DEFAULT.print(bufWriter)) {
 			for (var i = 0; i < wltpLinkAttributes.length; i++) {
 				var length_m = wltpLinkAttributes[i].length;
@@ -305,13 +415,49 @@ public class PHEMTest {
 				var sumo_em_g_km = (sumo_em/1000) / ((double) length_m / 1000);
 				System.out.println("Link " + i + ": MATSim NOx=" + matsim_em_g_km + " g/km, SUMO NOx=" + sumo_em_g_km + " g/km");
 			}
-		}
+		}*/
 		// Now we need to read in the sumo-files and get the SUMO results
 		// output-files comes from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
 
+		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
 
+		List<WLTPLinkComparison> comparison = new ArrayList<>();
+		int currentSecond = 0;
+		for(int i = 0; i < wltpLinkAttributes.size(); i++){
+			comparison.add( new WLTPLinkComparison(
+				i,
+				currentSecond,
+				wltpLinkAttributes.get(i).time,
 
-		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions and save them in a csv
+				new double[]{sumoSegments.get(i).CO/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO),
+					link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO) / (sumoSegments.get(i).CO/1000)},
+
+				new double[]{sumoSegments.get(i).CO2/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) / (sumoSegments.get(i).CO2/1000)},
+
+				new double[]{sumoSegments.get(i).HC/1000,
+					link_pollutant2grams.get(i).get(Pollutant.HC),
+					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
+					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
+
+				new double[]{sumoSegments.get(i).PMx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.PM),
+					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.PM) / (sumoSegments.get(i).PMx/1000)},
+
+				new double[]{sumoSegments.get(i).NOx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.NOx),
+					link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.NOx) / (sumoSegments.get(i).NOx/1000)}
+			));
+			currentSecond += wltpLinkAttributes.get(i).time;
+		}
+
+		// Print out the results as csv
 		CSVPrinter writer = new CSVPrinter(
 			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_out.csv"),
 			CSVFormat.DEFAULT);
@@ -341,47 +487,46 @@ public class PHEMTest {
 			"NOx-Factor"
 		);
 
-		// TODO Add max diff values
-		int currentSecond = 0;
-		for(int i = 0; i < wltpLinkAttributes.length; i++){
+		for(int i = 0; i < comparison.size(); i++){
 			writer.printRecord(
 				i,
 				currentSecond,
-				wltpLinkAttributes[i].time,
+				wltpLinkAttributes.get(i).time,
 
-				sumoSegments.get(i).CO/1000,
-				link_pollutant2grams.get(i).get(Pollutant.CO),
-				link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
-				computeFactor(link_pollutant2grams.get(i).get(Pollutant.CO), sumoSegments.get(i).CO/1000),
+				comparison.get(i).CO[1],
+				comparison.get(i).CO[2],
+				comparison.get(i).CO[3],
+				comparison.get(i).CO[3],
 
-				sumoSegments.get(i).CO2/1000,
-				link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
-				link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
-				computeFactor(link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL), sumoSegments.get(i).CO2/1000),
+				comparison.get(i).CO2[1],
+				comparison.get(i).CO2[2],
+				comparison.get(i).CO2[3],
+				comparison.get(i).CO2[3],
 
-				sumoSegments.get(i).HC/1000,
-				link_pollutant2grams.get(i).get(Pollutant.HC),
-				link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
-				computeFactor(link_pollutant2grams.get(i).get(Pollutant.HC), sumoSegments.get(i).HC/1000),
+				comparison.get(i).HC[1],
+				comparison.get(i).HC[2],
+				comparison.get(i).HC[3],
+				comparison.get(i).HC[3],
 
-				sumoSegments.get(i).PMx/1000,
-				link_pollutant2grams.get(i).get(Pollutant.PM),
-				link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
-				computeFactor(link_pollutant2grams.get(i).get(Pollutant.PM),sumoSegments.get(i).PMx/1000),
+				comparison.get(i).PMx[1],
+				comparison.get(i).PMx[2],
+				comparison.get(i).PMx[3],
+				comparison.get(i).PMx[3],
 
-				sumoSegments.get(i).NOx/1000,
-				link_pollutant2grams.get(i).get(Pollutant.NOx),
-				link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
-				computeFactor(link_pollutant2grams.get(i).get(Pollutant.NOx), sumoSegments.get(i).NOx/1000)
+				comparison.get(i).NOx[1],
+				comparison.get(i).NOx[2],
+				comparison.get(i).NOx[3],
+				comparison.get(i).NOx[3]
 			);
-			currentSecond += wltpLinkAttributes[i].time;
 		}
 		writer.flush();
 		writer.close();
-	}
 
-	private double computeFactor(double a, double b){
-		return a/b;
+		// Start the tests
+		var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_ref.csv"));
+		testHbefaV4_1(refComparison, comparison);
+		testValueDeviation(refComparison, comparison);
+
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
@@ -417,4 +562,13 @@ public class PHEMTest {
 	 * @param hbefaStreetType More information at: {@link VspHbefaRoadTypeMapping}
 	 */
 	private record WLTPLinkAttributes(int time, int length, double freespeed, String hbefaStreetType){}
+
+	/**
+	 * Helper struct containing values important for comparing SUMO and MATSim emissions.
+	 * CO, CO2, HC, PM, NO are double-arrays of length 4, containing: absolute emission SUMO / absolute emission MATSim / diff / factor
+	 * @param segment index of segment
+	 * @param startTime in seconds
+	 * @param travelTime in seconds <br>
+	 */
+	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 }
