@@ -6,6 +6,8 @@ import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +81,7 @@ public class PHEMTest {
 		return drivingCycleSeconds;
 	}
 
-	/**
+	/** TODO Remove
 	 * Reads a csv (header: time,speed,acceleration) containing a wltp cycle and converts it into a MATSim test-network, with links representing the
 	 * phases of the cycle. The first link has its origin at (0,0) and the test-track extends into positive x.
 	 * @param network Network to put in the links
@@ -354,8 +356,9 @@ public class PHEMTest {
 	}
 
 	// TODO Petrol and diesel
-	@Test
-	public void test() throws IOException, URISyntaxException {
+	@ParameterizedTest
+	@ValueSource(strings = {"petrol", "diesel"}) // TODO Add diesel
+	public void test(String fuel) throws IOException, URISyntaxException {
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -377,14 +380,22 @@ public class PHEMTest {
 		wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
 		wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
 
-		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_petrol_output.csv");
+		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
 		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
 
 		// Define vehicle
 		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
-		vehicleAttributes.setHbefaTechnology("petrol (4S)");
-		vehicleAttributes.setHbefaSizeClass("average");
-		vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
+		switch(fuel){
+			case "petrol":
+				vehicleAttributes.setHbefaTechnology("petrol (4S)");
+				vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
+				break;
+			case "diesel":
+				vehicleAttributes.setHbefaTechnology("diesel");
+				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
+				break;
+		}
+		vehicleAttributes.setHbefaSizeClass("average"); // TODO Fix table for final tests
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
 			vehicleAttributes);
@@ -459,7 +470,7 @@ public class PHEMTest {
 
 		// Print out the results as csv
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_out.csv"),
+			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_" + fuel + "_out.csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"segment",
@@ -490,8 +501,8 @@ public class PHEMTest {
 		for(int i = 0; i < comparison.size(); i++){
 			writer.printRecord(
 				i,
-				currentSecond,
-				wltpLinkAttributes.get(i).time,
+				comparison.get(i).startTime,
+				comparison.get(i).travelTime,
 
 				comparison.get(i).CO[0],
 				comparison.get(i).CO[1],
@@ -523,7 +534,7 @@ public class PHEMTest {
 		writer.close();
 
 		// Start the tests
-		var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_ref.csv"));
+		var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_" + fuel + "_ref.csv"));
 		testHbefaV4_1(refComparison, comparison);
 		testValueDeviation(refComparison, comparison);
 
