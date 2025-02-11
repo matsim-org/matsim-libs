@@ -79,6 +79,8 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser / SBB
  */
 public class SBBTransitQSimEngine extends TransitQSimEngine /*implements DepartureHandler, MobsimEngine, AgentSource*/ {
+    // my intuition is that I would prefer doing this via delegation.  where one binds the TransitQSimEngine explicitly, and then retrieves it via
+    // injection.  See FISS for an example. kai, feb'25
 
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngine.class);
 
@@ -94,12 +96,16 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     private InternalInterface internalInterface;
     private TransitDriverAgentFactory deterministicDriverFactory;
     private TransitDriverAgentFactory networkDriverFactory;
-    private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+    @Inject private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
     private boolean createLinkEvents = false;
 
     @Inject
-    public SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TransitDriverAgentFactory networkDriverFactory) {
+    SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TransitDriverAgentFactory networkDriverFactory) {
+        /* https://github.com/google/guice/wiki/KeepConstructorsHidden */
+
         super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, networkDriverFactory);
+        // (yy it feels a bit weird that this accepts a modified stopHandlerFactory via injection, but puts the simple factory into super(...).  kai, feb'25
+
         this.qSim = qSim;
         this.context = context;
         this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
@@ -120,12 +126,6 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
         if (this.config.getDeterministicServiceModes().isEmpty()) {
             log.warn("There are no modes registered for the deterministic transit simulation, so no transit vehicle will be handled by this engine.");
         }
-    }
-
-    @Override
-    @Inject
-    public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-        this.stopHandlerFactory = stopHandlerFactory;
     }
 
     @Override

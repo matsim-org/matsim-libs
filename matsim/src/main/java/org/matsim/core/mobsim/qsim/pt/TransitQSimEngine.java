@@ -100,6 +100,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
 							 UmlaufBuilder umlaufBuilder, TransitStopAgentTracker tracker,
 							 TransitDriverAgentFactory transitDriverFactory) {
+		// (yy this needs to be public because of SBBTransitQSimEngine.  But see https://github.com/google/guice/wiki/KeepConstructorsHidden . kai, feb'25)
+
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.umlaufBuilder = umlaufBuilder;
@@ -108,8 +110,10 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		this.transitDriverFactory = transitDriverFactory;
 	}
 
-	// For tests (which create an Engine, and externally create Agents as well).
 	public InternalInterface getInternalInterface() {
+		// For tests (which create an Engine, and externally create Agents as well).
+		// yy those tests are unfortunately in a different package.  exposing the internal interface in this way clearly defies its purpose (I wanted
+		// to restrict a bit who can add and remove agents into and from the mobsim).  kai, feb'25
 		return this.internalInterface;
 	}
 
@@ -202,12 +206,9 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return false ;
 	}
 
+	@Override
 	public TransitStopAgentTracker getAgentTracker() {
 		return agentTracker;
-	}
-
-	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-		this.stopHandlerFactory = stopHandlerFactory;
 	}
 
 	@Override
