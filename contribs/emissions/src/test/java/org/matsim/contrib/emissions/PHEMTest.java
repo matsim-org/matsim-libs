@@ -383,7 +383,7 @@ public class PHEMTest {
 		// Define vehicle
 		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
 		vehicleAttributes.setHbefaTechnology("petrol (4S)");
-		vehicleAttributes.setHbefaSizeClass("not specified"); // TODO FIx table for final tests
+		vehicleAttributes.setHbefaSizeClass("average");
 		vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
