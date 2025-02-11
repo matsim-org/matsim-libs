@@ -205,7 +205,12 @@ public class LeastCostPathTree {
     }
 
     public int getComingFrom(int nodeIndex) {
-        return this.comingFrom[nodeIndex];
+        if (graph.hasTurnRestrictions()) {
+            // always make sure to only expose uncolored node indices. nkuehnel Feb'25
+            return graph.getNode(comingFrom[nodeIndex]).getId().index();
+        } else {
+            return this.comingFrom[nodeIndex];
+        }
     }
 
     public interface StopCriterion {
