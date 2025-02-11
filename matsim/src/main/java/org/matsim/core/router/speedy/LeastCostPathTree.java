@@ -204,7 +204,6 @@ public class LeastCostPathTree {
         this.data[index + 2] = distance;
     }
 
-
     public int getComingFrom(int nodeIndex) {
         if (graph.hasTurnRestrictions()) {
             // always make sure to only expose uncolored node indices. nkuehnel Feb'25
