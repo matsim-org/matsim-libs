@@ -68,7 +68,6 @@ public class VehicleScheduleTest {
 	 * - carrier "ccCarrierWithShipments1":
 	 * 		no vehicle is in operation when shipment "small_shipment_1" needs to be delivered
 	 * 		shipment "large_shipment_1" is too big for all vehicles
-	 *
 	 * - carrier "ccCarrierWithShipment2":
 	 * 		no vehicle is not in operation when shipment "small_shipment_2" needs to be picked up
 	 * 		shipment "large_shipment_2" is too big for all vehicles

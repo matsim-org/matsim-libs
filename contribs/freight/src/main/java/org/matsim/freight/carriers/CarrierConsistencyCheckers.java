@@ -90,10 +90,9 @@ public class CarrierConsistencyCheckers {
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
 				isCarrierCapable.put(carrier.getId(), false);
-				//TODO: Für Montag: Wieso kommen .info und .warn durcheinander?
 				log.warn("Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
 				for (CarrierJob job : jobTooBigForVehicle) {
-					log.info("Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
+					log.warn("Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
 				}
 			}
 		}
@@ -108,9 +107,6 @@ public class CarrierConsistencyCheckers {
 	/**
 	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
 	 */
-	//@KMT: ich habe hier einiges umgebaut, beim Erstellen der verschiedenen Tests ist mir ein Logikfehler aufgefallen.
-	//@Anton: Muss ich mal in Ruhe ansehen -> eher Montag vormittag ;)
-	//KMT: Jetzt macht der Code für meine Begriffe was er soll, bin gespannt, was du so findest ;-)
 	//TODO: Umstellung von boolean auf enum
 	public static boolean vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
@@ -123,8 +119,6 @@ public class CarrierConsistencyCheckers {
 			Map<Id<? extends CarrierJob>, ShipmentPickupInfo> shipmentPickupWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ShipmentDeliveryInfo> shipmentDeliveryWindows = new HashMap<>();
 			Map<Id<? extends CarrierJob>, ServiceInfo> serviceWindows = new HashMap<>();
-			//feasibleJob saves job ID and vehicle ID of all feasible Jobs
-			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
 			//nonFeasibleJob saves Job ID and reason why a job can not be handled by a carrier -> not enough capacity at all (=job is too big for all existing vehicles) OR no sufficient vehicle in operation
 			Map<Id<? extends CarrierJob>, String> nonFeasibleJob = new HashMap<>();
 			//go through all vehicles of the current carrier and determine vehicle ID, operation time window & capacity
@@ -150,6 +144,9 @@ public class CarrierConsistencyCheckers {
 				shipmentPickupWindows.put(shipment.getId(), new ShipmentPickupInfo(shipment.getPickupStartingTimeWindow(), shipment.getCapacityDemand()));
 			}
 
+			//feasibleJob saves job ID and vehicle ID of all feasible Jobs
+			//TODO: Was will IntelliJ hier?
+			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
 			//run through all existing shipments
 			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
 				//determine pickup time window
@@ -325,8 +322,6 @@ public class CarrierConsistencyCheckers {
 				Id<? extends CarrierJob> serviceId = serviceIterator.next();
 				int count = serviceCount.getOrDefault(serviceId,0);
 					if (count == 1) {
-						//TODO: Dieser Logger entfällt, wenn der Code fertig ist -> Erwartetes Ergebnis muss nicht für jeden Job einzeln ausgegeben werden.
-						//log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), serviceId);
 						serviceIterator.remove();
 					} else if (count > 1){
 						log.warn("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), serviceId, count);
@@ -345,8 +340,6 @@ public class CarrierConsistencyCheckers {
 				String shipmentId = shipmentIterator.next();
 				int count = shipmentCount.getOrDefault(shipmentId,0);
 				if (count == 1) {
-					//TODO: Dieser Logger entfällt, wenn der Code fertig ist -> Erwartetes Ergebnis muss nicht für jeden Job einzeln ausgegeben werden.
-					//log.info("Carrier '{}': Job '{}' is scheduled once.", carrier.getId(), shipmentId);
 					shipmentIterator.remove();
 				} else if (count > 1){
 					log.warn("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), shipmentId, count);
@@ -371,13 +364,7 @@ public class CarrierConsistencyCheckers {
 				isCarrierCapable.put(carrier.getId(), allJobsInTourCheckResult.ALL_JOBS_IN_TOURS);
 			}
 		}
-		//determine which return value is apprpriate, based on the value(s) of isCarrierCapable. Only Return SCHEDULED_ONCE, if all values are SCHEDULED_ONCE.
-		//@KMT: Es kann natürlich nur einen Rückgabewert geben, wäre es theoretisch nötig, Kombinationen zurückgeben zu können?
-		//-> zwei Carrier haben nicht SCHEDULED_ONCE sondern zwei verschiedene andere, dann wird aktuell nur einer der beiden returned...
-		// TODO  @Anton: Das könnt ihr heute gerne mal diskutieren, wie man es am besten macht.
-		// Dadurch, dass die einzelnen Checks ja dennoch hier ihre Warnungen ausgeben, könnte ich mir vorstellen, dass es einfach reicht,
-		// einen Fehler zurückzugeben, wenn einer der Checks fehlschlägt. Und dann an geeigneter Stelle.. drauf hinzuweisen, dass es noch mehr issues geben kann und man das Logfile lesen muss.
-		// Ist aber jetzt nicht originäre Aufgabe des Tests.
+		//TODO: Evtl Rückbau auf Boolean oder nur zwei (bzw. drei) Enums: TOUR_CHECK_SUCCESS / TOUR_CHECK_FAIL / ERROR
 		if (isCarrierCapable.values().stream().allMatch(v -> v.equals(allJobsInTourCheckResult.ALL_JOBS_IN_TOURS))) {
 			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals(allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS))) {
