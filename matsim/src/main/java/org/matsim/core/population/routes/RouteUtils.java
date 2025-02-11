@@ -206,7 +206,6 @@ public class RouteUtils {
 		return now - startTime;
 	}
 
-	@Deprecated // rename to calcDistanceExcludingStartEndLink.  kai, feb'25
 	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
 		double length = 0. ;
 		for ( Link link : path.links ) {

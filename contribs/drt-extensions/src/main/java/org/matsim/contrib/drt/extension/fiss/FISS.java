@@ -26,6 +26,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -82,8 +83,8 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	private final Scenario scenario;
 
 
-	@Inject FISS( MatsimServices matsimServices, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-				  @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandlerDefaultImpl networkModeDepartureHandler ) {
+	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
+		      @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandlerDefaultImpl networkModeDepartureHandler ) {
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
 
@@ -117,7 +118,6 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			Person person = planAgent.getCurrentPlan().getPerson();
 			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
-//			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
 			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
 			// yyyy This travel time _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
