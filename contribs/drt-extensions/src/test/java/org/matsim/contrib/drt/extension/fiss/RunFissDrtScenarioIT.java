@@ -151,40 +151,37 @@ public class RunFissDrtScenarioIT {
 			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		}
 
+		// ### controler:
+
 		final Controler controler = DrtOperationsControlerCreator.createControler(config, false);
 
-
 		//FISS part
-		LinkCounter linkCounter = new LinkCounter();
 		{
+			// FISS config:
 			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 			fissConfigGroup.sampleFactor = 0.1;
 			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
 			fissConfigGroup.switchOffFISSLastIteration = true;
 
+			// provide mode vehicle types (in production code, one should set them more diligently):
 			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
 			for( String sampledMode : fissConfigGroup.sampledModes ){
-				final Id<VehicleType> vehicleTypeId = Id.create( sampledMode, VehicleType.class );
-				VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get( vehicleTypeId );
-
-				if( vehicleType == null ){
-						vehicleType = VehicleUtils.createVehicleType( vehicleTypeId );
-						vehiclesContainer.addVehicleType( vehicleType );
-						LOG.info( "Created explicit default vehicle type for mode '{}'", sampledMode );
-				}
+				vehiclesContainer.addVehicleType( VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) ) );
 			}
 
-
+			// add FISS module:
 			controler.addOverridingModule( new FISSModule() );
 
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					addEventHandlerBinding().toInstance(linkCounter);
-				}
-			});
-
 		}
+
+		// for testing:
+		LinkCounter linkCounter = new LinkCounter();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(linkCounter);
+			}
+		});
 
 		controler.run();
 		{
