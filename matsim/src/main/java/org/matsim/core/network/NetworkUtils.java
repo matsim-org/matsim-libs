@@ -42,9 +42,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkModeRestriction;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -907,6 +909,15 @@ public final class NetworkUtils {
 		new MatsimNetworkReader(network).readFile(string);
 	}
 
+	/**
+	 * Check whether networks are (technically) identical. This only considers
+	 * {@link DisallowedNextLinks} and no other link/node attributes.
+	 * 
+	 * @param expected
+	 * @param actual
+	 * @return true if the network's links and nodes are the same incl.
+	 *         DisallowedNextLinks
+	 */
 	public static boolean compare(Network expected, Network actual) {
 
 		// check that all element from expected result are in tested network
@@ -951,12 +962,16 @@ public final class NetworkUtils {
 
 	private static boolean testLinksAreEqual(Link expected, Link actual) {
 
+		DisallowedNextLinks actualDnl = getDisallowedNextLinks(actual);
+		DisallowedNextLinks expectedDnl = getDisallowedNextLinks(expected);
+
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
 				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
-				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();
+				&& expected.getNumberOfLanes() == actual.getNumberOfLanes()
+				&& expectedDnl == null ? actualDnl == null : expectedDnl.equals(actualDnl);
 	}
 
 	private static boolean testNodesAreEqual(Node expected, Node actual) {
@@ -1023,6 +1038,10 @@ public final class NetworkUtils {
 
 	public static void removeDisallowedNextLinks(Link link) {
 		link.getAttributes().removeAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static void copyAttributesExceptDisallowedNextLinks(Link from, Link to) {
+		AttributesUtils.copyAttributesFromToExcept(from, to, DISALLOWED_NEXT_LINKS_ATTRIBUTE);
 	}
 
 	public static void addAllowedMode(Link link, String mode) {

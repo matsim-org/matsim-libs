@@ -24,6 +24,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 public class EmissionsDashboardTest {
 
@@ -34,7 +35,7 @@ public class EmissionsDashboardTest {
 	private static final String HBEFA_FILE_WARM_AVERAGE = HBEFA_2020_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void generate() {
@@ -42,7 +43,6 @@ public class EmissionsDashboardTest {
 		// This test can only run if the password is set
 		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "emissions");
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -57,7 +57,8 @@ public class EmissionsDashboardTest {
 		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 		SimWrapper sw = SimWrapper.create()
-			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()));
+			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
+			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")));
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 
@@ -68,9 +69,14 @@ public class EmissionsDashboardTest {
 
 		controler.run();
 
-		Assertions.assertThat(out)
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
 			.isDirectoryContaining("glob:**emissions_total.csv")
 			.isDirectoryContaining("glob:**emissions_grid_per_day.avro");
+
+
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "impact"))
+			.isDirectoryContaining("glob:**emissions_car.csv")
+			.isDirectoryContaining("glob:**general_car.csv");
 
 	}
 

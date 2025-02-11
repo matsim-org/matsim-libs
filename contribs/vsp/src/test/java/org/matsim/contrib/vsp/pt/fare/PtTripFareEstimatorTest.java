@@ -95,7 +95,7 @@ public class PtTripFareEstimatorTest {
 
 		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car), TripModeFilter.ACCEPT_ALL);
 
 		List<MinMaxEstimate> ests = new ArrayList<>();
 
@@ -150,7 +150,7 @@ public class PtTripFareEstimatorTest {
 
 		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car), TripModeFilter.ACCEPT_ALL);
 
 		List<MinMaxEstimate> singleTrips = estimateAgent(TestScenario.Agents.get(2));
 
@@ -160,7 +160,7 @@ public class PtTripFareEstimatorTest {
 		System.out.println(singleTrips);
 
 		// 2nd one does hat have a pt connection
-		double estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
+		double estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
@@ -168,7 +168,7 @@ public class PtTripFareEstimatorTest {
 			.isCloseTo(-2738.72, Offset.offset(0.1));
 
 
-		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
+		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
@@ -176,7 +176,7 @@ public class PtTripFareEstimatorTest {
 			.isCloseTo(-1222.91, Offset.offset(0.1));
 
 		// Essentially single trip
-		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
+		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
 		assertThat(estimate)
 			.isCloseTo(singleTrips.get(0).getMin(), Offset.offset(0.1));
 

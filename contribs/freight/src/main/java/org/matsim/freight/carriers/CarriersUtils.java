@@ -215,7 +215,7 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
-		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/CarriersAnalysis").runCarrierAnalysis(
+		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight").runCarrierAnalysis(
 			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
@@ -247,7 +247,7 @@ public class CarriersUtils {
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
-		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
+		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
 		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
 
@@ -310,6 +310,21 @@ public class CarriersUtils {
 			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
 
 		return true;
+	}
+
+	/**
+	 * Creates a list of carriers with unhandled jobs.
+	 *
+	 * @param carriers the carriers
+	 * @return list of carriers with unhandled jobs
+	 */
+	public static List<Carrier> createListOfCarrierWithUnhandledJobs(Carriers carriers) {
+		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			if (!allJobsHandledBySelectedPlan(carrier))
+				carriersWithUnhandledJobs.add(carrier);
+		}
+		return carriersWithUnhandledJobs;
 	}
 
 	/**

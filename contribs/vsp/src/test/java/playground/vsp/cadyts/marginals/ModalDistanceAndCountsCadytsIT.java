@@ -137,11 +137,13 @@ public class ModalDistanceAndCountsCadytsIT {
 		createPopulation(scenario.getPopulation(), scenario.getNetwork());
 
 		VehicleType car = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		car.setNetworkMode(TransportMode.car);
 		car.setMaximumVelocity(100 / 3.6);
 		car.setLength(7.5);
 
 		// make bike and car equally fast for now
 		VehicleType bike = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
+		bike.setNetworkMode(TransportMode.bike);
 		bike.setMaximumVelocity(25 / 3.6);
 		bike.setLength(7.5);
 		scenario.getVehicles().addVehicleType(car);

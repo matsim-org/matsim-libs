@@ -31,15 +31,13 @@ public class SelectSubtourModeStrategyProvider implements Provider<PlanStrategy>
 	private Provider<GeneratorContext> generator;
 	@Inject
 	private Config config;
-	@Inject
-	private Scenario scenario;
 
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSubtourModeStrategy(config, scenario, generator));
+		builder.addStrategyModule(new SelectSubtourModeStrategy(config, generator));
 
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 

@@ -93,7 +93,7 @@ public class LeastCostPathTree {
             }
         }
 
-        if(graph.hasTurnRestrictions()) {
+        if (graph.hasTurnRestrictions()) {
             consolidateColoredNodes();
         }
     }
@@ -147,7 +147,7 @@ public class LeastCostPathTree {
             }
         }
 
-        if(graph.hasTurnRestrictions()) {
+        if (graph.hasTurnRestrictions()) {
             consolidateColoredNodes();
         }
     }
@@ -162,17 +162,11 @@ public class LeastCostPathTree {
                 if (uncoloredNode.getId().index() != i) {
                     int uncoloredIndex = uncoloredNode.getId().index();
                     double uncoloredCost = getCost(uncoloredIndex);
-
-                    double coloredTime = getTimeRaw(i);
-                    double coloredDistance = getDistance(i);
                     double coloredCost = getCost(i);
 
-                    if (Double.isFinite(uncoloredCost)) {
-                        if (coloredCost < uncoloredCost) {
-                            setData(uncoloredIndex, coloredCost, coloredTime, coloredDistance);
-                        }
-                    } else {
-                        setData(uncoloredIndex, coloredCost, coloredTime, coloredDistance);
+                    if (coloredCost < uncoloredCost) {
+                        setData(uncoloredIndex, coloredCost, getTimeRaw(i), getDistance(i));
+                        this.comingFrom[uncoloredIndex] = this.comingFrom[i];
                     }
                 }
             }
@@ -211,7 +205,12 @@ public class LeastCostPathTree {
     }
 
     public int getComingFrom(int nodeIndex) {
-        return this.comingFrom[nodeIndex];
+        if (graph.hasTurnRestrictions()) {
+            // always make sure to only expose uncolored node indices. nkuehnel Feb'25
+            return graph.getNode(comingFrom[nodeIndex]).getId().index();
+        } else {
+            return this.comingFrom[nodeIndex];
+        }
     }
 
     public interface StopCriterion {

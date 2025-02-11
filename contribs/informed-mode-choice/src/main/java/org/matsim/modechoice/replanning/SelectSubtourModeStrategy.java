@@ -32,12 +32,11 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 	private final InformedModeChoiceConfigGroup config;
 	private final SubtourModeChoiceConfigGroup smc;
 	private final Provider<GeneratorContext> generator;
-	private final IdMap<Person, PlanModel> models;
 
 	private final Set<String> nonChainBasedModes;
 	private final Set<String> switchModes;
 
-	public SelectSubtourModeStrategy(Config config, Scenario scenario, Provider<GeneratorContext> generator) {
+	public SelectSubtourModeStrategy(Config config, Provider<GeneratorContext> generator) {
 		super(config.global());
 
 		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
@@ -49,19 +48,13 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				.collect(Collectors.toSet());
 
 		this.switchModes = new HashSet<>(this.config.getModes());
-
-		this.models = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
-
-		for (Person value : scenario.getPopulation().getPersons().values()) {
-			this.models.put(value.getId(), PlanModel.newInstance(value.getSelectedPlan()));
-		}
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		GeneratorContext context = generator.get();
-		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes, config.isRequireDifferentModes()));
+		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context, context.selector, context.pruner, nonChainBasedModes, config.isRequireDifferentModes()));
 	}
 
 	/**
@@ -92,15 +85,12 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 		@Override
 		public void run(Plan plan) {
 
-			PlanModel model = models.get(plan.getPerson().getId());
+			PlanModel model = ctx.service.getPlanModel(plan);
 			model.setPlan(plan);
 
 			if (model.trips() == 0)
 				return;
 
-			// Force re-estimation
-			if (rnd.nextDouble() < config.getProbaEstimate())
-				model.reset();
 
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
