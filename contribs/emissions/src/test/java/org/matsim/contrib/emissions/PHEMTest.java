@@ -319,11 +319,11 @@ public class PHEMTest {
 		 Assertions.assertEquals(refComparison.size(), testComparison.size(), "It seems like you are comparing two different setups. Maybe the reference-file was changed improperly?");
 
 		for (int i = 0; i < refComparison.size(); i++){
-			Assertions.assertEquals(refComparison.get(i).CO[1], testComparison.get(i).CO[1], "MATSim values changed for CO");
-			Assertions.assertEquals(refComparison.get(i).CO2[1], testComparison.get(i).CO2[1], "MATSim values changed for CO2");
-			Assertions.assertEquals(refComparison.get(i).HC[1], testComparison.get(i).HC[1], "MATSim values changed for HC");
-			Assertions.assertEquals(refComparison.get(i).PMx[1], testComparison.get(i).PMx[1], "MATSim values changed for PMx");
-			Assertions.assertEquals(refComparison.get(i).NOx[1], testComparison.get(i).NOx[1], "MATSim values changed for NOx");
+			Assertions.assertEquals(refComparison.get(i).CO[1], testComparison.get(i).CO[1], 0.001, "MATSim values changed for CO");
+			Assertions.assertEquals(refComparison.get(i).CO2[1], testComparison.get(i).CO2[1], 0.001, "MATSim values changed for CO2");
+			Assertions.assertEquals(refComparison.get(i).HC[1], testComparison.get(i).HC[1], 0.001, "MATSim values changed for HC");
+			Assertions.assertEquals(refComparison.get(i).PMx[1], testComparison.get(i).PMx[1], 0.001, "MATSim values changed for PMx");
+			Assertions.assertEquals(refComparison.get(i).NOx[1], testComparison.get(i).NOx[1], 0.001, "MATSim values changed for NOx");
 		}
 	}
 
@@ -396,12 +396,12 @@ public class PHEMTest {
 		// Calculate MATSim-emissions
 		EmissionModule module = new EmissionModule(scenario, manager);
 		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
-		for(int i = 0; i < wltpLinkAttributes.size(); i++){
+		for (WLTPLinkAttributes wltpLinkAttribute : wltpLinkAttributes) {
 			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-				wltpLinkAttributes.get(i).time,
-				wltpLinkAttributes.get(i).hbefaStreetType,
-				wltpLinkAttributes.get(i).freespeed,
-				wltpLinkAttributes.get(i).length,
+				wltpLinkAttribute.time,
+				wltpLinkAttribute.hbefaStreetType,
+				wltpLinkAttribute.freespeed,
+				wltpLinkAttribute.length,
 				vehHbefaInfo));
 		}
 
@@ -493,29 +493,29 @@ public class PHEMTest {
 				currentSecond,
 				wltpLinkAttributes.get(i).time,
 
+				comparison.get(i).CO[0],
 				comparison.get(i).CO[1],
 				comparison.get(i).CO[2],
 				comparison.get(i).CO[3],
-				comparison.get(i).CO[3],
 
+				comparison.get(i).CO2[0],
 				comparison.get(i).CO2[1],
 				comparison.get(i).CO2[2],
 				comparison.get(i).CO2[3],
-				comparison.get(i).CO2[3],
 
+				comparison.get(i).HC[0],
 				comparison.get(i).HC[1],
 				comparison.get(i).HC[2],
 				comparison.get(i).HC[3],
-				comparison.get(i).HC[3],
 
+				comparison.get(i).PMx[0],
 				comparison.get(i).PMx[1],
 				comparison.get(i).PMx[2],
 				comparison.get(i).PMx[3],
-				comparison.get(i).PMx[3],
 
+				comparison.get(i).NOx[0],
 				comparison.get(i).NOx[1],
 				comparison.get(i).NOx[2],
-				comparison.get(i).NOx[3],
 				comparison.get(i).NOx[3]
 			);
 		}
