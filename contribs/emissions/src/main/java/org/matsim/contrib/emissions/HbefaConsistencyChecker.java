@@ -9,11 +9,11 @@ import java.util.*;
 public class HbefaConsistencyChecker {
 
 	/**
-	 * Tests the read-in hbefa-maps and makes sure that:
-	 * 	(1) Technology-column contains petrol or diesel
-	 * 	(2) EmissionConcept contains neither petrol nor diesel
-	 * 	(3) EmissionConcept and SizeClass contains "average" as fallback (used in technology-average-lookup)
-	 * 	(4) Average table contain only average entries in VehicleAttributes
+	 * Tests the read-in hbefa-maps and makes sure that: <br>
+	 * 	(1) Technology-column contains petrol or diesel <br>
+	 * 	(2) EmissionConcept contains neither petrol nor diesel <br>
+	 * 	(3) EmissionConcept and SizeClass contains "average" as fallback (used in technology-average-lookup) <br>
+	 * 	(4) Average table contain only average entries in VehicleAttributes <br>
 	 *
 	 * 	Background of this consistency check is an error in the hbefa database, which causes the column names to be named wrong.
 	 *
@@ -97,26 +97,28 @@ public class HbefaConsistencyChecker {
 			if( technologies.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() &&
 				technologies.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
 				throw new CorruptedHbefaTableException(
-					"Detailed warm table does not contains neither diesel nor petrol key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n"+
+					"Detailed warm table does not contain neither diesel nor petrol key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n"+
 					"The first 5 entries of technology-column are: " + Iterables.limit(technologies, 5));
 
 			if( !emConcepts.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() ||
 				!emConcepts.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
-				throw new CorruptedHbefaTableException("Detailed warm table contains diesel or petrol key in the emission-concept-column. Unless you specifically put them in, you are probably using a corrupted hbefa table! \n"+
+				throw new CorruptedHbefaTableException("Detailed warm table contain diesel or petrol key in the emission-concept-column. Unless you specifically put them in, you are probably using a corrupted hbefa table! \n"+
 					"The first 5 entries of emission-concept-column are: " + Iterables.limit(emConcepts, 5));
 
 			// Test (3)
 			if( !emConcepts.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
-					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
-					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
-					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+				throw new IllegalArgumentException("""
+					Emission-concept-column of warm detailed table does not contain average as key.\s
+					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
+					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
+					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()\s""");
 
 			if( !sizeClass.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
-					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
-					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
-					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+				throw new IllegalArgumentException("""
+					size-class-column of warm detailed table does not contain average as key.\s
+					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
+					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
+					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()\s""");
 
 			technologies.clear();
 			emConcepts.clear();
@@ -141,16 +143,18 @@ public class HbefaConsistencyChecker {
 
 			// Test (3)
 			if( !emConcepts.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
-					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
-					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
-					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+				throw new IllegalArgumentException("""
+					Emission-concept-column of warm detailed table does not contain average as key.\s
+					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
+					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
+					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()""");
 
 			if( !sizeClass.contains("average") )
-				throw new IllegalArgumentException("Emission-concept-column of warm detailed table does not contain average as key. " +
-					"This may cause problems with the lookup-behaviors \"tryDetailedThenTechnologyAverageElseAbort\" and " +
-					"\"tryDetailedThenTechnologyAverageThenAverageTable\". If you use one of these behaviors, make sure that an average entry exists! " +
-					"If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker() ");
+				throw new IllegalArgumentException("""
+					size-class-column of warm detailed table does not contain average as key.\s
+					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
+					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
+					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()""");
 
 			technologies.clear();
 			emConcepts.clear();
