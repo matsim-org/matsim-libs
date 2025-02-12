@@ -1,5 +1,6 @@
 package org.matsim.freight.carriers.consistency_checkers;
 
+import org.apache.logging.log4j.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -20,12 +21,15 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  *
  */
 public class VehicleScheduleTest {
-
+	//Please specify wanted logger level here:
+	//Level.WARN -> all log-messages will be displayed as errors in red.
+	//Level.WARN -> all log-messages will be displayed as warnings in red.
+	//Level.INFO -> all log-messages will be displayed as information in white.
+	Level lvl = Level.ERROR;
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-	 * This test should return true.
 	 */
 	@Test
 	void testVehicleScheduleShipment_passes() {
@@ -48,13 +52,12 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
+		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
 	}
 
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-	 * This test should return false, because:
 	 * - carrier "ccCarrierWithShipments1":
 	 * 		no vehicle is in operation when shipment "small_shipment_1" needs to be delivered
 	 * 		shipment "large_shipment_1" is too big for all vehicles
@@ -83,14 +86,13 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
+		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
 	}
 
 
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-	 * This test should return true.
 	 */
 	@Test
 	void testVehicleScheduleService_passes() {
@@ -113,13 +115,12 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
+		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
 	}
 
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
-	 * This test should return false, because:
 	 * - carrier "ccCarrierWithShipments1":
 	 * 		small_service_1: no vehicle in operation
 	 * 		medium_service_1: vehicle in operation is too small
@@ -148,8 +149,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
+		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
 	}
 
 }

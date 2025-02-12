@@ -3,7 +3,7 @@
 	<carrier id="ccCarrierWithShipments1">
 		<capabilities fleetSize="INFINITE">
 			<vehicles>
-				<vehicle id="cargo_bike_1a" depotLinkId="1" typeId="cargo_bike" earliestStart="07:00:00" latestEnd="11:00:00"/>
+				<vehicle id="cargo_bike_1a" depotLinkId="1" typeId="cargo_bike" earliestStart="07:00:00" latestEnd="12:00:00"/>
 				<vehicle id="cargo_bike_1b" depotLinkId="1" typeId="cargo_bike" earliestStart="12:00:00" latestEnd="14:00:00"/>
 				<vehicle id="heavy_truck_1" depotLinkId="1" typeId="heavy_truck" earliestStart="14:00:00" latestEnd="17:00:00"/>
 			</vehicles>
