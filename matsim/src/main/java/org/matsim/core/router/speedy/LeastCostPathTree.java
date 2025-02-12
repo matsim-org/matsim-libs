@@ -10,6 +10,8 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
@@ -242,7 +244,7 @@ public class LeastCostPathTree {
     }
 
     // by not exposing internal indices to the outside we ensure that only uncolored nodes are returned. nkuehnel Feb'25
-    public final class PathIterator {
+    public final class PathIterator implements Iterator<Node> {
 
         private int current;
 
@@ -250,11 +252,16 @@ public class LeastCostPathTree {
             current = startNode.getId().index();
         }
 
-        public Node next() {
+        @Override
+        public Node next() throws NoSuchElementException {
             current = comingFrom[current];
+            if (current < 0) {
+                throw new NoSuchElementException();
+            }
             return graph.getNode(current);
         }
 
+        @Override
         public boolean hasNext() {
             return comingFrom[current] >= 0;
         }
