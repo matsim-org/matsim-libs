@@ -50,12 +50,6 @@ public class CarrierConsistencyCheckers {
 	}
 	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand) {
 	}
-	//Fixme :)
-		//	public Result checkBefore(Level level) {
-		//		boolean habeFehlergefunden = false;  //oder per int=0 und je True hochzählen...
-		//		habeFehlergefunden =  capacityCheck().. (boolean zurückgeben (nur TRUE!!!))
-		//		andere...
-	//	}
 
 	public static CheckResult checkBefore(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
@@ -72,7 +66,18 @@ public class CarrierConsistencyCheckers {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
-
+	public static CheckResult checkAfter(Carriers carriers, Level lvl) {
+		setLogLevel(lvl);
+		int checkFailed = 0;
+		if (allJobsInTours(carriers, lvl)==CheckResult.CHECK_FAILED) {
+			checkFailed++;
+		}
+		if (checkFailed==0) {
+			return CheckResult.CHECK_SUCCESSFUL;
+		} else {
+			return CheckResult.CHECK_FAILED;
+		}
+	}
 	/**
 	 * @author antonstock
 	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.

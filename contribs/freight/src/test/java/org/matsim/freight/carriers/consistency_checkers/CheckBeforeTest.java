@@ -19,7 +19,7 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  *
  *
  * 	 */
-public class checkBefore {
+public class CheckBeforeTest {
 	//Please specify wanted logger level here:
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
