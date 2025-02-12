@@ -9,8 +9,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
-import java.util.List;
-
 public class EvBaseModule extends AbstractModule {
 	public void install(){
 		install(new ElectricFleetModule() );

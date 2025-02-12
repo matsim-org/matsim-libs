@@ -59,7 +59,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork, drtCfg.travelTimeMatrixCachePath));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 

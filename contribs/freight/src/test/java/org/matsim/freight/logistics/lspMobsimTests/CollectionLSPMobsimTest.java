@@ -46,6 +46,7 @@ import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -72,7 +73,7 @@ public class CollectionLSPMobsimTest {
 
 		// create config:
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);

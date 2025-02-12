@@ -34,21 +34,15 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 			throw new IllegalArgumentException("Mask needs length " + planModel.trips() + ": " + Arrays.toString(mask));
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
-
-		if (!planModel.hasEstimates()) {
-			service.initEstimates(context, planModel);
-		}
+		List<PlanModelService.ConstraintHolder<?>> constraints = calculator.buildConstraints(context, planModel);
 
 		Predicate<ModeEstimate> considerMode = m -> consideredModes == null || consideredModes.contains(m.getMode());
-
-		router.routeSingleTrip(planModel, planModel.filterModes(considerMode.and(ModeEstimate::isUsable)), idx);
-
-		service.calculateEstimates(context, planModel);
+		calculator.prepareEstimates(planModel, context, considerMode.and(ModeEstimate::isUsable), idx);
 
 		List<PlanCandidate> candidates = new ArrayList<>();
 
 		// construct candidates
-		for (List<ModeEstimate> value : planModel.getEstimates().values()) {
+		gen: for (List<ModeEstimate> value : planModel.getEstimates().values()) {
 
 			Optional<ModeEstimate> opt = value.stream()
 					.filter(ModeEstimate::isUsable)
@@ -68,10 +62,16 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 			String[] modes = planModel.getCurrentModes();
 			modes[idx] = est.getMode();
 
-			double estimate = est.getEstimates()[idx];
+			double estimate = calculator.calculatePlanEstimate(context, planModel, modes);
 
 			if (estimate == Double.NEGATIVE_INFINITY)
 				continue;
+
+			for (PlanModelService.ConstraintHolder<?> c : constraints) {
+				if (!c.test(modes)) {
+					continue gen;
+				}
+			}
 
 			candidates.add(new PlanCandidate(modes, estimate));
 		}

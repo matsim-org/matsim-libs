@@ -13,14 +13,22 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Router responsible for routing all possible modes between trips.
  */
 public final class EstimateRouter {
+
+	/**
+	 * Initial value for unrouted trips.
+	 */
+	static final List<Leg> UN_ROUTED = List.of();
 
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
@@ -41,30 +49,47 @@ public final class EstimateRouter {
 	/**
 	 * Route all modes that are relevant with all possible options.
 	 */
-	public void routeModes(PlanModel model, Collection<String> modes) {
+	public void routeModes(PlanModel model, Collection<String> modes, TripModeFilter filter) {
 
 		double[] startTimes = model.getStartTimes();
 
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 		calcStartTimes(model, timeTracker, startTimes, model.trips());
 
-		for (String mode : modes) {
+		String[] currentMode = model.getCurrentModesMutable();
 
-			List<Leg>[] legs = new List[model.trips()];
+		List<String> considerModes = Stream.concat(Arrays.stream(currentMode), modes.stream())
+			.filter(Objects::nonNull)
+			.distinct()
+			.toList();
+
+
+		for (String mode : considerModes) {
+
+			// Null may be put into the collection, which will just be ignored here
+			if (mode == null)
+				continue;
+
+			// Legs will be updated in-place
+			List<Leg>[] legs = model.getLegs(mode, UN_ROUTED);
 
 			int i = 0;
-
 			for (TripStructureUtils.Trip oldTrip : model) {
 
-				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
-
-				timeTracker.setTime(startTimes[i]);
-
-				// Ignored mode
-				if (!modes.contains(routingMode)) {
-					legs[i++] = null;
+				// The current modes are always routed, regardless of filter.
+				// they are always needed to score whole plan
+				if (!filter.accept(mode, i) && !mode.equals(currentMode[i])) {
+					i++;
 					continue;
 				}
+
+				// Skip entries that are already routed
+				if (legs[i] != UN_ROUTED) {
+					i++;
+					continue;
+				}
+
+				timeTracker.setTime(startTimes[i]);
 
 				Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
 				Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
@@ -97,49 +122,6 @@ public final class EstimateRouter {
 				legs[i++] = ll;
 
 			}
-
-			model.setLegs(mode, legs);
-		}
-
-		model.setFullyRouted(true);
-	}
-
-	/**
-	 * Route a single trip with certain index.
-	 */
-	public void routeSingleTrip(PlanModel model, Collection<String> modes, int idx) {
-
-		double[] startTimes = model.getStartTimes();
-		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-
-		// Plus one so that start time idx is calculated
-		calcStartTimes(model, timeTracker, startTimes, idx + 1);
-
-		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
-
-		Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
-		Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
-
-		for (String mode : modes) {
-
-			timeTracker.setTime(startTimes[idx]);
-
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
-					mode, from, to,
-					oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
-					model.getPerson(),
-					oldTrip.getTripAttributes()
-			);
-
-			List<Leg> ll = newTrip.stream()
-					.filter(el -> el instanceof Leg)
-					.map(el -> (Leg) el)
-					.collect(Collectors.toList());
-
-			List<Leg>[] legs = new List[model.trips()];
-			legs[idx] = ll;
-
-			model.setLegs(mode, legs);
 		}
 	}
 
