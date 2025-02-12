@@ -46,7 +46,6 @@ import picocli.CommandLine;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 @CommandLine.Command(
 	name = "transit", description = "General public transit analysis.",
@@ -55,7 +54,8 @@ import java.nio.file.Path;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"pt_pax_volumes.csv.gz",
-		"pt_pax_per_hour_and_vehicle_type.csv"
+		"pt_pax_per_hour_and_vehicle_type.csv",
+		"pt_pax_per_hour_and_vehicle_type_and_agency.csv"
 	}
 )
 public class PublicTransitAnalysis implements MATSimAppCommand {
@@ -85,7 +85,7 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
 		PtStop2StopAnalysis ptStop2StopEventHandler = new PtStop2StopAnalysis(scenario.getTransitVehicles(), sample.getUpscaleFactor());
-		PtPassengerCountsEventHandler passengerCountsHandler = new PtPassengerCountsEventHandler(scenario.getTransitVehicles());
+		PtPassengerCountsEventHandler passengerCountsHandler = new PtPassengerCountsEventHandler(scenario.getTransitSchedule(), scenario.getTransitVehicles());
 
 		eventsManager.addHandler(ptStop2StopEventHandler);
 		eventsManager.addHandler(passengerCountsHandler);
@@ -108,9 +108,7 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 
 	private void writePassengerCounts(PtPassengerCountsEventHandler handler) {
 
-		Path path = output.getPath("pt_pax_per_hour_and_vehicle_type.csv");
-
-		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(path, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output.getPath("pt_pax_per_hour_and_vehicle_type.csv"), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
 
 			csv.printRecord("vehicle_type", "hour", "passenger_count");
 			for (Int2ObjectMap.Entry<Object2IntMap<Id<VehicleType>>> kv : handler.getCounts().int2ObjectEntrySet()) {
@@ -122,6 +120,22 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		} catch (IOException e) {
 			log.error("Error writing passenger counts.", e);
 		}
+
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output.getPath("pt_pax_per_hour_and_vehicle_type_and_agency.csv"), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("vehicle_type", "agency", "hour", "passenger_count");
+			for (Int2ObjectMap.Entry<Object2IntMap<PtPassengerCountsEventHandler.AgencyVehicleType>> kv : handler.getAgencyCounts().int2ObjectEntrySet()) {
+				for (Object2IntMap.Entry<PtPassengerCountsEventHandler.AgencyVehicleType> vc : kv.getValue().object2IntEntrySet()) {
+					csv.printRecord(vc.getKey().vehicleType(), vc.getKey().agency(), kv.getIntKey(), vc.getIntValue() * sample.getUpscaleFactor());
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Error writing passenger counts.", e);
+		}
+
+
 	}
 
 	private Config prepareConfig() {
