@@ -17,11 +17,9 @@ public class CarrierConsistencyCheckers {
 	public enum AllJobsInToursDetailedCheckResult {
 		ALL_JOBS_IN_TOURS, NOT_ALL_JOBS_IN_TOURS, JOBS_SCHEDULED_MULTIPLE_TIMES, JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, JOBS_IN_TOUR_BUT_NOT_LISTED, CHECK_SUCCESSFUL, CHECK_FAILED, ERROR
 	}
-
+	//needed for log messages, log level etc.
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
-
 	private static Level currentLevel;
-
 	public static void setLogLevel(Level level) {
 		currentLevel = level;
 		Configurator.setLevel(log.getName(), level);
