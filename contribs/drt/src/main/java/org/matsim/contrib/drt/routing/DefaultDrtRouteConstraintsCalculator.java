@@ -46,8 +46,7 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
 			double maxDetour = Math.max(defaultSet.minimumAllowedDetour, unsharedRideTime * (defaultSet.maxDetourAlpha -1) + defaultSet.maxDetourBeta);
 			double maxRideTime = unsharedRideTime + Math.min(defaultSet.maxAbsoluteDetour, maxDetour);
 			double maxWaitTime = constraintsSet.maxWaitTime;
-
-			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime);
+			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime, constraintsSet.maxAllowedPickupDelay, constraintsSet.lateDiversionthreshold);
 		} else {
 			throw new IllegalArgumentException("Constraint set is not a default set");
 		}

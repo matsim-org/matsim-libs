@@ -40,6 +40,8 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
+	private final double maxPickupDelay;
+	private final double lateDiversionThreshold;
 
 	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
@@ -58,6 +60,8 @@ public class DrtRequest implements PassengerRequest {
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
+		maxPickupDelay = builder.maxPickupDelay;
+		lateDiversionThreshold = builder.lateDiversionThreshold;
 	}
 
 	public static Builder newBuilder() {
@@ -76,6 +80,8 @@ public class DrtRequest implements PassengerRequest {
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
+		builder.maxPickupDelay = copy.getMaxPickupDelay();
+		builder.lateDiversionThreshold = copy.getLateDiversionThreshold();
 		return builder;
 	}
 
@@ -106,6 +112,10 @@ public class DrtRequest implements PassengerRequest {
 	public double getMaxRideDuration() {
 		return maxRideDuration;
 	}
+
+	public double getMaxPickupDelay() {return maxPickupDelay;}
+
+	public double getLateDiversionThreshold() {return lateDiversionThreshold;}
 
 	@Override
 	public Link getFromLink() {
@@ -155,6 +165,8 @@ public class DrtRequest implements PassengerRequest {
 		private double latestStartTime;
 		private double latestArrivalTime;
 		private double maxRideDuration;
+		private double maxPickupDelay;
+		private double lateDiversionThreshold;
 		private List<Id<Person>> passengerIds = new ArrayList<>();
 		private String mode;
 		private Link fromLink;
@@ -190,6 +202,16 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder maxRideDuration(double maxRideDuration) {
 			this.maxRideDuration = maxRideDuration;
+			return this;
+		}
+
+		public Builder maxPickupDelay(double maxPickupDelay) {
+			this.maxPickupDelay = maxPickupDelay;
+			return this;
+		}
+
+		public Builder lateDiversionThreshold(double lateDiversionThreshold) {
+			this.lateDiversionThreshold = lateDiversionThreshold;
 			return this;
 		}
 
