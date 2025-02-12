@@ -1,8 +1,10 @@
-package org.matsim.freight.carriers;
+package org.matsim.freight.carriers.consistency_checkers;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -41,6 +43,14 @@ public class CarrierConsistencyCheckers {
 
 	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand) {
 	}
+
+	//Fixme :)
+//	public Result checkBefore(Level level) {
+//		boolean habeFehlergefunden = false;  //oder per int=0 und je True hochzählen...
+//		habeFehlergefunden =  capacityCheck().. (boolean zurückgeben (nur TRUE!!!))
+//		andere...
+//	}
+
 	/**
 	 * @author antonstock
 	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
@@ -48,7 +58,7 @@ public class CarrierConsistencyCheckers {
 	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
 	 */
-	public static capacityCheckResult capacityCheck(Carriers carriers) {
+	/*package-private*/ static capacityCheckResult capacityCheck(Carriers carriers) {
 
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
