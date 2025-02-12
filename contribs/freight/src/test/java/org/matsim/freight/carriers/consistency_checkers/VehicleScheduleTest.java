@@ -3,7 +3,6 @@ package org.matsim.freight.carriers.consistency_checkers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -24,15 +23,6 @@ public class VehicleScheduleTest {
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
-
-	//@ Anton: Habe hier auch noch nit im Detail rein geschaut. Was mir sofort auffällt: Bitte analog zum anderen Test:
-	// -> bis auf 3. erledigt
-	//
-	// 3.) Assertions statt Assert -> TODO: Umbau mache ich zusammen mit der Umstellung auf Enum
-	//
-	//
-
-
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 * This test should return true.
@@ -58,8 +48,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
+		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
 	}
 
 	/**
@@ -73,7 +63,7 @@ public class VehicleScheduleTest {
 	 * 		shipment "large_shipment_2" is too big for all vehicles
 	 */
 	@Test
-	void testVehicleScheduleShipment_failes() {
+	void testVehicleScheduleShipment_fails() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
@@ -93,8 +83,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertFalse(areCarriersCapable, "All jobs can be handled.");
+		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
 	}
 
 
@@ -123,8 +113,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assert.isTrue(areCarriersCapable, "At least one job can NOT be handled.");
+		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
 	}
 
 	/**
@@ -138,7 +128,7 @@ public class VehicleScheduleTest {
 	 *		extra_large_service_2: vehicles are too small
 	 */
 	@Test
-	void testVehicleScheduleService_failes() {
+	void testVehicleScheduleService_fails() {
 
 		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
@@ -158,8 +148,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		boolean areCarriersCapable = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
-		Assertions.assertFalse(areCarriersCapable, "All jobs can be handled.");
+		CarrierConsistencyCheckers.scheduleCheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers);
+		Assertions.assertEquals(CarrierConsistencyCheckers.scheduleCheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
 	}
 
 }

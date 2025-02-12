@@ -15,7 +15,7 @@ public class CarrierConsistencyCheckers {
 	}
 	//TODO: ScheduleTest auf enum umstellen
 	public enum scheduleCheckResult {
-		VEHICLE_AVAILABLE, NO_VEHICLE_AVAILABLE
+		CHECK_SUCCESSFUL, CHECK_FAILED
 	}
 
 	public enum allJobsInTourCheckResult {
@@ -116,8 +116,8 @@ public class CarrierConsistencyCheckers {
 	/**
 	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
 	 */
-	//TODO: Umstellung von boolean auf enum
-	public static boolean vehicleScheduleTest(Carriers carriers) {
+
+	public static scheduleCheckResult vehicleScheduleTest(Carriers carriers) {
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 		//go through all carriers
@@ -158,7 +158,7 @@ public class CarrierConsistencyCheckers {
 			//TODO: Was will IntelliJ hier?
 			// @Anton: er sagt (und das sehe ich auch so), dass du nur Einträge in die Map rein packst, aber nie lesend auf die Map zugreifst. also irgendwas damit machst.
 			// Das ist also ein Hinweis drauf, dass es entweder die Map nicht braucht oder aber man etwas nicht zu Ende ausgearbeitet hat.
-			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
+			//Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
 			//run through all existing shipments
 			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
 				//determine pickup time window
@@ -186,9 +186,7 @@ public class CarrierConsistencyCheckers {
 					}
 				}
 				//if shipment is transportable => job is feasible
-				if (isTransportable) {
-					feasibleJob.put(shipmentID, possibleVehicles);
-				} else {
+				if (!isTransportable) {
 					nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup");
 				}
 			}
@@ -217,16 +215,13 @@ public class CarrierConsistencyCheckers {
 						possibleVehicles.add(vehicleID);
 					}
 				}
-				if (isTransportable) {
-					feasibleJob.put(shipmentID, possibleVehicles);
-				} else {
+				if (!isTransportable) {
 					//if current shipment is already saved in nonFeasibleJob, the shipment can neither be picked up nor delivered
 					if (nonFeasibleJob.containsKey(shipmentID)) {
 						nonFeasibleJob.put(shipmentID, "No sufficient vehicle for pickup and delivery");
 					} else {
 						nonFeasibleJob.put(shipmentID, "No sufficient vehicle for delivery");
 					}
-
 				}
 			}
 
@@ -255,9 +250,7 @@ public class CarrierConsistencyCheckers {
 						possibleVehicles.add(vehicleID);
 					}
 				}
-				if (isTransportable) {
-					feasibleJob.put(serviceID, possibleVehicles);
-				} else {
+				if (!isTransportable) {
 					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service");
 				}
 			}
@@ -271,13 +264,17 @@ public class CarrierConsistencyCheckers {
 		}
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		//TODO: Umstellung auf enum
-		boolean allCarriersCapable = isCarrierCapable.values().stream().allMatch(v -> v);
+
 		isCarrierCapable.forEach((carrierId, value) -> {
 			if (!value) {
 				log.warn("Carrier " + carrierId + " can not handle all jobs.");
 			}
 		});
-		return allCarriersCapable;
+		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
+			return scheduleCheckResult.CHECK_SUCCESSFUL;
+			} else {
+			return scheduleCheckResult.CHECK_FAILED;
+		}
 	}
 
 	/**
@@ -290,12 +287,6 @@ public class CarrierConsistencyCheckers {
 		boolean jobInToursMoreThanOnce = false;
 		boolean jobIsMissing = false;
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			//TODO: @KMT: Soll die Prüfung über alle Touren hinweg oder für jede Tour einzeln gemacht werden?
-			// @Anton: Wenn das der Test ist, ob alle Jobs auch auf Touren geplant sind, dass muss der Test schauen,
-			// ob jeder Job vom Carrier(!) exakt einmal in irgendeiner seiner (einen oder mehreren) Touren auftaucht.
-
-			//Aktuell wird es für jede Tour einzeln gemacht
-			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 			List<Id<? extends CarrierJob>> serviceInTour = new LinkedList<>();
 			List<String> shipmentInTour = new LinkedList<>();
 
@@ -304,7 +295,8 @@ public class CarrierConsistencyCheckers {
 
 			Map<Id<? extends CarrierJob>, Integer> serviceCount = new HashMap<>();
 			Map<String, Integer> shipmentCount = new HashMap<>();
-			//hier müsste for (tour) hin, wenn über alle Touren zusammen
+
+			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 					//carrier only has one job-type: services or shipments
 					//service is saved as an Id
@@ -316,7 +308,7 @@ public class CarrierConsistencyCheckers {
 						shipmentInTour.add(shipmentBasedActivity.getShipment().getId() + " | " + shipmentBasedActivity.getActivityType());
 					}
 				}
-			//hier muss dann }
+			}
 
 			//save all jobs the current carrier should do
 			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix CarrierConstants.PICKUP /.DELIVERY
@@ -379,8 +371,6 @@ public class CarrierConsistencyCheckers {
 			} else {
 				log.info("Carrier '{}': All jobs are scheduled once.", carrier.getId());
 				isCarrierCapable.put(carrier.getId(), allJobsInTourCheckResult.ALL_JOBS_IN_TOURS);
-			}
-		//diese Klammer muss weg, wenn die Touren-Logik geändert wird
 			}
 		}
 		//TODO: Evtl Rückbau auf Boolean oder nur zwei (bzw. drei) Enums: TOUR_CHECK_SUCCESS / TOUR_CHECK_FAIL / ERROR

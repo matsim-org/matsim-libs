@@ -82,7 +82,7 @@ public class TourTestShipments {
 	 * This test is supposed to return JOBS_SCHEDULED_MULTIPLE_TIMES, because job "parcel_2" is scheduled twice.
 	 */
 	@Test
-	void testTour_shipment_failes_1() {
+	void testTour_shipment_fails_1() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -129,7 +129,7 @@ public class TourTestShipments {
 	 * NOTE: If pickup of a shipment is missing but the delivery is part of a tour, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
 	@Test
-	void testTour_shipment_failes_2() {
+	void testTour_shipment_fails_2() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -176,7 +176,7 @@ public class TourTestShipments {
 	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
 	@Test
-	void testTour_shipment_failes_3() {
+	void testTour_shipment_fails_3() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -221,7 +221,7 @@ public class TourTestShipments {
 	 * This test is supposed to catch a NullPointerException, because the tour of carrier1 has "parcel_ab"'s pickup and delivery scheduled, but not listed as a shipment.
 	 */
 	@Test
-	void testTour_shipment_failes_4() {
+	void testTour_shipment_fails_4() {
 		//@KMT: Diese Lösung ist nicht besonders elegant, gibt es da vielleicht eine bessere Option?
 
 		String pathToInput = utils.getPackageInputDirectory();

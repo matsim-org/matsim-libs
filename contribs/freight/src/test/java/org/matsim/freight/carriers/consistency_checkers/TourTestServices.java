@@ -85,7 +85,7 @@ public class TourTestServices {
 	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
 	 */
 	@Test
-	void testTour_services_failes_1() {
+	void testTour_services_fails_1() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -131,7 +131,7 @@ public class TourTestServices {
 	 * This test is supposed to return NOT_ALL_JOBS_IN_TOURS, because jobs "parcel_8" is not scheduled.
 	 */
 	@Test
-	void testTour_services_failes_2() {
+	void testTour_services_fails_2() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -177,7 +177,7 @@ public class TourTestServices {
 	 * This test is supposed to return JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, because jobs "parcel_8" is not scheduled and job "parcel_3" is scheduled twice.
 	 */
 	@Test
-	void testTour_services_failes_3() {
+	void testTour_services_fails_3() {
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
@@ -222,7 +222,7 @@ public class TourTestServices {
 	 * This test is supposed to catch a UncheckedIOException, because the tour of carrier1 has service "parcel_ab" scheduled, but not listed as a service.
 	 */
 	@Test
-	void testTour_services_failes_4() {
+	void testTour_services_fails_4() {
 		//@KMT: Diese Lösung ist nicht besonders elegant, gibt es da vielleicht eine bessere Option?
 
 		String pathToInput = utils.getPackageInputDirectory();

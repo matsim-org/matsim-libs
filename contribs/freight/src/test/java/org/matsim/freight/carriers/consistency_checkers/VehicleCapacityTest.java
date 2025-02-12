@@ -56,7 +56,7 @@ public class VehicleCapacityTest {
 	 * ccCarrierWithShipments2: shipment "large_shipment" capacity demand of 16 is too high
 	 */
 	@Test
-	void testVehicleCapacityShipments_failes() {
+	void testVehicleCapacityShipments_fails() {
 
 		Config config = ConfigUtils.createConfig();
 
