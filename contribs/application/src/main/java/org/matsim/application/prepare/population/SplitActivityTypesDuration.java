@@ -135,6 +135,8 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 				String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
 				act.setType(newType);
 
+				// activities that are shorter than endTimeToDuration will be forced to have their initial duration.
+				// Talk to KN or to Tilmann if you need to understand this.
 				if (duration <= endTimeToDuration && act.getEndTime().isDefined()) {
 					act.setEndTimeUndefined();
 					act.setMaximumDuration(duration);
