@@ -26,4 +26,9 @@ public abstract class LSPConstants extends CarrierConstants {
   public static final String SHIPMENT_PLANS = "shipmentPlans";
   public static final String START_TIME = "startTime";
   public static final String TYPE = "type";
+  //Shipment activity types
+  public static final String HANDLING = "HANDLING"; //"Handle" sounds a bit unclear in the German translation. Therefor we are breaking the unofficial naming convention here. KMT/KN jan'25
+  public static final String LOAD = "LOAD";
+  public static final String TRANSPORT = "TRANSPORT";
+  public static final String UNLOAD = "UNLOAD";
 }
