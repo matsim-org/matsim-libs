@@ -15,37 +15,58 @@ public class ProfilingEventsModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		addControlerListenerBinding().to(IterationTimer.class);
+		var iterationTimer = new JFRIterationTimer();
+		addControlerListenerBinding().toInstance(iterationTimer.startListener);
+		addControlerListenerBinding().toInstance(iterationTimer);
 		addControlerListenerBinding().to(MatsimEvents.class);
 		addMobsimListenerBinding().to(MobsimTimer.class);
 	}
 
-	private static final class IterationTimer implements IterationStartsListener, IterationEndsListener {
+	static class JFRIterationTimer implements IterationEndsListener {
 
-		private JFRIterationEvent event = null;
+		private final StartListener startListener = new StartListener();
 
+		static class StartListener implements IterationStartsListener {
 
+			private JFRIterationEvent event = null;
+
+			/**
+			 * @return Almost highest possible priority to start before most other listeners.
+			 * 		   Run only after instrumentation start listener.
+			 */
+			@Override
+			public double priority() {
+				return Double.MAX_VALUE - 100;
+			}
+
+			@Override
+			public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
+				if (event != null) {
+					event.commit();
+				}
+				event = new JFRIterationEvent(iterationStartsEvent.getIteration());
+				event.begin();
+			}
+
+		}
+
+		/**
+		 * @return Almost lowest possible priority to end after most other listeners.
+		 * 		   Only run before instrumentation end listener.
+		 */
 		@Override
 		public double priority() {
-			return Double.MAX_VALUE - 100;
+			return Double.MIN_VALUE + 100;
 		}
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			if (event != null) {
-				event.commit();
-				event = null;
+			if (startListener.event != null) {
+				startListener.event.commit();
+				startListener.event = null;
 			}
 		}
 
-		@Override
-		public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
-			if (event != null) {
-				event.commit();
-			}
-			event = new JFRIterationEvent(iterationStartsEvent.getIteration());
-			event.begin();
-		}
 	}
 
 	private static final class MobsimTimer implements MobsimInitializedListener, MobsimBeforeCleanupListener {
