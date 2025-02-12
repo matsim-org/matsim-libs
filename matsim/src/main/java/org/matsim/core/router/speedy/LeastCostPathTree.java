@@ -204,13 +204,8 @@ public class LeastCostPathTree {
         this.data[index + 2] = distance;
     }
 
-    public int getComingFrom(int nodeIndex) {
-        if (graph.hasTurnRestrictions()) {
-            // always make sure to only expose uncolored node indices. nkuehnel Feb'25
-            return graph.getNode(comingFrom[nodeIndex]).getId().index();
-        } else {
-            return this.comingFrom[nodeIndex];
-        }
+    public PathIterator getComingFromIterator(Node node) {
+        return new PathIterator(node);
     }
 
     public interface StopCriterion {
@@ -246,4 +241,22 @@ public class LeastCostPathTree {
         }
     }
 
+    // by not exposing internal indices to the outside we ensure that only uncolored nodes are returned. nkuehnel Feb'25
+    public final class PathIterator {
+
+        private int current;
+
+        public PathIterator(Node startNode) {
+            current = startNode.getId().index();
+        }
+
+        public Node next() {
+            current = comingFrom[current];
+            return graph.getNode(current);
+        }
+
+        public boolean hasNext() {
+            return comingFrom[current] >= 0;
+        }
+    }
 }

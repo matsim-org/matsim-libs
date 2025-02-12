@@ -60,7 +60,7 @@ class OneToManyPathCalculator {
 	private final double startTime;
 
 	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
-			boolean forwardSearch, Link fromLink, double startTime) {
+							boolean forwardSearch, Link fromLink, double startTime) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
 		this.travelTime = travelTime;
@@ -145,10 +145,9 @@ class OneToManyPathCalculator {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.add(toNode);
 
-		int index = dijkstraTree.getComingFrom(toNode.getId().index());
-		while (index >= 0) {
-			nodes.add(nodeMap.get(Id.get(index, Node.class)));
-			index = dijkstraTree.getComingFrom(index);
+		LeastCostPathTree.PathIterator pathIterator = dijkstraTree.getComingFromIterator(toNode);
+		while (pathIterator.hasNext()) {
+			nodes.add(pathIterator.next());
 		}
 
 		if (forward) {
