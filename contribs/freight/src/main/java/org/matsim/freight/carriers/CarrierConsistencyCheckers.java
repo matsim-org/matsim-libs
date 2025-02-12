@@ -135,6 +135,7 @@ public class CarrierConsistencyCheckers {
 				vehicleOperationWindows.put(vehicleID, new VehicleInfo(operationWindow, vehicleCapacity));
 			}
 			//TODO: @KMT: Wenn Pickup und Delivery von demselben Fahrzeug gemacht werden muss, kann hier einiges an Code weg und in die untere Schleife eingebaut werden
+			// @Anton: Ja, das muss vom gleichen Fzg (also innerhalb der gleichen Toru gemacht werden. Sonst würden sich ja Sendungen heimlich im Fzg ansammeln ;)
 			/*
 			 * SHIPMENTS PART - Pickup
 			 */
@@ -145,6 +146,8 @@ public class CarrierConsistencyCheckers {
 
 			//feasibleJob saves job ID and vehicle ID of all feasible Jobs
 			//TODO: Was will IntelliJ hier?
+			// @Anton: er sagt (und das sehe ich auch so), dass du nur Einträge in die Map rein packst, aber nie lesend auf die Map zugreifst. also irgendwas damit machst.
+			// Das ist also ein Hinweis drauf, dass es entweder die Map nicht braucht oder aber man etwas nicht zu Ende ausgearbeitet hat.
 			Map<Id<? extends CarrierJob>, List<Id<Vehicle>>> feasibleJob = new HashMap<>();
 			//run through all existing shipments
 			for (Id<? extends CarrierJob> shipmentID : shipmentPickupWindows.keySet()) {
@@ -268,7 +271,8 @@ public class CarrierConsistencyCheckers {
 	}
 
 	/**
-	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once (if the job is a shipment, pickup and delivery are two different jobs).
+	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once
+	 * (if the job is a shipment, pickup and delivery are two different jobs).
 	 */
 	public static allJobsInTourCheckResult allJobsInTours(Carriers carriers) {
 		Map<Id<Carrier>, allJobsInTourCheckResult> isCarrierCapable = new HashMap<>();
@@ -277,6 +281,9 @@ public class CarrierConsistencyCheckers {
 		boolean jobIsMissing = false;
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			//TODO: @KMT: Soll die Prüfung über alle Touren hinweg oder für jede Tour einzeln gemacht werden?
+			// @Anton: Wenn das der Test ist, ob alle Jobs auch auf Touren geplant sind, dass muss der Test schauen,
+			// ob jeder Job vom Carrier(!) exakt einmal in irgendeiner seiner (einen oder mehreren) Touren auftaucht.
+
 			//Aktuell wird es für jede Tour einzeln gemacht
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 			List<Id<? extends CarrierJob>> serviceInTour = new LinkedList<>();
@@ -367,6 +374,9 @@ public class CarrierConsistencyCheckers {
 			}
 		}
 		//TODO: Evtl Rückbau auf Boolean oder nur zwei (bzw. drei) Enums: TOUR_CHECK_SUCCESS / TOUR_CHECK_FAIL / ERROR
+		// Ja, klingt sinnvoll für mich. Wobei du die Rückmeldung, was intern war, ja gerne dennoch mit diesem Detail-grad
+		// intern für die Tests und die Logausgabe behalten kannst.
+		// --> Lass uns allgemein mal gemeinsam in den VspConsistencyChecker schauen, wie der umgesetzt ist.
 		if (isCarrierCapable.values().stream().allMatch(v -> v.equals(allJobsInTourCheckResult.ALL_JOBS_IN_TOURS))) {
 			return allJobsInTourCheckResult.ALL_JOBS_IN_TOURS;
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals(allJobsInTourCheckResult.NOT_ALL_JOBS_IN_TOURS))) {
