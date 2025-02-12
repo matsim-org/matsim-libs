@@ -20,7 +20,7 @@ public class ConfigOptions {
 	 * Tries to load the config from folder if no specific config has been given via command line.
 	 * @see ApplicationUtils#matchInput(String, Path)
 	 */
-	public Config loadFromPath(Path path) {
+	public Config loadConfig(Path path) {
 		if (configPath == null) {
 			return ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", path).toAbsolutePath().toString());
 		}

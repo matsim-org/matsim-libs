@@ -29,7 +29,6 @@ import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
 import org.matsim.contrib.emissions.analysis.Raster;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
@@ -155,7 +154,7 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 	}
 
 	private Config prepareConfig() {
-		Config config = co.loadFromPath(input.getRunDirectory());
+		Config config = co.loadConfig(input.getRunDirectory());
 
 		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
