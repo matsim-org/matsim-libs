@@ -155,7 +155,7 @@ public final class SimWrapper {
 
 		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
+		int i = 1;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
