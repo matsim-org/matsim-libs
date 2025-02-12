@@ -87,6 +87,7 @@
 		<module>osm</module>
 		<module>otfvis</module>
 		<module>parking</module>
+		<module>profiling-utils</module>
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
 		<module>railsim</module>
@@ -101,7 +102,7 @@
 		<module>sumo</module>
 		<module>taxi</module>
 		<module>vsp</module>
-    </modules>
+	</modules>
 
 	<dependencies>
 		<dependency>
