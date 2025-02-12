@@ -118,7 +118,7 @@ public class SimWrapperTest {
 
 		simWrapper.generate(Path.of(outputDirectory));
 
-		Assertions.assertThat(new File(outputDirectory, "dashboard-0.yaml"))
+		Assertions.assertThat(new File(outputDirectory, "dashboard-1.yaml"))
 				.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-0.yaml"));
 
 	}
@@ -152,7 +152,7 @@ public class SimWrapperTest {
 
 		simWrapper.generate(Path.of(outputDirectory));
 
-		Assertions.assertThat(new File(outputDirectory, "dashboard-0.yaml"))
+		Assertions.assertThat(new File(outputDirectory, "dashboard-1.yaml"))
 			.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-1.yaml"));
 
 	}
