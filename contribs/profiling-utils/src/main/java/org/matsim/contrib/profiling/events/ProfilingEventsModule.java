@@ -32,10 +32,7 @@ public class ProfilingEventsModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			if (event == null) {
-				var errorEvent = new JFRProfilingErrorEvent("Iteration ended but event was null");
-				errorEvent.commit();
-			} else {
+			if (event != null) {
 				event.commit();
 				event = null;
 			}
@@ -44,8 +41,6 @@ public class ProfilingEventsModule extends AbstractModule {
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
 			if (event != null) {
-				var errorEvent = new JFRProfilingErrorEvent("Iteration started but event was not null");
-				errorEvent.commit();
 				event.commit();
 			}
 			event = new JFRIterationEvent(iterationStartsEvent.getIteration());
@@ -59,10 +54,7 @@ public class ProfilingEventsModule extends AbstractModule {
 
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent mobsimBeforeCleanupEvent) {
-			if (event == null) {
-				var errorEvent = new JFRProfilingErrorEvent("Mobsim ended but event was null");
-				errorEvent.commit();
-			} else {
+			if (event != null) {
 				event.commit();
 				event = null;
 			}
@@ -71,8 +63,6 @@ public class ProfilingEventsModule extends AbstractModule {
 		@Override
 		public void notifyMobsimInitialized(MobsimInitializedEvent mobsimInitializedEvent) {
 			if (event != null) {
-				var errorEvent = new JFRProfilingErrorEvent("Mobsim started but event was not null");
-				errorEvent.commit();
 				event.commit();
 			}
 			event = new JFRMobsimEvent();
