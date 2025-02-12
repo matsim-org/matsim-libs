@@ -64,7 +64,7 @@ public class ServicesTourTest {
 	}
 
 	/**
-	 * This test is supposed to return CHECK_FAILED, because job "parcel_2" is scheduled twice.
+	 * This test is supposed to return CHECK_FAILED, because job "parcel_2" is scheduled three times.
 	 */
 	@Test
 	void testTour_services_fails_1() {
