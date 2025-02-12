@@ -11,6 +11,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
@@ -146,8 +147,12 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 * Run dashboard creation and execution. This method is useful when used outside MATSim.
 	 */
 	public void run(Path output) throws IOException {
+		run(output, null);
+	}
+
+	void run(Path output, @Nullable String configPath) throws IOException {
 		generate(output);
-		simWrapper.run(output);
+		simWrapper.run(output, configPath);
 	}
 
 }
