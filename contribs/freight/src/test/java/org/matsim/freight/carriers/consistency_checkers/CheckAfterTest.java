@@ -16,6 +16,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
 /**
+ * TODO: @Anton: Bitte noch etwas dokumentieren, was du hier testest. Allgemein hier oben und dann an den einzelnen Tests. Danke.
  *
  *  @author antonstock
  *
@@ -29,6 +30,7 @@ public class CheckAfterTest {
 	Level lvl = Level.ERROR;
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	void checkAfter_passes() {
 		Config config = ConfigUtils.createConfig();
@@ -41,9 +43,10 @@ public class CheckAfterTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL,testResult,"At least one check failed.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL,checkResult,"At least one check failed.");
 	}
+
 	@Test
 	void checkAfter_fails() {
 		Config config = ConfigUtils.createConfig();
@@ -56,7 +59,7 @@ public class CheckAfterTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED,testResult,"All checks passed.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED,checkResult,"All checks passed.");
 	}
 }

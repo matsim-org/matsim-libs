@@ -54,8 +54,8 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "There is at least one inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "There is at least one inconsistency within the selected plan!");
 
 
 	}
@@ -81,14 +81,14 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
 
 	/**
 	 * This test is supposed to return CHECK_FAILED, because both pickup and delivery of "parcel_5" are not scheduled.
-	 * NOTE: If pickup of a shipment is missing but the delivery is part of a tour, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
+	 * NOTE: If pickup of a shipment is missing but the delivery is part of a tour, CarrierPlanXmlReader will throw a IllegalStateException. These scenarios are not part of this test.
 	 */
 	@Test
 	void testTour_shipment_fails_2() {
@@ -108,14 +108,14 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
 
 	/**
 	 * This test is supposed to return CHECK_FAILED, because both pickup and delivery of "parcel_5" are not scheduled and pickup of "parcel_1" is scheduled twice.
-	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateExeption. These scenarios are not part of this test.
+	 * NOTE: If the delivery of a shipment is scheduled n times but its pickup n-1 times, CarrierPlanXmlReader will throw a IllegalStateException. These scenarios are not part of this test.
 	 */
 	@Test
 	void testTour_shipment_fails_3() {
@@ -135,8 +135,8 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 	}
 
 	/**
@@ -147,8 +147,8 @@ public class ShipmentsTourTest {
 		//@KMT: Diese Lösung ist nicht besonders elegant, gibt es da vielleicht eine bessere Option?
 
 		String pathToInput = utils.getPackageInputDirectory();
-		boolean exceptionCatched = false;
-		CarrierConsistencyCheckers.CheckResult testResult;
+		boolean exceptionCaught = false;
+		CarrierConsistencyCheckers.CheckResult checkResult;
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
@@ -162,16 +162,16 @@ public class ShipmentsTourTest {
 		try {
 			CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 		} catch (NullPointerException e) {
-			exceptionCatched = true;
+			exceptionCaught = true;
 		}
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		if (!exceptionCatched) {
-			testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		if (!exceptionCaught) {
+			checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
 		} else {
-			testResult = CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
+			checkResult = CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
 		}
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 	}
 }

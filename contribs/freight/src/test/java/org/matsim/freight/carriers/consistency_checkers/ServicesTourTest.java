@@ -57,8 +57,8 @@ public class ServicesTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "There is at least one inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "There is at least one inconsistency within the selected plan!");
 
 
 	}
@@ -84,8 +84,8 @@ public class ServicesTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
 
@@ -110,8 +110,8 @@ public class ServicesTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
 
@@ -136,8 +136,8 @@ public class ServicesTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 	}
 
 	/**
@@ -146,8 +146,8 @@ public class ServicesTourTest {
 	@Test
 	void testTour_services_fails_4() {
 		String pathToInput = utils.getPackageInputDirectory();
-		boolean exceptionCatched = false;
-		CarrierConsistencyCheckers.CheckResult testResult;
+		boolean exceptionCaught = false;
+		CarrierConsistencyCheckers.CheckResult checkResult;
 		Config config = ConfigUtils.createConfig();
 
 		FreightCarriersConfigGroup freightConfigGroup;
@@ -161,16 +161,16 @@ public class ServicesTourTest {
 		try {
 			CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 		} catch (UncheckedIOException e) {
-			exceptionCatched = true;
+			exceptionCaught = true;
 		}
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		if (!exceptionCatched) {
-			testResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		if (!exceptionCaught) {
+			checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
 		} else {
-			testResult = CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
+			checkResult = CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
 		}
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "There is no inconsistency within the selected plan!");
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 	}
 }

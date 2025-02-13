@@ -51,8 +51,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one carrier has no sufficient vehicle!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one carrier has no sufficient vehicle!");
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "At least one vehicle of every carrier has enough capacity for the largest job!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "At least one vehicle of every carrier has enough capacity for the largest job!");
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one carrier has no sufficient vehicle!");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.capacityCheck(carriers, lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one carrier has no sufficient vehicle!");
 	}
 
 	/**
@@ -124,8 +124,8 @@ public class VehicleCapacityTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.capacityCheck(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "At least one vehicle of every carrier has enough capacity for the largest job.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.capacityCheck(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "At least one vehicle of every carrier has enough capacity for the largest job.");
 	}
 }
 

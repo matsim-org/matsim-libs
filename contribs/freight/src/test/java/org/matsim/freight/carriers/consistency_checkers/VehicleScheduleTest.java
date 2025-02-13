@@ -52,8 +52,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one job can not be handled.");
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "All jobs can be handled.");
 	}
 
 
@@ -115,8 +115,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, testResult, "At least one job can not be handled.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one job can not be handled.");
 	}
 
 	/**
@@ -149,8 +149,8 @@ public class VehicleScheduleTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult testResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, testResult, "All jobs can be handled.");
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleTest(carriers,lvl);
+		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "All jobs can be handled.");
 	}
 
 }
