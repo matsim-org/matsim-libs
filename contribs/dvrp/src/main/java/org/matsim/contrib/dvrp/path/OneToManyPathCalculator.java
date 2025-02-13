@@ -125,7 +125,7 @@ class OneToManyPathCalculator {
 			return null;
 		}
 		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
-		var links = constructLinkSequenceNew(dijkstraTree, toNode, forwardSearch);
+		var links = constructLinkSequence(dijkstraTree, toNode, forwardSearch);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
 	}
@@ -152,7 +152,7 @@ class OneToManyPathCalculator {
 		return nodes;
 	}
 
-	private List<Link> constructLinkSequenceNew(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+	private List<Link> constructLinkSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
 		ArrayList<Link> links = new ArrayList<>();
 
 		LeastCostPathTree.LinkPathIterator pathIterator = dijkstraTree.getLinkPathIterator(toNode);
