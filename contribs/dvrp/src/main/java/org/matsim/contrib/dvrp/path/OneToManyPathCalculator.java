@@ -67,8 +67,6 @@ class OneToManyPathCalculator {
 		this.forwardSearch = forwardSearch;
 		this.fromLink = fromLink;
 		this.startTime = startTime;
-
-		verifyParallelLinks();
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks) {
@@ -179,32 +177,5 @@ class OneToManyPathCalculator {
 				VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime) :
 				VrpPaths.getLastLinkTT(travelTime, fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
-	}
-
-	private final static Logger logger = LogManager.getLogger(OneToManyPathCalculator.class);
-	private static int parallelLinksWarningCount = 0;
-
-	private void verifyParallelLinks() {
-		if (parallelLinksWarningCount < 20) {
-			for (Node prevNode : nodeMap.values()) {
-				Set<Integer> candidates = new HashSet<>();
-
-				for (Link link : prevNode.getOutLinks().values()) {
-					if (!candidates.add(link.getToNode().getId().index())) {
-						logger.warn(
-								"Found parallel links between nodes {} and {}. This may lead to problems in path calculation.",
-								prevNode.getId().toString(), link.getToNode().getId().toString());
-
-						if (parallelLinksWarningCount > 20) {
-							logger.warn("Consider using NetworkSegmentDoubleLinks.run on your network");
-							logger.warn("Only showing 20 of these warnings ...");
-							return;
-						}
-
-						parallelLinksWarningCount++;
-					}
-				}
-			}
-		}
 	}
 }
