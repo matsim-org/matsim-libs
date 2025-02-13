@@ -49,6 +49,13 @@ public class CarrierConsistencyCheckers {
 	private record ServiceInfo(TimeWindow serviceWindow, double capacityDemand) {
 	}
 
+	/**
+	 * Todo: @Anton: Da das hier die public Methode ist, bitte noch kurze Doku hier dran hängen...
+	 * ((Und ggf. mal über den Namen der Methode nachdenken. Vielleicht gibt es da noch was Prägnanteres??))
+	 * @param carriers
+	 * @param lvl
+	 * @return
+	 */
 	public static CheckResult checkBefore(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		int checkFailed = 0;
@@ -64,6 +71,14 @@ public class CarrierConsistencyCheckers {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
+
+	/**
+	 * Todo: @Anton: Da das hier die public Methode ist, bitte noch kurze Doku hier dran hängen...
+	 * ((Und ggf. mal über den Namen der Methode nachdenken. Vielleicht gibt es da noch was Prägnanteres??))
+	 * @param carriers
+	 * @param lvl
+	 * @return
+	 */
 	public static CheckResult checkAfter(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		int checkFailed = 0;
@@ -76,15 +91,26 @@ public class CarrierConsistencyCheckers {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
+
 	/**
-	 * @author antonstock
+	 *
 	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
 	 * capacityCheck returns boolean isVehicleSufficient:
 	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
+	 * <p>
+	 * Todo: @Anton: So ne Java-Doc sollte auch noch die Werte beschreiben, die übergeben werden. Und Rückgabe bei Return.
+	 *  Das @Author brauchst du hier eigentlich nicht, wenn du es in der gesammte Klasse hast. Wenn du es hier willst, dann am Besten zwischen den allgemeinen Text und die Variablenbeschreibung.
+	 *  Leerzeilen in Javadoc bitte mit <p> füllen (neuer Absatz)
+	 *  ((Habe mal das Raster vorbereitet.))
+	 * @author antonstock
+	 *
+	 * @param carriers
+	 * @param lvl
+	 * @return
 	 */
 	/*package-private*/ static CheckResult capacityCheck(Carriers carriers, Level lvl) {
-	setLogLevel(lvl);
+		setLogLevel(lvl);
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 
@@ -142,8 +168,8 @@ public class CarrierConsistencyCheckers {
 	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
 	 */
 
-	public static CheckResult vehicleScheduleTest(Carriers carriers, Level lvl) {
-	setLogLevel(lvl);
+	/*package-private*/ static CheckResult vehicleScheduleTest(Carriers carriers, Level lvl) {
+		setLogLevel(lvl);
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 		//go through all carriers
@@ -255,7 +281,7 @@ public class CarrierConsistencyCheckers {
 		});
 		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
 			return CheckResult.CHECK_SUCCESSFUL;
-			} else {
+		} else {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
@@ -264,8 +290,8 @@ public class CarrierConsistencyCheckers {
 	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once
 	 * (if the job is a shipment, pickup and delivery are two different jobs).
 	 */
-	public static CheckResult allJobsInTours(Carriers carriers, Level lvl) {
-	setLogLevel(lvl);
+	/*package-private*/ static CheckResult allJobsInTours(Carriers carriers, Level lvl) {
+		setLogLevel(lvl);
 		Map<Id<Carrier>, AllJobsInToursDetailedCheckResult> isCarrierCapable = new HashMap<>();
 		boolean jobInToursMoreThanOnce = false;
 		boolean jobIsMissing = false;
