@@ -123,7 +123,7 @@ public final class ShpOptions {
 		else if (shp.endsWith(".gpkg")) {
 
 			// GeoPackage does not work with URLs, need to download it first
-			if (url.getProtocol().startsWith("http")) {
+			if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar")) {
 
 				String name = FilenameUtils.getBaseName(url.getFile());
 

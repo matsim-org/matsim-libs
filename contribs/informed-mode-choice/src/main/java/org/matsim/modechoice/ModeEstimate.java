@@ -1,10 +1,5 @@
 package org.matsim.modechoice;
 
-import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -15,8 +10,9 @@ public final class ModeEstimate {
 	private final String mode;
 	private final ModeAvailability option;
 
-	private final double[] est;
+	private final double[] legEst;
 	private final double[] tripEst;
+	private final double[] actEst;
 
 	/**
 	 * Mark trips with no real usage. E.g pt trips that consist only of walk legs.
@@ -46,8 +42,9 @@ public final class ModeEstimate {
 		this.option = option;
 		this.min = isMin;
 		this.usable = isUsable;
-		this.est = usable ? new double[n] : null;
+		this.legEst = usable ? new double[n] : null;
 		this.tripEst = storeTripEst ? new double[n] : null;
+		this.actEst = usable ? new double[n] : null;
 		this.noRealUsage = usable ? new boolean[n] : null;
 	}
 
@@ -67,8 +64,12 @@ public final class ModeEstimate {
 		return min;
 	}
 
-	public double[] getEstimates() {
-		return est;
+	public double[] getLegEstimates() {
+		return legEst;
+	}
+
+	public double[] getActEst() {
+		return actEst;
 	}
 
 	public double[] getTripEstimates() {

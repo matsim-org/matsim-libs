@@ -51,8 +51,7 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule{
 
 	@Deprecated // for experts only
 	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Class<? extends Annotation> annotationClass ){
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class,
-				annotationClass );
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class, annotationClass );
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
@@ -106,7 +105,7 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule{
 	 * for the other ways to configure {@link org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory},
 	 * and then the latter could be deprecated.</p>
 	 */
-	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculator(){
+	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculatorBinding(){
 		return Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding();
 	}
 }
