@@ -12,6 +12,7 @@ import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
+import static org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers.CheckResult.*;
 
 /**
  * @author antonstock
@@ -23,9 +24,11 @@ public class CarrierCapabilitiesCheckTest {
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
 	//Level.INFO -> all log-messages will be displayed as information in white.
-	Level lvl = Level.ERROR;
+	private final Level lvl = Level.ERROR;
+
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	void CarrierCapabilitiesCheck_passes() {
 		Config config = ConfigUtils.createConfig();
@@ -34,12 +37,10 @@ public class CarrierCapabilitiesCheckTest {
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL,checkResult,"At least one check failed.");
+
+		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl),"At least one check failed.");
 	}
 	@Test
 	void CarrierCapabilitiesCheck_fails() {
@@ -49,11 +50,9 @@ public class CarrierCapabilitiesCheckTest {
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED,checkResult,"All checks passed.");
+
+		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl),"All checks passed.");
 	}
 }

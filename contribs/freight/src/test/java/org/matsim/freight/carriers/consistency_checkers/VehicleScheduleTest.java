@@ -13,6 +13,8 @@ import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
+import static org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
+import static org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL;
 
 /**
  *
@@ -25,35 +27,28 @@ public class VehicleScheduleTest {
 	//Level.WARN -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
 	//Level.INFO -> all log-messages will be displayed as information in white.
-	Level lvl = Level.ERROR;
+	private final Level lvl = Level.ERROR;
+
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
+
 	/**
 	 * This test will check if the given jobs can be handled by the carriers -> A vehicle with sufficient capacity has to be in operation.
 	 */
 	@Test
 	void testVehicleScheduleShipment_passes() {
-
-		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
-
-		FreightCarriersConfigGroup freightConfigGroup;
-		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersShipmentsPASS.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one job can not be handled.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl), "At least one job can not be handled.");
 	}
 
 	/**
@@ -67,27 +62,18 @@ public class VehicleScheduleTest {
 	 */
 	@Test
 	void testVehicleScheduleShipment_fails() {
-
-		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
-
-		FreightCarriersConfigGroup freightConfigGroup;
-		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersShipmentsFAIL.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "All jobs can be handled.");
+		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl), "All jobs can be handled.");
 	}
 
 
@@ -96,27 +82,18 @@ public class VehicleScheduleTest {
 	 */
 	@Test
 	void testVehicleScheduleService_passes() {
-
-		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
-
-		FreightCarriersConfigGroup freightConfigGroup;
-		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersServicesPASS.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "At least one job can not be handled.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl), "At least one job can not be handled.");
 	}
 
 	/**
@@ -130,27 +107,18 @@ public class VehicleScheduleTest {
 	 */
 	@Test
 	void testVehicleScheduleService_fails() {
-
-		// relative path to Freight/Scenarios/CCTestInput/
 		String pathToInput = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
-
-		FreightCarriersConfigGroup freightConfigGroup;
-		freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(pathToInput + "CCTestCarriersServicesFAIL.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(pathToInput + "CCTestVeh.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl);
-		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "All jobs can be handled.");
+		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.vehicleScheduleCheck(carriers,lvl), "All jobs can be handled.");
 	}
 
 }
