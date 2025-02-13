@@ -127,7 +127,7 @@ class OneToManyPathCalculator {
 			return null;
 		}
 		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
-		var links = constructLinkSequence(nodes);
+		var links = constructLinkSequenceNew(dijkstraTree, toNode, forwardSearch);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
 	}
@@ -145,10 +145,8 @@ class OneToManyPathCalculator {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.add(toNode);
 
-		LeastCostPathTree.PathIterator pathIterator = dijkstraTree.getComingFromIterator(toNode);
-		while (pathIterator.hasNext()) {
-			nodes.add(pathIterator.next());
-		}
+		LeastCostPathTree.PathIterator pathIterator = dijkstraTree.getNodePathIterator(toNode);
+		pathIterator.forEachRemaining(nodes::add);
 
 		if (forward) {
 			Collections.reverse(nodes);
@@ -156,21 +154,14 @@ class OneToManyPathCalculator {
 		return nodes;
 	}
 
-	private List<Link> constructLinkSequence(List<Node> nodes) {
-		List<Link> links = new ArrayList<>(nodes.size() - 1);
-		Node prevNode = nodes.get(0);
-		for (int i = 1; i < nodes.size(); i++) {
-			Node nextNode = nodes.get(i);
-			for (Link link : prevNode.getOutLinks().values()) {
-				//FIXME this method will not work properly if there are many prevNode -> nextNode links
-				//TODO save link idx in tree OR pre-check: at most 1 arc per each node pair OR choose faster/better link
-				// sh, 26/07/2023, added a check further below to increase awareness
-				if (link.getToNode() == nextNode) {
-					links.add(link);
-					break;
-				}
-			}
-			prevNode = nextNode;
+	private List<Link> constructLinkSequenceNew(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+		ArrayList<Link> links = new ArrayList<>();
+
+		LeastCostPathTree.LinkPathIterator pathIterator = dijkstraTree.getLinkPathIterator(toNode);
+		pathIterator.forEachRemaining(links::add);
+
+		if (forward) {
+			Collections.reverse(links);
 		}
 		return links;
 	}
