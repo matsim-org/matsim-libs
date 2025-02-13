@@ -108,4 +108,3 @@ public class VehicleCapacityTest {
 		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.vehicleCapacityCheck(carriers,lvl), "At least one vehicle of every carrier has enough capacity for the largest job.");
 	}
 }
-

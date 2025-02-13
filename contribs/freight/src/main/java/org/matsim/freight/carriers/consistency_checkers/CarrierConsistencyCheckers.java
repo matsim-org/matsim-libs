@@ -27,7 +27,7 @@ public class CarrierConsistencyCheckers {
 		currentLevel = level;
 		Configurator.setLevel(log.getName(), level);
 	}
-	
+
 	private static void logMessage(String msg, Object... params) {
 		if (currentLevel==Level.WARN){
 			log.warn(msg, params);
