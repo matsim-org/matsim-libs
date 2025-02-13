@@ -271,7 +271,7 @@ public class CarrierConsistencyCheckers {
 					}
 				}
 				if (!isTransportable) {
-					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service");
+					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service.");
 				}
 			}
 			if (nonFeasibleJob.isEmpty()) {
