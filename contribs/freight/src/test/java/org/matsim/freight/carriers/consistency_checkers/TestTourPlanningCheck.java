@@ -16,13 +16,11 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
 /**
- * TODO: @Anton: Bitte noch etwas dokumentieren, was du hier testest. Allgemein hier oben und dann an den einzelnen Tests. Danke.
- *
- *  @author antonstock
- *
- *
+ * @author antonstock
+ * TestTourPlanningCheck checks, if all jobs are scheduled correctly, i.e. every job is part of only one tour.
+ * both Tests are designed to succeed, checkResult of _passes should be "CHECK_SUCCESSFUL" while checkResult of _fails should be "CHECK_FAILED".
  * 	 */
-public class CheckAfterTest {
+public class TestTourPlanningCheck {
 	//Please specify wanted logger level here:
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
@@ -32,7 +30,7 @@ public class CheckAfterTest {
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void checkAfter_passes() {
+	void tourPlanningCheck_passes() {
 		Config config = ConfigUtils.createConfig();
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCPlansCarrierWithServicesPASS.xml");
@@ -43,12 +41,12 @@ public class CheckAfterTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.tourPlanningCheck(carriers, lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL,checkResult,"At least one check failed.");
 	}
 
 	@Test
-	void checkAfter_fails() {
+	void tourPlanningCheck_fails() {
 		Config config = ConfigUtils.createConfig();
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCPlansCarrierWithServicesFAIL_1.xml");
@@ -59,7 +57,7 @@ public class CheckAfterTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkAfter(carriers, lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.tourPlanningCheck(carriers, lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED,checkResult,"All checks passed.");
 	}
 }

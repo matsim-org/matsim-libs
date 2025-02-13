@@ -14,13 +14,11 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
 /**
- * TODO: @Anton: Bitte noch etwas dokumentieren, was du hier testest. Allgemein hier oben und dann an den einzelnen Tests. Danke.
- *
- *  @author antonstock
- *
- *
+ * @author antonstock
+ * TestCarrierCapabilitiesCheck checks, if all carriers are able to handle all given jobs.
+ * both Tests are designed to succeed, checkResult of _passes should be "CHECK_SUCCESSFUL" while checkResult of _fails should be "CHECK_FAILED".
  * 	 */
-public class CheckBeforeTest {
+public class TestCarrierCapabilitiesCheck {
 	//Please specify wanted logger level here:
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
@@ -29,7 +27,7 @@ public class CheckBeforeTest {
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
-	void checkBefore_passes() {
+	void CarrierCapabilitiesCheck_passes() {
 		Config config = ConfigUtils.createConfig();
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipmentsPASS.xml");
@@ -40,11 +38,11 @@ public class CheckBeforeTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkBefore(carriers, lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL,checkResult,"At least one check failed.");
 	}
 	@Test
-	void checkBefore_fails() {
+	void CarrierCapabilitiesCheck_fails() {
 		Config config = ConfigUtils.createConfig();
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "CCTestCarriersShipmentsFAIL.xml");
@@ -55,7 +53,7 @@ public class CheckBeforeTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.checkBefore(carriers, lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED,checkResult,"All checks passed.");
 	}
 }

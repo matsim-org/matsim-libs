@@ -16,11 +16,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 
 /**
- *
  * @author antonstock
- * doc: this method will check if all given jobs, here shipments, are scheduled properly, i.e. all jobs occur exactly once.
- *
- *
+ * this method will check if all given jobs, here shipments, are scheduled properly, i.e. all jobs occur exactly once.
  */
 
 public class ShipmentsTourTest {
@@ -54,7 +51,7 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInToursCheck(carriers,lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_SUCCESSFUL, checkResult, "There is at least one inconsistency within the selected plan!");
 
 
@@ -81,7 +78,7 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInToursCheck(carriers,lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
@@ -108,7 +105,7 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInToursCheck(carriers,lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 
 	}
@@ -135,7 +132,7 @@ public class ShipmentsTourTest {
 
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+		CarrierConsistencyCheckers.CheckResult checkResult = CarrierConsistencyCheckers.allJobsInToursCheck(carriers,lvl);
 		Assertions.assertEquals(CarrierConsistencyCheckers.CheckResult.CHECK_FAILED, checkResult, "There is no inconsistency within the selected plan!");
 	}
 
@@ -168,7 +165,7 @@ public class ShipmentsTourTest {
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
 		if (!exceptionCaught) {
-			checkResult = CarrierConsistencyCheckers.allJobsInTours(carriers,lvl);
+			checkResult = CarrierConsistencyCheckers.allJobsInToursCheck(carriers,lvl);
 		} else {
 			checkResult = CarrierConsistencyCheckers.CheckResult.CHECK_FAILED;
 		}

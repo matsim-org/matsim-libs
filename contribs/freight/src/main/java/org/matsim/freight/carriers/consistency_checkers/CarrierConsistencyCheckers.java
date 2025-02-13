@@ -9,7 +9,10 @@ import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
-
+	/**
+	 * @author antonstock
+	 * contains methods to determine possible inconsistencies before and after tour planning, i.e. jobs which are too big for all vehicles, jobs with incompatible time windows, jobs not assigned to a tour
+	 */
 public class CarrierConsistencyCheckers {
 	public enum CheckResult {
 		CHECK_SUCCESSFUL, CHECK_FAILED, ERROR
@@ -50,19 +53,43 @@ public class CarrierConsistencyCheckers {
 	}
 
 	/**
-	 * Todo: @Anton: Da das hier die public Methode ist, bitte noch kurze Doku hier dran hängen...
-	 * ((Und ggf. mal über den Namen der Methode nachdenken. Vielleicht gibt es da noch was Prägnanteres??))
+	 * this method will run through both vehicleCapacityCheck and vehicleScheduleCheck to check, if all carriers are able to handle given jobs.
+	 * carrierCapabilitiesCheck returns enum CheckResult:
+	 * CHECK_SUCCESSFUL if both checks return CHECK_SUCCESSFUL
+	 * CHECK_FAILED if one or both checks return CHECK_FAIL
 	 * @param carriers
 	 * @param lvl
-	 * @return
+	 * @return CheckResult
 	 */
-	public static CheckResult checkBefore(Carriers carriers, Level lvl) {
+	public static CheckResult carrierCapabilitiesCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		int checkFailed = 0;
-		if (capacityCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
+		if (vehicleCapacityCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
 			checkFailed++;
 		}
-		if (vehicleScheduleTest(carriers, lvl)==CheckResult.CHECK_FAILED) {
+		if (vehicleScheduleCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
+			checkFailed++;
+		}
+		if (checkFailed==0) {
+			return CheckResult.CHECK_SUCCESSFUL;
+		} else {
+			return CheckResult.CHECK_FAILED;
+		}
+	}
+
+		/**
+		 * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
+		 * allJobsInToursCheck returns enum CheckResult:
+		 * CHECK_SUCCESSFUL if allJobsInToursCheck returns CHECK_SUCCESSFUL
+		 * CHECK_FAILED if allJobsInToursCheck returns CHECK_FAIL
+		 * @param carriers
+		 * @param lvl
+		 * @return CheckResult
+		 */
+	public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
+		setLogLevel(lvl);
+		int checkFailed = 0;
+		if (allJobsInToursCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
 			checkFailed++;
 		}
 		if (checkFailed==0) {
@@ -73,43 +100,16 @@ public class CarrierConsistencyCheckers {
 	}
 
 	/**
-	 * Todo: @Anton: Da das hier die public Methode ist, bitte noch kurze Doku hier dran hängen...
-	 * ((Und ggf. mal über den Namen der Methode nachdenken. Vielleicht gibt es da noch was Prägnanteres??))
-	 * @param carriers
-	 * @param lvl
-	 * @return
-	 */
-	public static CheckResult checkAfter(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
-		int checkFailed = 0;
-		if (allJobsInTours(carriers, lvl)==CheckResult.CHECK_FAILED) {
-			checkFailed++;
-		}
-		if (checkFailed==0) {
-			return CheckResult.CHECK_SUCCESSFUL;
-		} else {
-			return CheckResult.CHECK_FAILED;
-		}
-	}
-
-	/**
-	 *
-	 * This method checks if every carrier is able to handle every given job (services + shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
-	 * capacityCheck returns boolean isVehicleSufficient:
-	 * = true: the highest vehicle capacity is greater or equal to the highest capacity demand
-	 * = false: the highest vehicle capacity is less tan or equal to the highest capacity demand
+	 * This method checks if every carrier is able to handle every given job (services or shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
+	 * vehicleCapacityCheck returns enum CheckResult:
+	 * = CHECK_SUCCESSFUL: the highest vehicle capacity is greater or equal to the highest capacity demand
+	 * = CHECK_FAILED: the highest vehicle capacity is less than the highest capacity demand
 	 * <p>
-	 * Todo: @Anton: So ne Java-Doc sollte auch noch die Werte beschreiben, die übergeben werden. Und Rückgabe bei Return.
-	 *  Das @Author brauchst du hier eigentlich nicht, wenn du es in der gesammte Klasse hast. Wenn du es hier willst, dann am Besten zwischen den allgemeinen Text und die Variablenbeschreibung.
-	 *  Leerzeilen in Javadoc bitte mit <p> füllen (neuer Absatz)
-	 *  ((Habe mal das Raster vorbereitet.))
-	 * @author antonstock
-	 *
 	 * @param carriers
 	 * @param lvl
-	 * @return
+	 * @return CheckResult
 	 */
-	/*package-private*/ static CheckResult capacityCheck(Carriers carriers, Level lvl) {
+	/*package-private*/ static CheckResult vehicleCapacityCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
@@ -166,9 +166,16 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
+	 * vehicleScheduleCheck returns enum CheckResult:
+	 * CHECK_SUCCESSFUL if all jobs can be handled
+	 * CHECK_FAILED if at least one job can not be handled
+	 * <p>
+	 * @param carriers
+	 * @param lvl
+	 * @return CheckResult
 	 */
 
-	/*package-private*/ static CheckResult vehicleScheduleTest(Carriers carriers, Level lvl) {
+	/*package-private*/ static CheckResult vehicleScheduleCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
@@ -289,8 +296,14 @@ public class CarrierConsistencyCheckers {
 	/**
 	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once
 	 * (if the job is a shipment, pickup and delivery are two different jobs).
+	 * allJobsInToursCheck returns enum CheckResult:
+	 * CHECK_SUCCESSFUL if all jobs occur only once
+	 * CHECK_FAILED in all other cases
+	 * @param carriers
+	 * @param lvl
+	 * @return CheckResult
 	 */
-	/*package-private*/ static CheckResult allJobsInTours(Carriers carriers, Level lvl) {
+	/*package-private*/ static CheckResult allJobsInToursCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		Map<Id<Carrier>, AllJobsInToursDetailedCheckResult> isCarrierCapable = new HashMap<>();
 		boolean jobInToursMoreThanOnce = false;
