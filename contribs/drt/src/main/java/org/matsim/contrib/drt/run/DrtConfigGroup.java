@@ -85,6 +85,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean useModeFilteredSubnetwork = false;
 
 	@Parameter
+	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
+	public String travelTimeMatrixCachePath = null;
+
+	@Parameter
 	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
 	public double stopDuration = Double.NaN;// seconds

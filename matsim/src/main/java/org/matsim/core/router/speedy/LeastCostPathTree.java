@@ -11,6 +11,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
@@ -294,6 +295,9 @@ public class LeastCostPathTree {
         @Override
         public Node next() {
             current = comingFrom[current];
+            if (current < 0) {
+                throw new NoSuchElementException();
+            }
             return graph.getNode(current);
         }
 
@@ -321,6 +325,9 @@ public class LeastCostPathTree {
                 return graph.getLink(current);
             }
             current = comingFromLink[current];
+            if (current < 0) {
+                throw new NoSuchElementException();
+            }
             return graph.getLink(current);
         }
 
