@@ -20,7 +20,7 @@ import static org.matsim.core.config.ConfigUtils.addOrGetModule;
  * TestTourPlanningCheck checks, if all jobs are scheduled correctly, i.e. every job is part of only one tour.
  * both Tests are designed to succeed, checkResult of _passes should be "CHECK_SUCCESSFUL" while checkResult of _fails should be "CHECK_FAILED".
  * 	 */
-public class TestTourPlanningCheck {
+public class TourPlanningCheckTest {
 	//Please specify wanted logger level here:
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
