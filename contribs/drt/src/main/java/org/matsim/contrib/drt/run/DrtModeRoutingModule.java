@@ -20,9 +20,10 @@
 
 package org.matsim.contrib.drt.run;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +33,16 @@ import org.matsim.contrib.drt.estimator.DrtEstimator;
 import org.matsim.contrib.drt.estimator.EstimationRoutingModuleProvider;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
-import org.matsim.contrib.drt.routing.*;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
+import org.matsim.contrib.drt.routing.DrtRouteCreator;
+import org.matsim.contrib.drt.routing.DrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtStopFacility;
+import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
+import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
@@ -56,9 +66,9 @@ import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
-import java.net.URL;
-import java.util.List;
-import java.util.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * This is a DRT-customised version of DvrpModeRoutingModule
@@ -160,7 +170,8 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			var travelTime = getModalInstance(TravelTime.class);
 			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
 					travelTime, getModalInstance(TravelDisutilityFactory.class),
-					getModalInstance(DrtRouteConstraintsCalculator.class));
+					getModalInstance(DrtRouteConstraintsCalculator.class), 
+					getModalInstance(DvrpLoadFromTrip.class), getModalInstance(DvrpLoadType.class));
 		}
 	}
 

@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
-import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
@@ -17,18 +16,22 @@ import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskS
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultAssignShiftToVehicleLogic;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftStartLogic;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcherImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -40,6 +43,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Singleton;
 
 /**
  * @author nkuehnel / MOIA
@@ -77,7 +82,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0),
+				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class)),
 						drtShiftParams.considerUpcomingShiftsForInsertion))).asEagerSingleton();
 
 
