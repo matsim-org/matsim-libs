@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -62,6 +63,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private LaneFactory laneFactory;
 		private LinkSpeedCalculator linkSpeedCalculator;
 		private VehicleHandler vehicleHandler;
+		private ParkingSearchTimeCalculator parkingSearchTimeCalculator;
 
 		Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 			this.context = context;
@@ -80,13 +82,17 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			this.vehicleHandler = vehicleHandler;
 		}
 
+		public void setParkingSearchTimeCalculator(ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+			this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
+		}
+
 		QLinkImpl build(Link link, QNodeI toNode) {
 			if (laneFactory == null) {
 				laneFactory = new QueueWithBuffer.Builder(context);
 			}
 			Objects.requireNonNull(linkSpeedCalculator);
 			Objects.requireNonNull(vehicleHandler);
-			return new QLinkImpl(link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
+			return new QLinkImpl(link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
 		}
 	}
 
@@ -108,8 +114,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private NetsimEngineContext context;
 
 	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context,
-					  NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
-		super(link2, toNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
+					  NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+		super(link2, toNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
 		this.context = context;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
@@ -184,7 +190,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		// if the vehicle is allowed to leave the parking search, remove it from the queue
 		while (!getParkingSearchQueue().isEmpty() && getParkingSearchQueue().peek().getEarliestLinkExitTime() <= context.getSimTimer().getTimeOfDay()) {
 			QVehicle veh = this.getParkingSearchQueue().poll();
-			arriveAndPark(veh);
+			arriveAndPark(veh, true);
 		}
 	}
 

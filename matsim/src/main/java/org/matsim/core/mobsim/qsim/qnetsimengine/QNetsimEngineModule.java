@@ -25,6 +25,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 
 public final class QNetsimEngineModule extends AbstractQSimModule {
@@ -57,10 +58,11 @@ public final class QNetsimEngineModule extends AbstractQSimModule {
 			bind(QNetworkFactory.class).to(DefaultQNetworkFactory.class).in(Singleton.class);
 		}
 
-		// === LinkSpeedCalculator(s):
+		// Calculators for QLink:
 
 		Multibinder.newSetBinder(this.binder(), LinkSpeedCalculator.class);
 		Multibinder.newSetBinder(this.binder(), VehicleHandler.class);
+		Multibinder.newSetBinder(this.binder(), ParkingSearchTimeCalculator.class);
 		// (initialize this here so we do not have to hedge against "null".)
 
 //		addLinkSpeedCalculatorBinding().to(...);
