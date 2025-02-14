@@ -36,8 +36,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ConstantParkingSearchTime;
-import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeFunction;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.network.NetworkUtils;
@@ -107,17 +106,17 @@ abstract class AbstractQLink implements QLinkI {
 	private final NetsimInternalInterface netsimEngine;
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
-	//TODO
-	private final ParkingSearchTimeFunction parkingSearchTimeFunction = new ConstantParkingSearchTime(100);
+	private final ParkingSearchTimeCalculator parkingSearchTimeCalculator;
 	private final VehicleHandler vehicleHandler;
 
-	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
 		this.link = link;
 		this.toQNode = toNode;
 		this.context = context;
 		this.netsimEngine = netsimEngine2;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehicleHandler = vehicleHandler;
+		this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
 	}
 
 	@Override
@@ -180,20 +179,22 @@ abstract class AbstractQLink implements QLinkI {
 			context.getEventsManager().processEvent(
 				new VehicleStartsParkingSearch(now, qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
 
-			double parkingSearchTime = parkingSearchTimeFunction.calculateParkingSearchTime(qveh, this.link.getId());
+			double parkingSearchTime = parkingSearchTimeCalculator.calculateParkingSearchTime(qveh, this.link);
 			qveh.setEarliestLinkExitTime(now + parkingSearchTime);
 			parkingSearchQueue.add(qveh);
 		} else if (vehicleArrival == VehicleHandler.VehicleArrival.ALLOWED) {
 			// in this case no parking search events are created
-			arriveAndPark(qveh);
+			arriveAndPark(qveh, false);
 		}
 
 		return true;
 	}
 
-	final void arriveAndPark(QVehicle qveh) {
-		context.getEventsManager().processEvent(
-			new VehicleEndsParkingSearch(context.getSimTimer().getTimeOfDay(), qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
+	final void arriveAndPark(QVehicle qveh, boolean fromParkingSearch) {
+		if (fromParkingSearch) {
+			context.getEventsManager().processEvent(
+				new VehicleEndsParkingSearch(context.getSimTimer().getTimeOfDay(), qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
+		}
 		addParkedVehicle(qveh, false);
 		this.netsimEngine.letVehicleArrive(qveh);
 		makeVehicleAvailableToNextDriver(qveh);
