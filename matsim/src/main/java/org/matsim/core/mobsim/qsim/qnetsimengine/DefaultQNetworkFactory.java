@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -72,6 +73,10 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 
 	@Inject
 	private Set<VehicleHandler> vehicleHandlers = Collections.emptySet();
+
+	@Inject
+	private Set<ParkingSearchTimeCalculator> parkingSearchTimeCalculators = Collections.emptySet();
+
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine1;
 
@@ -116,8 +121,13 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 		for (VehicleHandler handler : vehicleHandlers) {
 			vehicleHandler.addVehicleHandler(handler);
 		}
-
 		linkBuilder.setVehicleHandler(vehicleHandler);
+
+		DefaultParkingSearchTime parkingSearchTime = new DefaultParkingSearchTime();
+		for (ParkingSearchTimeCalculator calculator : parkingSearchTimeCalculators) {
+			parkingSearchTime.addHandler(calculator);
+		}
+		linkBuilder.setParkingSearchTimeCalculator(parkingSearchTime);
 
 		return linkBuilder.build(link, toQueueNode);
 	}
