@@ -8,13 +8,12 @@ import org.matsim.api.core.v01.events.handler.VehicleEndsParkingSearchEventHandl
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.events.MobsimScopeEventHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ParkingObserver implements BeforeMobsimListener, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler {
+public class ParkingObserver implements MobsimScopeEventHandler, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler {
 	ParkingCapacityInitializer parkingCapacityInitializer;
 
 	Map<Id<Link>, Integer> indexByLinkId;
@@ -69,15 +68,5 @@ public class ParkingObserver implements BeforeMobsimListener, VehicleEntersTraff
 		// park vehicle
 		Id<Link> linkId = event.getLinkId();
 		parkingCount[indexByLinkId.get(linkId)]++;
-	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-	}
-
-	@Override
-	public void reset(int iteration) {
-		//TODO
 	}
 }

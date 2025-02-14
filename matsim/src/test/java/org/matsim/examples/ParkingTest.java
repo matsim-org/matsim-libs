@@ -13,7 +13,9 @@ import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.parking.*;
-import org.matsim.core.network.kernel.ConstantNetworkKernelFunction;
+import org.matsim.core.network.kernel.ConstantKernelDistance;
+import org.matsim.core.network.kernel.DefaultKernelFunction;
+import org.matsim.core.network.kernel.KernelDistance;
 import org.matsim.core.network.kernel.NetworkKernelFunction;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
@@ -28,6 +30,8 @@ import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingCapacityI
 public class ParkingTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	double kernelDistance = 1000;
 
 	@Test
 	void testNoParking() {
@@ -69,6 +73,7 @@ public class ParkingTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		for (Link value : scenario.getNetwork().getLinks().values()) {
 			value.getAttributes().putAttribute(LINK_ON_STREET_SPOTS, 1);
@@ -82,8 +87,11 @@ public class ParkingTest {
 			protected void configureQSim() {
 				bind(ParkingObserver.class).in(Singleton.class);
 				bind(ParkingCapacityInitializer.class).to(ZeroParkingCapacityInitializer.class);
-				bind(NetworkKernelFunction.class).to(ConstantNetworkKernelFunction.class);
-				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(0.4, -6));
+				bind(NetworkKernelFunction.class).to(DefaultKernelFunction.class);
+				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
+				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
+
+				addMobsimScopeEventHandlerBinding().to(ParkingObserver.class);
 
 				addVehicleHandlerBinding().to(ParkingVehicleHandler.class);
 				bind(ParkingOccupancyObservingSearchTimeCalculator.class).in(Singleton.class);
@@ -100,16 +108,10 @@ public class ParkingTest {
 		String eventsFile = "output_events.xml.gz";
 		String populationFile = "output_plans.xml.gz";
 
-		utils.createInputDirectory();
-		utils.copyFileFromOutputToInput(eventsFile);
-		utils.copyFileFromOutputToInput(populationFile);
-
 		ComparisonResult comparisonResult = EventsUtils.compareEventsFiles(utils.getInputDirectory() + eventsFile, utils.getOutputDirectory() + eventsFile);
 		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, comparisonResult);
 
 		PopulationComparison.Result result = PopulationUtils.comparePopulations(utils.getInputDirectory() + populationFile, utils.getOutputDirectory() + populationFile);
 		Assertions.assertEquals(PopulationComparison.Result.equal, result);
 	}
-
-
 }
