@@ -66,7 +66,7 @@ public class SimWrapperRunner implements MATSimAppCommand {
 
 			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(config), config);
 			try {
-				listener.run(input);
+				listener.run(input, configPath);
 			} catch (IOException e) {
 				log.error("Error creating dashboards on {}", input, e);
 			}

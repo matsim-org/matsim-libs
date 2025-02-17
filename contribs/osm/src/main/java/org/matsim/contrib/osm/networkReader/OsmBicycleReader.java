@@ -26,8 +26,9 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 	private static final Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
 			OsmTags.TRUNK, OsmTags.TRUNK_LINK));
 	private static final Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
-			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS));
-
+//			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS // Steps should only be allowed if there are ramps.
+			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS_RAMP, OsmTags.STEPS_RAMP_BICYCLE
+	));
 	private final SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
 	public OsmBicycleReader(OsmNetworkParser parser,
@@ -136,7 +137,8 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 			addOverridingLinkProperties(OsmTags.FOOTWAY, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.PEDESTRIAN, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.PATH, new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false));
-			addOverridingLinkProperties(OsmTags.STEPS, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
+			addOverridingLinkProperties(OsmTags.STEPS_RAMP, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
+			addOverridingLinkProperties(OsmTags.STEPS_RAMP_BICYCLE, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
 		}
 
 		@Override
