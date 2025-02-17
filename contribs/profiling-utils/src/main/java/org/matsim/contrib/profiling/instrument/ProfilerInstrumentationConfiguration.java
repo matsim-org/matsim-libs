@@ -24,13 +24,14 @@ import java.nio.file.Path;
 
 public class ProfilerInstrumentationConfiguration {
 
+	/**
+	 * @return a default configuration starting at iteration 1, ending at iteration 2, and creating the recording in
+	 * 		   the configured output directory as "profile.jfr".
+	 */
 	public static ProfilerInstrumentationConfiguration defaultConfiguration() {
 		return new ProfilerInstrumentationConfiguration();
 	}
 
-	/**
-	 * Path outputPath = Path.of(ConfigUtils.addOrGetModule(config, ControllerConfigGroup.class).getOutputDirectory(), "profile.jfr");
-	 */
 	private Path outputPath = null;
 	private int startIteration = 1;
 	private int endIteration = 2;
@@ -47,6 +48,13 @@ public class ProfilerInstrumentationConfiguration {
 		return endIteration;
 	}
 
+	/**
+	 * If not set, {@link ProfilerInstrumentationModule#install()} will default to
+	 * {@code Path.of(ConfigUtils.addOrGetModule(config, ControllerConfigGroup.class).getOutputDirectory(), "profile.jfr")}
+	 *
+	 * @param outputPath a Path to where the recording file should be created
+	 * @return this for further configuring in builder style
+	 */
 	public ProfilerInstrumentationConfiguration outputPath(Path outputPath) {
 		this.outputPath = outputPath;
 		return this;
