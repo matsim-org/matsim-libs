@@ -8,6 +8,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
+/**
+ * @author Sebatian Hörl (sebhoerl), IRT SystemX
+ */
 public abstract class AbstractRoutingDriveTaskUpdater implements DriveTaskUpdater {
     protected final LeastCostPathCalculator lcpc;
     protected final TravelTime travelTime;

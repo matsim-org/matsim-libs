@@ -7,6 +7,9 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
+/**
+ * @author Sebatian Hörl (sebhoerl), IRT SystemX
+ */
 public class DrtRoutingDriveTaskUpdater extends AbstractRoutingDriveTaskUpdater {
     private final DrtTaskFactory taskFactory;
 
