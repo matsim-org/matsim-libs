@@ -312,6 +312,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new CleanPersonLinkIds());
 
+		//this is necessary, as the network cleaner can delete routes even though they belong to a route in an agents plan.
+		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
+
 		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
 		if (facilityPath != null) {
