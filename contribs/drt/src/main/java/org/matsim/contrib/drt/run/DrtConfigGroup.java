@@ -45,9 +45,11 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -58,6 +60,7 @@ import com.google.common.base.Verify;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -155,6 +158,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
+	@Parameter
+	@Comment("Defines how often to write analysis on capacities and loads of the mode")
+	@PositiveOrZero
+	public int loadCapacityAnalysisInterval = 0;
 
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
@@ -187,6 +194,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Nullable
 	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+
+	public DvrpLoadParams loadParams = new DvrpLoadParams();
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -248,6 +257,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
+		// load
+		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
+			() -> loadParams,
+			params -> loadParams = (DvrpLoadParams) params);
 	}
 
 	/**
