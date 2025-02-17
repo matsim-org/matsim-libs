@@ -139,8 +139,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(
-				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
+		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(EDrtVehicleDataEntryFactory.class));
 
 		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)

@@ -20,13 +20,17 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
+import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -50,6 +54,7 @@ import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -67,6 +72,9 @@ import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -116,7 +124,12 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl());
+		bindModal(VehicleDataEntryFactoryImpl.class).toProvider(modalProvider(getter -> {
+			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+			return new VehicleDataEntryFactoryImpl(loadType);
+		}));
+
+		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(VehicleDataEntryFactoryImpl.class)).in(Singleton.class);
 
 		DrtOptimizationConstraintsSet defaultOptimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)

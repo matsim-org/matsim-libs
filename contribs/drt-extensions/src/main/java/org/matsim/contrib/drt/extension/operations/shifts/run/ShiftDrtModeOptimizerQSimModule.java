@@ -46,6 +46,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleets;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -108,9 +109,10 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
 								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet()))));
 
-		bindModal(VehicleEntry.EntryFactory.class).toInstance(
-				new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(), shiftsParams.considerUpcomingShiftsForInsertion)
-		);
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
+			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType), shiftsParams.considerUpcomingShiftsForInsertion); 
+		}));
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class))));
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
