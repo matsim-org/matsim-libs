@@ -164,6 +164,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Whether full simulation drt is employed")
 	public SimulationType simulationType = SimulationType.fullSimulation;
 
+	@Parameter
+	@Comment("Defines whether routes along schedules are updated regularly")
+	public boolean updateRoutes = false;
+
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 

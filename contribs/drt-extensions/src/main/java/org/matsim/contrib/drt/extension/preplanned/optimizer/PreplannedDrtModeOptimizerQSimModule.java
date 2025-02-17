@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -82,6 +83,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))))).asEagerSingleton();
+						new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)),
+						getter.getModal(DriveTaskUpdater.class)))).asEagerSingleton();
 	}
 }

@@ -52,6 +52,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -182,7 +183,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))))).asEagerSingleton();
+						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)),
+						getter.getModal(DriveTaskUpdater.class)))).asEagerSingleton();
 
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
