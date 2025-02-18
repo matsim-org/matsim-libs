@@ -28,7 +28,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 	private static final Logger log = LogManager.getLogger(SelectSingleTripModeStrategy.class);
 
-	private final Provider<SingleTripChoicesGenerator> generator;
+	private final Provider<GeneratorContext> generator;
 	private final Provider<PlanSelector> selector;
 
 	private final Set<String> modes;
@@ -38,7 +38,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
 	                                    Set<String> modes,
-	                                    Provider<SingleTripChoicesGenerator> generator,
+	                                    Provider<GeneratorContext> generator,
 	                                    Provider<PlanSelector> selector,
 	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
 		super(globalConfigGroup);
@@ -55,21 +55,21 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	}
 
 
-	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
+	public static Algorithm newAlgorithm(GeneratorContext generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
 		return new Algorithm(generator, selector, pruner, modes, requireDifferentModes);
 	}
 
 	public static final class Algorithm implements PlanAlgorithm {
 
-		private final SingleTripChoicesGenerator generator;
+		private final GeneratorContext ctx;
 		private final PlanSelector selector;
 		private final CandidatePruner pruner;
 		private final Set<String> modes;
 		private final Random rnd;
 		private final boolean requireDifferentModes;
 
-		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
-			this.generator = generator;
+		public Algorithm(GeneratorContext generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
+			this.ctx = generator;
 			this.selector = selector;
 			this.pruner = pruner;
 			this.modes = new HashSet<>(modes);
@@ -79,7 +79,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 		@Override
 		public void run(Plan plan) {
-			PlanModel model = PlanModel.newInstance(plan);
+			PlanModel model = ctx.service.getPlanModel(plan);
 
 			PlanCandidate c = chooseCandidate(model);
 
@@ -124,7 +124,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			// Set it to be modifiable
 			mask[idx] = true;
 
-			List<PlanCandidate> candidates = generator.generate(model, modes, mask);
+			List<PlanCandidate> candidates = ctx.singleGenerator.generate(model, modes, mask);
 
 			// Remove based on threshold
 			if (pruner != null) {

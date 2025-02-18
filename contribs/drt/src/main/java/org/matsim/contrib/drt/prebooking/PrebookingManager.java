@@ -173,9 +173,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		List<Id<Person>> personIds = personsLegs.stream().map(p -> p.agent().getId()).toList();
 		eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, personIds));
 
-		Leg representativeLeg = personsLegs.get(0).leg();
-		PassengerRequest request = requestCreator.createRequest(requestId, personIds, representativeLeg.getRoute(),
-				getLink(representativeLeg.getRoute().getStartLinkId()), getLink(representativeLeg.getRoute().getEndLinkId()), earliestDepartureTime,
+		List<Route> routes = personsLegs.stream().map(PersonLeg::leg).map(Leg::getRoute).toList();
+		Route representativeRoute = routes.get(0);
+		PassengerRequest request = requestCreator.createRequest(requestId, personIds, routes,
+				getLink(representativeRoute.getStartLinkId()), getLink(representativeRoute.getEndLinkId()), earliestDepartureTime,
 				now);
 
 		Set<String> violations = requestValidator.validateRequest(request);

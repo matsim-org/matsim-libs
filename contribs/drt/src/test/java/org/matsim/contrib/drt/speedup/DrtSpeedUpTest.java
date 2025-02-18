@@ -27,9 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -275,7 +273,7 @@ public class DrtSpeedUpTest {
 		var personId = Id.create(id, Person.class);
 
 		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, List.of(personId), linkAB.getId(),
-				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, null, null);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,

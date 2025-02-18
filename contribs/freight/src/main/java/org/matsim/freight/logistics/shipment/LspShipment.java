@@ -56,6 +56,8 @@ public interface LspShipment
 
   double getPickupServiceTime(); // same as in CarrierShipment
 
+  //Consider changing this ShipmentLog to MATSim's experienced plans.
+  //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   LspShipmentPlan getShipmentLog();
 
   Collection<LspShipmentRequirement> getRequirements();

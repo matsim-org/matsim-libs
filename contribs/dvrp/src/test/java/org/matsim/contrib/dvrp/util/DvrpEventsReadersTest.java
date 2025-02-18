@@ -21,12 +21,10 @@
 package org.matsim.contrib.dvrp.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -52,6 +50,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
@@ -72,7 +71,7 @@ public class DvrpEventsReadersTest {
 	}
 
 	private final List<Event> dvrpEvents = List.of(
-			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink),
+			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink, null, "1"),
 			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200),
 			new PassengerRequestRejectedEvent(2, mode, request, List.of(person), "cause_1"),
 			new PassengerPickedUpEvent(111, mode, request, person, vehicle),
