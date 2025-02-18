@@ -2,8 +2,10 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.noise.NoiseAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.*;
-import org.matsim.simwrapper.viz.ColorScheme;
+import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DashboardUtils;
+import org.matsim.simwrapper.Header;
+import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Tile;
@@ -13,13 +15,13 @@ import org.matsim.simwrapper.viz.Tile;
  */
 public class NoiseDashboard implements Dashboard {
 
-	private double minDb = 40;
-	private double maxDb = 80;
-
 	private final String coordinateSystem;
+	private final double minDb = 40;
+	private final double maxDb = 80;
 
 	/**
 	 * Best provide the crs from {@link org.matsim.core.config.groups.GlobalConfigGroup}
+	 *
 	 * @param coordinateSystem for the {@link GridMap}
 	 */
 	public NoiseDashboard(String coordinateSystem) {
@@ -51,8 +53,8 @@ public class NoiseDashboard implements Dashboard {
 				viz.display.lineColor.dataset = "noise";
 				viz.display.lineColor.columnName = "value";
 				viz.display.lineColor.join = "Link Id";
-				//viz.display.lineColor.fixedColors = new String[]{"#1175b3", "#95c7df", "#f4a986", "#cc0c27"};
-				viz.display.lineColor.setColorRamp(ColorScheme.Oranges, 8, false, "35, 45, 55, 65, 75, 85, 95");
+				viz.display.lineColor.fixedColors = new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"};
+				viz.display.lineColor.setColorRamp(6, "55, 60, 65, 70, 75");
 				viz.display.lineWidth.dataset = "noise";
 				viz.display.lineWidth.columnName = "value";
 				viz.display.lineWidth.scaleFactor = 8d;
@@ -64,12 +66,18 @@ public class NoiseDashboard implements Dashboard {
 				viz.description = "Total Noise Immissions per day";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_day.%s", "avro");
+				viz.cellSize = 250;
+				viz.setColorRamp(new double[]{55, 60, 65, 70, 75}, new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"}
+				);
 			})
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Hourly Noise Immissions (Grid)";
 				viz.description = "Noise Immissions per hour";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "immission_per_hour.%s", "avro");
+				viz.cellSize = 250;
+				viz.setColorRamp(new double[]{55, 60, 65, 70, 75}, new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"}
+				);
 			});
 		layout.row("damages")
 			.el(GridMap.class, (viz, data) -> {
@@ -77,12 +85,18 @@ public class NoiseDashboard implements Dashboard {
 				viz.description = "Total Noise Damages per day [€]";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_day.%s", "avro");
+				viz.cellSize = 250;
+				viz.setColorRamp(new double[]{55, 60, 65, 70, 75}, new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"}
+				);
 			})
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Hourly Noise Damages (Grid)";
 				viz.description = "Noise Damages per hour [€]";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_hour.%s", "avro");
+				viz.cellSize = 250;
+				viz.setColorRamp(new double[]{55, 60, 65, 70, 75}, new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"}
+				);
 			});
 
 
