@@ -2,6 +2,7 @@ package org.matsim.core.network.turnRestrictions;
 
 import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -140,6 +141,8 @@ public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
                     link.getCapacity(),
                     link.getNumberOfLanes()
             );
+            // copy all attributes except initial turn restrictions
+            NetworkUtils.copyAttributesExceptDisallowedNextLinks(coloredLink.link, linkCopy);
             network.addLink(linkCopy);
         }
     }
@@ -157,7 +160,7 @@ public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
     }
 
     private void advance(TurnRestrictionsContext.ColoredLink coloredLink, List<Id<Link>> currentPath,
-                                Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions) {
+                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions) {
 
         if (!network.getLinks().containsKey(coloredLink.link.getId())) {
             // link sequence is not part of the network anymore and doesn't need to be explored.
@@ -166,23 +169,32 @@ public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
 
         if (coloredLink.toColoredNode != null) {
             Node node = coloredLink.toColoredNode.node();
-            Set<Link> unrestrictedReachableLinks = new HashSet<>(node.getOutLinks().values()
+
+            // set of reachable links from the original node
+            // use id, as the link object may have been deleted and re-inserted as a copy during the process
+            Set<Id<Link>> unrestrictedReachableLinks = new HashSet<>(node.getOutLinks().values()
                     .stream()
-                    .filter(link -> network.getLinks().containsKey(link.getId()))
+                    .map(Identifiable::getId)
+                    .filter(link -> network.getLinks().containsKey(link))
                     .collect(Collectors.toSet()));
+
+
             List<TurnRestrictionsContext.ColoredLink> toAdvance = new ArrayList<>();
             for (TurnRestrictionsContext.ColoredLink outLink : coloredLink.toColoredNode.outLinks()) {
-                unrestrictedReachableLinks.remove(outLink.link);
+                // remove from the set all links that are also reachable from within the colored subgraph
+                unrestrictedReachableLinks.remove(outLink.link.getId());
                 if (outLink.toColoredNode != null) {
                     toAdvance.add(outLink);
                 }
             }
 
+            // any remaining link is _not_ reachable from within the colored subgraph
+            // -> there must be a turn restriction from the current start link across the path
             if (!unrestrictedReachableLinks.isEmpty()) {
                 DisallowedNextLinks disallowedNextLinks = NetworkUtils.getOrCreateDisallowedNextLinks(replacedStartLink);
-                for (Link unrestrictedReachableLink : unrestrictedReachableLinks) {
+                for (Id<Link> unrestrictedReachableLink : unrestrictedReachableLinks) {
                     List<Id<Link>> path = new ArrayList<>(currentPath);
-                    path.add(unrestrictedReachableLink.getId());
+                    path.add(unrestrictedReachableLink);
                     disallowedNextLinks.addDisallowedLinkSequence("car", path);
                 }
             }

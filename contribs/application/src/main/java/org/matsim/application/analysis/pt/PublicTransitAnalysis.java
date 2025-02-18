@@ -19,14 +19,18 @@
 
 package org.matsim.application.analysis.pt;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.pt.stop2stop.PtStop2StopAnalysis;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.SampleOptions;
@@ -36,7 +40,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
 import picocli.CommandLine;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 @CommandLine.Command(
 	name = "transit", description = "General public transit analysis.",
@@ -45,6 +54,8 @@ import picocli.CommandLine;
 @CommandSpec(requireRunDirectory = true,
 	produces = {
 		"pt_pax_volumes.csv.gz",
+		"pt_pax_per_hour_and_vehicle_type.csv",
+		"pt_pax_per_hour_and_vehicle_type_and_agency.csv"
 	}
 )
 public class PublicTransitAnalysis implements MATSimAppCommand {
@@ -53,8 +64,10 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(PublicTransitAnalysis.class);
+
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(PublicTransitAnalysis.class);
+
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
@@ -72,7 +85,11 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		String eventsFile = ApplicationUtils.matchInput("events", input.getRunDirectory()).toString();
 
 		PtStop2StopAnalysis ptStop2StopEventHandler = new PtStop2StopAnalysis(scenario.getTransitVehicles(), sample.getUpscaleFactor());
+		PtPassengerCountsEventHandler passengerCountsHandler = new PtPassengerCountsEventHandler(scenario.getTransitSchedule(), scenario.getTransitVehicles());
+
 		eventsManager.addHandler(ptStop2StopEventHandler);
+		eventsManager.addHandler(passengerCountsHandler);
+
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
@@ -84,7 +101,41 @@ public class PublicTransitAnalysis implements MATSimAppCommand {
 		ptStop2StopEventHandler.writeStop2StopEntriesByDepartureCsv(output.getPath("pt_pax_volumes.csv.gz"),
 			",", ";");
 
+		writePassengerCounts(passengerCountsHandler);
+
 		return 0;
+	}
+
+	private void writePassengerCounts(PtPassengerCountsEventHandler handler) {
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output.getPath("pt_pax_per_hour_and_vehicle_type.csv"), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("vehicle_type", "hour", "passenger_count");
+			for (Int2ObjectMap.Entry<Object2IntMap<Id<VehicleType>>> kv : handler.getCounts().int2ObjectEntrySet()) {
+				for (Object2IntMap.Entry<Id<VehicleType>> vc : kv.getValue().object2IntEntrySet()) {
+					csv.printRecord(vc.getKey(), kv.getIntKey(), vc.getIntValue() * sample.getUpscaleFactor());
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Error writing passenger counts.", e);
+		}
+
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(output.getPath("pt_pax_per_hour_and_vehicle_type_and_agency.csv"), StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+
+			csv.printRecord("vehicle_type", "agency", "hour", "passenger_count");
+			for (Int2ObjectMap.Entry<Object2IntMap<PtPassengerCountsEventHandler.AgencyVehicleType>> kv : handler.getAgencyCounts().int2ObjectEntrySet()) {
+				for (Object2IntMap.Entry<PtPassengerCountsEventHandler.AgencyVehicleType> vc : kv.getValue().object2IntEntrySet()) {
+					csv.printRecord(vc.getKey().vehicleType(), vc.getKey().agency(), kv.getIntKey(), vc.getIntValue() * sample.getUpscaleFactor());
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Error writing passenger counts.", e);
+		}
+
+
 	}
 
 	private Config prepareConfig() {

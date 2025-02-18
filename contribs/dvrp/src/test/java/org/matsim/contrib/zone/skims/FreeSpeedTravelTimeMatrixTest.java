@@ -21,6 +21,8 @@
 package org.matsim.contrib.zone.skims;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -30,12 +32,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystem;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -75,7 +88,7 @@ public class FreeSpeedTravelTimeMatrixTest {
 		assertThat(matrix.getTravelTime(nodeC, nodeA, 0)).isEqualTo(0);
 		assertThat(matrix.getTravelTime(nodeB, nodeC, 0)).isEqualTo(20 + 1); // 1 s for moving over nodes
 		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 1); // 1 s for moving over nodes
-	
+
 		// write and read cache
 		URL cachePath = new File(utils.getOutputDirectory(), "cache.bin").toURI().toURL();
 		matrix.write(cachePath, network);
@@ -130,5 +143,47 @@ public class FreeSpeedTravelTimeMatrixTest {
 		assertThat(matrix.getTravelTime(nodeC, nodeA, 0)).isEqualTo(9 + 1); // 1 s for moving over nodes
 		assertThat(matrix.getTravelTime(nodeB, nodeC, 0)).isEqualTo(20 + 11 + 2); // 2 s for moving over nodes
 		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 9 + 2); // 2 s for moving over nodes
+	}
+
+	@Test
+	void cacheViaConfig() {
+		// need to get an absolute path, otherwise will try to generate the cache relative to the config
+		String cachePath = new File(utils.getOutputDirectory() + "/cache.bin").getAbsolutePath();
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+				"generic_dvrp_one_taxi_config.xml");
+
+		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup());
+		DvrpConfigGroup dvrpConfig = DvrpConfigGroup.get(config);
+
+		DvrpTravelTimeMatrixParams params = dvrpConfig.getTravelTimeMatrixParams();
+		params.maxNeighborDistance = 9999;
+		params.cachePath = cachePath;
+
+		SquareGridZoneSystemParams zoneParams = new SquareGridZoneSystemParams();
+		zoneParams.cellSize = 1000;
+		params.addParameterSet(zoneParams);
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+
+		{
+			// generate from scratch
+            assertFalse(new File(cachePath).exists());
+
+			config.controller().setOutputDirectory( "test\\output\\generic_dvrp_one_taxi_cacheViaConfig_1");
+			Controler controller = new Controler(scenario);
+			controller.addOverridingModule(new DvrpModule());
+			controller.getInjector().getInstance(TravelTimeMatrix.class);
+		}
+
+		{
+			// read from cache
+			assertTrue(new File(cachePath).exists());
+			config.controller().setOutputDirectory( "test\\output\\generic_dvrp_one_taxi_cacheViaConfig_2");
+			Controler controller = new Controler(scenario);
+			controller.addOverridingModule(new DvrpModule());
+			controller.getInjector().getInstance(TravelTimeMatrix.class);
+		}
 	}
 }

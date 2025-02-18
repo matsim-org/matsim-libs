@@ -24,6 +24,28 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 	@Override
 	public double estimate(EstimatorContext context, double arrivalTime, Activity act) {
 
+		double departureTime = Math.max(arrivalTime, timeInterpretation.decideOnActivityEndTime(act, arrivalTime).orElse(context.scoring.simulationPeriodInDays * 24 * 3600) );
+		return estScore(context, arrivalTime, departureTime, act);
+	}
+
+	@Override
+	public double estimateLastAndFirstOfDay(EstimatorContext context, double arrivalTime, Activity last, Activity first) {
+
+		double firstEnd = timeInterpretation.decideOnActivityEndTime(first, 0).orElse(0);
+
+		if (last.getType().equals(first.getType())) {
+			// Shift end time to the next day
+			double endTime = firstEnd + 24 * 3600;
+			return estScore(context, arrivalTime, endTime, last);
+		}
+
+		// Score first and last separately
+		return estScore(context, 0, firstEnd, first) +
+			estScore(context, arrivalTime, context.scoring.simulationPeriodInDays * 24 * 3600, last);
+	}
+
+	private double estScore(EstimatorContext context, double arrivalTime, double departureTime, Activity act) {
+
 		ActivityUtilityParameters actParams = context.scoring.utilParams.get(act.getType());
 
 		if (!actParams.isScoreAtAll())
@@ -33,8 +55,6 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 		OptionalTime closingTime = actParams.getClosingTime();
 
 		double activityStart = arrivalTime;
-		double departureTime = Math.max(arrivalTime, timeInterpretation.decideOnActivityEndTime(act, arrivalTime).orElse(context.scoring.simulationPeriodInDays * 24 * 3600) );
-
 		double activityEnd = departureTime;
 
 		if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
@@ -44,7 +64,7 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 			activityEnd = closingTime.seconds();
 		}
 		if (openingTime.isDefined() && closingTime.isDefined()
-				&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
+			&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 			// agent could not perform action
 			activityStart = departureTime;
 			activityEnd = departureTime;
@@ -74,7 +94,7 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 
 		if ( duration >= 3600.*actParams.getZeroUtilityDuration_h() ) {
 			double utilPerf = context.scoring.marginalUtilityOfPerforming_s * typicalDuration
-					* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+				* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 			// also removing the "wait" alternative scoring.
 			score += utilPerf;
 		} else {
@@ -102,6 +122,6 @@ public class DefaultActivityEstimator implements ActivityEstimator {
 		}
 
 		return score;
-	}
 
+	}
 }

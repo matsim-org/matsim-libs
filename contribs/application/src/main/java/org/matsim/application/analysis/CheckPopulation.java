@@ -19,12 +19,12 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @CommandLine.Command(
 		name = "check-population",
@@ -121,16 +121,16 @@ public class CheckPopulation implements MATSimAppCommand {
 
 		List<? extends Person> agents = population.getPersons().values().stream()
 				.filter(filter)
-				.collect(Collectors.toList());
+				.toList();
 
 		// agents with trips
 		List<? extends Person> mobileAgents = agents.stream()
-				.filter(a -> TripStructureUtils.getTrips(a.getSelectedPlan()).size() > 0)
-				.collect(Collectors.toList());
+				.filter(a -> !TripStructureUtils.getTrips(a.getSelectedPlan()).isEmpty())
+				.toList();
 
 		List<TripStructureUtils.Trip> trips = agents.stream().flatMap(
 				agent -> TripStructureUtils.getTrips(agent.getSelectedPlan().getPlanElements()).stream()
-		).collect(Collectors.toList());
+		).toList();
 
 		log.info("Number of trips: \t\t{}", trips.size());
 		log.info("Avg. trips per agent: \t{}", (double) trips.size() / agents.size());
@@ -154,6 +154,8 @@ public class CheckPopulation implements MATSimAppCommand {
 		counts.forEach((k, v) -> log.info("\t{}-m: {} ({}%)", k.intValue(), v, Math.round((v * 1000d) / trips.size()) / 10d));
 
 		sep();
+		log.info("Activities:");
+		log.info("");
 
 		Object2IntMap<String> acts = new Object2IntAVLTreeMap<>();
 		Object2IntMap<String> firstAct = new Object2IntAVLTreeMap<>();
@@ -164,34 +166,97 @@ public class CheckPopulation implements MATSimAppCommand {
 
 		List<TripStructureUtils.Subtour> subtours = new ArrayList<>();
 
+		NavigableSet<Double> timeGroups = new TreeSet<>(List.of(0d, 1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d,
+			12d, 13d, 14d, 15d, 16d, 17d, 18d, 19d, 20d, 21d, 22d, 23d));
+		Map<String, Double2IntMap> actStartTimes = new HashMap<>();
+		Map<String, Double2IntMap> actEndTimes = new HashMap<>();
+		int noStartTime = 0;
+		int noEndTime = 0;
+		int noStartAndEndTime = 0;
+		int zeroDurationActs = 0;
+		int numberOfActs = 0;
+
 		for (Person agent : agents) {
 
 			// if there are no facility or link ids. the coordinate is used as proxy id.
 			for (PlanElement el : agent.getSelectedPlan().getPlanElements()) {
-				if (el instanceof Activity) {
-					Activity act = (Activity) el;
-					if (act.getFacilityId() == null && act.getLinkId() == null) {
-						act.setLinkId(Id.createLinkId(act.getCoord().toString()));
-					}
+				if (el instanceof Activity act && act.getFacilityId() == null && act.getLinkId() == null) {
+					act.setLinkId(Id.createLinkId(act.getCoord().toString()));
 				}
 			}
 
 			subtours.addAll(TripStructureUtils.getSubtours(agent.getSelectedPlan()));
 
-			List<String> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities)
-					.stream().map(CheckPopulation::actName).collect(Collectors.toList());
+			List<Activity> activities = new ArrayList<>(TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities));
 
-			if (activities.size() == 0)
+			if (activities.isEmpty())
 				continue;
 
-			firstAct.mergeInt(activities.get(0), 1, Integer::sum);
-			lastAct.mergeInt(activities.get(activities.size() - 1), 1, Integer::sum);
-			activities.forEach(act -> acts.mergeInt(act, 1, Integer::sum));
+			firstAct.mergeInt(actName(activities.getFirst()), 1, Integer::sum);
+			lastAct.mergeInt(actName(activities.getLast()), 1, Integer::sum);
+			activities.forEach(act -> acts.mergeInt(actName(act), 1, Integer::sum));
 
-			for (String act : Sets.newHashSet(activities)) {
-				haveActivity.mergeInt(act, 1, Integer::sum);
+			for (Activity act : Sets.newHashSet(activities)) {
+				String name = actName(act);
+				haveActivity.mergeInt(name, 1, Integer::sum);
+
+				boolean hasNoStartTime = false;
+				boolean hasNoEndTime = false;
+
+//				find time bin for start and end of act or increase counter if no start or end time is defined
+				hasNoStartTime = categorizeTime(act.getStartTime(), timeGroups, actStartTimes, name, hasNoStartTime);
+				hasNoEndTime = categorizeTime(act.getEndTime(), timeGroups, actEndTimes, name, hasNoEndTime);
+
+//				increase counters
+				if (hasNoStartTime || hasNoEndTime) {
+					noStartTime += hasNoStartTime ? 1 : 0;
+					noEndTime += hasNoEndTime ? 1 : 0;
+					noStartAndEndTime += (hasNoStartTime && hasNoEndTime) ? 1 : 0;
+				}
+
+				double duration = 0.;
+				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
+					duration = act.getEndTime().seconds() - act.getStartTime().seconds();
+				} else if (act.getStartTime().isDefined() && !act.getEndTime().isDefined()) {
+//					initiate as 24h in case act is the last act of a plan
+					double previousActStart = 24 * 3600.;
+
+					if (activities.indexOf(act) != activities.indexOf(activities.getLast())) {
+						previousActStart = activities.get(activities.indexOf(act) + 1).getStartTime().seconds();
+					}
+					duration = previousActStart - act.getStartTime().seconds();
+				} else if (act.getEndTime().isDefined() && !act.getStartTime().isDefined()) {
+//					initiate as 0 in case act is first act of a plan
+					double previousActEnd = 0.;
+					if (activities.indexOf(act) != activities.indexOf(activities.getFirst())) {
+						previousActEnd = activities.get(activities.indexOf(act) - 1).getEndTime().seconds();
+					}
+					duration = act.getEndTime().seconds() - previousActEnd;
+				}
+
+				if (duration <= 0.) {
+					zeroDurationActs++;
+				}
+				numberOfActs++;
 			}
 		}
+
+		log.info("Activity type start time distributions:");
+		log.info("");
+
+		logActTimes(actStartTimes);
+
+		log.info("Activity type end time distributions:");
+		log.info("");
+
+		logActTimes(actEndTimes);
+
+		log.info("Activities without start time: {}", noStartTime);
+		log.info("Activities without end time: {}", noEndTime);
+		log.info("Activities without start AND end time: {}", noStartAndEndTime);
+		log.info("Activities with duration of <=0s: {} ({}%)", zeroDurationActs, String.format("%.2f", ((double) zeroDurationActs / numberOfActs) * 100));
+		log.info("");
+
 
 		log.info("Number of persons having at least one activity:");
 		haveActivity.forEach((k, v) -> log.info("\t{}: {} ({}%)", k, v, Math.round((v * 1000d) / agents.size()) / 10d));
@@ -210,12 +275,34 @@ public class CheckPopulation implements MATSimAppCommand {
 
 		long closed = subtours.stream().filter(TripStructureUtils.Subtour::isClosed).count();
 
-		if (subtours.size() > 0)
+		if (!subtours.isEmpty())
 			log.info("Closed subtours estimate: \t{}%", Math.round((closed * 1000d) / subtours.size()) / 10d);
 		else
 			log.info("No info about subtours (link or facilities ids missing)");
 
 		return 0;
+	}
+
+	private static void logActTimes(Map<String, Double2IntMap> actTimesMap) {
+		actTimesMap.forEach((k, v) -> {
+			double total = v.values().intStream().sum();
+
+			// Iterate again to log each entry
+			v.forEach((subKey, subValue) -> log.info("{} - {}h: {} ({}%)", k, subKey, subValue, String.format("%.2f", (subValue / total) * 100)));
+			log.info("");
+		});
+	}
+
+	private boolean categorizeTime(OptionalTime time, NavigableSet<Double> timeGroups, Map<String, Double2IntMap> timesMap, String name, boolean timeNotDefined) {
+		if (time.isDefined()) {
+			double group = timeGroups.floor(Math.floor(time.seconds()/3600));
+
+			timesMap.putIfAbsent(name, new Double2IntAVLTreeMap());
+			timesMap.get(name).mergeInt(group, 1, Integer::sum);
+		} else {
+			timeNotDefined = true;
+		}
+		return timeNotDefined;
 	}
 
 	private static String actName(Activity act) {

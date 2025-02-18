@@ -35,6 +35,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -48,11 +49,13 @@ public class VehicleDataEntryFactoryImplTest {
 
 	//time slack: 30 (departure is the constraint)
 	private final Stop stop1 = stop(300, 340, 400, 430);
+	
+	private static final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void computeSlackTimes_withStops() {
 		final List<Double> precedingStayTimes = Arrays.asList(0.0, 0.0);
-		
+
 		//final stay task not started - vehicle slack time is 50
 		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 30, 50);
 
@@ -66,7 +69,7 @@ public class VehicleDataEntryFactoryImplTest {
 	@Test
 	void computeSlackTimes_withoutStops() {
 		final List<Double> precedingStayTimes = Arrays.asList();
-		
+
 		//final stay task not started yet - vehicle slack time is 10
 		assertThat(computeSlackTimes(vehicle(500, 490), 485, new Stop[] {}, null, precedingStayTimes)).containsExactly(10, 10);
 
@@ -90,7 +93,7 @@ public class VehicleDataEntryFactoryImplTest {
 	void computeSlackTimes_withStart() {
 		final List<Double> noPrecedingStayTimes = Arrays.asList();
 		final List<Double> onePrecedingStayTime = Arrays.asList(0.0);
-		
+
 		//start without stop
 		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] {}, stop0, noPrecedingStayTimes)).containsExactly(30, 50);
 
@@ -107,7 +110,7 @@ public class VehicleDataEntryFactoryImplTest {
 				0.0, //
 				33.0 // second stop is a prebooked pickup, so slack for insertion after first stop is longer
 				);
-		
+
 		// note that these examples are naively adapted from computeSlackTimes_withStops
 		// in practice the slack would never pass the service end time slack (ie the
 		// last value in the list) if the preceding insertions were done correctly and
@@ -124,7 +127,7 @@ public class VehicleDataEntryFactoryImplTest {
 	}
 
 	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
-		return new Stop(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, loadType.getEmptyLoad(), loadType);
 	}
 
 	private DvrpVehicle vehicle(double vehicleEndTime, double lastStayTaskBeginTime) {

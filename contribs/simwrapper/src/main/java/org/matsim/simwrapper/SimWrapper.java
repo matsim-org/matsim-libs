@@ -155,7 +155,7 @@ public final class SimWrapper {
 
 		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
+		int i = 1;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
@@ -188,6 +188,12 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+		run(dir, null);
+	}
+	/**
+	 * Run the pipeline, and pass a different config file. This functionality is only available via {@link SimWrapperRunner}.
+	 */
+	void run(Path dir, String configPath) {
 
 		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
 			try {
@@ -206,6 +212,9 @@ public final class SimWrapper {
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
 			runner.setSampleSize(configGroup.sampleSize);
+
+			if (configPath != null)
+				runner.setConfigPath(configPath);
 
 			if (ctx.shp != null) {
 

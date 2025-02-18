@@ -1,6 +1,10 @@
 package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 
-import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -13,19 +17,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.Fleets;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegersLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author nkuehnel / MOIA
@@ -39,6 +44,8 @@ public class SpatIalRequestFleetFilterTest {
 
     @RegisterExtension
     public MatsimTestUtils utils = new MatsimTestUtils();
+
+    private static final IntegersLoadType loadType = new IntegersLoadType("passengers");
 
     @Test
     void test() {
@@ -154,11 +161,7 @@ public class SpatIalRequestFleetFilterTest {
     }
 
     private Waypoint.Start start(Task task, double time, Link link, int occupancy) {
-        return new Waypoint.Start(task, link, time, occupancy);
-    }
-
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, int outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy);
+        return new Waypoint.Start(task, link, time, loadType.fromArray(occupancy));
     }
 
 }

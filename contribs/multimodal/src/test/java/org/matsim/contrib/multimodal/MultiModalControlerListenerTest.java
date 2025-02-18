@@ -264,7 +264,7 @@ public class MultiModalControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+				addTravelTimeBinding(TransportMode.ride).to( carTravelTime() );
         		addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
 			}
 		});

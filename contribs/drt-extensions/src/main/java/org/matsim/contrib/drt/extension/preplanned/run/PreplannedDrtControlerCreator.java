@@ -32,12 +32,13 @@ import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -84,7 +85,7 @@ public final class PreplannedDrtControlerCreator {
 					bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 									getter -> new VehicleOccupancyProfileCalculator(getMode(),
 											getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),
-											ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, WaitForStopTask.TYPE))))
+											ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, WaitForStopTask.TYPE), getter.getModal(DvrpLoadType.class))))
 							.asEagerSingleton();
 				}
 			});

@@ -214,6 +214,11 @@ public abstract class Gbl {
 			throw new RuntimeException( "Object is null; follow stack trace" ) ;
 		}
 	}
+	public static void assertNotNull( Object obj, String msg ) {
+		if ( obj==null ) {
+			throw new RuntimeException( msg ) ;
+		}
+	}
 	public static void fail() {
 		throw new RuntimeException("failure; follow stack trace") ;
 	}

@@ -22,7 +22,11 @@ package org.matsim.contrib.drt.extension.services.optimizer;
 import org.matsim.contrib.drt.extension.services.dispatcher.ServiceTaskDispatcher;
 import org.matsim.contrib.drt.extension.services.schedule.DrtServiceDynActionCreator;
 import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTaskFactoryImpl;
-import org.matsim.contrib.drt.optimizer.*;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
+import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -34,6 +38,7 @@ import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -67,7 +72,7 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		})).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl()))).asEagerSingleton();
+			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl(getter.getModal(DvrpLoadType.class))))).asEagerSingleton();
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 			getter -> {

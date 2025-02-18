@@ -50,7 +50,7 @@ public class EstimateRouterTest {
 		Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
 		PlanModel planModel = PlanModel.newInstance(plan);
 
-		router.routeModes(planModel, group.getModes());
+		router.routeModes(planModel, group.getModes(), TripModeFilter.ACCEPT_ALL);
 
 		assertThat(planModel)
 				.isNotNull();

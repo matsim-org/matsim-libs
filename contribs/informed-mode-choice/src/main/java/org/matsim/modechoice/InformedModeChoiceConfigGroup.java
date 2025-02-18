@@ -29,8 +29,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@PositiveOrZero
-	@Comment("1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice." +
-		" POSITIVE_INFINITY will select randomly from the best k.")
+	@Comment("1/beta parameter (or temperature tau) to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice." +
+		" POSITIVE_INFINITY will select randomly.")
 	private double invBeta = Double.POSITIVE_INFINITY;
 
 	@Parameter
@@ -55,7 +55,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@PositiveOrZero
-	@Comment("Probability to re-estimate an existing plan model.")
+	@Comment("Probability to drop all estimates for a plan.")
 	private double probaEstimate = 0;
 
 	public InformedModeChoiceConfigGroup() {

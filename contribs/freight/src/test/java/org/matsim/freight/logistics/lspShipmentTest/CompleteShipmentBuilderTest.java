@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
@@ -48,7 +49,7 @@ public class CompleteShipmentBuilderTest {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		this.network = scenario.getNetwork();
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 		this.shipments = new ArrayList<>();

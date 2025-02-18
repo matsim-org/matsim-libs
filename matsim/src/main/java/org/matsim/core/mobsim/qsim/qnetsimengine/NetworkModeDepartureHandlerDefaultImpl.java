@@ -32,11 +32,12 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
-class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
+public class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHandler {
+	// needs to be public so it can be used as a delegate.  Constructor is package-private (and should remain so).  kai, jan'25
 
 	private static final Logger log = LogManager.getLogger( NetworkModeDepartureHandlerDefaultImpl.class );
 
-	private int cntTeleportVehicle = 0;
+	private static int cntTeleportVehicle = 0;
 
 	private final VehicleBehavior vehicleBehavior;
 
@@ -63,11 +64,9 @@ class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHand
 	}
 
 	private void handleNetworkModeDeparture( double now, MobsimDriverAgent agent, Id<Link> linkId ) {
-		// The situation where a leg starts and ends at the same link used to be
-		// handled specially, for all agents except AbstractTransitDriverAgents.
-		// This however caused some problems in some cases, as apparently for taxicabs.
-		// Thus, such trips are now simulated normally.
-		// See MATSIM-233 for details. td apr'14
+		// The situation where a leg starts and ends at the same link used to be handled specially, for all agents except
+		// AbstractTransitDriverAgents. This however caused some problems in some cases, as apparently for taxicabs. Thus, such trips are now
+		// simulated normally. See MATSIM-233 for details. td apr'14
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
@@ -81,7 +80,7 @@ class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHand
 					log.error( "Note that, with AgentSource and if the agent starts on a leg, the vehicle needs to be inserted BEFORE the agent!") ;
 					throw new RuntimeException( msg+" aborting ...") ;
 				}
-				teleportVehicleTo(vehicle, linkId);
+				teleportVehicleTo(vehicle, linkId, qNetsimEngine);
 
 				vehicle.setDriver(agent);
 				agent.setVehicle(vehicle) ;
@@ -102,8 +101,9 @@ class NetworkModeDepartureHandlerDefaultImpl implements NetworkModeDepartureHand
 		}
 	}
 
-	private void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId) {
+	public static void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId, QNetsimEngineI qNetsimEngine ) {
 		if (vehicle.getCurrentLink() != null) {
+
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;
 				log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);

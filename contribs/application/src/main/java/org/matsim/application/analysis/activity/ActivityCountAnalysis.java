@@ -56,7 +56,7 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 	/**
 	 * Specifies activity types that should be counted only once per agent per region.
 	 */
-	@CommandLine.Option(names = "--single-occurrence", description = "Activity types that are only counted once per agent")
+	@CommandLine.Option(names = "--single-occurrence", description = "Activity types that are only counted once per agent", split = ";")
 	private Set<String> singleOccurrence;
 
 	public static void main(String[] args) {

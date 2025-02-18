@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.config.Config;
@@ -130,7 +131,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						300, getter.get(QSimConfigGroup.class), ImmutableSet.of(DrtDriveTask.TYPE,
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
-						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)))).asEagerSingleton();
+						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE), getter.getModal(DvrpLoadType.class)))).asEagerSingleton();
 
 		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),

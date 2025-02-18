@@ -14,7 +14,7 @@ import com.google.inject.Provider;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class StrategicChargingReplanningStrategy implements Provider<PlanStrategy> {
-	static public final String STRATEGY = "strategic_charging";
+	static public final String STRATEGY = "StrategicCharging";
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Provider<StrategicChargingReplanningAlgorithm> algorithmProvider;

@@ -80,6 +80,21 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@Override
 	public Integer call() throws Exception {
 
+		if ( this.maxTypicalDuration != 24*3600 ) {
+			throw new RuntimeException( "You have used maxTypicalDuration=" + this.maxTypicalDuration
+												+ "; as of now, it is not clear what other values than 24*3600 mean.  See comments in code."  );
+			// comments:
+
+			// In principle, it should be possible to read, say, 7-day activity plans.  In this case, the last activity would have a start time of,
+			// say, 6*24*3600+20*3600, which would need to be merged with the first activity.  This is clearly plausible, but it needs to be checked
+			// if the mergeOvernightActivities methods does the right thing in such a case.  Preferably write a test!!!!
+
+			// Even if the above use case makes sense, this would imply that only multiples of 24*3600 would make sense as values of
+			// maxTypicalDuration.  This should then be enforced except if someone has an idea what a different value means.
+
+			// kn, ts, cr, feb'25
+		}
+
 		Population population = PopulationUtils.readPopulation(input.toString());
 
 		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
@@ -109,10 +124,19 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 					duration = act.getMaximumDuration().seconds();
 				else
 					duration = act.getEndTime().orElse(maxTypicalDuration) - act.getStartTime().orElse(0);
+				// (Under normal circumstances, maxTypicalDuration is NOT changed from its default value, which is 24*3600.   Then, we
+				// generate durations from or to midnight.  Note that overnight activities are merged below.  kai, feb'25)
+
+				// (yy The senozon plans have startTime = prevAct.endTime + travelTime.  In general, one should NOT rely on activity start times.
+				// Better use TimeInterpretation#decide...Time methods.)
+
+				// kn, ts, feb'25
 
 				String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
 				act.setType(newType);
 
+				// activities that are shorter than endTimeToDuration will be forced to have their initial duration.
+				// Talk to KN or to Tilmann if you need to understand this.
 				if (duration <= endTimeToDuration && act.getEndTime().isDefined()) {
 					act.setEndTimeUndefined();
 					act.setMaximumDuration(duration);

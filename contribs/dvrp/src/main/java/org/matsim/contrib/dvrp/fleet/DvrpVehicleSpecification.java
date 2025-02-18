@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -50,7 +51,7 @@ public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return vehicle capacity
 	 */
-	int getCapacity();
+	DvrpLoad getCapacity();
 
 	/**
 	 * @return vehicle operations start time

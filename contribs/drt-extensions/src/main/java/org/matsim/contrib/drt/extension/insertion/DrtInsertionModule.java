@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.extension.insertion.objectives.VehicleDistanceObje
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -302,7 +303,7 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 					distanceApproximator = null;
 				}
 
-				return new VehicleRangeConstraint(vehicleRangeSupplier, distanceCalculator, distanceApproximator);
+				return new VehicleRangeConstraint(vehicleRangeSupplier, distanceCalculator, distanceApproximator, getter.getModal(DvrpLoadType.class));
 			}));
 
 			constraintBindings.add(modalKey(VehicleRangeConstraint.class));
@@ -448,7 +449,7 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 				distanceCalculator = getter.getModal(RoutingDistanceCalculator.class);
 			}
 
-			return new VehicleDistanceObjective(vehicleDistanceWeights, distanceCalculator);
+			return new VehicleDistanceObjective(vehicleDistanceWeights, distanceCalculator, getter.getModal(DvrpLoadType.class));
 		}));
 	}
 

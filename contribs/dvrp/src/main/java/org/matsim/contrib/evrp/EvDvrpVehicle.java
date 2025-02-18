@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -61,8 +62,13 @@ public class EvDvrpVehicle implements DvrpVehicle {
 	}
 
 	@Override
-	public int getCapacity() {
+	public DvrpLoad getCapacity() {
 		return vehicle.getCapacity();
+	}
+
+	@Override
+	public void setCapacity(DvrpLoad capacity) {
+		this.vehicle.setCapacity(capacity);
 	}
 
 	@Override

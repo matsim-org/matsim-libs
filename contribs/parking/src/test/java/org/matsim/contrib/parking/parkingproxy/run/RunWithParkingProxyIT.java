@@ -35,35 +35,38 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 public class RunWithParkingProxyIT {
-        private static final Logger log = LogManager.getLogger(RunWithParkingProxyIT.class);
-        @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(RunWithParkingProxyIT.class);
 
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	/**
+	 * This is only a regression test! The test was disabled with commit 740c0cd84 in jan'22.
+	 * I reactivate this test and update the event/experienced plans files. But still, somebody needs to check the results manually. paul, feb'25
+	 */
 	@Test
-	@Disabled
-	void testMain(){
-                RunWithParkingProxy.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "chessboard" ), "config.xml" ).toString()
-                                , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-                                , "--config:controler.lastIteration=2"
-                                , "--config:controler.writePlansInterval=1"
-                                , "--config:parkingProxy.method=events"
-                                , "--config:global.numberOfThreads=1"
-                                , "--config:controler.routingAlgorithmType=FastAStarLandmarks"
-                } );
-                {
-                        String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-                        String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-                        ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-                        if(!result.equals(ComparisonResult.FILES_ARE_EQUAL)) {
-                        	throw new RuntimeException("Events comparison ended with result " + result.name());
-                        }
-                }
-                {
-                        final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-                        PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_experienced_plans.xml.gz" );
-                        final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-                        PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_experienced_plans.xml.gz" );
-						PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
-						Assertions.assertEquals(PopulationComparison.Result.equal, result);
-                }
-        }
+	void testMain() {
+		RunWithParkingProxy.main(new String[]{IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml").toString()
+			, "--config:controller.outputDirectory=" + utils.getOutputDirectory()
+			, "--config:controller.lastIteration=2"
+			, "--config:controller.writePlansInterval=1"
+			, "--config:global.numberOfThreads=1"
+		});
+		{
+			String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+			String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+			ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+			if (!result.equals(ComparisonResult.FILES_ARE_EQUAL)) {
+				throw new RuntimeException("Events comparison ended with result " + result.name());
+			}
+		}
+		{
+			final Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_experienced_plans.xml.gz");
+			final Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+			PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_experienced_plans.xml.gz");
+			PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
+			Assertions.assertEquals(PopulationComparison.Result.equal, result);
+		}
+	}
 }

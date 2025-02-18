@@ -145,6 +145,8 @@ public final class LspShipmentUtils {
 
   //-----------------------------
   // LoggedShipment<..> builders
+  // Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
+  //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   //-----------------------------
 
   @SuppressWarnings("ClassEscapesDefinedScope")
@@ -369,7 +371,7 @@ public final class LspShipmentUtils {
     }
 
     public LspShipmentPlanElement build() {
-      return new LoggedLspShipmentHandle(this);
+      return new LoggedLspShipmentHandling(this);
     }
   }
 
@@ -533,8 +535,8 @@ public final class LspShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledLspShipmentHandle build() {
-      return new ScheduledLspShipmentHandle(this);
+    public ScheduledLspShipmentHandling build() {
+      return new ScheduledLspShipmentHandling(this);
     }
   }
 

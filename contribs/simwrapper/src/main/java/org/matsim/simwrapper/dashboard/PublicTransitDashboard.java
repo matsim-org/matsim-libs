@@ -42,7 +42,7 @@ public class PublicTransitDashboard implements Dashboard {
 				"--mode-filter", "", "--shp", "none");
 
 			viz.transitSchedule = data.output("(*.)?output_transitSchedule.xml.gz");
-			viz.ptStop2stopFile = data.compute(PublicTransitAnalysis.class, "pt_pax_volumes.csv.gz");
+			viz.demand = data.compute(PublicTransitAnalysis.class, "pt_pax_volumes.csv.gz");
 
 			if (!customRouteTypes.isEmpty())
 				viz.customRouteTypes = customRouteTypes;

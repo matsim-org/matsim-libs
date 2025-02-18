@@ -152,7 +152,8 @@ public class DashboardTests {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "pt");
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz");
+			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz")
+			.isDirectoryContaining("glob:**pt_pax_per_hour_and_vehicle_type_and_agency.csv");
 	}
 
 	@Test

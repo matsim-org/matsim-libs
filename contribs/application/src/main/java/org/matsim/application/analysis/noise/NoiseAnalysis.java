@@ -11,10 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.SampleOptions;
-import org.matsim.application.options.ShpOptions;
+import org.matsim.application.options.*;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.ProcessNoiseImmissions;
@@ -60,6 +57,9 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
+
+	@CommandLine.Mixin
+	private final ConfigOptions co = new ConfigOptions();
 
 	@CommandLine.Mixin
 	private final SampleOptions sampleOptions = new SampleOptions();
@@ -181,7 +181,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 	}
 
 	private Config prepareConfig() {
-		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
+		Config config = co.loadConfig(input.getRunDirectory());
 
 		//it is important to match "output_vehicles.xml.gz" specifically, because otherwise dvrpVehicle files might be matched and the code crashes later
 		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());

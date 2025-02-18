@@ -52,6 +52,7 @@ import com.google.inject.name.Names;
  */
 public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	private final boolean useModeFilteredSubnetwork;
+	private final String modalCachePath;
 
 	@Inject
 	private DvrpConfigGroup dvrpConfigGroup;
@@ -62,9 +63,14 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	@Inject
 	private QSimConfigGroup qSimConfigGroup;
 
-	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
+	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork, String modalCachePath) {
 		super(mode);
 		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+		this.modalCachePath = modalCachePath;
+	}
+
+	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
+		this(mode, useModeFilteredSubnetwork, null);
 	}
 
 	@Override
@@ -91,11 +97,11 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 						
 						
-						if (matrixParams.cachePath == null) {
+						if (modalCachePath == null) {
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize());
 						} else {
-							URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), matrixParams.cachePath);
+							URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), modalCachePath);
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize(), cachePath);
 						}

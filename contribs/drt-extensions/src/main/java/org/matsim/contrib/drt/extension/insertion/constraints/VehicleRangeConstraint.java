@@ -11,19 +11,21 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 
 public class VehicleRangeConstraint implements DrtInsertionConstraint {
-	private final InsertionDistanceCalculator insertionCalculator = new InsertionDistanceCalculator();
-
+	private final InsertionDistanceCalculator insertionCalculator;
+	
 	private final VehicleRangeSupplier rangeSupplier;
 	private final DistanceCalculator distanceCalculator;
 	private final DistanceApproximator distanceApproximator;
 
 	public VehicleRangeConstraint(VehicleRangeSupplier rangeSupplier, DistanceCalculator distanceEstimator,
-			@Nullable DistanceApproximator distanceApproximator) {
+			@Nullable DistanceApproximator distanceApproximator, DvrpLoadType loadType) {
 		this.rangeSupplier = rangeSupplier;
 		this.distanceCalculator = distanceEstimator;
 		this.distanceApproximator = distanceApproximator;
+		this.insertionCalculator = new InsertionDistanceCalculator(loadType);
 	}
 
 	@Override

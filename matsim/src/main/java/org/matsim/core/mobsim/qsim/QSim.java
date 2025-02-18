@@ -105,7 +105,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
-	//	private static final int INFO_PERIOD = 10;
 
 	private final EventsManager events;
 
@@ -173,18 +172,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			return null;
 		}
 
-//		@Override
-//		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-//		public void rescheduleActivityEnd(MobsimAgent agent) {
-//			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
-//			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
-//			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence,
-//			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
-//			QSim.this.activityEngine.rescheduleActivityEnd(agent);
-//		}
-
-		@Override
-		public final List<DepartureHandler> getDepartureHandlers() {
+		@Override public final List<DepartureHandler> getDepartureHandlers() {
 			return departureHandlers ;
 		}
 	};
@@ -192,7 +180,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
 	private final Injector childInjector;
-//	private QVehicleFactory qVehicleFactory;
 
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
@@ -223,7 +210,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		this.simTimer = new MobsimTimer( sc.getConfig().qsim().getTimeStepSize());
 
 		this.childInjector = childInjector ;
-//		this.qVehicleFactory = qVehicleFactory;
 	}
 
 	// ============================================================================================================================

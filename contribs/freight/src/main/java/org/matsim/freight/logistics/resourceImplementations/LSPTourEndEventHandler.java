@@ -37,6 +37,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
+import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
+
 /*package-private*/ class LSPTourEndEventHandler
     implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LspShipment> {
 
@@ -108,7 +110,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void logTransport(double endTime, Id<Link> endLinkId) {
-    String idString = resource.getId().toString() + logisticChainElement.getId() + "TRANSPORT";
+    String idString = resource.getId().toString() + logisticChainElement.getId() + TRANSPORT;
     LspShipmentPlanElement abstractPlanElement =
         lspShipment
             .getShipmentLog()

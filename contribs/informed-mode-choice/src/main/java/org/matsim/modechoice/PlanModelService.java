@@ -2,45 +2,57 @@ package org.matsim.modechoice;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
-import org.matsim.api.core.v01.population.Leg;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.*;
+import org.matsim.modechoice.estimators.LegEstimator;
+import org.matsim.modechoice.estimators.TripEstimator;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A service for working with {@link PlanModel} and creating estimates.
  */
 @SuppressWarnings("unchecked")
-public final class PlanModelService implements StartupListener {
+public final class PlanModelService implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	@Inject
-	private Map<String, LegEstimator> legEstimators;
+	private final InformedModeChoiceConfigGroup config;
+	private final Map<String, ModeOptions> options;
+	/**
+	 * A memory cache for plan models. This is used to avoid re-routing and re-estimation of the same plans.
+	 */
+	private final Map<Id<Person>, PlanModel> memory = new ConcurrentHashMap<>();
+	private final Map<Id<Person>, DoubleList> diffs = new ConcurrentHashMap<>();
 
-	@Inject
-	private Map<String, TripEstimator> tripEstimator;
-
-	@Inject
-	private Set<TripScoreEstimator> tripScores;
-
-	@Inject
-	private Set<TripConstraint<?>> constraints;
-
-	@Inject
-	private ActivityEstimator actEstimator;
-
-	@Inject
-	private TimeInterpretation timeInterpretation;
+	/**
+	 * Write estimate statistics.
+	 */
+	private final BufferedWriter out;
 
 	@Inject
 	private EventsManager eventsManager;
@@ -48,19 +60,41 @@ public final class PlanModelService implements StartupListener {
 	@Inject
 	private ControlerListenerManager controlerListenerManager;
 
-	private final InformedModeChoiceConfigGroup config;
-	private final Map<String, ModeOptions> options;
+	@Inject
+	private ScoringParametersForPerson params;
 
 	@Inject
-	private PlanModelService(InformedModeChoiceConfigGroup config, Map<String, ModeOptions> options) {
+	private Map<String, TripEstimator> tripEstimator;
+
+	@Inject
+	private Map<String, LegEstimator> legEstimators;
+
+	@Inject
+	private Set<TripConstraint<?>> constraints;
+
+	@Inject
+	private PlanModelService(InformedModeChoiceConfigGroup config, OutputDirectoryHierarchy io,
+							 Map<String, ModeOptions> options) {
 		this.config = config;
 		this.options = options;
 
 		for (String mode : config.getModes()) {
-
 			if (!options.containsKey(mode))
 				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));
 		}
+
+		this.out = IOUtils.getBufferedWriter(io.getOutputFilename("score_estimates_stats.csv"));
+		try {
+			this.out.write("iteration,mean_estimate_mae,median_estimate_mae,p95_estimate_mae,p99_estimate_mae,mean_corrected_estimate_mae,p95_corrected_estimate_mae,p99_corrected_estimate_mae,mean_estimate_bias\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override
+	public double priority() {
+		// Run after scoring listeners
+		return -10;
 	}
 
 	@Override
@@ -85,10 +119,120 @@ public final class PlanModelService implements StartupListener {
 		}
 	}
 
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+
+		if (config.getProbaEstimate() >= 1) {
+			memory.clear();
+		} else if (config.getProbaEstimate() > 0) {
+
+			Random rnd = MatsimRandom.getLocalInstance();
+
+			// Remove plans from memory with a certain probability
+			memory.keySet().removeIf(id -> rnd.nextDouble() < config.getProbaEstimate());
+		}
+
+		Population population = event.getServices().getScenario().getPopulation();
+
+		SummaryStatistics bias = new SummaryStatistics();
+		DescriptiveStatistics mae = new DescriptiveStatistics();
+
+		// The corrected mae subtracts the systematically bias from the estimate
+		DescriptiveStatistics correctedMae = new DescriptiveStatistics();
+
+		for (Person person : population.getPersons().values()) {
+
+			Plan executedPlan = person.getSelectedPlan();
+
+			// Remove the estimate so it is only used once
+			Object estimate = executedPlan.getAttributes().removeAttribute(PlanCandidate.ESTIMATE_ATTR);
+			Double score = executedPlan.getScore();
+
+			DoubleList diffs = this.diffs.computeIfAbsent(person.getId(), k -> new DoubleArrayList());
+
+			if (estimate instanceof Double est && score != null) {
+				double diff = est - score;
+				bias.addValue(diff);
+				mae.addValue(Math.abs(diff));
+
+				diffs.add(diff);
+
+				if (diffs.size() > event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
+					diffs.removeDouble(0);
+				}
+			}
+
+			if (diffs.size() >= event.getServices().getConfig().replanning().getMaxAgentPlanMemorySize()) {
+
+				double minDiff = Double.POSITIVE_INFINITY;
+				for (double d : diffs) {
+					if (d < minDiff)
+						minDiff = d;
+				}
+
+				double sumDiff = 0;
+				for (double d : diffs) {
+					sumDiff += Math.abs(d - minDiff);
+				}
+
+				correctedMae.addValue(sumDiff / diffs.size());
+			}
+		}
+
+		this.writeStats(event.getIteration(), mae, correctedMae, bias);
+	}
+
+	private void writeStats(int iteration, DescriptiveStatistics mae, DescriptiveStatistics correctedMae, SummaryStatistics bias) {
+		try {
+			out.write(String.format(Locale.ENGLISH, "%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
+				iteration,
+				mae.getMean(),
+				mae.getPercentile(50),
+				mae.getPercentile(95),
+				mae.getPercentile(99),
+				correctedMae.getMean(),
+				correctedMae.getPercentile(95),
+				correctedMae.getPercentile(99),
+				bias.getMean()
+			));
+			out.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		try {
+			out.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Get a plan model from memory for a person. If not present, a new one is created.
+	 */
+	public PlanModel getPlanModel(Plan plan) {
+
+		Id<Person> id = plan.getPerson().getId();
+		PlanModel model = memory.get(id);
+		if (model == null) {
+			model = PlanModel.newInstance(plan);
+			initEstimates(model);
+			memory.put(id, model);
+		} else
+			model.setPlan(plan);
+
+		return model;
+	}
+
 	/**
 	 * Initialized {@link ModeEstimate} for all available options in the {@link PlanModel}. No routing or estimation is performed yet.
 	 */
-	public void initEstimates(EstimatorContext context, PlanModel planModel) {
+	void initEstimates(PlanModel planModel) {
+
+		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
 		for (String mode : config.getModes()) {
 
@@ -111,23 +255,13 @@ public final class PlanModelService implements StartupListener {
 
 				} else {
 
-					c.add(new ModeEstimate(mode, modeOption, planModel.trips(), usable, false, false));
+					c.add(new ModeEstimate(mode, modeOption, planModel.trips(), usable, te != null, false));
 
 				}
 			}
 
 			planModel.putEstimate(mode, c);
 		}
-	}
-
-	/**
-	 * Return the modes an estimator was registered for.
-	 */
-	public List<String> modesForEstimator(LegEstimator est) {
-		return legEstimators.entrySet().stream().filter(e -> e.getValue().equals(est))
-				.map(Map.Entry::getKey)
-				.distinct()
-				.collect(Collectors.toList());
 	}
 
 	/**
@@ -155,89 +289,6 @@ public final class PlanModelService implements StartupListener {
 	}
 
 	/**
-	 * Calculate the estimates for all options. Note that plan model has to be routed before computing estimates.
-	 */
-	@SuppressWarnings("rawtypes")
-	public void calculateEstimates(EstimatorContext context, PlanModel planModel) {
-
-		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
-
-			for (ModeEstimate c : e.getValue()) {
-
-				if (!c.isUsable())
-					continue;
-
-				// All estimates are stored within the objects and modified directly here
-				double[] values = c.getEstimates();
-				double[] tValues = c.getTripEstimates();
-				boolean[] noUsage = c.getNoRealUsage();
-
-				// Collect all estimates
-				for (int i = 0; i < planModel.trips(); i++) {
-
-					List<Leg> legs = planModel.getLegs(c.getMode(), i);
-
-					// This mode could not be applied
-					if (legs == null) {
-						values[i] = Double.NEGATIVE_INFINITY;
-						continue;
-					}
-
-					TripEstimator tripEst = tripEstimator.get(c.getMode());
-
-					// some options may produce equivalent results, but are re-estimated
-					// however, the more expensive computation is routing and only done once
-					boolean realUsage = planModel.hasModeForTrip(c.getMode(), i);
-					noUsage[i] = !realUsage;
-
-					double estimate = 0;
-					if (tripEst != null && realUsage) {
-						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
-						double tripEstimate = c.isMin() ? minMax.getMin() : minMax.getMax();
-
-						// Only store if required
-						if (tValues != null)
-							tValues[i] = tripEstimate;
-
-						estimate += tripEstimate;
-					}
-
-					double tt = 0;
-
-					for (Leg leg : legs) {
-						String legMode = leg.getMode();
-
-						tt += timeInterpretation.decideOnLegTravelTime(leg).orElse(0);
-
-						// Already scored with the trip estimator
-						if (tripEst != null && legMode.equals(c.getMode()))
-							continue;
-
-						LegEstimator legEst = legEstimators.get(legMode);
-
-						if (legEst == null)
-							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);
-
-						// TODO: add delay estimate? (e.g waiting time for drt, currently not respected)
-						estimate += legEst.estimate(context, legMode, leg, c.getOption());
-					}
-
-					TripStructureUtils.Trip trip = planModel.getTrip(i);
-
-					// early or late arrival can also have an effect on the activity scores which is potentially considered here
-					estimate += actEstimator.estimate(context, planModel.getStartTimes()[i] + tt, trip.getDestinationActivity());
-
-					for (TripScoreEstimator tripScore : tripScores) {
-						estimate += tripScore.estimate(context, c.getMode(), trip);
-					}
-
-					values[i] = estimate;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Return whether any constraints are registered.
 	 */
 	public boolean hasConstraints() {
@@ -246,6 +297,7 @@ public final class PlanModelService implements StartupListener {
 
 	/**
 	 * Check whether all registered constraints are met.
+	 *
 	 * @param modes array of used modes for each trip of the day
 	 */
 	public boolean isValidOption(PlanModel model, String[] modes) {
@@ -257,9 +309,9 @@ public final class PlanModelService implements StartupListener {
 		EstimatorContext context = new EstimatorContext(model.getPerson(), null);
 
 		for (TripConstraint<?> c : this.constraints) {
-			ConstraintHolder<?> h = new ConstraintHolder<>(
-					(TripConstraint<Object>) c,
-					c.getContext(context, model)
+			PlanModelService.ConstraintHolder<?> h = new PlanModelService.ConstraintHolder<>(
+				(TripConstraint<Object>) c,
+				c.getContext(context, model)
 			);
 
 			if (!h.test(modes))

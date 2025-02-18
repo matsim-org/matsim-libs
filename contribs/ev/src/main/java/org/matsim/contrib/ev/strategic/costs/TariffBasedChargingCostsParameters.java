@@ -29,6 +29,15 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 		super(SET_NAME);
 	}
 
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		if (TariffParameters.SET_NAME.equals(type)) {
+			return new TariffParameters();
+		} else {
+			throw new IllegalStateException(SET_NAME + " doesn't accept parameter sets of type " + type);
+		}
+	}
+
 	/**
 	 * This parameter set describes a tariff for a charger. A list of subscriptions
 	 * can be defined so that only persons with the respective subscription can make

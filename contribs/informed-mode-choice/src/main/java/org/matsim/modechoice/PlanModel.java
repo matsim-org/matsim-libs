@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
@@ -42,11 +43,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 * Estimates for all modes and all available {@link ModeOptions}.
 	 */
 	private final Map<String, List<ModeEstimate>> estimates;
-
-	/**
-	 * Flag to indicate all routes have been computed;
-	 */
-	private boolean fullyRouted;
 
 	/**
 	 * Create a new plan model instance from an existing plan.
@@ -217,29 +213,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return Arrays.asList(trips);
 	}
 
-	void setLegs(String mode, List<Leg>[] legs) {
-		mode = mode.intern();
-
-		List<Leg>[] existing = this.legs.putIfAbsent(mode, legs);
-
-		if (existing != null) {
-
-			if (legs.length != existing.length)
-				throw new IllegalArgumentException(String.format("Existing legs have different length than the newly provided: %d vs. %d", existing.length, legs.length));
-
-			// Copy existing non-null legs
-			for (int i = 0; i < legs.length; i++) {
-				List<Leg> l = legs[i];
-				if (l != null)
-					existing[i] = l;
-			}
-		}
-	}
-
-	void setFullyRouted(boolean value) {
-		this.fullyRouted = value;
-	}
-
 	void putEstimate(String mode, List<ModeEstimate> options) {
 		this.estimates.put(mode, options);
 	}
@@ -265,17 +238,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	/**
-	 * Check io estimates are present. Otherwise call {@link PlanModelService}
-	 */
-	public boolean hasEstimates() {
-		return !this.estimates.isEmpty();
-	}
-
-	public boolean isFullyRouted() {
-		return fullyRouted;
-	}
-
-	/**
 	 * Return all possible choice combinations.
 	 */
 	public List<List<ModeEstimate>> combinations() {
@@ -295,6 +257,11 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 			return null;
 
 		return legs[i];
+	}
+
+	@SuppressWarnings("unchecked")
+	List<Leg>[] getLegs(String mode, List<Leg> def) {
+		return this.legs.computeIfAbsent(mode.intern(), k -> IntStream.range(0, trips.length).mapToObj(i -> def).toArray(List[]::new));
 	}
 
 	/**
@@ -317,7 +284,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	public void reset() {
 		legs.clear();
 		estimates.clear();
-		fullyRouted = false;
 	}
 
 	@Override

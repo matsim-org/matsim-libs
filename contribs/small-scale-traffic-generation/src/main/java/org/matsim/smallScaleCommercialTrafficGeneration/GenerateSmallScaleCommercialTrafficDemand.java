@@ -44,7 +44,6 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
-import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.gbl.Gbl;
@@ -67,7 +66,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
@@ -340,7 +338,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * Solves the generated carrier-plans and puts them into the Scenario.
-	 * If a carrier has unhandled services, a carrier-replanning loop delets the old plans and generates new plans.
+	 * If a carrier has unhandled services, a carrier-replanning loop deletes the old plans and generates new plans.
 	 * The new plans will then be solved and checked again.
 	 * This is repeated until the carrier-plans are solved or the {@code maxReplanningIterations} are reached.
 	 * @param originalScenario complete Scenario
@@ -467,9 +465,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario);
-			List<Carrier> nonCompleteSolvedCarriers = unhandledServicesSolution.createListOfCarrierWithUnhandledJobs(originalScenario);
-			if (!nonCompleteSolvedCarriers.isEmpty())
-				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
+			if (!nonCompleteSolvedCarriers.isEmpty()) {
+				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
+					unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
+			}
 			solvedCarriers.putAll(CarriersUtils.getCarriers(originalScenario).getCarriers());
 			CarriersUtils.getCarriers(originalScenario).getCarriers().clear();
 			if (!splitVRPs)

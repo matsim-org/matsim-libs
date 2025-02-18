@@ -80,6 +80,8 @@ class LspShipmentImpl extends LSPDataObject<LspShipment> implements LspShipment 
   }
 
     @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
+	//Consider changing this ShipmentLog to MATSim's experienced plans.
+	//This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   @Override
   public LspShipmentPlan getShipmentLog() {
     return shipmentLog;

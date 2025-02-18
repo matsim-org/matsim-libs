@@ -26,7 +26,7 @@ public class ActivityDashboard implements Dashboard {
 	private final String shpFile;
 	private final Map<String, String> activityMapping = new LinkedHashMap<>();
 	private final Map<String, String> refCsvs = new LinkedHashMap<>();
-	private final Set<String> countMultipleOccurrencesSet = new HashSet<>();
+	private final Set<String> countSingleOccurrencesSet = new HashSet<>();
 	private List<Indicator> indicators = new ArrayList<>();
 
 	/**
@@ -68,8 +68,8 @@ public class ActivityDashboard implements Dashboard {
 		activityMapping.put(name, String.join(",", activities));
 		refCsvs.put(name, refCsv);
 
-		if (countMultipleOccurrences) {
-			countMultipleOccurrencesSet.add(name);
+		if (!countMultipleOccurrences) {
+			countSingleOccurrencesSet.add(name);
 		}
 
 		this.indicators = indicators;
@@ -88,9 +88,9 @@ public class ActivityDashboard implements Dashboard {
 			.map(e -> "%s=%s".formatted(e.getKey(), e.getValue()))
 			.collect(Collectors.joining(";")));
 
-		if (!countMultipleOccurrencesSet.isEmpty()) {
+		if (!countSingleOccurrencesSet.isEmpty()) {
 			args.add("--single-occurrence");
-			args.add(String.join(";", countMultipleOccurrencesSet));
+			args.add(String.join(";", countSingleOccurrencesSet));
 		}
 
 		for (Map.Entry<String, String> activity : activityMapping.entrySet()) {

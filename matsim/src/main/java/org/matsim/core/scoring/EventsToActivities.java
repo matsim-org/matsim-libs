@@ -81,8 +81,9 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
+		PersonExperiencedActivity personExperiencedActivity = new PersonExperiencedActivity(event.getPersonId(), activity);
         for (ActivityHandler activityHandler : this.activityHandlers) {
-            activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
+            activityHandler.handleActivity(personExperiencedActivity);
         }
     }
 
@@ -107,8 +108,9 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 
     public void finish() {
         this.activities.forEach((id, activity) -> {
+			PersonExperiencedActivity personExperiencedActivity = new PersonExperiencedActivity(id, activity);
             for (ActivityHandler activityHandler : this.activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
+                activityHandler.handleActivity(personExperiencedActivity);
             }
         });
     }

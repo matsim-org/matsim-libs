@@ -29,11 +29,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -43,7 +46,6 @@ import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
-import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -51,6 +53,7 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffT
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
@@ -70,6 +73,8 @@ public class DefaultUnplannedRequestInserterTest {
 	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1);
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
+
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@RegisterExtension
 	public final ForkJoinPoolExtension forkJoinPoolExtension = new ForkJoinPoolExtension();
@@ -216,7 +221,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null,
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null, loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :

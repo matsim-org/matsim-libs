@@ -143,7 +143,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+				List.of(passenger.getId()), List.of(route), getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 

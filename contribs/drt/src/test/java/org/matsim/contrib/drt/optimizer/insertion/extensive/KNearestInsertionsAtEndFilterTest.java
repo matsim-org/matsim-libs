@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -36,6 +37,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPo
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 
 import com.google.common.collect.ImmutableList;
 
@@ -43,6 +45,8 @@ import com.google.common.collect.ImmutableList;
  * @author Michal Maciejewski (michalm)
  */
 public class KNearestInsertionsAtEndFilterTest {
+
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void k0_atEndInsertionsNotReturned() {
@@ -108,16 +112,16 @@ public class KNearestInsertionsAtEndFilterTest {
 	private InsertionWithDetourData insertion(VehicleEntry vehicleEntry, int pickupIdx, double pickupDepartureTime) {
 		return new InsertionWithDetourData(new Insertion(vehicleEntry,
 				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
-						vehicleEntry.getWaypoint(pickupIdx + 1)), null), null,
+						vehicleEntry.getWaypoint(pickupIdx + 1)), null, loadType.fromInt(1)), null,
 				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, Double.NaN), null));
 	}
 
 	private Waypoint.Start start(double endTime) {
-		return new Waypoint.Start(null, null, endTime, 0);
+		return new Waypoint.Start(null, null, endTime, loadType.fromInt(0));
 	}
 
 	private Waypoint.Stop stop(double endTime) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), loadType.fromInt(0), loadType);
 	}
 
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {

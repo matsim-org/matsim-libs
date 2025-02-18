@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
@@ -36,8 +37,13 @@ public class DefaultShiftDvrpVehicle implements ShiftDvrpVehicle {
 	}
 
 	@Override
-	public int getCapacity() {
+	public DvrpLoad getCapacity() {
 		return vehicle.getCapacity();
+	}
+
+	@Override
+	public void setCapacity(DvrpLoad capacity) {
+		this.vehicle.setCapacity(capacity);
 	}
 
 	@Override

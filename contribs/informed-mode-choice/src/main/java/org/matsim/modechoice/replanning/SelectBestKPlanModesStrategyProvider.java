@@ -29,15 +29,12 @@ public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrate
 	@Inject
 	private Provider<GeneratorContext> generator;
 
-	@Inject
-	private Provider<PlanSelector> selector;
-
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SimplePlanSelectionStrategy(globalConfigGroup, generator, selector));
+		builder.addStrategyModule(new SimplePlanSelectionStrategy(globalConfigGroup, generator));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 		return builder.build();

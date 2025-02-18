@@ -34,16 +34,30 @@ import com.google.inject.name.Names;
 /**
  * Contains information about which QSim components should be used in the
  * simulation and in which order they are registered with the QSim.
+ *
+ * @deprecated -- one can achive many (all?) of the same functionality at the config level, see {@link QSimComponentsConfigGroup}.  Doing it through
+ * the config group is consistent with other places where we have similar functionality (which is to bind things by Guice, but activate them
+ * separately), e.g. related to {@link org.matsim.core.config.groups.ReplanningConfigGroup}.  I think that the parallel functionality here just makes
+ * it more difficult, since maintainers need to learn another dialect.  kai, jan'25
  */
 final public class QSimComponentsConfig {
 	private final List<Object> components = new LinkedList<>();
 	private final Set<Key<?>> keys = new HashSet<>();
 
+
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void addComponent(Class<? extends Annotation> annotation) {
 		addComponent(Key.get(Object.class, annotation));
 		components.add(annotation);
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void addComponent(Annotation annotation) {
 		addComponent(Key.get(Object.class, annotation));
 		components.add(annotation);
@@ -56,15 +70,27 @@ final public class QSimComponentsConfig {
 		keys.add(componentKey);
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void addNamedComponent(String name) {
 		addComponent(Names.named(name));
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void removeComponent(Class<? extends Annotation> annotation) {
 		addComponent(Key.get(Object.class, annotation));
 		components.remove(annotation);
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void removeComponent(Annotation annotation) {
 		removeComponent(Key.get(Object.class, annotation));
 		components.remove(annotation);
@@ -76,14 +102,26 @@ final public class QSimComponentsConfig {
 		}
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void removeNamedComponent(String name) {
 		removeComponent(Names.named(name));
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public boolean hasComponent(Class<? extends Annotation> annotation) {
 		return hasComponent(Key.get(Object.class, annotation));
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public boolean hasComponent(Annotation annotation) {
 		return hasComponent(Key.get(Object.class, annotation));
 	}
@@ -92,6 +130,10 @@ final public class QSimComponentsConfig {
 		return keys.contains(componentKey);
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public boolean hasNamedComponent(String name) {
 		return hasComponent(Names.named(name));
 	}
@@ -102,11 +144,19 @@ final public class QSimComponentsConfig {
 				"Type " + componentKey.getAnnotationType();
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public void clear() {
 		components.clear();
 		keys.clear();
 	}
 
+	/**
+	 * @deprecated see javadoc of {@link QSimComponentsConfig}
+	 */
+	@Deprecated
 	public List<Object> getActiveComponents() {
 		return Collections.unmodifiableList(components);
 	}

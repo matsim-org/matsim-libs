@@ -47,9 +47,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 	/**
 	 * Replaces a strategy in the config. Can be used to enable one of the strategies in this module programmatically.
+	 *
+	 * @param weight if not null, the weight of the strategy is set to this value.
 	 */
 	public static void replaceReplanningStrategy(Config config, String subpopulation,
-									   String existing, String replacement) {
+									   String existing, String replacement, Double weight) {
 
 		// Copy list because it is unmodifiable
 		List<ReplanningConfigGroup.StrategySettings> strategies = new ArrayList<>(config.replanning().getStrategySettings());
@@ -66,9 +68,21 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		found.forEach(s -> s.setStrategyName(replacement));
 
+		if (weight != null) {
+			found.forEach(s -> s.setWeight(weight));
+		}
+
 		// reset und set new strategies
 		config.replanning().clearStrategySettings();
 		strategies.forEach(s -> config.replanning().addStrategySettings(s));
+	}
+
+	/**
+	 * Replaces a strategy in the config.
+	 */
+	public static void replaceReplanningStrategy(Config config, String subpopulation,
+												 String existing, String replacement) {
+		replaceReplanningStrategy(config, subpopulation, existing, replacement, null);
 	}
 
 	/**
@@ -99,6 +113,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(BestChoiceGenerator.class);
 		bind(SingleTripChoicesGenerator.class);
 		bind(GeneratorContext.class);
+		bind(EstimateCalculator.class);
 
 		bind(PlanModelService.class).asEagerSingleton();
 		addControlerListenerBinding().to(PlanModelService.class).asEagerSingleton();

@@ -7,10 +7,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
-import org.matsim.application.options.CrsOptions;
-import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.SampleOptions;
-import org.matsim.application.options.ShpOptions;
+import org.matsim.application.options.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +30,7 @@ public final class CommandRunner {
 	private String defaultShp = null;
 	private String defaultCrs = null;
 	private Double defaultSampleSize = null;
+	private String configPath = null;
 
 
 	/**
@@ -216,6 +214,13 @@ public final class CommandRunner {
 			}
 		}
 
+		if (ApplicationUtils.acceptsOptions(command, ConfigOptions.class) && !ArrayUtils.contains(existingArgs, "--config")) {
+			if (configPath != null) {
+				args.add("--config");
+				args.add(configPath);
+			}
+		}
+
 		// Adds output arguments for this class
 		for (String produce : spec.produces()) {
 			String arg = "--output-" + InputOptions.argName(produce);
@@ -349,6 +354,13 @@ public final class CommandRunner {
 	 */
 	public void setCRS(String crs) {
 		defaultCrs = crs;
+	}
+
+	/**
+	 * Set a config path, which is passed to command using {@link ConfigOptions}.
+	 */
+	public void setConfigPath(String configPath) {
+		this.configPath = configPath;
 	}
 
 	/**

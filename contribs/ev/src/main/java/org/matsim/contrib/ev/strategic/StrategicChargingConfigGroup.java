@@ -4,6 +4,7 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.ev.strategic.costs.AttributeBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.DefaultChargingCostsParameters;
+import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.core.config.Config;
 
@@ -20,7 +21,7 @@ import jakarta.validation.constraints.PositiveOrZero;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
-	public static final String GROUP_NAME = "startegic_charging";
+	public static final String GROUP_NAME = "strategic_charging";
 
 	public static StrategicChargingConfigGroup get(Config config) {
 		return (StrategicChargingConfigGroup) config.getModules().get(GROUP_NAME);
@@ -48,6 +49,13 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 				() -> (AttributeBasedChargingCostsParameters) costs, //
 				c -> {
 					costs = (AttributeBasedChargingCostsParameters) c;
+				});
+
+		addDefinition(TariffBasedChargingCostsParameters.SET_NAME, //
+				TariffBasedChargingCostsParameters::new, //
+				() -> (TariffBasedChargingCostsParameters) costs, //
+				c -> {
+					costs = (TariffBasedChargingCostsParameters) c;
 				});
 	}
 

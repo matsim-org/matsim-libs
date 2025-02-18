@@ -28,10 +28,10 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{true, false, false, false});
 
 		assertThat(candidates)
-				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
+				.first().matches(c -> c.getMode(0).equals(TransportMode.bike));
 
 		assertThat(candidates)
-				.last().matches(c -> c.getMode(0).equals(TransportMode.ride));
+				.last().matches(c -> c.getMode(0).equals(TransportMode.car));
 
 	}
 
@@ -67,7 +67,7 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		assertThat(candidates)
 				.hasSize(2)
-				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
+				.first().matches(c -> c.getMode(0).equals(TransportMode.walk));
 
 	}
 }

@@ -22,12 +22,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -76,7 +72,7 @@ public final class BicycleModule extends AbstractModule {
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
-				this.addLinkSpeedCalculator().to( BicycleLinkSpeedCalculator.class );
+				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
 			}
 		} );
 

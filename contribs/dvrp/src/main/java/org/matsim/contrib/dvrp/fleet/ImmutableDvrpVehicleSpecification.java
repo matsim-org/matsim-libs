@@ -25,6 +25,8 @@ import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoad;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.MoreObjects;
@@ -37,7 +39,7 @@ import com.google.common.base.MoreObjects;
 public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpecification {
 	private final Id<DvrpVehicle> id;
 	private final Id<Link> startLinkId;
-	private final int capacity;
+	private final DvrpLoad capacity;
 
 	// time window
 	private final double serviceBeginTime;
@@ -81,7 +83,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	}
 
 	@Override
-	public int getCapacity() {
+	public DvrpLoad getCapacity() {
 		return capacity;
 	}
 
@@ -109,7 +111,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	public static final class Builder {
 		private Id<DvrpVehicle> id;
 		private Id<Link> startLinkId;
-		private Integer capacity;
+		private DvrpLoad capacity;
 		private Double serviceBeginTime;
 		private Double serviceEndTime;
 
@@ -126,9 +128,13 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 			return this;
 		}
 
-		public Builder capacity(int val) {
+		public Builder capacity(DvrpLoad val) {
 			capacity = val;
 			return this;
+		}
+
+		public Builder capacity(int val) {
+			return this.capacity(IntegerLoad.fromValue(val));
 		}
 
 		public Builder serviceBeginTime(double val) {
