@@ -142,6 +142,12 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		install(new SharingMetricsModule(drtCfg));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new CapacityLoadAnalysisHandler(getMode(), getter.getModal(FleetSpecification.class), getter.get(OutputDirectoryHierarchy.class), getter.get(EventsManager.class), drtCfg.loadCapacityAnalysisInterval, getter.getModal(DvrpLoadType.class))));
+		addControlerListenerBinding().toProvider(modalProvider( //
+			getter -> new CapacityLoadAnalysisHandler(getMode(), //
+			getter.getModal(FleetSpecification.class), //
+			getter.get(OutputDirectoryHierarchy.class), //
+			getter.get(EventsManager.class), //
+			drtCfg.loadParams.analysisInterval, //
+			getter.getModal(DvrpLoadType.class))));
 	}
 }
