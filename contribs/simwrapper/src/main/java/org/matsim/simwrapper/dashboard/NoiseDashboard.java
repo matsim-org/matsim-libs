@@ -60,6 +60,27 @@ public class NoiseDashboard implements Dashboard {
 				viz.display.lineWidth.scaleFactor = 8d;
 				viz.display.lineWidth.join = "Link Id";
 			});
+		layout.row("emissions")
+			.el(MapPlot.class, (viz, data) -> {
+				viz.title = "Noise Emissions (Link) (6-22)";
+				viz.description = "Maximum Noise Level per day [dB]";
+				viz.height = 12.0;
+				viz.center = data.context().getCenter();
+				viz.zoom = data.context().mapZoomLevel;
+				viz.minValue = minDb;
+				viz.maxValue = maxDb;
+				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
+				viz.addDataset("noise", data.compute(NoiseAnalysis.class, "emission_per_night_22_to_6.csv"));
+				viz.display.lineColor.dataset = "noise";
+				viz.display.lineColor.columnName = "value";
+				viz.display.lineColor.join = "Link Id";
+				viz.display.lineColor.fixedColors = new String[]{"#FFFFFF", "#E2F1BF", "#F3C683", "#CD463D", "#75075C", "#430A4A"};
+				viz.display.lineColor.setColorRamp(6, "55, 60, 65, 70, 75");
+				viz.display.lineWidth.dataset = "noise";
+				viz.display.lineWidth.columnName = "value";
+				viz.display.lineWidth.scaleFactor = 8d;
+				viz.display.lineWidth.join = "Link Id";
+			});
 		layout.row("imissions")
 			.el(GridMap.class, (viz, data) -> {
 				viz.title = "Noise Immissions (Grid)";
