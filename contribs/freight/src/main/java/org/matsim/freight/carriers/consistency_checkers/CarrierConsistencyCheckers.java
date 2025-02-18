@@ -78,16 +78,16 @@ public class CarrierConsistencyCheckers {
 		}
 	}
 
-		/**
-		 * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
-		 * allJobsInToursCheck returns enum CheckResult:
-		 * CHECK_SUCCESSFUL if allJobsInToursCheck returns CHECK_SUCCESSFUL
-		 * CHECK_FAILED if allJobsInToursCheck returns CHECK_FAIL
-		 * @param carriers
-		 * @param lvl
-		 * @return CheckResult
-		 */
-	public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
+  /**
+   * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
+   * allJobsInToursCheck
+   *
+   * @param carriers Carriers to check
+   * @param lvl level of log messages / errors
+   * @return CheckResult CHECK_SUCCESSFUL if allJobsInToursCheck returns CHECK_SUCCESSFUL
+   * 		 * CHECK_FAILED if allJobsInToursCheck returns CHECK_FAIL
+   */
+  public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
 		int checkFailed = 0;
 		if (allJobsInToursCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
