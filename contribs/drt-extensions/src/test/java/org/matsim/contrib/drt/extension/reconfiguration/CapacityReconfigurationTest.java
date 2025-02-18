@@ -173,7 +173,7 @@ public class CapacityReconfigurationTest {
 				.addOrGetDefaultDrtOptimizationConstraintsSet().rejectRequestIfMaxWaitOrTravelTimeViolated = useRejections;
 
 		// produce analysis output on capacities and loads
-		drtConfig.loadCapacityAnalysisInterval = 1;
+		drtConfig.loadParams.analysisInterval = 1;
 
 		// set up two dimensions
 		drtConfig.loadParams.dimensions = List.of("passengers", "goods");

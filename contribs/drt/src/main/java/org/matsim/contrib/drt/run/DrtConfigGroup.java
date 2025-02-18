@@ -158,11 +158,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-	@Parameter
-	@Comment("Defines how often to write analysis on capacities and loads of the mode")
-	@PositiveOrZero
-	public int loadCapacityAnalysisInterval = 0;
-
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
 	}
