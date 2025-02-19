@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -194,7 +195,7 @@ public class DefaultRequestInsertionSchedulerTest {
 
     private static DefaultRequestInsertionScheduler getDefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer) {
         MinimumStopDurationAdapter stopDuration = new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(StaticPassengerStopDurationProvider.of(STOP_DURATION, 0.0)), 60.);
-        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration));
+        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
         DefaultRequestInsertionScheduler insertionScheduler = new DefaultRequestInsertionScheduler(fleet, timer, TRAVEL_TIME, scheduleTimingUpdater,
                 new DrtTaskFactoryImpl(), stopDuration, true);
         return insertionScheduler;
