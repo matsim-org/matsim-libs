@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -181,7 +182,7 @@ public class TopKMinMaxTest {
 		protected void configure() {
 
 			PopulationFactory f = PopulationUtils.getFactory();
-
+			bind(Config.class).toInstance(config);
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
 			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
