@@ -12,33 +12,31 @@ import org.matsim.freight.logistics.LSPs;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
 	* @author anton stock
 	 * this class provides tests to check if resource IDs are unique and if all existing shipments are assigned to exactly one plan.
 	 */
-public class LogisticsConsitencyChecker {
+public class LogisticsConsistencyChecker {
 
 	public enum CheckResult {
 		CHECK_SUCCESSFUL, CHECK_FAILED, ERROR
 	}
 
 	//needed for log messages, log level etc.
-	private static final Logger log = LogManager.getLogger(LogisticsConsitencyChecker.class);
+	private static final Logger log = LogManager.getLogger(LogisticsConsistencyChecker.class);
 	private static Level currentLevel;
+
 	public static void setLogLevel(Level level) {
 		currentLevel = level;
 		Configurator.setLevel(log.getName(), level);
 	}
 
 	private static void logMessage(String msg, Object... params) {
-		if (currentLevel==Level.WARN){
+		if (currentLevel == Level.WARN) {
 			log.warn(msg, params);
-		} else if (currentLevel==Level.ERROR) {
+		} else if (currentLevel == Level.ERROR) {
 			log.error(msg, params);
 		} else {
 			log.info(msg, params);
@@ -46,9 +44,10 @@ public class LogisticsConsitencyChecker {
 	}
 
 	/**
-	 *	this method will check if all existing resource IDs are unique.
+	 * this method will check if all existing resource IDs are unique.
+	 *
 	 * @param lsps the LSPs to check
-	 * @param lvl level of log messages / errors
+	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
 	public static CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
@@ -60,7 +59,7 @@ public class LogisticsConsitencyChecker {
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LSPResource resource : lsp.getResources()) {
 				//if a resource id is already in this list, the id exists more than once
-				if(lspResourceList.contains(resource.getId())){
+				if (lspResourceList.contains(resource.getId())) {
 					logMessage("Resource with ID '{}' exists more than once.", resource.getId());
 					resourceIDsAreUnique = false;
 				} else {
@@ -76,45 +75,66 @@ public class LogisticsConsitencyChecker {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
-		/**
-		 *	this method will check if all resources are assigned to exactly one plan
-		 * @param lsps the LSPs to check
-		 * @param lvl level of log messages / errors
-		 * @return CheckResult
-		 */
-	public static CheckResult shipmentsArePlannedExactlyOnce(LSPs lsps, Level lvl) {
-		var result =  CheckResult.CHECK_FAILED; //TODO...
+
+	/**
+	 * this method will check if all resources are assigned to exactly one plan
+	 *
+	 * @param lsps the LSPs to check
+	 * @param lvl  level of log messages / errors
+	 * @return CheckResult
+	 */
+	public static CheckResult shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPs lsps, Level lvl) {
 		//all resource ids are being saved in this list
+		List<Id> lspShipmentPlansList = new LinkedList<Id>();
 		List<Id> lspShipmentsList = new LinkedList<Id>();
 
-		List<Id> lspPlansList = new LinkedList<Id>();
-		//
-		boolean allShipmentsHavePlans = true;
+		setLogLevel(lvl);
+
+
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
 				lspShipmentsList.add(lspShipment.getId());
 			}
-			//for (LSPPlan lspPlan : lsp.getPlans()) { //Alle Pläne
-				//for (LspShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-				//	lspPlansList.add(shipmentPlan.getLspShipmentId());
-				//}
-			//}
+			//for selected plan only
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
-				lspPlansList.add(shipmentSelectedPlan.getLspShipmentId());
+				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
+				//@KMT: Hier wird immer nur 1x shipmentNorth ausgegeben, obwohl es in der XML zweimal auftaucht...
+				logMessage(shipmentSelectedPlan.getLspShipmentId().toString());
+			}
+
+		}
+		Set<Id> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
+		List<Id> shipmentsWithoutPlan = new LinkedList<>();
+
+		for (Id shipmentId : lspShipmentsList) {
+			if (!plannedShipmentIds.contains(shipmentId)) {
+				shipmentsWithoutPlan.add(shipmentId);
 			}
 		}
 
-		Set<Id> shipmentHasNoPlan = new HashSet<>(lspShipmentsList);
-		shipmentHasNoPlan.removeAll(lspPlansList);
-
-		if(shipmentHasNoPlan.isEmpty()){
-			logMessage("All shipments have a plan.");
-			return CheckResult.CHECK_SUCCESSFUL;
-		} else {
-			//@KMT: Ich verstehe leider nicht, wieso die Ausgabe nicht funktioniert... egal ob .size oder .toString, es kommt einfach nichts nach dem Doppelpunkt :(
-			logMessage("The following shipments have no plan: ", shipmentHasNoPlan);
+		if (!shipmentsWithoutPlan.isEmpty()) {
+			logMessage("Shipments without a plan: {}", shipmentsWithoutPlan);
 			return CheckResult.CHECK_FAILED;
+		} else {
+			logMessage("All shipments have plans.");
+			return CheckResult.CHECK_SUCCESSFUL;
 		}
 	}
+	/**
+	 *
+	 */
+	public static CheckResult shipmentsArePlannedExactlyOnceAllPlans(LSPs lsps, Level lvl) {
+		setLogLevel(lvl);
+		for (LSP lsp : lsps.getLSPs().values()) {
+			for (LspShipment lspShipment : lsp.getLspShipments()) {
 
+			}
+			for (LSPPlan lspPlan : lsp.getPlans()) { //Alle Pläne
+				for (LspShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
+
+				}
+			}
+		}
+return null;
+	}
 }

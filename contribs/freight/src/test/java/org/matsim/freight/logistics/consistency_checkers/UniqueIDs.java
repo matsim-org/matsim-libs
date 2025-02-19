@@ -17,7 +17,7 @@ import org.matsim.freight.logistics.FreightLogisticsConfigGroup;
 
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.LSPs;
-import org.matsim.freight.logistics.consistency_checker.LogisticsConsitencyChecker;
+import org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker;
 import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -26,8 +26,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.util.Collections;
 
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
-import static org.matsim.freight.logistics.consistency_checker.LogisticsConsitencyChecker.CheckResult.CHECK_FAILED;
-import static org.matsim.freight.logistics.consistency_checker.LogisticsConsitencyChecker.CheckResult.CHECK_SUCCESSFUL;
+import static org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker.CheckResult.CHECK_FAILED;
+import static org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker.CheckResult.CHECK_SUCCESSFUL;
 
 
 /**
@@ -64,7 +64,7 @@ public class UniqueIDs {
 
 		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps.xml");
 
-		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsitencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"At least one resource ID exists more than once.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"At least one resource ID exists more than once.");
 
 	}
 	@Test
@@ -87,11 +87,11 @@ public class UniqueIDs {
 
 		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
-		Assertions.assertEquals(CHECK_FAILED, LogisticsConsitencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"All resource IDs are unique.");
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"All resource IDs are unique.");
 
 	}
 	@Test
-	public void ShipmentHasPlan_passes() {
+	public void ShipmentHasPlanSelectedPlanOnly_passes() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -110,7 +110,7 @@ public class UniqueIDs {
 
 		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps.xml");
 
-		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsitencyChecker.shipmentsArePlannedExactlyOnce(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"Not all shipments are planned.");
 
 	}
 
@@ -118,7 +118,7 @@ public class UniqueIDs {
 	 * should fail, because shipmentSouth is not planned.
 	 */
 	@Test
-	public void ShipmentHasPlan_fails() {
+	public void ShipmentHasPlanSelectedPlanOnly_fails() {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -137,7 +137,7 @@ public class UniqueIDs {
 
 		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
-		Assertions.assertEquals(CHECK_FAILED, LogisticsConsitencyChecker.shipmentsArePlannedExactlyOnce(LSPUtils.getLSPs(scenario), lvl),"At least one shipment is not planned.");
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
 
 	}
 }
