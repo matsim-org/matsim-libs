@@ -278,7 +278,7 @@ public final class EstimateCalculator {
 
 					// some options may produce equivalent results, but are re-estimated
 					// however, the more expensive computation is routing and only done once
-					boolean realUsage = planModel.hasModeForTrip(c.getMode(), i);
+					boolean realUsage = planModel.doesNotConsistOfOnlyWalksLegs(c.getMode(), i);
 					noUsage[i] = !realUsage;
 
 					double estimate = 0;
