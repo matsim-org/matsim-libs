@@ -55,12 +55,9 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * this method will run through both vehicleCapacityCheck and vehicleScheduleCheck to check, if all carriers are able to handle given jobs.
-	 * carrierCapabilitiesCheck returns enum CheckResult:
-	 * CHECK_SUCCESSFUL if both checks return CHECK_SUCCESSFUL
-	 * CHECK_FAILED if one or both checks return CHECK_FAIL
 	 * @param carriers
 	 * @param lvl
-	 * @return CheckResult
+	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	public static CheckResult carrierCapabilitiesCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
@@ -84,8 +81,8 @@ public class CarrierConsistencyCheckers {
    *
    * @param carriers Carriers to check
    * @param lvl level of log messages / errors
-   * @return CheckResult CHECK_SUCCESSFUL if allJobsInToursCheck returns CHECK_SUCCESSFUL
-   * 		 * CHECK_FAILED if allJobsInToursCheck returns CHECK_FAIL
+   * @return CheckResult 'CHECK_SUCCESSFUL' if allJobsInToursCheck returns CHECK_SUCCESSFUL
+   * 		 and 'CHECK_FAILED' if allJobsInToursCheck returns CHECK_FAIL
    */
   public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
@@ -102,13 +99,12 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * This method checks if every carrier is able to handle every given job (services or shipments) with the available fleet. This method does not check the vehicle's schedule but the capacity only.
-	 * vehicleCapacityCheck returns enum CheckResult:
 	 * = CHECK_SUCCESSFUL: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = CHECK_FAILED: the highest vehicle capacity is less than the highest capacity demand
 	 * <p>
 	 * @param carriers
 	 * @param lvl
-	 * @return CheckResult
+	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult vehicleCapacityCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
@@ -167,13 +163,12 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
-	 * vehicleScheduleCheck returns enum CheckResult:
 	 * CHECK_SUCCESSFUL if all jobs can be handled
 	 * CHECK_FAILED if at least one job can not be handled
 	 * <p>
 	 * @param carriers
 	 * @param lvl
-	 * @return CheckResult
+	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 
 	/*package-private*/ static CheckResult vehicleScheduleCheck(Carriers carriers, Level lvl) {
@@ -297,12 +292,11 @@ public class CarrierConsistencyCheckers {
 	/**
 	 * This method will check whether all jobs have been correctly assigned to a tour, i.e. each job only occurs once
 	 * (if the job is a shipment, pickup and delivery are two different jobs).
-	 * allJobsInToursCheck returns enum CheckResult:
 	 * CHECK_SUCCESSFUL if all jobs occur only once
 	 * CHECK_FAILED in all other cases
 	 * @param carriers
 	 * @param lvl
-	 * @return CheckResult
+	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult allJobsInToursCheck(Carriers carriers, Level lvl) {
 		setLogLevel(lvl);
