@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @CommandLine.Command(
 	name = "noise-analysis",
@@ -39,6 +42,7 @@ import java.util.*;
 	requireRunDirectory = true,
 	produces = {
 		"emission_per_day.csv",
+		"emission_per_night_22_to_6.csv",
 		"immission_per_day.%s",
 		"immission_per_hour.%s",
 		"damages_receiverPoint_per_hour.%s",
@@ -71,6 +75,12 @@ public class NoiseAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
 	private String noiseBarrierFile;
 
+	@CommandLine.Option(names = "--start-hour", description = "Sets the start hour for the noise calculation.", defaultValue = "0")
+	private int startHour;
+
+	@CommandLine.Option(names = "--end-hour", description = "Sets the end hour for the noise calculation.", defaultValue = "24")
+	private int endHour;
+
 	public static void main(String[] args) {
 		new NoiseAnalysis().execute(args);
 	}
@@ -81,23 +91,26 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		config.controller().setOutputDirectory(input.getRunDirectory().toString());
 
+
+		log.info("startHour: " + startHour + " endHour: " + endHour);
+
 		//trying to set noise parameters more explicitly, here...
 		//if NoiseConfigGroup was added before. do not override (most) parameters
-		boolean overrideParameters = ! ConfigUtils.hasModule(config, NoiseConfigGroup.class);
+		boolean overrideParameters = !ConfigUtils.hasModule(config, NoiseConfigGroup.class);
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
-		if (overrideParameters){
+		if (overrideParameters) {
 			log.warn("no NoiseConfigGroup was configured before. Will set some standards. You should check the next lines in the log file and the output_config.xml!");
 			noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivities.toArray(String[]::new));
 			noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities.toArray(String[]::new));
 
 			{
 				//the default settings are now actually the same as what we 'override' here, but let's leave it here for clarity.
-				Set<String> ignoredNetworkModes = CollectionUtils.stringArrayToSet( new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk} );
-				noiseParameters.setNetworkModesToIgnoreSet( ignoredNetworkModes );
+				Set<String> ignoredNetworkModes = CollectionUtils.stringArrayToSet(new String[]{TransportMode.bike, TransportMode.walk, TransportMode.transit_walk, TransportMode.non_network_walk});
+				noiseParameters.setNetworkModesToIgnoreSet(ignoredNetworkModes);
 
 				String[] hgvIdPrefixes = {"lkw", "truck", "freight"};
-				noiseParameters.setHgvIdPrefixesArray( hgvIdPrefixes );
+				noiseParameters.setHgvIdPrefixesArray(hgvIdPrefixes);
 			}
 
 			//use actual speed and not freespeed
@@ -139,10 +152,10 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		noiseParameters.setThrowNoiseEventsCaused(false);
 		noiseParameters.setComputeNoiseDamages(true);
 
-		if(! sampleOptions.isSet() && noiseParameters.getScaleFactor() == 1d){
+		if (!sampleOptions.isSet() && noiseParameters.getScaleFactor() == 1d) {
 			log.warn("You didn't provide the simulation sample size via command line option --sample-size! This means, noise damages are not scaled!!!");
-		} else if (noiseParameters.getScaleFactor() == 1d){
-			if (sampleOptions.getSample() == 1d){
+		} else if (noiseParameters.getScaleFactor() == 1d) {
+			if (sampleOptions.getSample() == 1d) {
 				log.warn("Be aware that the noise output is not scaled. This might be unintended. If so, assure to provide the sample size via command line option --sample-size, in the SimWrapperConfigGroup," +
 					"or provide the scaleFactor (the inverse of the sample size) in the NoiseConfigGroup!!!");
 			}

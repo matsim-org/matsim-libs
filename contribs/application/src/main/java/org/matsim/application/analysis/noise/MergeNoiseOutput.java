@@ -19,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.CsvOptions;
-import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import tech.tablesaw.api.*;
@@ -32,9 +31,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-
-import static org.geotools.gml3.v3_2.GML.coordinateSystem;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Merges noise data from multiple files into one file.
@@ -43,70 +42,74 @@ final class MergeNoiseOutput {
 
 	private static final Logger log = LogManager.getLogger(MergeNoiseOutput.class);
 
-
 	/**
 	 * If true, a CSV file is created for immissions. Deprecated, this code will be removed.
 	 */
 	private static final boolean CREATE_CSV_FILES = false;
 
+	private static final int HOUR_STEP = 3600;
+
 	private final Path outputDirectory;
 	private final String crs;
-	private final int minTime = 3600;
-	private int maxTime = 24 * 3600;
+	private final int minTime = HOUR_STEP;
+	private final Map<String, Float> totalReceiverPointValues = new HashMap<>();
+	private final int maxTime = 24 * HOUR_STEP;
 
-	private final Map<String,Float> totalReceiverPointValues = new HashMap<>();
-
-	MergeNoiseOutput(Path path, String coordinateSystem ) {
-		this.outputDirectory = path;
+	MergeNoiseOutput(Path outputDirectory, String coordinateSystem) {
+		this.outputDirectory = outputDirectory;
 		this.crs = coordinateSystem;
+	}
+
+	/**
+	 * Returns a formatted time string using the given time format.
+	 *
+	 * @param time time in seconds
+	 * @return formatted time string
+	 */
+	private static String formatTime(double time) {
+		return Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
 	}
 
 	/**
 	 * Rounds a value to a given precision.
 	 *
-	 * @param value     value to round
-	 * @param precision number of decimal places
+	 * @param value value to round
 	 * @return rounded value
 	 */
-	private static double round(double value, int precision) {
-		return BigDecimal.valueOf(value).setScale(precision, RoundingMode.HALF_UP).doubleValue();
+	private double roundToOneDecimalPlace(double value) {
+		return BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).doubleValue();
 	}
 
 	/**
-	 * Returns the maximum time.
+	 * Checks if the given time falls in the nighttime window (i.e. before 06:00 or after 22:00).
 	 *
-	 * @return maxTime value
+	 * @param time time in seconds
+	 * @return true if time is within night range, false otherwise
 	 */
-	public int getMaxTime() {
-		return maxTime;
-	}
-
-	/**
-	 * Sets the maximum time.
-	 *
-	 * @param maxTime value
-	 */
-	public void setMaxTime(int maxTime) {
-		this.maxTime = maxTime;
+	private boolean isNightTime(double time) {
+		int nightBreakStart = 6 * HOUR_STEP;
+		int nightBreakEnd = 22 * HOUR_STEP;
+		return time <= nightBreakStart || time > nightBreakEnd;
 	}
 
 	/**
 	 * Merges noise data from multiple files into one file.
 	 */
 	public void run() throws IOException {
-		mergeReceiverPointData(outputDirectory + "/immissions/", "immission");
-		mergeReceiverPointData(outputDirectory + "/damages_receiverPoint/", "damages_receiverPoint");
-		mergeLinkData(outputDirectory.toString() + "/emissions/", "emission");
+		mergeReceiverPointData(outputDirectory.resolve("immissions") + File.separator, "immission");
+		mergeReceiverPointData(outputDirectory.resolve("damages_receiverPoint") + File.separator, "damages_receiverPoint");
+		mergeLinkData(outputDirectory.resolve("emissions") + File.separator, false);
+		mergeLinkData(outputDirectory.resolve("emissions") + File.separator, true);
 	}
 
 	/**
 	 * Writes the given data to the given file.
 	 *
-	 * @param xytData
-	 * @param output
+	 * @param xytData data to write
+	 * @param output  target file
 	 */
 	private void writeAvro(XYTData xytData, File output) {
-		log.info(String.format("Start writing avro file to %s", output.toString() ));
+		log.info("Start writing avro file to {}", output);
 		DatumWriter<XYTData> datumWriter = new SpecificDatumWriter<>(XYTData.class);
 		try (DataFileWriter<XYTData> dataFileWriter = new DataFileWriter<>(datumWriter)) {
 			dataFileWriter.setCodec(CodecFactory.deflateCodec(9));
@@ -117,29 +120,46 @@ final class MergeNoiseOutput {
 		}
 	}
 
-	private void mergeLinkData(String pathParameter, String label) throws IOException {
-		log.info("Merging emissions data for label {}", label);
+	/**
+	 * Merges emissions data for each link. If isNight is true, only the time range from 22:00 to 6:00 is considered.
+	 *
+	 * @param basePath Directory containing emissions CSV files
+	 * @param isNight  If true, only the nighttime range is considered
+	 * @throws IOException if an I/O error occurs
+	 */
+	private void mergeLinkData(String basePath, boolean isNight) throws IOException {
 		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
 		Table csvOutputMerged = Table.create(TextColumn.create("Link Id"), DoubleColumn.create("value"));
 
-		for (double time = minTime; time <= maxTime; time += 3600.) {
-			String path = pathParameter + label + "_" + this.round(time, 1) + ".csv";
+		for (double time = minTime; time <= maxTime; time += HOUR_STEP) {
+			// In night mode, only process times outside 06:00-22:00.
+			if (isNight && !isNightTime(time)) {
+				continue;
+			}
 
-			// Read the file
-			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("Link Id", ColumnType.TEXT,
-					"Noise Emission " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS), ColumnType.DOUBLE))
-				.sample(false)
-				.separator(CsvOptions.detectDelimiter(path)).build());
+			String fileName = basePath + "emission_" + roundToOneDecimalPlace(time) + ".csv";
+			if (!Files.exists(Path.of(fileName))) {
+				log.warn("File {} does not exist", fileName);
+				continue;
+			}
+
+			String columnName = "Noise Emission " + formatTime(time);
+			Table table = Table.read().csv(
+				CsvReadOptions.builder(IOUtils.getBufferedReader(fileName))
+					.columnTypesPartial(Map.of("Link Id", ColumnType.TEXT, columnName, ColumnType.DOUBLE))
+					.sample(false)
+					.separator(CsvOptions.detectDelimiter(fileName))
+					.build()
+			);
 
 			for (Row row : table) {
 				String linkId = row.getString("Link Id");
 				double value = row.getDouble(row.columnCount() - 1);
 				mergedData.mergeDouble(linkId, value, Double::max);
-
 			}
 		}
 
+		// Create merged output table.
 		for (Object2DoubleMap.Entry<String> entry : mergedData.object2DoubleEntrySet()) {
 			if (entry.getDoubleValue() >= 0.0) {
 				Row writeRow = csvOutputMerged.appendRow();
@@ -148,51 +168,50 @@ final class MergeNoiseOutput {
 			}
 		}
 
-		File out = outputDirectory.getParent().resolve(label + "_per_day.csv").toFile();
+		String fileSuffix = isNight ? "_per_night_22_to_6.csv" : "_per_day.csv";
+		File out = outputDirectory.getParent().resolve("emission" + fileSuffix).toFile();
 		csvOutputMerged.write().csv(out);
-		log.info("Merged noise data written to {} ", out);
+		log.info("Merged noise data written to {}", out);
 	}
 
 	/**
-	 * Merges receiverPoint data (written by {@link org.matsim.contrib.noise.NoiseWriter}
+	 * Merges receiver point data (written by {@link org.matsim.contrib.noise.NoiseWriter}).
 	 *
-	 * @param outputDir path to the receiverPoint data
-	 * @param label         label for the receiverPoint data (which kind of data)
+	 * @param outputDir Directory path containing receiver point CSV files
+	 * @param label     Label for the receiver point data (which kind of data)
+	 * @throws IOException if an I/O error occurs
 	 */
 	private void mergeReceiverPointData(String outputDir, String label) throws IOException {
-
-		// data per time step, maps coord to value
+		// Map of time-step to data mapping (coord -> value)
 		Int2ObjectMap<Object2FloatMap<FloatFloatPair>> data = new Int2ObjectOpenHashMap<>();
 
-		// Loop over all files
-		//TODO could be adjusted to time bin size from noise config group
-		String substrToCapitalize = null;
-		for (int time = minTime; time <= maxTime; time += 3600) {
+		// Compute the capitalized base label once.
+		String baseLabel = label.contains("_") ? label.substring(0, label.lastIndexOf("_")) : label;
+		String capitalizedLabel = StringUtils.capitalize(baseLabel);
 
-			String timeDataFile = outputDir + label + "_" + round(time, 1) + ".csv";
-
-			Object2FloatOpenHashMap<FloatFloatPair> values = new Object2FloatOpenHashMap<>();
-
+		// Process each time step.
+		for (int time = minTime; time <= maxTime; time += HOUR_STEP) {
+			String timeDataFile = outputDir + label + "_" + roundToOneDecimalPlace(time) + ".csv";
 			if (!Files.exists(Path.of(timeDataFile))) {
 				log.warn("File {} does not exist", timeDataFile);
 				continue;
 			}
 
-			//we need "damages_receiverPoint" -> "Damages 01:00:00" and "immission" -> "Immision 01:00:00"
-			substrToCapitalize = label.contains("_") ? label.substring(0, label.lastIndexOf("_")) : label;
-			String valueHeader = StringUtils.capitalize(substrToCapitalize) + " " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
+			String valueHeader = capitalizedLabel + " " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
+			Object2FloatOpenHashMap<FloatFloatPair> values = new Object2FloatOpenHashMap<>();
 
-			// Read the data file
-			Table dataTable = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(timeDataFile))
-				.columnTypesPartial(Map.of("x", ColumnType.FLOAT,
-					"y", ColumnType.FLOAT,
-					"Receiver Point Id", ColumnType.INTEGER,
-					"t", ColumnType.DOUBLE,
-					valueHeader, ColumnType.DOUBLE))
-				.sample(false)
-				.separator(CsvOptions.detectDelimiter(timeDataFile)).build());
+			Table dataTable = Table.read().csv(
+				CsvReadOptions.builder(IOUtils.getBufferedReader(timeDataFile))
+					.columnTypesPartial(Map.of("x", ColumnType.FLOAT,
+						"y", ColumnType.FLOAT,
+						"Receiver Point Id", ColumnType.INTEGER,
+						"t", ColumnType.DOUBLE,
+						valueHeader, ColumnType.DOUBLE))
+					.sample(false)
+					.separator(CsvOptions.detectDelimiter(timeDataFile))
+					.build()
+			);
 
-			// Loop over all rows in the data file
 			for (Row row : dataTable) {
 				float x = row.getFloat("x");
 				float y = row.getFloat("y");
@@ -200,101 +219,110 @@ final class MergeNoiseOutput {
 				FloatFloatPair coord = FloatFloatPair.of(x, y);
 				values.put(coord, value);
 			}
-
 			data.put(time, values);
 		}
 
-		// hour data
+		// Build per-hour XYTData.
 		XYTData xytHourData = new XYTData();
+		List<Integer> timestamps = data.keySet().intStream().boxed().sorted().toList();
+		xytHourData.setTimestamps(timestamps);
 
-		xytHourData.setTimestamps(data.keySet().intStream().boxed().toList());
-		List<Float> xCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::firstFloat)).distinct().sorted().toList();
-		List<Float> yCoords = data.values().stream().flatMap(m -> m.keySet().stream().map(FloatFloatPair::secondFloat)).distinct().sorted().toList();
+		List<Float> xCoords = data.values().stream()
+			.flatMap(m -> m.keySet().stream().map(FloatFloatPair::firstFloat))
+			.distinct()
+			.sorted()
+			.toList();
+		List<Float> yCoords = data.values().stream()
+			.flatMap(m -> m.keySet().stream().map(FloatFloatPair::secondFloat))
+			.distinct()
+			.sorted()
+			.toList();
 
 		xytHourData.setXCoords(xCoords);
 		xytHourData.setYCoords(yCoords);
 
-		FloatList raw = new FloatArrayList();
-
+		FloatList rawHourData = new FloatArrayList();
 		Object2FloatMap<FloatFloatPair> perDay = new Object2FloatOpenHashMap<>();
 
-		for (Integer ts : xytHourData.getTimestamps()) {
-			Object2FloatMap<FloatFloatPair> d = data.get((int) ts);
-
-			for (Float x : xytHourData.getXCoords()) {
-				for (Float y : xytHourData.getYCoords()) {
+		for (Integer ts : timestamps) {
+			Object2FloatMap<FloatFloatPair> timeData = data.get(ts);
+			for (Float x : xCoords) {
+				for (Float y : yCoords) {
 					FloatFloatPair coord = FloatFloatPair.of(x, y);
-					float v = d.getOrDefault(coord, 0);
-					raw.add(v);
-					if (v > 0)
+					float v = timeData.getOrDefault(coord, 0);
+					rawHourData.add(v);
+					if (v > 0) {
 						perDay.mergeFloat(coord, v, Float::sum);
+					}
 				}
 			}
 		}
 
-		xytHourData.setData(Map.of(label, raw));
+		xytHourData.setData(Map.of(label, rawHourData));
 		xytHourData.setCrs(crs);
+		File outHour = outputDirectory.getParent().resolve(label + "_per_hour.avro").toFile();
+		writeAvro(xytHourData, outHour);
 
-		File out = outputDirectory.getParent().resolve(label + "_per_hour.avro").toFile();
-
-		writeAvro(xytHourData, out);
-
-		raw = new FloatArrayList();
-		// day data
-		XYTData xytDayData = new XYTData();
-
-		for (Float x : xytHourData.getXCoords()) {
-			for (Float y : xytHourData.getYCoords()) {
+		// Build per-day XYTData.
+		FloatList rawDayData = new FloatArrayList();
+		for (Float x : xCoords) {
+			for (Float y : yCoords) {
 				FloatFloatPair coord = FloatFloatPair.of(x, y);
 				float v = perDay.getOrDefault(coord, 0);
-				raw.add(v);
+				rawDayData.add(v);
 			}
 		}
-
+		XYTData xytDayData = new XYTData();
 		xytDayData.setTimestamps(List.of(0));
 		xytDayData.setXCoords(xCoords);
 		xytDayData.setYCoords(yCoords);
-		xytDayData.setData(Map.of(label, raw));
+		xytDayData.setData(Map.of(label, rawDayData));
 		xytDayData.setCrs(crs);
-
 		File outDay = outputDirectory.getParent().resolve(label + "_per_day.avro").toFile();
-
 		writeAvro(xytDayData, outDay);
-		//cache the overall sum
-		this.totalReceiverPointValues.put(substrToCapitalize, raw.stream().reduce(0f, Float::sum));
+
+		// Cache the overall sum.
+		float totalSum = rawDayData.stream().reduce(0f, Float::sum);
+		totalReceiverPointValues.put(baseLabel, totalSum);
 	}
 
-	// Merges the immissions data
-
+	// Merges the immissions data (deprecated)
 	@Deprecated
 	private void mergeImmissionsCSV(String pathParameter, String label) throws IOException {
 		log.info("Merging immissions data for label {}", label);
 		Object2DoubleMap<Coord> mergedData = new Object2DoubleOpenHashMap<>();
 
-		Table csvOutputPerHour = Table.create(DoubleColumn.create("time"), DoubleColumn.create("x"), DoubleColumn.create("y"), DoubleColumn.create("value"));
-		Table csvOutputMerged = Table.create(DoubleColumn.create("time"), DoubleColumn.create("x"), DoubleColumn.create("y"), DoubleColumn.create("value"));
+		Table csvOutputPerHour = Table.create(
+			DoubleColumn.create("time"),
+			DoubleColumn.create("x"),
+			DoubleColumn.create("y"),
+			DoubleColumn.create("value")
+		);
+		Table csvOutputMerged = Table.create(
+			DoubleColumn.create("time"),
+			DoubleColumn.create("x"),
+			DoubleColumn.create("y"),
+			DoubleColumn.create("value")
+		);
 
-		// Loop over all files
-		for (double time = minTime; time <= maxTime; time += 3600.) {
+		for (double time = minTime; time <= maxTime; time += HOUR_STEP) {
+			String filePath = pathParameter + label + "_" + roundToOneDecimalPlace(time) + ".csv";
+			Table table = Table.read().csv(
+				CsvReadOptions.builder(IOUtils.getBufferedReader(filePath))
+					.columnTypesPartial(Map.of("x", ColumnType.DOUBLE,
+						"y", ColumnType.DOUBLE,
+						"Receiver Point Id", ColumnType.INTEGER,
+						"t", ColumnType.DOUBLE))
+					.sample(false)
+					.separator(CsvOptions.detectDelimiter(filePath))
+					.build()
+			);
 
-			String path = pathParameter + label + "_" + round(time, 1) + ".csv";
-
-			// Read the file
-			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("x", ColumnType.DOUBLE,
-					"y", ColumnType.DOUBLE,
-					"Receiver Point Id", ColumnType.INTEGER,
-					"t", ColumnType.DOUBLE))
-				.sample(false)
-				.separator(CsvOptions.detectDelimiter(path)).build());
-
-			// Loop over all rows in the file
 			for (Row row : table) {
 				double x = row.getDouble("x");
 				double y = row.getDouble("y");
 				Coord coord = new Coord(x, y);
-				double value = row.getDouble(1); // 1
-
+				double value = row.getDouble(1);
 				mergedData.mergeDouble(coord, value, Double::max);
 
 				Row writeRow = csvOutputPerHour.appendRow();
@@ -305,7 +333,6 @@ final class MergeNoiseOutput {
 			}
 		}
 
-		// Create the merged data
 		for (Object2DoubleMap.Entry<Coord> entry : mergedData.object2DoubleEntrySet()) {
 			Row writeRow = csvOutputMerged.appendRow();
 			writeRow.setDouble("time", 0.0);
@@ -314,17 +341,15 @@ final class MergeNoiseOutput {
 			writeRow.setDouble("value", entry.getDoubleValue());
 		}
 
-		// Write the merged data (per hour) to a file
-		File out = outputDirectory.getParent().resolve(label + "_per_hour.csv").toFile();
-		csvOutputPerHour.write().csv(out);
-		log.info("Merged noise data written to {} ", out);
+		File outHour = outputDirectory.getParent().resolve(label + "_per_hour.csv").toFile();
+		csvOutputPerHour.write().csv(outHour);
+		log.info("Merged noise data written to {}", outHour);
 
-		// Write the merged data (per day) to a file
-		File outPerDay = outputDirectory.getParent().resolve(label + "_per_day.csv").toFile();
-		csvOutputMerged.write().csv(outPerDay);
-		log.info("Merged noise data written to {} ", outPerDay);
-
+		File outDay = outputDirectory.getParent().resolve(label + "_per_day.csv").toFile();
+		csvOutputMerged.write().csv(outDay);
+		log.info("Merged noise data written to {}", outDay);
 	}
+
 	public Map<String, Float> getTotalReceiverPointValues() {
 		return totalReceiverPointValues;
 	}
