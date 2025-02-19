@@ -33,11 +33,11 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/** 
+/**
  * Converts a {@link Geometry}, specifically a {@link Polygon} to a sequence
- * of coordinates, each representing a boundary point of the polygon. This is 
+ * of coordinates, each representing a boundary point of the polygon. This is
  * used to write a concave hull's characteristics to an {@link ObjectAttributes}
- * file for facilities, or simply as a {@link Facility}'s {@link Attributes}. 
+ * file for facilities, or simply as a {@link Facility}'s {@link Attributes}.
  *
  * @author jwjoubert
  */
@@ -59,10 +59,10 @@ public class HullConverter implements AttributeConverter<Geometry> {
 		}
 
 		Coordinate[] ca = new Coordinate[list.size()];
-		
+
 		/* Distinguish between points, lines and polygons. */
 		if(ca.length == 1){
-			ca[0] = list.get(0);
+			ca[0] = list.getFirst();
 			g = gf.createPoint(ca[0]);
 		} else if(ca.length == 2){
 			ca[0] = list.get(0);
@@ -74,7 +74,7 @@ public class HullConverter implements AttributeConverter<Geometry> {
 			}
 			g = gf.createPolygon(gf.createLinearRing(ca), null);
 		}
-		
+
 		return g;
 	}
 
@@ -84,7 +84,7 @@ public class HullConverter implements AttributeConverter<Geometry> {
 			log.error("Could not convert the geometry: it is not of type Geometry. Returning empty string.");
 			return "";
 		}
-		
+
 		/* Convert to the format: (x1;y1),(x2;y2),...,(xn;yn) */
 		Coordinate[] ca = ((Geometry)o).getCoordinates();
 		StringBuilder s = new StringBuilder();
@@ -100,7 +100,7 @@ public class HullConverter implements AttributeConverter<Geometry> {
 		s.append(";");
 		s.append(ca[ca.length - 1].y);
 		s.append(")");
-		
+
 		return s.toString();
 	}
 
