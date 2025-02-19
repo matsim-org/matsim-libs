@@ -38,8 +38,8 @@ public class MaxDetourConstraintTest {
 
 		// Max wait time
 		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
+                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = 300;
 
 		// Turn on the max detour constraint
