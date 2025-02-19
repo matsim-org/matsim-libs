@@ -48,15 +48,11 @@ public class PtTripFareEstimatorTest {
 	private PtTripWithDistanceBasedFareEstimator estimator;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 
 		Config config = TestScenario.loadConfig(utils);
 
 		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
-
-		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
-		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
-
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
