@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.logistics.LSP;
@@ -12,6 +13,9 @@ import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPs;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class LogisticsConsitencyChecker {
 
@@ -38,36 +42,38 @@ public class LogisticsConsitencyChecker {
 	}
 
 	/**
-	 * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
-	 * allJobsInToursCheck returns enum CheckResult:
-	 * CHECK_SUCCESSFUL if allJobsInToursCheck returns CHECK_SUCCESSFUL
-	 * CHECK_FAILED if allJobsInToursCheck returns CHECK_FAIL
+	 *
+	 * //TODO: doc
+	 *
 	 * @param lsps the LSPs to check
 	 * @param lvl level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult uniqueResourcesCheck(LSPs lsps, Level lvl) {
+
+
+	public static CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
 		setLogLevel(lvl);
-		int checkFailed = 0;
-		if (resourcesAreUnique(lsps, lvl) == CheckResult.CHECK_FAILED) {
-			checkFailed++;
-		}
-		return CheckResult.CHECK_FAILED;
-	}
-
-	private static LogisticsConsitencyChecker.CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
-		var result =  CheckResult.CHECK_FAILED; //TODO...
-
+		List<Id> lspResourceList = new LinkedList<Id>();
+		boolean resourceIDsAreUnique = true;
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LSPResource resource : lsp.getResources()) {
-				resource.getId(); //TODO...
+				if(lspResourceList.contains(resource.getId())){
+					logMessage("Resource with ID '{}' exists more than once.", resource.getId());
+					resourceIDsAreUnique = false;
+				} else {
+					lspResourceList.add(resource.getId());
+				}
 			}
 		}
-
-		return result;
+		if (resourceIDsAreUnique) {
+			logMessage("All resource IDs are unique.");
+			return CheckResult.CHECK_SUCCESSFUL;
+		} else {
+			return CheckResult.CHECK_FAILED;
+		}
 	}
 
-	private static LogisticsConsitencyChecker.CheckResult shipmentsArePlannedExactlyOnce(LSPs lsps, Level lvl) {
+	public static CheckResult shipmentsArePlannedExactlyOnce(LSPs lsps, Level lvl) {
 		var result =  CheckResult.CHECK_FAILED; //TODO...
 
 		for (LSP lsp : lsps.getLSPs().values()) {
