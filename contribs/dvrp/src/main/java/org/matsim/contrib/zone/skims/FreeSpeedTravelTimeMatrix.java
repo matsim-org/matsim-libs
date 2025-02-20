@@ -199,53 +199,57 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 	}
 
 	public void write(URL outputPath, Network dvrpNetwork) {
-		try (DataOutputStream outputStream = new DataOutputStream(IOUtils.getOutputStream(outputPath, false))) {
-			// obtain fixed order of zones
+		try (DataOutputStream outputStream = new DataOutputStream(
+				new BufferedOutputStream(IOUtils.getOutputStream(outputPath, false)))) {
+
+			// Obtain fixed order of zones
 			List<Zone> zones = new ArrayList<>(zoneSystem.getZones().values());
 			outputStream.writeInt(zones.size());
 			for (Zone zone : zones) {
 				outputStream.writeUTF(zone.getId().toString());
 			}
 
-			// write matrix
-			for (var from : zones) {
-				for (var to : zones) {
-					int value = freeSpeedTravelTimeMatrix.get(from, to);
-					outputStream.writeInt(value);
+			// Write matrix
+			for (Zone from : zones) {
+				for (Zone to : zones) {
+					outputStream.writeInt(freeSpeedTravelTimeMatrix.get(from, to));
 				}
 			}
 
-			// write if sparse exists
+			// Write if sparse matrix exists
 			outputStream.writeBoolean(freeSpeedTravelTimeSparseMatrix != null);
 
 			if (freeSpeedTravelTimeSparseMatrix != null) {
-				// obtain fixed order of nodes
+				// Obtain fixed order of nodes
 				List<Node> nodes = new ArrayList<>(dvrpNetwork.getNodes().values());
 				outputStream.writeInt(nodes.size());
-				for (Node node : nodes) {
+
+				// Precompute node indices for fast lookup
+				Map<Node, Integer> nodeIndexMap = new HashMap<>(nodes.size());
+				for (int i = 0; i < nodes.size(); i++) {
+					Node node = nodes.get(i);
+					nodeIndexMap.put(node, i);
 					outputStream.writeUTF(node.getId().toString());
 				}
 
 				for (Node from : nodes) {
-					// write size of the matrix row
-					int rowSize = 0;
+					// Write size of the matrix row
+					List<Map.Entry<Integer, Integer>> nonZeroEntries = new ArrayList<>();
 
 					for (Node to : nodes) {
 						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
 						if (value >= 0) {
-							rowSize++;
+							nonZeroEntries.add(Map.entry(nodeIndexMap.get(to), value));
 						}
 					}
 
-					outputStream.writeInt(rowSize);
-					
-					// write matrix row
-					for (Node to : nodes) {
-						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
-						if (value >= 0) {
-							outputStream.writeInt(nodes.indexOf(to));
-							outputStream.writeInt(value);
-						}
+					// Write row size
+					outputStream.writeInt(nonZeroEntries.size());
+
+					// Write matrix row
+					for (var entry : nonZeroEntries) {
+						outputStream.writeInt(entry.getKey());
+						outputStream.writeInt(entry.getValue());
 					}
 				}
 			}
