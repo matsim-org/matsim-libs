@@ -20,13 +20,9 @@
 
 package org.matsim.contrib.zone.skims;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,14 +36,13 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-import com.google.common.collect.Sets;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
  * @author Michal Maciejewski (michalm)
