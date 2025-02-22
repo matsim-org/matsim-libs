@@ -60,9 +60,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String NOTIFY_ABOUT_STUCK_VEHICLES = "notifyAboutStuckVehicles";
 	/* package */ final static String NOTIFY_ABOUT_STUCK_VEHICLES_STRING =
 		"Boolean. `true': when a vehicle is moved to the next link because the stuck time is exceeded, a PersonStuckAndContinueEvent is thrown.";
-	private static final String MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION = "maxNumberOfLogStatementsReCapacityAdaption";
-	/* package */ final static String MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION_STRING =
-		"integer. 10 by default. Use -1 if all (flow and storage) capacity adaptions should by written into the logfile.";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
@@ -96,7 +93,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private boolean removeStuckVehicles = false;
 	private boolean notifyAboutStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
-	private int maxNumberOfLogStatementsReCapacityAdaption = 10;
 	@Positive
 	private int numberOfThreads = 1;
 	//	private static final String CREATING_VEHICLES_FOR_ALL_NETWORK_MODES = "creatingVehiclesForAllNetworkModes";
@@ -182,8 +178,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING);
 		map.put(STUCK_TIME, STUCK_TIME_STRING);
 		map.put(NOTIFY_ABOUT_STUCK_VEHICLES, NOTIFY_ABOUT_STUCK_VEHICLES_STRING);
-		map.put(MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION, MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION_STRING);
-
 		{
 			StringBuilder options = new StringBuilder(60);
 			for (TrafficDynamics dyn : TrafficDynamics.values()) {
@@ -489,19 +483,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(TRAFFIC_DYNAMICS)
 	public TrafficDynamics getTrafficDynamics() {
 		return this.trafficDynamics;
-	}
-
-	@StringGetter(MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION)
-	public int getMaxNumberOfLogStatementsReCapacityAdaption() {
-		return this.maxNumberOfLogStatementsReCapacityAdaption;
-	}
-
-	@StringSetter(MAX_NUMBER_OF_LOG_STATEMENTS_RE_CAPACITY_ADAPTION)
-	public void setMaxNumberOfLogStatementsReCapacityAdaption(final int maxNumberOfLogStatementsReCapacityAdaption) {
-		if ( maxNumberOfLogStatementsReCapacityAdaption < -1 ) {
-			throw new IllegalArgumentException( "Number of log statements must be positive, or -1 (for unlimited), got "+maxNumberOfLogStatementsReCapacityAdaption );
-		}
-		this.maxNumberOfLogStatementsReCapacityAdaption = maxNumberOfLogStatementsReCapacityAdaption;
 	}
 
 	@StringGetter(NUMBER_OF_THREADS)
