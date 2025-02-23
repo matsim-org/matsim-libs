@@ -62,7 +62,7 @@ public class CapacityReconfigurationTest {
 		assertEquals(198, tracker.pickedUpPassengers);
 		assertEquals(0, tracker.pickedUpGoods);
 	}
-	
+
 	@Test
 	void testSimpleReconfiguration() {
 		Id.resetCaches();
@@ -173,10 +173,10 @@ public class CapacityReconfigurationTest {
 				.addOrGetDefaultDrtOptimizationConstraintsSet().rejectRequestIfMaxWaitOrTravelTimeViolated = useRejections;
 
 		// produce analysis output on capacities and loads
-		drtConfig.loadParams.analysisInterval = 1;
+		drtConfig.getLoadParams().analysisInterval = 1;
 
 		// set up two dimensions
-		drtConfig.loadParams.dimensions = List.of("passengers", "goods");
+		drtConfig.getLoadParams().dimensions = List.of("passengers", "goods");
 
 		return drtConfig;
 	}
