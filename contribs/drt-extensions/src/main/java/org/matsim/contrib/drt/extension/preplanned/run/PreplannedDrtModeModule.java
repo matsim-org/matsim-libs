@@ -64,13 +64,13 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.loadParams.defaultRequestDimension);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.getLoadParams().defaultRequestDimension);
 		})).asEagerSingleton();
 
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.loadParams));
+				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.getLoadParams()));
 
 		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
 				+ " It would interfere with simulation of pre-calculated vehicle schedules."

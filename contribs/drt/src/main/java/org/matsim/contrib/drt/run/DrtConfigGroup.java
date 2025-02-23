@@ -190,10 +190,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
-	private DrtEstimatorParams drtEstimatorParams;
+	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
 
-	@NotNull
-	public DvrpLoadParams loadParams;
+	@Nullable
+	private DvrpLoadParams loadParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -205,8 +205,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
 		super(GROUP_NAME);
 		initSingletonParameterSets(constraintsSetSupplier);
-		this.addParameterSet(new DvrpLoadParams());
-		this.addParameterSet(new DrtEstimatorParams());
 	}
 
 	private void initSingletonParameterSets(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
@@ -383,6 +381,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
 		return Optional.ofNullable(drtEstimatorParams);
+	}
+
+	public DvrpLoadParams getLoadParams() {
+		if(this.loadParams == null) {
+			this.addParameterSet(new DvrpLoadParams());
+		}
+		return this.loadParams;
 	}
 
 	/**
