@@ -912,7 +912,7 @@ public final class NetworkUtils {
 	/**
 	 * Check whether networks are (technically) identical. This only considers
 	 * {@link DisallowedNextLinks} and no other link/node attributes.
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 * @return true if the network's links and nodes are the same incl.
@@ -971,7 +971,7 @@ public final class NetworkUtils {
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
 				&& expected.getNumberOfLanes() == actual.getNumberOfLanes()
-				&& expectedDnl == null ? actualDnl == null : expectedDnl.equals(actualDnl);
+				&& Objects.equals(expectedDnl, actualDnl);
 	}
 
 	private static boolean testNodesAreEqual(Node expected, Node actual) {
