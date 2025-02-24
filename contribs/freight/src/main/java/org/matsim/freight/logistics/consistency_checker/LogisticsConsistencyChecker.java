@@ -15,9 +15,9 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import java.util.*;
 
 /**
-	* @author anton stock
-	 * this class provides tests to check if resource IDs are unique and if all existing shipments are assigned to exactly one plan.
-	 */
+ * @author anton stock
+ * this class provides tests to check if resource IDs are unique and if all existing shipments are assigned to exactly one plan.
+ */
 public class LogisticsConsistencyChecker {
 
 	public enum CheckResult {
@@ -53,7 +53,7 @@ public class LogisticsConsistencyChecker {
 	public static CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
 		setLogLevel(lvl);
 		//all resource ids are being saved in this list
-		List<Id> lspResourceList = new LinkedList<Id>();
+		List<Id<LSPResource>> lspResourceList = new LinkedList<>();
 		//true, as long as no resource id exists more than once
 		boolean resourceIDsAreUnique = true;
 		for (LSP lsp : lsps.getLSPs().values()) {
@@ -85,11 +85,10 @@ public class LogisticsConsistencyChecker {
 	 */
 	public static CheckResult shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPs lsps, Level lvl) {
 		//all resource ids are being saved in this list
-		List<Id> lspShipmentPlansList = new LinkedList<Id>();
-		List<Id> lspShipmentsList = new LinkedList<Id>();
+		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
+		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
 
 		setLogLevel(lvl);
-
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
@@ -98,15 +97,16 @@ public class LogisticsConsistencyChecker {
 			//for selected plan only
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
 				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
-				//@KMT: Hier wird immer nur 1x shipmentNorth ausgegeben, obwohl es in der XML zweimal auftaucht...
+				//Todo: @KMT: Hier wird immer nur 1x shipmentNorth ausgegeben, obwohl es in der XML zweimal auftaucht...
+				//@ Anton: Im selectedPlan (--> selected=True) ist doch jedes nur einmal drin. (lsps.xml) Folglich sieht das für mich an der Stelle richtig aus.
 				logMessage(shipmentSelectedPlan.getLspShipmentId().toString());
 			}
 
 		}
-		Set<Id> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
-		List<Id> shipmentsWithoutPlan = new LinkedList<>();
+		Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
+		List<Id<LspShipment>> shipmentsWithoutPlan = new LinkedList<>();
 
-		for (Id shipmentId : lspShipmentsList) {
+		for (Id<LspShipment> shipmentId : lspShipmentsList) {
 			if (!plannedShipmentIds.contains(shipmentId)) {
 				shipmentsWithoutPlan.add(shipmentId);
 			}
@@ -127,14 +127,14 @@ public class LogisticsConsistencyChecker {
 		setLogLevel(lvl);
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
-
+				//TODO: Hier fehlt noch die Implementierung
 			}
 			for (LSPPlan lspPlan : lsp.getPlans()) { //Alle Pläne
 				for (LspShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-
+					//TODO: Hier fehlt noch die Implementierung
 				}
 			}
 		}
-return null;
+		return null;
 	}
 }
