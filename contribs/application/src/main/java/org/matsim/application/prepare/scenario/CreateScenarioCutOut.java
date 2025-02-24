@@ -477,7 +477,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				continue;
 
 			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
-			link.setCapacity(1000000.0);
+			link.setCapacity(1_000_000);
 
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
