@@ -383,7 +383,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(drtEstimatorParams);
 	}
 
-	public DvrpLoadParams getLoadParams() {
+	public DvrpLoadParams addOrGetLoadParams() {
 		if(this.loadParams == null) {
 			this.addParameterSet(new DvrpLoadParams());
 		}

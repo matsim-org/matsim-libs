@@ -75,7 +75,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.getLoadParams()));
+				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.addOrGetLoadParams()));
 		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
@@ -123,7 +123,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.getLoadParams().defaultRequestDimension);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().defaultRequestDimension);
 		})).asEagerSingleton();
 
 	}
