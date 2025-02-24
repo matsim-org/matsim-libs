@@ -190,7 +190,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
-	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+	private DrtEstimatorParams drtEstimatorParams;
 
 	@Nullable
 	private DvrpLoadParams loadParams;
