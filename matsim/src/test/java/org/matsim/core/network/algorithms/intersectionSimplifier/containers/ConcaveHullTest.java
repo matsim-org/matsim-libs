@@ -30,7 +30,22 @@ import org.locationtech.jts.geom.Polygon;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ConcaveHullTest {
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	void testMain(){
+		String[] args = new String[]{
+			utils.getClassInputDirectory() + "testCoordinates.csv",
+			"2",
+			utils.getOutputDirectory()
+		};
+		try{
+			ConcaveHull.main(args);
+		} catch(Exception e){
+			Assertions.fail(e);
+		}
+	}
 
 
 	/** Test whether duplicate input points are removed. **/
@@ -46,17 +61,17 @@ public class ConcaveHullTest {
 	}
 
 
+	@Test
 	public void testGetConcaveHull(){
 		GeometryCollection gc = setup();
 		ConcaveHull ch = new ConcaveHull(gc, 1.0);
 		Geometry g = ch.getConcaveHull();
-		Assertions.assertTrue(g instanceof Polygon, "Wrong geometry created.");
+        Assertions.assertInstanceOf(Polygon.class, g, "Wrong geometry created.");
 	}
 
 
 	/**
 	 * Set up a small test case:
-	 *
 	 *   ^
 	 *   |
 	 *   3         4
@@ -83,7 +98,6 @@ public class ConcaveHullTest {
 	/**
 	 * Creates a similar {@link GeometryCollection} as in setup() but have
 	 * triplicates of points 7 & 8.
-	 * @return
 	 */
 	private GeometryCollection setupWithDuplicates(){
 		GeometryFactory gf = new GeometryFactory();
