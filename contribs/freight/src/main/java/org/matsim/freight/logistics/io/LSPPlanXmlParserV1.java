@@ -236,6 +236,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         elementIdResourceIdMap.put(logisticChainElementId, resourceId);
       }
+
       case SHIPMENT_PLAN -> {
         shipmentPlanId = atts.getValue(SHIPMENT_ID);
         Gbl.assertNotNull(shipmentPlanId);
@@ -290,6 +291,8 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
             planElement = planElementBuilder.build();
           }
         }
+		  //TODO: This is a bit problematic, because for shipments with the same id, the planElements will be put on top of each other and the LspShipmentPlan will only exist once with all elements of all those shipments. KMT' Feb25
+		  // Find another way to store them OR load them into the data structure.
         planElements.put(elementId, planElement);
       }
     }
