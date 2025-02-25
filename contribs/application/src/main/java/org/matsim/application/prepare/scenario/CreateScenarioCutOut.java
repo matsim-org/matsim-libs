@@ -26,8 +26,8 @@ import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -44,9 +44,6 @@ import picocli.CommandLine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
@@ -310,7 +307,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes after cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new CleanPersonLinkIds());
+		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new PersonNetworkLinkCheck(scenario.getNetwork()));
 
 		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
@@ -598,54 +595,5 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 	}
 
-
-	private final class CleanPersonLinkIds implements PersonAlgorithm {
-
-
-		@Override
-		public void run(Person person) {
-
-			Plan plan = person.getSelectedPlan();
-			Network network = scenario.getNetwork();
-
-			for (Trip trip : TripStructureUtils.getTrips(plan)) {
-				// activity link ids are reset, if they are not retained in the cleaned network
-				if (trip.getOriginActivity().getLinkId() != null) {
-					if (!network.getLinks().containsKey(trip.getOriginActivity().getLinkId()))
-						trip.getOriginActivity().setLinkId(null);
-				}
-
-				if (trip.getDestinationActivity().getLinkId() != null) {
-					if (!network.getLinks().containsKey(trip.getDestinationActivity().getLinkId()))
-						trip.getDestinationActivity().setLinkId(null);
-				}
-			}
-
-			for (Leg leg : TripStructureUtils.getLegs(plan)) {
-
-				if (!(leg.getRoute() instanceof NetworkRoute r))
-					continue;
-
-				Stream<Id<Link>> stream = Stream.concat(Stream.of(r.getStartLinkId(), r.getEndLinkId()), r.getLinkIds().stream());
-
-				boolean valid = stream.allMatch(l -> {
-
-					Link link = network.getLinks().get(l);
-
-					// Check if link is present in the network
-					if (link == null)
-						return false;
-
-					// Check if the link has the needed mode
-					return link.getAllowedModes().contains(leg.getMode());
-				});
-
-				if (!valid) {
-					PopulationUtils.resetRoutes(plan);
-					break;
-				}
-			}
-		}
-	}
 
 }
