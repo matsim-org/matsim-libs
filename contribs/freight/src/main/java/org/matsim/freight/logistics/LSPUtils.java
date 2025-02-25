@@ -58,7 +58,7 @@ public final class LSPUtils {
     return new WaitingShipmentsImpl();
   }
 
-  public static void addLSPs(Scenario scenario, LSPs lsps) {
+  public static void loadLspsIntoScenario(Scenario scenario, LSPs lsps) {
     Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
     // Register carriers from all lsps
     for (LSP lsp : lsps.getLSPs().values()) {
@@ -74,10 +74,7 @@ public final class LSPUtils {
   public static LSPs getLSPs(Scenario scenario) {
     Object result = scenario.getScenarioElement(lspsString);
     if (result == null) {
-      throw new RuntimeException(
-          "there is no scenario element of type "
-              + lspsString
-              + ".  You will need something like LSPUtils.addLSPs( scenario, lsps) somewhere.");
+      throw new RuntimeException("there is no scenario element of type " + lspsString + ".  You will need something like LSPUtils.addLSPs( scenario, lsps) somewhere.");
     }
     return (LSPs) result;
   }

@@ -153,7 +153,7 @@ final class ExampleGroceryDeliveryMultipleChains {
     Scenario scenario = ScenarioUtils.loadScenario(config);
 
     log.info("Add LSP to the scenario");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+    LSPUtils.loadLspsIntoScenario(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
 
     return scenario;
   }

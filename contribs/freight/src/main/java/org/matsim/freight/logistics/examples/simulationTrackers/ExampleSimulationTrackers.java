@@ -191,7 +191,7 @@ import org.matsim.vehicles.VehicleUtils;
     ArrayList<LSP> lspList = new ArrayList<>();
     lspList.add(lsp);
     LSPs lsps = new LSPs(lspList);
-    LSPUtils.addLSPs(scenario, lsps);
+    LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
     // Start the Mobsim one iteration is sufficient for tracking
     Controler controler = new Controler(config);

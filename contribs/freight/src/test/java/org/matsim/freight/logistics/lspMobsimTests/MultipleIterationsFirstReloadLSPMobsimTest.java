@@ -210,7 +210,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 
 		Controller controller = ControllerUtils.createController(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 		controller.addOverridingModule(new LSPModule());
 		controller.addOverridingModule( new AbstractModule(){
 			@Override public void install(){

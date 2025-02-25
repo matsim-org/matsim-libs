@@ -86,7 +86,7 @@ import org.matsim.vehicles.VehicleUtils;
     ArrayList<LSP> lspList = new ArrayList<>();
     lspList.add(lsp);
     LSPs lsps = new LSPs(lspList);
-    LSPUtils.addLSPs(scenario, lsps);
+    LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
     config.controller().setFirstIteration(0);
     config.controller().setLastIteration(0);

@@ -284,7 +284,7 @@ public class CompleteLSPMobsimTest {
 		lspList.add(completeLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
 		Controller controller = ControllerUtils.createController(scenario);
 

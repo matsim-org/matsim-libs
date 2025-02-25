@@ -206,7 +206,7 @@ public class MultipleShipmentsFirstReloadLSPMobsimTest {
 
 		Controller controller = ControllerUtils.createController(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

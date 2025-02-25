@@ -194,7 +194,7 @@ public class CollectionLSPReplanningTest {
 //		collectionLSP.setReplanner(replanner);
 
 
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(collectionLSP)));
+		LSPUtils.loadLspsIntoScenario(scenario, new LSPs(Collections.singletonList(collectionLSP)));
 
 		Controller controller = ControllerUtils.createController(scenario);
 

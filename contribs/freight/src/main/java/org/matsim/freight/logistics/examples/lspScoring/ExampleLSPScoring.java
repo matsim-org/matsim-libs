@@ -210,7 +210,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // Prepare LSPModule and add the LSP
     LSPs lsps = new LSPs(Collections.singletonList(lsp));
-    LSPUtils.addLSPs(scenario, lsps);
+    LSPUtils.loadLspsIntoScenario(scenario, lsps);
     return scenario;
   }
 

@@ -156,7 +156,7 @@ public class CollectionLSPScoringTest {
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
 		Controller controller = ControllerUtils.createController(scenario);
 
