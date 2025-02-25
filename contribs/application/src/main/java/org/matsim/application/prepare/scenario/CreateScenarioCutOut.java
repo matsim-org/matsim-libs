@@ -129,6 +129,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
 
+	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
+	private boolean checkBeeline;
+
 	@CommandLine.Mixin
 	private CrsOptions crs;
 
@@ -530,13 +533,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
-			if (originCoord != null && destinationCoord != null) {
+			// also keep persons traveling through or close to area (beeline)
+			if (checkBeeline && originCoord != null && destinationCoord != null) {
 				LineString line = geoFactory.createLineString(new Coordinate[]{
 					MGC.coord2Coordinate(originCoord),
 					MGC.coord2Coordinate(destinationCoord)
 				});
 
-				// also keep persons traveling through or close to area (beeline)
 				if (line.intersects(geom)) {
 					keepPerson = true;
 				}
