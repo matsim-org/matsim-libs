@@ -28,7 +28,7 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 
 	private static final Logger log = LogManager.getLogger(PersonNetworkLinkCheck.class);
 
-	@CommandLine.Option(names = "--population", description = "Path to population", required = true)
+	@CommandLine.Option(names = {"--input", "--population"}, description = "Path to population", required = true)
 	private String populationPath;
 
 	@CommandLine.Option(names = "--network", description = "Path to network", required = true)
