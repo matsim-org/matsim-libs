@@ -126,7 +126,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
 	private Set<String> modes;
 
-	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept", defaultValue = TransportMode.pt, split = ",")
+	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept. No change events will be generated for these.", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
 
 	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
@@ -475,6 +475,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			// Don't generate events for links thar are in the shapefile + buffer
 			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
 				continue;
+
+			// Don't generate events for these fixed modes.
+			if (link.getAllowedModes().equals(keepModes))
+				continue;
+
 
 			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
 			link.setCapacity(1_000_000);
