@@ -479,16 +479,26 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
 			link.setCapacity(1_000_000);
 
+			Double prevSpeed = null;
+
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
 
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
+
+				// Skip if the speed is the same as the previous speed
+				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
+					continue;
+				}
+
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
 				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
+
+				prevSpeed = freespeed;
 			}
 		}
 
