@@ -378,6 +378,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	// Rejections
 
+	private static final String ABORT_STUCK_REASON = " rejected prebooked request";
 	private final IdSet<Person> stuckUponActivity = new IdSet<>(Person.class);
 
 	private void processRejections(double now) {
@@ -456,7 +457,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		((HasModifiablePlan) agent).resetCaches();
 		internalInterface.getMobsim().rescheduleActivityEnd(agent);
 		eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
-				this.mode));
+				null, mode + ABORT_STUCK_REASON));
 
 		internalInterface.getMobsim().getAgentCounter().incLost();
 
