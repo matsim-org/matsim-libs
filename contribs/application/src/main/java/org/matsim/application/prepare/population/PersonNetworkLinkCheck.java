@@ -14,6 +14,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import picocli.CommandLine;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -39,11 +40,18 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 	private Network network;
 
 	@SuppressWarnings("unused")
-	PersonNetworkLinkCheck() {
+	public PersonNetworkLinkCheck() {
 	}
 
-	public PersonNetworkLinkCheck(Network network) {
+	private PersonNetworkLinkCheck(Network network) {
 		this.network = network;
+	}
+
+	/**
+	 * Create an instance of the class used directly as a {@link PersonAlgorithm}.
+	 */
+	public static PersonAlgorithm createPersonAlgorithm(Network network) {
+		return new PersonNetworkLinkCheck(network);
 	}
 
 	public static void main(String[] args) {
@@ -64,6 +72,8 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 
 	@Override
 	public void run(Person person) {
+
+		Objects.requireNonNull(network, "Network not set. Make sure to use PersonNetworkLinkCheck.createPersonAlgorithm(network).");
 
 		for (Plan plan : person.getPlans()) {
 

@@ -310,7 +310,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes after cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new PersonNetworkLinkCheck(scenario.getNetwork()));
+		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), PersonNetworkLinkCheck.createPersonAlgorithm(scenario.getNetwork()));
 
 		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
