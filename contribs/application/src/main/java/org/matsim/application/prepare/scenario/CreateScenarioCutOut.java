@@ -126,6 +126,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
 	private Set<String> modes;
 
+	@CommandLine.Option(names = "--clean-modes", description = "Additional modes to consider for network cleaning", split = ",")
+	private Set<String> cleanModes;
+
 	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept. No change events will be generated for these.", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
 
@@ -305,6 +308,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		for (String mode : modes) {
 			log.info("Cleaning mode {}", mode);
 			cleaner.run(Set.of(mode));
+		}
+
+		if (cleanModes != null) {
+			for (String mode : cleanModes) {
+				log.info("Cleaning mode {}", mode);
+				cleaner.run(Set.of(mode));
+			}
 		}
 
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
