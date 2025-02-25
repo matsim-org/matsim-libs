@@ -1,5 +1,7 @@
 package org.matsim.application.prepare.population;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -22,6 +24,8 @@ import java.util.stream.Stream;
  */
 @CommandLine.Command(name = "person-network-link-check", description = "Check the plan of a person for non-existing link ids.")
 public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlgorithm {
+
+	private static final Logger log = LogManager.getLogger(PersonNetworkLinkCheck.class);
 
 	@CommandLine.Option(names = "--population", description = "Path to population", required = true)
 	private String populationPath;
@@ -64,7 +68,7 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 			for (PlanElement el : plan.getPlanElements()) {
 
 				if (el instanceof Activity act) {
-					checkActivity(act);
+					checkActivity(person, act);
 				} else if (el instanceof Leg leg) {
 
 					if (leg.getRoute() instanceof NetworkRoute r)
@@ -77,10 +81,15 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 		}
 	}
 
-	private void checkActivity(Activity act) {
+	private void checkActivity(Person person, Activity act) {
 		// activity link ids are reset, if they are not contained in the network
-		if (act.getLinkId() != null && !network.getLinks().containsKey(act.getLinkId()))
+		if (act.getLinkId() != null && !network.getLinks().containsKey(act.getLinkId())) {
+
 			act.setLinkId(null);
+			if (act.getFacilityId() == null && act.getCoord() == null) {
+				log.warn("Person {} now has activity without link id and no facility id or coordinate.", person.getId());
+			}
+		}
 	}
 
 	private void checkRoute(Leg leg, Route route) {
