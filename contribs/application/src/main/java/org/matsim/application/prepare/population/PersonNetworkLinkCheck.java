@@ -57,6 +57,8 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 		Population population = PopulationUtils.readPopulation(populationPath);
 		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), this);
 
+		PopulationUtils.writePopulation(population, output);
+
 		return 0;
 	}
 
@@ -73,7 +75,7 @@ public final class PersonNetworkLinkCheck implements MATSimAppCommand, PersonAlg
 
 					if (leg.getRoute() instanceof NetworkRoute r)
 						checkNetworkRoute(leg, r);
-					else
+					else if (leg.getRoute() != null)
 						checkRoute(leg, leg.getRoute());
 
 				}
