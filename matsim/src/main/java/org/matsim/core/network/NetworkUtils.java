@@ -1013,6 +1013,18 @@ public final class NetworkUtils {
 
 	private static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
 
+	/**
+	 * Checks whether any sequence of DisallowedNextLinks exists within the network.
+	 */
+	public static boolean hasDisallowedNextLinks(Network network) {
+		Optional<? extends Link> link = network.getLinks().values().stream().filter(l -> {
+			DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(l);
+			return dnl != null && !dnl.isEmpty();
+		}).findAny();
+
+		return link.isPresent();
+	}
+
 	@Nullable
 	public static DisallowedNextLinks getDisallowedNextLinks(Link link) {
 		return (DisallowedNextLinks) link.getAttributes().getAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);

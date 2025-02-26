@@ -112,6 +112,8 @@ class DisallowedNextLinksUtilsTest {
 
 		Network network = createNetwork();
 
+		Assertions.assertFalse(NetworkUtils.hasDisallowedNextLinks(network));
+
 		Link l01 = network.getLinks().get(Id.createLinkId("01"));
 		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
 		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12"), Id.createLinkId("23")));
@@ -121,6 +123,7 @@ class DisallowedNextLinksUtilsTest {
 
 		Assertions.assertNotNull(NetworkUtils.getDisallowedNextLinks(l01));
 		Assertions.assertFalse(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.hasDisallowedNextLinks(network));
 
 		// * --------------------------------------------------
 
