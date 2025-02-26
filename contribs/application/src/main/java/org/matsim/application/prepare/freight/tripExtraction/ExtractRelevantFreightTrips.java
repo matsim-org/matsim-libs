@@ -76,7 +76,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--tripType", description = "Set the tripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
 	private TripType tripType;
 
-	@CommandLine.Option(names = "--LegMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
+	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
 	private String legMode;
 
 	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips", defaultValue = "freight")
@@ -144,13 +144,13 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		int generated = 0;
 		int processed = 0;
 		log.info("Start creating the modified plans: there are in total {} persons to be processed",
-				originalPlans.getPersons().keySet().size());
+				originalPlans.getPersons().size());
 
 		for (Person person : originalPlans.getPersons().values()) {
 
 			processed += 1;
 			if (processed % 10000 == 0) {
-				log.info("Processing: {} persons of {} persons have been processed", processed, originalPlans.getPersons().keySet().size());
+				log.info("Processing: {} persons of {} persons have been processed", processed, originalPlans.getPersons().size());
 			}
 
 			Plan plan = person.getSelectedPlan();
