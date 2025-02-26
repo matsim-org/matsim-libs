@@ -41,6 +41,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	// This script will extract the relevant freight trips within the given shape
 	// file from the German wide freight traffic.
 	private static final Logger log = LogManager.getLogger(ExtractRelevantFreightTrips.class);
+	public static final String GEOGRAPHICAL_TRIP_TYPE = "geographical_Trip_Type";
 
 	/**
 	 * Enum for the type of trips to be extracted. The following types are available:
@@ -173,26 +174,27 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 			switch (tripType) {
 				case ALL -> {
-					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord);
+					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord, attributes);
 					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
 						startLink, endLink,
-						linksOnTheBoundary, act1, endCoord);
+						linksOnTheBoundary, act1, endCoord, attributes);
 					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
-						startLink, endLink, linksOnTheBoundary, act1, endCoord);
+						startLink, endLink, linksOnTheBoundary, act1, endCoord, attributes);
 					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
-						startLink, endLink, linksOnTheBoundary, act1, endCoord);
+						startLink, endLink, linksOnTheBoundary, act1, endCoord, attributes);
 				}
 				case INTERNAL ->
-					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord);
+					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord,
+						attributes);
 				case OUTGOING ->
 					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
 				case INCOMING ->
 					createActivitiesForIncomingTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
 				case TRANSIT ->
 					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
-						startLink, endLink,	linksOnTheBoundary, act1, endCoord);
+						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
 				default -> throw new IllegalStateException("Unexpected value: " + tripType);
 			}
 
@@ -251,7 +253,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 */
 	private void createActivitiesForTransitTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+												List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
 		if (!originIsInside && !destinationIsInside) {
 			double timeSpent = 0;
 			boolean vehicleIsInside = false;
@@ -288,6 +290,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 					}
 				}
 			}
+			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "transit");
 		}
 	}
 
@@ -296,7 +299,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 */
 	private void createActivitiesForIncomingTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												  double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												  List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+												  List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
 		if (!originIsInside && destinationIsInside) {
 			if (cutOnBoundary) {
 				boolean isCoordSet = false;
@@ -329,6 +332,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				act0.setEndTime(departureTime);
 			}
 			act1.setCoord(ct.transform(endCoord));
+			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "incoming");
 		}
 	}
 
@@ -337,7 +341,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 */
 	private void createActivitiesForOutgoingTrip(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
 												 double departureTime, LeastCostPathCalculator router, Network network, Id<Link> startLink, Id<Link> endLink,
-												 List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord) {
+												 List<Id<Link>> linksOnTheBoundary, Activity act1, Coord endCoord, Attributes attributes) {
 		if (originIsInside && !destinationIsInside) {
 			act0.setCoord(ct.transform(startCoord));
 			act0.setEndTime(departureTime);
@@ -364,7 +368,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			} else {
 				act1.setCoord(ct.transform(endCoord));
 			}
-
+			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "outgoing");
 		}
 	}
 
@@ -372,11 +376,12 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 * Create activities if the trip is an internal trip
 	 */
 	private static void createActivitiesForInternalTrips(boolean originIsInside, boolean destinationIsInside, Activity act0, CoordinateTransformation ct, Coord startCoord,
-								  double departureTime, Activity act1, Coord endCoord) {
+														 double departureTime, Activity act1, Coord endCoord, Attributes attributes) {
 		if (originIsInside && destinationIsInside) {
 			act0.setCoord(ct.transform(startCoord));
 			act0.setEndTime(departureTime);
 			act1.setCoord(ct.transform(endCoord));
+			attributes.putAttribute(GEOGRAPHICAL_TRIP_TYPE, "internal");
 		}
 	}
 }
