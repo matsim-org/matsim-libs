@@ -78,6 +78,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--LegMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
 	private String legMode;
 
+	@CommandLine.Option(names = "--subpopulation", description = "Set subpopulation for the extracted freight trips", defaultValue = "freight")
+	private String subpopulation;
+
 	private final SplittableRandom rnd = new SplittableRandom(4711);
 
 	private final List<Coord> fromCoords = new ArrayList<>();
