@@ -213,7 +213,7 @@ final class ExampleTwoEchelonGrid {
     }
 
     log.info("Add LSP to the scenario");
-    LSPUtils.loadLspsIntoScenario(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
     return scenario;
   }

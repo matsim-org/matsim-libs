@@ -179,12 +179,7 @@ public class CollectionTrackerTest {
 		}
 		collectionLSP.scheduleLogisticChains();
 
-
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(collectionLSP);
-		LSPs lsps = new LSPs(lspList);
-
-		LSPUtils.loadLspsIntoScenario(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 
 		Controller controller = ControllerUtils.createController(scenario);
 

@@ -76,17 +76,17 @@ public final class LSPUtils {
 		return lsps;
 	}
 
-	public static void loadLspsIntoScenario(Scenario scenario, LSPs lspsToLoad) {
+	public static void loadLspsIntoScenario(Scenario scenario, Collection<LSP> lspsToLoad) {
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		// Register carriers from all lspsToLoad
-		for (LSP lsp : lspsToLoad.getLSPs().values()) {
+		for (LSP lsp : lspsToLoad) {
 			for (LSPResource lspResource : lsp.getResources()) {
 				if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
 					carriers.addCarrier(lspCarrierResource.getCarrier());
 				}
 			}
 		}
-		addOrGetLsps(scenario).putAllLsps(lspsToLoad.getLSPs().values());
+		addOrGetLsps(scenario).putAllLsps(lspsToLoad);
 	}
 
 	public static LSPs getLSPs(Scenario scenario) {

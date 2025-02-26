@@ -178,11 +178,8 @@ public class MainRunOnlyLSPMobsimTest {
 		}
 		lsp.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.loadLspsIntoScenario(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 
 		Controller controller = ControllerUtils.createController(scenario);
 
