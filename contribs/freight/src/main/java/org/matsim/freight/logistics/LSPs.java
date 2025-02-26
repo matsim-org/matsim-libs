@@ -30,10 +30,10 @@ public class LSPs {
   private final Map<Id<LSP>, LSP> lsps = new LinkedHashMap<>();
 
   public LSPs(Collection<LSP> lsps) {
-    makeMap(lsps);
+    putAllLsps(lsps);
   }
 
-  private void makeMap(Collection<LSP> lsps) {
+  public void putAllLsps(Collection<LSP> lsps) {
     for (LSP c : lsps) {
       this.lsps.put(c.getId(), c);
     }

@@ -60,17 +60,33 @@ public final class LSPUtils {
 		return new WaitingShipmentsImpl();
 	}
 
-	public static void loadLspsIntoScenario(Scenario scenario, LSPs lsps) {
+	/**
+	 * Will return the lsps container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the LSPs should be added.
+	 * @return the lsps container
+	 */
+	public static LSPs addOrGetLsps( Scenario scenario ) {
+		LSPs lsps = (LSPs) scenario.getScenarioElement(lspsString);
+		if (lsps == null) {
+			lsps = new LSPs(Collections.emptyList());
+			scenario.addScenarioElement(lspsString, lsps);
+		}
+		return lsps;
+	}
+
+	public static void loadLspsIntoScenario(Scenario scenario, LSPs lspsToLoad) {
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
-		// Register carriers from all lsps
-		for (LSP lsp : lsps.getLSPs().values()) {
+		// Register carriers from all lspsToLoad
+		for (LSP lsp : lspsToLoad.getLSPs().values()) {
 			for (LSPResource lspResource : lsp.getResources()) {
 				if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
 					carriers.addCarrier(lspCarrierResource.getCarrier());
 				}
 			}
 		}
-		scenario.addScenarioElement(lspsString, lsps);
+		addOrGetLsps(scenario).putAllLsps(lspsToLoad.getLSPs().values());
 	}
 
 	public static LSPs getLSPs(Scenario scenario) {
@@ -93,20 +109,7 @@ public final class LSPUtils {
 		return (Double) attributable.getAttributes().getAttribute("fixedCost");
 	}
 
-	/**
-	 * Will return the lsps container of the scenario.
-	 * If it does not exist, it will be created.
-	 *
-	 * @param scenario The scenario where the LSPs should be added.
-	 * @return the lsps container
-	 */
-	public static LSPs addOrGetLsps( Scenario scenario ) {
-		LSPs lsps = (LSPs) scenario.getScenarioElement(lspsString);
-		if (lsps == null) {
-			scenario.addScenarioElement(lspsString, new LSPs(Collections.EMPTY_LIST));
-		}
-		return lsps;
-	}
+
 
 	public static void setFixedCost(Attributable attributable, Double fixedCost) {
 		attributable.getAttributes().putAttribute("fixedCost", fixedCost);
