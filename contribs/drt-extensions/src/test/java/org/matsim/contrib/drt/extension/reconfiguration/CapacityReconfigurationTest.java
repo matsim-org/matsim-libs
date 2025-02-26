@@ -16,6 +16,7 @@ import org.matsim.contrib.drt.extension.reconfiguration.run.CapacityReconfigurat
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.DefaultDvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -62,7 +63,7 @@ public class CapacityReconfigurationTest {
 		assertEquals(198, tracker.pickedUpPassengers);
 		assertEquals(0, tracker.pickedUpGoods);
 	}
-	
+
 	@Test
 	void testSimpleReconfiguration() {
 		Id.resetCaches();
@@ -172,11 +173,13 @@ public class CapacityReconfigurationTest {
 		drtConfig.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet().rejectRequestIfMaxWaitOrTravelTimeViolated = useRejections;
 
+		DvrpLoadParams loadParams = drtConfig.addOrGetLoadParams();
+
 		// produce analysis output on capacities and loads
-		drtConfig.loadCapacityAnalysisInterval = 1;
+		loadParams.analysisInterval = 1;
 
 		// set up two dimensions
-		drtConfig.loadParams.dimensions = List.of("passengers", "goods");
+		loadParams.dimensions = List.of("passengers", "goods");
 
 		return drtConfig;
 	}

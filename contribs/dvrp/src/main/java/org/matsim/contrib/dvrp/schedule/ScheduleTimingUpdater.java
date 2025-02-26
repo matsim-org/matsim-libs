@@ -34,12 +34,14 @@ public class ScheduleTimingUpdater {
 
 	private final MobsimTimer timer;
 	private final StayTaskEndTimeCalculator stayTaskEndTimeCalculator;
+	private final DriveTaskUpdater driveTaskUpdater;
 
 	public final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
 
-	public ScheduleTimingUpdater(MobsimTimer timer, StayTaskEndTimeCalculator stayTaskEndTimeCalculator) {
+	public ScheduleTimingUpdater(MobsimTimer timer, StayTaskEndTimeCalculator stayTaskEndTimeCalculator, DriveTaskUpdater driveTaskUpdater) {
 		this.timer = timer;
 		this.stayTaskEndTimeCalculator = stayTaskEndTimeCalculator;
+		this.driveTaskUpdater = driveTaskUpdater;
 	}
 
 	/**
@@ -63,6 +65,10 @@ public class ScheduleTimingUpdater {
 			return;
 		}
 
+		if (schedule.getCurrentTask() instanceof DriveTask driveTask) {
+			driveTaskUpdater.updateCurrentDriveTask(vehicle, driveTask);
+		}
+
 		double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(), timer.getTimeOfDay());
 		updateTimingsStartingFromCurrentTask(vehicle, predictedEndTime);
 	}
@@ -70,7 +76,7 @@ public class ScheduleTimingUpdater {
 	private void updateTimingsStartingFromCurrentTask(DvrpVehicle vehicle, double newEndTime) {
 		Schedule schedule = vehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
-		if (currentTask.getEndTime() != newEndTime) {
+		if (currentTask.getEndTime() != newEndTime || driveTaskUpdater != DriveTaskUpdater.NOOP) {
 			currentTask.setEndTime(newEndTime);
 			updateTimingsStartingFromTaskIdx(vehicle, currentTask.getTaskIdx() + 1, newEndTime);
 		}
@@ -81,9 +87,9 @@ public class ScheduleTimingUpdater {
 		List<? extends Task> tasks = schedule.getTasks();
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-			Task task = tasks.get(i);
-			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
+			double calcEndTime = calcNewEndTime(vehicle, tasks.get(i), newBeginTime);
 
+			Task task = tasks.get(i);
 			if (calcEndTime == REMOVE_STAY_TASK) {
 				schedule.removeTask(task);
 				i--;
@@ -98,10 +104,11 @@ public class ScheduleTimingUpdater {
 	}
 
 	private double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		if (task instanceof DriveTask) {
-			// cannot be shortened/lengthen, therefore must be moved forward/backward
+		if (task instanceof DriveTask driveTask) {
+			// depending on the implementation, update the path
+			driveTaskUpdater.updatePlannedDriveTask(vehicle, driveTask, newBeginTime);
+			
 			VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
-			// TODO one may consider recalculation of SP!!!!
 			return newBeginTime + path.getTravelTime();
 		} else {
 			return stayTaskEndTimeCalculator.calcNewEndTime(vehicle, (StayTask)task, newBeginTime);
