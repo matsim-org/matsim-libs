@@ -41,8 +41,7 @@ import java.util.Set;
 @CommandSpec(
 	requireRunDirectory = true,
 	produces = {
-		"emission_per_day.csv",
-		"emission_per_night_22_to_6.csv",
+		"emissions.csv",
 		"immission_per_day.%s",
 		"immission_per_hour.%s",
 		"damages_receiverPoint_per_hour.%s",

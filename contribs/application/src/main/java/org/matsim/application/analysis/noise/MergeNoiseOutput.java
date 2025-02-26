@@ -13,6 +13,8 @@ import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +23,10 @@ import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import tech.tablesaw.api.*;
+import tech.tablesaw.api.ColumnType;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.File;
@@ -32,6 +37,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,13 +48,7 @@ final class MergeNoiseOutput {
 
 	private static final Logger log = LogManager.getLogger(MergeNoiseOutput.class);
 
-	/**
-	 * If true, a CSV file is created for immissions. Deprecated, this code will be removed.
-	 */
-	private static final boolean CREATE_CSV_FILES = false;
-
 	private static final int HOUR_STEP = 3600;
-
 	private final Path outputDirectory;
 	private final String crs;
 	private final int minTime = HOUR_STEP;
@@ -68,6 +68,62 @@ final class MergeNoiseOutput {
 	 */
 	private static String formatTime(double time) {
 		return Time.writeTime(time, Time.TIMEFORMAT_HHMMSS);
+	}
+
+	/**
+	 * Averages the given noise levels. The formula is: 10 * log10(1/n * sum(10^(L/10))),
+	 * where n is the number of values and L is the noise level.
+	 * Source: <a href="https://de.wikipedia.org/wiki/Mittelungspegel">Wikipedia:
+	 * Mittelungspegel</a> (19.02.2025); DIN 45641 – Mittelung von Schallpegeln
+	 *
+	 * @param pegel nosise levels
+	 * @param day
+	 * @return averaged noise level
+	 */
+	private static double averagingLevel(double[] pegel, DaySection day) {
+		double sum = 0;
+
+		// The day is divided into three sections: day, evening, and night
+		// The day is from 06:00 to 18:00, the evening from 18:00 to 22:00,
+		// and the night from 22:00 to 06:00
+		if (day == DaySection.DAY) {
+			for (int i = 6; i < 18; i++) {
+				sum += Math.pow(10, pegel[i] / 10);
+			}
+			return 10 * Math.log10(sum / 12);
+		} else if (day == DaySection.EVENING) {
+			for (int i = 18; i < 22; i++) {
+				sum += Math.pow(10, pegel[i] / 10);
+			}
+			return 10 * Math.log10(sum / 4);
+		} else if (day == DaySection.NIGHT) {
+			for (int i = 0; i < 6; i++) {
+				sum += Math.pow(10, pegel[i] / 10);
+			}
+			for (int i = 22; i < 24; i++) {
+				sum += Math.pow(10, pegel[i] / 10);
+			}
+			return 10 * Math.log10(sum / 8);
+		}
+		return 0;
+	}
+
+	/**
+	 * Calculates the L_DEN value based on the given noise levels.
+	 * <p>
+	 * Sources:
+	 * <p>
+	 * RICHTLINIE 2002/49/EG DES EUROPÄISCHEN PARLAMENTS UND DES RATES
+	 * vom 25. Juni 2002 über die Bewertung und Bekämpfung von Umgebungslärm
+	 * (Anhang 1)
+	 *
+	 * @param lDay     noise level during the day (L_day)
+	 * @param lEvening noise level during the evening (L_evening)
+	 * @param lNight   noise level during the night (L_night)
+	 * @return calculated L_DEN
+	 */
+	private static double calculateLDen(double lDay, double lEvening, double lNight) {
+		return 10 * Math.log10((12 * Math.pow(10, lDay / 10) + 4 * Math.pow(10, (lEvening + 5) / 10) + 8 * Math.pow(10, (lNight + 10) / 10)) / 24);
 	}
 
 	/**
@@ -98,8 +154,7 @@ final class MergeNoiseOutput {
 	public void run() throws IOException {
 		mergeReceiverPointData(outputDirectory.resolve("immissions") + File.separator, "immission");
 		mergeReceiverPointData(outputDirectory.resolve("damages_receiverPoint") + File.separator, "damages_receiverPoint");
-		mergeLinkData(outputDirectory.resolve("emissions") + File.separator, false);
-		mergeLinkData(outputDirectory.resolve("emissions") + File.separator, true);
+		mergeLinkData(outputDirectory.resolve("emissions") + File.separator);
 	}
 
 	/**
@@ -121,22 +176,18 @@ final class MergeNoiseOutput {
 	}
 
 	/**
-	 * Merges emissions data for each link. If isNight is true, only the time range from 22:00 to 6:00 is considered.
+	 * Creates the L_DEN, L_day, L_evening, and L_night values for each link.
 	 *
 	 * @param basePath Directory containing emissions CSV files
-	 * @param isNight  If true, only the nighttime range is considered
 	 * @throws IOException if an I/O error occurs
 	 */
-	private void mergeLinkData(String basePath, boolean isNight) throws IOException {
-		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
-		Table csvOutputMerged = Table.create(TextColumn.create("Link Id"), DoubleColumn.create("value"));
+	private void mergeLinkData(String basePath) throws IOException {
 
-		for (double time = minTime; time <= maxTime; time += HOUR_STEP) {
-			// In night mode, only process times outside 06:00-22:00.
-			if (isNight && !isNightTime(time)) {
-				continue;
-			}
+		Map<String, double[]> linkNoiseValues = new LinkedHashMap<>();
 
+		for (int i = 0; i < 24; i++) {
+
+			double time = minTime + i * HOUR_STEP;
 			String fileName = basePath + "emission_" + roundToOneDecimalPlace(time) + ".csv";
 			if (!Files.exists(Path.of(fileName))) {
 				log.warn("File {} does not exist", fileName);
@@ -155,22 +206,23 @@ final class MergeNoiseOutput {
 			for (Row row : table) {
 				String linkId = row.getString("Link Id");
 				double value = row.getDouble(row.columnCount() - 1);
-				mergedData.mergeDouble(linkId, value, Double::max);
+				linkNoiseValues.computeIfAbsent(linkId, k -> new double[24])[i] = value;
 			}
 		}
 
-		// Create merged output table.
-		for (Object2DoubleMap.Entry<String> entry : mergedData.object2DoubleEntrySet()) {
-			if (entry.getDoubleValue() >= 0.0) {
-				Row writeRow = csvOutputMerged.appendRow();
-				writeRow.setString("Link Id", entry.getKey());
-				writeRow.setDouble("value", entry.getDoubleValue());
+		Path out = outputDirectory.getParent().resolve("emissions.csv");
+
+		try (CSVPrinter csv = new CSVPrinter(Files.newBufferedWriter(out), CSVFormat.DEFAULT)) {
+			csv.printRecord("Link Id", "L_day (dB(A))", "L_evening (dB(A))", "L_night (dB(A))", "L_DEN (dB(A))");
+			for (Map.Entry<String, double[]> entry : linkNoiseValues.entrySet()) {
+				double[] values = entry.getValue();
+				double lDay = averagingLevel(values, DaySection.DAY);
+				double lEvening = averagingLevel(values, DaySection.EVENING);
+				double lNight = averagingLevel(values, DaySection.NIGHT);
+				double lDEN = calculateLDen(lDay, lEvening, lNight);
+				csv.printRecord(entry.getKey(), lDay, lEvening, lNight, lDEN);
 			}
 		}
-
-		String fileSuffix = isNight ? "_per_night_22_to_6.csv" : "_per_day.csv";
-		File out = outputDirectory.getParent().resolve("emission" + fileSuffix).toFile();
-		csvOutputMerged.write().csv(out);
 		log.info("Merged noise data written to {}", out);
 	}
 
@@ -353,4 +405,11 @@ final class MergeNoiseOutput {
 	public Map<String, Float> getTotalReceiverPointValues() {
 		return totalReceiverPointValues;
 	}
+
+	private enum DaySection {
+		DAY,
+		EVENING,
+		NIGHT
+	}
+
 }
