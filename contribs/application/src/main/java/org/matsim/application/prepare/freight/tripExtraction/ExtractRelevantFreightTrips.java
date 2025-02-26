@@ -26,6 +26,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
@@ -149,7 +150,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			}
 
 			Plan plan = person.getSelectedPlan();
-//            String goodType = (String) person.getAttributes().getAttribute("type_of_good"); // TODO keep all the attribute from original population
+            Attributes attributes = person.getAttributes();
 			// By default, the plan of each freight person consist of only 3 elements:
 			// startAct, leg, endAct
 			Activity startActivity = (Activity) plan.getPlanElements().get(0);
@@ -195,7 +196,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			// Add new freight person to the output plans if trips is relevant
 			if (act0.getEndTime().orElse(86400) < 86400) {
 				Person freightPerson = populationFactory.createPerson(Id.create("freight_" + generated, Person.class));
-				freightPerson.getAttributes().putAttribute("subpopulation", "freight");
+				attributes.getAsMap().forEach(freightPerson.getAttributes()::putAttribute);
+				freightPerson.getAttributes().putAttribute("subpopulation", subpopulation);
 				Plan freightPersonPlan = populationFactory.createPlan();
 				freightPersonPlan.addActivity(act0);
 				freightPersonPlan.addLeg(leg);
