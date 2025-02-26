@@ -621,16 +621,30 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				}
 			}
 
-			// Remove routes that contain now non-existing links
-			Set<Id<Link>> linkIds = TripStructureUtils.getLegs(plan).stream()
-				.map(Leg::getRoute)
-				.filter(r -> r instanceof NetworkRoute)
-				.map(r -> (NetworkRoute) r)
-				.flatMap(r -> Stream.concat(Stream.of(r.getStartLinkId(), r.getEndLinkId()), r.getLinkIds().stream()))
-				.collect(Collectors.toSet());
+			for (Leg leg : TripStructureUtils.getLegs(plan)) {
 
-			if (!linkIds.stream().allMatch(l -> network.getLinks().containsKey(l)))
-				PopulationUtils.resetRoutes(person.getSelectedPlan());
+				if (!(leg.getRoute() instanceof NetworkRoute r))
+					continue;
+
+				Stream<Id<Link>> stream = Stream.concat(Stream.of(r.getStartLinkId(), r.getEndLinkId()), r.getLinkIds().stream());
+
+				boolean valid = stream.allMatch(l -> {
+
+					Link link = network.getLinks().get(l);
+
+					// Check if link is present in the network
+					if (link == null)
+						return false;
+
+					// Check if the link has the needed mode
+					return link.getAllowedModes().contains(leg.getMode());
+				});
+
+				if (!valid) {
+					PopulationUtils.resetRoutes(plan);
+					break;
+				}
+			}
 		}
 	}
 
