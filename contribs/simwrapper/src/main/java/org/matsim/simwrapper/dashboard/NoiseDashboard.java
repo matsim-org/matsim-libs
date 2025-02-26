@@ -124,57 +124,36 @@ public class NoiseDashboard implements Dashboard {
 
 		layout.row("disclaimer")
 			.el(TextBlock.class, (viz, data) -> {
-				viz.backgroundColor = "white";
 				viz.content = """
-
 					# Disclaimer
 
-					Die in dieser Analyse verwendeten Schallpegelwerte basieren auf den Vorgaben von **CNOSSOS-EU** sowie der deutschen Norm **RLS-16**. Es werden der nächtliche Schallpegel ($L_{night}$) sowie der berechnete Gesamtpegel $\\mathbf{L_{DEN}}$ angezeigt, der aus den Werten $L_{day}$, $L_{evening}$ und $L_{night}$ abgeleitet wird.
+					The sound level values per hour are calculated using the noise analysis ([noise-contrib](https://github.com/matsim-org/matsim-libs/tree/master/contribs/noise)) [1, 2, 3]. The night-time sound level ($L_{night}$) and the calculated total level ${L_{DEN}}$ are shown, which is derived from the values $L_{day}$, $L_{evening}$ and $L_{night}$.
 
-					Die Berechnung von $\\mathbf{L_{DEN}}$ erfolgt gemäß folgender Formel:
-
-					$$
-					L_{DEN} = 10 \\cdot \\log_{10}\\left(\\frac{12 \\cdot 10^{L_{day}/10} + 4 \\cdot 10^{(L_{evening}+5)/10} + 8 \\cdot 10^{(L_{night}+10)/10}}{24}\\right)
-					$$
-
-					Die Mittelungspegel $L_{day}$, $L_{evening}$ und $L_{night}$ werden mittels der Formel
-
-					$$
-					L_{avg} = 10 \\cdot \\log_{10}\\left(\\frac{1}{n} \\sum 10^{L/10}\\right)
-					$$
-
-					berechnet, wobei $n$ die Anzahl der Messwerte und $L$ der jeweilige Schallpegel ist. Für die einzelnen Tagesabschnitte gilt:
-
-					- **Tag ($L_{day}$)**: Berechnet über den Zeitraum von 06:00 bis 18:00 Uhr
-					- **Abend ($L_{evening}$)**: Berechnet über den Zeitraum von 18:00 bis 22:00 Uhr
-					- **Nacht ($L_{night}$)**: Berechnet über den Zeitraum von 22:00 bis 06:00 Uhr
-
-					Diese Formel basiert auf der **RICHTLINIE 2002/49/EG** des Europäischen Parlaments und des Rates vom 25. Juni 2002 zur Bewertung und Bekämpfung von Umgebungslärm. Zur Ermittlung der Mittelungspegel wird die in DIN 45641 beschriebene Methode angewandt, wie sie auch in der Wikipedia-Erklärung zum **Mittelungspegel** (Stand: 19.02.2025) dargestellt wird.
-
-					# Disclaimer (English)
-
-					The noise level data used in this analysis is based on the guidelines of **CNOSSOS-EU** and the German standard **RLS-16**. Both the night-time noise level ($L_{night}$) and the calculated overall level $\\mathbf{L_{DEN}}$ — derived from $L_{day}$, $L_{evening}$, and $L_{night}$ — are presented.
-
-					$\\mathbf{L_{DEN}}$ is computed using the following formula:
+					The calculation of ${L_{DEN}}$ is based on the following formula:
 
 					$$
 					L_{DEN} = 10 \\cdot \\log_{10}\\left(\\frac{12 \\cdot 10^{L_{day}/10} + 4 \\cdot 10^{(L_{evening}+5)/10} + 8 \\cdot 10^{(L_{night}+10)/10}}{24}\\right)
 					$$
 
-					The noise levels $L_{day}$, $L_{evening}$, and $L_{night}$ are averaged using the formula
+					The averaging levels $L_{day}$, $L_{evening}$ and $L_{night}$ are calculated using the formula
 
 					$$
 					L_{avg} = 10 \\cdot \\log_{10}\\left(\\frac{1}{n} \\sum 10^{L/10}\\right)
 					$$
 
-					where $n$ represents the number of measurements and $L$ is the individual noise level. The averaging is performed for different time periods as follows:
+					where $n$ is the number of measured values and $L$ is the respective sound level. The following applies to the individual day sections
 
-					- **Day ($L_{day}$)**: Calculated over the period from 06:00 to 18:00
-					- **Evening ($L_{evening}$)**: Calculated over the period from 18:00 to 22:00
-					- **Night ($L_{night}$)**: Calculated over the period from 22:00 to 06:00
+					- **day ($L_{day}$)**: Period from 06:00 to 18:00
+					- **Evening ($L_{evening}$)**: Period from 18:00 to 22:00
+					- **Night ($L_{night}$)**: Period from 22:00 to 06:00
 
-					This formula is based on the **Directive 2002/49/EC** of the European Parliament and the Council of 25 June 2002, which governs the assessment and management of environmental noise. In addition, the averaging of noise levels is performed according to the method described in DIN 45641, as also referenced in the Wikipedia entry on **noise level averaging** (dated 19.02.2025).
+					These indicators are based on [DIRECTIVE 2002/49/EC](https://eur-lex.europa.eu/eli/dir/2002/49/oj/eng) of the European Parliament and of the Council of June 25, 2002 relating to the assessment and management of environmental noise. The method described in DIN 45641 is used to determine the averaging level, as also described in the Wikipedia explanation of **averaging level** (as of: 19.02.2025).
+
+					[1] I. Kaddoura, L. Kroeger, and K. Nagel. User-specific and dynamic internalization of road traffic noise exposures. Networks and Spatial Economics, 2016. DOI: 10.1007/s11067-016-9321-2. Preprint available [ here](https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-12/). \s
+					[2] I. Kaddoura and K. Nagel. Activity-based computation of marginal noise exposure costs: Implications for traffic management. Transportation Research Record 2597, 2016. DOI: 10.3141/2597-15. Preprint available [ here](https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-13/). \s
+					[3] N. Kuehnel, I. Kaddoura and R. Moeckel. Noise Shielding in an Agent-Based Transport Model Using Volunteered Geographic Data. Procedia Computer Science Volume 151, 2019. Pages 808-813 DOI: 10.1016/j.procs.2019.04.110. Available from <a href="https://www.sciencedirect.com/science/article/pii/S1877050919305745">here</a>.
 					""";
+				viz.backgroundColor = "white";
 			});
 
 
