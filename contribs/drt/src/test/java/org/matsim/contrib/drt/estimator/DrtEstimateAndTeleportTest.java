@@ -39,6 +39,7 @@ public class DrtEstimateAndTeleportTest {
 			new OTFVisConfigGroup());
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.addParameterSet(new DrtEstimatorParams());
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new AbstractModule() {

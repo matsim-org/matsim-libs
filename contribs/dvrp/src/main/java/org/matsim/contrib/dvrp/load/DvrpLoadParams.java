@@ -10,6 +10,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import com.google.common.base.Preconditions;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
@@ -57,6 +58,11 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
     @Parameter
     @Comment("if no other load information is given, each request obtains a unit load for the given dimension")
     public String defaultRequestDimension = "passengers";
+
+    @Parameter
+    @Comment("Defines how often to write analysis on capacities and loads of the mode")
+    @PositiveOrZero
+    public int analysisInterval = 0;
 
     @Override
     public void checkConsistency(Config config) {

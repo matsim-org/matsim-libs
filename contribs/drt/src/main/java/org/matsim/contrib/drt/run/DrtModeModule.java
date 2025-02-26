@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
@@ -53,6 +54,8 @@ import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+import java.util.Optional;
+
 /**
  * @author michalm (Michal Maciejewski)
  */
@@ -75,7 +78,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.loadParams));
+				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.addOrGetLoadParams()));
 		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
@@ -118,12 +121,16 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
 
 		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
-			install(new DrtEstimatorModule(getMode(), drtCfg, drtCfg.getDrtEstimatorParams().get()));
+			Optional<DrtEstimatorParams> drtEstimatorParams = drtCfg.getDrtEstimatorParams();
+			if(drtEstimatorParams.isEmpty()) {
+				throw new IllegalStateException("parameter set 'estimator' is required when 'simulationType' is set to 'estimateAndTeleport'");
+			}
+			install(new DrtEstimatorModule(getMode(), drtCfg, drtEstimatorParams.get()));
 		}
 
 		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.loadParams.defaultRequestDimension);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().defaultRequestDimension);
 		})).asEagerSingleton();
 
 	}
