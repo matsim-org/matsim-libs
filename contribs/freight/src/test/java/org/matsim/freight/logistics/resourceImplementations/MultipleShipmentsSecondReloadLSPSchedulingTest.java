@@ -350,21 +350,17 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>
-						entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
 				assertSame(service.getServiceLinkId(), shipment.getFrom());
-                assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
 				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				boolean handledByTranshipmentHub = false;
 				for (LogisticChainElement clientElement :
-						reloadEventHandler.getTranshipmentHub().getClientElements()) {
+					reloadEventHandler.getTranshipmentHub().getClientElements()) {
 					if (clientElement == element) {
 						handledByTranshipmentHub = true;
 						break;
@@ -383,16 +379,13 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
 				assertSame(service.getServiceLinkId(), toLinkId);
-                assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
 				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				boolean handledByTranshipmentHub = false;
 				for (LogisticChainElement clientElement : reloadEventHandler.getTranshipmentHub().getClientElements()) {
