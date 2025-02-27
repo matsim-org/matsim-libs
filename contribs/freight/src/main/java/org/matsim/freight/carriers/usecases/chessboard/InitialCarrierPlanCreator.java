@@ -147,7 +147,7 @@ final class InitialCarrierPlanCreator {
         //		SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
         //create carrierPlan from solution
-        CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+        CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
         NetworkRouter.routePlan(plan, netbasedTransportcosts);
         return plan;
     }

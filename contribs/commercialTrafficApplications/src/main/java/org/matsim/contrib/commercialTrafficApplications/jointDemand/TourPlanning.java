@@ -165,7 +165,7 @@ class TourPlanning {
 			log.info("tour planning for carrier " + carrier.getId() + " took "
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 			// get the CarrierPlan
-			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
+			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(bestSolution);
 
 			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(carrierPlan, transportCosts); // we need to route

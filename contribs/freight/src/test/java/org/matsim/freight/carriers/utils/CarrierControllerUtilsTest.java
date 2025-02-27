@@ -143,7 +143,7 @@ public class CarrierControllerUtilsTest{
 		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
 			//Routing bestPlan to Network
-		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrierWServices, bestSolution) ;
+		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 		NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 		carrierWServices.addPlan(carrierPlanServicesAndShipments) ;
 
