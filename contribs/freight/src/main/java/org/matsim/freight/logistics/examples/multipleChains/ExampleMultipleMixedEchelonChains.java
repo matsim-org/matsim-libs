@@ -491,8 +491,4 @@ final class ExampleMultipleMixedEchelonChains {
     return resourceList;
   }
 
-  enum AssignerSetting {
-    primary,
-    roundRobin
-  }
 }

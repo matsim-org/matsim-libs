@@ -185,19 +185,15 @@ import org.matsim.vehicles.VehicleUtils;
 
   private static LSP createInitialLSP(Scenario scenario, SolutionType solutionType) {
 
-    Network network = scenario.getNetwork();
 
     LSPUtils.LSPBuilder lspBuilder =
         switch (solutionType) {
-          case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(
-              Id.create("LSPwithReloading", LSP.class));
+          case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class));
           case onePlan_direct, twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
         };
 
-    //		lspBuilder.setSolutionScorer(new MyLSPScorer());
 
-    final Id<Link> depotLinkId =
-        Id.createLinkId("(4 2) (4 3)"); // TODO: Hochziehen aber non-static.
+    final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); // TODO: Hochziehen aber non-static.
     final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
 
     LogisticChainElement depotElement;

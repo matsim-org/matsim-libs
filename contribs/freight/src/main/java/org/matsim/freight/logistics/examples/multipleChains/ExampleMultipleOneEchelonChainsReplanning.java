@@ -208,7 +208,6 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
   private static LSP createLSP(Scenario scenario) {
     log.info("create LSP");
-    Network network = scenario.getNetwork();
 
     // A plan with one logistic chain, containing a single carrier is created
     LSPPlan singleOneEchelonChainPlan;

@@ -167,9 +167,7 @@ final class ExampleTwoEchelonGrid {
       CommandLine cmd = ConfigUtils.getCommandLine(args);
     } else {
       config
-          .controller()
-          .setOutputDirectory(
-              "output/2echelon_"
+          .controller().setOutputDirectory("output/2echelon_"
                   + demandSetting
                   + "_"
                   + costSetting

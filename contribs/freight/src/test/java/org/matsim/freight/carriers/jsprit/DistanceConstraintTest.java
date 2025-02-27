@@ -112,7 +112,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV1.getId(), vehicleType_SmallV1);
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV1));
-		createCarriers(carriers, fleetSize, carrierV1, vehicleTypes);
+		createCarrier(fleetSize, carrierV1, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -194,7 +194,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV2.getId(), vehicleType_SmallV2);
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV2));
-		createCarriers(carriers, fleetSize, carrierV2, vehicleTypes);
+		createCarrier(fleetSize, carrierV2, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -281,7 +281,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV3.getId(), vehicleType_SmallV3);
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV3));
-		createCarriers(carriers, fleetSize, carrierV3, vehicleTypes);
+		createCarrier(fleetSize, carrierV3, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -380,7 +380,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_Diesel.getId(), vehicleType_Diesel);
 
 		carriers.addCarrier(addThreeServicesToCarrier(carrierV4));
-		createCarriers(carriers, fleetSize, carrierV4, vehicleTypes);
+		createCarrier(fleetSize, carrierV4, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -467,7 +467,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_MidSizeV5.getId(), vehicleType_MidSizeV5);
 
 		carriers.addCarrier(addTwoShipmentsToCarrier(carrierV5));
-		createCarriers(carriers, fleetSize, carrierV5, vehicleTypes);
+		createCarrier(fleetSize, carrierV5, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -547,7 +547,7 @@ public class DistanceConstraintTest {
 		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV5.getId(), vehicleType_LargeV5);
 
 		carriers.addCarrier(addTwoShipmentsToCarrier(carrierV5));
-		createCarriers(carriers, fleetSize, carrierV5, vehicleTypes);
+		createCarrier(fleetSize, carrierV5, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -667,8 +667,7 @@ public class DistanceConstraintTest {
 	 * Creates the vehicle at the depot, ads this vehicle to the carriers and sets
 	 * the capabilities. Sets TimeWindow for the carriers.
 	 */
-	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
-									   CarrierVehicleTypes vehicleTypes) {
+	private static void createCarrier(FleetSize fleetSize, Carrier singleCarrier, CarrierVehicleTypes vehicleTypes) {
 		double earliestStartingTime = 8 * 3600;
 		double latestFinishingTime = 10 * 3600;
 		List<CarrierVehicle> vehicles = new ArrayList<>();
@@ -679,7 +678,11 @@ public class DistanceConstraintTest {
 		}
 
 		// define Carriers
-		defineCarriers(carriers, fleetSize, singleCarrier, vehicles, vehicleTypes);
+		singleCarrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build());
+		for (CarrierVehicle carrierVehicle : vehicles) {
+			CarriersUtils.addCarrierVehicle(singleCarrier, carrierVehicle);
+		}
+		singleCarrier.getCarrierCapabilities().getVehicleTypes().addAll(vehicleTypes.getVehicleTypes().values());
 	}
 
 	/**
@@ -693,17 +696,4 @@ public class DistanceConstraintTest {
 				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime).build();
 	}
 
-	/**
-	 * Defines and sets the Capabilities of the Carrier, including the vehicleTypes
-	 * for the carriers
-	 */
-	private static void defineCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
-									   List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {
-
-		singleCarrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build());
-		for (CarrierVehicle carrierVehicle : vehicles) {
-			CarriersUtils.addCarrierVehicle(singleCarrier, carrierVehicle);
-		}
-		singleCarrier.getCarrierCapabilities().getVehicleTypes().addAll(vehicleTypes.getVehicleTypes().values());
-	}
 }

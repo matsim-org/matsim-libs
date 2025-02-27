@@ -194,7 +194,6 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 
   private static LSP createLSP(Scenario scenario) {
     log.info("create LSP");
-    Network network = scenario.getNetwork();
 
     // A plan with a two hub chains is created
     LSPPlan multipleTwoEchelonChainsPlan;

@@ -119,28 +119,29 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		}
 
-		@SuppressWarnings("SameReturnValue") // Keep the method as code example.
+		@SuppressWarnings({"SameReturnValue", "unused"}) // Keep the method as code example.
 		private double getFixEmploymentCost(CarrierVehicle vehicle) {
 			return 0;
 		}
 
-		@SuppressWarnings({"SameReturnValue", "SameParameterValue"}) // Keep the method as code example.
+		@SuppressWarnings({"SameReturnValue", "SameParameterValue", "unused"}) // Keep the method as code example.
 		private double getToll(Id<Link> linkId, CarrierVehicle vehicle, Person driver) {
 			return 0;
 		}
 
-		@SuppressWarnings("SameReturnValue") // Keep the method as code example.
+		@SuppressWarnings({"SameReturnValue", "unused"}) // Keep the method as code example.
 		private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
 			return 1.0;
 		}
 
-		@SuppressWarnings("SameReturnValue")  // Keep the method as code example.
+		@SuppressWarnings({"SameReturnValue", "unused"})  // Keep the method as code example.
 		private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
 			return 0.0;
 		}
 
 	}
 
+	@SuppressWarnings("unused") //Keep the class as code example.
 	static class DriverActScoring implements BasicScoring, ActivityScoring{
 
 		boolean firstEnd = true;
