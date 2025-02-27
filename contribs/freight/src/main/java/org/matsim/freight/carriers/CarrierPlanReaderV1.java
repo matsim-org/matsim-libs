@@ -268,9 +268,9 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 		}
 		if (name.equals("plan")) {
-			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
+			CarrierPlan currentPlan = new CarrierPlan(scheduledTours );
 			currentPlan.setScore(currentScore );
-			currentCarrier.getPlans().add( currentPlan );
+			currentCarrier.addPlan(currentPlan);
 			if(this.selected){
 				currentCarrier.setSelectedPlan( currentPlan );
 			}
