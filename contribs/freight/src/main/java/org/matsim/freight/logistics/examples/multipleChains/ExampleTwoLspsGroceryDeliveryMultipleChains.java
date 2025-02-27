@@ -235,6 +235,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
    * @return the LSP
    */
+  @SuppressWarnings("SameParameterValue")
   private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
     //Chains

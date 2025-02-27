@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -101,12 +100,12 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 						}
 						distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
 					}
-					score += (-1)*distance*getDistanceParameter(vehicle,null);
+					score += (-1)*distance*getDistanceParameter(vehicle);
 				}
 
 			}
 
-			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
+			private double getDistanceParameter(CarrierVehicle vehicle) {
 				return vehicle.getType().getCostInformation().getCostsPerMeter();
 			}
 
