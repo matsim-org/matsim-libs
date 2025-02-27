@@ -745,7 +745,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
 					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
@@ -769,7 +769,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					algorithm = Jsprit.Builder.newInstance(problem)
 							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();

@@ -77,7 +77,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
@@ -126,7 +126,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 	}
 

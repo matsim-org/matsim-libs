@@ -221,7 +221,7 @@ public class CarriersUtils {
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
+			scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
 
 		Carriers carriers = getCarriers(scenario);
 
@@ -376,6 +376,13 @@ public class CarriersUtils {
 		return addOrGetCarriers(scenario);
 	}
 
+	/**
+	 * Will return the {@link Carriers} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the Carrier should be added.
+	 * @return the Carriers container
+	 */
 	public static Carriers addOrGetCarriers(Scenario scenario) {
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {
@@ -395,13 +402,39 @@ public class CarriersUtils {
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
-	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from or added.
+	 * @return the CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getOrAddCarrierVehicleTypes(Scenario scenario) {
 		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 		if (types == null) {
 			types = new CarrierVehicleTypes();
 			scenario.addScenarioElement(CARRIER_VEHICLE_TYPES, types);
 		}
 		return types;
+	}
+
+	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * Please note, that this has changed in feb'25:
+	 * If the container does not exist, it will throw an exception instead of creating it.
+	 * For creating it, please use {@link #getOrAddCarrierVehicleTypes(Scenario)}.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from .
+	 * @return the (existing) CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
+		// not found. (Similar to getOrCreateCarriers and getCarriers.) kmt, feb'25
+		if (scenario.getScenarioElement(CARRIER_VEHICLE_TYPES) == null) {
+			throw new RuntimeException("cannot retrieve carrierVehicleTypes from scenario; typical ways to resolve that problem are to call " +
+				"CarrierControlerUtils.getOrCreateCarriers(...) or CarrierControlerUtils.loadCarriersAccordingToFreightConfig(...) early enough\n");
+		}
+		return (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 	}
 
 
@@ -420,7 +453,7 @@ public class CarriersUtils {
 		if (carriersVehicleTypesFile == null ||carriersVehicleTypesFile.isEmpty()) {
 			throw new IllegalArgumentException("CarriersVehicleTypes file path should not be null or empty");
 		}
-		new CarrierVehicleTypeReader(getCarrierVehicleTypes(scenario)).readURL(
+		new CarrierVehicleTypeReader(getOrAddCarrierVehicleTypes(scenario)).readURL(
 			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersVehicleTypesFile));
 
 		//Load Carriers
@@ -429,7 +462,7 @@ public class CarriersUtils {
 			throw new IllegalArgumentException("Carriers file path should not be null or empty");
 		}
 		// also registers with scenario
-		new CarrierPlanXmlReader(addOrGetCarriers(scenario), getCarrierVehicleTypes(scenario)).readURL(
+		new CarrierPlanXmlReader(addOrGetCarriers(scenario), getOrAddCarrierVehicleTypes(scenario)).readURL(
 			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersFile));
 	}
 
