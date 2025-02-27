@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.profiling.aop;
 
+import org.matsim.core.controler.listener.ScoringListener;
+
 public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspect {
 
     pointcut eventPoints(Object o):
