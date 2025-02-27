@@ -124,11 +124,16 @@ public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 		// first access and last egress
 		TransitStopFacility access = null;
 		TransitStopFacility egress = null;
+		boolean constantHandled = false;
 
 		for (Leg leg : trip) {
 
 			// Only score PT legs, other legs are estimated upstream
 			if (TransportMode.pt.equals(leg.getMode())) {
+
+				if (!constantHandled){
+					estimate += params.constant;
+				}
 
 				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
