@@ -280,21 +280,15 @@ public class CompleteLSPMobsimTest {
 		}
 		completeLSP.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(completeLSP);
-		LSPs lsps = new LSPs(lspList);
-
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(completeLSP));
 
 		Controller controller = ControllerUtils.createController(scenario);
-
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				install(new LSPModule());
 			}
 		});
-
 
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);

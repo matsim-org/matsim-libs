@@ -133,7 +133,7 @@ import org.matsim.vehicles.VehicleUtils;
     lsp.scheduleLogisticChains();
 
     log.info("Set up simulation controller and LSPModule");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(lsp)));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 
     // @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll. Damit kann
     // man dann auch vollständig auf

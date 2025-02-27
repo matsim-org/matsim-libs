@@ -91,7 +91,7 @@ public class MultipleChainsReplanningTest {
 			link.setCapacity(1000);
 		}
 
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
 		return scenario;
 	}

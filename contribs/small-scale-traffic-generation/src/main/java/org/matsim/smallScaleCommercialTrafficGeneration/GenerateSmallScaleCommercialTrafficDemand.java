@@ -263,7 +263,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 				// Remove vehicle types which are not used by the carriers
-				Map<Id<VehicleType>, VehicleType> readVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes();
+				Map<Id<VehicleType>, VehicleType> readVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes();
 				List<Id<VehicleType>> usedCarrierVehicleTypes = CarriersUtils.getCarriers(scenario).getCarriers().values().stream()
 					.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
 					.map(vehicle -> vehicle.getType().getId())
@@ -580,7 +580,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			@Override
 			public void install() {
 				bind(CarrierStrategyManager.class).toProvider(
-					new MyCarrierPlanStrategyManagerFactory(CarriersUtils.getCarrierVehicleTypes(scenario)));
+					new MyCarrierPlanStrategyManagerFactory(CarriersUtils.getOrAddCarrierVehicleTypes(scenario)));
 				bind(CarrierScoringFunctionFactory.class).toInstance(new MyCarrierScoringFunctionFactory());
 			}
 		});
@@ -610,7 +610,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
 
-		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
+		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
 
 		// Only a vehicle with cost information will work properly
@@ -651,7 +651,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						assert odMatrixEntry.possibleVehicleTypes != null;
 
 						for (String possibleVehicleType : odMatrixEntry.possibleVehicleTypes) {
-							if (CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
+							if (CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
 								Id.create(possibleVehicleType, VehicleType.class)))
 								vehicleTypes.add(possibleVehicleType);
 						}
@@ -806,7 +806,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													int fixedNumberOfVehiclePerTypeAndLocation) {
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
-		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
+		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 
 		CarrierCapabilities carrierCapabilities;
 

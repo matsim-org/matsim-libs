@@ -292,7 +292,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 				}
 			}
 			carrierToRemove.forEach(carrier -> carriers.getCarriers().remove(carrier.getId()));
-			CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
+			CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
 
 			carriers.getCarriers().values().forEach(carrier -> {
 				Carrier newCarrier = CarriersUtils
