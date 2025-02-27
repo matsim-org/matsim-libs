@@ -93,7 +93,7 @@ import org.matsim.vehicles.VehicleType;
       if ((load + lspShipment.getSize())
           > vehicleType.getCapacity().getOther().intValue()) {
         load = 0;
-        CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
+        CarrierPlan plan = createCarrierPlan(carrier, shipmentsInCurrentTour);
         scheduledPlans.add(plan);
         shipmentsInCurrentTour.clear();
       }
@@ -101,7 +101,7 @@ import org.matsim.vehicles.VehicleType;
       load = load + lspShipment.getSize();
     }
     if (!shipmentsInCurrentTour.isEmpty()) {
-      CarrierPlan plan = createPlan(carrier, shipmentsInCurrentTour);
+      CarrierPlan plan = createCarrierPlan(carrier, shipmentsInCurrentTour);
       scheduledPlans.add(plan);
       shipmentsInCurrentTour.clear();
     }
@@ -110,13 +110,13 @@ import org.matsim.vehicles.VehicleType;
     for (CarrierPlan scheduledPlan : scheduledPlans) {
       scheduledTours.addAll(scheduledPlan.getScheduledTours());
     }
-    CarrierPlan plan = new CarrierPlan(carrier, scheduledTours);
+    CarrierPlan plan = new CarrierPlan(scheduledTours);
     plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
     carrier.addPlan(plan);
     carrier.setSelectedPlan(plan);
   }
 
-  private CarrierPlan createPlan(Carrier carrier, List<LspShipment> lspShipments) {
+  private CarrierPlan createCarrierPlan(Carrier carrier, List<LspShipment> lspShipments) {
 
     // TODO: Allgemein: Hier ist alles manuell zusammen gesetzt; es findet KEINE Tourenplanung
     // statt!
@@ -163,7 +163,7 @@ import org.matsim.vehicles.VehicleType;
     ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
 
     tours.add(sTour);
-    CarrierPlan plan = new CarrierPlan(carrier, tours);
+    CarrierPlan plan = new CarrierPlan(tours);
     NetworkRouter.routePlan(plan, netbasedTransportcosts);
     plan.setScore(scorePlanManually(plan));
     return plan;

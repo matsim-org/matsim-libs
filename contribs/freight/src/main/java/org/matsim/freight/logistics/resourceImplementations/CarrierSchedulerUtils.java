@@ -82,7 +82,7 @@ public class CarrierSchedulerUtils {
     vra.setMaxIterations(jspritIterations);
     VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
 
-    CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+    CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
     NetworkRouter.routePlan(plan, netbasedTransportCosts);
     carrier.addPlan(plan);
     carrier.setSelectedPlan(plan);

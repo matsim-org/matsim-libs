@@ -148,7 +148,7 @@ public class CarriersUtils {
 			Tour tour = sTour.getTour().duplicate();
 			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
 		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
+		CarrierPlan copiedPlan = new CarrierPlan(tours);;
 		double initialScoreOfCopiedPlan = plan2copy.getScore();
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		return copiedPlan;
@@ -863,7 +863,7 @@ public class CarriersUtils {
 
 			log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
 
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier {}", carrier.getId());

@@ -149,7 +149,7 @@ public class IntegrationIT {
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			// (maybe not optimal, but since re-routing is a matsim strategy,

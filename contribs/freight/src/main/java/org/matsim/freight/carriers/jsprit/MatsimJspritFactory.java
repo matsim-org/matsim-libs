@@ -703,7 +703,7 @@ public final class MatsimJspritFactory {
 	 * The input parameter {@link Carrier} is just required to initialize the plan.
 	 * </br>
 	 */
-	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
+	public static CarrierPlan createPlan(VehicleRoutingProblemSolution solution) {
 		Collection<ScheduledTour> tours = new ArrayList<>();
 		int tourIdIndex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
@@ -711,7 +711,7 @@ public final class MatsimJspritFactory {
 			tourIdIndex++;
 			tours.add(scheduledTour);
 		}
-		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
+		CarrierPlan carrierPlan = new CarrierPlan(tours); //
 		carrierPlan.setJspritScore(solution.getCost() * (-1));
 		return carrierPlan;
 	}

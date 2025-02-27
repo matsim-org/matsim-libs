@@ -164,7 +164,7 @@ public class FixedCostsTest  {
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
 			//Routing bestPlan to Network
-			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlan,netBasedCosts) ;
 			carrier.addPlan(carrierPlan) ;
 			carriersPlannedAndRouted.addCarrier(carrier);
