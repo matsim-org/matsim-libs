@@ -34,16 +34,23 @@ public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
 	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_REASON = "reason";
 
 	private final Id<Person> personId;
 	private final Id<Link> linkId;
 	private final String legMode;
+	private final String reason;
 
-	public PersonStuckEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode) {
+	public PersonStuckEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode, String reason) {
 		super(time);
 		this.personId = agentId;
 		this.linkId = linkId;
 		this.legMode = legMode;
+		this.reason = reason;
+	}
+
+	public PersonStuckEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode) {
+		this(time, agentId, linkId, legMode, null);
 	}
 
 	public Id<Person> getPersonId() {
@@ -58,6 +65,10 @@ public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 		return this.legMode;
 	}
 
+	public String getReason() {
+		return this.reason;
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -70,6 +81,9 @@ public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 		if (this.legMode != null) {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
+		if (this.reason != null) {
+			attr.put(ATTRIBUTE_REASON, this.legMode);
+		}
 		return attr;
 	}
 
@@ -80,6 +94,10 @@ public class PersonStuckEvent extends Event implements HasPersonId, HasLinkId {
 
 		if (this.legMode != null) {
 			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);
+		}
+
+		if (this.reason != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_REASON, this.reason);
 		}
 
 		writeXMLEnd(out);

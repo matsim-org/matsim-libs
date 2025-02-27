@@ -27,15 +27,15 @@ import org.matsim.api.core.v01.network.Node;
 
 
 /**
- * A simple class linking a {@link DigicoreActivity} to a specific cluster.
- * 
+ * A simple class linking an activity to a specific cluster.
+ *
  * @author jwjoubert
  */
 public class ClusterActivity implements Identifiable<Coord>{
-	private Id<Coord> activityId;
-	private Node node;
+	private final Id<Coord> activityId;
+	private final Node node;
 	private Cluster cluster;
-	
+
 	public ClusterActivity(Id<Coord> activityId, Node node, Cluster cluster){
 		this.activityId = activityId;
 		this.node = node;
@@ -45,7 +45,7 @@ public class ClusterActivity implements Identifiable<Coord>{
 	public Coord getCoord() {
 		return this.node.getCoord();
 	}
-	
+
 	public Node getNode() {
 		return this.node;
 	}
@@ -53,7 +53,7 @@ public class ClusterActivity implements Identifiable<Coord>{
 	public Cluster getCluster() {
 		return cluster;
 	}
-	
+
 	public void setCluster(Cluster cluster){
 		this.cluster = cluster;
 	}
@@ -62,6 +62,6 @@ public class ClusterActivity implements Identifiable<Coord>{
 	public Id<Coord> getId() {
 		return this.activityId;
 	}
-	
+
 
 }
