@@ -49,7 +49,6 @@ import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -60,7 +59,6 @@ import com.google.common.base.Verify;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -192,9 +190,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
-	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+	private DrtEstimatorParams drtEstimatorParams;
 
-	public DvrpLoadParams loadParams = new DvrpLoadParams();
+	@Nullable
+	private DvrpLoadParams loadParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -382,6 +381,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
 		return Optional.ofNullable(drtEstimatorParams);
+	}
+
+	public DvrpLoadParams addOrGetLoadParams() {
+		if(this.loadParams == null) {
+			this.addParameterSet(new DvrpLoadParams());
+		}
+		return this.loadParams;
 	}
 
 	/**
