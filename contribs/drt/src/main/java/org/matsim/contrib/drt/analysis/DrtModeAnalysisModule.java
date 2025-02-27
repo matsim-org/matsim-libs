@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.sharingmetrics.SharingMetricsModule;
 import org.matsim.contrib.dvrp.analysis.CapacityLoadAnalysisHandler;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -142,6 +141,12 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		install(new SharingMetricsModule(drtCfg));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new CapacityLoadAnalysisHandler(getMode(), getter.getModal(FleetSpecification.class), getter.get(OutputDirectoryHierarchy.class), getter.get(EventsManager.class), drtCfg.loadCapacityAnalysisInterval, getter.getModal(DvrpLoadType.class))));
+		addControlerListenerBinding().toProvider(modalProvider( //
+			getter -> new CapacityLoadAnalysisHandler(getMode(), //
+			getter.getModal(FleetSpecification.class), //
+			getter.get(OutputDirectoryHierarchy.class), //
+			getter.get(EventsManager.class), //
+			drtCfg.addOrGetLoadParams().analysisInterval, //
+			getter.getModal(DvrpLoadType.class))));
 	}
 }
