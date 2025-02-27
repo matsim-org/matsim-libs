@@ -202,19 +202,8 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * Stores transport-costs, transport-times and the distance of travel.
 	 *
 	 * @author stefan schröder
-	 *
 	 */
-	static class TransportData {
-		public final double transportCosts;
-		public final double transportTime;
-		public final double transportDistance;
-
-		public TransportData(double transportCosts, double transportTime, double transportDistance) {
-			super();
-			this.transportCosts = transportCosts;
-			this.transportTime = transportTime;
-			this.transportDistance = transportDistance;
-		}
+		record TransportData(double transportCosts, double transportTime, double transportDistance) {
 
 	}
 

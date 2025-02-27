@@ -165,7 +165,7 @@ public final class MatsimJspritFactory {
 		}
 		Location location = locationBuilder.build();
 
-		Builder serviceBuilder = Builder.newInstance(carrierService.getId().toString());
+		@SuppressWarnings("rawtypes") Builder serviceBuilder = Builder.newInstance(carrierService.getId().toString());
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
 				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
