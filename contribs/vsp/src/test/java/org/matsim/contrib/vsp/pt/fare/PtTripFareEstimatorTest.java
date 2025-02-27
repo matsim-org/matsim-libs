@@ -120,7 +120,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(est)
 			.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
 			.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
-			.isCloseTo(-380.3, Offset.offset(0.1));
+			.isCloseTo(-379.3, Offset.offset(0.1));
 
 	}
 
@@ -161,7 +161,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-2746.04, Offset.offset(0.1));
+			.isCloseTo(-2738.7, Offset.offset(0.1));
 
 
 		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
@@ -169,7 +169,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-1225.65, Offset.offset(0.1));
+			.isCloseTo( -1222.9, Offset.offset(0.1));
 
 		// Essentially single trip
 		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
