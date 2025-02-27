@@ -110,14 +110,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				return vehicle.getType().getCostInformation().getCostsPerMeter();
 			}
 
-//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//				}
-//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//				return null;
-//			}
-//
 		}
 
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{

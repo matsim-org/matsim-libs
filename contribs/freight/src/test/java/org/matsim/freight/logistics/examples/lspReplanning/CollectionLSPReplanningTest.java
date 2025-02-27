@@ -181,25 +181,10 @@ public class CollectionLSPReplanningTest {
 		collectionLSP.scheduleLogisticChains();
 
 
-//		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-//		maybeTodayAssigner.setLSP(collectionLSP);
-//		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy();
-//
-//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-//		strategyManager.addStrategy(strategy, null, 1);
-//
-//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-//
-//
-//		collectionLSP.setReplanner(replanner);
-
-
 		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 
 		Controller controller = ControllerUtils.createController(scenario);
-
 		controller.addOverridingModule(new LSPModule() );
-
 		controller.addOverridingModule(new AbstractModule(){
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toProvider(() -> {

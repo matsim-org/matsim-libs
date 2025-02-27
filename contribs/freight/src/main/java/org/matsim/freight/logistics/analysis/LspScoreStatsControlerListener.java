@@ -116,9 +116,6 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.minIteration = this.controllerConfigGroup.getFirstIteration();
-		//		int maxIter = controlerConfigGroup.getLastIteration();
-		//		int iterations = maxIter - this.minIteration;
-		//		if (iterations > 5000) iterations = 5000; // limit the history size
 		for ( ScoreItem item : ScoreItem.values() ) {
 			this.scoreHistory.put( item, new TreeMap<>() ) ;
 			this.perLsp.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));

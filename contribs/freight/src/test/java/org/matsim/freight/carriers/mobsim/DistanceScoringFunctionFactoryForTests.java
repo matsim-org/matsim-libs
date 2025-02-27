@@ -135,13 +135,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 				return 0.0;
 			}
 
-//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//				}
-//				log.error("Vehicle with Id does not exist", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//				return null;
-//			}
 		}
 
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{
@@ -222,8 +215,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
 		DriverLegScoring driverLegScoring = new DriverLegScoring(carrier, network);
 		sf.addScoringFunction(driverLegScoring);
-//		sf.addScoringFunction(new NumberOfToursAward(carrier));
-//		sf.addScoringFunction(new DriverActScoring());
 		return sf;
 	}
 

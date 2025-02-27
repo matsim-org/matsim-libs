@@ -54,19 +54,6 @@ final class InitialCarrierPlanCreator {
     }
 
     public CarrierPlan createPlan(Carrier carrier){
-//		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-//		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, carrier.getCarrierCapabilities().getVehicleTypes());
-//		NetworkBasedTransportCosts costs = costsBuilder.build();
-//		vrpBuilder.setRoutingCost(costs);
-//		VehicleRoutingProblem vrp = vrpBuilder.build();
-//
-//		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
-////		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
-//		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-//
-//		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
-//
-
 
         //construct the routing problem - here the interface to jsprit comes into play
         VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);

@@ -253,16 +253,6 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 	@Test
 	public void testSecondReloadLSPScheduling() {
 
-		/*for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<AbstractShipmentPlanElement> elementList = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(elementList, new AbstractShipmentPlanElementComparator());
-			System.out.println();
-			for(AbstractShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());
-			}
-			System.out.println();
-		}*/
-
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			assertEquals(8, LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());

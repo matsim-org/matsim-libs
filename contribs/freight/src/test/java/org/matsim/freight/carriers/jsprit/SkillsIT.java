@@ -96,9 +96,6 @@ public class SkillsIT {
 		carrier.addPlan(newPlan);
 		SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
-//		new CarrierPlanXmlWriterV3(CarrierControlerUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");
-//		Scenario scNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new CarrierPlanXmlReaderV3(CarrierControlerUtils.getCarriers(scNew)).readFile(utils.getOutputDirectory() + "carriers.xml");
 		return solution;
 	}
 
@@ -113,18 +110,10 @@ public class SkillsIT {
 				CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 				capabilitiesBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
-//				CostInformation costInformation1 = new CostInformation() ;
-//				costInformation1.setFixedCosts( 1000.0 );
-//				costInformation1.setCostsPerMeter( 0.001 );
-//				costInformation1.setCostsPerSecond( 0.001 );
-//				VehicleCapacity vehicleCapacity = new VehicleCapacity();
-//				vehicleCapacity.setWeightInTons(2.0);
 
 				/* Vehicle type 1. */
 				VehicleType typeOne = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
-//				typeOne.setCostInformation(costInformation1);
 				typeOne.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
-//				typeOne.setCapacity(vehicleCapacity);
 				typeOne.getCapacity().setOther( 2.0 );
 				CarriersUtils.addSkill(typeOne, "skill 1");
 				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
@@ -135,9 +124,7 @@ public class SkillsIT {
 
 				/* Vehicle type 2. */
 				VehicleType typeTwo = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
-//				typeTwo.setCostInformation(costInformation1);
 				typeTwo.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
-//				typeTwo.setCapacity(vehicleCapacity);
 				typeTwo.getCapacity().setOther( 2.0 );
 				CarriersUtils.addSkill(typeTwo, "skill 2");
 				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
@@ -150,7 +137,6 @@ public class SkillsIT {
 			}
 			carriers.addCarrier(carrier);
 		}
-
 		return scenario;
 	}
 

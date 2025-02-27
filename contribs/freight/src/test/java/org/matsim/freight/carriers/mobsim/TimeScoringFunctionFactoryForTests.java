@@ -135,29 +135,16 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				return 1.0;
 			}
 
-//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//				}
-//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//				return null;
-//			}
 		}
 
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{
 
 		 boolean firstEnd = true;
-
 		 double startTime;
-
 		 double startTimeOfEnd;
-
 		 double timeAtActivities = 0.0;
-
 		 double amountPerHour = 20.0;
-
 		 double startCurrentAct;
-
 		 double time_at_activities = 0.0;
 
 		@Override
@@ -229,8 +216,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
 		DriverLegScoring driverLegScoring = new DriverLegScoring(carrier, network);
-//		sf.addScoringFunction(driverLegScoring);
-//		sf.addScoringFunction(new NumberOfToursAward(carrier));
 		sf.addScoringFunction(new DriverActScoring());
 		return sf;
 	}
