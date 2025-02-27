@@ -26,8 +26,11 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -86,7 +89,7 @@ public final class LSPUtils {
 				}
 			}
 		}
-		addOrGetLsps(scenario).putAllLsps(lspsToLoad);
+		addOrGetLsps(scenario).addLsps(lspsToLoad);
 	}
 
 	public static LSPs getLSPs(Scenario scenario) {
@@ -96,6 +99,23 @@ public final class LSPUtils {
 		}
 		return (LSPs) result;
 	}
+
+	public static void loadLspsAccordingToConfig(Scenario scenario) {
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		LSPs lsps = addOrGetLsps(scenario);
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
+
+		FreightLogisticsConfigGroup logisticsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightLogisticsConfigGroup.class);
+		String lspsFilePath = logisticsConfig.getLspsFile();
+
+		if (lspsFilePath == null || lspsFilePath.isEmpty()) {
+			throw new IllegalArgumentException("LSPs file path should not be null or empty");
+		}
+		new LSPPlanXmlReader(lsps, carriers).readURL(IOUtils.extendUrl(scenario.getConfig().getContext(), lspsFilePath));
+
+	}
+
 
 	public static Double getVariableCost(Attributable attributable) {
 		return (Double) attributable.getAttributes().getAttribute("variableCost");

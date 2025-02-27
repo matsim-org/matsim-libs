@@ -377,9 +377,6 @@ public class CarriersUtils {
 	}
 
 	public static Carriers addOrGetCarriers(Scenario scenario) {
-		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controller is started, it is better to fail if the carriers are not found.
-		// kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {
 			carriers = new Carriers();
@@ -407,6 +404,8 @@ public class CarriersUtils {
 		return types;
 	}
 
+
+
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
 	 *
@@ -415,13 +414,23 @@ public class CarriersUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()));
+		//Load VehicleTypes
 
-		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
-		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
+		String carriersVehicleTypesFile = freightCarriersConfigGroup.getCarriersVehicleTypesFile();
+		if (carriersVehicleTypesFile == null ||carriersVehicleTypesFile.isEmpty()) {
+			throw new IllegalArgumentException("CarriersVehicleTypes file path should not be null or empty");
+		}
+		new CarrierVehicleTypeReader(getCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersVehicleTypesFile));
+
+		//Load Carriers
+		String carriersFile = freightCarriersConfigGroup.getCarriersFile();
+		if (carriersFile == null ||carriersFile.isEmpty()) {
+			throw new IllegalArgumentException("Carriers file path should not be null or empty");
+		}
+		// also registers with scenario
+		new CarrierPlanXmlReader(addOrGetCarriers(scenario), getCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersFile));
 	}
 
 	/**
