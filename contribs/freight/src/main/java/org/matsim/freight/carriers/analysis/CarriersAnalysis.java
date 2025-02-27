@@ -60,7 +60,6 @@ public class CarriersAnalysis {
 	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
-	private final String delimiter = "\t";
 
 	public enum CarrierAnalysisType {
 		/**
@@ -201,6 +200,7 @@ public class CarriersAnalysis {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
 		if (!folder.exists())
 			folder.mkdirs();
+		String delimiter = "\t";
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 		switch (analysisType) {
 			case carriersPlans_unPlanned -> carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);

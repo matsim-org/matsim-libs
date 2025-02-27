@@ -81,15 +81,14 @@ final class InitialCarrierPlanCreator {
         //should be inline with activity-scoring
         VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts(){
 
-            private final double penalty4missedTws = 0.01;
-
-            @Override
+			@Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
                 double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
+				double penalty4missedTws = 0.01;
+				return penalty4missedTws *tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
             }
 
 			@Override
