@@ -129,13 +129,13 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 			return 0;
 		}
 
-		@SuppressWarnings({"SameReturnValue", "unused"}) // Keep the method as code example.
+		@SuppressWarnings({"SameReturnValue", "unused", "SameParameterValue"}) // Keep the method as code example.
 		private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
 			return 1.0;
 		}
 
 		@SuppressWarnings({"SameReturnValue", "unused"})  // Keep the method as code example.
-		private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
+		private double getTimeParameter(CarrierVehicle vehicle, @SuppressWarnings("SameParameterValue") Person driver) {
 			return 0.0;
 		}
 

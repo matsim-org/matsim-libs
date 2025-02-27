@@ -84,9 +84,9 @@ public class CarrierControllerUtilsTest{
 		//Create carrier with services and shipments
 		Carriers carriersWithServicesAndShipments = new Carriers();
 		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
-		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+		CarrierService service1 = createMatsimService("Service1", "i(3,9)");
 		CarriersUtils.addService(carrierWServices, service1);
-		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
+		CarrierService service2 = createMatsimService("Service2", "i(4,9)");
 		CarriersUtils.addService(carrierWServices, service2);
 
 		//Create carrier with shipments
@@ -318,7 +318,7 @@ public class CarrierControllerUtilsTest{
 	void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
 		assertThrows(UnsupportedOperationException.class, () -> {
 			Carrier carrierMixedWServicesAndShipments = CarriersUtils.createCarrier(Id.create("CarrierMixed", Carrier.class));
-			CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+			CarrierService service1 = createMatsimService("Service1", "i(3,9)");
 			CarriersUtils.addService(carrierMixedWServicesAndShipments, service1);
 			CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
 			CarriersUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
@@ -350,9 +350,9 @@ public class CarrierControllerUtilsTest{
 				.build();
 	}
 
-	private static CarrierService createMatsimService(String id, String to, int size) {
+	private static CarrierService createMatsimService(String id, String to) {
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setCapacityDemand(size)
+				.setCapacityDemand(2)
 				.setServiceDuration(31.0);
 		return builder.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 				.build();
