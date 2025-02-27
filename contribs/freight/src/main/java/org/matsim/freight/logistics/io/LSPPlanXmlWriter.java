@@ -76,8 +76,7 @@ public class LSPPlanXmlWriter extends MatsimXmlWriter {
       this.close();
       logger.info("done");
     } catch (IOException e) {
-      e.printStackTrace();
-      logger.error(e);
+      logger.error("IOException while writing", e);
       System.exit(1);
     }
   }

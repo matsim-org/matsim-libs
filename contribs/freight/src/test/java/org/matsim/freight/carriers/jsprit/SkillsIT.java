@@ -26,6 +26,8 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -40,7 +42,11 @@ import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+
 public class SkillsIT {
+
+	private static final Logger log = LogManager.getLogger(SkillsIT.class);
+
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 	private final Id<Link> carrierLocation = Id.createLinkId("i(1,0)");
@@ -54,7 +60,7 @@ public class SkillsIT {
 		try {
 			solutionWithDifferentSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Exception while running example", e);
 			Assertions.fail("Should run integration test without exception.");
 		}
 		Assertions.assertEquals(2L, solutionWithDifferentSkills.getRoutes().size(), "Wrong number of vehicles.");
@@ -70,7 +76,7 @@ public class SkillsIT {
 		try {
 			solutionWithSameSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Exception while running example", e);
 			Assertions.fail("Should run integration test without exception.");
 		}
 		Assertions.assertEquals(1L, solutionWithSameSkills.getRoutes().size(), "Wrong number of vehicles.");

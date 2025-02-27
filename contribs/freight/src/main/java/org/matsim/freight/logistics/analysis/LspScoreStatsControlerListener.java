@@ -163,7 +163,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException while writing score stats", e);
 		}
 
 //		int index = event.getIteration() - this.minIteration;

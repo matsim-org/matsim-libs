@@ -424,7 +424,7 @@ public class CarrierControllerUtilsTest{
 		try {
 			CarriersUtils.runJsprit(scenario);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Exception occurred while running Jsprit", e);
 			Assertions.fail();
 		}
 
