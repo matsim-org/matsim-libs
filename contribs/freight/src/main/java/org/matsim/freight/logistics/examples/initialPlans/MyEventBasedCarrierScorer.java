@@ -133,20 +133,17 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 					vehicleType2TourDuration.put(vehicleType, tourDuration);
 				}
 
-				// scoring needed?
-				final double currentNuOfVehiclesNeeded =
-					Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
-				final Integer nuAlreadyScored = vehicleType2ScoredFixCosts.get(vehicleType);
-				if (nuAlreadyScored == null) {
-					log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
-					score = score - vehicleType.getCostInformation().getFixedCosts();
-					vehicleType2ScoredFixCosts.put(vehicleType, 1);
-				} else if (currentNuOfVehiclesNeeded > nuAlreadyScored) {
-					log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
-					score = score - vehicleType.getCostInformation().getFixedCosts();
-					vehicleType2ScoredFixCosts.put(
-						vehicleType, vehicleType2ScoredFixCosts.get(vehicleType) + 1);
-				}
+				// scoring needed? (This is a workaround to recuce number of fix costs for vehicles in scoring, because currently there is no possibility to run vehicles for several tours.)
+				final double currentNuOfVehiclesNeeded = Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
+				//Rechnet mit wie oft schon Fixkosten eingerechnet wurden in Scoring. Solange der Wert kleiner ist als nuOfVehiclesNeeded, werden Fixkosten abgezogen.
+				vehicleType2ScoredFixCosts.compute(vehicleType, (key, nuAlreadyScored) -> {
+					if (nuAlreadyScored == null || currentNuOfVehiclesNeeded > nuAlreadyScored) {
+						log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
+						score -= vehicleType.getCostInformation().getFixedCosts();
+						return (nuAlreadyScored == null) ? 1 : nuAlreadyScored + 1;
+					}
+					return nuAlreadyScored;
+				});
 			}
 
 			// variable costs per time
