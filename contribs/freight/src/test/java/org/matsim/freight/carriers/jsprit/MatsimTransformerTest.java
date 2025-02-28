@@ -504,7 +504,7 @@ public class MatsimTransformerTest {
 			.build();
 		CarriersUtils.addService(carrier, carrierService1);
 		CarrierService carrierService2 = CarrierService.Builder
-			.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("i(3,9)", Link.class),20)
+			.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("i(3,9)", Link.class),10)
 			.setServiceDuration(20.0)
 			.build();
 		CarriersUtils.addService(carrier, carrierService2);
