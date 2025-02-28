@@ -200,8 +200,7 @@ public class FixedCostsTest  {
 
 	@SuppressWarnings("SameParameterValue")
 	private static CarrierService createMatsimService(String id, String to, int size) {
-		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-			.setCapacityDemand(size)
+		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class),size)
 			.setServiceDuration(31.0)
 			.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 			.build();

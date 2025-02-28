@@ -133,7 +133,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 					vehicleType2TourDuration.put(vehicleType, tourDuration);
 				}
 
-				// scoring needed? (This is a workaround to recuce number of fix costs for vehicles in scoring, because currently there is no possibility to run vehicles for several tours.)
+				// scoring needed? (This is a workaround to reduce number of fix costs for vehicles in scoring, because currently there is no possibility to run vehicles for several tours.)
 				final double currentNuOfVehiclesNeeded = Math.ceil(vehicleType2TourDuration.get(vehicleType) / MAX_SHIFT_DURATION);
 				//Rechnet mit wie oft schon Fixkosten eingerechnet wurden in Scoring. Solange der Wert kleiner ist als nuOfVehiclesNeeded, werden Fixkosten abgezogen.
 				vehicleType2ScoredFixCosts.compute(vehicleType, (key, nuAlreadyScored) -> {
