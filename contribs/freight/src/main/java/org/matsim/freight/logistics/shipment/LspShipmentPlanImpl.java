@@ -64,7 +64,7 @@ import org.matsim.api.core.v01.Id;
     // should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
     ArrayList<LspShipmentPlanElement> logList = new ArrayList<>(planElements.values());
-    logList.sort(new LogElementComparator());
+    logList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
     Collections.reverse(logList);
     return logList.getFirst();
   }
@@ -74,25 +74,4 @@ import org.matsim.api.core.v01.Id;
     planElements.clear();
   }
 
-  static class LogElementComparator implements Comparator<LspShipmentPlanElement> {
-
-    @Override
-    public int compare(LspShipmentPlanElement o1, LspShipmentPlanElement o2) {
-      if (o1.getStartTime() > o2.getStartTime()) {
-        return 1;
-      }
-      if (o1.getStartTime() < o2.getStartTime()) {
-        return -1;
-      }
-      if (o1.getStartTime() == o2.getStartTime()) {
-        if (o1.getEndTime() > o2.getEndTime()) {
-          return 1;
-        }
-        if (o1.getEndTime() < o2.getEndTime()) {
-          return -1;
-        }
-      }
-      return 0;
-    }
-  }
 }

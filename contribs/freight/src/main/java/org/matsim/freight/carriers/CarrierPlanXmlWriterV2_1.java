@@ -97,7 +97,7 @@ import org.matsim.vehicles.VehicleType;
 			close();
 			logger.info("done");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Exception occurred while writing", e);
 			logger.error(e);
 			System.exit(1);
 		}

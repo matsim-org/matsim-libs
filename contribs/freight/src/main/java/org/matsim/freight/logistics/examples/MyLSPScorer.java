@@ -19,7 +19,7 @@
   * ***********************************************************************
  */
 
-package org.matsim.freight.logistics.examples.initialPlans;
+package org.matsim.freight.logistics.examples;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubReso
  *
  * @author Kai Martins-Turner (kturner)
  */
-/*package-private*/ class MyLSPScorer implements LSPScorer {
+public class MyLSPScorer implements LSPScorer {
   final Logger logger = LogManager.getLogger(MyLSPScorer.class);
   private double score = 0;
   private LSP lsp;
@@ -88,11 +88,10 @@ import org.matsim.freight.logistics.resourceImplementations.TransshipmentHubReso
         lspPlan.getLogisticChains().stream()
             .mapToInt(logisticChain -> logisticChain.getLspShipmentIds().size())
             .sum();
-    if (lspPlanShipmentCount != lsp.getLspShipments().size()) {
-      logger.error(
-          "LspPlan doesn't contain the same number of shipments as LSP, "
-              + "shipments probably lost during replanning.");
-      score -= 10000;
+    int shipmentCountDifference = lsp.getLspShipments().size() - lspPlanShipmentCount;
+    if (shipmentCountDifference > 0) {
+      logger.error("LspPlan contains less shipments than LSP; shipments probably lost during replanning.");
+      score -= 10000 * shipmentCountDifference;
     }
   }
 

@@ -211,7 +211,6 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 				double varCostsTime = 0.;
 				double varCostsDist = 0.;
 				double fixedCosts = 0.;
-				double totalVehCosts = 0.;
 				for (Id<Vehicle> vehicleId : vehicleId2VehicleType.keySet()) {
 					if (vehicleId2CarrierId.get(vehicleId).equals(carrierId)) {
 						final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
@@ -223,7 +222,8 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 						varCostsDist = varCostsDist + vehicleId2TourLength.get(vehicleId) * costsPerMeter;
 					}
 				}
-				totalVehCosts = fixedCosts + varCostsTime + varCostsDist;
+
+				double totalVehCosts = fixedCosts + varCostsTime + varCostsDist;
 				bw1.write(delimiter + fixedCosts);
 				bw1.write(delimiter + varCostsTime);
 				bw1.write(delimiter + varCostsDist);

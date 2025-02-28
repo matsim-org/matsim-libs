@@ -88,7 +88,7 @@ public class ResourceImplementationUtils {
         writer.write(str1 + "\n");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipments of LSP", e);
     }
   }
 
@@ -109,7 +109,7 @@ public class ResourceImplementationUtils {
         writeShipmentWithPlanElements(writer, shipment, elementList);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipmentPlan of LSP", e);
     }
   }
 
@@ -158,7 +158,7 @@ public class ResourceImplementationUtils {
         writeShipmentWithPlanElements(writer, lspShipment, elementList);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipmentLog of LSP", e);
     }
   }
 
@@ -189,7 +189,7 @@ public class ResourceImplementationUtils {
       writer.write("### \n");
 
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out scores of LSP", e);
     }
   }
 

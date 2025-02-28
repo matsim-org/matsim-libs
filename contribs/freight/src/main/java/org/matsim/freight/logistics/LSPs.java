@@ -44,7 +44,7 @@ public class LSPs {
 
 	public void addLsps(Collection<LSP> lsps) {
 		for (LSP lsp : lsps) {
-			this.lsps.put(lsp.getId(), lsp);
+			addLsp(lsp);
 		}
 	}
 	public void addLsp(LSP lsp) {

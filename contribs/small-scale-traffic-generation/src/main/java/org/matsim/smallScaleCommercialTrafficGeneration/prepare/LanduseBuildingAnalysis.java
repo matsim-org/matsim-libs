@@ -100,8 +100,8 @@ public class LanduseBuildingAnalysis {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone,
 		Map<String, List<String>> landuseCategoriesAndDataConnection, Map<String, String> zoneIdRegionConnection) {
 
-		Map<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<String, Object2DoubleOpenHashMap<String>>();
-		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalSquareMetersPerCategory = new HashMap<>();
+		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesInCategoriesPerZone = new HashMap<>();
 		Map<String, Object2DoubleOpenHashMap<String>> totalEmployeesPerCategories = new HashMap<>();
 
 		investigationAreaData.keySet()
@@ -135,7 +135,7 @@ public class LanduseBuildingAnalysis {
 		 * creates the percentages of each category and zones based on the sum in this
 		 * category
 		 */
-		Map<String, Object2DoubleOpenHashMap<String>> checkPercentages = new HashMap<String, Object2DoubleOpenHashMap<String>>();
+		Map<String, Object2DoubleOpenHashMap<String>> checkPercentages = new HashMap<>();
 		investigationAreaData.keySet()
 				.forEach(c -> checkPercentages.computeIfAbsent(c, k -> new Object2DoubleOpenHashMap<>()));
 		for (String zoneId : resultingDataPerZone.keySet())
@@ -318,7 +318,7 @@ public class LanduseBuildingAnalysis {
 				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
 					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
 
-			List<String> categoriesOfBuilding = new ArrayList<String>();
+			List<String> categoriesOfBuilding = new ArrayList<>();
 			String[] buildingTypes;
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());

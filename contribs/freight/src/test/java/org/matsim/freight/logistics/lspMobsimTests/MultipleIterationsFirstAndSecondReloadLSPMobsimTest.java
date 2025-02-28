@@ -73,8 +73,7 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 	@BeforeEach
 	public void initialize() {
 		//Todo/Fixme: In the result there only the second hub is used. -- see Issue #170.  KMT Nov'23
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);

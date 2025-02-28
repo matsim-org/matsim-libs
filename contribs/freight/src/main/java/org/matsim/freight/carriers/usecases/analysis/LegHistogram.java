@@ -30,6 +30,9 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -59,6 +62,8 @@ import org.matsim.core.utils.misc.Time;
  * based on events.
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+
+	private static final Logger log = LogManager.getLogger(LegHistogram.class);
 
 	private int iteration = 0;
 	private final int binSize;
@@ -184,7 +189,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			stream = new PrintStream(filename);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.warn("FileNotFoundException occurred while writing", e);
 			return;
 		}
 		write(stream);
@@ -360,7 +365,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred while writing", e);
 		}
 	}
 
@@ -378,7 +383,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred while writing", e);
 		}
 	}
 
