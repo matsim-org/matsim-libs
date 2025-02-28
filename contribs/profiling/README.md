@@ -13,7 +13,7 @@ Add as dependency to the `pom.xml`:
 ```xml
 <dependency>
 	<groupId>org.matsim.contrib</groupId>
-	<artifactId>profiling-utils</artifactId>
+	<artifactId>profiling</artifactId>
 	<version>${matsim.version}</version>
 	<scope>compile</scope>
 </dependency>

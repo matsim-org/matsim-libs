@@ -10,8 +10,8 @@
 	</parent>
 
 	<groupId>org.matsim.contrib</groupId>
-	<artifactId>profiling-utils</artifactId>
-	<name>profiling-utils</name>
+	<artifactId>profiling</artifactId>
+	<name>profiling</name>
 
 	<properties>
 		<aspectj.version>1.9.22.1</aspectj.version>
