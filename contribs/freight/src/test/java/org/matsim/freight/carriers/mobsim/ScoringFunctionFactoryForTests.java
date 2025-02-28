@@ -51,14 +51,12 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			private double score = 0.0;
 			private final Network network;
 			private final Carrier carrier;
-			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
 
 		 public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<>();
 			}
 
 
@@ -75,7 +73,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			@Override
 			public void reset() {
 				score = 0.0;
-				employedVehicles.clear();
 			}
 
 
@@ -91,7 +88,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
-					employedVehicles.add(vehicle);
 					double distance = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();

@@ -60,8 +60,6 @@ public class CollectionShipmentBuilderTest {
 		for (int i = 1; i < 11; i++) {
 			Id<LspShipment> id = Id.create(i, LspShipment.class);
 			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
-			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
-			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
 				Collections.shuffle(linkList);
@@ -73,15 +71,14 @@ public class CollectionShipmentBuilderTest {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
-
 			}
-
 			builder.setToLinkId(toLinkId);
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setStartTimeWindow(startTimeWindow);
+
+			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
+			builder.setCapacityDemand(capacityDemand);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			shipments.add(builder.build());
 		}
 	}
@@ -91,10 +88,10 @@ public class CollectionShipmentBuilderTest {
 		assertEquals(10, shipments.size());
 		for (LspShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
-			assertNotNull(shipment.getSize());
+			assertTrue(shipment.getSize() >= 0 && shipment.getSize() < 10);
 			assertNotNull(shipment.getDeliveryTimeWindow());
 			assertNotNull(shipment.getFrom());
-			assertNotNull(shipment.getDeliveryServiceTime());
+			assertEquals(shipment.getSize()*60, shipment.getDeliveryServiceTime());
 			assertNotNull(shipment.getTo());
 			assertNotNull(shipment.getPickupTimeWindow());
 			assertNotNull(shipment.getShipmentLog());
@@ -103,7 +100,6 @@ public class CollectionShipmentBuilderTest {
 			assertTrue(shipment.getSimulationTrackers().isEmpty());
 			assertEquals(shipment.getShipmentLog().getLspShipmentId(), shipment.getId());
 			assertTrue(shipment.getShipmentLog().getPlanElements().isEmpty());
-
 
 			Link link = network.getLinks().get(shipment.getFrom());
 			assertTrue(link.getFromNode().getCoord().getX() <= 4000);

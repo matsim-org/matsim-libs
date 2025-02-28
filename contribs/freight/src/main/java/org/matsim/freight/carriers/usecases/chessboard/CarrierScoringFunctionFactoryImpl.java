@@ -155,13 +155,11 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		private double score = 0.0;
 		private final Network network;
 		private final Carrier carrier;
-		private final Set<CarrierVehicle> employedVehicles;
 
 		public SimpleDriversLegScoring( Carrier carrier, Network network ) {
 			super();
 			this.network = network;
 			this.carrier = carrier;
-			employedVehicles = new HashSet<>();
 		}
 
 		@Override
@@ -186,7 +184,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				Id<Vehicle> vehicleId = nRoute.getVehicleId();
 				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
-				employedVehicles.add(vehicle);
 				double distance = 0.0;
 				if(leg.getRoute() instanceof NetworkRoute){
 					Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
@@ -205,10 +202,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
 				if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
 				score += (-1) * timeCosts;
-
 			}
 		}
-
 	}
 
 

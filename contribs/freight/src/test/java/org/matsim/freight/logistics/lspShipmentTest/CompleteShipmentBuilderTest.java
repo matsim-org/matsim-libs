@@ -57,8 +57,6 @@ public class CompleteShipmentBuilderTest {
 		for (int i = 1; i < 11; i++) {
 			Id<LspShipment> id = Id.create(i, LspShipment.class);
 			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
-			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
-			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
 				Collections.shuffle(linkList);
@@ -72,7 +70,6 @@ public class CompleteShipmentBuilderTest {
 					builder.setToLinkId(pendingToLink.getId());
 					break;
 				}
-
 			}
 
 			while (true) {
@@ -85,14 +82,13 @@ public class CompleteShipmentBuilderTest {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
-
 			}
 
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setStartTimeWindow(startTimeWindow);
+			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setCapacityDemand(capacityDemand);
+			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			shipments.add(builder.build());
 		}
 	}
@@ -103,10 +99,10 @@ public class CompleteShipmentBuilderTest {
 		assertEquals(10, shipments.size());
 		for (LspShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
-			assertNotNull(shipment.getSize());
+			assertTrue(shipment.getSize() >= 0 && shipment.getSize() < 10);
 			assertNotNull(shipment.getDeliveryTimeWindow());
 			assertNotNull(shipment.getFrom());
-			assertNotNull(shipment.getDeliveryServiceTime());
+			assertEquals(shipment.getSize()*60, shipment.getDeliveryServiceTime());
 			assertNotNull(shipment.getTo());
 			assertNotNull(shipment.getPickupTimeWindow());
 			assertNotNull(shipment.getShipmentLog());

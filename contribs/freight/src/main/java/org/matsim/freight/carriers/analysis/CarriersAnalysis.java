@@ -198,8 +198,10 @@ public class CarriersAnalysis {
 	 */
 	public void runCarrierAnalysis(CarrierAnalysisType analysisType) {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
-		if (!folder.exists())
+		if (!folder.exists()) {
+			//noinspection ResultOfMethodCallIgnored
 			folder.mkdirs();
+		}
 		String delimiter = "\t";
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 		switch (analysisType) {
