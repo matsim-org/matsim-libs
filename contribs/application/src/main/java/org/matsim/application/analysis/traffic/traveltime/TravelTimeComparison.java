@@ -89,7 +89,9 @@ public class TravelTimeComparison implements MATSimAppCommand {
 
 		data.addColumns(
 			DoubleColumn.create("simulated", data.rowCount()),
-			DoubleColumn.create("free_flow", data.rowCount())
+			DoubleColumn.create("simulated_tt", data.rowCount()),
+			DoubleColumn.create("free_flow", data.rowCount()),
+			DoubleColumn.create("free_flow_tt", data.rowCount())
 		);
 
 		for (Row row : data) {
@@ -105,12 +107,14 @@ public class TravelTimeComparison implements MATSimAppCommand {
 			double speed = 3.6 * dist / congested.travelTime;
 
 			row.setDouble("simulated", speed);
+			row.setDouble("simulated_tt", congested.travelTime);
 
 			LeastCostPathCalculator.Path freeflow = computePath(network, freeflowRouter, row);
 			dist = freeflow.links.stream().mapToDouble(Link::getLength).sum();
 			speed = 3.6 * dist / freeflow.travelTime;
 
 			row.setDouble("free_flow", speed);
+			row.setDouble("free_flow_tt", freeflow.travelTime);
 		}
 
 		data = data.dropWhere(data.doubleColumn("simulated").isMissing());
