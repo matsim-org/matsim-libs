@@ -329,14 +329,10 @@ public class NetworkBasedTransportCostsTest {
 		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
 			//No information about the vehicleType available anywhere, because it is not registered centrally.
 			// -> Use the vehicleId to distinguish the types.
+			// KMT (Feb'25): I think the type should no be available.
 			var vehTypeIdString = vehicleId.toString();
-			if (vehTypeIdString.equals("vehicle1")) {
-				return 1;
-			} else if (vehTypeIdString.equals("vehicle2")) {
-				return 0.5;
-			} else {
-				return 0;
-			}
+			//Factor 1 for vehicle1, 0.5 for vehicle2, 0 for all others.
+			return vehTypeIdString.equals("vehicle1") ? 1 : vehTypeIdString.equals("vehicle2") ? 0.5 : 0;
 		};
 		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 
