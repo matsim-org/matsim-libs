@@ -53,18 +53,15 @@ public class UniqueIDs {
 	@Test
 	public void TestAreResourceIDsUnique_Passes() {
 		Config config = ConfigUtils.createConfig();
-//		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-//		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lspTestFile.xml"); //Does not work atm.
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.emptyList()));
-		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps.xml");
+		LSPUtils.loadLspsAccordingToConfig(scenario);
 
 		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"At least one resource ID exists more than once.");
 	}
@@ -75,18 +72,15 @@ public class UniqueIDs {
 	@Test
 	public void TestAreResourceIDsUnique_Fails() {
 		Config config = ConfigUtils.createConfig();
-//		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		//logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lspTestFile.xml"); //Does not work atm.
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.emptyList()));
-		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
+		LSPUtils.loadLspsAccordingToConfig(scenario);
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"All resource IDs are unique.");
 	}
@@ -95,18 +89,15 @@ public class UniqueIDs {
 	@Test
 	public void ShipmentHasPlanSelectedPlanOnly_passes() {
 		Config config = ConfigUtils.createConfig();
-//		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		//logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lspTestFile.xml"); //Does not work atm.
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.emptyList()));
-		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps.xml");
+		LSPUtils.loadLspsAccordingToConfig(scenario);
 
 //		//Versuch mal per Hand einen weitern gleich lautenden ShipmentPlan zu erstellen. Geht nicht :)
 //		var lsps = LSPUtils.getLSPs(scenario);
@@ -128,18 +119,16 @@ public class UniqueIDs {
 	@Test
 	public void ShipmentHasPlanSelectedPlanOnly_fails() {
 		Config config = ConfigUtils.createConfig();
-//		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
-		//logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lspTestFile.xml"); //Does not work atm.
+
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.emptyList()));
-		new LSPPlanXmlReader(LSPUtils.getLSPs(scenario), CarriersUtils.getCarriers(scenario)).readFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
+		LSPUtils.loadLspsAccordingToConfig(scenario);
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
 	}
