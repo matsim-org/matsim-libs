@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -57,8 +58,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -91,8 +91,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenVehicleTypeNotKnow_throwException(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -119,8 +118,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -171,8 +169,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollAllTypes(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
@@ -226,8 +223,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollOneTypeTollFactor(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
@@ -309,8 +305,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollBasedOnVehicleId(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
