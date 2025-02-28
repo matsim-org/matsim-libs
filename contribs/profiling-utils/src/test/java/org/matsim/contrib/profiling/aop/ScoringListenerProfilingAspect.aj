@@ -24,8 +24,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 
 public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspect {
 
-    pointcut eventPoints(Object o):
-            target(o) &&
+    pointcut eventPoints():
             call(void ScoringListener.notifyScoring(..));
 
 }

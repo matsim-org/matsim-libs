@@ -25,15 +25,15 @@ import org.matsim.contrib.profiling.events.JFRMatsimEvent;
 
 public abstract aspect AbstractProfilingEventAspect {
 
-    abstract pointcut eventPoints(Object o);
+    abstract pointcut eventPoints();
 
-    void around(Object o): eventPoints(o) {
-        Event jfrEvent = JFRMatsimEvent.create("AOP profiling: " + o.getClass().getName());
+    void around(): eventPoints() {
+        Event jfrEvent = JFRMatsimEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
 
-        System.out.println("AOP profiling: " + o.getClass().getSimpleName());
+        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
 
         jfrEvent.begin();
-        proceed(o);
+        proceed();
         jfrEvent.commit();
     }
 }

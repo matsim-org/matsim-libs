@@ -46,7 +46,7 @@ public class AspectJTest {
 	public void testAspectJ_compileTime() {
 		var scoringListener = new MyScoringListener();
 		scoringListener.notifyScoring(new ScoringEvent(null, 1, false));
-		assertThat(outputStreamCaptor.toString()).isEqualTo("AOP profiling: MyScoringListener\nscoring event\n");
+		assertThat(outputStreamCaptor.toString()).isEqualTo("AOP profiling: void org.matsim.contrib.profiling.aop.AspectJTest.MyScoringListener.notifyScoring(ScoringEvent)\nscoring event\n");
 	}
 
 	/**
