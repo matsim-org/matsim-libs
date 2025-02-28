@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
-/* package-private */ class LogisticChainImpl extends LSPDataObject<LogisticChain>
-    implements LogisticChain {
+/* package-private */ class LogisticChainImpl extends LSPDataObject<LogisticChain> implements LogisticChain {
+  @SuppressWarnings("unused")
   private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
 
   private final Collection<LogisticChainElement> logisticChainElements;

@@ -173,9 +173,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		List<Id<Person>> personIds = personsLegs.stream().map(p -> p.agent().getId()).toList();
 		eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, personIds));
 
-		Leg representativeLeg = personsLegs.get(0).leg();
-		PassengerRequest request = requestCreator.createRequest(requestId, personIds, representativeLeg.getRoute(),
-				getLink(representativeLeg.getRoute().getStartLinkId()), getLink(representativeLeg.getRoute().getEndLinkId()), earliestDepartureTime,
+		List<Route> routes = personsLegs.stream().map(PersonLeg::leg).map(Leg::getRoute).toList();
+		Route representativeRoute = routes.get(0);
+		PassengerRequest request = requestCreator.createRequest(requestId, personIds, routes,
+				getLink(representativeRoute.getStartLinkId()), getLink(representativeRoute.getEndLinkId()), earliestDepartureTime,
 				now);
 
 		Set<String> violations = requestValidator.validateRequest(request);
@@ -377,6 +378,9 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	// Rejections
 
+	private static final String ABORT_STUCK_REASON = " rejected prebooked request";
+	private final IdSet<Person> stuckUponActivity = new IdSet<>(Person.class);
+
 	private void processRejections(double now) {
 		for (Id<Request> requestId : rejectedEventIds) {
 			RequestItem item = requests.remove(requestId);
@@ -400,25 +404,20 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 						Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 						PlanElement planElement = plan.getPlanElements().get(index);
 
-						if (planElement instanceof Activity currentActivity) {
-							Activity activity = currentActivity;
-							activity.setEndTime(Double.POSITIVE_INFINITY);
-							activity.setMaximumDurationUndefined();
-
-							((HasModifiablePlan) agent).resetCaches();
-							internalInterface.getMobsim().rescheduleActivityEnd(agent);
-							eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
-									this.mode));
-
-							internalInterface.getMobsim().getAgentCounter().incLost();
-							internalInterface.getMobsim().getAgentCounter().decLiving();
+						if (planElement instanceof Activity) {
+							// the agent is on an activity, let it get stuck further below
+							stuckUponActivity.add(passengerId);
 						} else {
-							// If the current element is a leg, the agent is walking towards the pickup location
-							// We make the agent stuck at the interaction activity
+							// the agent is on a leg, so we cannot make it stuck directly. 
+							// instead, we set the next activity to an infinite duration and 
+							// make the agent get stuck right after the activity starts
+							
 							while (index < plan.getPlanElements().size()) {
 								if (plan.getPlanElements().get(index) instanceof Activity activity) {
-									activity.setEndTime(Double.POSITIVE_INFINITY);
+									activity.setEndTime(Double.MAX_VALUE); // very long but not infinite (= regular last activity)
 									activity.setMaximumDurationUndefined();
+									stuckUponActivity.add(agent.getId());
+									break;
 								}
 
 								index++;
@@ -430,6 +429,40 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 		}
 
 		rejectedEventIds.clear();
+
+		Iterator<Id<Person>> stuckIterator = stuckUponActivity.iterator();
+		while (stuckIterator.hasNext()) {
+			Id<Person> personId = stuckIterator.next();
+			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(personId);
+
+			PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
+			if (planElement instanceof Activity activity) {
+				abortAgent(agent, activity, now);
+				stuckIterator.remove();
+			}
+		}
+	}
+
+	private void abortAgent(MobsimAgent agent, Activity activity, double now) {
+		// this would be the simple way, but then it looks like the agent is stuck 
+		// because of something related to the activity. however, we want to make 
+		//it clear that drt is the cause here
+		
+		// agent.setStateToAbort(now);
+		// internalInterface.arrangeNextAgentState(agent);
+
+		activity.setEndTime(Double.POSITIVE_INFINITY);
+		activity.setMaximumDurationUndefined();
+
+		((HasModifiablePlan) agent).resetCaches();
+		internalInterface.getMobsim().rescheduleActivityEnd(agent);
+		eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getCurrentLinkId(),
+				null, mode + ABORT_STUCK_REASON));
+
+		internalInterface.getMobsim().getAgentCounter().incLost();
+
+		// will be called by the activity engine
+		// internalInterface.getMobsim().getAgentCounter().decLiving();
 	}
 
 	// Stuck

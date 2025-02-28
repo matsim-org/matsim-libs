@@ -48,117 +48,108 @@ import org.matsim.vehicles.Vehicle;
 @Disabled
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
-	 static class DriverLegScoring implements BasicScoring, LegScoring{
+	static class DriverLegScoring implements BasicScoring, LegScoring{
 
-			private double score = 0.0;
-			private final Network network;
-			private final Carrier carrier;
-			private final Set<CarrierVehicle> employedVehicles;
-			private Leg currentLeg = null;
-			private double currentLegStartTime;
+		private double score = 0.0;
+		private final Network network;
+		private final Carrier carrier;
+		private final Set<CarrierVehicle> employedVehicles;
+		private Leg currentLeg = null;
+		private double currentLegStartTime;
 
-			public DriverLegScoring(Carrier carrier, Network network) {
-				super();
-				this.network = network;
-				this.carrier = carrier;
-				employedVehicles = new HashSet<>();
-			}
-
-
-			@Override
-			public void finish() {
-
-			}
-
-
-			@Override
-			public double getScore() {
-				return score;
-			}
-
-
-			@Override
-			public void reset() {
-				score = 0.0;
-				employedVehicles.clear();
-			}
-
-
-			@Override
-			public void startLeg(double time, Leg leg) {
-				currentLeg = leg;
-				currentLegStartTime = time;
-			}
-
-
-			@Override
-			public void endLeg(double time) {
-				if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
-					Id<Vehicle> vehicleId = nRoute.getVehicleId();
-					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
-					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
-					if(!employedVehicles.contains(vehicle)){
-						employedVehicles.add(vehicle);
-						score += (-1)*getFixEmploymentCost(vehicle);
-					}
-					double distance = 0.0;
-					double toll = 0.0;
-					if(currentLeg.getRoute() instanceof NetworkRoute){
-						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
-						for(Id<Link> linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
-							distance += network.getLinks().get(linkId).getLength();
-							toll += getToll(linkId, vehicle, null);
-						}
-						distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
-						toll += getToll(currentLeg.getRoute().getEndLinkId(), vehicle, null);
-					}
-					score += (-1)*(time-currentLegStartTime)*getTimeParameter(vehicle,null);
-					score += (-1)*distance*getDistanceParameter(vehicle,null);
-					score += (-1)*toll;
-				}
-
-			}
-
-			private double getFixEmploymentCost(CarrierVehicle vehicle) {
-				return 0.0;
-			}
-
-			private double getToll(Id<Link> linkId, CarrierVehicle vehicle, Person driver) {
-				return 0;
-			}
-
-			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
-				return 0.0;
-			}
-
-			private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
-				return 1.0;
-			}
-
-//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//				}
-//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//				return null;
-//			}
+		public DriverLegScoring(Carrier carrier, Network network) {
+			super();
+			this.network = network;
+			this.carrier = carrier;
+			employedVehicles = new HashSet<>();
 		}
 
-	 static class DriverActScoring implements BasicScoring, ActivityScoring{
 
-		 boolean firstEnd = true;
+		@Override
+		public void finish() {
 
-		 double startTime;
+		}
 
-		 double startTimeOfEnd;
 
-		 double timeAtActivities = 0.0;
+		@Override
+		public double getScore() {
+			return score;
+		}
 
-		 double amountPerHour = 20.0;
 
-		 double startCurrentAct;
+		@Override
+		public void reset() {
+			score = 0.0;
+			employedVehicles.clear();
+		}
 
-		 double time_at_activities = 0.0;
+
+		@Override
+		public void startLeg(double time, Leg leg) {
+			currentLeg = leg;
+			currentLegStartTime = time;
+		}
+
+
+		@Override
+		public void endLeg(double time) {
+			if(currentLeg.getRoute() instanceof NetworkRoute nRoute){
+				Id<Vehicle> vehicleId = nRoute.getVehicleId();
+				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
+				assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
+				if(!employedVehicles.contains(vehicle)){
+					employedVehicles.add(vehicle);
+					score += (-1)*getFixEmploymentCost(vehicle);
+				}
+				double distance = 0.0;
+				double toll = 0.0;
+				if(currentLeg.getRoute() instanceof NetworkRoute){
+					distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
+					for(Id<Link> linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
+						distance += network.getLinks().get(linkId).getLength();
+						toll += getToll(linkId, vehicle, null);
+					}
+					distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
+					toll += getToll(currentLeg.getRoute().getEndLinkId(), vehicle, null);
+				}
+				score += (-1)*(time-currentLegStartTime)*getTimeParameter(vehicle,null);
+				score += (-1)*distance*getDistanceParameter(vehicle,null);
+				score += (-1)*toll;
+			}
+
+		}
+
+		@SuppressWarnings("SameReturnValue") // Keep the method as code example.
+		private double getFixEmploymentCost(CarrierVehicle vehicle) {
+			return 0.0;
+		}
+
+		@SuppressWarnings({"SameReturnValue", "SameParameterValue"}) // Keep the method as code example.
+		private double getToll(Id<Link> linkId, CarrierVehicle vehicle, Person driver) {
+			return 0;
+		}
+
+		@SuppressWarnings({"SameReturnValue", "SameParameterValue"}) // Keep the method as code example.
+		private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
+			return 0.0;
+		}
+
+		@SuppressWarnings({"SameReturnValue", "SameParameterValue"}) // Keep the method as code example.
+		private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
+			return 1.0;
+		}
+
+	}
+
+	static class DriverActScoring implements BasicScoring, ActivityScoring{
+
+		boolean firstEnd = true;
+		double startTime;
+		double startTimeOfEnd;
+		double timeAtActivities = 0.0;
+		double amountPerHour = 20.0;
+		double startCurrentAct;
+		double time_at_activities = 0.0;
 
 		@Override
 		public void startActivity(double time, Activity act) {
@@ -194,7 +185,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			firstEnd = true;
 		}
 
-	 }
+	}
 
 	static class NumberOfToursAward implements BasicScoring{
 
@@ -229,8 +220,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
 		DriverLegScoring driverLegScoring = new DriverLegScoring(carrier, network);
-//		sf.addScoringFunction(driverLegScoring);
-//		sf.addScoringFunction(new NumberOfToursAward(carrier));
 		sf.addScoringFunction(new DriverActScoring());
 		return sf;
 	}

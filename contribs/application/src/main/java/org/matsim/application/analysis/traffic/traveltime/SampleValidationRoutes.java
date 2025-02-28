@@ -88,6 +88,9 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--input-od", description = "Use input fromNode,toNode instead of sampling", required = false)
 	private String inputOD;
 
+	@CommandLine.Option(names = "--offline", description = "Only write the aggregated result without fetching any new data.")
+	private boolean offline;
+
 	public static void main(String[] args) {
 		new SampleValidationRoutes().execute(args);
 	}
@@ -95,10 +98,10 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	/**
 	 * Read the produced API files and collect the speeds by hour.
 	 */
-	public static Map<FromToNodes, Int2ObjectMap<DoubleList>> readValidation(List<String> validationFiles) throws IOException {
+	public static Map<FromToNodes, Int2ObjectMap<Data>> readValidation(List<String> validationFiles) throws IOException {
 
 		// entry to hour and list of speeds
-		Map<FromToNodes, Int2ObjectMap<DoubleList>> entries = new LinkedHashMap<>();
+		Map<FromToNodes, Int2ObjectMap<Data>> entries = new LinkedHashMap<>();
 
 		for (String file : validationFiles) {
 
@@ -109,15 +112,21 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 
 				for (CSVRecord r : parser) {
 					FromToNodes e = new FromToNodes(Id.createNodeId(r.get("from_node")), Id.createNodeId(r.get("to_node")));
-					double speed = Double.parseDouble(r.get("dist")) / Double.parseDouble(r.get("travel_time"));
+					double travelTime = Double.parseDouble(r.get("travel_time"));
+					double dist = Double.parseDouble(r.get("dist"));
+					double speed = dist / travelTime;
 
 					if (!Double.isFinite(speed)) {
 						log.warn("Invalid entry {}", r);
 						continue;
 					}
 
-					Int2ObjectMap<DoubleList> perHour = entries.computeIfAbsent(e, (k) -> new Int2ObjectLinkedOpenHashMap<>());
-					perHour.computeIfAbsent(Integer.parseInt(r.get("hour")), k -> new DoubleArrayList()).add(speed);
+					Int2ObjectMap<Data> perHour = entries.computeIfAbsent(e, (k) -> new Int2ObjectLinkedOpenHashMap<>());
+					Data d = perHour.computeIfAbsent(Integer.parseInt(r.get("hour")), k -> new Data());
+
+					d.speeds.add(speed);
+					d.travelTimes.add(travelTime);
+					d.dists.add(dist);
 				}
 			}
 		}
@@ -174,9 +183,10 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		for (Map.Entry<RouteAPI, String> e : apis.entrySet()) {
 
 			Path out = Path.of(output.getPath().toString().replace(".csv", "-api-" + e.getKey() + ".csv"));
-			futures.add(
-				CompletableFuture.runAsync(new FetchRoutesTask(e.getKey(), e.getValue(), routes, hours, out), executor)
-			);
+			if (!offline)
+				futures.add(
+					CompletableFuture.runAsync(new FetchRoutesTask(e.getKey(), e.getValue(), routes, hours, out), executor)
+				);
 
 			files.add(out.toString());
 		}
@@ -185,31 +195,38 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 		all.join();
 		executor.shutdown();
 
-		Map<FromToNodes, Int2ObjectMap<DoubleList>> res = readValidation(files);
+		Map<FromToNodes, Int2ObjectMap<Data>> res = readValidation(files);
 
 		Path ref = Path.of(output.getPath().toString().replace(".csv", "-ref.csv"));
 
 		// Write the reference file
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(ref), CSVFormat.DEFAULT)) {
-			printer.printRecord("from_node", "to_node", "hour", "min", "max", "mean", "std");
+			printer.printRecord("from_node", "to_node", "hour", "min", "max", "mean", "std",
+				"min_tt", "max_tt", "mean_tt", "mean_dist");
 
 			// Target values
-			for (Map.Entry<FromToNodes, Int2ObjectMap<DoubleList>> e : res.entrySet()) {
+			for (Map.Entry<FromToNodes, Int2ObjectMap<Data>> e : res.entrySet()) {
 
-				Int2ObjectMap<DoubleList> perHour = e.getValue();
-				for (Int2ObjectMap.Entry<DoubleList> e2 : perHour.int2ObjectEntrySet()) {
+				Int2ObjectMap<Data> perHour = e.getValue();
+				for (Int2ObjectMap.Entry<Data> e2 : perHour.int2ObjectEntrySet()) {
 
 					SummaryStatistics stats = new SummaryStatistics();
+					SummaryStatistics ttStats = new SummaryStatistics();
+					SummaryStatistics distStats = new SummaryStatistics();
+
 					// This is as kmh
-					e2.getValue().forEach(v -> stats.addValue(v * 3.6));
+					e2.getValue().speeds.forEach(v -> stats.addValue(v * 3.6));
+					e2.getValue().travelTimes.forEach(ttStats::addValue);
+					e2.getValue().dists.forEach(distStats::addValue);
 
 					printer.printRecord(e.getKey().fromNode, e.getKey().toNode, e2.getIntKey(),
-						stats.getMin(), stats.getMax(), stats.getMean(), stats.getStandardDeviation());
+						stats.getMin(), stats.getMax(), stats.getMean(), stats.getStandardDeviation(),
+						ttStats.getMin(), ttStats.getMax(), ttStats.getMean(), distStats.getMean());
 				}
 			}
 		}
 
-		log.info("All done.");
+		log.info("Written reference file to {}", ref);
 
 		return 0;
 	}
@@ -347,6 +364,16 @@ public class SampleValidationRoutes implements MATSimAppCommand {
 	 * Key as pair of from and to node.
 	 */
 	public record FromToNodes(Id<Node> fromNode, Id<Node> toNode) {
+	}
+
+	/**
+	 * Results obtained from multiple APIs.
+	 */
+	public record Data(DoubleList speeds, DoubleList travelTimes, DoubleList dists) {
+
+		public Data() {
+			this(new DoubleArrayList(), new DoubleArrayList(), new DoubleArrayList());
+		}
 	}
 
 	record Route(Id<Node> fromNode, Id<Node> toNode, Coord from, Coord to, double travelTime, double dist) {

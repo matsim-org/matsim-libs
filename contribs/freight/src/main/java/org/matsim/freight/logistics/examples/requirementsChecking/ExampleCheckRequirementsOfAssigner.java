@@ -71,8 +71,6 @@ class ExampleCheckRequirementsOfAssigner {
 
   private static LSP createLSPWithProperties(Scenario scenario) {
 
-    final Network network = scenario.getNetwork();
-
     // Create red LogisticsSolution which has the corresponding info
     final Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
     final Id<VehicleType> collectionVehTypeId = Id.create("RedCarrierVehicleType", VehicleType.class);
@@ -86,8 +84,7 @@ class ExampleCheckRequirementsOfAssigner {
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
-    CarrierVehicle redVehicle =
-        CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionVehType);
+    CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities redCapabilities =
         CarrierCapabilities.Builder.newInstance()
@@ -97,8 +94,7 @@ class ExampleCheckRequirementsOfAssigner {
     Carrier redCarrier = CarriersUtils.createCarrier(redCarrierId);
     redCarrier.setCarrierCapabilities(redCapabilities);
 
-    LSPResource redResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
+    LSPResource redResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)

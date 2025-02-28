@@ -65,8 +65,8 @@ public class EDrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
 			{
 				// Reuse already bound EDrtVehicleDataEntryFactoryProvider
-				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider provider = getter.get(EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class);
-				return new DrtServiceEntryFactory(provider.get());
+				EDrtVehicleDataEntryFactory delegate = getter.getModal(EDrtVehicleDataEntryFactory.class);
+				return new DrtServiceEntryFactory(delegate);
 			}
 
 		)).asEagerSingleton();

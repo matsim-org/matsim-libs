@@ -153,7 +153,7 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 		Leg leg = (Leg) ((PlanAgent) passenger).getCurrentPlanElement();
 		Route route = leg.getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+				List.of(passenger.getId()), List.of(route), getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 

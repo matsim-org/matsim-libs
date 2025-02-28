@@ -89,7 +89,7 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 					ArrayList<Double> timeVariants = new ArrayList<>(List.of(initTourStart));
 					for (int i = person.getPlans().size(); i < numberOfPlanVariants; i++) {
 						Plan newPLan = person.createCopyOfSelectedPlanAndMakeSelected();
-						person.setSelectedPlan(person.getPlans().get(0));
+						person.setSelectedPlan(person.getPlans().getFirst());
 						double variantStartTime = createStartTimeVariante(timeVariants);
 						double variantEndTime = variantStartTime + typicalTourDuration;
 						PopulationUtils.getFirstActivity(newPLan).setEndTime(variantStartTime);
@@ -111,11 +111,11 @@ public class CreateDifferentPlansForFreightPopulation implements MATSimAppComman
 					for (int i = person.getPlans().size(); i < numberOfPlanVariants; i++) {
 						if (activityIndexList.size() < 2)
 							continue;
-						List<Integer> activityNewIndexList = new ArrayList<Integer>(activityIndexList);
+						List<Integer> activityNewIndexList = new ArrayList<>(activityIndexList);
 						Collections.shuffle(activityNewIndexList, rnd);
 						List<Integer> alreadySwapedActivity = new ArrayList<>();
 						Plan newPLan = person.createCopyOfSelectedPlanAndMakeSelected();
-						person.setSelectedPlan(person.getPlans().get(0));
+						person.setSelectedPlan(person.getPlans().getFirst());
 						for (int j = 0; j < activityIndexList.size(); j++) {
 							if (alreadySwapedActivity.contains(activityIndexList.get(j)))
 								continue;
