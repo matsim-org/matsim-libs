@@ -55,7 +55,7 @@ public class IsTheRightCustomerScoredTest {
         scenario = ScenarioUtils.loadScenario(config);
         CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-        //limit the fleet size of carrier pizza_1 so that it can handly only one order/job
+        //limit the fleet size of carrier pizza_1 so that it can handle only one order/job
         CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
         preparePopulation(scenario);

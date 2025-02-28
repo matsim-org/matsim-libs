@@ -27,5 +27,4 @@ public interface LanduseDataConnectionCreator {
 		return count.get();
 	}
 
-	;
 }
