@@ -8,6 +8,9 @@ import org.matsim.vehicles.Vehicle;
 
 public aspect PersonVehiclesAspect {
 
+    /**
+     * When using simple class names, ensure the class is part of the imports above.
+     */
     pointcut personVehicles(PersonVehicles p, String mode):
             target(p) && args(mode) &&
                     call(Id<Vehicle> PersonVehicles.getVehicle(..));

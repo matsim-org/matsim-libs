@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.vehicles.PersonVehicles;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -25,6 +27,14 @@ public class AspectJTest {
 		@Override
 		public void notifyScoring(ScoringEvent event) {
 			System.out.println("scoring event");
+		}
+	}
+
+	static final class MyReplanningContext implements ReplanningContext {
+
+		@Override
+		public int getIteration() {
+			return 6;
 		}
 	}
 
@@ -62,4 +72,17 @@ public class AspectJTest {
 		assertThat(result.toString()).isEqualTo("aspect");
 	}
 
+	@Test
+	public void whenPostCompileTimeWeaving_usingAnnotatedAspect_expectPrintFromAdvice() {
+		var factory = VehicleUtils.getFactory();
+		assertThat(factory).isNotNull(); // ensure the original implementation was not changed
+		assertThat(outputStreamCaptor.toString()).isEqualTo("aspect via annotations: VehiclesFactory org.matsim.vehicles.VehicleUtils.getFactory()\n");
+	}
+
+	@Test
+	public void whenCompileTimeWeaving_usingAnnotatedAspect_expectPrintFromAdvice() {
+		var myContext = new MyReplanningContext();
+		assertThat(myContext.getIteration()).isEqualTo(7); // changed via the advice in aspect
+		assertThat(outputStreamCaptor.toString()).isEqualTo("iteration before incrementing: 6 - int org.matsim.contrib.profiling.aop.AspectJTest.MyReplanningContext.getIteration()\n");
+	}
 }
