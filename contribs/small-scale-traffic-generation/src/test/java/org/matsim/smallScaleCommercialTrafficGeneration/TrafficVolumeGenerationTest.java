@@ -412,7 +412,7 @@ public class TrafficVolumeGenerationTest {
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
 		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier2", Carrier.class)));
 		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
@@ -481,7 +481,7 @@ public class TrafficVolumeGenerationTest {
 		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
 
 		Assertions.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
 		Assertions.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
 

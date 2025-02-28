@@ -134,7 +134,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //		SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
         //create carrierPlan from solution
-        CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+        CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
 
         //route plan (currently jsprit does not memorize the routes, thus route the plan)
 //		NetworkRouter.routePlan(plan, networkBasedTransportCosts);

@@ -132,7 +132,7 @@ import org.matsim.vehicles.VehicleType;
       shipmentsInCurrentTour.clear();
     }
 
-    CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
+    CarrierPlan plan = new CarrierPlan(unifyTourIds(scheduledPlans));
     plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
     plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
     carrier.addPlan(plan);

@@ -322,7 +322,7 @@ public class MatsimTransformerTest {
 		VehicleRoutingProblem vehicleRoutingProblem = VehicleRoutingProblem.Builder.newInstance().addAllJobs(services1)
 				.addAllJobs(services2).addVehicle(v1).addVehicle(v2).build();
 
-		CarrierPlan plan = new CarrierPlan(CarriersUtils.createCarrier(Id.create("myCarrier", Carrier.class)), sTours);
+		CarrierPlan plan = new CarrierPlan(sTours);
 		plan.setScore(-100.0);
 		VehicleRoutingProblemSolution solution = MatsimJspritFactory.createSolution(plan, vehicleRoutingProblem);
 		assertNotNull(solution);

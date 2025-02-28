@@ -225,7 +225,7 @@ class CarrierPlanXmlParserV2_1 extends MatsimXmlParser {
 				if (selected == null) this.selected = false;
 				else this.selected = selected.equals("true");
 				scheduledTours = new ArrayList<>();
-				currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
+				currentPlan = new CarrierPlan(scheduledTours);
 				break;
 			case "tour":
 				String tourId = atts.getValue("tourId");

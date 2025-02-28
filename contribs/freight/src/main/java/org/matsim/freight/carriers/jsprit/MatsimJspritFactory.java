@@ -703,7 +703,7 @@ public final class MatsimJspritFactory {
 	 * The input parameter {@link Carrier} is just required to initialize the plan.
 	 * </br>
 	 */
-	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
+	public static CarrierPlan createPlan(VehicleRoutingProblemSolution solution) {
 		Collection<ScheduledTour> tours = new ArrayList<>();
 		int tourIdIndex = 1;
 		for (VehicleRoute route : solution.getRoutes()) {
@@ -711,7 +711,7 @@ public final class MatsimJspritFactory {
 			tourIdIndex++;
 			tours.add(scheduledTour);
 		}
-		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
+		CarrierPlan carrierPlan = new CarrierPlan(tours); //
 		carrierPlan.setJspritScore(solution.getCost() * (-1));
 		return carrierPlan;
 	}
@@ -745,7 +745,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
 					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
@@ -769,7 +769,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getOrAddCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					algorithm = Jsprit.Builder.newInstance(problem)
 							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();

@@ -69,7 +69,7 @@ public final class RunChessboard {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
-		CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes( scenario );
+		CarrierVehicleTypes types = CarriersUtils.getOrAddCarrierVehicleTypes( scenario );
 
 		Controller controller = ControllerUtils.createController( scenario );
 

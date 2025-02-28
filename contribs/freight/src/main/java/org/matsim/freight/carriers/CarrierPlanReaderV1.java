@@ -268,9 +268,12 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 		}
 		if (name.equals("plan")) {
-			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
+			CarrierPlan currentPlan = new CarrierPlan(scheduledTours );
 			currentPlan.setScore(currentScore );
-			currentCarrier.getPlans().add( currentPlan );
+			//The following is done instead of currentCarrier.addPlan(currentPlan), because addPlan() sets the selected plan, if now plan is already selected.
+			//In this version here it seems to be ok, to have also plans without any decision if they are selected or not.
+			currentCarrier.getPlans().add(currentPlan); // Just add the plan without making it the selected one.
+			currentPlan.setCarrier(currentCarrier); // This is necessary for the bidirectional reference.
 			if(this.selected){
 				currentCarrier.setSelectedPlan( currentPlan );
 			}

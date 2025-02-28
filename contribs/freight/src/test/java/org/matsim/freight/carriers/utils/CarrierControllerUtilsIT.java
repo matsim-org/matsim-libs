@@ -131,7 +131,7 @@ public class CarrierControllerUtilsIT{
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
 				//Routing bestPlan to Network
-			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}
@@ -156,7 +156,7 @@ public class CarrierControllerUtilsIT{
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
 				//Routing bestPlan to Network
-			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}

@@ -314,7 +314,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in CarrierVehicleTypes container. Used so that even unused vehTypes appear in the output
-		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes());
 		//For the case that there are additional vehicle types found in the events.
 		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);
