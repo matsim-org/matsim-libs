@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>org.matsim.contrib</groupId>
-	<artifactId>profiling-utils</artifactId>
+	<artifactId>profiling</artifactId>
 	<name>profiling-utils</name>
 
 	<properties>
