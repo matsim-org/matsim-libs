@@ -37,14 +37,7 @@ class MyCarrierScorer implements CarrierScoringFunctionFactory {
 		return sf;
 	}
 
-	private static class TakeJspritScore implements SumScoringFunction.BasicScoring {
-
-		private final Carrier carrier;
-
-		public TakeJspritScore(Carrier carrier) {
-			super();
-			this.carrier = carrier;
-		}
+	private record TakeJspritScore(Carrier carrier) implements SumScoringFunction.BasicScoring {
 
 		@Override
 		public void finish() {}
