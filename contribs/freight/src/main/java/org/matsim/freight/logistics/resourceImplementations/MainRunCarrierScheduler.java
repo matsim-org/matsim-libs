@@ -261,34 +261,7 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
-    LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
-        LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
-    builder.setResourceId(resource.getId());
-    for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        builder.setLogisticChainElement(element);
-      }
-    }
-    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-    Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
-    double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
-    double cumulatedLoadingTime = 0;
-    for (TourElement element : tour.getTourElements()) {
-      if (element instanceof Tour.ServiceActivity activity) {
-        cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
-      }
-    }
-    builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
-    builder.setEndTime(startTimeOfTransport);
-
-    LspShipmentPlanElement load = builder.build();
-    String idString =
-        load.getResourceId()
-            + String.valueOf(load.getLogisticChainElement().getId())
-            + load.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-        .addPlanElement(id, load);
+	  CarrierSchedulerUtils.addShipmentLoadElement(lspShipment, tour, resource, super.lspPlan);
   }
 
   private void addShipmentTransportElement(LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
