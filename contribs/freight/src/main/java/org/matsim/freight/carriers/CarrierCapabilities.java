@@ -56,7 +56,9 @@ public class CarrierCapabilities {
 
 		private final Collection<VehicleType> vehicleTypes = new ArrayList<>();
 		private final Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
+		private final Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		private FleetSize fleetSize = FleetSize.FINITE;
+
 
 		public Builder setFleetSize(FleetSize fleetSize){
 			this.fleetSize = fleetSize;
@@ -65,6 +67,11 @@ public class CarrierCapabilities {
 
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
 			vehicles.put(carrierVehicle.getId(), carrierVehicle);
+			VehicleType type = carrierVehicle.getType();
+			if(!typeIds.contains(type.getId())){
+				vehicleTypes.add(type);
+				typeIds.add(type.getId());
+			}
 			return this;
 		}
 
