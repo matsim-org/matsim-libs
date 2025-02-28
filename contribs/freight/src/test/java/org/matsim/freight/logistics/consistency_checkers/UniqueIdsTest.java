@@ -4,29 +4,20 @@ import org.apache.logging.log4j.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 
 import org.matsim.freight.logistics.FreightLogisticsConfigGroup;
 
-import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPUtils;
-import org.matsim.freight.logistics.LSPs;
 import org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker;
-import org.matsim.freight.logistics.io.LSPPlanXmlReader;
-import org.matsim.freight.logistics.shipment.*;
 import org.matsim.testcases.MatsimTestUtils;
 
-
-
-import java.util.Collections;
 
 import static org.matsim.core.config.ConfigUtils.addOrGetModule;
 import static org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker.CheckResult.CHECK_FAILED;
@@ -37,7 +28,7 @@ import static org.matsim.freight.logistics.consistency_checker.LogisticsConsiste
  *  hier gibt es (noch) nichts zu sehen :-)
  *
  */
-public class UniqueIDs {
+public class UniqueIdsTest {
 	//Please specify wanted logger level here:
 	//Level.ERROR -> all log-messages will be displayed as errors in red.
 	//Level.WARN -> all log-messages will be displayed as warnings in red.
@@ -57,7 +48,7 @@ public class UniqueIDs {
 		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -76,7 +67,7 @@ public class UniqueIDs {
 		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -93,13 +84,14 @@ public class UniqueIDs {
 		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-//		//Versuch mal per Hand einen weitern gleich lautenden ShipmentPlan zu erstellen. Geht nicht :)
+//		//Versuch mal per Hand einen weiteren, gleich lautenden ShipmentPlan zu erstellen. --> Geht nicht :) Kannst du also entfernen.
+		// Habe es dir hier nur mal stehen gelassen, damit du siehst, wie ich es versucht hatte.
 //		var lsps = LSPUtils.getLSPs(scenario);
 //		var lsp = lsps.getLSPs().get(Id.create("LSP_1", LSP.class));
 //		var lspPlan = lsp.getSelectedPlan();
@@ -124,7 +116,7 @@ public class UniqueIDs {
 		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
 
 		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml"); //Dahin kopieren..
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
