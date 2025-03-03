@@ -13,17 +13,18 @@ public class ParkingOccupancyObservingSearchTimeCalculator implements ParkingSea
 	private ParkingSearchTimeFunction parkingSearchTimeFunction;
 
 	@Inject
-	private ParkingObserver parkingObserver;
+	private ParkingOccupancyObserver parkingOccupancyObserver;
 
 	@Inject
 	private NetworkKernelFunction kernelFunction;
 
 
 	@Override
-	public double calculateParkingSearchTime(QVehicle vehicle, Link link) {
+	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
 		Map<Id<Link>, Double> weightedLinkIds = kernelFunction.calculateWeightedKernel(vehicle, link);
-		Map<Id<Link>, ParkingCount> idParkingCountMap = parkingObserver.getParkingCount(weightedLinkIds);
-		return parkingSearchTimeFunction.calculateParkingSearchTime(idParkingCountMap);
+		Map<Id<Link>, ParkingCount> parkingCountPerLinkId = parkingOccupancyObserver.getParkingCount(now, weightedLinkIds);
+		double res = parkingSearchTimeFunction.calculateParkingSearchTime(parkingCountPerLinkId);
+		return res;
 	}
 
 	public interface Factory {

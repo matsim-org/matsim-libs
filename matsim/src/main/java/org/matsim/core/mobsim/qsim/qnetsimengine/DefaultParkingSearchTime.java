@@ -15,11 +15,11 @@ public class DefaultParkingSearchTime implements ParkingSearchTimeCalculator {
 	}
 
 	@Override
-	public double calculateParkingSearchTime(QVehicle vehicle, Link link) {
+	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
 		double time = Double.NaN;
 
 		for (ParkingSearchTimeCalculator handler : handlers) {
-			double tmp = handler.calculateParkingSearchTime(vehicle, link);
+			double tmp = handler.calculateParkingSearchTime(now, vehicle, link);
 
 			if (Double.isNaN(tmp)) {
 				// Handler was not able to calculate parking search time

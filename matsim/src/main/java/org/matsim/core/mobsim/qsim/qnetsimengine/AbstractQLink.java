@@ -179,7 +179,7 @@ abstract class AbstractQLink implements QLinkI {
 			context.getEventsManager().processEvent(
 				new VehicleStartsParkingSearch(now, qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
 
-			double parkingSearchTime = parkingSearchTimeCalculator.calculateParkingSearchTime(qveh, this.link);
+			double parkingSearchTime = parkingSearchTimeCalculator.calculateParkingSearchTime(now, qveh, this.link);
 			qveh.setEarliestLinkExitTime(now + parkingSearchTime);
 			parkingSearchQueue.add(qveh);
 		} else if (vehicleArrival == VehicleHandler.VehicleArrival.ALLOWED) {
