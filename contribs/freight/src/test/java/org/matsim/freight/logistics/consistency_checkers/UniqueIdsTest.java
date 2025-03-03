@@ -158,7 +158,7 @@ public class UniqueIdsTest {
 
 	/**
 	 * this test will check if shipmentForEveryShipmentPlanSelectedPlanOnly-method works as intended and should fail, because planWOShipment is not planned in any plan.
-	 * @KMT: funktioniert nicht
+	 * @KMT: funktioniert nicht, siehe E-Mail
 	 */
 	@Test
 	public void AllShipmentPlansGotShipmentSelectedPlanOnly_fails() {
