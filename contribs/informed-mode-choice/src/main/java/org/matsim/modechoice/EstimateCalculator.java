@@ -184,10 +184,6 @@ public final class EstimateCalculator {
 
 			TripStructureUtils.Trip trip = planModel.getTrip(i);
 
-			for (TripScoreEstimator tripScore : tripScores) {
-				estimate += tripScore.estimate(context, mode, trip);
-			}
-
 			// Try to estimate aborted plans
 
 			if (simulationEndTime.isDefined() && tt.getTime().seconds() > simulationEndTime.seconds()) {
