@@ -11,7 +11,7 @@ public class ConstantParkingSearchTime implements ParkingSearchTimeCalculator {
 	}
 
 	@Override
-	public double calculateParkingSearchTime(QVehicle vehicle, Link link) {
+	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
 		return time;
 	}
 }
