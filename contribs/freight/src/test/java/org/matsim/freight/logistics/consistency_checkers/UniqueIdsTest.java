@@ -39,7 +39,7 @@ public class UniqueIdsTest {
 	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
-	 * TODO: Bitte noch kleine Beschreibung des Test-Cases einfügen. Danke :)
+	 * this test will check if resourcesAreUnique-method works as intended and should pass, because all resource IDs in lsps.xml are unique.
 	 */
 	@Test
 	public void TestAreResourceIDsUnique_Passes() {
@@ -58,7 +58,7 @@ public class UniqueIdsTest {
 	}
 
 	/**
-	 * TODO: Bitte noch kleine Beschreibung des Test-Cases einfügen. Danke :)
+	 * this test will check if resourcesAreUnique-method works as intended and should fail, because there are two resources named "carrierSouth" in lsps_fail.xml
 	 */
 	@Test
 	public void TestAreResourceIDsUnique_Fails() {
@@ -76,7 +76,9 @@ public class UniqueIdsTest {
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.resourcesAreUnique(LSPUtils.getLSPs(scenario), lvl),"All resource IDs are unique.");
 	}
 
-
+	/**
+	 * this test will check if shipmentPlanForEveryShipment-method works as intended and should pass, because all shipments in lsps.xml have got a plan in the selected plan.
+	 */
 	@Test
 	public void ShipmentHasPlanSelectedPlanOnly_passes() {
 		Config config = ConfigUtils.createConfig();
@@ -90,26 +92,14 @@ public class UniqueIdsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-//		//Versuch mal per Hand einen weiteren, gleich lautenden ShipmentPlan zu erstellen. --> Geht nicht :) Kannst du also entfernen.
-		// Habe es dir hier nur mal stehen gelassen, damit du siehst, wie ich es versucht hatte.
-//		var lsps = LSPUtils.getLSPs(scenario);
-//		var lsp = lsps.getLSPs().get(Id.create("LSP_1", LSP.class));
-//		var lspPlan = lsp.getSelectedPlan();
-//    	LspShipmentPlan shipmentPlan = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan,Id.create("shipmentSouth", LspShipment.class));
-//   	 LspShipmentPlanElement shipmentPlanElement = LspShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
-//		 .setEndTime(30).setStartTime(15)
-//		.build();
-//		shipmentPlan.addPlanElement(Id.create("ABC", LspShipmentPlanElement.class), shipmentPlanElement);
-//		lspPlan.addShipmentPlan(shipmentPlan);
-
-		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"Not all shipments are planned.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentPlanForEveryShipmentSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"Not all shipments are planned.");
 	}
 
 	/**
-	 * should fail, because shipmentSouth is not planned.
+	 * this test will check if shipmentPlanForEveryShipmentSelectedPlanOnly-method works as intended and should fail, because shipmentWOPlan is not planned.
 	 */
 	@Test
-	public void ShipmentHasPlanSelectedPlanOnly_fails() {
+	public void AllShipmentsGotPlanSelectedPlanOnly_fails() {
 		Config config = ConfigUtils.createConfig();
 
 		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
@@ -122,6 +112,70 @@ public class UniqueIdsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentPlanForEveryShipmentSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
+	}
+
+
+
+	/**
+	 * this test will check if shipmentPlanForEveryShipmentAllPlans-method works as intended and should pass
+	 */
+	@Test
+	public void AllShipmentsGotPlanAllPlans_passes() {
+		Config config = ConfigUtils.createConfig();
+
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps.xml");
+
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		LSPUtils.loadLspsAccordingToConfig(scenario);
+
+		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentPlanForEveryShipmentAllPlans(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
+	}
+	/**
+	 * this test will check if shipmentPlanForEveryShipment-method works as intended and should fail, because shipmentWOPlan is not planned in any plan.
+	 */
+	@Test
+	public void AllShipmentsGotPlanAllPlans_fails() {
+		Config config = ConfigUtils.createConfig();
+
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
+
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		LSPUtils.loadLspsAccordingToConfig(scenario);
+
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentPlanForEveryShipmentAllPlans(LSPUtils.getLSPs(scenario), lvl),"All shipments are planned.");
+	}
+
+	/**
+	 * this test will check if shipmentForEveryShipmentPlanSelectedPlanOnly-method works as intended and should fail, because planWOShipment is not planned in any plan.
+	 * @KMT: funktioniert nicht
+	 */
+	@Test
+	public void AllShipmentPlansGotShipmentSelectedPlanOnly_fails() {
+		Config config = ConfigUtils.createConfig();
+
+		FreightLogisticsConfigGroup logisticsConfigGroup = addOrGetModule(config, FreightLogisticsConfigGroup.class);
+		logisticsConfigGroup.setLspsFile(utils.getPackageInputDirectory() + "lsps_fail.xml");
+
+		FreightCarriersConfigGroup freightConfigGroup = addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfigGroup.setCarriersFile(utils.getPackageInputDirectory() + "carriers.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "vehicles.xml");
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		LSPUtils.loadLspsAccordingToConfig(scenario);
+
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}
 }
+
+

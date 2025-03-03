@@ -77,13 +77,13 @@ public class LogisticsConsistencyChecker {
 	}
 
 	/**
-	 * this method will check if all resources are assigned to exactly one plan
+	 * this method will check if every shipment has got a shipment plan (selected plan only)
 	 *
 	 * @param lsps the LSPs to check
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult shipmentsArePlannedExactlyOnceSelectedPlanOnly(LSPs lsps, Level lvl) {
+	public static CheckResult shipmentPlanForEveryShipmentSelectedPlanOnly(LSPs lsps, Level lvl) {
 		//all resource ids are being saved in this list
 		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
 		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
@@ -97,9 +97,6 @@ public class LogisticsConsistencyChecker {
 			//for selected plan only
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
 				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
-				//Todo: @KMT: Hier wird immer nur 1x shipmentNorth ausgegeben, obwohl es in der XML zweimal auftaucht...
-				//@ Anton: Im selectedPlan (--> selected=True) ist doch jedes nur einmal drin. (lsps.xml) Folglich sieht das für mich an der Stelle richtig aus.
-				logMessage(shipmentSelectedPlan.getLspShipmentId().toString());
 			}
 
 		}
@@ -121,20 +118,90 @@ public class LogisticsConsistencyChecker {
 		}
 	}
 	/**
+	 * this method will check if every shipment has got a shipment plan (all plans)
 	 *
+	 * @param lsps the LSPs to check
+	 * @param lvl  level of log messages / errors
+	 * @return CheckResult
 	 */
-	public static CheckResult shipmentsArePlannedExactlyOnceAllPlans(LSPs lsps, Level lvl) {
+	public static CheckResult shipmentPlanForEveryShipmentAllPlans(LSPs lsps, Level lvl) {
+		//all resource ids are being saved in this list
+		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
+		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
+
 		setLogLevel(lvl);
+
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
-				//TODO: Hier fehlt noch die Implementierung
+				lspShipmentsList.add(lspShipment.getId());
+				logMessage("Shipment ID "+lspShipment.getId().toString());
 			}
-			for (LSPPlan lspPlan : lsp.getPlans()) { //Alle Pläne
+			//for all plans
+			for (LSPPlan lspPlan : lsp.getPlans()) {
 				for (LspShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-					//TODO: Hier fehlt noch die Implementierung
+					lspShipmentPlansList.add(shipmentPlan.getLspShipmentId());
+					logMessage("ShipmentPlan ID: "+shipmentPlan.getLspShipmentId().toString());
 				}
 			}
+
 		}
-		return null;
+		Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
+		List<Id<LspShipment>> shipmentsWithoutPlan = new LinkedList<>();
+
+		for (Id<LspShipment> shipmentId : lspShipmentsList) {
+			if (!plannedShipmentIds.contains(shipmentId)) {
+				shipmentsWithoutPlan.add(shipmentId);
+			}
+		}
+
+		if (!shipmentsWithoutPlan.isEmpty()) {
+			logMessage("Shipments without a plan: {}", shipmentsWithoutPlan);
+			return CheckResult.CHECK_FAILED;
+		} else {
+			logMessage("All shipments have plans.");
+			return CheckResult.CHECK_SUCCESSFUL;
+		}
 	}
+	/**
+	 * this method will check if every shipmentPlan has got a shipment (selected plan only)
+	 *
+	 * @param lsps the LSPs to check
+	 * @param lvl  level of log messages / errors
+	 * @return CheckResult
+	 */
+	public static CheckResult shipmentForEveryShipmentPlanSelectedPlanOnly(LSPs lsps, Level lvl) {
+		// Alle ShipmentPlan-IDs werden in dieser Liste gespeichert
+		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
+		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
+
+		setLogLevel(lvl);
+
+		for (LSP lsp : lsps.getLSPs().values()) {
+			for (LspShipment lspShipment : lsp.getLspShipments()) {
+				lspShipmentsList.add(lspShipment.getId());
+			}
+			// selected plan only
+			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
+				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
+			}
+		}
+		Set<Id<LspShipment>> availableShipments = new HashSet<>(lspShipmentsList);
+		List<Id<LspShipment>> plansWithoutShipments = new LinkedList<>();
+
+		logMessage(availableShipments.toString());
+		for (Id<LspShipment> shipmentPlanId : lspShipmentPlansList) {
+			logMessage("ShipmentPlan ID: "+shipmentPlanId.toString());
+			if (!availableShipments.contains(shipmentPlanId)) {
+				plansWithoutShipments.add(shipmentPlanId);
+			}
+		}
+		if (!plansWithoutShipments.isEmpty()) {
+			logMessage("ShipmentPlans without a matching shipment: {}", plansWithoutShipments);
+			return CheckResult.CHECK_FAILED;
+		} else {
+			logMessage("All shipment plans have a corresponding shipment.");
+			return CheckResult.CHECK_SUCCESSFUL;
+		}
+	}
+
 }

@@ -52,11 +52,6 @@
 						<element id="CarrierNorthnorthCarrierElementTRANSPORT" type="TRANSPORT" startTime="60.0" endTime="1020.0" resourceId="CarrierNorth"/>
 						<element id="CarrierNorthnorthCarrierElementUNLOAD" type="UNLOAD" startTime="1020.0" endTime="1080.0" resourceId="CarrierNorth"/>
 					</shipmentPlan>
-					<shipmentPlan shipmentId="shipmentSouth" chainId="southChain">
-						<element id="carrierSouthsouthCarrierElementLOAD" type="LOAD" startTime="0.0" endTime="60.0" resourceId="carrierSouth"/>
-						<element id="carrierSouthsouthCarrierElementTRANSPORT" type="TRANSPORT" startTime="60.0" endTime="1020.0" resourceId="carrierSouth"/>
-						<element id="carrierSouthsouthCarrierElementUNLOAD" type="UNLOAD" startTime="1020.0" endTime="1080.0" resourceId="carrierSouth"/>
-					</shipmentPlan>
 				</shipmentPlans>
 			</LspPlan>
 		</LspPlans>
