@@ -26,8 +26,4 @@ public class ParkingOccupancyObservingSearchTimeCalculator implements ParkingSea
 		double res = parkingSearchTimeFunction.calculateParkingSearchTime(parkingCountPerLinkId);
 		return res;
 	}
-
-	public interface Factory {
-		ParkingOccupancyObservingSearchTimeCalculator create(double kernelDistance);
-	}
 }

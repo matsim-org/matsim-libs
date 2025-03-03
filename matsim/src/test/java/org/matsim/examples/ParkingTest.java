@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.events.VehicleStartsParkingSearch;
 import org.matsim.api.core.v01.events.handler.VehicleEndsParkingSearchEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleStartsParkingSearchEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -42,7 +44,7 @@ public class ParkingTest {
 
 	@Test
 	void testNoParking() {
-		Config config = getConfig();
+		Config config = getConfig(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controller controller = ControllerUtils.createController(scenario);
 
@@ -61,7 +63,7 @@ public class ParkingTest {
 
 	@Test
 	void testParking_constantTime() {
-		Config config = getConfig();
+		Config config = getConfig(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controller controller = ControllerUtils.createController(scenario);
 
@@ -98,9 +100,8 @@ public class ParkingTest {
 
 	@Test
 	void testParking_BellocheTime() {
-		Config config = getConfig();
-		config.controller().setLastIteration(0);
-		config.eventsManager().setNumberOfThreads(1);
+		Config config = getConfig(1);
+		config.eventsManager().setNumberOfThreads(4);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		for (Link value : scenario.getNetwork().getLinks().values()) {
@@ -111,15 +112,99 @@ public class ParkingTest {
 		Controller controller = ControllerUtils.createController(scenario);
 
 		//all always two seconds parking search time, because there is only one agents and for each parking request, the Occ is 0, thus the result of the Belloche function is always alpha (=2)
+		/*
+		agent 1:
+		- 22500 - 22502: parking search time 2*exp(0)=2 (0 parking cars)
+		- 23102 - 23909: parking search time 2*exp(6)=807 (1 parking car! - this is because there is an empty route and consequently the vehicle
+		leave and parking search start happen in the same time step. Parking observer returns the occupancy of the last time step, where the vehicle
+		 was registered as parking.)
+		- 38849 - 38851: parking search time 2*exp(0)=2 (0 parking cars)
+		 */
 		List<VehicleStartsParkingSearch> starts = List.of(
 			createStartsParking(22500, "20"),
 			createStartsParking(23102, "20"),
-			createStartsParking(38044, "1")
+			createStartsParking(38849, "1")
 		);
 		List<VehicleEndsParkingSearch> ends = List.of(
 			createEndsParking(22502, "20"),
-			createEndsParking(23104, "20"),
-			createEndsParking(38046, "1")
+			createEndsParking(23909, "20"),
+			createEndsParking(38851, "1")
+		);
+
+		TestEventHandler testEventHandler = new TestEventHandler(starts, ends);
+
+		controller.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				addQSimComponentBinding("ParkingOccupancyOberserver").to(ParkingOccupancyObserver.class);
+				addMobsimScopeEventHandlerBinding().to(ParkingOccupancyObserver.class);
+				addVehicleHandlerBinding().to(ParkingVehicleHandler.class);
+				bind(ParkingOccupancyObservingSearchTimeCalculator.class).in(Singleton.class);
+				addParkingSearchTimeCalculatorBinding().to(ParkingOccupancyObservingSearchTimeCalculator.class);
+			}
+		});
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(ParkingOccupancyObserver.class).in(Singleton.class);
+				bind(ParkingCapacityInitializer.class).to(ZeroParkingCapacityInitializer.class);
+				bind(NetworkKernelFunction.class).to(DefaultKernelFunction.class);
+				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
+				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
+
+				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
+				addEventHandlerBinding().toInstance(testEventHandler);
+			}
+		});
+
+		controller.run();
+
+		checkResult(testEventHandler);
+	}
+
+
+	@Test
+	void testParking_BellocheTime_MultipleAgents(){
+		Config config = getConfig(2);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		for (Link value : scenario.getNetwork().getLinks().values()) {
+			value.getAttributes().putAttribute(LINK_ON_STREET_SPOTS, 1);
+			value.getAttributes().putAttribute(LINK_OFF_STREET_SPOTS, 0);
+		}
+
+		//shift first activity end of person 2 to 6:10, such that it is always behind the first activity end of person 1
+		Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId("2")).getPlans().getFirst();
+		((Activity) plan.getPlanElements().get(0)).setEndTime(6*3600+10);
+
+		Controller controller = ControllerUtils.createController(scenario);
+
+		/*
+		agent 1:
+		- 22500 - 22502: parking search time 2*exp(0)=2 (0 parking cars)
+		- 23102 - 23115: parking search time 2*exp(10*2/11)=13 (2 parking cars, agent 1 & 2!! - see explanation above)
+		- 38055 - 38057: parking search time 2*exp(0)=2 (0 parking cars)
+
+		agent 2:
+		- 22510 - 22515: parking search time 2*exp(10*1/11)=5 (1 parking car, agent 1)
+		- 23115 - 23120: parking search time 2*exp(10*1/11)=5 (1 parking car, agent 1)
+		- 38060 - 38065: parking search time 2*exp(10*1/11)=5 (1 parking car, agent 1)
+		 */
+		List<VehicleStartsParkingSearch> starts = List.of(
+			createStartsParking(22500, "20", "1"),
+			createStartsParking(22510, "20", "2"),
+			createStartsParking(23102, "20", "1"),
+			createStartsParking(23115, "20", "2"),
+			createStartsParking(38055, "1", "1"),
+			createStartsParking(38060, "1", "2")
+		);
+		List<VehicleEndsParkingSearch> ends = List.of(
+			createEndsParking(22502, "20", "1"),
+			createEndsParking(22515, "20", "2"),
+			createEndsParking(23115, "20", "1"),
+			createEndsParking(23120, "20", "2"),
+			createEndsParking(38057, "1", "1"),
+			createEndsParking(38065, "1", "2")
 		);
 
 		TestEventHandler testEventHandler = new TestEventHandler(starts, ends);
@@ -139,10 +224,13 @@ public class ParkingTest {
 				bind(ParkingOccupancyObserver.class).in(Singleton.class);
 				bind(ParkingCapacityInitializer.class).to(ZeroParkingCapacityInitializer.class);
 				bind(NetworkKernelFunction.class).to(DefaultKernelFunction.class);
-				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
-				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
+				//changed to 1000
+				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(3000));
+				//changed to beta=-10
+				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -10));
 
 				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
 			}
 		});
@@ -156,6 +244,9 @@ public class ParkingTest {
 		String eventsFile = "output_events.xml.gz";
 		String populationFile = "output_plans.xml.gz";
 
+		utils.copyFileFromOutputToInput(eventsFile);
+		utils.copyFileFromOutputToInput(populationFile);
+
 		ComparisonResult comparisonResult = EventsUtils.compareEventsFiles(utils.getInputDirectory() + eventsFile, utils.getOutputDirectory() + eventsFile);
 		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, comparisonResult);
 
@@ -165,8 +256,8 @@ public class ParkingTest {
 		testEventHandler.checkAllEventsProcessed();
 	}
 
-	private Config getConfig() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+	private Config getConfig(int suffix) {
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans" + suffix + ".xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
@@ -202,11 +293,19 @@ public class ParkingTest {
 		}
 	}
 
+	private static VehicleStartsParkingSearch createStartsParking(double time, String linkId, String personId) {
+		return new VehicleStartsParkingSearch(time, Id.createPersonId(personId), Id.createLinkId(linkId), Id.createVehicleId(personId), "car");
+	}
+
+	private static VehicleEndsParkingSearch createEndsParking(double time, String linkId, String personId) {
+		return new VehicleEndsParkingSearch(time, Id.createPersonId(personId), Id.createLinkId(linkId), Id.createVehicleId(personId), "car");
+	}
+
 	private static VehicleStartsParkingSearch createStartsParking(double time, String linkId) {
-		return new VehicleStartsParkingSearch(time, Id.createPersonId("1"), Id.createLinkId(linkId), Id.createVehicleId("1"), "car");
+		return createStartsParking(time, linkId, "1");
 	}
 
 	private static VehicleEndsParkingSearch createEndsParking(double time, String linkId) {
-		return new VehicleEndsParkingSearch(time, Id.createPersonId("1"), Id.createLinkId(linkId), Id.createVehicleId("1"), "car");
+		return createEndsParking(time, linkId, "1");
 	}
 }
