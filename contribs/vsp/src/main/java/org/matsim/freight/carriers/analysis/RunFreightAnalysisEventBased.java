@@ -118,7 +118,7 @@ public class RunFreightAnalysisEventBased {
 				new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
 		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
-		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
+		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter);
 		eventsManager.addHandler(carrierLoadAnalysis);
 
 		eventsManager.initProcessing();

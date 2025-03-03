@@ -21,8 +21,6 @@
 
 package org.matsim.freight.carriers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -33,13 +31,9 @@ import org.matsim.vehicles.VehicleType;
 
 /**
  *
- *
  * @author sschroeder
- *
  */
 public final class CarrierVehicle implements Vehicle {
-
-	private static final Logger log = LogManager.getLogger(CarrierVehicle.class);
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -59,7 +53,6 @@ public final class CarrierVehicle implements Vehicle {
 	 * Builder to build vehicles.
 	 *
 	 * @author sschroeder
-	 *
 	 */
 	public static class Builder {
 
@@ -80,7 +73,6 @@ public final class CarrierVehicle implements Vehicle {
 		private final Id<Link> locationId;
 		private final Id<Vehicle> vehicleId;
 		private final VehicleType type;
-//		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 
@@ -173,7 +165,6 @@ public final class CarrierVehicle implements Vehicle {
 
 
 	public Id<VehicleType> getVehicleTypeId() {
-//		return typeId;
 		return vehicleType.getId();
 	}
 

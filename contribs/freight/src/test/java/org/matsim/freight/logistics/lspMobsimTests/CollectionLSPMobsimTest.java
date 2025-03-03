@@ -179,7 +179,7 @@ public class CollectionLSPMobsimTest {
 		}
 
 		Controller controller = ControllerUtils.createController(scenario);
-		controller.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
+		controller.getEvents().addHandler((BasicEventHandler) log::warn);
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
