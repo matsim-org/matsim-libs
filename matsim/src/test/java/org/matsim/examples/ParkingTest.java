@@ -244,9 +244,6 @@ public class ParkingTest {
 		String eventsFile = "output_events.xml.gz";
 		String populationFile = "output_plans.xml.gz";
 
-		utils.copyFileFromOutputToInput(eventsFile);
-		utils.copyFileFromOutputToInput(populationFile);
-
 		ComparisonResult comparisonResult = EventsUtils.compareEventsFiles(utils.getInputDirectory() + eventsFile, utils.getOutputDirectory() + eventsFile);
 		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, comparisonResult);
 
