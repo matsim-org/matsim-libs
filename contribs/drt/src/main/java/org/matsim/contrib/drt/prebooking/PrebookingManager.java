@@ -436,14 +436,14 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(personId);
 
 			if(agent != null) {
-				PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
-				if (planElement instanceof Activity activity) {
+                if (WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity activity) {
 					abortAgent(agent, activity, now);
+					stuckIterator.remove();
 				}
 			} else {
 				// the agent no longer exists in the mobsim, we assume it is already been handled elsewhere. nkuehnel, march'25
+				stuckIterator.remove();
 			}
-			stuckIterator.remove();
 		}
 	}
 
