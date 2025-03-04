@@ -1,6 +1,9 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
 
 import com.google.inject.Inject;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEndsParkingSearch;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -8,19 +11,30 @@ import org.matsim.api.core.v01.events.handler.VehicleEndsParkingSearchEventHandl
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.utils.io.IOUtils;
 
+import java.io.BufferedWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ParkingOccupancyObserver implements MobsimScopeEventHandler, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler, BeforeMobsimListener, MobsimBeforeSimStepListener {
-	ParkingCapacityInitializer parkingCapacityInitializer;
-	Network network;
+	private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ParkingOccupancyObserver.class);
+
+	private static final String PARKING_INITIAL_FILE = "parkingInitialOccupancy.csv";
+
+	private ParkingCapacityInitializer parkingCapacityInitializer;
+	private Network network;
+	private OutputDirectoryHierarchy outputDirectoryHierarchy;
+	private Config config;
+
 
 	Map<Id<Link>, Integer> indexByLinkId;
 	int[] parkingOccupancyOfLastTimeStep;
@@ -30,48 +44,17 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 	double lastTimeStep = -1;
 
 	@Inject
-	public ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer) {
+	public ParkingOccupancyObserver(Network network, ParkingCapacityInitializer parkingCapacityInitializer, Config config, OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.parkingCapacityInitializer = parkingCapacityInitializer;
 		this.network = network;
-	}
-
-	private void initialize(Network network) {
-		indexByLinkId = new HashMap<>(network.getLinks().size());
-		int linkCount = network.getLinks().size();
-
-		capacity = new int[linkCount];
-		parkingOccupancy = new int[linkCount];
-		parkingOccupancyOfLastTimeStep = new int[linkCount];
-
-		Map<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> initialCapacities = parkingCapacityInitializer.initialize();
-
-		int counter = 0;
-		for (Id<Link> id : network.getLinks().keySet()) {
-			indexByLinkId.put(id, counter++);
-
-			ParkingCapacityInitializer.ParkingInitialCapacity parkingInitialCapacity = initialCapacities.getOrDefault(id, new ParkingCapacityInitializer.ParkingInitialCapacity(0, 0));
-			int index = indexByLinkId.get(id);
-
-			capacity[index] = parkingInitialCapacity.capacity();
-			parkingOccupancyOfLastTimeStep[index] = parkingInitialCapacity.initial();
-			parkingOccupancy[index] = parkingInitialCapacity.initial();
-		}
-	}
-
-	synchronized Map<Id<Link>, ParkingCount> getParkingCount(double now, Map<Id<Link>, Double> weightedLinks) {
-		Map<Id<Link>, ParkingCount> result = new HashMap<>();
-		for (Map.Entry<Id<Link>, Double> entry : weightedLinks.entrySet()) {
-			Id<Link> linkId = entry.getKey();
-			double weight = entry.getValue();
-			int index = indexByLinkId.get(linkId);
-			int occupancy = parkingOccupancyOfLastTimeStep[index];
-			result.put(linkId, new ParkingCount(occupancy, capacity[index], weight));
-		}
-		return result;
+		this.config = config;
+		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
 
 	@Override
 	public synchronized void handleEvent(VehicleEntersTrafficEvent event) {
+		checkTime(event.getTime());
+
 		// unpark vehicle
 		Id<Link> linkId = event.getLinkId();
 
@@ -83,6 +66,8 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 
 	@Override
 	public synchronized void handleEvent(VehicleEndsParkingSearch event) {
+		checkTime(event.getTime());
+
 		// park vehicle
 		Id<Link> linkId = event.getLinkId();
 		parkingOccupancy[indexByLinkId.get(linkId)]++;
@@ -90,8 +75,10 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		// initialize
-		initialize(network);
+		initialize(event.getIteration() , network);
+
+		//reset timer
+		lastTimeStep = -1;
 	}
 
 	@Override
@@ -109,5 +96,69 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 		this.parkingOccupancyOfLastTimeStep = Arrays.copyOf(this.parkingOccupancy, this.parkingOccupancy.length);
 
 		lastTimeStep = currentTimeStep;
+	}
+
+	private void checkTime(double now) {
+		if (now != lastTimeStep) {
+			throw new IllegalArgumentException("Time " + now + " does not match last time " + lastTimeStep);
+		}
+	}
+
+	private void initialize(int iteration, Network network) {
+		indexByLinkId = new HashMap<>(network.getLinks().size());
+		int linkCount = network.getLinks().size();
+
+		capacity = new int[linkCount];
+		parkingOccupancy = new int[linkCount];
+		parkingOccupancyOfLastTimeStep = new int[linkCount];
+
+		Map<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> initialCapacities = parkingCapacityInitializer.initialize();
+		writeInitialParkingOccupancy(iteration, initialCapacities);
+
+		int counter = 0;
+		for (Id<Link> id : network.getLinks().keySet()) {
+			indexByLinkId.put(id, counter++);
+
+			ParkingCapacityInitializer.ParkingInitialCapacity parkingInitialCapacity = initialCapacities.getOrDefault(id, new ParkingCapacityInitializer.ParkingInitialCapacity(0, 0));
+			int index = indexByLinkId.get(id);
+
+			capacity[index] = parkingInitialCapacity.capacity();
+			parkingOccupancyOfLastTimeStep[index] = parkingInitialCapacity.initial();
+			parkingOccupancy[index] = parkingInitialCapacity.initial();
+		}
+	}
+
+	synchronized Map<Id<Link>, ParkingCount> getParkingCount(double now, Map<Id<Link>, Double> weightedLinks) {
+		checkTime(now);
+
+		Map<Id<Link>, ParkingCount> result = new HashMap<>();
+		for (Map.Entry<Id<Link>, Double> entry : weightedLinks.entrySet()) {
+			Id<Link> linkId = entry.getKey();
+			double weight = entry.getValue();
+			int index = indexByLinkId.get(linkId);
+			int occupancy = parkingOccupancyOfLastTimeStep[index];
+			result.put(linkId, new ParkingCount(occupancy, capacity[index], weight));
+		}
+		return result;
+	}
+
+	private void writeInitialParkingOccupancy(int iteration, Map<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> initialCapacities) {
+		String file = outputDirectoryHierarchy.getIterationFilename(iteration, PARKING_INITIAL_FILE);
+		BufferedWriter bufferedWriter = IOUtils.getBufferedWriter(file);
+
+		log.info("Writing initial parking occupancy to {}", file);
+		try {
+			CSVPrinter csvPrinter = new CSVPrinter(bufferedWriter, CSVFormat.Builder.create()
+				.setDelimiter(config.global().getDefaultDelimiter().charAt(0))
+				.setHeader(new String[]{"linkId", "capacity", "occupancy"}).build());
+
+			for (Map.Entry<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> entry : initialCapacities.entrySet()) {
+				csvPrinter.printRecord(entry.getKey(), entry.getValue().capacity(), entry.getValue().initial());
+			}
+			csvPrinter.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		log.info("Finished writing initial parking occupancy to {}", file);
 	}
 }
