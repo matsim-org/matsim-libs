@@ -207,8 +207,8 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 			double averageTruckLoad = Double.parseDouble(dataPoint);
 			int counter = 0;
 			for (GoodsFlow goodFlow : goodsFlows) {
-				List<Id<Link>> linksAlongRoute = routesMap.get(goodFlow.getFrom()).get(goodFlow.getTo());
-				double numOfTrucks = goodFlow.getTonsPerYear() / (workingDays * averageTruckLoad); // non-integer value is allowed here, as it is a generall analysis
+				List<Id<Link>> linksAlongRoute = routesMap.get(goodFlow.from()).get(goodFlow.to());
+				double numOfTrucks = goodFlow.tonsPerYear() / (workingDays * averageTruckLoad); // non-integer value is allowed here, as it is a generall analysis
 				for (Id<Link> linkId : linksAlongRoute) {
 					double originalValue = actualCounts.get(linkId);
 					actualCounts.put(linkId, originalValue + numOfTrucks);
@@ -314,29 +314,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 		return totalError;
 	}
 
-	private static class GoodsFlow {
-		private final String from;
-		private final String to;
-		private final double tonsPerYear;
-
-		GoodsFlow(String from, String to, double tonsPerYear) {
-			this.from = from;
-			this.to = to;
-			this.tonsPerYear = tonsPerYear;
-		}
-
-		public String getFrom() {
-			return from;
-		}
-
-		public String getTo() {
-			return to;
-		}
-
-		public double getTonsPerYear() {
-			return tonsPerYear;
-		}
-	}
+	private record GoodsFlow(String from, String to, double tonsPerYear) {}
 
 	private boolean checkIfTripIsRelevant(String mode, String from, String to, String tons) {
 		return mode.equals("2") && !from.equals(to) && !tons.equals("0");
