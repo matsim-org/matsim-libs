@@ -107,9 +107,9 @@ public class GenerateLookupTable implements MATSimAppCommand {
                 }
             }
 
-            for (String[] verkerhszelleAndName : incompleteCellLists) {
-                String verkehrszelle = verkerhszelleAndName[0];
-                String name = verkerhszelleAndName[1];
+            for (String[] verkehrszelleAndName : incompleteCellLists) {
+                String verkehrszelle = verkehrszelleAndName[0];
+                String name = verkehrszelleAndName[1];
                 String nuts2006 = coreDataLookupTable.getOrDefault(verkehrszelle, new TrafficCellCoreData(verkehrszelle, name)).getNuts2006();
                 tsvWriter.printRecord(verkehrszelle, name, nuts2006);
             }
