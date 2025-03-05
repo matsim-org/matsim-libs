@@ -15,9 +15,10 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.io.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
@@ -48,8 +49,9 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 	private void prepareMapping() throws IOException {
 		logger.info("Reading NUTS shape files...");
 		Set<String> relevantNutsIds = new HashSet<>();
-		try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
-			CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(lookUpTablePath), StandardCharsets.UTF_8)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
 				if (!record.get(3).equals("")) {
 					relevantNutsIds.add(record.get(3));
@@ -89,8 +91,9 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 		logger.info("Network and shapefile processing complete!");
 
 		logger.info("Computing mapping between Verkehrszelle and departure location...");
-		try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
-			CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(lookUpTablePath), StandardCharsets.UTF_8)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
 				String verkehrszelle = record.get(0);
 				String nuts2021 = record.get(3);

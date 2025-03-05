@@ -12,14 +12,15 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import picocli.CommandLine;
 
+import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +61,9 @@ public class PrepareCountingData implements MATSimAppCommand {
 		tsvWriter.printRecord("nearest_link_id", "total_count", "count_direction_1",
 			"count_direction_2", "road_name", "road_type", "link_to_node_x", "link_to_node_y",
 			"station_x", "station_y");
-
-		try (CSVParser parser = new CSVParser(Files.newBufferedReader(rawDataPath, StandardCharsets.ISO_8859_1),
-			CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(rawDataPath.toString()), StandardCharsets.ISO_8859_1)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
 				String totalCountString = record.get(37).replace(".", "");
 				if (!totalCountString.equals("") && !totalCountString.equals("0")) {

@@ -3,12 +3,11 @@ package org.matsim.application.prepare.freight.tripGeneration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.matsim.core.utils.io.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -171,9 +170,10 @@ public class TripRelation {
 
 	public static List<TripRelation> readTripRelations(String pathToKettenData) throws IOException {
 		List<TripRelation> tripRelations = new ArrayList<>();
-		try (CSVParser parser = CSVParser.parse(URI.create(pathToKettenData).toURL(), StandardCharsets.ISO_8859_1,
-			CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
-			for (CSVRecord record : parser) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(pathToKettenData), StandardCharsets.ISO_8859_1)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
+					for (CSVRecord record : parser) {
 				Builder builder = new Builder();
 				// Read locations
 				builder.originalCell(record.get(0)).originalCellMainRun(record.get(2)).
