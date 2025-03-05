@@ -190,20 +190,4 @@ public class TripRelation {
 		}
 		return tripRelations;
 	}
-
-	public static TripRelation readTripRelation(CSVRecord record) {
-		Builder builder = new Builder();
-		// Read locations
-		builder.originalCell(record.get(0)).originalCellMainRun(record.get(2)).
-			destinationCellMainRun(record.get(3)).destinationCell(record.get(1));
-		// Read trips
-		builder.modePreRun(record.get(6)).modeMainRun(record.get(7)).modePostRun(record.get(8));
-
-		// Read goods type and tons
-		builder.goodsType(record.get(10)).tonsPerYear(Double.parseDouble(record.get(16)));
-
-		// Build trip relation and add to list
-		return builder.build();
-	}
-
 }
