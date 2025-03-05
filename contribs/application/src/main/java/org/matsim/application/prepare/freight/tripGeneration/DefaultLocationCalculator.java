@@ -53,7 +53,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
 				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
-				if (!record.get(3).equals("")) {
+				if (!record.get(3).isEmpty()) {
 					relevantNutsIds.add(record.get(3));
 				}
 			}
@@ -97,7 +97,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 			for (CSVRecord record : parser) {
 				String verkehrszelle = record.get(0);
 				String nuts2021 = record.get(3);
-				if (!nuts2021.equals("") && nutsToLinksMapping.get(nuts2021) != null) {
+				if (!nuts2021.isEmpty() && nutsToLinksMapping.get(nuts2021) != null) {
 					mapping.put(verkehrszelle, nutsToLinksMapping.get(nuts2021).stream().map(Identifiable::getId).collect(Collectors.toList()));
 					continue;
 				}

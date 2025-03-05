@@ -125,7 +125,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
 				String totalCountString = record.get(37).replace(".", "");
-				if (!totalCountString.equals("") && !totalCountString.equals("0")) {
+				if (!totalCountString.isEmpty() && !totalCountString.equals("0")) {
 					String xString = record.get(156).replace(".", "");
 					String yString = record.get(157).replace(".", "");
 					Coord coord = new Coord(Double.parseDouble(xString),

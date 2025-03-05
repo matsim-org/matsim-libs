@@ -66,7 +66,7 @@ public class PrepareCountingData implements MATSimAppCommand {
 				.setSkipHeaderRecord(true).build().parse(reader);
 			for (CSVRecord record : parser) {
 				String totalCountString = record.get(37).replace(".", "");
-				if (!totalCountString.equals("") && !totalCountString.equals("0")) {
+				if (!totalCountString.isEmpty() && !totalCountString.equals("0")) {
 					String countDirection1String = record.get(38).replace(".", "");
 					String countDirection2String = record.get(39).replace(".", "");
 					String xString = record.get(156).replace(".", "");
