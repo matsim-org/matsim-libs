@@ -65,7 +65,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
 
         log.info("Reading trip relations...");
         List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
-        log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
+		log.info("Trip relations successfully loaded. There are {} trip relations", tripRelations.size());
 
         log.info("Start generating population...");
         Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
@@ -76,7 +76,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             }
 
             if (i % 500000 == 0) {
-                log.info("Processing: " + i + " out of " + tripRelations.size() + " entries have been processed");
+				log.info("Processing: {} out of {} entries have been processed", i, tripRelations.size());
             }
         }
 

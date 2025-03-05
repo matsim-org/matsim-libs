@@ -199,7 +199,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 		String[] dataPoints = loadsToTryOut.split(",");
 		Map<Double, Double> sumAbsErrorSummary = new HashMap<>(); // Average truck load --> error
 		for (String dataPoint : dataPoints) {
-			log.info("Processing: setting average load of truck to " + dataPoint + " ton");
+			log.info("Processing: setting average load of truck to {} ton", dataPoint);
 			Map<Id<Link>, Double> actualCounts = new HashMap<>();
 			for (Id<Link> linkId : countingStations) {
 				actualCounts.put(linkId, 0.0);
@@ -215,12 +215,12 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 				}
 				counter++;
 				if (counter % 100000 == 0) {
-					log.info("Processing: " + counter + " / " + numOfDataEntry);
+					log.info("Processing: {} / {}", counter, numOfDataEntry);
 				}
 			}
 			double error = calculateTotalError(actualCounts, referenceCounts);
 			sumAbsErrorSummary.put(averageTruckLoad, error);
-			log.info("This lead to total error of " + error);
+			log.info("This lead to total error of {}", error);
 		}
 
 		// write down the summary data in csv (also print in the console)
@@ -269,19 +269,19 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 				}
 				counter++;
 				if (counter % 2000 == 0) {
-					log.info("Calculating: " + counter + " / " + total);
+					log.info("Calculating: {} / {}", counter, total);
 				}
 			}
 		}
 		tsvWriter.close();
 		for (String region : regionsWithoutInformation) {
-			log.warn("We don't have information for region " + region + " in the lookup table");
+			log.warn("We don't have information for region {} in the lookup table", region);
 		}
 	}
 
 	private void loadRoutesMapFromData(Path preCalculatedRoutes, Map<String, Map<String, List<Id<Link>>>> routesMap,
 									   Map<String, Id<Link>> verkehrszelleToLinkIdMapping) throws IOException {
-		log.info("Loading pre-calculated routes from" + preCalculatedRoutes.toString());
+		log.info("Loading pre-calculated routes from{}", preCalculatedRoutes.toString());
 		// Initialize routes map
 		for (String from : verkehrszelleToLinkIdMapping.keySet()) {
 			routesMap.put(from, new HashMap<>());
