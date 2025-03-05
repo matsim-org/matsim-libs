@@ -8,16 +8,24 @@ import org.matsim.core.network.kernel.NetworkKernelFunction;
 
 import java.util.Map;
 
+/**
+ * This class calculates the parking search time based on the parking occupancy.
+ * It plugs together the following components:
+ * <ul>
+ *     <li> NetworkKernelFunction: calculates the links within a certain radius of the vehicle ("kernel")
+ *     <li> ParkingOccupancyObserver: observes the parking occupancy and returns the parking count per link
+ *     <li> ParkingSearchTimeFunction: calculates the parking search time based on the parking occupancy
+ * </ul>
+ */
 public class ParkingOccupancyObservingSearchTimeCalculator implements ParkingSearchTimeCalculator {
 	@Inject
-	private ParkingSearchTimeFunction parkingSearchTimeFunction;
+	private NetworkKernelFunction kernelFunction;
 
 	@Inject
 	private ParkingOccupancyObserver parkingOccupancyObserver;
 
 	@Inject
-	private NetworkKernelFunction kernelFunction;
-
+	private ParkingSearchTimeFunction parkingSearchTimeFunction;
 
 	@Override
 	public double calculateParkingSearchTime(double now, QVehicle vehicle, Link link) {
