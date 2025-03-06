@@ -82,9 +82,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 	private final SplittableRandom rnd = new SplittableRandom(4711);
 
-	private final List<Coord> fromCoords = new ArrayList<>();
-	private final List<Coord> toCoords = new ArrayList<>();
-
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
 	}
@@ -208,9 +205,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				freightPerson.addPlan(freightPersonPlan);
 				outputPlans.addPerson(freightPerson);
 				generated += 1;
-
-				fromCoords.add(act0.getCoord());
-				toCoords.add(act1.getCoord());
 			}
 		}
 
