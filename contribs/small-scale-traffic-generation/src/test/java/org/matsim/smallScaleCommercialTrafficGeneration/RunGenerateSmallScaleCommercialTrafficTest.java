@@ -87,6 +87,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 				"--jspritIterations", jspritIterations,
 				"--creationOption", creationOption,
 				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
+				"--additionalTravelBufferPerIterationInMinutes", "10",
 				"--includeExistingModels",
 				"--zoneShapeFileName", zoneShapeFileName,
 				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
