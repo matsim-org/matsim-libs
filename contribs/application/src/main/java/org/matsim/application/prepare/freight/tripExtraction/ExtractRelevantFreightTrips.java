@@ -51,7 +51,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 * <li>INTERNAL: Extract only trips with origin and destination in the shape area</li>
 	 * <li>TRANSIT: Extract only trips driving through the shape area</li> </ul>
 	 */
-	private enum TripType {
+	private enum geographicalTripType {
 		ALL, INCOMING, INTERNAL, OUTGOING, TRANSIT
 	}
 
@@ -73,8 +73,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
 	private boolean cutOnBoundary;
 
-	@CommandLine.Option(names = "--tripType", description = "Set the tripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
-	private TripType tripType;
+	@CommandLine.Option(names = "--geographicalTripType", description = "Set the geographicalTripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
+	private geographicalTripType geographicalTripType;
 
 	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
 	private String legMode;
@@ -172,7 +172,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			Leg leg = populationFactory.createLeg(legMode);
 			Activity act1 = populationFactory.createActivityFromCoord("freight_end", null);
 
-			switch (tripType) {
+			switch (geographicalTripType) {
 				case ALL -> {
 					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord, attributes);
 					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
@@ -195,7 +195,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				case TRANSIT ->
 					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
 						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
-				default -> throw new IllegalStateException("Unexpected value: " + tripType);
+				default -> throw new IllegalStateException("Unexpected value: " + geographicalTripType);
 			}
 
 			// Add new freight person to the output plans if trips is relevant
