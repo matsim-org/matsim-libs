@@ -109,7 +109,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(200, link1, TransportMode.drt));
         estimator.handleEvent(departureEvent(500, link2, TransportMode.drt));
         estimator.handleEvent(departureEvent(1500, link1, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
         List<RebalancingStrategy.Relocation> relocations = strategy.calculateMinCostRelocations(0, rebalanceableVehicles, Collections.emptyMap());
@@ -137,7 +137,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(300, link1, TransportMode.drt));
         // 1 expected trip in zone 2
         estimator.handleEvent(departureEvent(100, link2, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
 
@@ -199,7 +199,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(300, link1, TransportMode.drt));
         // 1 expected trip in zone 2
         estimator.handleEvent(departureEvent(100, link2, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
 
