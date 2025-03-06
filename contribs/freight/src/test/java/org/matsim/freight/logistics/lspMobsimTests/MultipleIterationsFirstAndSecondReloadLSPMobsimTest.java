@@ -73,8 +73,7 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 	@BeforeEach
 	public void initialize() {
 		//Todo/Fixme: In the result there only the second hub is used. -- see Issue #170.  KMT Nov'23
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -260,13 +259,9 @@ public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 		}
 		lsp.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);
-
 		Controller controller = ControllerUtils.createController(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 		controller.addOverridingModule(new LSPModule());
 		controller.addOverridingModule( new AbstractModule(){
 			@Override public void install(){

@@ -71,8 +71,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 	@BeforeEach
 	public void initialize() {
 
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -167,13 +166,9 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		}
 		collectionLSP.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(collectionLSP);
-		LSPs lsps = new LSPs(lspList);
-
 		Controller controller = ControllerUtils.createController(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

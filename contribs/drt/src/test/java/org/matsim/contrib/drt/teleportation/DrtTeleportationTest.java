@@ -8,6 +8,7 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
@@ -58,6 +59,7 @@ class DrtTeleportationTest {
 
 		// Setup to enable estimator and teleportation
 		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.addParameterSet(new DrtEstimatorParams());
 
 		// This uses the helper method to bind an estimator. Alternatively a separate modal module could also be created.
 		controler.addOverridingModule(new AbstractModule() {

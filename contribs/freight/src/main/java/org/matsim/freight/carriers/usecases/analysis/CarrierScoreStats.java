@@ -186,7 +186,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 					(sumScoreWorst / nofScoreWorst) + "\t" + (sumAvgScores / nofAvgScores) + "\t" + (sumScoreBest / nofScoreBest) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred while writing", e);
 		}
 
 		if (this.history != null) {
@@ -227,7 +227,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 		try {
 			this.out.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred", e);
 		}
 
 	}

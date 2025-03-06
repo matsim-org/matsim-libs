@@ -68,8 +68,7 @@ public class FirstReloadLSPMobsimTest {
 
 	@BeforeEach
 	public void initialize() {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -200,10 +199,7 @@ public class FirstReloadLSPMobsimTest {
 		}
 		lsp.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 
 		Controller controller = ControllerUtils.createController(scenario);
 

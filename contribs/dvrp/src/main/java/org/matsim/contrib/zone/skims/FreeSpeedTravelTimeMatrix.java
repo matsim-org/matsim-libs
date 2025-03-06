@@ -20,13 +20,9 @@
 
 package org.matsim.contrib.zone.skims;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,14 +36,13 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-import com.google.common.collect.Sets;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -199,53 +194,57 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 	}
 
 	public void write(URL outputPath, Network dvrpNetwork) {
-		try (DataOutputStream outputStream = new DataOutputStream(IOUtils.getOutputStream(outputPath, false))) {
-			// obtain fixed order of zones
+		try (DataOutputStream outputStream = new DataOutputStream(
+				new BufferedOutputStream(IOUtils.getOutputStream(outputPath, false)))) {
+
+			// Obtain fixed order of zones
 			List<Zone> zones = new ArrayList<>(zoneSystem.getZones().values());
 			outputStream.writeInt(zones.size());
 			for (Zone zone : zones) {
 				outputStream.writeUTF(zone.getId().toString());
 			}
 
-			// write matrix
-			for (var from : zones) {
-				for (var to : zones) {
-					int value = freeSpeedTravelTimeMatrix.get(from, to);
-					outputStream.writeInt(value);
+			// Write matrix
+			for (Zone from : zones) {
+				for (Zone to : zones) {
+					outputStream.writeInt(freeSpeedTravelTimeMatrix.get(from, to));
 				}
 			}
 
-			// write if sparse exists
+			// Write if sparse matrix exists
 			outputStream.writeBoolean(freeSpeedTravelTimeSparseMatrix != null);
 
 			if (freeSpeedTravelTimeSparseMatrix != null) {
-				// obtain fixed order of nodes
+				// Obtain fixed order of nodes
 				List<Node> nodes = new ArrayList<>(dvrpNetwork.getNodes().values());
 				outputStream.writeInt(nodes.size());
-				for (Node node : nodes) {
+
+				// Precompute node indices for fast lookup
+				Map<Node, Integer> nodeIndexMap = new HashMap<>(nodes.size());
+				for (int i = 0; i < nodes.size(); i++) {
+					Node node = nodes.get(i);
+					nodeIndexMap.put(node, i);
 					outputStream.writeUTF(node.getId().toString());
 				}
 
 				for (Node from : nodes) {
-					// write size of the matrix row
-					int rowSize = 0;
+					// Write size of the matrix row
+					List<Map.Entry<Integer, Integer>> nonZeroEntries = new ArrayList<>();
 
 					for (Node to : nodes) {
 						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
 						if (value >= 0) {
-							rowSize++;
+							nonZeroEntries.add(Map.entry(nodeIndexMap.get(to), value));
 						}
 					}
 
-					outputStream.writeInt(rowSize);
-					
-					// write matrix row
-					for (Node to : nodes) {
-						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
-						if (value >= 0) {
-							outputStream.writeInt(nodes.indexOf(to));
-							outputStream.writeInt(value);
-						}
+					// Write row size
+					outputStream.writeInt(nonZeroEntries.size());
+
+					// Write matrix row
+					for (var entry : nonZeroEntries) {
+						outputStream.writeInt(entry.getKey());
+						outputStream.writeInt(entry.getValue());
 					}
 				}
 			}

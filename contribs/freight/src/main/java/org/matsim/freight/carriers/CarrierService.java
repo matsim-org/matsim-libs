@@ -134,8 +134,7 @@ public final class CarrierService implements CarrierJob {
 		/**
 		* Sets the demand (size; capacity needed) of the service.
 		 * When not set, it is by default 0.
-		 * <p>
-		 * IMO we can put this into the Builder directly instead of a separate method? kturner dec'24
+		 *
 		 * @deprecated please use the constructor including the capacity demand {@link #newInstance(Id, Id, int)} instead
 		 *
 		 * @param capacityDemand the demand (size; capacity needed) of the service

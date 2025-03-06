@@ -58,12 +58,14 @@ public class PtTripEstimator implements TripEstimator {
 		double estimate = 0;
 		int numberOfVehicularLegs = 0;
 		double totalWaitingTime = 0.0;
-
+		boolean constantHandled = false;
 		for (Leg leg : trip) {
 
-			// Only score PT legs, other legs are estimated upstream
+			// Only score PT legs, other legs are estimated upstream, constant is only charged once per trip
 			if (TransportMode.pt.equals(leg.getMode())) {
-
+				if (!constantHandled){
+					estimate += params.constant;
+				}
 				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
 				totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
@@ -89,8 +91,7 @@ public class PtTripEstimator implements TripEstimator {
 		double dist = leg.getRoute().getDistance();
 		double tt = leg.getTravelTime().orElse(0);
 
-		return params.constant +
-				params.marginalUtilityOfDistance_m * dist +
+		return 	params.marginalUtilityOfDistance_m * dist +
 				params.marginalUtilityOfTraveling_s * tt +
 				context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * dist;
 	}
@@ -103,7 +104,7 @@ public class PtTripEstimator implements TripEstimator {
 
 		List<Double> offsets = transitRoute.getStops().stream()
 				.filter(stop -> stop.getStopFacility().getId().equals(route.getAccessStopId()))
-				.map(TransitRouteStop::getDepartureOffset).map(OptionalTime::seconds).collect(Collectors.toList());
+				.map(TransitRouteStop::getDepartureOffset).map(OptionalTime::seconds).toList();
 
 		double minimalWaitingTime = Double.POSITIVE_INFINITY;
 

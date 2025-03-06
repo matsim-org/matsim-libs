@@ -59,12 +59,12 @@ class RunCreateDataDistributionOfStructureDataTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
-		reader.parse(Path.of(utils.getOutputDirectory()).resolve("commercialFacilities.xml.gz").toUri().toURL());	;
+		reader.parse(Path.of(utils.getOutputDirectory()).resolve("commercialFacilities.xml.gz").toUri().toURL());
 		ActivityFacilities createdFacilities = scenario.getActivityFacilities();
 
 		Scenario scenarioInput = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		reader = new MatsimFacilitiesReader(scenarioInput);
-		reader.parse(Path.of(utils.getPackageInputDirectory()).getParent().resolve("commercialFacilities.xml.gz").toUri().toURL());	;
+		reader.parse(Path.of(utils.getPackageInputDirectory()).getParent().resolve("commercialFacilities.xml.gz").toUri().toURL());
 		ActivityFacilities existingFacilities = scenarioInput.getActivityFacilities();
 
 		Assertions.assertEquals(existingFacilities.getFacilities().size(), createdFacilities.getFacilities().size());
@@ -88,7 +88,7 @@ class RunCreateDataDistributionOfStructureDataTest {
 				sumsOfSharesPerZoneAndCategory.get(zone).mergeDouble(assignedDataType, share, Double::sum);
 			}
 		});
-		Assertions.assertEquals(3, sumsOfSharesPerZoneAndCategory.keySet().size());
+		Assertions.assertEquals(3, sumsOfSharesPerZoneAndCategory.size());
 		sumsOfSharesPerZoneAndCategory.values().forEach(sumsOfShares -> {
 			sumsOfShares.values().forEach(share -> {
 				Assertions.assertEquals(1.0, share, 0.0001);

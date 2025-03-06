@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -52,14 +51,12 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			private double score = 0.0;
 			private final Network network;
 			private final Carrier carrier;
-			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
 
 		 public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<>();
 			}
 
 
@@ -76,7 +73,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			@Override
 			public void reset() {
 				score = 0.0;
-				employedVehicles.clear();
 			}
 
 
@@ -92,7 +88,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
-					employedVehicles.add(vehicle);
 					double distance = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
@@ -101,23 +96,15 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 						}
 						distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
 					}
-					score += (-1)*distance*getDistanceParameter(vehicle,null);
+					score += (-1)*distance*getDistanceParameter(vehicle);
 				}
 
 			}
 
-			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
+			private double getDistanceParameter(CarrierVehicle vehicle) {
 				return vehicle.getType().getCostInformation().getCostsPerMeter();
 			}
 
-//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//				}
-//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//				return null;
-//			}
-//
 		}
 
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{

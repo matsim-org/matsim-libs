@@ -44,204 +44,173 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
  */
 /*package-private*/ class CollectionCarrierScheduler extends LSPResourceScheduler {
 
-  private static final Logger log = LogManager.getLogger(CollectionCarrierScheduler.class);
+	private static final Logger log = LogManager.getLogger(CollectionCarrierScheduler.class);
 
-  private Carrier carrier;
-  private CollectionCarrierResource resource;
-  private final Scenario scenario;
+	private Carrier carrier;
+	private CollectionCarrierResource resource;
+	private final Scenario scenario;
 
-  /**
-   * Constructor for the CollectionCarrierScheduler.
-   * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
-   *
-   * @param scenario the road pricing scheme
-   */
-  CollectionCarrierScheduler(Scenario scenario) {
-    this.scenario = scenario;
-  }
+	/**
+	 * Constructor for the CollectionCarrierScheduler.
+	 * TODO: In the future, the scenario should come via injection(?) This here is only a dirty workaround. KMT'Aug'24
+	 *
+	 * @param scenario the road pricing scheme
+	 */
+	CollectionCarrierScheduler(Scenario scenario) {
+		this.scenario = scenario;
+	}
 
-  @Override
-  public void initializeValues(LSPResource resource) {
-    if (resource.getClass() == CollectionCarrierResource.class) {
-      this.resource = (CollectionCarrierResource) resource;
-      this.carrier = this.resource.getCarrier();
-      this.carrier.getServices().clear();
-      this.carrier.getShipments().clear();
-      this.carrier.getPlans().clear();
-    }
-  }
+	@Override
+	public void initializeValues(LSPResource resource) {
+		if (resource.getClass() == CollectionCarrierResource.class) {
+			this.resource = (CollectionCarrierResource) resource;
+			this.carrier = this.resource.getCarrier();
+			this.carrier.getServices().clear();
+			this.carrier.getShipments().clear();
+			this.carrier.getPlans().clear();
+		}
+	}
 
-  @Override
-  public void scheduleResource() {
-    for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
-      CarrierService carrierService = convertToCarrierService(lspShipmentToBeAssigned);
-      carrier.getServices().put(carrierService.getId(), carrierService);
-    }
-    CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
-  }
+	@Override
+	public void scheduleResource() {
+		for (LspShipment lspShipmentToBeAssigned : lspShipmentsToSchedule) {
+			CarrierService carrierService = convertToCarrierService(lspShipmentToBeAssigned);
+			carrier.getServices().put(carrierService.getId(), carrierService);
+		}
+		CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
+	}
 
-  private CarrierService convertToCarrierService(LspShipment lspShipment) {
-    Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-	  CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom());
-	  CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
-            .setCapacityDemand(lspShipment.getSize())
-            .setServiceDuration(lspShipment.getDeliveryServiceTime())
-            .build();
-    //ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
-    if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
-      log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
-              new IllegalStateException("Id of LspShipment and CarrierService do not match"));
-    }
-    return carrierService;
-  }
+	private CarrierService convertToCarrierService(LspShipment lspShipment) {
+		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom(),lspShipment.getSize());
+		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
+			.setServiceDuration(lspShipment.getDeliveryServiceTime())
+			.build();
+		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
+		if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
+			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
+				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
+		}
+		return carrierService;
+	}
 
-  @Override
-  protected void updateShipments() {
-    for (LspShipment lspShipment : lspShipmentsToSchedule) {
-      for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-        Tour tour = scheduledTour.getTour();
-        for (TourElement element : tour.getTourElements()) {
-          if (element instanceof ServiceActivity serviceActivity) {
-            if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
-              addShipmentLoadElement(lspShipment, tour, serviceActivity);
-              addShipmentTransportElement(lspShipment, tour, serviceActivity);
-              addShipmentUnloadElement(lspShipment, tour);
-              addCollectionTourEndEventHandler(serviceActivity.getService(), lspShipment, resource, tour);
-              addCollectionServiceEventHandler(serviceActivity.getService(), lspShipment, resource);
-            }
-          }
-        }
-      }
-    }
-  }
+	@Override
+	protected void updateShipments() {
+		for (LspShipment lspShipment : lspShipmentsToSchedule) {
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				Tour tour = scheduledTour.getTour();
+				for (TourElement element : tour.getTourElements()) {
+					if (element instanceof ServiceActivity serviceActivity) {
+						if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
+							addShipmentLoadElement(lspShipment, tour, serviceActivity);
+							addShipmentTransportElement(lspShipment, tour, serviceActivity);
+							addShipmentUnloadElement(lspShipment, tour);
+							addCollectionTourEndEventHandler(serviceActivity.getService(), lspShipment, resource, tour);
+							addCollectionServiceEventHandler(serviceActivity.getService(), lspShipment, resource);
+						}
+					}
+				}
+			}
+		}
+	}
 
-  private void addShipmentLoadElement(
-          LspShipment lspShipment, Tour tour, ServiceActivity serviceActivity) {
+	private void addShipmentLoadElement(LspShipment lspShipment, Tour tour, ServiceActivity serviceActivity) {
 
-    LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
-            LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
-    builder.setResourceId(resource.getId());
+		LspShipmentUtils.ScheduledShipmentLoadBuilder builder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+		builder.setResourceId(resource.getId());
 
-    for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        builder.setLogisticChainElement(element);
-      }
-    }
+		for (LogisticChainElement element : resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				builder.setLogisticChainElement(element);
+			}
+		}
 
-    int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-    Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex - 1);
-    double startTimeOfLoading =
-            legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
-    builder.setStartTime(startTimeOfLoading);
-    builder.setEndTime(startTimeOfLoading + lspShipment.getDeliveryServiceTime());
+		Leg legBeforeService = (Leg) tour.getTourElements().get(tour.getTourElements().indexOf(serviceActivity) - 1);
+		double startTimeOfLoading = legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
+		builder.setStartTime(startTimeOfLoading);
+		builder.setEndTime(startTimeOfLoading + lspShipment.getDeliveryServiceTime());
 
-    LspShipmentPlanElement load = builder.build();
-    String idString =
-            load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-            .addPlanElement(id, load);
-  }
+		LspShipmentPlanElement load = builder.build();
+		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
+		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, load);
+	}
 
-  private void addShipmentTransportElement(
-          LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
+	private void addShipmentTransportElement(LspShipment lspShipment, Tour tour, Tour.ServiceActivity serviceActivity) {
 
-    LspShipmentUtils.ScheduledShipmentTransportBuilder builder =
-            LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
-    builder.setResourceId(resource.getId());
+		LspShipmentUtils.ScheduledShipmentTransportBuilder builder = LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+		builder.setResourceId(resource.getId());
+		builder.setCarrierId(carrier.getId());
+		builder.setFromLinkId(serviceActivity.getLocation());
+		builder.setToLinkId(tour.getEndLinkId());
+		builder.setCarrierService(serviceActivity.getService());
 
-    for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        builder.setLogisticChainElement(element);
-      }
-    }
+		for (LogisticChainElement element : resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				builder.setLogisticChainElement(element);
+			}
+		}
 
-    int serviceIndex = tour.getTourElements().indexOf(serviceActivity);
-    Leg legAfterService = (Leg) tour.getTourElements().get(serviceIndex + 1);
-    double startTimeOfTransport = legAfterService.getExpectedDepartureTime();
-    builder.setStartTime(startTimeOfTransport);
-    Leg lastLeg = (Leg) tour.getTourElements().getLast();
-    double endTimeOfTransport = lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
-    builder.setEndTime(endTimeOfTransport);
-    builder.setCarrierId(carrier.getId());
-    builder.setFromLinkId(serviceActivity.getLocation());
-    builder.setToLinkId(tour.getEndLinkId());
-    builder.setCarrierService(serviceActivity.getService());
-    LspShipmentPlanElement transport = builder.build();
-    String idString =
-            transport.getResourceId()
-                    + ""
-                    + transport.getLogisticChainElement().getId()
-                    + transport.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-            .addPlanElement(id, transport);
-  }
+		Leg legAfterService = (Leg) tour.getTourElements().get(tour.getTourElements().indexOf(serviceActivity) + 1);
+		builder.setStartTime(legAfterService.getExpectedDepartureTime());
+		Leg lastLeg = (Leg) tour.getTourElements().getLast();
+		builder.setEndTime(lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime());
+		LspShipmentPlanElement transport = builder.build();
 
-  private void addCollectionServiceEventHandler(
-          CarrierService carrierService, LspShipment lspShipment, LSPCarrierResource resource) {
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
+		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, transport);
+	}
 
-    for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        CollectionServiceEndEventHandler endHandler =
-                new CollectionServiceEndEventHandler(
-                        carrierService, lspShipment, element, resource);
-        lspShipment.addSimulationTracker(endHandler);
-        break;
-      }
-    }
-  }
+	private void addCollectionServiceEventHandler(CarrierService carrierService, LspShipment lspShipment, LSPCarrierResource resource) {
 
-  private void addCollectionTourEndEventHandler(
-          CarrierService carrierService,
-          LspShipment lspShipment,
-          LSPCarrierResource resource,
-          Tour tour) {
-    for (LogisticChainElement element : this.resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        LSPTourEndEventHandler handler =
-                new LSPTourEndEventHandler(
-                        lspShipment, carrierService, element, resource, tour);
-        lspShipment.addSimulationTracker(handler);
-        break;
-      }
-    }
-  }
+		for (LogisticChainElement element : this.resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, lspShipment, element, resource);
+				lspShipment.addSimulationTracker(endHandler);
+				break;
+			}
+		}
+	}
 
-  private void addShipmentUnloadElement(LspShipment lspShipment, Tour tour) {
+	private void addCollectionTourEndEventHandler(CarrierService carrierService, LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
+		for (LogisticChainElement element : this.resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				LSPTourEndEventHandler handler = new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour);
+				lspShipment.addSimulationTracker(handler);
+				break;
+			}
+		}
+	}
 
-    LspShipmentUtils.ScheduledShipmentUnloadBuilder builder =
-            LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
-    builder.setResourceId(resource.getId());
-    for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        builder.setLogisticsChainElement(element);
-      }
-    }
-    Leg lastLeg = (Leg) tour.getTourElements().getLast();
-    double startTime = lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
-    builder.setStartTime(startTime);
-    builder.setEndTime(startTime + getUnloadEndTime(tour));
+	private void addShipmentUnloadElement(LspShipment lspShipment, Tour tour) {
 
-    LspShipmentPlanElement unload = builder.build();
-    String idString =
-            unload.getResourceId()
-                    + ""
-                    + unload.getLogisticChainElement().getId()
-                    + unload.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-            .addPlanElement(id, unload);
-  }
+		LspShipmentUtils.ScheduledShipmentUnloadBuilder builder = LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
+		builder.setResourceId(resource.getId());
+		for (LogisticChainElement element : resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				builder.setLogisticsChainElement(element);
+			}
+		}
+		Leg lastLeg = (Leg) tour.getTourElements().getLast();
+		double startTime = lastLeg.getExpectedDepartureTime() + lastLeg.getExpectedTransportTime();
+		builder.setStartTime(startTime);
+		builder.setEndTime(startTime + getUnloadEndTime(tour));
 
-  private double getUnloadEndTime(Tour tour) {
-    double unloadEndTime = 0;
-    for (TourElement element : tour.getTourElements()) {
-      if (element instanceof Tour.ServiceActivity serviceActivity) {
-        unloadEndTime = unloadEndTime + serviceActivity.getDuration();
-      }
-    }
-    return unloadEndTime;
-  }
+		LspShipmentPlanElement unload = builder.build();
+		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + unload.getElementType();
+		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, unload);
+	}
+
+	private double getUnloadEndTime(Tour tour) {
+		double unloadEndTime = 0;
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof Tour.ServiceActivity serviceActivity) {
+				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
+			}
+		}
+		return unloadEndTime;
+	}
 
 }
