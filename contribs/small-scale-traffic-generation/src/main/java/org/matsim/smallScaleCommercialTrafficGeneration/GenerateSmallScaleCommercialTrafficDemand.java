@@ -134,7 +134,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
 	private int jspritIterations;
 
-	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "10")
+	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "30")
 	private int additionalTravelBufferPerIterationInMinutes;
 
 	@CommandLine.Option(names = "--maxReplanningIterations", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
