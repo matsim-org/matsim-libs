@@ -99,6 +99,15 @@ public class ShiftsParams extends ReflectiveConfigGroupWithConfigurableParameter
 			"In this case, make sure that 'shiftScheduleLookAhead' is larger than the prebboking slack.")
 	public boolean considerUpcomingShiftsForInsertion = false;
 
+	@Parameter
+	@Comment("Defines when the vehicle will head to the hub once the shift end is scheduled with the options [immediate] and [justInTime]. " +
+			"immediate: the vehicle will directly head to the hub once the shift end is scheduled (and may continue service from there)." +
+			"justInTime: the vehicle will stay at its current position and head to the hub just in time for the shift end."
+	)
+	public ShiftEndRelocationArrival shiftEndRelocationArrival = ShiftEndRelocationArrival.justInTime;
+
+	public enum ShiftEndRelocationArrival {immediate, justInTime}
+
 	public ShiftsParams() {
 		super(SET_NAME);
 	}
