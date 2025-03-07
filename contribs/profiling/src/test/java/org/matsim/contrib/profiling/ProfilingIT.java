@@ -16,7 +16,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.profiling.instrument.ProfilerInstrumentationConfiguration.defaultConfiguration;
 
 public class ProfilingIT {
 
@@ -32,7 +31,7 @@ public class ProfilingIT {
 		config.controller().setLastIteration(2);
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
-		controller.addOverridingModule(new ProfilerInstrumentationModule(defaultConfiguration()));
+		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 2));
 		controller.addOverridingModule(new ProfilingEventsModule());
 		// run scenario
 		controller.run();

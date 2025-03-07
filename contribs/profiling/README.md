@@ -46,14 +46,12 @@ Name and filename can be set to your liking. `repository` should be set to a fas
 The `ProfilerInstrumentationModule` can be used to create a profiling recording only for a chosen number of iterations.
 
 ```java
-controller.addOverridingModule(new ProfilerInstrumentationModule(
-        defaultConfiguration()
-            .startIteration(10)
-            .endIteration.(35)
-            .outputPath(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), "profile.jfr"))
-));
+controller.addOverridingModule(new ProfilerInstrumentationModule(10, 20, "profile");
 ```
-The output path given in the example is the default. You only need to specify it, if you want to use a different path or filename.
+This will create a recording `profile.jfr` in the configured controller output directory,
+starts to record in iteration 10, and stop after iteration 20. 
+
+This example output file name is the default and can be omitted.
 
 </details>
   </li>
