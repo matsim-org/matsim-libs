@@ -59,17 +59,12 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 
 	@Override // fixme install is called 4 times?!
 	public void install() {
-		if (this.config.getOutputPath() == null) {
-			// cannot be in the constructor as the config is injected later
-			this.config.outputPath(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), "profile.jfr"));
-		}
-
 		Recording recording;
 		// todo more than one recording?
 		try {
 			log.info("Instantiating JFR Recording");
 			recording = new Recording(Configuration.getConfiguration("profile"));
-			recording.setDestination(config.getOutputPath());
+			recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), config.getOutputFilename() + ".jfr"));
 			recording.setName("instrumented-profile-" + config.getStartIteration() + "-" + config.getEndIteration());
 		} catch (IOException | ParseException e) {
 			log.error("Could not instantiate JFR Recording", e);
