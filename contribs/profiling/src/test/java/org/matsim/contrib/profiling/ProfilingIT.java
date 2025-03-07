@@ -36,7 +36,7 @@ public class ProfilingIT {
 		// run scenario
 		controller.run();
 		// check for profile.jfr to exist
-		File recording = new File(config.controller().getOutputDirectory(), "profile.jfr");
+		File recording = new File(config.controller().getOutputDirectory(), "profile-1-2.jfr");
 		assertThat(recording).exists();
 		assertThat(recording).isNotEmpty();
 		// read the profile.jfr and expect the events defined by the module and via AOP to be there
@@ -44,24 +44,32 @@ public class ProfilingIT {
 	}
 
 	@Test
-	public void whenProfilingTwice_expectTwoRecordingFiles() {
+	public void whenRecordingMultipleTimes_expectSeveralRecordingFiles() {
 		// use simple scenario configuration for testing
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(3);
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
-		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 2, "profile-1"));
-		controller.addOverridingModule(new ProfilerInstrumentationModule(2, 3, "profile-2"));
+		controller.addOverridingModule(new ProfilerInstrumentationModule(0));
+		controller.addOverridingModule(new ProfilerInstrumentationModule(1));
+		controller.addOverridingModule(new ProfilerInstrumentationModule(2));
+		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 3, "profile"));
 		controller.addOverridingModule(new ProfilingEventsModule());
 		// run scenario
 		controller.run();
 		// check for the recordings to exist
-		File file1 = new File(config.controller().getOutputDirectory(), "profile-1.jfr");
-		File file2 = new File(config.controller().getOutputDirectory(), "profile-2.jfr");
+		File file1 = new File(config.controller().getOutputDirectory(), "profile-0.jfr");
+		File file2 = new File(config.controller().getOutputDirectory(), "profile-1.jfr");
+		File file3 = new File(config.controller().getOutputDirectory(), "profile-2.jfr");
+		File file4 = new File(config.controller().getOutputDirectory(), "profile.jfr");
 		assertThat(file1).exists();
 		assertThat(file1).isNotEmpty();
 		assertThat(file2).exists();
 		assertThat(file2).isNotEmpty();
+		assertThat(file3).exists();
+		assertThat(file3).isNotEmpty();
+		assertThat(file4).exists();
+		assertThat(file4).isNotEmpty();
 	}
 
 }
