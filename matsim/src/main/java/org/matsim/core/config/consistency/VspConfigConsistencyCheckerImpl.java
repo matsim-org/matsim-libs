@@ -312,7 +312,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added jan'13
-		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+		if ( actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +

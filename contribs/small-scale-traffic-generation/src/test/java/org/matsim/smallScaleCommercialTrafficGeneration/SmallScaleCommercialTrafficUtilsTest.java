@@ -48,7 +48,7 @@ public class SmallScaleCommercialTrafficUtilsTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void findZoneOfLinksTest() throws IOException, URISyntaxException {
+	void findZoneOfLinksTest() {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");

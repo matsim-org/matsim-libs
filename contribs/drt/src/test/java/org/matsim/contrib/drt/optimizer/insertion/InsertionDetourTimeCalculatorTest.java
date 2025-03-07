@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.Insert
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -54,6 +56,7 @@ public class InsertionDetourTimeCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void detourTimeLoss_start_pickup_dropoff() {
@@ -225,11 +228,11 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private Waypoint.Start start(Task task, double time, Link link) {
-		return new Waypoint.Start(task, link, time, 0);
+		return new Waypoint.Start(task, link, time, loadType.getEmptyLoad());
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), loadType.getEmptyLoad(), loadType);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

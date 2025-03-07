@@ -48,15 +48,11 @@ public class PtTripFareEstimatorTest {
 	private PtTripWithDistanceBasedFareEstimator estimator;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 
 		Config config = TestScenario.loadConfig(utils);
 
 		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
-
-		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
-		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
-
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
@@ -103,7 +99,7 @@ public class PtTripFareEstimatorTest {
 
 			List<Leg> trip = model.getLegs(TransportMode.pt, i);
 
-			if (trip == null || !model.hasModeForTrip(TransportMode.pt, i)) {
+			if (trip == null || !model.doesNotConsistOfOnlyWalksLegs(TransportMode.pt, i)) {
 				continue;
 			}
 
@@ -124,7 +120,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(est)
 			.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
 			.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
-			.isCloseTo(-379.4, Offset.offset(0.1));
+			.isCloseTo(-379.3, Offset.offset(0.1));
 
 	}
 
@@ -165,7 +161,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-2738.72, Offset.offset(0.1));
+			.isCloseTo(-2738.7, Offset.offset(0.1));
 
 
 		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
@@ -173,7 +169,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-1222.91, Offset.offset(0.1));
+			.isCloseTo( -1222.9, Offset.offset(0.1));
 
 		// Essentially single trip
 		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);

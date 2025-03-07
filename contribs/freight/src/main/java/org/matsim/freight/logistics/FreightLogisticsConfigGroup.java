@@ -52,7 +52,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #LSPS_FILE_DESC}
+     * @param lspsFile {@value #LSPS_FILE_DESC}
      */
     @StringSetter(LSPS_FILE)
     public void setLspsFile(String lspsFile) {

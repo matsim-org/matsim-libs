@@ -55,7 +55,7 @@ public class IsTheRightCustomerScoredTest {
         scenario = ScenarioUtils.loadScenario(config);
         CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-        //limit the fleet size of carrier pizza_1 so that it can handly only one order/job
+        //limit the fleet size of carrier pizza_1 so that it can handle only one order/job
         CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
         preparePopulation(scenario);
@@ -110,7 +110,7 @@ public class IsTheRightCustomerScoredTest {
         Id<CarrierService> serviceActivity = tour.getTour().getTourElements().stream()
                 .filter(tourElement -> tourElement instanceof Tour.ServiceActivity)
                 .map(tourElement -> ((Tour.ServiceActivity) tourElement).getService())
-                .map(carrierService -> carrierService.getId())
+                .map(CarrierService::getId)
                 .findFirst().orElseThrow(() -> new RuntimeException("no service activity found in scheduledTours"));
 
         Assertions.assertEquals(partyPizzaPlan.getPerson().getId().toString(), serviceActivity.toString().split("_")[0], "the person that is delivered pizza should be customerOrderingForParty");
@@ -118,9 +118,9 @@ public class IsTheRightCustomerScoredTest {
         //compare scores
         Assertions.assertTrue(partyPizzaPlan.getScore() > nonCustomerPlan.getScore(), "the plan of the customer receiving a job should get a higher score than the plan of the non customer ");
         Assertions.assertTrue(partyPizzaPlan.getScore() > lonelyPizzaPlan.getScore(), "the plan of the customer receiving a job should get a higher score than the plan of the customer not receiving one ");
-        Assertions.assertTrue(partyPizzaPlan.getScore() - lonelyPizzaPlan.getScore() == MAX_JOB_SCORE, "the difference of receiving a job in time and not receiving it at all should be the maxJobScore=" + MAX_JOB_SCORE + " as job is performed in time");
-        Assertions.assertEquals(lonelyPizzaPlan.getScore(), 0.0, MatsimTestUtils.EPSILON, "not receiving a job at all should be scored with zero");
-        Assertions.assertTrue(lonelyPizzaPlan.getScore() - nonCustomerPlan.getScore() == 0);
+		Assertions.assertEquals(MAX_JOB_SCORE, partyPizzaPlan.getScore() - lonelyPizzaPlan.getScore(), "the difference of receiving a job in time and not receiving it at all should be the maxJobScore=" + MAX_JOB_SCORE + " as job is performed in time");
+        Assertions.assertEquals(0.0, lonelyPizzaPlan.getScore(), MatsimTestUtils.EPSILON, "not receiving a job at all should be scored with zero");
+		Assertions.assertEquals(0, lonelyPizzaPlan.getScore() - nonCustomerPlan.getScore());
     }
 
 

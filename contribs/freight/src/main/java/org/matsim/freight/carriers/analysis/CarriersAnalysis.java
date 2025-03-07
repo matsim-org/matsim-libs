@@ -60,7 +60,6 @@ public class CarriersAnalysis {
 	private final String ANALYSIS_OUTPUT_PATH;
 	private Scenario scenario = null;
 	private Carriers carriers = null;
-	private final String delimiter = "\t";
 
 	public enum CarrierAnalysisType {
 		/**
@@ -199,16 +198,15 @@ public class CarriersAnalysis {
 	 */
 	public void runCarrierAnalysis(CarrierAnalysisType analysisType) {
 		File folder = new File(String.valueOf(ANALYSIS_OUTPUT_PATH));
-		if (!folder.exists())
+		if (!folder.exists()) {
+			//noinspection ResultOfMethodCallIgnored
 			folder.mkdirs();
+		}
+		String delimiter = "\t";
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, carriers);
 		switch (analysisType) {
-			case carriersPlans_unPlanned -> {
-				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
-			}
-			case carriersPlans -> {
-				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
-			}
+			case carriersPlans_unPlanned -> carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans_unPlanned);
+			case carriersPlans -> carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersPlans);
 			case carriersAndEvents -> {
 				carrierPlanAnalysis.runAnalysisAndWriteStats(ANALYSIS_OUTPUT_PATH, CarrierAnalysisType.carriersAndEvents);
 
@@ -219,7 +217,7 @@ public class CarriersAnalysis {
 					delimiter, scenario);
 				eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
-				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
+				CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter);
 				eventsManager.addHandler(carrierLoadAnalysis);
 
 				eventsManager.initProcessing();

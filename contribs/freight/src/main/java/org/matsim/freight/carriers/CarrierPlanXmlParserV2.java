@@ -324,9 +324,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				currentCarrier = null;
 			}
 			case "plan" -> {
-				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
+				CarrierPlan currentPlan = new CarrierPlan(scheduledTours);
 				currentPlan.setScore(currentScore);
-				currentCarrier.getPlans().add(currentPlan);
+				currentCarrier.addPlan(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}

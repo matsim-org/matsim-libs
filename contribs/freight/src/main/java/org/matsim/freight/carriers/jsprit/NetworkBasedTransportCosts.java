@@ -155,94 +155,55 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 * memory-consuming.
 	 *
 	 * @author stefan schröder
-	 *
 	 */
-	static class TransportDataKey {
-		private final String from;
-		private final String to;
-		private final double time;
-		private final String vehicleType;
+		record TransportDataKey(String from, String to, double time, String vehicleType) {
 
-		public TransportDataKey(String from, String to, double time, String vehicleType) {
-			super();
-			this.from = from;
-			this.to = to;
-			this.time = time;
-			this.vehicleType = vehicleType;
-		}
-
-		public String getFrom() {
-			return from;
-		}
-
-		public String getTo() {
-			return to;
-		}
-
-		public double getTime() {
-			return time;
-		}
-
-		public String getVehicleType() {
-			return vehicleType;
-		}
 
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((from == null) ? 0 : from.hashCode());
-			result = prime * result + Double.hashCode(time);
-			result = prime * result + ((to == null) ? 0 : to.hashCode());
-			result = prime * result + ((vehicleType == null) ? 0 : vehicleType.hashCode());
-			return result;
-		}
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + ((from == null) ? 0 : from.hashCode());
+				result = prime * result + Double.hashCode(time);
+				result = prime * result + ((to == null) ? 0 : to.hashCode());
+				result = prime * result + ((vehicleType == null) ? 0 : vehicleType.hashCode());
+				return result;
+			}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			TransportDataKey other = (TransportDataKey) obj;
-			if (from == null) {
-				if (other.from != null)
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
 					return false;
-			} else if (!from.equals(other.from))
-				return false;
-			if (Double.doubleToLongBits(time) != Double.doubleToLongBits(other.time))
-				return false;
-			if (to == null) {
-				if (other.to != null)
+				if (getClass() != obj.getClass())
 					return false;
-			} else if (!to.equals(other.to))
-				return false;
-			if (vehicleType == null) {
-				return other.vehicleType == null;
-			} else return vehicleType.equals(other.vehicleType);
-		}
+				TransportDataKey other = (TransportDataKey) obj;
+				if (from == null) {
+					if (other.from != null)
+						return false;
+				} else if (!from.equals(other.from))
+					return false;
+				if (Double.doubleToLongBits(time) != Double.doubleToLongBits(other.time))
+					return false;
+				if (to == null) {
+					if (other.to != null)
+						return false;
+				} else if (!to.equals(other.to))
+					return false;
+				if (vehicleType == null) {
+					return other.vehicleType == null;
+				} else return vehicleType.equals(other.vehicleType);
+			}
 
-	}
+		}
 
 	/**
 	 * Stores transport-costs, transport-times and the distance of travel.
 	 *
 	 * @author stefan schröder
-	 *
 	 */
-	static class TransportData {
-		public final double transportCosts;
-		public final double transportTime;
-		public final double transportDistance;
-
-		public TransportData(double transportCosts, double transportTime, double transportDistance) {
-			super();
-			this.transportCosts = transportCosts;
-			this.transportTime = transportTime;
-			this.transportDistance = transportDistance;
-		}
+		record TransportData(double transportCosts, double transportTime, double transportDistance) {
 
 	}
 
@@ -298,15 +259,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	}
 
-	private static class VehicleTypeVarCosts {
-		final double perMeter;
-		final double perSecond;
-
-		VehicleTypeVarCosts(double perMeter, double perSecond) {
-			super();
-			this.perMeter = perMeter;
-			this.perSecond = perSecond;
-		}
+	private record VehicleTypeVarCosts(double perMeter, double perSecond) {
 	}
 
 	/**

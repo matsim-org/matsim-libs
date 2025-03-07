@@ -51,31 +51,31 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	@Override
 	public void readFile( String filename ){
-		log.info(MSG) ;
 		try {
 			reader.readFile( filename );
 		} catch (Exception e) {
+			log.info(MSG) ;
 			log.warn("### Exception found while trying to read CarrierPlan: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
-					log.warn("read with validation = true failed. Try it again without validation... filename: {}", filename);
-					reader.setValidating(false);
-					reader.readFile(filename);
+				log.warn("read with validation = true failed. Try it again without validation... filename: {}", filename);
+				reader.setValidating(false);
+				reader.readFile(filename);
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
-			throw  e;}
+				throw  e;}
 		}
 	}
 
 	@Override
 	public void readURL( URL url ){
-		log.info(MSG) ;
 		try {
 			reader.readURL(url);
 		}  catch (Exception e) {
+			log.info(MSG) ;
 			log.warn("### Exception found while trying to read CarrierPlan: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());
-			reader.setValidating(false);
-			reader.readURL(url);
+				reader.setValidating(false);
+				reader.readURL(url);
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
 				throw  e;
 			}
@@ -83,13 +83,19 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	}
 
 	public void readStream( InputStream inputStream ){
-		log.info(MSG) ;
 		try {
 			reader.setValidating(false);
 			reader.parse(inputStream);
 		} catch (Exception e) {
+			log.info(MSG) ;
 			log.warn("### Exception found while trying to read CarrierPlan: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
-			throw  e;
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation... ");
+				reader.setValidating(false);
+				reader.parse(inputStream);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;
+			}
 		}
 	}
 

@@ -132,7 +132,7 @@ import org.matsim.vehicles.VehicleType;
       shipmentsInCurrentTour.clear();
     }
 
-    CarrierPlan plan = new CarrierPlan(carrier, unifyTourIds(scheduledPlans));
+    CarrierPlan plan = new CarrierPlan(unifyTourIds(scheduledPlans));
     plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
     plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
     carrier.addPlan(plan);
@@ -181,10 +181,9 @@ import org.matsim.vehicles.VehicleType;
 
   private CarrierService convertToCarrierService(LspShipment lspShipment) {
     Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-    CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo())
+    CarrierService carrierService = CarrierService.Builder.newInstance(serviceId, lspShipment.getTo(), lspShipment.getSize())
             //TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
             //If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-            .setCapacityDemand(lspShipment.getSize())
             .setServiceDuration(lspShipment.getDeliveryServiceTime())
             .build();
     //ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
@@ -261,35 +260,8 @@ import org.matsim.vehicles.VehicleType;
   }
 
   private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
-    LspShipmentUtils.ScheduledShipmentLoadBuilder builder =
-            LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
-    builder.setResourceId(resource.getId());
-
-    for (LogisticChainElement element : resource.getClientElements()) {
-      if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-        builder.setLogisticChainElement(element);
-      }
-    }
-
-    int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
-    Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
-    double startTimeOfTransport = legAfterStart.getExpectedDepartureTime();
-    double cumulatedLoadingTime = 0;
-    for (TourElement element : tour.getTourElements()) {
-      if (element instanceof Tour.ServiceActivity activity) {
-        cumulatedLoadingTime = cumulatedLoadingTime + activity.getDuration();
-      }
-    }
-    builder.setStartTime(startTimeOfTransport - cumulatedLoadingTime);
-    builder.setEndTime(startTimeOfTransport);
-
-    LspShipmentPlanElement load = builder.build();
-    String idString =
-            load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-            .addPlanElement(id, load);
-  }
+	  CarrierSchedulerUtils.addShipmentLoadElement(lspShipment, tour, resource, super.lspPlan);
+     }
 
   private void addShipmentTransportElement(
     LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
