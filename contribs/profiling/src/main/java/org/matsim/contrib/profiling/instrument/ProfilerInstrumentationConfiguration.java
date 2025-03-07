@@ -20,7 +20,9 @@
 
 package org.matsim.contrib.profiling.instrument;
 
-import java.nio.file.Path;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+
+import java.util.Objects;
 
 public class ProfilerInstrumentationConfiguration {
 
@@ -32,12 +34,15 @@ public class ProfilerInstrumentationConfiguration {
 		return new ProfilerInstrumentationConfiguration();
 	}
 
-	private Path outputPath = null;
+	private String outputFilename = "profile";
 	private int startIteration = 1;
 	private int endIteration = 2;
 
-	public Path getOutputPath() {
-		return outputPath;
+	/**
+	 * @return name of the output file (without extension)
+	 */
+	public String getOutputFilename() {
+		return outputFilename;
 	}
 
 	public int getStartIteration() {
@@ -49,14 +54,14 @@ public class ProfilerInstrumentationConfiguration {
 	}
 
 	/**
-	 * If not set, {@link ProfilerInstrumentationModule#install()} will default to
-	 * {@code Path.of(ConfigUtils.addOrGetModule(config, ControllerConfigGroup.class).getOutputDirectory(), "profile.jfr")}
+	 * The file will be created in {@link ControllerConfigGroup#getOutputDirectory()}
+	 * with this given name and the {@code .jfr} extension.
 	 *
-	 * @param outputPath a Path to where the recording file should be created
+	 * @param outputFilename name of the .jfr recording file
 	 * @return this for further configuring in builder style
 	 */
-	public ProfilerInstrumentationConfiguration outputPath(Path outputPath) {
-		this.outputPath = outputPath;
+	public ProfilerInstrumentationConfiguration outputFilename(String outputFilename) {
+		this.outputFilename = Objects.requireNonNull(outputFilename);
 		return this;
 	}
 
