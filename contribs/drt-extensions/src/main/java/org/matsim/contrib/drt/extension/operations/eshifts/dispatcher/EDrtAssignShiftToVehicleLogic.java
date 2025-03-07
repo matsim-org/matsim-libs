@@ -34,18 +34,6 @@ public class EDrtAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic 
 	@Override
 	public boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift) {
 
-		// no, if charging
-		if(vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
-			final Task currentTask = vehicle.getSchedule().getCurrentTask();
-			if (currentTask instanceof EDrtWaitForShiftTask) {
-				if (((EDrtWaitForShiftTask) currentTask).getChargingTask() != null) {
-					if (currentTask.getEndTime() > shift.getStartTime()) {
-						return false;
-					}
-				}
-			}
-		}
-
 		// no, if below battery threshold
 		if (vehicle instanceof EvShiftDvrpVehicle) {
 			final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
