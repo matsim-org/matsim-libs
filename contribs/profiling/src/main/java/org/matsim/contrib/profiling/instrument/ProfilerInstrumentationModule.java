@@ -113,12 +113,7 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 
 	}
 
-	private static class ProfilingStartListener implements IterationStartsListener {
-		private final ProfilerInstrumentationModule parent;
-
-		ProfilingStartListener(ProfilerInstrumentationModule parent) {
-			this.parent = parent;
-		}
+	private record ProfilingStartListener(ProfilerInstrumentationModule parent) implements IterationStartsListener {
 
 		@Override
 		public double priority() {
@@ -136,12 +131,7 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 		}
 	}
 
-	private static class ProfilingEndListener implements IterationEndsListener {
-		private final ProfilerInstrumentationModule parent;
-
-		ProfilingEndListener(ProfilerInstrumentationModule parent) {
-			this.parent = parent;
-		}
+	private record ProfilingEndListener(ProfilerInstrumentationModule parent) implements IterationEndsListener {
 
 		@Override
 		public double priority() {
