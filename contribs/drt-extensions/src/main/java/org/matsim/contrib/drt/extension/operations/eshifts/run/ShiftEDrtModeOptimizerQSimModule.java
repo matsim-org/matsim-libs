@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
@@ -9,18 +10,13 @@ import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingSched
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtAssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftStartLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultAssignShiftToVehicleLogic;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftStartLogic;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
@@ -43,8 +39,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Singleton;
 
 /**
  * @author nkuehnel / MOIA
@@ -75,7 +69,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 								getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 								getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-								drtShiftParams, new EDrtShiftStartLogic(new DefaultShiftStartLogic()),
+								drtShiftParams, new DefaultShiftStartLogic(),
 								new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams),
 								getter.getModal(ShiftScheduler.class)),
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
