@@ -29,8 +29,10 @@ import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +43,7 @@ import java.util.Objects;
 /**
  * Create a JFR profiling recording for the duration of the configured MATSim iterations
  */
-public class ProfilerInstrumentationModule extends AbstractModule {
+public class ProfilerInstrumentationModule extends AbstractModule implements StartupListener {
 
 	private static final Logger log = LogManager.getLogger(ProfilerInstrumentationModule.class);
 
@@ -75,10 +77,21 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 		this.outputFilename = Objects.requireNonNull(outputFilename);
 	}
 
-	@Override // fixme install is called 4 times?!
+	@Override
 	public void install() {
-		Recording recording;
-		// todo more than one recording?
+		addControlerListenerBinding().toInstance(this);
+		addControlerListenerBinding().toInstance(new ProfilingStartListener(this));
+		addControlerListenerBinding().toInstance(new ProfilingEndListener(this));
+	}
+
+	/**
+	 * Initialize the jfr {@link Recording} and potentially error out as early as possible if the Recording cannot be instantiated.
+	 */
+	public void notifyStartup(StartupEvent startupEvent) {
+		if (recording != null) {
+			throw new IllegalStateException("Already initialized");
+		}
+
 		try {
 			log.info("Instantiating JFR Recording");
 			recording = new Recording(Configuration.getConfiguration("profile"));
@@ -98,18 +111,13 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 			log.info("{}: {}", setting.getKey(), setting.getValue());
 		}
 
-		addControlerListenerBinding().toInstance(new ProfilingStartListener(recording, startIteration));
-		addControlerListenerBinding().toInstance(new ProfilingEndListener(recording, endIteration));
 	}
 
-
 	private static class ProfilingStartListener implements IterationStartsListener {
-		private final Recording recording;
-		private final int startIteration;
+		private final ProfilerInstrumentationModule parent;
 
-		ProfilingStartListener(Recording recording, int startIteration) {
-			this.recording = recording;
-			this.startIteration = startIteration;
+		ProfilingStartListener(ProfilerInstrumentationModule parent) {
+			this.parent = parent;
 		}
 
 		@Override
@@ -120,21 +128,19 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
-			if (iterationStartsEvent.getIteration() == startIteration) {
+			if (iterationStartsEvent.getIteration() == parent.startIteration) {
 				// start recording
 				log.info("[PROFILING] Starting Recording at iteration {}", iterationStartsEvent.getIteration());
-				recording.start();
+				parent.recording.start();
 			}
 		}
 	}
 
 	private static class ProfilingEndListener implements IterationEndsListener {
-		private final Recording recording;
-		private final int endIteration;
+		private final ProfilerInstrumentationModule parent;
 
-		ProfilingEndListener(Recording recording, int startIteration) {
-			this.recording = recording;
-			this.endIteration = startIteration;
+		ProfilingEndListener(ProfilerInstrumentationModule parent) {
+			this.parent = parent;
 		}
 
 		@Override
@@ -145,11 +151,11 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			if (iterationEndsEvent.getIteration() == endIteration) {
+			if (iterationEndsEvent.getIteration() == parent.endIteration) {
 				// stop recording - automatically dumped since output path is set and then closed as well
-				recording.stop();
+				parent.recording.stop();
 			}
-			log.info("[PROFILING] {} Current iteration: {}", recording.getState(), iterationEndsEvent.getIteration());
+			log.info("[PROFILING] {} Current iteration: {}", parent.recording.getState(), iterationEndsEvent.getIteration());
 		}
 	}
 
