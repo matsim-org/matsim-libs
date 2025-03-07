@@ -22,21 +22,13 @@ public class CarrierConsistencyCheckers {
 	}
 	//needed for log messages, log level etc.
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
-	private static Level currentLevel;
-	public static void setLogLevel(Level level) {
-		currentLevel = level;
-		Configurator.setLevel(log.getName(), level);
-	}
-
-	private static void logMessage(String msg, Object... params) {
-		if (currentLevel==Level.WARN){
-			log.warn(msg, params);
-		} else if (currentLevel==Level.ERROR) {
-			log.error(msg, params);
-		} else {
-			log.info(msg, params);
+		public static Level setInternalLogLevel(Level level) {
+			if (level == Level.FATAL) {
+				return Level.ERROR;
+			} else {
+				return level;
+			}
 		}
-	}
 
 	private static boolean doesJobFitInVehicle(Double capacity, Double demand) {
 		return demand <= capacity;
@@ -60,7 +52,7 @@ public class CarrierConsistencyCheckers {
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	public static CheckResult carrierCapabilitiesCheck(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
+		Level level = setInternalLogLevel(lvl);
 		int checkFailed = 0;
 		if (vehicleCapacityCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
 			checkFailed++;
@@ -85,7 +77,7 @@ public class CarrierConsistencyCheckers {
    * 		 and 'CHECK_FAILED' if allJobsInToursCheck returns CHECK_FAIL
    */
   public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
+	  Level level = setInternalLogLevel(lvl);
 		int checkFailed = 0;
 		if (allJobsInToursCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
 			checkFailed++;
@@ -107,7 +99,7 @@ public class CarrierConsistencyCheckers {
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult vehicleCapacityCheck(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
+		Level level = setInternalLogLevel(lvl);
 		//this map stores all checked carrier's IDs along with the result. true = carrier can handle all jobs.
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 
@@ -142,14 +134,14 @@ public class CarrierConsistencyCheckers {
 
 			//if map is empty, there is a sufficient vehicle for every job
 			if (jobTooBigForVehicle.isEmpty()) {
-				logMessage("Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity);
+				log.log(level, "Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity);
 				isCarrierCapable.put(carrier.getId(), true);
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
 				isCarrierCapable.put(carrier.getId(), false);
-				logMessage("Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
+				log.log(level,"Carrier '{}': Demand of {} job(s) too high!", carrier.getId().toString(), jobTooBigForVehicle.size());
 				for (CarrierJob job : jobTooBigForVehicle) {
-					logMessage("Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
+					log.log(level,"Demand of Job '{}' is too high: '{}'", job.getId().toString(), job.getCapacityDemand());
 				}
 			}
 		}
@@ -172,7 +164,7 @@ public class CarrierConsistencyCheckers {
 	 */
 
 	/*package-private*/ static CheckResult vehicleScheduleCheck(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
+		Level level = setInternalLogLevel(lvl);
 		//isCarrierCapable saves carrierIDs and check result (true/false)
 		Map<Id<Carrier>, Boolean> isCarrierCapable = new HashMap<>();
 		//go through all carriers
@@ -238,7 +230,7 @@ public class CarrierConsistencyCheckers {
 				}
 				//if shipment is transportable => job is feasible
 				if (!isTransportable) {
-					logMessage("Job '{}' can not be handled by carrier '{}'.", shipmentID, carrier.getId().toString());
+					log.log(level,"Job '{}' can not be handled by carrier '{}'.", shipmentID, carrier.getId().toString());
 					nonFeasibleJob.put(shipmentID, "No sufficient vehicle available for this job.");
 				}
 			}
@@ -279,7 +271,7 @@ public class CarrierConsistencyCheckers {
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		isCarrierCapable.forEach((carrierId, value) -> {
 			if (!value) {
-				logMessage("Carrier " + carrierId + " can not handle all jobs.");
+				log.log(level,"Carrier " + carrierId + " can not handle all jobs.");
 			}
 		});
 		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
@@ -299,7 +291,7 @@ public class CarrierConsistencyCheckers {
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult allJobsInToursCheck(Carriers carriers, Level lvl) {
-		setLogLevel(lvl);
+		Level level = setInternalLogLevel(lvl);
 		Map<Id<Carrier>, AllJobsInToursDetailedCheckResult> isCarrierCapable = new HashMap<>();
 		boolean jobInToursMoreThanOnce = false;
 		boolean jobIsMissing = false;
@@ -350,10 +342,10 @@ public class CarrierConsistencyCheckers {
 				if (count == 1) {
 					serviceIterator.remove();
 				} else if (count > 1) {
-					logMessage("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), serviceId, count);
+					log.log(level,"Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), serviceId, count);
 					jobInToursMoreThanOnce = true;
 				} else {
-					logMessage("Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), serviceId);
+					log.log(level,"Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), serviceId);
 					jobIsMissing = true;
 				}
 			}
@@ -368,10 +360,10 @@ public class CarrierConsistencyCheckers {
 				if (count == 1) {
 					shipmentIterator.remove();
 				} else if (count > 1) {
-					logMessage("Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), shipmentId, count);
+					log.log(level,"Carrier '{}': Job '{}' is scheduled {} times!", carrier.getId(), shipmentId, count);
 					jobInToursMoreThanOnce = true;
 				} else {
-					logMessage("Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), shipmentId);
+					log.log(level,"Carrier '{}': Job '{}' is not part of a tour!", carrier.getId(), shipmentId);
 					jobIsMissing = true;
 				}
 			}
@@ -386,7 +378,7 @@ public class CarrierConsistencyCheckers {
 				}
 				//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
-				logMessage("Carrier '{}': All jobs are scheduled once.", carrier.getId());
+				log.log(level,"Carrier '{}': All jobs are scheduled once.", carrier.getId());
 				isCarrierCapable.put(carrier.getId(), AllJobsInToursDetailedCheckResult.ALL_JOBS_IN_TOURS);
 			}
 		}
@@ -400,7 +392,7 @@ public class CarrierConsistencyCheckers {
 		} else if (isCarrierCapable.values().stream().anyMatch(v -> v.equals(AllJobsInToursDetailedCheckResult.JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED))) {
 			return CheckResult.CHECK_FAILED;
 		} else {
-			logMessage("Unexpected outcome! Please check all input files.");
+			log.log(level,"Unexpected outcome! Please check all input files.");
 			return CheckResult.ERROR;
 		}
 	}
