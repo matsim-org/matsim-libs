@@ -50,7 +50,8 @@ controller.addOverridingModule(new ProfilerInstrumentationModule(10, 20, "profil
 ```
 This will create a recording `profile.jfr` in the configured controller output directory,
 starts to record in iteration 10, and stop after iteration 20.  
-This example output file name is the default and can be omitted.
+Omitting the name will default to including the iterations, i.e. `profile-10-20.jfr`.  
+The endIteration can be omitted to only record the given iteration.
 
 The following Java options should still be used additionally:
 

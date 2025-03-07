@@ -53,13 +53,22 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 	private Recording recording;
 
 	/**
+	 * Create a profile.jfr recording for the given iteration.
+	 *
+	 * @param startIteration iteration to create a profiler recording for
+	 */
+	public ProfilerInstrumentationModule(int startIteration) {
+		this(startIteration, startIteration, "profile-"+startIteration);
+	}
+
+	/**
 	 * Create a profile.jfr recording between given start and end iterations (including).
 	 *
 	 * @param startIteration iteration before which to start the profiler recording
 	 * @param endIteration iteration after which to end the profiler recording
 	 */
 	public ProfilerInstrumentationModule(int startIteration, int endIteration) {
-		this(startIteration, endIteration, "profile");
+		this(startIteration, endIteration, "profile-"+startIteration+"-"+endIteration);
 	}
 
 	/**
