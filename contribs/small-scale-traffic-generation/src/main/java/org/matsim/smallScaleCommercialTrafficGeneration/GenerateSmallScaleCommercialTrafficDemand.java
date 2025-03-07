@@ -134,7 +134,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--jspritIterations", description = "Set number of jsprit iterations", required = true)
 	private int jspritIterations;
 
-	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "10")
+	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "30")
 	private int additionalTravelBufferPerIterationInMinutes;
 
 	@CommandLine.Option(names = "--maxReplanningIterations", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
@@ -464,7 +464,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 			log.info("Solving carriers {}-{} of all {} carriers. This are {} VRP to solve.", fromIndex + 1, toIndex, allCarriers.size(),
 				subCarriers.size());
-			CarriersUtils.runJsprit(originalScenario);
+			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
 			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
 			if (!nonCompleteSolvedCarriers.isEmpty()) {
 				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");

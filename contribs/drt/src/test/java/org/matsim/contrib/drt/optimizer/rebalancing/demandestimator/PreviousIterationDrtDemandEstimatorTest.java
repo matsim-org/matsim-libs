@@ -70,7 +70,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		//no events in previous iterations
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		assertDemand(estimator, 0, zone1, 0);
 		assertDemand(estimator, 2000, zone1, 0);
@@ -96,7 +96,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		//time bin 5400-7200
 		estimator.handleEvent(departureEvent(7000, link1, TransportMode.drt));
 		estimator.handleEvent(departureEvent(7100, link2, TransportMode.drt));
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		//time bin 0-1800
 		assertDemand(estimator, 0, zone1, 3);
@@ -121,7 +121,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 
 		estimator.handleEvent(departureEvent(100, link1, "mode X"));
 		estimator.handleEvent(departureEvent(200, link2, TransportMode.car));
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		assertDemand(estimator, 0, zone1, 0);
 		assertDemand(estimator, 0, zone2, 0);
@@ -137,7 +137,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		assertDemand(estimator, 0, zone1, 0);
 		assertDemand(estimator, 0, zone2, 0);
 
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		assertDemand(estimator, 0, zone1, 1);
 		assertDemand(estimator, 0, zone2, 1);
@@ -149,7 +149,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 
 		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
 		estimator.handleEvent(departureEvent(2200, link2, TransportMode.drt));
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		assertDemand(estimator, 0, zone1, 1);
 		assertDemand(estimator, 1799, zone1, 1);
@@ -166,7 +166,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 		PreviousIterationDrtDemandEstimator estimator = createEstimator();
 
 		estimator.handleEvent(departureEvent(10000000, link1, TransportMode.drt));
-		estimator.reset(1);
+		estimator.notifyIterationEnds(null);
 
 		assertDemand(estimator, 10000000, zone1, 1);
 	}

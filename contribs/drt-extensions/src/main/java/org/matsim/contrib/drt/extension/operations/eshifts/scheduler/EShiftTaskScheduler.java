@@ -1,11 +1,5 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.scheduler;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -14,15 +8,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftSchedules;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.*;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
@@ -30,14 +19,9 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.ev.charging.BatteryCharging;
@@ -53,7 +37,12 @@ import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
  * @author nkuehnel / MOIA
@@ -75,7 +64,7 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
 
     public EShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
                                MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftsParams shiftsParams,
-                               ChargingInfrastructure chargingInfrastructure, OperationFacilities operationFacilities, Fleet fleet,
+                               ChargingInfrastructure chargingInfrastructure,
                                ChargingStrategy.Factory chargingStrategyFactory) {
         this.travelTime = travelTime;
         this.timer = timer;
@@ -307,6 +296,17 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
                     // remove STAY
                     schedule.removeLastTask();
                 }
+
+                if(path.getArrivalTime() < shift.getEndTime()) {
+                    double delta = shift.getEndTime() - path.getArrivalTime();
+                    if(shiftsParams.shiftEndRelocationArrival == ShiftsParams.ShiftEndRelocationArrival.justInTime) {
+                        DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTime,
+                                departureTime + delta, currentLink);
+                        schedule.addTask(waitTask);
+                        path = path.withDepartureTime(departureTime + delta);
+                    }
+                }
+
                 //add drive to break location
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)); // add RELOCATE
 
@@ -316,8 +316,12 @@ public class EShiftTaskScheduler implements ShiftTaskScheduler {
                     logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                             + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
                 }
-                schedule.addTask(taskFactory.createStayTask(vehicle, path.getArrivalTime(), startTime,
-                        path.getToLink()));
+
+                if(shiftsParams.shiftEndRelocationArrival != ShiftsParams.ShiftEndRelocationArrival.justInTime) {
+                    schedule.addTask(taskFactory.createStayTask(vehicle, path.getArrivalTime(), startTime,
+                            path.getToLink()));
+                }
+
                 appendShiftChange(vehicle, shift, breakFacility, startTime, endTime, link);
             } else {
                 drtStayTask.setEndTime(shift.getEndTime());

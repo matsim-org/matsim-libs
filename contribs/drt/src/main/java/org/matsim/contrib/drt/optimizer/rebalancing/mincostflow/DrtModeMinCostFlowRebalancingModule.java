@@ -101,6 +101,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								strategyParams.demandEstimationPeriod))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addControlerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:

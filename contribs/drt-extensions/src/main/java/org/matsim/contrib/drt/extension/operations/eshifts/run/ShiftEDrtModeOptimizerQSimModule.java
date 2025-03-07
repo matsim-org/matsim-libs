@@ -87,7 +87,6 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
 						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams, getter.getModal(ChargingInfrastructure.class),
-						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class),
 						getter.getModal(ChargingStrategy.Factory.class))
 		)).asEagerSingleton();
 
