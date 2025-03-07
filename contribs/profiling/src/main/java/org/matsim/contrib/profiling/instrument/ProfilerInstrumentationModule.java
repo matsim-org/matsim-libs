@@ -101,9 +101,11 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 			log.error("Could not instantiate JFR Recording", e);
 			throw new RuntimeException(e);
 		}
-		recording.setToDisk(false); // true might be better for longer recordings? memory usage vs disk IO?
-		// todo if disk=true; how to set repository setting here?
-		recording.setDumpOnExit(true); // in case it exits prematurely?
+		// required for multiple recordings
+		// toDisk writes to /tmp by default; to use a different directory (e.g. for more space or faster storage)
+		// add the java option -XX:FlightRecorderOptions=stackdepth=2048,repository="/fast"
+		recording.setToDisk(true); // might be better for longer recordings? memory usage vs disk IO?
+		recording.setDumpOnExit(true); // in case the jvm exits prematurely?
 
 		// debug: dump all current JFR recoding settings
 		log.info("[PROFILING] Recording settings");

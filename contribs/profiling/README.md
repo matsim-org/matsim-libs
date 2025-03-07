@@ -49,9 +49,14 @@ The `ProfilerInstrumentationModule` can be used to create a profiling recording 
 controller.addOverridingModule(new ProfilerInstrumentationModule(10, 20, "profile");
 ```
 This will create a recording `profile.jfr` in the configured controller output directory,
-starts to record in iteration 10, and stop after iteration 20. 
-
+starts to record in iteration 10, and stop after iteration 20.  
 This example output file name is the default and can be omitted.
+
+The following Java options should still be used additionally:
+
+```
+-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:FlightRecorderOptions=stackdepth=2048,repository="/tmp"
+```
 
 </details>
   </li>
