@@ -144,6 +144,7 @@ public class RunFissDrtScenarioIT {
 		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
 		shiftsParams.shiftInputFile = shiftsFile;
 		shiftsParams.allowInFieldChangeover = true;
+		shiftsParams.shiftEndRelocationArrival = ShiftsParams.ShiftEndRelocationArrival.immediate;
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 
