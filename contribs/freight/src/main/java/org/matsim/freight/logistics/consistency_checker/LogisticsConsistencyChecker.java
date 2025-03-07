@@ -164,27 +164,29 @@ public class LogisticsConsistencyChecker {
 	 */
 	public static CheckResult shipmentForEveryShipmentPlanSelectedPlanOnly(LSPs lsps, Level lvl) {
 		// Alle ShipmentPlan-IDs werden in dieser Liste gespeichert
-		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
-		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
+		List<Id<LspShipment>> lspShipmentIdsList = new LinkedList<>();
+		List<Id<LspShipment>> lspShipmentIdsList_selectedPlan = new LinkedList<>();
 
 		Level level = setInternalLogLevel(lvl);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
-				lspShipmentsList.add(lspShipment.getId());
+				lspShipmentIdsList.add(lspShipment.getId());
 			}
 			// selected plan only
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
-				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
+				lspShipmentIdsList_selectedPlan.add(shipmentSelectedPlan.getLspShipmentId());
 			}
-		}
-		Set<Id<LspShipment>> availableShipments = new HashSet<>(lspShipmentsList);
+		} //TODO @anton: Bitte prüfen, ob du wirklich hier schon zu machen willst. mMn sollte der Check auch für jeden Lsp einzeln erfolgen.
+		Set<Id<LspShipment>> availableShipments = new HashSet<>(lspShipmentIdsList);
 		List<Id<LspShipment>> plansWithoutShipments = new LinkedList<>();
 
 		log.log(lvl, "Available Shipments: {}", availableShipments.toString());
-		for (Id<LspShipment> shipmentPlanId : lspShipmentPlansList) {
+		log.log(lvl, "Ids shipments from selected plans: {}", lspShipmentIdsList_selectedPlan.toString());
+
+		for (Id<LspShipment> shipmentPlanId : availableShipments) {
 			log.log(level, "ShipmentPlan Id: {}",  shipmentPlanId.toString());
-			if (!availableShipments.contains(shipmentPlanId)) {
+			if (!lspShipmentIdsList_selectedPlan.contains(shipmentPlanId)) {
 				plansWithoutShipments.add(shipmentPlanId);
 			}
 		}
