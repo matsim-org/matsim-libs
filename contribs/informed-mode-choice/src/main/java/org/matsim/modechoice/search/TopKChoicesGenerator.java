@@ -170,8 +170,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 
 		// threshold need to be rechecked again on the global best
-		if (!Double.isNaN(diffThreshold) && diffThreshold >= 0) {
-			double best = result.get(0).getUtility();
+		if (!Double.isNaN(diffThreshold) && diffThreshold >= 0 && !result.isEmpty()) {
+			double best = result.getFirst().getUtility();
 
 			// absolute threshold
 			result.removeIf(c -> c.getUtility() < best - diffThreshold);

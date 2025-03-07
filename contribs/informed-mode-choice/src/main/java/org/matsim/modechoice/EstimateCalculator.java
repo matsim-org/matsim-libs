@@ -4,8 +4,12 @@ import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.hermes.HermesConfigGroup;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.modechoice.constraints.TripConstraint;
@@ -20,35 +24,37 @@ import java.util.function.Predicate;
  */
 public final class EstimateCalculator {
 
-	@Inject
-	private QSimConfigGroup qsim;
 
+	private final OptionalTime simulationEndTime;
 	@Inject
 	private EstimateRouter router;
-
 	@Inject
 	private Map<String, LegEstimator> legEstimators;
-
 	@Inject
 	private Map<String, TripEstimator> tripEstimator;
-
 	@Inject
 	private Set<TripConstraint<?>> constraints;
-
 	@Inject
 	private Set<TripScoreEstimator> tripScores;
-
 	@Inject
 	private ActivityEstimator actEstimator;
-
 	@Inject
 	private TimeInterpretation timeInterpretation;
-
 	@Inject
 	private Map<String, FixedCostsEstimator> fixedCosts;
-
 	@Inject
 	private PlanModelService service;
+
+	@Inject
+	EstimateCalculator(Config config) {
+		simulationEndTime = switch (config.controller().getMobsim()) {
+			case QSimConfigGroup.GROUP_NAME -> config.qsim().getEndTime();
+			case HermesConfigGroup.NAME -> OptionalTime.defined(config.hermes().getEndTime());
+			case JDEQSimConfigGroup.NAME -> config.jdeqSim().getSimulationEndTime();
+			default -> throw new IllegalStateException("Unexpected value: " + config.controller().getMobsim());
+		};
+	}
+
 
 	/**
 	 * Route and prepare estimates for all trips, expect those that are not considered.
@@ -178,12 +184,9 @@ public final class EstimateCalculator {
 
 			TripStructureUtils.Trip trip = planModel.getTrip(i);
 
-			for (TripScoreEstimator tripScore : tripScores) {
-				estimate += tripScore.estimate(context, mode, trip);
-			}
-
 			// Try to estimate aborted plans
-			if (qsim.getEndTime().isDefined() && tt.getTime().seconds() > qsim.getEndTime().seconds()) {
+
+			if (simulationEndTime.isDefined() && tt.getTime().seconds() > simulationEndTime.seconds()) {
 				estimate += context.scoring.abortedPlanScore;
 
 				// Estimate the first activity, because the overnight estimation will not be performed
@@ -271,7 +274,7 @@ public final class EstimateCalculator {
 
 					// some options may produce equivalent results, but are re-estimated
 					// however, the more expensive computation is routing and only done once
-					boolean realUsage = planModel.hasModeForTrip(c.getMode(), i);
+					boolean realUsage = planModel.doesNotConsistOfOnlyWalksLegs(c.getMode(), i);
 					noUsage[i] = !realUsage;
 
 					double estimate = 0;
@@ -292,7 +295,7 @@ public final class EstimateCalculator {
 						tt += timeInterpretation.decideOnLegTravelTime(leg).orElse(0);
 
 						// Already scored with the trip estimator
-						if (tripEst != null && legMode.equals(c.getMode()))
+						if (tripEst != null && tripEstimator.containsKey(leg.getMode()))
 							continue;
 
 						LegEstimator legEst = legEstimators.get(legMode);

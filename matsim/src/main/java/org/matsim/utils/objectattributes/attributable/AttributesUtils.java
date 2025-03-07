@@ -39,11 +39,42 @@ public class AttributesUtils {
 	}
 
 	/**
+	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object
+	 * themselves, which should be fine for 99.9% of the usecases of Attributes
+	 * (value objects).
+	 * 
+	 * @param from
+	 * @param to
+	 * @param exceptAttribute does not copy attribute with that name
+	 */
+	public static void copyToExcept(Attributes from, Attributes to, String exceptAttribute) {
+		for (var entry : from.getAsMap().entrySet()) {
+			String key = entry.getKey();
+			if (!key.equals(exceptAttribute)) {
+				to.putAttribute(key, entry.getValue());
+			}
+		}
+	}
+
+	/**
 	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object themselves,
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
 	 */
 	public static <T extends Attributable> void copyAttributesFromTo( T from , T to ) {
 		copyTo( from.getAttributes() , to.getAttributes() );
+	}
+
+	/**
+	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object
+	 * themselves, which should be fine for 99.9% of the usecases of Attributes
+	 * (value objects).
+	 * 
+	 * @param from
+	 * @param to
+	 * @param exceptAttribute does not copy attribute with that name
+	 */
+	public static <T extends Attributable> void copyAttributesFromToExcept(T from, T to, String exceptAttribute) {
+		copyToExcept(from.getAttributes(), to.getAttributes(), exceptAttribute);
 	}
 
 	/**

@@ -84,9 +84,9 @@ public class CarrierControllerUtilsTest{
 		//Create carrier with services and shipments
 		Carriers carriersWithServicesAndShipments = new Carriers();
 		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
-		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+		CarrierService service1 = createMatsimService("Service1", "i(3,9)");
 		CarriersUtils.addService(carrierWServices, service1);
-		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
+		CarrierService service2 = createMatsimService("Service2", "i(4,9)");
 		CarriersUtils.addService(carrierWServices, service2);
 
 		//Create carrier with shipments
@@ -113,10 +113,10 @@ public class CarrierControllerUtilsTest{
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
-				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
+			carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
-				.addVehicle(carrierVehicle)
-				.setFleetSize(FleetSize.INFINITE);
+			.addVehicle(carrierVehicle)
+			.setFleetSize(FleetSize.INFINITE);
 		carrierWServices.setCarrierCapabilities(ccBuilder.build());
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
@@ -137,13 +137,13 @@ public class CarrierControllerUtilsTest{
 		vrpBuilder.setRoutingCost(netBasedCosts) ;
 		VehicleRoutingProblem problem = vrpBuilder.build();
 
-			// get the algorithm out-of-the-box, search solution and get the best one.
+		// get the algorithm out-of-the-box, search solution and get the best one.
 		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
-			//Routing bestPlan to Network
-		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrierWServices, bestSolution) ;
+		//Routing bestPlan to Network
+		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 		NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 		carrierWServices.addPlan(carrierPlanServicesAndShipments) ;
 
@@ -180,7 +180,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipments.getShipments().values()) {
-            demandShipments += carrierShipment.getCapacityDemand();
+			demandShipments += carrierShipment.getCapacityDemand();
 		}
 		Assertions.assertEquals(3, demandShipments);
 	}
@@ -192,7 +192,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWShipments.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-            demandShipments += carrierShipment.getCapacityDemand();
+			demandShipments += carrierShipment.getCapacityDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -204,7 +204,7 @@ public class CarrierControllerUtilsTest{
 		Assertions.assertEquals(2, carrierWShipmentsOnlyFromCarrierWServices.getShipments().size());
 		int demandShipments = 0;
 		for (CarrierShipment carrierShipment : carrierWShipmentsOnlyFromCarrierWServices.getShipments().values()) {
-            demandShipments += carrierShipment.getCapacityDemand();
+			demandShipments += carrierShipment.getCapacityDemand();
 		}
 		Assertions.assertEquals(4, demandShipments);
 	}
@@ -242,33 +242,33 @@ public class CarrierControllerUtilsTest{
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
-				System.out.println("Found Shipment1");
-				foundShipment1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getPickupLinkId());
-				Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getDeliveryLinkId());
-            Assertions.assertEquals(1, carrierShipment1.getCapacityDemand());
-				Assertions.assertEquals(30.0, carrierShipment1.getDeliveryDuration(), 0);
+			System.out.println("Found Shipment1");
+			foundShipment1 = true;
+			Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getPickupLinkId());
+			Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getDeliveryLinkId());
+			Assertions.assertEquals(1, carrierShipment1.getCapacityDemand());
+			Assertions.assertEquals(30.0, carrierShipment1.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3600.0, carrierShipment1.getDeliveryStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36000.0, carrierShipment1.getDeliveryStartingTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(5.0, carrierShipment1.getPickupDuration(), 0);
+			Assertions.assertEquals(5.0, carrierShipment1.getPickupDuration(), 0);
 			Assertions.assertEquals(0.0, carrierShipment1.getPickupStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(7200.0, carrierShipment1.getPickupStartingTimeWindow().getEnd(), 0);
-			}
+		}
 		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
-				System.out.println("Found Shipment2");
-				foundShipment2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getPickupLinkId());
-				Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getDeliveryLinkId());
-            Assertions.assertEquals(2, carrierShipment2.getCapacityDemand());
-				Assertions.assertEquals(30.0, carrierShipment2.getDeliveryDuration(), 0);
+			System.out.println("Found Shipment2");
+			foundShipment2 = true;
+			Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getPickupLinkId());
+			Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getDeliveryLinkId());
+			Assertions.assertEquals(2, carrierShipment2.getCapacityDemand());
+			Assertions.assertEquals(30.0, carrierShipment2.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3600.0, carrierShipment2.getDeliveryStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36000.0, carrierShipment2.getDeliveryStartingTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(5.0, carrierShipment2.getPickupDuration(), 0);
+			Assertions.assertEquals(5.0, carrierShipment2.getPickupDuration(), 0);
 			Assertions.assertEquals(0.0, carrierShipment2.getPickupStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(7200.0, carrierShipment2.getPickupStartingTimeWindow().getEnd(), 0);
-			}
+		}
 		Assertions.assertTrue(foundShipment1, "Not found Shipment1 after copying");
 		Assertions.assertTrue(foundShipment2, "Not found Shipment2 after copying");
 	}
@@ -281,44 +281,44 @@ public class CarrierControllerUtilsTest{
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
-				foundService1 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getPickupLinkId());
-				Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getDeliveryLinkId());
-            Assertions.assertEquals(2, carrierShipment1.getCapacityDemand());
-				Assertions.assertEquals(31.0, carrierShipment1.getDeliveryDuration(), 0);
+			foundService1 = true;
+			Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getPickupLinkId());
+			Assertions.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getDeliveryLinkId());
+			Assertions.assertEquals(2, carrierShipment1.getCapacityDemand());
+			Assertions.assertEquals(31.0, carrierShipment1.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3601.0, carrierShipment1.getDeliveryStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36001.0, carrierShipment1.getDeliveryStartingTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(0.0, carrierShipment1.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment1.getPickupDuration(), 0);
 			Assertions.assertEquals(0.0, carrierShipment1.getPickupStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36001.0, carrierShipment1.getPickupStartingTimeWindow().getEnd(), 0);
-			}
+		}
 		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
-				foundService2 = true;
-				Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getPickupLinkId());
-				Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getDeliveryLinkId());
-            Assertions.assertEquals(2, carrierShipment2.getCapacityDemand());
-				Assertions.assertEquals(31.0, carrierShipment2.getDeliveryDuration(), 0);
+			foundService2 = true;
+			Assertions.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getPickupLinkId());
+			Assertions.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getDeliveryLinkId());
+			Assertions.assertEquals(2, carrierShipment2.getCapacityDemand());
+			Assertions.assertEquals(31.0, carrierShipment2.getDeliveryDuration(), 0);
 			Assertions.assertEquals(3601.0, carrierShipment2.getDeliveryStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36001.0, carrierShipment2.getDeliveryStartingTimeWindow().getEnd(), 0);
-				Assertions.assertEquals(0.0, carrierShipment2.getPickupDuration(), 0);
+			Assertions.assertEquals(0.0, carrierShipment2.getPickupDuration(), 0);
 			Assertions.assertEquals(0.0, carrierShipment2.getPickupStartingTimeWindow().getStart(), 0);
 			Assertions.assertEquals(36001.0, carrierShipment2.getPickupStartingTimeWindow().getEnd(), 0);
-			}
+		}
 		Assertions.assertTrue(foundService1, "Not found converted Service1 after converting");
 		Assertions.assertTrue(foundService2, "Not found converted Service2 after converting");
 	}
 
 	/*Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP.
-	* Currently, the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
-	* Maybe it is because of the misunderstanding, that a Service is modeled as "Pickup" and not as thought before as "Delivery". KMT sep18
-	*/
+	 * Currently, the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
+	 * Maybe it is because of the misunderstanding, that a Service is modeled as "Pickup" and not as thought before as "Delivery". KMT sep18
+	 */
 	@Test
 	void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
 		assertThrows(UnsupportedOperationException.class, () -> {
 			Carrier carrierMixedWServicesAndShipments = CarriersUtils.createCarrier(Id.create("CarrierMixed", Carrier.class));
-			CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+			CarrierService service1 = createMatsimService("Service1", "i(3,9)");
 			CarriersUtils.addService(carrierMixedWServicesAndShipments, service1);
 			CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
 			CarriersUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
@@ -343,19 +343,18 @@ public class CarrierControllerUtilsTest{
 		}
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
-				.setDeliveryDuration(30.0)
-				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
-				.setPickupDuration(5.0)
-				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
-				.build();
+			.setDeliveryDuration(30.0)
+			.setDeliveryStartingTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+			.setPickupDuration(5.0)
+			.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
+			.build();
 	}
 
-	private static CarrierService createMatsimService(String id, String to, int size) {
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setCapacityDemand(size)
-				.setServiceDuration(31.0);
-		return builder.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
-				.build();
+	private static CarrierService createMatsimService(String id, String to) {
+		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class),2)
+			.setServiceDuration(31.0)
+			.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+			.build();
 	}
 
 	@Test
@@ -375,9 +374,8 @@ public class CarrierControllerUtilsTest{
 
 	@Test
 	void testAddShipmentSkill(){
-		CarrierShipment shipment = CarrierShipment.Builder.newInstance(
-				Id.create("testShipment", CarrierShipment.class), Id.createLinkId("1"), Id.createLinkId("2"), 1)
-				.build();
+		CarrierShipment shipment = CarrierShipment.Builder.newInstance(Id.create("testShipment", CarrierShipment.class), Id.createLinkId("1"), Id.createLinkId("2"), 1)
+			.build();
 		Assertions.assertFalse(CarriersUtils.hasSkill(shipment, "testSkill"), "Should not have skill.");
 
 		CarriersUtils.addSkill(shipment, "testSkillOne");
@@ -391,9 +389,8 @@ public class CarrierControllerUtilsTest{
 
 	@Test
 	void testAddServiceSkill(){
-		CarrierService service = CarrierService.Builder.newInstance(
-				Id.create("testShipment", CarrierService.class), Id.createLinkId("2"))
-				.build();
+		CarrierService service = CarrierService.Builder.newInstance(Id.create("testShipment", CarrierService.class), Id.createLinkId("2"),0)
+			.build();
 		Assertions.assertFalse(CarriersUtils.hasSkill(service, "testSkill"), "Should not have skill.");
 
 		CarriersUtils.addSkill(service, "testSkillOne");
@@ -424,7 +421,7 @@ public class CarrierControllerUtilsTest{
 		try {
 			CarriersUtils.runJsprit(scenario);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Exception occurred while running Jsprit", e);
 			Assertions.fail();
 		}
 

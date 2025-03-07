@@ -45,6 +45,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
@@ -83,6 +84,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
 			+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)")
 	public boolean useModeFilteredSubnetwork = false;
+
+	@Parameter
+	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
+	public String travelTimeMatrixCachePath = null;
 
 	@Parameter
 	@Comment("Minimum vehicle stop duration. Must be positive.")
@@ -151,7 +156,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
 	}
@@ -159,6 +163,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Whether full simulation drt is employed")
 	public SimulationType simulationType = SimulationType.fullSimulation;
+
+	@Parameter
+	@Comment("Defines whether routes along schedules are updated regularly")
+	public boolean updateRoutes = false;
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
@@ -182,7 +190,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
-	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+	private DrtEstimatorParams drtEstimatorParams;
+
+	@Nullable
+	private DvrpLoadParams loadParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -244,6 +255,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
+		// load
+		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
+			() -> loadParams,
+			params -> loadParams = (DvrpLoadParams) params);
 	}
 
 	/**
@@ -365,6 +381,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtEstimatorParams> getDrtEstimatorParams() {
 		return Optional.ofNullable(drtEstimatorParams);
+	}
+
+	public DvrpLoadParams addOrGetLoadParams() {
+		if(this.loadParams == null) {
+			this.addParameterSet(new DvrpLoadParams());
+		}
+		return this.loadParams;
 	}
 
 	/**

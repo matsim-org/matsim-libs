@@ -10,11 +10,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +55,9 @@ public class GenerateLookupTable implements MATSimAppCommand {
         // Read german lookup table
         Map<String, String> german2006To2021Transformation =
                 new GermanNutsTransformation(german2006shp, nuts2021shp).getNuts2006To2021Mapping();
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(germanTable, StandardCharsets.UTF_8),
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(germanTable.toString()), StandardCharsets.UTF_8)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
             for (CSVRecord record : parser) {
                 String verkerhszelle = record.get(0);
                 String name = record.get(1);
@@ -66,8 +68,9 @@ public class GenerateLookupTable implements MATSimAppCommand {
         }
 
         // Read international lookup table
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(internationalTable, StandardCharsets.UTF_8),
-                CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(internationalTable.toString()), StandardCharsets.UTF_8)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(',').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
             for (CSVRecord record : parser) {
                 String verkerhszelle = record.get(0);
                 String name = record.get(1);
@@ -81,8 +84,9 @@ public class GenerateLookupTable implements MATSimAppCommand {
         List<SimpleFeature> featuresNuts2021 = nuts2021shp.readFeatures();
         CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(output.toString()), CSVFormat.TDF);
         tsvWriter.printRecord("verkehrszelle", "name", "NUTS_2006", "NUTS_2021", "NUTS_2021_name", "coord_x", "coord_y");
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(input, StandardCharsets.ISO_8859_1),
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(input.toString()), StandardCharsets.ISO_8859_1)) {
+			CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(';').setHeader()
+				.setSkipHeaderRecord(true).build().parse(reader);
             List<String[]> incompleteCellLists = new ArrayList<>();
             for (CSVRecord record : parser) {
                 String verkerhszelle = record.get(0);
@@ -91,7 +95,7 @@ public class GenerateLookupTable implements MATSimAppCommand {
                     incompleteCellLists.add(new String[]{verkerhszelle, name});
                 } else {
                     TrafficCellCoreData coreData = coreDataLookupTable.get(verkerhszelle);
-                    if (coreData.getNuts2021().equals("")) {
+                    if (coreData.getNuts2021().isEmpty()) {
                         incompleteCellLists.add(new String[]{verkerhszelle, name});
                     } else {
                         String nuts2006 = coreData.getNuts2006();
@@ -103,9 +107,9 @@ public class GenerateLookupTable implements MATSimAppCommand {
                 }
             }
 
-            for (String[] verkerhszelleAndName : incompleteCellLists) {
-                String verkehrszelle = verkerhszelleAndName[0];
-                String name = verkerhszelleAndName[1];
+            for (String[] verkehrszelleAndName : incompleteCellLists) {
+                String verkehrszelle = verkehrszelleAndName[0];
+                String name = verkehrszelleAndName[1];
                 String nuts2006 = coreDataLookupTable.getOrDefault(verkehrszelle, new TrafficCellCoreData(verkehrszelle, name)).getNuts2006();
                 tsvWriter.printRecord(verkehrszelle, name, nuts2006);
             }

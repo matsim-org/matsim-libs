@@ -105,19 +105,7 @@ public class CollectionLSPScoringTest {
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(LSPUtils.createLSPPlan().setInitialShipmentAssigner(createSingleLogisticChainShipmentAssigner()).addLogisticChain(collectionSolution))
 				.setLogisticChainScheduler(createDefaultSimpleForwardLogisticChainScheduler(Collections.singletonList(collectionResource)))
-//				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
 				.build();
-
-//		TipEventHandler handler = new TipEventHandler();
-//		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-//		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-//		function.getAttributes().add(value );
-//		TipInfo info = new TipInfo();
-//		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
-//		collectionResource.addSimulationTracker(tipTracker);
-//		TipScorer tipScorer = new TipScorer();
-//		collectionLSP.addSimulationTracker( tipScorer );
-//		collectionLSP.setScorer(tipScorer);
 
 		List<Link> linkList = new LinkedList<>(network.getLinks().values());
 
@@ -152,11 +140,7 @@ public class CollectionLSPScoringTest {
 
 		collectionLSP.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(collectionLSP);
-		LSPs lsps = new LSPs(lspList);
-
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 
 		Controller controller = ControllerUtils.createController(scenario);
 

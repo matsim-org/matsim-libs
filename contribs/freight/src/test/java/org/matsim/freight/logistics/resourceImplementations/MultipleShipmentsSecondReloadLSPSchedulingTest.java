@@ -20,6 +20,11 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -28,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -67,8 +73,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 
 	@BeforeEach
 	public void initialize() {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		Network network = scenario.getNetwork();
@@ -255,16 +260,6 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 	@Test
 	public void testSecondReloadLSPScheduling() {
 
-		/*for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<AbstractShipmentPlanElement> elementList = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(elementList, new AbstractShipmentPlanElementComparator());
-			System.out.println();
-			for(AbstractShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());
-			}
-			System.out.println();
-		}*/
-
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			assertEquals(8, LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
@@ -362,12 +357,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-				iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>
-					entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
@@ -395,11 +386,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-				iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;

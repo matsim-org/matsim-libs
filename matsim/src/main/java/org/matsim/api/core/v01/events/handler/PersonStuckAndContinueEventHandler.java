@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * AgentStuckEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,     *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
+package org.matsim.api.core.v01.events.handler;
 
-import java.util.Comparator;
-import java.util.Map;
+import org.matsim.api.core.v01.events.PersonStuckAndContinueEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-import org.locationtech.jts.triangulate.quadedge.QuadEdge;
-
-public class QuadEdgeComparator implements Comparator<QuadEdge> {
-	
-	Map<QuadEdge,Double> map;
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param map
-	 * 		map containing QuadEdge and Double
-	 */
-	public QuadEdgeComparator(Map<QuadEdge,Double> map) {
-		this.map = map;
-	}
-
-	/**
-	 * Method of comparison. Ranks the QuadEdge in descending order.
-	 * 
-	 * @param qeA
-	 * 		quad edge to compare
-	 * @param qeB
-	 * 		quad edge to compare
-	 * @return
-	 * 		1 if double value associated to qeA  < double
-	 * 		value associated to qeB,
-	 * 		0 if values are equals,
-	 * 		-1 otherwise
-	 */
-	@Override
-	public int compare(QuadEdge qeA, QuadEdge qeB) {
-		Double valA = this.map.get(qeA);
-		Double valB = this.map.get(qeB);
-		return valB.compareTo(valA);
-	}
-
+public interface PersonStuckAndContinueEventHandler extends EventHandler {
+	public void handleEvent (PersonStuckAndContinueEvent event);
 }

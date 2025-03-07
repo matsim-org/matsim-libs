@@ -344,10 +344,7 @@ import org.matsim.vehicles.VehicleUtils;
     lsp.scheduleLogisticChains();
 
     // set up simulation controller and LSPModule
-    ArrayList<LSP> lspList = new ArrayList<>();
-    lspList.add(lsp);
-    LSPs lsps = new LSPs(lspList);
-    LSPUtils.addLSPs(scenario, lsps);
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 
     Controller controller = ControllerUtils.createController(scenario);
     controller.addOverridingModule(

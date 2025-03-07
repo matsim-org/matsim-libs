@@ -67,8 +67,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 
 	@BeforeEach
 	public void initialize() {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
@@ -288,13 +287,9 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		}
 		completeLSP.scheduleLogisticChains();
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(completeLSP);
-		LSPs lsps = new LSPs(lspList);
-
 		Controller controller = ControllerUtils.createController(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(completeLSP));
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

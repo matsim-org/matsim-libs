@@ -43,7 +43,8 @@
  import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
  import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
  import org.matsim.contrib.dvrp.fleet.FleetSpecification;
- import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.contrib.dvrp.load.IntegerLoad;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
  import org.matsim.core.controler.events.AfterMobsimEvent;
  import org.matsim.core.controler.events.BeforeMobsimEvent;
  import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -80,10 +81,18 @@
 			 final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		 this.scenario = scenario;
 		 this.drtMode = drtMode;
+
+		 for (var vehicle : fleet.getVehicleSpecifications().values()) {
+			// need IntegerType to determine the maxCapacity, but this could also be a config option /sh, januar 2025
+			Preconditions.checkArgument(vehicle.getCapacity() instanceof IntegerLoad, "Companions require a IntegerLoadType in the current implementation.");
+		 }
+
 		 this.maxCapacity = fleet.getVehicleSpecifications()
 				 .values()
 				 .stream()
-				 .mapToInt(DvrpVehicleSpecification::getCapacity)
+				 .map(DvrpVehicleSpecification::getCapacity)
+				 .map(IntegerLoad.class::cast)
+			     .mapToInt(IntegerLoad::getValue)
 				 .max()
 				 .orElse(0);
 		 installSampler(drtWithExtensionsConfigGroup);
