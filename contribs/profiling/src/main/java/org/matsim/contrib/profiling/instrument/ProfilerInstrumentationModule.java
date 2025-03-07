@@ -36,25 +36,43 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * Start/Stop JFR profiling recordings.
+ * Create a JFR profiling recording for the duration of the configured MATSim iterations
  */
 public class ProfilerInstrumentationModule extends AbstractModule {
 
 	private static final Logger log = LogManager.getLogger(ProfilerInstrumentationModule.class);
 
-	private final ProfilerInstrumentationConfiguration config;
+	private final int startIteration;
+	private final int endIteration;
+	private final String outputFilename;
+	private Recording recording;
 
-	public ProfilerInstrumentationModule(ProfilerInstrumentationConfiguration config) {
-		this.config = config;
+	/**
+	 * Create a profile.jfr recording between given start and end iterations (including).
+	 *
+	 * @param startIteration iteration before which to start the profiler recording
+	 * @param endIteration iteration after which to end the profiler recording
+	 */
+	public ProfilerInstrumentationModule(int startIteration, int endIteration) {
+		this(startIteration, endIteration, "profile");
+	}
 
-		int startIteration = config.getStartIteration();
-		int endIteration = config.getEndIteration();
-
+	/**
+	 * @param startIteration iteration before which to start the profiler recording
+	 * @param endIteration iteration after which to end the profiler recording
+	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
+	 */
+	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename) {
 		if (startIteration < 0 || endIteration < 0 || startIteration > endIteration) {
-			throw new IllegalArgumentException("startIteration must be positive and greater than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
+			throw new IllegalArgumentException("startIteration must be positive and less than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
 		}
+
+		this.startIteration = startIteration;
+		this.endIteration = endIteration;
+		this.outputFilename = Objects.requireNonNull(outputFilename);
 	}
 
 	@Override // fixme install is called 4 times?!
@@ -64,8 +82,8 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 		try {
 			log.info("Instantiating JFR Recording");
 			recording = new Recording(Configuration.getConfiguration("profile"));
-			recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), config.getOutputFilename() + ".jfr"));
-			recording.setName("instrumented-profile-" + config.getStartIteration() + "-" + config.getEndIteration());
+			recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), outputFilename + ".jfr"));
+			recording.setName("instrumented-profile-" + startIteration + "-" + endIteration);
 		} catch (IOException | ParseException e) {
 			log.error("Could not instantiate JFR Recording", e);
 			throw new RuntimeException(e);
@@ -80,12 +98,12 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 			log.info("{}: {}", setting.getKey(), setting.getValue());
 		}
 
-		addControlerListenerBinding().toInstance(new ProfilingStartListener(recording, config.getStartIteration()));
-		addControlerListenerBinding().toInstance(new ProfilingEndListener(recording, config.getEndIteration()));
+		addControlerListenerBinding().toInstance(new ProfilingStartListener(recording, startIteration));
+		addControlerListenerBinding().toInstance(new ProfilingEndListener(recording, endIteration));
 	}
 
 
-	static class ProfilingStartListener implements IterationStartsListener {
+	private static class ProfilingStartListener implements IterationStartsListener {
 		private final Recording recording;
 		private final int startIteration;
 
@@ -110,7 +128,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 		}
 	}
 
-	static class ProfilingEndListener implements IterationEndsListener {
+	private static class ProfilingEndListener implements IterationEndsListener {
 		private final Recording recording;
 		private final int endIteration;
 
