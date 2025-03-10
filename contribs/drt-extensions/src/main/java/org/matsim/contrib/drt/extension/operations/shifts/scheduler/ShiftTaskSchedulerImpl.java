@@ -40,24 +40,24 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
     private final static Logger logger = LogManager.getLogger(ShiftTaskSchedulerImpl.class);
 
-	private final TravelTime travelTime;
+    private final TravelTime travelTime;
     private final MobsimTimer timer;
     private final ShiftDrtTaskFactory taskFactory;
     private final LeastCostPathCalculator router;
 
     private final ShiftsParams shiftsParams;
 
-	private final Network network;
+    private final Network network;
 
-	public ShiftTaskSchedulerImpl(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-								  MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftsParams shiftsParams) {
-		this.travelTime = travelTime;
-		this.timer = timer;
-		this.taskFactory = taskFactory;
-		this.network = network;
-		this.shiftsParams = shiftsParams;
-		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-	}
+    public ShiftTaskSchedulerImpl(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+                                  MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftsParams shiftsParams) {
+        this.travelTime = travelTime;
+        this.timer = timer;
+        this.taskFactory = taskFactory;
+        this.network = network;
+        this.shiftsParams = shiftsParams;
+        this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+    }
 
     @Override
     public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {
@@ -123,8 +123,8 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     }
 
     private void relocateForBreakImpl(ShiftDvrpVehicle vehicle, double startTime, double endTime,
-                                        double latestDetourArrival, Link link, DrtShift shift,
-                                        OperationFacility breakFacility) {
+                                      double latestDetourArrival, Link link, DrtShift shift,
+                                      OperationFacility breakFacility) {
         Schedule schedule = vehicle.getSchedule();
         DrtShiftBreak shiftBreak = shift.getBreak().orElseThrow();
         ShiftBreakTask shiftBreakTask = createShiftBreakTask(vehicle, startTime, endTime, link, shiftBreak, breakFacility);
@@ -183,11 +183,11 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                     schedule.removeLastTask();
                 }
                 if (path.getArrivalTime() < shift.getEndTime()) {
-                    double delta = shift.getEndTime() - path.getArrivalTime();
+                    double slack = shift.getEndTime() - path.getArrivalTime();
                     if (shiftsParams.shiftEndRelocationArrival == ShiftsParams.ShiftEndRelocationArrival.justInTime) {
-                        DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTime, departureTime + delta, currentLink);
+                        DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTime, departureTime + slack, currentLink);
                         schedule.addTask(waitTask);
-                        path = path.withDepartureTime(departureTime + delta);
+                        path = path.withDepartureTime(departureTime + slack);
                     }
                 }
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE));
@@ -211,11 +211,11 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     }
 
     private void appendShiftChange(DvrpVehicle vehicle, DrtShift shift, OperationFacility breakFacility,
-                                     double startTime, double endTime, Link link) {
+                                   double startTime, double endTime, Link link) {
         Schedule schedule = vehicle.getSchedule();
         ShiftChangeOverTask changeTask = taskFactory.createShiftChangeoverTask(vehicle, startTime, endTime, link, shift, breakFacility);
         schedule.addTask(changeTask);
-        if(endTime < vehicle.getServiceEndTime()) {
+        if (endTime < vehicle.getServiceEndTime()) {
             schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(), link, breakFacility));
         }
     }
