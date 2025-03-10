@@ -213,7 +213,6 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     private void appendShiftChange(DvrpVehicle vehicle, DrtShift shift, OperationFacility breakFacility,
                                      double startTime, double endTime, Link link) {
         Schedule schedule = vehicle.getSchedule();
-        // Delegate creation of the shift changeover task to a hook method
         ShiftChangeOverTask changeTask = taskFactory.createShiftChangeoverTask(vehicle, startTime, endTime, link, shift, breakFacility);
         schedule.addTask(changeTask);
         if(endTime < vehicle.getServiceEndTime()) {
