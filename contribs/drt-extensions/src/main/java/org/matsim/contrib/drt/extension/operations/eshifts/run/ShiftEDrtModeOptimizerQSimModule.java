@@ -80,14 +80,16 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						drtShiftParams.considerUpcomingShiftsForInsertion))).asEagerSingleton();
 
 
-		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class)))).in(Singleton.class);
+		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->
+						new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class),
+								drtShiftParams, getter.get(ChargingInfrastructure.class), getter.getModal(ChargingStrategy.Factory.class))))
+				.in(Singleton.class);
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams, getter.getModal(ChargingInfrastructure.class),
-						getter.getModal(ChargingStrategy.Factory.class))
+						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams)
 		)).asEagerSingleton();
 
 		// See EDrtModeOptimizerQSimModule
