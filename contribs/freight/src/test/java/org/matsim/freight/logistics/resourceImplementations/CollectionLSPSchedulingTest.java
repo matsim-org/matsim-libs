@@ -49,6 +49,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.freight.logistics.LspTestUtils;
 
 public class CollectionLSPSchedulingTest {
 
@@ -127,7 +128,7 @@ public class CollectionLSPSchedulingTest {
 			while (true) {
 				Collections.shuffle(linkList, random);
 				Link pendingFromLink = linkList.getFirst();
-				if (isWithinBound(pendingFromLink, new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), new Coord(4000, 4000))) {
+				if (LspTestUtils.isWithinBound(pendingFromLink, new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), new Coord(4000, 4000))) {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
@@ -144,19 +145,6 @@ public class CollectionLSPSchedulingTest {
 		}
 		collectionLSP.scheduleLogisticChains();
 
-	}
-
-	private static boolean isWithinBound(Link pendingFromLink, Coord minCoord, Coord maxCoord) {
-		Coord fromNodeCoord = pendingFromLink.getFromNode().getCoord();
-		Coord toNodeCoord = pendingFromLink.getToNode().getCoord();
-		return fromNodeCoord.getX() >= minCoord.getX() &&
-			fromNodeCoord.getX() <= maxCoord.getX() &&
-			fromNodeCoord.getY() >= minCoord.getY() &&
-			fromNodeCoord.getY() <= maxCoord.getY() &&
-			toNodeCoord.getX() >= minCoord.getX() &&
-			toNodeCoord.getX() <= maxCoord.getX() &&
-			toNodeCoord.getY() >= minCoord.getY() &&
-			toNodeCoord.getY() <= maxCoord.getY();
 	}
 
 	@Test
