@@ -196,8 +196,7 @@ public class CompleteLSPSchedulingTest {
 			.setLocationLinkId(distributionLinkId)
 			.build();
 
-		Id<LogisticChainElement> distributionElementId = Id.create("DistributionElement", LogisticChainElement.class);
-		distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(distributionElementId)
+		distributionElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("DistributionElement", LogisticChainElement.class))
 			.setResource(distributionResource)
 			.build();
 
@@ -271,10 +270,8 @@ public class CompleteLSPSchedulingTest {
 
 			}
 
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setStartTimeWindow(startTimeWindow);
+			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
 			lsp.assignShipmentToLSP(shipment);

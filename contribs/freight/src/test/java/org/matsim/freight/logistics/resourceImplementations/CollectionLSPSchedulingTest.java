@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -65,7 +66,7 @@ public class CollectionLSPSchedulingTest {
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 				Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
-		org.matsim.vehicles.VehicleType collectionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
+		VehicleType collectionVehType = VehicleUtils.createVehicleType(vehicleTypeId, TransportMode.car);
 		collectionVehType.getCapacity().setOther(10);
 		collectionVehType.getCostInformation().setCostsPerMeter(0.0004);
 		collectionVehType.getCostInformation().setCostsPerSecond(0.38);
@@ -84,7 +85,7 @@ public class CollectionLSPSchedulingTest {
 
 
         Id.create("CollectionCarrierResource", LSPResource.class);
-        CollectionCarrierResourceBuilder adapterBuilder = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier);
+        CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierResourceBuilder.newInstance(carrier);
 		adapterBuilder.setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario));
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionResource = adapterBuilder.build();
@@ -126,10 +127,7 @@ public class CollectionLSPSchedulingTest {
 			while (true) {
 				Collections.shuffle(linkList, random);
 				Link pendingFromLink = linkList.getFirst();
-				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+				if (isWithinBound(pendingFromLink, new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), new Coord(4000, 4000))) {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
@@ -146,6 +144,19 @@ public class CollectionLSPSchedulingTest {
 		}
 		collectionLSP.scheduleLogisticChains();
 
+	}
+
+	private static boolean isWithinBound(Link pendingFromLink, Coord minCoord, Coord maxCoord) {
+		Coord fromNodeCoord = pendingFromLink.getFromNode().getCoord();
+		Coord toNodeCoord = pendingFromLink.getToNode().getCoord();
+		return fromNodeCoord.getX() >= minCoord.getX() &&
+			fromNodeCoord.getX() <= maxCoord.getX() &&
+			fromNodeCoord.getY() >= minCoord.getY() &&
+			fromNodeCoord.getY() <= maxCoord.getY() &&
+			toNodeCoord.getX() >= minCoord.getX() &&
+			toNodeCoord.getX() <= maxCoord.getX() &&
+			toNodeCoord.getY() >= minCoord.getY() &&
+			toNodeCoord.getY() <= maxCoord.getY();
 	}
 
 	@Test
