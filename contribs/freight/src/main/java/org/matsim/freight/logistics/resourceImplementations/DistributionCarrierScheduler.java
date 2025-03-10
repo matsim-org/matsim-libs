@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
@@ -219,19 +220,20 @@ import org.matsim.vehicles.VehicleType;
 		ccBuilder.setFleetSize(FleetSize.INFINITE);
 
 		//copy all vehicles from the original carrier to the auxiliary carrier.
-		var startTime = 0.0; //Todo set to something meaningful, e.g. arrivalTime of the first shipment.
+		var startTime = 0.0; //Todo: set to something meaningful, e.g. arrivalTime of the first shipment.
 		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			var cv = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
 				.setEarliestStart(startTime)
 				.setLatestEnd(24 * 60 * 60)
 				.build();
-			ccBuilder.addVehicle(carrierVehicle);
+			ccBuilder.addVehicle(cv);
 		}
 
 		auxCarrier.setCarrierCapabilities(ccBuilder.build());
 
 		//add all shipments.
 		for (LspShipment lspShipment : shipmentsToSchedule) {
+			lspShipment.getShipmentLog().getMostRecentEntry(); // todo mal mit Debugger hier rein stellen
 			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
 			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
 		}
@@ -273,7 +275,8 @@ import org.matsim.vehicles.VehicleType;
 	 */
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
 		Id<CarrierShipment> serviceId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
-		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getTo(), lspShipment.getSize())
+		Id<Link> fromLinkId = lspShipment.getFrom(); //Todo: needs to be the hub, if there is one. KMT mar'25
+		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
 			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
 			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
 			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
