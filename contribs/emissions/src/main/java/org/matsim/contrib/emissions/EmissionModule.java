@@ -183,7 +183,7 @@ public final class EmissionModule {
 
 		if(emissionConfigGroup.getHbefaConsistencyChecker() == EmissionsConfigGroup.UseHbefaConsistencyChecker.check){
 			logger.info("Checking consistency of hbefa-tables");
-			HbefaConsistencyChecker.checkConsistency(avgHbefaWarmTable, detailedHbefaWarmTable, avgHbefaColdTable, detailedHbefaColdTable);
+			HbefaConsistencyChecker.checkConsistency(emissionConfigGroup.getDetailedVsAverageLookupBehavior(), avgHbefaWarmTable, detailedHbefaWarmTable, avgHbefaColdTable, detailedHbefaColdTable);
 		}
 
 		logger.info("leaving createLookupTables");
