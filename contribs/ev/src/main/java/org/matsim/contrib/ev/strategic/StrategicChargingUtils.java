@@ -274,7 +274,7 @@ public class StrategicChargingUtils {
      * <li>Agents still need to be activated using the `activate` method</li>
      * </ul>
      */
-    static public void configureStanadlone(Config config) {
+    static public void configureStandalone(Config config) {
         configure(config);
 
         config.replanning().setMaxAgentPlanMemorySize(1);
