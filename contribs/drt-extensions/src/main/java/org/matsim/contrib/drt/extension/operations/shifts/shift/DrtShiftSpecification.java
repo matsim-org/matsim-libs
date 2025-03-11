@@ -38,7 +38,7 @@ public interface DrtShiftSpecification extends Identifiable<DrtShift> {
     Optional<Id<DvrpVehicle>> getDesignatedVehicleId();
 
 	/**
-	 * Type may beu sed to distinguish various specifications of the shift, e.g., for specifically trained drivers/operators
+	 * Type may be used to distinguish various specifications of the shift, e.g., for specifically trained drivers/operators
 	 */
 	Optional<String> getShiftType();
 }
