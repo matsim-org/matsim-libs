@@ -180,6 +180,7 @@ class QueueWithBufferTest {
 		qNode.setNetElementActivationRegistry(mock(NetElementActivationRegistry.class));
 		var b = new QLinkImpl.Builder(context, internalInterface);
 		b.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator());
+		b.setVehicleHandler(new DefaultVehicleHandler());
 		var l =  b.build(link, qNode);
 		l.setNetElementActivationRegistry(mock(NetElementActivationRegistry.class));
 		return l;

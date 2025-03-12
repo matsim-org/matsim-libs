@@ -19,20 +19,16 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
-
-import java.util.AbstractQueue;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+import java.util.*;
 
-	public PassingVehicleQ() {} // to find calls 
-	
+public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+	public PassingVehicleQ() {
+	} // to find calls
+
 	private final Queue<QVehicle> delegate = new PriorityQueue<>(11, new Comparator<QVehicle>() {
 
 		@Override
@@ -60,7 +56,7 @@ public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements Ve
 	@Override
 	public void addFirst(QVehicle qveh) {
 		qveh.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
-		this.add(qveh) ; // uses the AbstractQueue.add, which in turn uses the PassingVehicleQ.offer.
+		this.add(qveh); // uses the AbstractQueue.add, which in turn uses the PassingVehicleQ.offer.
 	}
 
 	@Override

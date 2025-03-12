@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,58 +31,62 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public final class HybridNetworkFactory implements QNetworkFactory {
-	@Inject QSimConfigGroup qsimConfig ;
-	@Inject EventsManager events ;
-	@Inject Scenario scenario ;
+	@Inject
+	QSimConfigGroup qsimConfig;
+	@Inject
+	EventsManager events;
+	@Inject
+	Scenario scenario;
 
-	private Network network ;
+	private Network network;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
+	private NetsimInternalInterface netsimEngine;
 
 
 	private ExternalEngine externalEngine;
 
 	@Override
-	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2 ) {
+	public void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
 		network = arg2.getNetsimNetwork().getNetwork();
-		double effectiveCellSize = ( network).getEffectiveCellSize() ;
+		double effectiveCellSize = (network).getEffectiveCellSize();
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
-		if (! Double.isNaN(network.getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+		linkWidthCalculator.setLinkWidthForVis(qsimConfig.getLinkWidthForVis());
+		if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+			linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 
-		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
+		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator);
 
-		this.netsimEngine = arg2 ;
+		this.netsimEngine = arg2;
 
 	}
 
 	@Override
 	public QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
-		return builder.build( node ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context, qsimConfig);
+		return builder.build(node);
 	}
 
 
 	@Override
 	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 		if (link.getAllowedModes().contains("2ext")) {
-			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-			VehicleHandler vehicleHandler = new DefaultVehicleHandler();
+			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+			VehicleHandler vehicleHandler = new org.matsim.core.mobsim.qsim.qnetsimengine.DefaultVehicleHandler();
+			ParkingSearchTimeCalculator parkingSearchTimeCalculator = new DefaultParkingSearchTime();
 			// yyyyyy I don't think that this would have been set correctly before I refactored this.  kai, feb'18
-			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator, vehicleHandler);
+			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
 		}
 //		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine );
-		QLinkImpl ret = linkBuilder.build(link, queueNode) ;
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine);
+		QLinkImpl ret = linkBuilder.build(link, queueNode);
 		if (link.getAllowedModes().contains("ext2")) {
 			this.externalEngine.registerAdapter(new QLinkInternalIAdapter(ret));
 		}
