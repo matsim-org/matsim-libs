@@ -257,6 +257,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		EnergyEntry entry = this.energy.get(vehicleId);
 		double initialSoc = entry.current / entry.total;
 
+		//wouldn't an NPE be thrown above (and below) if entry was null? ts, march 2025
 		if (entry != null) {
 			entry.current = endCharge;
 		}
@@ -444,6 +445,12 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 			AtomicDouble travelDistance = new AtomicDouble(0.0);
 
 			for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
+				// don't we need to filter for legs with the EV, i.e. of the chargingMode?
+				// while the finalizeDetour() method takes max(0,observedDetour) and observedDetour considers trips with EV only,
+				// the fact that we do not filter here means that detours with EV are first compensated by legs with other modes, before they are scored, right?
+				// Moreover, I ran into situations where leg.getTravelTime was undefined, even though that the travel time was set in the route (e.g. walk) -
+				// maybe that doesn't belong here, but should we handle undefined times here?
+				// ts, march 2025
 				travelTime.addAndGet(-leg.getTravelTime().seconds());
 				travelDistance.addAndGet(-leg.getRoute().getDistance());
 			}
