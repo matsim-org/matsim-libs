@@ -104,7 +104,7 @@ public class LSPShipmentPlansGotShipmentsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-		//Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"At least one plan has not got a shipment.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"At least one plan has not got a shipment.");
 	}
 	/**
 	 * this test will check if shipmentForEveryShipmentPlanAllPlans-method works as intended and should succeed, because planWOShipmentSelected and planWOShipmentAll have no shipments.
@@ -123,7 +123,12 @@ public class LSPShipmentPlansGotShipmentsTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
 
-		//Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
+		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
+		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
+		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
+		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
+
+		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}
 }
 
