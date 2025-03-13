@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 
@@ -14,8 +15,12 @@ import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 
 import org.matsim.freight.logistics.FreightLogisticsConfigGroup;
 
+import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker;
+import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlan;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -73,6 +78,11 @@ public class LSPShipmentPlansGotShipmentsTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		LSPUtils.loadLspsAccordingToConfig(scenario);
+
+		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
+		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
+		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
+		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}

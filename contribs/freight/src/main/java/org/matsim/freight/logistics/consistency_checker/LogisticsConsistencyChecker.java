@@ -135,13 +135,13 @@ public class LogisticsConsistencyChecker {
 					log.log(level, "ShipmentPlan Id: {}", shipmentPlan.getLspShipmentId().toString());
 				}
 			}
-		Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
-		for (Id<LspShipment> shipmentId : lspShipmentsList) {
-			if (!plannedShipmentIds.contains(shipmentId)) {
-				shipmentsWithoutPlan.add(shipmentId);
+			Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
+			for (Id<LspShipment> shipmentId : lspShipmentsList) {
+				if (!plannedShipmentIds.contains(shipmentId)) {
+					shipmentsWithoutPlan.add(shipmentId);
+				}
 			}
 		}
-	}
 		if (!shipmentsWithoutPlan.isEmpty()) {
 			log.log(level, "Shipments without a plan: {}", shipmentsWithoutPlan);
 			return CheckResult.CHECK_FAILED;
@@ -164,9 +164,14 @@ public class LogisticsConsistencyChecker {
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
-				log.log(level, "Plan: "+shipmentSelectedPlan.getLspShipmentId().toString());
+				log.log(level, "Plan: {}", shipmentSelectedPlan.getLspShipmentId().toString());
 			}
-	}
+		}
+
+		//TODO: @Anton: Ich habe in der Testmethode nun poer Hand einen ShipmentPlan eingefügt, der hoffentlich das macht, was du hier testen willst.
+		// Folglich könntest du dich mMn nun hier an eine Implentierung wagen. :)
+
+
 		if (!plansWithoutShipments.isEmpty()) {
 			log.log(level, "ShipmentPlan without a matching shipment: {}", plansWithoutShipments);
 			return CheckResult.CHECK_FAILED;
