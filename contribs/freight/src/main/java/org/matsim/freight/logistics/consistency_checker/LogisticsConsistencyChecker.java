@@ -200,7 +200,7 @@ public class LogisticsConsistencyChecker {
 	 */
 	public static CheckResult shipmentForEveryShipmentPlanAllPlans(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
-
+		//TODO: Namensgebung verbessern
 		List<Id<LspShipment>> plans = new LinkedList<>();
 		List<Id<LspShipment>> shipments = new LinkedList<>();
 		List<Id<LspShipment>> plansWithoutShipments = new LinkedList<>();
