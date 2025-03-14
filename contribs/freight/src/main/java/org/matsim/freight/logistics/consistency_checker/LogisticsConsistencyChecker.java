@@ -54,6 +54,7 @@ public class LogisticsConsistencyChecker {
 			for (LSPResource resource : lsp.getResources()) {
 				//if a resource id is already in this list, the id exists more than once
 				if (lspResourceList.contains(resource.getId())) {
+					//TODO: LSP ins Log rein
 					log.log(level, "Resource with Id:'{}' exists more than once.", resource.getId());
 					resourceIDsAreUnique = false;
 				} else {
@@ -93,10 +94,12 @@ public class LogisticsConsistencyChecker {
 				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
 			}
 
+			//TODO: Set kann raus
 			Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
 			for (Id<LspShipment> shipmentId : lspShipmentsList) {
 				if (!plannedShipmentIds.contains(shipmentId)) {
 					shipmentsWithoutPlan.add(shipmentId);
+					//TODO: Log Nachricht mit shipmentID und LSP
 				}
 			}
 		}
