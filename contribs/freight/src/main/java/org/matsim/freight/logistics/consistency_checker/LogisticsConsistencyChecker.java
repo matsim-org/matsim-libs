@@ -18,7 +18,7 @@ import java.util.Set;
 
 /**
  * @author anton stock
- * this class provides tests to check if resource IDs are unique and if all existing shipments are assigned to exactly one plan.
+ * this class provides tests to check if resource Ids are unique and if all existing shipments are assigned to exactly one plan.
  */
 public class LogisticsConsistencyChecker {
 
@@ -38,7 +38,7 @@ public class LogisticsConsistencyChecker {
 	}
 
 	/**
-	 * this method will check if all existing resource IDs are unique.
+	 * this method will check if all existing resource Ids are unique.
 	 *
 	 * @param lsps the LSPs to check
 	 * @param lvl  level of log messages / errors
@@ -49,22 +49,21 @@ public class LogisticsConsistencyChecker {
 		//all resource ids are being saved in this list
 		List<Id<LSPResource>> lspResourceList = new LinkedList<>();
 		//true, as long as no resource id exists more than once
-		boolean resourceIDsAreUnique = true;
+		boolean resourceIdsAreUnique = true;
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LSPResource resource : lsp.getResources()) {
 				//if a resource id is already in this list, the id exists more than once
 				if (lspResourceList.contains(resource.getId())) {
-					//TODO: LSP ins Log rein
-					log.log(level, "Resource with Id:'{}' exists more than once.", resource.getId());
-					resourceIDsAreUnique = false;
+					log.log(level, "Resource with Id '{}' of '{}' exists more than once.", resource.getId(), lsp.getId());
+					resourceIdsAreUnique = false;
 				} else {
 					lspResourceList.add(resource.getId());
 				}
 			}
 		}
 		//check is successful, if all resource ids are unique
-		if (resourceIDsAreUnique) {
-			log.log(level, "All resource IDs are unique.");
+		if (resourceIdsAreUnique) {
+			log.log(level, "All resource Ids are unique.");
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
 			return CheckResult.CHECK_FAILED;
@@ -79,7 +78,7 @@ public class LogisticsConsistencyChecker {
 	 * @return CheckResult
 	 */
 	public static CheckResult shipmentPlanForEveryShipmentSelectedPlanOnly(LSPs lsps, Level lvl) {
-		//lists for plan IDs, shipment IDs
+		//lists for plan Ids, shipment Ids
 		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
 		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
 		List<Id<LspShipment>> shipmentsWithoutPlan = new LinkedList<>();
@@ -94,17 +93,15 @@ public class LogisticsConsistencyChecker {
 				lspShipmentPlansList.add(shipmentSelectedPlan.getLspShipmentId());
 			}
 
-			//TODO: Set kann raus
-			Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
 			for (Id<LspShipment> shipmentId : lspShipmentsList) {
-				if (!plannedShipmentIds.contains(shipmentId)) {
+				if (!lspShipmentPlansList.contains(shipmentId)) {
 					shipmentsWithoutPlan.add(shipmentId);
-					//TODO: Log Nachricht mit shipmentID und LSP
+					log.log(level, "Shipment with Id '{}' of '{}' has no corresponding plan!", shipmentId, lsp.getId());
 				}
 			}
 		}
 		if (!shipmentsWithoutPlan.isEmpty()) {
-			log.log(level, "Shipments without a plan: {}", shipmentsWithoutPlan);
+			log.log(level, "Shipment(s) without a plan: {}", shipmentsWithoutPlan);
 			return CheckResult.CHECK_FAILED;
 		} else {
 			log.log(level, "All shipments have plans.");
@@ -119,7 +116,7 @@ public class LogisticsConsistencyChecker {
 	 * @return CheckResult
 	 */
 	public static CheckResult shipmentPlanForEveryShipmentAllPlans(LSPs lsps, Level lvl) {
-		//all resource ids are being saved in this list
+		//all resource Ids are being saved in this list
 		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
 		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
 		List<Id<LspShipment>> shipmentsWithoutPlan = new LinkedList<>();
@@ -135,15 +132,15 @@ public class LogisticsConsistencyChecker {
 					lspShipmentPlansList.add(shipmentPlan.getLspShipmentId());
 				}
 			}
-			Set<Id<LspShipment>> plannedShipmentIds = new HashSet<>(lspShipmentPlansList);
 			for (Id<LspShipment> shipmentId : lspShipmentsList) {
-				if (!plannedShipmentIds.contains(shipmentId)) {
+				if (!lspShipmentPlansList.contains(shipmentId)) {
 					shipmentsWithoutPlan.add(shipmentId);
+					log.log(level, "Shipment with Id '{}' of '{}' has no corresponding plan!", shipmentId, lsp.getId());
 				}
 			}
 		}
 		if (!shipmentsWithoutPlan.isEmpty()) {
-			log.log(level, "Shipments without a plan: {}", shipmentsWithoutPlan);
+			log.log(level, "Shipment(s) without a plan: {}", shipmentsWithoutPlan);
 			return CheckResult.CHECK_FAILED;
 		} else {
 			log.log(level, "All shipments have plans.");
@@ -165,15 +162,14 @@ public class LogisticsConsistencyChecker {
 		List<Id<LspShipment>> plansWithoutShipments = new LinkedList<>();
 
 		for (LSP lsp : lsps.getLSPs().values()) {
-			//store all plan IDs in shipmentPlans
+			//store all plan Ids in shipmentPlans
 			for (LspShipmentPlan shipmentSelectedPlan : lsp.getSelectedPlan().getShipmentPlans()) {
 				shipmentPlans.add(shipmentSelectedPlan.getLspShipmentId());
 			}
-			//store all shipment IDs in shipments
+			//store all shipment Ids in shipments
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
 				lspShipments.add(lspShipment.getId());
 			}
-			Set<Id<LspShipment>> shipmentIds = new HashSet<>(lspShipments); //Todo: Warum hier ein neues Set?
 
 			for (Id<LspShipment> shipmentPlanId : shipmentPlans) {
 				if (!lspShipments.contains(shipmentPlanId)) {
@@ -184,7 +180,7 @@ public class LogisticsConsistencyChecker {
 		}
 
 		if (!plansWithoutShipments.isEmpty()) {
-			log.log(level, "ShipmentPlan without a matching shipment: {}", plansWithoutShipments);
+			log.log(level, "ShipmentPlan(s) without a matching shipment: {}", plansWithoutShipments);
 			return CheckResult.CHECK_FAILED;
 		} else {
 			log.log(level, "All shipment shipmentPlans have a corresponding shipment.");
@@ -200,27 +196,25 @@ public class LogisticsConsistencyChecker {
 	 */
 	public static CheckResult shipmentForEveryShipmentPlanAllPlans(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
-		//TODO: Namensgebung verbessern
-		List<Id<LspShipment>> plans = new LinkedList<>();
-		List<Id<LspShipment>> shipments = new LinkedList<>();
+		List<Id<LspShipment>> shipmentPlanIds = new LinkedList<>();
+		List<Id<LspShipment>> shipmentIds = new LinkedList<>();
 		List<Id<LspShipment>> plansWithoutShipments = new LinkedList<>();
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			//for all plans
 			for (LSPPlan lspPlan : lsp.getPlans()) {
-				//store all plan IDs in plans
+				//store all plan Ids in plans
 				for (LspShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-					plans.add(shipmentPlan.getLspShipmentId());
+					shipmentPlanIds.add(shipmentPlan.getLspShipmentId());
 				}
 			}
-			//store all shipment IDs in shipments
+			//store all shipment Ids in shipments
 			for (LspShipment lspShipment : lsp.getLspShipments()) {
-				shipments.add(lspShipment.getId());
+				shipmentIds.add(lspShipment.getId());
 			}
-			Set<Id<LspShipment>> shipmentIDs = new HashSet<>(shipments);
 
-			for (Id<LspShipment> shipmentPlanId : plans) {
-				if (!shipmentIDs.contains(shipmentPlanId)) {
+			for (Id<LspShipment> shipmentPlanId : shipmentPlanIds) {
+				if (!shipmentIds.contains(shipmentPlanId)) {
 					plansWithoutShipments.add(shipmentPlanId);
 					log.log(level, "ShipmentPlan {} of {} does not have a corresponding shipment.", shipmentPlanId, lsp.getId().toString());
 				}
