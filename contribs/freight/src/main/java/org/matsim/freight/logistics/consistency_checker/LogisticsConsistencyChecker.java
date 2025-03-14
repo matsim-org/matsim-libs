@@ -175,10 +175,10 @@ public class LogisticsConsistencyChecker {
 			}
 			Set<Id<LspShipment>> shipmentIds = new HashSet<>(lspShipments); //Todo: Warum hier ein neues Set?
 
-			for (Id<LspShipment> plan : shipmentPlans) {
-				if (!shipmentIds.contains(plan)) {
-					plansWithoutShipments.add(plan);
-					log.log(level, "ShipmentPlan {} does not have a corresponding shipment.", plan); //Todo: Add info about the LSP.
+			for (Id<LspShipment> shipmentPlanId : shipmentPlans) {
+				if (!lspShipments.contains(shipmentPlanId)) {
+					plansWithoutShipments.add(shipmentPlanId);
+					log.log(level, "ShipmentPlan {} of {} does not have a corresponding shipment.", shipmentPlanId, lsp.getId().toString());
 				}
 			}
 		}
@@ -219,16 +219,16 @@ public class LogisticsConsistencyChecker {
 			}
 			Set<Id<LspShipment>> shipmentIDs = new HashSet<>(shipments);
 
-			for (Id<LspShipment> plan : plans) {
-				if (!shipmentIDs.contains(plan)) {
-					plansWithoutShipments.add(plan);
-					log.log(level, "Plan {} does not have a shipment.", plan);
+			for (Id<LspShipment> shipmentPlanId : plans) {
+				if (!shipmentIDs.contains(shipmentPlanId)) {
+					plansWithoutShipments.add(shipmentPlanId);
+					log.log(level, "ShipmentPlan {} of {} does not have a corresponding shipment.", shipmentPlanId, lsp.getId().toString());
 				}
 			}
 		}
 
 		if (!plansWithoutShipments.isEmpty()) {
-			log.log(level, "ShipmentPlan without a matching shipment: {}", plansWithoutShipments);
+			log.log(level, "ShipmentPlan(s) without a matching shipment: {}", plansWithoutShipments);
 			return CheckResult.CHECK_FAILED;
 		} else {
 			log.log(level, "All shipment plans have a corresponding shipment.");
