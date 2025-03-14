@@ -448,10 +448,11 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				// don't we need to filter for legs with the EV, i.e. of the chargingMode?
 				// while the finalizeDetour() method takes max(0,observedDetour) and observedDetour considers trips with EV only,
 				// the fact that we do not filter here means that detours with EV are first compensated by legs with other modes, before they are scored, right?
-				// Moreover, I ran into situations where leg.getTravelTime was undefined, even though that the travel time was set in the route (e.g. walk) -
-				// maybe that doesn't belong here, but should we handle undefined times here?
 				// ts, march 2025
-				travelTime.addAndGet(-leg.getTravelTime().seconds());
+				Double legTravelTime = leg.getRoute().getTravelTime().isDefined() ? leg.getRoute().getTravelTime().seconds() :
+						leg.getTravelTime().isDefined() ? leg.getTravelTime().seconds() : null;
+				if (legTravelTime == null) throw new IllegalStateException("Leg " + leg + "  of person + " + person + " has no travel time.");
+				travelTime.addAndGet(legTravelTime);
 				travelDistance.addAndGet(-leg.getRoute().getDistance());
 			}
 
