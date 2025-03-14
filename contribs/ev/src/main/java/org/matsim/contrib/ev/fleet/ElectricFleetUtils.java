@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.fleet;
 import java.util.Collection;
 import java.util.Objects;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
@@ -36,13 +37,36 @@ public final class ElectricFleetUtils {
 	public static final String CHARGER_TYPES = "chargerTypes";
 	private static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	private ElectricFleetUtils(){} // do not instantiate
+
+	/**
+	 * Sets the the state of charge at the beginning of the simulation for the vehicle.
+	 * The value must be provided in the range [0, 1].
+	 * @param vehicle
+	 * @param initialSoc
+	 */
 	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
+		Preconditions.checkArgument(initialSoc >= 0 && initialSoc <= 1,
+				"Trying to set invalid initialSoc value for vehicle: %s. Please provide a value in [0, 1] or batteryCapacity of ", vehicle.getId());
 		vehicle.getAttributes().putAttribute( INITIAL_SOC, initialSoc );
 	}
 
-	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
-		engineInformation.getAttributes().putAttribute( CHARGER_TYPES, chargerTypes );
+	/**
+	 * Sets the charger types the vehicle type is compatible with.
+	 * @param vehicleType
+	 * @param chargerTypes
+	 */
+	public static void setChargerTypes(VehicleType vehicleType, Collection<String> chargerTypes) {
+		vehicleType.getEngineInformation().getAttributes().putAttribute( CHARGER_TYPES, chargerTypes );
 	}
+
+	/**
+	 * Changes the attribute of the vehicle type's engine information such that the vehicle type is considered to be electric (by the EV contrib).
+	 * @param vehicleType
+	 */
+	public static void setElectricVehicleType(VehicleType vehicleType) {
+		VehicleUtils.setHbefaTechnology(vehicleType.getEngineInformation(), EV_ENGINE_HBEFA_TECHNOLOGY);
+	}
+
 	public static void run(String file) {
 		var vehicles = VehicleUtils.createVehiclesContainer();
 		var reader = new MatsimVehicleReader(vehicles);
