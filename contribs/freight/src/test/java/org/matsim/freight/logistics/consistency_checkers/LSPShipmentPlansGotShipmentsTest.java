@@ -131,7 +131,6 @@ public class LSPShipmentPlansGotShipmentsTest {
 		for (LSPPlan lspPlanTemp : lsp1.getPlans()) {
 			if (!lspPlanTemp.equals(lsp1.getSelectedPlan())){
 				lspPlan=lspPlanTemp;
-				//TODO: Gerne Konstrukt nehmen, wo er dann abbricht -> ersten NON-Selected Plan.
 			}
 		}
 		assert lspPlan != null;
