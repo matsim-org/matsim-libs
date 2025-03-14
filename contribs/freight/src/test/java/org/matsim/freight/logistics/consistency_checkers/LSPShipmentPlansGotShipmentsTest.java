@@ -16,6 +16,7 @@ import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.logistics.FreightLogisticsConfigGroup;
 
 import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPUtils;
 import org.matsim.freight.logistics.consistency_checker.LogisticsConsistencyChecker;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -82,7 +83,7 @@ public class LSPShipmentPlansGotShipmentsTest {
 		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
 		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
 		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
-		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
+		LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanSelectedPlanOnly(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}
@@ -125,9 +126,16 @@ public class LSPShipmentPlansGotShipmentsTest {
 
 		//manually add a shipment plan to the selcted plan of LSP_1. The shipmentId of this plan does NOT match to the shipments defined in the lsp itself.
 		//This must be done here in code, because when reading in the XML file, only shipment plans are added, if their shipmentId that matches to the shipments defined in the lsp.
-		//TODO: Let's add it to the non selected plan, or what do you think?
 		LSP lsp1 = LSPUtils.addOrGetLsps(scenario).getLSPs().get(Id.create("LSP_1", LSP.class));
-		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lsp1.getSelectedPlan(), Id.create("planWOShipmentSelected", LspShipment.class));
+		LSPPlan lspPlan = null;
+		for (LSPPlan lspPlanTemp : lsp1.getPlans()) {
+			if (!lspPlanTemp.equals(lsp1.getSelectedPlan())){
+				lspPlan=lspPlanTemp;
+				//TODO: Gerne Konstrukt nehmen, wo er dann abbricht -> ersten NON-Selected Plan.
+			}
+		}
+		assert lspPlan != null;
+		LspShipmentPlan planWoShipmentInJobs = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, Id.create("planWOShipmentSelected", LspShipment.class));
 
 		Assertions.assertEquals(CHECK_FAILED, LogisticsConsistencyChecker.shipmentForEveryShipmentPlanAllPlans(LSPUtils.getLSPs(scenario), lvl),"All plans got a shipment.");
 	}
