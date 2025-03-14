@@ -34,8 +34,8 @@ public class DefaultDvrpLoadFromTrip implements DvrpLoadFromTrip {
 
 	@Override
 	public DvrpLoad getLoad(Person person, Attributes tripAttributes) {
-		DvrpLoad tripLoad = processAttributes(person.getAttributes(), person);
-		DvrpLoad personLoad = processAttributes(tripAttributes, person);
+		DvrpLoad personLoad = processAttributes(person.getAttributes(), person);
+		DvrpLoad tripLoad = processAttributes(tripAttributes, person);
 
 		Preconditions.checkState(!(tripLoad != null && personLoad != null),
 				String.format("Cannot define load on person and trip level for person %s",
