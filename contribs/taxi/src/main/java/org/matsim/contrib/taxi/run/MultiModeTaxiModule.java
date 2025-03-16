@@ -68,8 +68,8 @@ public class MultiModeTaxiModule extends AbstractModule {
 		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
 		// manually after the TaxiAsDrtConfigGroup config is created.
 		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
+                drtCfg.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = 3600;
 		defaultConstraintsSet.maxTravelTimeAlpha = 2;
 		defaultConstraintsSet.maxTravelTimeBeta = 3600;

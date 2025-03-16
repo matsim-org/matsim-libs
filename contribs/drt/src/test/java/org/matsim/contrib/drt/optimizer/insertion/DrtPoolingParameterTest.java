@@ -228,8 +228,8 @@ public class DrtPoolingParameterTest {
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements().forEach(x -> {
 			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-					(DefaultDrtOptimizationConstraintsSet) x.addOrGetDrtOptimizationConstraintsParams()
-							.addOrGetDefaultDrtOptimizationConstraintsSet();
+                    x.addOrGetDrtOptimizationConstraintsParams()
+                            .addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxWaitTime = maxWaitTime;
 			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
 			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
