@@ -20,11 +20,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Id;
@@ -37,11 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -50,17 +45,18 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
+import java.util.*;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	public static final String ORIGINAL_ROUTE_ATTRIBUTE = "originalRoute";
-
 	public interface TeleportedRouteCalculator {
+
 		Route calculateRoute(PassengerRequest request);
+		double getAverageWaitingTime();
+
 	}
 
 	private final String mode;
@@ -76,6 +72,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	private final TeleportationEngine teleportationEngine;
 	private final Queue<Pair<Double, PassengerRequest>> teleportedRequests = new PriorityQueue<>(
 			Comparator.comparingDouble(Pair::getLeft));
+	private final Queue<Pair<Double, PassengerRequest>> waitingRequests = new PriorityQueue<>(
+		Comparator.comparingDouble(Pair::getLeft));
 
 	private InternalInterface internalInterface;
 
@@ -115,7 +113,16 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	@Override
 	public void doSimStep(double time) {
-		//first process passenger dropoff events
+		//first process passenger pickup events
+		while (!waitingRequests.isEmpty() && waitingRequests.peek().getLeft() <= time) {
+			PassengerRequest request = waitingRequests.poll().getRight();
+			for (Id<Person> passenger : request.getPassengerIds()) {
+				//TODO: check whether to use first passenger Id
+				eventsManager.processEvent(new PassengerPickedUpEvent(time, mode, request.getId(), request.getPassengerIds().get(0), null));
+			}
+		}
+
+		//then process passenger dropoff events
 		while (!teleportedRequests.isEmpty() && teleportedRequests.peek().getLeft() <= time) {
 			PassengerRequest request = teleportedRequests.poll().getRight();
 			for (Id<Person> passenger : request.getPassengerIds()) {
@@ -149,8 +156,10 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			Route teleportedRoute = adaptLegRouteForTeleportation(List.of(passenger), request, now);
-			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
 			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
+			double waitingEnd = now + teleportedRouteCalculator.getAverageWaitingTime();
+			waitingRequests.add(ImmutablePair.of(waitingEnd, request));
+			//the teleportedRoute travel time already includes the waiting time - it has to because otherwise the delegation to teleportationEngine.doSimStep does not work properly
 			teleportedRequests.add(ImmutablePair.of(now + teleportedRoute.getTravelTime().seconds(), request));
 		} else {
 			//not much else can be done for immediate requests
@@ -178,7 +187,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		}
 
 		eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
-				request.getPassengerIds(), null, now, now + teleportedRoute.getTravelTime().seconds()));
+				request.getPassengerIds(), null, now, now + teleportedRouteCalculator.getAverageWaitingTime() + teleportedRoute.getTravelTime().seconds()));
 		return teleportedRoute;
 	}
 
