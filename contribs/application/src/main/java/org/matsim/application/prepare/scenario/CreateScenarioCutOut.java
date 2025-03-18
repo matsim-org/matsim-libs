@@ -502,15 +502,16 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
 
+				// avoid that link speed is higher than the free speed of the link
+				if (freespeed >= link.getFreespeed()) {
+					freespeed =link.getFreespeed();
+				}
+
 				// Skip if the speed is the same as the previous speed
 				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
 					continue;
 				}
 
-				// avoid that link speed is higher than the free speed of the link
-				if (freespeed >= link.getFreespeed()) {
-					freespeed =link.getFreespeed();
-				}
 
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
