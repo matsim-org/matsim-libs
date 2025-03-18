@@ -45,8 +45,8 @@ public class TimeDiscretizer {
 	}
 
 	public int getIdx(double time) {
-		checkArgument(time >= 0);
-		checkArgument(time <= maxTime);
+		checkArgument(time >= 0, "Time index may not be negative.");
+		checkArgument(time <= maxTime, "Time index must be <= maxTime.");
 		return TimeBinUtils.getTimeBinIndex(time, timeInterval, intervalCount);
 	}
 
