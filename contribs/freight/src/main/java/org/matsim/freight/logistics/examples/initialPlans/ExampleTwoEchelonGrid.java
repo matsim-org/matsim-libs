@@ -45,6 +45,7 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
@@ -149,12 +150,9 @@ final class ExampleTwoEchelonGrid {
 
     for (LSP lsp : LSPUtils.getLSPs(controller.getScenario()).getLSPs().values()) {
       ResourceImplementationUtils.printScores(controller.getControlerIO().getOutputPath(), lsp);
-      ResourceImplementationUtils.printShipmentsOfLSP(
-          controller.getControlerIO().getOutputPath(), lsp);
-      ResourceImplementationUtils.printResults_shipmentPlan(
-          controller.getControlerIO().getOutputPath(), lsp);
-      ResourceImplementationUtils.printResults_shipmentLog(
-          controller.getControlerIO().getOutputPath(), lsp);
+      ResourceImplementationUtils.printShipmentsOfLSP(controller.getControlerIO().getOutputPath(), lsp);
+      ResourceImplementationUtils.printResults_shipmentPlan(controller.getControlerIO().getOutputPath(), lsp);
+      ResourceImplementationUtils.printResults_shipmentLog(controller.getControlerIO().getOutputPath(), lsp);
     }
     log.info("Done.");
   }
@@ -170,9 +168,7 @@ final class ExampleTwoEchelonGrid {
       CommandLine cmd = ConfigUtils.getCommandLine(args);
     } else {
       config
-          .controller()
-          .setOutputDirectory(
-              "output/2echelon_"
+          .controller().setOutputDirectory("output/2echelon_"
                   + demandSetting
                   + "_"
                   + costSetting
@@ -213,7 +209,7 @@ final class ExampleTwoEchelonGrid {
     }
 
     log.info("Add LSP to the scenario");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
     return scenario;
   }

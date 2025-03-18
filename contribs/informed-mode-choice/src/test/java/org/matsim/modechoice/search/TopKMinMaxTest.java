@@ -181,32 +181,29 @@ public class TopKMinMaxTest {
 		protected void configure() {
 
 			PopulationFactory f = PopulationUtils.getFactory();
-
+			bind(Config.class).toInstance(config);
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
 			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
-			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then(new Answer<List<PlanElement>>() {
-				@Override
-				public List<PlanElement> answer(InvocationOnMock invocationOnMock) throws Throwable {
+			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then((Answer<List<PlanElement>>) invocationOnMock -> {
 
-					Leg walk = f.createLeg(TransportMode.walk);
-					Leg car = f.createLeg(TransportMode.car);
+                Leg walk = f.createLeg(TransportMode.walk);
+                Leg car = f.createLeg(TransportMode.car);
 
-					walk.setTravelTime(1);
-					car.setTravelTime(10);
+                walk.setTravelTime(1);
+                car.setTravelTime(10);
 
-					if (invocationOnMock.getArgument(0).equals(TransportMode.car))
-						return List.of(walk, car);
-					else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
-						walk.setTravelTime(100);
-						return List.of(walk);
-					} else
-						throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
-				}
-			});
+                if (invocationOnMock.getArgument(0).equals(TransportMode.car))
+                    return List.of(walk, car);
+                else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
+                    walk.setTravelTime(100);
+                    return List.of(walk);
+                } else
+                    throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
+            });
 
 			bind(EstimateRouter.class).toInstance(new EstimateRouter(router,
 					FacilitiesUtils.createActivityFacilities(),

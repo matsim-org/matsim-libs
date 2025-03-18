@@ -72,12 +72,9 @@ final class CarrierDriverAgent{
 	private final EventsManager events;
 	private final Collection<CarrierEventCreator> carrierEventCreators;
 
-	private final Driver2VehicleEventHandler driver2EventHandler = new Driver2VehicleEventHandler() ;
+	private final Driver2VehicleEventHandler driver2EventHandler = new Driver2VehicleEventHandler();
 
-
-
-	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier,
-			    EventsManager events, Collection<CarrierEventCreator> carrierEventCreators){
+	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier, EventsManager events, Collection<CarrierEventCreator> carrierEventCreators){
 		this.scoringFunction = scoringFunction;
 		this.carrier = carrier;
 		this.events = events;
@@ -106,8 +103,7 @@ final class CarrierDriverAgent{
 
 	private void handleEvent( PersonArrivalEvent event ){
 		currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds() );
-		double travelTime = currentLeg.getDepartureTime().seconds()
-						    + currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
+		double travelTime = currentLeg.getDepartureTime().seconds() + currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 		currentLeg.setTravelTime( travelTime );
 		if( currentRoute.size() > 1 ){
 			NetworkRoute networkRoute = RouteUtils.createNetworkRoute( currentRoute );
@@ -118,7 +114,7 @@ final class CarrierDriverAgent{
 		} else{
 			Id<Link> startLink;
 			if(!currentRoute.isEmpty()){
-				startLink = currentRoute.get(0);
+				startLink = currentRoute.getFirst();
 			} else{
 				startLink = event.getLinkId();
 			}
@@ -224,21 +220,21 @@ final class CarrierDriverAgent{
 
 	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter){
 //		if( scoringFunction == null ){
-			// (means "called from LSP".  kai, jul'22)
+		// (means "called from LSP".  kai, jul'22)
 
 		Id<Vehicle> vehicleId = driver2EventHandler.getVehicleOfDriver(driverId);
 
-			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
-			// filled from just listening to events.  kai, jul'22
-			for( CarrierEventCreator carrierEventCreator : carrierEventCreators) {
-				Event freightEvent = carrierEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
-				if(freightEvent != null) {
-					this.events.processEvent( freightEvent );
-					if( scoringFunction != null ){
-						scoringFunction.handleEvent( freightEvent );
-					}
+		// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
+		// filled from just listening to events.  kai, jul'22
+		for( CarrierEventCreator carrierEventCreator : carrierEventCreators) {
+			Event freightEvent = carrierEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter, vehicleId );
+			if(freightEvent != null) {
+				this.events.processEvent( freightEvent );
+				if( scoringFunction != null ){
+					scoringFunction.handleEvent( freightEvent );
 				}
 			}
+		}
 //		}
 	}
 
@@ -270,7 +266,7 @@ final class CarrierDriverAgent{
 	 *
 	 * @author kturner
 	 */
-	private final class Driver2VehicleEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private static final class Driver2VehicleEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 		private final Map<Id<Person>, Id<Vehicle>> driversVehicles = new ConcurrentHashMap<>();
 

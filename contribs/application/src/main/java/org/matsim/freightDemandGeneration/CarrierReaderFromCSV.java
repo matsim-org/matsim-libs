@@ -417,7 +417,7 @@ public final class CarrierReaderFromCSV {
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		CarrierVehicleTypes usedCarrierVehicleTypes = CarriersUtils.getCarrierVehicleTypes(scenario);
+		CarrierVehicleTypes usedCarrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		for (CarrierInformationElement singleNewCarrier : allNewCarrierInformation) {

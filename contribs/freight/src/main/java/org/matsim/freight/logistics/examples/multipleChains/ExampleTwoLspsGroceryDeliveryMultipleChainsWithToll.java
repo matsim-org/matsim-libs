@@ -21,7 +21,6 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
-import java.io.IOException;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +48,7 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
@@ -112,7 +112,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
     lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
-    LSPUtils.addLSPs(scenario, new LSPs(lsps));
+    LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
 
     Controller controller = prepareController(scenario, rpScheme);
@@ -266,6 +266,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
    * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
    * @return the LSP
    */
+  @SuppressWarnings("SameParameterValue")
   private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
     //Chains

@@ -57,15 +57,12 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
   private final TransshipmentHubScheduler transshipmentHubScheduler;
   private final List<LogisticChainElement> clientElements;
 
-  private
-  TransshipmentHubResource() { // Do not instantiate. (removable once this class is package-private
-                               // again) KMT oct'22
+  private TransshipmentHubResource() { // Do not instantiate. (removable once this class is package-private again) KMT oct'22
     super(null);
     this.locationLinkId = null;
     this.transshipmentHubScheduler = null;
     this.clientElements = null;
-    throw new RuntimeException(
-        "This should have never been called, because it is not planed for getting instantiated.");
+    throw new RuntimeException("This should have never been called, because it is not planed for getting instantiated.");
   }
 
   TransshipmentHubResource(
@@ -74,8 +71,7 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
     this.locationLinkId = builder.getLocationLinkId();
     this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
     transshipmentHubScheduler.setTranshipmentHub(this);
-    TransshipmentHubTourEndEventHandler eventHandler =
-        new TransshipmentHubTourEndEventHandler(this, scenario);
+    TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
     transshipmentHubScheduler.setTransshipmentHubTourEndEventHandler(eventHandler);
     this.clientElements = builder.getClientElements();
   }

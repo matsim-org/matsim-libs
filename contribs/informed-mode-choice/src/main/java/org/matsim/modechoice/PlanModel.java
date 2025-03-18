@@ -1,6 +1,7 @@
 package org.matsim.modechoice;
 
 import com.google.common.collect.Lists;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -265,17 +266,24 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	/**
-	 * Check whether a mode is available for a trip.
-	 * If for instance not pt option is found in the legs this will return false.
+	 * Check whether a mode is available for a trip or only walk legs are returned for non-walk trips
+	 * (i.e., because pt is not available).
+	 * A route consisting of only feeder modes other than walk (i.e., start->drt_feeder->station->walk->destination)
+	 * should be considered valid per definition of the pt router. This is also true if the pt router uses modeMappings to i.e., metro or bus.
+	 *
 	 */
-	public boolean hasModeForTrip(String mode, int i) {
+	public boolean doesNotConsistOfOnlyWalksLegs(String mode, int i) {
 
 		List<Leg>[] legs = this.legs.get(mode);
 		if (legs == null)
 			return false;
 
 		List<Leg> ll = legs[i];
-		return ll.stream().anyMatch(l -> l.getMode().equals(mode));
+		if (mode.equals(TransportMode.walk)) {
+			return ll.stream().anyMatch(l -> l.getMode().equals(mode));
+		} else {
+			return !ll.stream().allMatch(leg -> leg.getMode().equals(TransportMode.walk));
+		}
 	}
 
 	/**

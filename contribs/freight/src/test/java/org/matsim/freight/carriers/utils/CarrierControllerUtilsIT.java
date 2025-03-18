@@ -85,7 +85,7 @@ public class CarrierControllerUtilsIT{
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );
-        EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
+		EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
 		VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
 		VehicleUtils.setFuelConsumptionLitersPerMeter(engineInformation, 0.015);
 		VehicleCapacity capacity = carrierVehType.getCapacity() ;
@@ -101,10 +101,10 @@ public class CarrierControllerUtilsIT{
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
-				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
+			carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
-				.addVehicle(carrierVehicle)
-				.setFleetSize(FleetSize.INFINITE);
+			.addVehicle(carrierVehicle)
+			.setFleetSize(FleetSize.INFINITE);
 		carrierWServices.setCarrierCapabilities(ccBuilder.build());
 		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
@@ -125,13 +125,13 @@ public class CarrierControllerUtilsIT{
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build();
 
-				// get the algorithm out-of-the-box, search solution and get the best one.
+			// get the algorithm out-of-the-box, search solution and get the best one.
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
-				//Routing bestPlan to Network
-			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			//Routing bestPlan to Network
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}
@@ -142,7 +142,7 @@ public class CarrierControllerUtilsIT{
 
 		//Convert to jsprit VRP
 		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(
-				carriersWithServicesAndShipments );
+			carriersWithServicesAndShipments );
 
 		for (Carrier carrier : carriersWithShipmentsOnly.getCarriers().values()) {
 			//Build VRP
@@ -150,13 +150,13 @@ public class CarrierControllerUtilsIT{
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build();
 
-				// get the algorithm out-of-the-box, search solution and get the best one.
+			// get the algorithm out-of-the-box, search solution and get the best one.
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
-				//Routing bestPlan to Network
-			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			//Routing bestPlan to Network
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
 			carrier.addPlan(carrierPlanServicesAndShipments) ;
 		}
@@ -285,18 +285,17 @@ public class CarrierControllerUtilsIT{
 		}
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
-				.setDeliveryDuration(30.0)
-				.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
-				.setPickupDuration(5.0)
-				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
-				.build();
+			.setDeliveryDuration(30.0)
+			.setDeliveryStartingTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
+			.setPickupDuration(5.0)
+			.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
+			.build();
 	}
 
-	private static CarrierService createMatsimService(String id, String to, int size) {
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-				.setCapacityDemand(size)
-				.setServiceDuration(31.0);
-		return builder.setServiceStartingTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
-				.build();
+	private static CarrierService createMatsimService(String id, String to, @SuppressWarnings("SameParameterValue") int size) {
+		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class), size)
+			.setServiceDuration(31.0)
+			.setServiceStartingTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
+			.build();
 	}
 }
