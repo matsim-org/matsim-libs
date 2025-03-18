@@ -504,7 +504,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 				// avoid that link speed is higher than the free speed of the link
 				if (freespeed >= link.getFreespeed()) {
-					freespeed =link.getFreespeed();
+					freespeed = link.getFreespeed();
 				}
 
 				// Skip if the speed is the same as the previous speed
