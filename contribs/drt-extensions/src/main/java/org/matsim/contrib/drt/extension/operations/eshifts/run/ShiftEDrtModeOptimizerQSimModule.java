@@ -63,14 +63,17 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> null)
 		).asEagerSingleton();
 
+		bindModal(AssignShiftToVehicleLogic.class).toProvider(modalProvider(getter ->
+						new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams)
+		));
+
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new EDrtShiftDispatcherImpl(((EShiftTaskScheduler) getter.getModal(ShiftTaskScheduler.class)),
 						getter.getModal(ChargingInfrastructure.class), drtShiftParams, getter.getModal(OperationFacilities.class),
 						new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 								getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 								getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-								drtShiftParams, new DefaultShiftStartLogic(),
-								new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams),
+								drtShiftParams, new DefaultShiftStartLogic(), getter.getModal(AssignShiftToVehicleLogic.class),
 								getter.getModal(ShiftScheduler.class)),
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
