@@ -290,11 +290,11 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Sets up the controler
+     * Sets up the controller
      */
-    static public void configureControler(Controler controler) {
-        controler.addOverridingModule(new WithinDayEvModule());
-        controler.addOverridingModule(new StrategicChargingModule());
+    static public void configureController (Controler controller) {
+        controller.addOverridingModule(new WithinDayEvModule());
+        controller.addOverridingModule(new StrategicChargingModule());
     }
 
     /**

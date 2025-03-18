@@ -486,11 +486,11 @@ public class TestScenarioBuilder {
 		return scenario;
 	}
 
-	private Controler prepareControler(Scenario scenario) {
-		Controler controler = new Controler(scenario);
+	private Controler prepareController(Scenario scenario) {
+		Controler controller = new Controler(scenario);
 
-		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new AbstractModule() {
+		controller.addOverridingModule(new EvModule());
+		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(DriveEnergyConsumption.Factory.class).toInstance(vehicle -> {
@@ -503,21 +503,21 @@ public class TestScenarioBuilder {
 			}
 		});
 
-		prepareInfrastructure(controler);
+		prepareInfrastructure(controller);
 
-		controler.addOverridingModule(new WithinDayEvModule());
+		controller.addOverridingModule(new WithinDayEvModule());
 
 		if (enableStrategicCharging) {
-			controler.addOverridingModule(new StrategicChargingModule());
+			controller.addOverridingModule(new StrategicChargingModule());
 		}
 
-		return controler;
+		return controller;
 	}
 
 	public TestScenario build() {
 		Config config = prepareConfig();
 		Scenario scenario = prepareScenario(config);
-		Controler controller = prepareControler(scenario);
+		Controler controller = prepareController(scenario);
 
 		Tracker tracker = prepareTracker(controller);
 
