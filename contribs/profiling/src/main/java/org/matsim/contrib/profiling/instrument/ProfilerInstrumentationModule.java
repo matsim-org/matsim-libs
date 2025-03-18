@@ -43,14 +43,12 @@ import java.util.Objects;
 /**
  * Create a JFR profiling recording for the duration of the configured MATSim iterations
  */
-public class ProfilerInstrumentationModule extends AbstractModule implements StartupListener {
+public class ProfilerInstrumentationModule extends AbstractModule {
 
 	private static final Logger log = LogManager.getLogger(ProfilerInstrumentationModule.class);
 
-	private final int startIteration;
-	private final int endIteration;
-	private final String outputFilename;
-	private Recording recording;
+	private final ProfilingControlRegistry profilingControlRegistry;
+
 
 	/**
 	 * Create a profile.jfr recording for the given iteration.
@@ -77,54 +75,66 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
 	 */
 	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename) {
-		if (startIteration < 0 || endIteration < 0 || startIteration > endIteration) {
-			throw new IllegalArgumentException("startIteration must be positive and less than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
-		}
-
-		this.startIteration = startIteration;
-		this.endIteration = endIteration;
-		this.outputFilename = Objects.requireNonNull(outputFilename);
+		this.profilingControlRegistry = new ProfilingControlRegistry(startIteration, endIteration, outputFilename);
 	}
 
 	@Override
 	public void install() {
-		addControlerListenerBinding().toInstance(this);
-		addControlerListenerBinding().toInstance(new ProfilingStartListener(this));
-		addControlerListenerBinding().toInstance(new ProfilingEndListener(this));
+		addControlerListenerBinding().toInstance(profilingControlRegistry);
+		addControlerListenerBinding().toInstance(new ProfilingStartListener(profilingControlRegistry));
+		addControlerListenerBinding().toInstance(new ProfilingEndListener(profilingControlRegistry));
 	}
 
-	/**
-	 * Initialize the jfr {@link Recording} and potentially error out as early as possible if the Recording cannot be instantiated.
-	 */
-	public void notifyStartup(StartupEvent startupEvent) {
-		if (recording != null) {
-			throw new IllegalStateException("Already initialized");
+	private class ProfilingControlRegistry implements StartupListener {
+
+		private final int startIteration;
+		private final int endIteration;
+		private final String outputFilename;
+		private Recording recording;
+
+		public ProfilingControlRegistry(int startIteration, int endIteration, String outputFilename) {
+			if (startIteration < 0 || endIteration < 0 || startIteration > endIteration) {
+				throw new IllegalArgumentException("startIteration must be positive and less than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
+			}
+
+			this.startIteration = startIteration;
+			this.endIteration = endIteration;
+			this.outputFilename = Objects.requireNonNull(outputFilename);
 		}
 
-		try {
-			log.info("Instantiating JFR Recording");
-			recording = new Recording(Configuration.getConfiguration("profile"));
-			recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), outputFilename + ".jfr"));
-			recording.setName("instrumented-profile-" + startIteration + "-" + endIteration);
-		} catch (IOException | ParseException e) {
-			log.error("Could not instantiate JFR Recording", e);
-			throw new RuntimeException(e);
-		}
-		// required for multiple recordings
-		// toDisk writes to /tmp by default; to use a different directory (e.g. for more space or faster storage)
-		// add the java option -XX:FlightRecorderOptions=stackdepth=2048,repository="/fast"
-		recording.setToDisk(true); // might be better for longer recordings? memory usage vs disk IO?
-		recording.setDumpOnExit(true); // in case the jvm exits prematurely?
+		/**
+		 * Initialize the jfr {@link Recording} and potentially error out as early as possible if the Recording cannot be instantiated.
+		 */
+		public void notifyStartup(StartupEvent startupEvent) {
+			if (recording != null) {
+				throw new IllegalStateException("Already initialized");
+			}
 
-		// debug: dump all current JFR recoding settings
-		log.info("[PROFILING] Recording settings");
-		for (Map.Entry<String,String> setting : recording.getSettings().entrySet()) {
-			log.info("{}: {}", setting.getKey(), setting.getValue());
-		}
+			try {
+				log.info("Instantiating JFR Recording");
+				recording = new Recording(Configuration.getConfiguration("profile"));
+				recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), outputFilename + ".jfr"));
+				recording.setName("instrumented-profile-" + startIteration + "-" + endIteration);
+			} catch (IOException | ParseException e) {
+				log.error("Could not instantiate JFR Recording", e);
+				throw new RuntimeException(e);
+			}
+			// required for multiple recordings
+			// toDisk writes to /tmp by default; to use a different directory (e.g. for more space or faster storage)
+			// add the java option -XX:FlightRecorderOptions=stackdepth=2048,repository="/fast"
+			recording.setToDisk(true); // might be better for longer recordings? memory usage vs disk IO?
+			recording.setDumpOnExit(true); // in case the jvm exits prematurely?
 
+			// debug: dump all current JFR recoding settings
+			log.info("[PROFILING] Recording settings");
+			for (Map.Entry<String,String> setting : recording.getSettings().entrySet()) {
+				log.info("{}: {}", setting.getKey(), setting.getValue());
+			}
+
+		}
 	}
 
-	private record ProfilingStartListener(ProfilerInstrumentationModule parent) implements IterationStartsListener {
+	private record ProfilingStartListener(ProfilingControlRegistry settings) implements IterationStartsListener {
 
 		@Override
 		public double priority() {
@@ -134,15 +144,15 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
-			if (iterationStartsEvent.getIteration() == parent.startIteration) {
+			if (iterationStartsEvent.getIteration() == settings.startIteration) {
 				// start recording
 				log.info("[PROFILING] Starting Recording at iteration {}", iterationStartsEvent.getIteration());
-				parent.recording.start();
+				settings.recording.start();
 			}
 		}
 	}
 
-	private record ProfilingEndListener(ProfilerInstrumentationModule parent) implements IterationEndsListener {
+	private record ProfilingEndListener(ProfilingControlRegistry settings) implements IterationEndsListener {
 
 		@Override
 		public double priority() {
@@ -152,11 +162,11 @@ public class ProfilerInstrumentationModule extends AbstractModule implements Sta
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			if (iterationEndsEvent.getIteration() == parent.endIteration) {
+			if (iterationEndsEvent.getIteration() == settings.endIteration) {
 				// stop recording - automatically dumped since output path is set and then closed as well
-				parent.recording.stop();
+				settings.recording.stop();
 			}
-			log.info("[PROFILING] {} Current iteration: {}", parent.recording.getState(), iterationEndsEvent.getIteration());
+			log.info("[PROFILING] {} Current iteration: {}", settings.recording.getState(), iterationEndsEvent.getIteration());
 		}
 	}
 
