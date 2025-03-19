@@ -36,6 +36,7 @@
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
         <jackson.version>2.17.2</jackson.version>
+		<aspectj.version>1.9.23</aspectj.version>
         <jogl.version>2.5.0</jogl.version>
 		<junit.version>5.10.3</junit.version>
     </properties>
@@ -225,6 +226,17 @@
                 <artifactId>stax2-api</artifactId>
                 <version>4.2.2</version>
             </dependency>
+
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjweaver</artifactId>
+				<version>${aspectj.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjrt</artifactId>
+				<version>${aspectj.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>

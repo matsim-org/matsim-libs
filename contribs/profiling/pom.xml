@@ -13,10 +13,6 @@
 	<artifactId>profiling</artifactId>
 	<name>profiling</name>
 
-	<properties>
-		<aspectj.version>1.9.23</aspectj.version>
-	</properties>
-
 	<!-- Test dependencies -->
 	<dependencies>
 		<dependency>
@@ -27,13 +23,10 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
-			<version>${aspectj.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>${aspectj.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
