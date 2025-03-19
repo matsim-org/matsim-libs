@@ -14,7 +14,7 @@
 	<name>profiling</name>
 
 	<properties>
-		<aspectj.version>1.9.22.1</aspectj.version>
+		<aspectj.version>1.9.23</aspectj.version>
 	</properties>
 
 	<!-- Test dependencies -->
