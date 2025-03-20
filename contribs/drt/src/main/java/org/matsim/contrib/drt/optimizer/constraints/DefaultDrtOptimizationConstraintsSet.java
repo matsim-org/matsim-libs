@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.optimizer.constraints;
 import com.google.common.base.Verify;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.drt.estimator.DrtEstimator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 
 public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstraintsSet {
@@ -54,4 +56,13 @@ public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstra
         Verify.verify(maxAbsoluteDetour > minimumAllowedDetour, "The minimum allowed detour must" +
                 "be lower than the maximum allowed detour.");
     }
+
+	public static DefaultDrtOptimizationConstraintsSet get(DrtConfigGroup drtConfigGroup){
+		DrtOptimizationConstraintsSet constraints = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		if(constraints instanceof DefaultDrtOptimizationConstraintsSet defaultConstraints) {
+			return defaultConstraints;
+		} else {
+			throw new RuntimeException("The constraint set specified in the DRT config group is not a DefaultDrtOptimizationConstraintsSet!");
+		}
+	}
 }
