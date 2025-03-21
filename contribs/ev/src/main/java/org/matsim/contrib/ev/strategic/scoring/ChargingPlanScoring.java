@@ -50,6 +50,8 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -257,9 +259,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		EnergyEntry entry = this.energy.get(vehicleId);
 		double initialSoc = entry.current / entry.total;
 
-		if (entry != null) {
-			entry.current = endCharge;
-		}
+		//entry can not be null because we initialize the energy map with all vehicles, see initializeEnergy()
+		entry.current = endCharge;
 
 		double finalSoc = entry.current / entry.total;
 		handleChangeSoc(now, vehicleId, initialSoc, finalSoc);
@@ -440,15 +441,28 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		for (Person person : activePersons) {
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
 
-			AtomicDouble travelTime = new AtomicDouble(0.0);
-			AtomicDouble travelDistance = new AtomicDouble(0.0);
+			AtomicDouble plannedTotalTravelTime = new AtomicDouble(0.0);
+			AtomicDouble plannedTotalTravelDistance = new AtomicDouble(0.0);
 
 			for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
-				travelTime.addAndGet(-leg.getTravelTime().seconds());
-				travelDistance.addAndGet(-leg.getRoute().getDistance());
+				// Here, we determine the planned travel time.
+				// Later, we track the actual travel time by listening to events on links.
+				// This means, we can not compare access and egress legs.
+				// (otherwise we would include all legs with _routing_Mode.equals(chargingMode) in the following filter)
+				// tschlenther, march '24
+				// TODO: include detour of access and egress in ChargingPlanScoring !?
+				if (! leg.getMode().equals(chargingMode)) continue;
+
+				//would be better to use a TimeInterpretation object here, but we would need the MATSim config to instantiate it.
+				OptionalTime plannedLegTravelTime =  leg.getRoute().getTravelTime().or(leg.getTravelTime());
+				if (plannedLegTravelTime.isUndefined()){
+					throw new IllegalStateException("Leg " + leg + "  of person + " + person + " has no travel time.");
+				}
+				plannedTotalTravelTime.addAndGet(plannedLegTravelTime.seconds());
+				plannedTotalTravelDistance.addAndGet(-leg.getRoute().getDistance());
 			}
 
-			detours.put(vehicleId, new DetourPair(travelTime, travelDistance));
+			detours.put(vehicleId, new DetourPair(plannedTotalTravelTime, plannedTotalTravelDistance));
 		}
 	}
 
