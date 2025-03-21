@@ -38,10 +38,16 @@ import java.util.Map;
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
 import static org.apache.commons.lang3.math.IEEE754rUtils.min;
 
+/**
+ * This class contains three tests, that differ in levels of strictness: <br>
+ *  (1) Values must be exact to the results of HBEFAv4.1. This test should not fail, when changes are done in the emission-contrib.
+ *  	It will however fail, if a new HBEFA-version is set up. <br>
+ *  (2)	Values lie between SUMO and HBEFAv4.1. This test may fail when setting up a new HBEFA-version. Affected values should be checked <br>
+ *  (3) Average-deviance is better than for HBEFAv4.1. This test should never fail, even when setting up a new HBEFA-version. <br>
+ *  If you need to adjust this test for future HBEFA versions, you can use the diff_{fuel}_out.csv output and change and sue it as new reference file.
+ *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update.
+ */
 public class PHEMTest {
-
-	// TODO Rename CO to CO(total)
-	// TODO Rename PMx to PM
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
@@ -53,9 +59,7 @@ public class PHEMTest {
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
-	// TODO DEBUG ONLY
 	static CSVPrinter csvPrinter = null;
-	FileWriter fileWriter = null;
 
 	// ----- Helper methods -----
 
@@ -330,8 +334,9 @@ public class PHEMTest {
 	}
 
 	/**
-	 * Tests if the results lie in the allowed deviation interval, which is the range between the reference SUMO and MATSim emissions.
-	 * TODO CHeck if this test-setup is really useful. What if the deviation-factor decreases, but the sign of difference switches, so it lies outside?
+	 * Tests if the results lie in the allowed deviation interval, which is the range between the reference SUMO and MATSim emissions. <br>
+	 * <i>NOTE: This test could fail, even if overall results got better. If this test fails, after setting up a new HBEFA-version, the values could
+	 * have been "overcorrected" so that the difference was inverted. This is not necessarily bad, but should be investigated.</i>
 	 * @param refComparison original reference values
 	 * @param testComparison test values
 	 */
@@ -355,16 +360,47 @@ public class PHEMTest {
 		}
 	}
 
-	// TODO Petrol and diesel
+	/**
+	 * Computes the average deviation of MATSim results from SUMO results for test and reference. If this test fail, it means, that the average
+	 * deviation increased. This test should never fail, even if setting up a new HBEFA-version! It would mean that overall results got worse.
+	 * @param refComparison original reference values
+	 * @param testComparison test values
+	 */
+	private void averageDeviation(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison){
+		// Compute the average (relative) deviation
+
+		double[] refAverages = new double[5];
+		double[] testAverages = new double[5];
+
+		for (int i = 0; i < refComparison.size(); i++){
+			refAverages[0] += refComparison.get(i).CO[3];
+			refAverages[1] += refComparison.get(i).CO2[3];
+			refAverages[2] += refComparison.get(i).HC[3];
+			refAverages[3] += refComparison.get(i).PMx[3];
+			refAverages[4] += refComparison.get(i).NOx[3];
+
+			testAverages[0] += testComparison.get(i).CO[3];
+			testAverages[1] += testComparison.get(i).CO2[3];
+			testAverages[2] += testComparison.get(i).HC[3];
+			testAverages[3] += testComparison.get(i).PMx[3];
+			testAverages[4] += testComparison.get(i).NOx[3];
+		}
+
+		Assertions.assertTrue(testAverages[0]/refComparison.size()-1 <= refAverages[0]/refComparison.size()-1);
+		Assertions.assertTrue(testAverages[1]/refComparison.size()-1 <= refAverages[1]/refComparison.size()-1);
+		Assertions.assertTrue(testAverages[2]/refComparison.size()-1 <= refAverages[2]/refComparison.size()-1);
+		Assertions.assertTrue(testAverages[3]/refComparison.size()-1 <= refAverages[3]/refComparison.size()-1);
+		Assertions.assertTrue(testAverages[4]/refComparison.size()-1 <= refAverages[4]/refComparison.size()-1);
+	}
+
 	@ParameterizedTest
-	@ValueSource(strings = {"petrol", "diesel"}) // TODO Add diesel
+	@ValueSource(strings = {"petrol", "diesel"})
 	public void test(String fuel) throws IOException, URISyntaxException {
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction ); //TODO Check that this is correct
-		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //TODO Check that this is correct
-		ecg.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip); // TODO Remove this
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction );
+		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
@@ -380,6 +416,8 @@ public class PHEMTest {
 		wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
 		wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
 
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
 		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
 		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
 
@@ -395,7 +433,7 @@ public class PHEMTest {
 				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
 				break;
 		}
-		vehicleAttributes.setHbefaSizeClass("average"); // TODO Fix table for final tests
+		vehicleAttributes.setHbefaSizeClass("average");
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
 			HbefaVehicleCategory.PASSENGER_CAR,
 			vehicleAttributes);
@@ -416,22 +454,7 @@ public class PHEMTest {
 				vehHbefaInfo));
 		}
 
-		/*var file = Paths.get("C:\\Users\\aleks\\Desktop\\aggregate.csv");
-		try(var bufWriter = Files.newBufferedWriter(file); var csv = CSVFormat.DEFAULT.print(bufWriter)) {
-			for (var i = 0; i < wltpLinkAttributes.length; i++) {
-				var length_m = wltpLinkAttributes[i].length;
-				var matsim_em = link_pollutant2grams.get(i);
-				var sumo_em = sumoSegments.get(i).NOx();
-				var matsim_em_g_km = matsim_em.get(Pollutant.NOx) / ((double) length_m / 1000);
-				var sumo_em_g_km = (sumo_em/1000) / ((double) length_m / 1000);
-				System.out.println("Link " + i + ": MATSim NOx=" + matsim_em_g_km + " g/km, SUMO NOx=" + sumo_em_g_km + " g/km");
-			}
-		}*/
-		// Now we need to read in the sumo-files and get the SUMO results
-		// output-files comes from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
-
-		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
-
+		// Prepare data for comparison (and print out a csv for debugging)
 		List<WLTPLinkComparison> comparison = new ArrayList<>();
 		int currentSecond = 0;
 		for(int i = 0; i < wltpLinkAttributes.size(); i++){
@@ -455,6 +478,7 @@ public class PHEMTest {
 					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
 					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
 
+				// TODO We are comparing PMx to PM10. SUMO does not specify, what PMx exactly means.
 				new double[]{sumoSegments.get(i).PMx/1000,
 					link_pollutant2grams.get(i).get(Pollutant.PM),
 					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
@@ -534,10 +558,16 @@ public class PHEMTest {
 		writer.close();
 
 		// Start the tests
+
+		// We need to read in the reference-files with the SUMO and MATSIM results for HBEFA v4.1
 		var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_" + fuel + "_ref.csv"));
+
+
+		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
+
 		testHbefaV4_1(refComparison, comparison);
 		testValueDeviation(refComparison, comparison);
-
+		averageDeviation(refComparison, comparison);
 	}
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
