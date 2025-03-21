@@ -105,7 +105,7 @@ library(tidyverse)
 # ==== Plot (all components) in g/km ====
 {
   #Load data
-  diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_out.csv")
+  diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_petrol_out.csv")
 
   hbefa_avg <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Concept_2020_detailed_perTechAverage.csv")
   hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
@@ -288,3 +288,70 @@ library(tidyverse)
     geom_point(data=diff_out_CO2, aes(x=freespeed, y=gPkm, color=model))
 }
 
+# ==== Avg Factor Deviation ====
+{
+  #Load data
+  diff_out <- read_csv("contribs/emissions/test/output/org/matsim/contrib/emissions/PHEMTest/test/diff_petrol_out.csv")
+
+  #Compute avg Factors
+  diff_out_factors <- diff_out %>%
+    select(segment, "CO-Factor", "CO2(total)-Factor", "HC-Factor", "PM-Factor", "NOx-Factor") %>%
+  summarize(co_avg=sum(`CO-Factor`)/n()-1, co2_avg=sum(`CO2(total)-Factor`)/n()-1, hc_avg=sum(`HC-Factor`)/n()-1, pm_avg=sum(`PM-Factor`)/n()-1, nox_avg=sum(`NOx-Factor`)/n()-1)
+}
+
+# ==== Stop&Go-Fraction ====
+{
+  hbefa_det <- read_delim("D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
+
+  hbefa_det_split <- hbefa_det %>%
+    separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "Freespeed", "TrafficSituation"))
+
+  tech <- "petrol (4S)"
+  concept <- "PC P Euro-4"
+  component <- "CO"
+  reg <- "RUR"
+  roadtype <- "MW"
+
+  d <- hbefa_det_split %>%
+    filter(VehCat == "pass. car" &
+             Technology == tech &
+             EmConcept == concept &
+             Component == component &
+             Region == reg &
+             RoadType == roadtype &
+             Freespeed != ">130")
+             #(TrafficSituation == "Freeflow" | TrafficSituation == "St+Go"))
+             #&Subsegment == "PC diesel Euro-4")
+
+  ggplot(d) +
+    geom_line(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
+    #geom_line(data=e, aes(x=speed, y=EFA)) +
+    #geom_function(fun = function(v) e_ff(v), alpha=0.3, color="green", xlim = c(80, 130)) +
+    #geom_hline(aes(yintercept = 0.688245, color="SUMO-Wert"), linetype="dashed") +
+    #geom_function(fun = function(v) 0.0022*v^2 - 0.4093*v + 18.7549, alpha=0.3, xlim = c(80, 130)) +
+    labs(title=paste(tech, concept, reg, roadtype, component, sep=", ")) +
+    xlab("Geschwindigkeit (km/h)") +
+    ylab("Emissionen (g/km)")
+
+  # Print out diffs:
+  d2 <- d %>%
+    filter(TrafficSituation == "Freeflow")
+  diff(d2$EFA)
+
+  #geom_function(fun = function(v) (1-r(v))*e_ff(v)+r(v)*0.403, color="black", xlim = c(80, 130)) +
+  #geom_function(fun = function(v) r(v), alpha = 0.3, color="black", xlim = c(80, 130)) +
+
+  #e_ff <- function(v) {
+  #  #return (exp(-6.93254926906049018243+0.06375004168334660881*v))
+  #  return (0.00000193333*v^4 - 0.000745315*v^3 + 0.107818*v^2 - 6.91413*v + 165.726)
+  #}
+
+  r <- function(v) {
+    return ((17.9/(0.7*v))*((0.3*v)/(v-17.9)))
+  }
+
+  e <- tibble(
+    speed = c(80,90,100,110,120,130),
+    EFA = c(0.347, 0.317, 0.546, 0.784, 1.537, 3.524)
+  )
+}

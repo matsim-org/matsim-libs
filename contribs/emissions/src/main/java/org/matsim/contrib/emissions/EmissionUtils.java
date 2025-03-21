@@ -459,8 +459,6 @@ public abstract class EmissionUtils {
 
 			header = parser.getHeaderNames();
 
-			// TODO Many parts of this method are a copy of createWarmKey() and other methods but they are private. Maybe move this method to HbefaTable.java?
-
 			for (var record : parser) {
 				var key = createWarmKey(record);
 
