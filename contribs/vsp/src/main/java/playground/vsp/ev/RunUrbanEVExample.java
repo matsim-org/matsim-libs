@@ -142,9 +142,10 @@ public class RunUrbanEVExample {
 
 			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(),
 					VehicleType.class)); //TODO should at least have a suffix "_car"
-			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
+
+			ElectricFleetUtils.setElectricVehicleType(carVehicleType);	//alternatively you can do VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), CAR_BATTERY_CAPACITY_kWh);
-			ElectricFleetUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default" ) );
+			ElectricFleetUtils.setChargerTypes(carVehicleType, Arrays.asList("a", "b", "default" ) );
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			carVehicleType.setNetworkMode(TransportMode.car);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),

@@ -41,7 +41,6 @@ import java.util.Set;
 public class RunEShiftDrtScenarioIT {
 
 	private static final double MAX_RELATIVE_SOC = 0.9;// charge up to 80% SOC
-	private static final double MIN_RELATIVE_SOC = 0.15;// send to chargers vehicles below 20% SOC
 	private static final double TEMPERATURE = 20;// oC
 
 	@Test

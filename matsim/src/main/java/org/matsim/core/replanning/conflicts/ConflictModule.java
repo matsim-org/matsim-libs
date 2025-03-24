@@ -42,7 +42,7 @@ public class ConflictModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ConflictManager provideConflictManager(Set<ConflictResolver> resolvers, ConflictWriter writer) {
-		if (!getConfig().replanning().getPlanSelectorForRemoval()
+		if (resolvers.size() > 0 && !getConfig().replanning().getPlanSelectorForRemoval()
 				.equals(WorstPlanForRemovalSelectorWithConflicts.SELECTOR_NAME)) {
 			logger.warn("The replanning.planSelectorForRemoval is not set to "
 					+ WorstPlanForRemovalSelectorWithConflicts.SELECTOR_NAME

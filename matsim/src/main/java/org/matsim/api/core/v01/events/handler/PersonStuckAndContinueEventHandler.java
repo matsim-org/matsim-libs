@@ -1,9 +1,10 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ * AgentStuckEventHandler.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2025 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,18 +16,13 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
-package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
+ * *********************************************************************** */
 
-import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+package org.matsim.api.core.v01.events.handler;
 
-/**
- * @author nkuehnel / MOIA
- */
-public interface AssignShiftToVehicleLogic {
+import org.matsim.api.core.v01.events.PersonStuckAndContinueEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-	boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift);
-
+public interface PersonStuckAndContinueEventHandler extends EventHandler {
+	public void handleEvent (PersonStuckAndContinueEvent event);
 }

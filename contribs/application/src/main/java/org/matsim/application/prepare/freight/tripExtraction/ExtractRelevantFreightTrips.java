@@ -1,7 +1,5 @@
 package org.matsim.application.prepare.freight.tripExtraction;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -14,6 +12,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.application.prepare.freight.tripGeneration.GenerateFreightPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -29,7 +28,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import picocli.CommandLine;
 
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,7 +49,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	 * <li>INTERNAL: Extract only trips with origin and destination in the shape area</li>
 	 * <li>TRANSIT: Extract only trips driving through the shape area</li> </ul>
 	 */
-	private enum TripType {
+	private enum geographicalTripType {
 		ALL, INCOMING, INTERNAL, OUTGOING, TRANSIT
 	}
 
@@ -73,8 +71,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
 	private boolean cutOnBoundary;
 
-	@CommandLine.Option(names = "--tripType", description = "Set the tripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
-	private TripType tripType;
+	@CommandLine.Option(names = "--geographicalTripType", description = "Set the geographicalTripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
+	private geographicalTripType geographicalTripType;
 
 	@CommandLine.Option(names = "--legMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
 	private String legMode;
@@ -83,9 +81,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	private String subpopulation;
 
 	private final SplittableRandom rnd = new SplittableRandom(4711);
-
-	private final List<Coord> fromCoords = new ArrayList<>();
-	private final List<Coord> toCoords = new ArrayList<>();
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
@@ -172,7 +167,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			Leg leg = populationFactory.createLeg(legMode);
 			Activity act1 = populationFactory.createActivityFromCoord("freight_end", null);
 
-			switch (tripType) {
+			switch (geographicalTripType) {
 				case ALL -> {
 					createActivitiesForInternalTrips(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, act1, endCoord, attributes);
 					createActivitiesForOutgoingTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
@@ -195,7 +190,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				case TRANSIT ->
 					createActivitiesForTransitTrip(originIsInside, destinationIsInside, act0, ct, startCoord, departureTime, router, network,
 						startLink, endLink,	linksOnTheBoundary, act1, endCoord, attributes);
-				default -> throw new IllegalStateException("Unexpected value: " + tripType);
+				default -> throw new IllegalStateException("Unexpected value: " + geographicalTripType);
 			}
 
 			// Add new freight person to the output plans if trips is relevant
@@ -210,9 +205,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 				freightPerson.addPlan(freightPersonPlan);
 				outputPlans.addPerson(freightPerson);
 				generated += 1;
-
-				fromCoords.add(act0.getCoord());
-				toCoords.add(act1.getCoord());
 			}
 		}
 
@@ -230,20 +222,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		String resultSummaryPath = outputPath.toString().replace(".gz", "").replace(".xml", "")
 				+ "-locations-summary.tsv";
-		CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(resultSummaryPath), CSVFormat.TDF);
-		tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
-		for (int i = 0; i < fromCoords.size(); i++) {
-			Coord fromCoord = fromCoords.get(i);
-			Coord toCoord = toCoords.get(i);
-			List<String> outputRow = new ArrayList<>();
-			outputRow.add(Integer.toString(i + 1));
-			outputRow.add(Double.toString(fromCoord.getX()));
-			outputRow.add(Double.toString(fromCoord.getY()));
-			outputRow.add(Double.toString(toCoord.getX()));
-			outputRow.add(Double.toString(toCoord.getY()));
-			tsvWriter.printRecord(outputRow);
-		}
-		tsvWriter.close();
+		GenerateFreightPlans.createOutput_tripOD_relations(resultSummaryPath, outputPlans);
 
 		return 0;
 	}
