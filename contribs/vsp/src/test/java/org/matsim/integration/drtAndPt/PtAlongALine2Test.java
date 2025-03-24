@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -230,7 +230,7 @@ public class PtAlongALine2Test {
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
@@ -247,7 +247,7 @@ public class PtAlongALine2Test {
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
@@ -263,7 +263,7 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;

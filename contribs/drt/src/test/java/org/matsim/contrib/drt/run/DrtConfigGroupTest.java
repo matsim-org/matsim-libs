@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.run;
 import com.google.common.base.VerifyException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.core.config.Config;
@@ -34,7 +34,7 @@ class DrtConfigGroupTest {
 		config.addModule(drtConfig);
 
 		// add second DrtOptimizationConstraintsParams
-		DrtOptimizationConstraintsSet params = new DefaultDrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSet params = new DrtOptimizationConstraintsSetImpl();
 		params.name = "test";
 
 		DrtOptimizationConstraintsParams optimizationConstraintsParams = drtConfig.addOrGetDrtOptimizationConstraintsParams();
