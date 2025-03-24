@@ -38,7 +38,7 @@ public class StrategicChargingTest {
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.setScoreTrackingInterval(1);
-        config.getScoringParameters().zeroSoc = -1000.0; // incentivize agent to charge at work
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
 
         // motivate agent to charge at activity
         config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
@@ -88,7 +88,7 @@ public class StrategicChargingTest {
                 .build();
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
-        config.getScoringParameters().zeroSoc = -1000.0; // incentivize agent to charge
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
 
         // motivate agent to charge enroute
         config.setMaximumActivityChargingDuration(0.0);
@@ -132,7 +132,7 @@ public class StrategicChargingTest {
         wdConfig.setAllowSpoantaneousCharging(true);
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
-        config.getScoringParameters().zeroSoc = -1000.0; // incentivize agent to charge
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
 
         // disallow enroute and activity charging
         config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
