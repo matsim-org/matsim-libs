@@ -458,7 +458,7 @@ public class TestScenarioBuilder {
 
 		WithinDayEvConfigGroup withinDayConfig = new WithinDayEvConfigGroup();
 		config.addModule(withinDayConfig);
-		withinDayConfig.carMode = "car";
+		withinDayConfig.setCarMode("car");
 
 		if (enableStrategicCharging) {
 			StrategicChargingConfigGroup strategicConfig = new StrategicChargingConfigGroup();

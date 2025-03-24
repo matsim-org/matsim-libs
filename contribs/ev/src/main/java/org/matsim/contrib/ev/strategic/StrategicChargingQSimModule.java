@@ -44,7 +44,7 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 	StrategicChargingSlotProvider provideStrategicOfflineSlotProvider(ChargingInfrastructure infrastructure,
 			TimeInterpretation timeInterpretation, Scenario scenario, WithinDayEvConfigGroup config) {
 		return new StrategicChargingSlotProvider(infrastructure,
-				new ChargingSlotFinder(scenario, config.carMode));
+				new ChargingSlotFinder(scenario, config.getCarMode()));
 	}
 
 	@Provides

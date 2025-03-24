@@ -70,7 +70,7 @@ public class StrategicChargingModule extends AbstractModule {
 		addEventHandlerBinding().to(ChargerTypeAnalysisListener.class);
 
 		bind(Key.get(TravelTime.class, Names.named(MODE_BINDING)))
-				.to(Key.get(TravelTime.class, Names.named(withinDayConfig.carMode)));
+				.to(Key.get(TravelTime.class, Names.named(withinDayConfig.getCarMode())));
 
 		StrategicChargingConfigGroup chargingConfig = StrategicChargingConfigGroup.get(getConfig());
 
@@ -120,7 +120,7 @@ public class StrategicChargingModule extends AbstractModule {
 			ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
 			StrategicChargingConfigGroup scConfig, WithinDayEvConfigGroup withinConfig, ScoringTracker tracker) {
 		return new ChargingPlanScoring(eventsManager, population, network, fleet, costCalculator, scConfig.scoring,
-				withinConfig.carMode, tracker);
+				withinConfig.getCarMode(), tracker);
 	}
 
 	@Provides
@@ -167,7 +167,7 @@ public class StrategicChargingModule extends AbstractModule {
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
 			TimeInterpretation timeInterpretation) {
-		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.carMode);
+		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config);
 	}
 

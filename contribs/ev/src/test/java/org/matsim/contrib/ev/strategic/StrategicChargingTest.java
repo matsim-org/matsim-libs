@@ -129,7 +129,7 @@ public class StrategicChargingTest {
                 .build();
 
         WithinDayEvConfigGroup wdConfig = WithinDayEvConfigGroup.get(scenario.config());
-        wdConfig.allowSpoantaneousCharging = true;
+        wdConfig.setAllowSpoantaneousCharging(true);
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.scoring.zeroSoc = -1000.0; // incentivize agent to charge
