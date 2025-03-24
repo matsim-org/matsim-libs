@@ -462,7 +462,7 @@ public class TestScenarioBuilder {
 
 		if (enableStrategicCharging) {
 			StrategicChargingConfigGroup strategicConfig = new StrategicChargingConfigGroup();
-			strategicConfig.selectionStrategy = SelectionStrategy.Best; // to have a strong effect
+			strategicConfig.setSelectionStrategy(SelectionStrategy.Best); // to have a strong effect
 			config.addModule(strategicConfig);
 
 			ChargingPlanScoringParameters scoringParameters = new ChargingPlanScoringParameters();
