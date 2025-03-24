@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -50,7 +49,6 @@ public final class EstimateCalculator {
 		simulationEndTime = switch (config.controller().getMobsim()) {
 			case QSimConfigGroup.GROUP_NAME -> config.qsim().getEndTime();
 			case HermesConfigGroup.NAME -> OptionalTime.defined(config.hermes().getEndTime());
-			case JDEQSimConfigGroup.NAME -> config.jdeqSim().getSimulationEndTime();
 			default -> throw new IllegalStateException("Unexpected value: " + config.controller().getMobsim());
 		};
 	}

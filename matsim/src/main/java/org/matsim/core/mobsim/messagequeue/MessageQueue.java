@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * package-info.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,12 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * This package contains the Java-port of the DEQSim.
- * 
- * <h2>Package Maintainer(s):</h2>
- * <ul>
- *   <li>Rashid Waraich</li>
- * </ul>
+package org.matsim.core.mobsim.messagequeue;
+
+import java.util.PriorityQueue;
+
+/**
+ * The message queue of the micro-simulation.
+ * <br/>
+ * Via injection, one can currently get hold both of {@link MessageQueue} and {@link SteppableScheduler}.
+ * Seems to me that the intended API is actually the latter??  But I don't actually know.  / kn
+ *
+ * @author rashid_waraich
  */
-package org.matsim.core.mobsim.jdeqsim;
+public class MessageQueue {
+	private PriorityQueue<Message> queue = new PriorityQueue<>();
+
+	/**
+	 * Putting a message into the queue
+	 */
+	public void putMessage(Message m) {
+		queue.add(m);
+	}
+
+	/**
+	 * get the first message in the queue (with least time stamp)
+	 */
+	public Message getNextMessage() {
+		return queue.poll();
+	}
+
+	public boolean isEmpty() {
+		return queue.isEmpty();
+	}
+
+}

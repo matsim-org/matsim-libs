@@ -82,7 +82,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {qsim, JDEQSim, hermes}
+	public enum MobsimType {qsim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
