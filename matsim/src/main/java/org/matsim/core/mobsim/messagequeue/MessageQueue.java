@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * MessageQueueEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,26 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.messagequeueengine;
+package org.matsim.core.mobsim.messagequeue;
 
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.messagequeue.SteppableScheduler;
+import java.util.PriorityQueue;
 
-import jakarta.inject.Inject;
+/**
+ * The message queue of the micro-simulation.
+ * <br/>
+ * Via injection, one can currently get hold both of {@link MessageQueue} and {@link SteppableScheduler}.
+ * Seems to me that the intended API is actually the latter??  But I don't actually know.  / kn
+ *
+ * @author rashid_waraich
+ */
+public class MessageQueue {
+	private PriorityQueue<Message> queue = new PriorityQueue<>();
 
-class MessageQueueEngine implements MobsimBeforeSimStepListener {
-
-	private final SteppableScheduler scheduler;
-
-	@Inject
-	MessageQueueEngine(final SteppableScheduler scheduler) {
-		this.scheduler = scheduler;
+	/**
+	 * Putting a message into the queue
+	 */
+	public void putMessage(Message m) {
+		queue.add(m);
 	}
 
-	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		scheduler.doSimStep(e.getSimulationTime());
+	/**
+	 * get the first message in the queue (with least time stamp)
+	 */
+	public Message getNextMessage() {
+		return queue.poll();
+	}
+
+	public boolean isEmpty() {
+		return queue.isEmpty();
 	}
 
 }

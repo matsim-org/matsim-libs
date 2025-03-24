@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * MessageQueueEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,26 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.messagequeueengine;
+package org.matsim.core.mobsim.messagequeue;
 
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.messagequeue.SteppableScheduler;
+/**
+ * The basic message type used in the micro-simulation.
+ *
+ * @author rashid_waraich
+ */
+public abstract class Message implements Comparable<Message> {
 
-import jakarta.inject.Inject;
+	private double messageArrivalTime = 0;
 
-class MessageQueueEngine implements MobsimBeforeSimStepListener {
-
-	private final SteppableScheduler scheduler;
-
-	@Inject
-	MessageQueueEngine(final SteppableScheduler scheduler) {
-		this.scheduler = scheduler;
+	public Message(double messageArrivalTime) {
+		this.messageArrivalTime = messageArrivalTime;
 	}
 
+	public double getMessageArrivalTime() {
+		return messageArrivalTime;
+	}
+
+	/**
+	 * The comparison is done according to the message arrival Time. If the time
+	 * is equal of two messages, then the priority of the messages is compared
+	 */
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		scheduler.doSimStep(e.getSimulationTime());
+	public int compareTo(Message otherMessage) {
+		if (messageArrivalTime > otherMessage.messageArrivalTime) {
+			return 1;
+		} else if (messageArrivalTime < otherMessage.messageArrivalTime) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
+
+	public abstract void handleMessage();
 
 }

@@ -19,12 +19,9 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.jdeqsimengine;
+ package org.matsim.core.mobsim.messagequeue;
 
 import org.matsim.core.mobsim.framework.Steppable;
-import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
-import org.matsim.core.mobsim.jdeqsim.Scheduler;
 
 import jakarta.inject.Inject;
 
@@ -44,18 +41,17 @@ public class SteppableScheduler extends Scheduler implements Steppable {
 
 		// "lookahead" is, I think, just a cache of the next message in the queue, to avoid having to retreive it again.
 		// yyyy looks like a potential bug to me if some other message gets inserted with an earlier message arrival time?  kai, feb'19
+		// yes, I also think this works only if all messages are known in advance. marcel, march 2025
 		if (lookahead != null && time < lookahead.getMessageArrivalTime()) {
 			return;
 		}
 		if (lookahead != null) {
-			lookahead.processEvent();
 			lookahead.handleMessage();
 			lookahead = null;
 		}
 		while (!queue.isEmpty()) {
 			Message m = queue.getNextMessage();
 			if (m != null && m.getMessageArrivalTime() <= time) {
-				m.processEvent();
 				m.handleMessage();
 			} else {
 				lookahead = m;
