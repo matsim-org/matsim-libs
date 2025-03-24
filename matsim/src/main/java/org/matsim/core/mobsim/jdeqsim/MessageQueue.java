@@ -36,7 +36,7 @@ public class MessageQueue {
 	private int queueSize = 0;
 
 	/**
-	 * 
+	 *
 	 * Putting a message into the queue
 	 *
 	 * @param m
@@ -47,24 +47,7 @@ public class MessageQueue {
 	}
 
 	/**
-	 * 
-	 * Remove the message from the queue and discard it. - queue1.remove(m) does
-	 * not function, because it discards all message with the same priority as m
-	 * from the queue. - This java api bug is reported at:
-	 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6207984
-	 * 
-	 * => queue1.removeAll(Collections.singletonList(m)); can be used, but it has
-	 * been removed because of just putting a flag to kill a message is more efficient.
-	 * 
-	 * @param m
-	 */
-	public void removeMessage(Message m) {
-		m.killMessage();
-		queueSize--;
-	}
-
-	/**
-	 * 
+	 *
 	 * get the first message in the queue (with least time stamp)
 	 *
 	 * @return
