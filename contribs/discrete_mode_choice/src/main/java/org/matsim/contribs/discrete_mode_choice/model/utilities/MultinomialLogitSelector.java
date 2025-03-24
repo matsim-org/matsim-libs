@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,13 +13,13 @@ import org.apache.logging.log4j.Logger;
  * The MultinomialLogitSelector collects a set of candidates with given
  * utilities and then selects on according to the multinomial logit model. For
  * each candidate (i) a utility is calculated as:
- * 
+ *
  * <code>P(i) = exp( Ui ) / Sum( U1 + U2 + ... + Un )</code>
- * 
+ *
  * For large utilities the exponential terms can exceed the value range of a
  * double. Therefore, the selector has a cutoff value, which is a maximum of
  * 700.0 by default. If this value is reached a warning will be shown.
- * 
+ *
  * @author sebhoerl
  */
 public class MultinomialLogitSelector implements UtilitySelector {
@@ -50,7 +49,7 @@ public class MultinomialLogitSelector implements UtilitySelector {
 	@Override
 	public Optional<UtilityCandidate> select(Random random) {
 		// I) If not candidates are available, give back nothing
-		if (candidates.size() == 0) {
+		if (candidates.isEmpty()) {
 			return Optional.empty();
 		}
 
@@ -60,9 +59,9 @@ public class MultinomialLogitSelector implements UtilitySelector {
 		if (considerMinimumUtility) {
 			filteredCandidates = candidates.stream() //
 					.filter(c -> c.getUtility() > minimumUtility) //
-					.collect(Collectors.toList());
+					.toList();
 
-			if (filteredCandidates.size() == 0) {
+			if (filteredCandidates.isEmpty()) {
 				logger.warn(String.format(
 						"Encountered choice where all utilities were smaller than %f (minimum configured utility)",
 						minimumUtility));
@@ -91,8 +90,8 @@ public class MultinomialLogitSelector implements UtilitySelector {
 		List<Double> cumulativeDensity = new ArrayList<>(density.size());
 		double totalDensity = 0.0;
 
-		for (int i = 0; i < density.size(); i++) {
-			totalDensity += density.get(i);
+		for (Double obs : density) {
+			totalDensity += obs;
 			cumulativeDensity.add(totalDensity);
 		}
 
@@ -115,7 +114,7 @@ public class MultinomialLogitSelector implements UtilitySelector {
 		}
 
 		@Override
-		public UtilitySelector createUtilitySelector() {
+		public MultinomialLogitSelector createUtilitySelector() {
 			return new MultinomialLogitSelector(maximumUtility, minimumUtility, considerMinimumUtility);
 		}
 	}
