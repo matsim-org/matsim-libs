@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
@@ -79,10 +80,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
 
 	@CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
-	protected File configPath;
+	protected String configPath;
 
 	@CommandLine.Option(names = "--yaml", description = "Path to yaml file with config params to overwrite.", required = false)
-	protected Path specs;
+	protected String specs;
 
 	@CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
 	protected int iterations;
@@ -153,10 +154,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull( configPath, "No default scenario location given" ).getAbsoluteFile().toString();
+			String path = Objects.requireNonNull( configPath, "No default scenario location given" );
 			List<ConfigGroup> customModules = getCustomModules();
 
-			final Config config1 = ConfigUtils.loadConfig(path, customModules.toArray(new ConfigGroup[0] ) );
+			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
 			Config prepared = prepareConfig( config1 );
 
 			config = prepared != null ? prepared : config1;
@@ -169,7 +170,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Objects.requireNonNull(config);
 
 		if (specs != null)
-			ApplicationUtils.applyConfigUpdate(config, specs);
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(specs));
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -216,7 +217,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		return 0;
 	}
 
-	File getConfigPath() {
+	String getConfigPath() {
 		return configPath;
 	}
 
@@ -509,7 +510,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		config = tmp != null ? tmp : config;
 
 		if (app.specs != null) {
-			ApplicationUtils.applyConfigUpdate(config, app.specs);
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.specs));
 		}
 
 		if (app.remainingArgs != null) {
