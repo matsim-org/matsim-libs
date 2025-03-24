@@ -22,7 +22,7 @@ public class ParkingVehicleHandler implements VehicleHandler, TransitDriverStart
 
 	@Override
 	public VehicleArrival handleVehicleArrival(QVehicle vehicle, Link link) {
-		if (!vehicle.getDriver().getMode().equals(TransportMode.car)) {
+		if (!vehicle.getVehicle().getType().getNetworkMode().equals(TransportMode.car)) {
 			// If vehicle is no car, do not park it
 			return VehicleArrival.ALLOWED;
 		}

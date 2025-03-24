@@ -35,7 +35,7 @@ public class DefaultKernelFunction implements NetworkKernelFunction {
 	}
 
 	@Override
-	public Map<Id<Link>, Double> calculateWeightedKernel(QVehicle vehicle, Link link) {
+	synchronized public Map<Id<Link>, Double> calculateWeightedKernel(QVehicle vehicle, Link link) {
 		kernelCache.computeIfAbsent(new Tuple<>(vehicle.getVehicle().getId(), link.getId()),
 			k -> {
 				double distance = this.kernelDistance.calculateDistance(vehicle, link);

@@ -6,10 +6,12 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationUtils;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PlanBasedParkingCapacityInitializer implements ParkingCapacityInitializer {
@@ -30,7 +32,8 @@ public class PlanBasedParkingCapacityInitializer implements ParkingCapacityIniti
 
 		population.getPersons().values().stream()
 			.map(p -> PopulationUtils.getFirstActivityOfDayBeforeDepartingWithCar(p.getSelectedPlan()))
-			.map(a -> a.getLinkId())
+			.filter(Objects::nonNull)
+			.map(Activity::getLinkId)
 			.collect(Collectors.groupingBy(l -> l, Collectors.counting()))
 			.forEach((linkId, count) -> {
 				capacity.compute(linkId, (l,p) -> {
