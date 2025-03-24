@@ -5,7 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.Config;
 
-public class DefaultDrtOptimizationConstraintsSet extends DrtOptimizationConstraintsSet {
+public class DrtOptimizationConstraintsSetImpl extends DrtOptimizationConstraintsSet {
 
     @Parameter
     @Comment("Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "

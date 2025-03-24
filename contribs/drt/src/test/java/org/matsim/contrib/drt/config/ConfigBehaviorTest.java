@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -99,8 +99,8 @@ public class ConfigBehaviorTest{
             multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
             DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
-            DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet =
-                    (DefaultDrtOptimizationConstraintsSet) drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
+            DrtOptimizationConstraintsSetImpl optimizationConstraintsSet =
+                    drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
             optimizationConstraintsSet.maxTravelTimeAlpha = 2.;
             optimizationConstraintsSet.maxTravelTimeBeta = 5. * 60;
 
@@ -115,8 +115,8 @@ public class ConfigBehaviorTest{
             DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
 
             // check if you are getting back the values from the config file:
-            DefaultDrtOptimizationConstraintsSet constraintsSet =
-                    (DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
+            DrtOptimizationConstraintsSetImpl constraintsSet =
+                    drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
                             addOrGetDefaultDrtOptimizationConstraintsSet();
             Assertions.assertEquals( 2., constraintsSet.maxTravelTimeAlpha, Double.MIN_VALUE );
             Assertions.assertEquals( 300., constraintsSet.maxTravelTimeBeta, Double.MIN_VALUE );
