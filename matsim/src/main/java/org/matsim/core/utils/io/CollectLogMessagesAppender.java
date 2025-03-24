@@ -26,8 +26,8 @@ import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.filter.ThresholdFilter;
 import org.matsim.core.controler.Controler;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Queue;
 
 
 /**
@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class CollectLogMessagesAppender extends AbstractAppender {
 
-	private List<LogEvent> logEvents = new LinkedList<>();
+	private Queue<LogEvent> logEvents = new ConcurrentLinkedQueue<>();
 
 	public CollectLogMessagesAppender() {
 		super("collector",
@@ -52,7 +52,7 @@ public class CollectLogMessagesAppender extends AbstractAppender {
 		this.logEvents.add(e);
 	}
 
-	public List<LogEvent> getLogEvents() {
+	public Queue<LogEvent> getLogEvents() {
 		return this.logEvents;
 	}
 
