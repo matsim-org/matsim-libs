@@ -57,7 +57,7 @@ public class WithinDayEvConfigGroup extends ReflectiveConfigGroup {
 				"Config group '" + EvConfigGroup.GROUP_NAME + "'' must be defined when using within-day ev charging.");
 
 		EvConfigGroup evConfig = EvConfigGroup.get(config);
-		Verify.verify(maximumQueueTime > evConfig.chargeTimeStep,
+		Verify.verify(maximumQueueTime > evConfig.getChargeTimeStep(),
 				"Maximum queue time should be longer than the charging engine time step, to make sure we catch an event where a vehicle gets queued or plugged");
 	}
 }

@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.stats;
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.MatsimServices;
@@ -46,7 +47,7 @@ public class EvStatsModule extends AbstractModule {
 		addEventHandlerBinding().to(ChargingEventSequenceCollector.class);
 		addControlerListenerBinding().to(ChargingProceduresCSVWriter.class).in(Singleton.class);
 
-		if (evCfg.timeProfiles) {
+		if (evCfg.getAnalysisOutputs().contains(EvAnalysisOutput.TimeProfiles)) {
 			installQSimModule(new AbstractQSimModule() {
 				@Override
 				protected void configureQSim() {

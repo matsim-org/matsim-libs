@@ -454,7 +454,7 @@ public class TestScenarioBuilder {
 
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		config.addModule(evConfigGroup);
-		evConfigGroup.chargersFile = "none";
+		evConfigGroup.setChargersFile("none");
 
 		WithinDayEvConfigGroup withinDayConfig = new WithinDayEvConfigGroup();
 		config.addModule(withinDayConfig);

@@ -207,7 +207,7 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		if (evCfg.enforceChargingInteractionDuration){
+		if (evCfg.isEnforceChargingInteractionDuration()){
 			//this could actually happen when combining with edrt/etaxi/evrp
 			throw new RuntimeException("should currently not happen, as this event is only triggered in case the agent quits the charger queue without charging afterwards, " +
 				" and this should not happen with fixed charging activity duration.\n" +
