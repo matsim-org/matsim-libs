@@ -70,11 +70,11 @@ public class StrategicChargingModule extends AbstractModule {
 		addEventHandlerBinding().to(ChargerTypeAnalysisListener.class);
 
 		bind(Key.get(TravelTime.class, Names.named(MODE_BINDING)))
-				.to(Key.get(TravelTime.class, Names.named(withinDayConfig.carMode)));
+				.to(Key.get(TravelTime.class, Names.named(withinDayConfig.getCarMode())));
 
 		StrategicChargingConfigGroup chargingConfig = StrategicChargingConfigGroup.get(getConfig());
 
-		switch (chargingConfig.selectionStrategy) {
+		switch (chargingConfig.getSelectionStrategy()) {
 			case Best:
 				bind(ChargingPlanSelector.class).to(BestChargingPlanSelector.class);
 				break;
@@ -94,7 +94,7 @@ public class StrategicChargingModule extends AbstractModule {
 		addControlerListenerBinding().to(ChargingPlanScoring.class);
 		addControlerListenerBinding().to(ChargingPlanScoringListener.class);
 
-		if (chargingConfig.chargingScoreWeight != 0.0) {
+		if (chargingConfig.getChargingScoreWeight() != 0.0) {
 			bind(ScoringFunctionFactory.class).to(StrategicChargingScoringFunction.Factory.class).in(Singleton.class);
 		}
 
@@ -105,7 +105,7 @@ public class StrategicChargingModule extends AbstractModule {
 		bind(ChargerAccess.class).to(AttributeBasedChargerAccess.class);
 
 		install(new ChargerReservationModule(
-				chargingConfig.onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)));
+				chargingConfig.getOnlineSearchStrategy().equals(AlternativeSearchStrategy.ReservationBased)));
 	}
 
 	@Provides
@@ -119,15 +119,15 @@ public class StrategicChargingModule extends AbstractModule {
 	ChargingPlanScoring provideChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
 			ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
 			StrategicChargingConfigGroup scConfig, WithinDayEvConfigGroup withinConfig, ScoringTracker tracker) {
-		return new ChargingPlanScoring(eventsManager, population, network, fleet, costCalculator, scConfig.scoring,
-				withinConfig.carMode, tracker);
+		return new ChargingPlanScoring(eventsManager, population, network, fleet, costCalculator, scConfig.getScoringParameters(),
+				withinConfig.getCarMode(), tracker);
 	}
 
 	@Provides
 	@Singleton
 	ScoringTracker provideScoringTracker(OutputDirectoryHierarchy outputHierarchy,
 			StrategicChargingConfigGroup config) {
-		return new ScoringTracker(outputHierarchy, config.scoreTrackingInterval);
+		return new ScoringTracker(outputHierarchy, config.getScoreTrackingInterval());
 	}
 
 	@Provides
@@ -139,8 +139,8 @@ public class StrategicChargingModule extends AbstractModule {
 	@Provides
 	StrategicChargingReplanningAlgorithm provideStrategicReplanningAlgorithm(ChargingPlanSelector selector,
 			ChargingPlanInnovator creator, StrategicChargingConfigGroup config) {
-		return new StrategicChargingReplanningAlgorithm(selector, creator, config.selectionProbability,
-				config.maximumChargingPlans);
+		return new StrategicChargingReplanningAlgorithm(selector, creator, config.getSelectionProbability(),
+				config.getMaximumChargingPlans());
 	}
 
 	@Provides
@@ -160,14 +160,14 @@ public class StrategicChargingModule extends AbstractModule {
 
 	@Provides
 	ExponentialChargingPlanSelector provideExponentialPlanSelector(StrategicChargingConfigGroup config) {
-		return new ExponentialChargingPlanSelector(config.exponentialSelectionBeta);
+		return new ExponentialChargingPlanSelector(config.getExponentialSelectionBeta());
 	}
 
 	@Provides
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
 			TimeInterpretation timeInterpretation) {
-		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.carMode);
+		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config);
 	}
 
@@ -193,7 +193,7 @@ public class StrategicChargingModule extends AbstractModule {
 			ChargingPlanScoring chargingScoring) {
 		CharyparNagelScoringFunctionFactory delegate = new CharyparNagelScoringFunctionFactory(scenario);
 		return new StrategicChargingScoringFunction.Factory(delegate, chargingScoring,
-				chargingConfig.chargingScoreWeight);
+				chargingConfig.getChargingScoreWeight());
 	}
 
 	@Provides

@@ -30,7 +30,7 @@
 
 		<param name="chargersFile" value="one_etaxi_chargers.xml"/>
 
-		<param name="timeProfiles" value="true"/>
+		<param name="analysisOutputs" value="TimeProfiles"/>
 	</module>
 
 	<module name="vehicles">

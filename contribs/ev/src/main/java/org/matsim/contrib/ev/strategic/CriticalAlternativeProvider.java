@@ -61,7 +61,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
         this.travelTime = travelTime;
         this.chargerProvider = chargerProvider;
         this.infrastructure = infrastructure;
-        this.minimumDuration = config.minimumEnrouteChargingDuration;
+        this.minimumDuration = config.getMinimumEnrouteChargingDuration();
     }
 
     @Override

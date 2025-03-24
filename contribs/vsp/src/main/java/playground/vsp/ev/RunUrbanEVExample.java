@@ -44,16 +44,19 @@ package playground.vsp.ev;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -97,8 +100,8 @@ public class RunUrbanEVExample {
 	private static Config prepareConfig( String[] args ){
 		Config config = ConfigUtils.loadConfig( args );
 		EvConfigGroup evConfigGroup = ConfigUtils.addOrGetModule( config, EvConfigGroup.class );
-		evConfigGroup.timeProfiles = true;
-		evConfigGroup.chargersFile = "chargers.xml";
+		evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
+		evConfigGroup.setChargersFile("chargers.xml");
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 

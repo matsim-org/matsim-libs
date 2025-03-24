@@ -1,7 +1,7 @@
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestDESStarter_Berlin.java
+ * SteppableScheduler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,50 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.jdeqsim;
+ package org.matsim.core.mobsim.messagequeue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.matsim.core.mobsim.framework.Steppable;
 
-import org.junit.jupiter.api.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioUtils;
+import jakarta.inject.Inject;
 
+public class SteppableScheduler extends Scheduler implements Steppable {
 
-	public class TestDESStarter_Berlin extends AbstractJDEQSimTest {
+	private Message lookahead;
+	private boolean finished = false;
 
-	 @Test
-	 void test_Berlin_TestHandlerDetailedEventChecker() {
-		Config config = ConfigUtils.loadConfig("test/scenarios/berlin/config.xml");
-		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		ScenarioUtils.loadScenario(scenario);
+	@Inject
+	public SteppableScheduler(MessageQueue queue) {
+		super(queue);
+	}
 
-		this.runJDEQSim(scenario);
-		
-		assertEquals(scenario.getPopulation().getPersons().size(), super.eventsByPerson.size());
-		super.checkAscendingTimeStamps();
-		super.checkEventsCorrespondToPlans(scenario.getPopulation());
+	@Override
+	public void doSimStep(double time) {
+		finished = false; // I don't think we can restart once the queue has run dry, but just in case.
+
+		// "lookahead" is, I think, just a cache of the next message in the queue, to avoid having to retreive it again.
+		// yyyy looks like a potential bug to me if some other message gets inserted with an earlier message arrival time?  kai, feb'19
+		// yes, I also think this works only if all messages are known in advance. marcel, march 2025
+		if (lookahead != null && time < lookahead.getMessageArrivalTime()) {
+			return;
+		}
+		if (lookahead != null) {
+			lookahead.handleMessage();
+			lookahead = null;
+		}
+		while (!queue.isEmpty()) {
+			Message m = queue.getNextMessage();
+			if (m != null && m.getMessageArrivalTime() <= time) {
+				m.handleMessage();
+			} else {
+				lookahead = m;
+				return;
+			}
+		}
+		finished = true; // queue has run dry.
+	}
+
+	public boolean isFinished() {
+		return finished;
 	}
 
 }
