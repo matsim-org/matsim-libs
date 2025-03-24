@@ -32,7 +32,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * This constraint decides whether a mode is allowed for a certain trip by
  * checking whether the origin and/or destination location are within a feature
  * of a given shape file.
- * 
+ *
  * @author sebhoerl
  */
 public class ShapeFileConstraint implements TripConstraint {
@@ -43,7 +43,7 @@ public class ShapeFileConstraint implements TripConstraint {
 	private final Set<Geometry> shapes;
 
 	public enum Requirement {
-		ORIGIN, DESTINATION, BOTH, ANY, NONE;
+		ORIGIN, DESTINATION, BOTH, ANY, NONE
 	}
 
 	private final Requirement requirement;
@@ -77,18 +77,13 @@ public class ShapeFileConstraint implements TripConstraint {
 			boolean originValid = checkLinkId(trip.getOriginActivity().getLinkId());
 			boolean destinationValid = checkLinkId(trip.getDestinationActivity().getLinkId());
 
-			switch (requirement) {
-			case ANY:
-				return originValid || destinationValid;
-			case BOTH:
-				return originValid && destinationValid;
-			case DESTINATION:
-				return destinationValid;
-			case ORIGIN:
-				return originValid;
-			case NONE:
-				return !(originValid || destinationValid);
-			}
+			return switch (requirement) {
+				case ANY -> originValid || destinationValid;
+				case BOTH -> originValid && destinationValid;
+				case DESTINATION -> destinationValid;
+				case ORIGIN -> originValid;
+				case NONE -> !(originValid || destinationValid);
+			};
 		}
 
 		return true;
@@ -131,7 +126,7 @@ public class ShapeFileConstraint implements TripConstraint {
 		}
 
 		@Override
-		public TripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
+		public ShapeFileConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
 				Collection<String> availableModes) {
 			return new ShapeFileConstraint(network, restrictedModes, requirement, shapes);
 		}
