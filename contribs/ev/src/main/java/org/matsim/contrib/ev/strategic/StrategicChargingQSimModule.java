@@ -44,7 +44,7 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 	StrategicChargingSlotProvider provideStrategicOfflineSlotProvider(ChargingInfrastructure infrastructure,
 			TimeInterpretation timeInterpretation, Scenario scenario, WithinDayEvConfigGroup config) {
 		return new StrategicChargingSlotProvider(infrastructure,
-				new ChargingSlotFinder(scenario, config.carMode));
+				new ChargingSlotFinder(scenario, config.getCarMode()));
 	}
 
 	@Provides
@@ -54,9 +54,9 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 			ChargerReservationManager reservationManager, TimeInterpretation timeInterpretation,
 			CriticalAlternativeProvider criticalProvider) {
 		return new StrategicChargingAlternativeProvider(scenario, chargerProvider, infrastructure, access,
-				chargingConfig.onlineSearchStrategy,
-				chargingConfig.useProactiveOnlineSearch, timeInterpretation, reservationManager, criticalProvider,
-				chargingConfig.maximumAlternatives);
+				chargingConfig.getOnlineSearchStrategy(),
+				chargingConfig.isUseProactiveOnlineSearch(), timeInterpretation, reservationManager, criticalProvider,
+				chargingConfig.getMaximumAlternatives());
 	}
 
 	@Provides

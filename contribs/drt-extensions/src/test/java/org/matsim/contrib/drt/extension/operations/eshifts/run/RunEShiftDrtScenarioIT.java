@@ -19,6 +19,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -167,9 +168,9 @@ public class RunEShiftDrtScenarioIT {
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.chargersFile = chargersFile;
-		evConfigGroup.minimumChargeTime = 0;
-		evConfigGroup.timeProfiles = true;
+		evConfigGroup.setChargersFile(chargersFile);
+		evConfigGroup.setMinimumChargeTime(0);
+		evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
 		config.addModule(evConfigGroup);
 
 		config.vehicles().setVehiclesFile(evsFile);

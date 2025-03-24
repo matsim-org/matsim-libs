@@ -15,6 +15,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -149,9 +150,9 @@ public class ServicesTestUtils {
 		if(electrified)
 		{
 			final EvConfigGroup evConfigGroup = new EvConfigGroup();
-			evConfigGroup.chargersFile = chargersFile;
-			evConfigGroup.minimumChargeTime = 0;
-			evConfigGroup.timeProfiles = true;
+			evConfigGroup.setChargersFile(chargersFile);
+			evConfigGroup.setMinimumChargeTime(0);
+			evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
 			config.addModule(evConfigGroup);
 		}
 

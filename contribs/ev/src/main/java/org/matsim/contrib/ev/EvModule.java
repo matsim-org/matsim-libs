@@ -42,7 +42,7 @@ public class EvModule extends AbstractModule {
 			@Override protected void configureQSim() {
 				bind(VehicleChargingHandler.class).in(Singleton.class);
 				addMobsimScopeEventHandlerBinding().to( VehicleChargingHandler.class);
-				if(evCfg.enforceChargingInteractionDuration){
+				if(evCfg.isEnforceChargingInteractionDuration()){
 					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler.class);
 					addMobsimListenerBinding().to(VehicleChargingHandler.class);
 				}
