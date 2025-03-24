@@ -20,14 +20,16 @@
 
 package org.matsim.api.core.v01.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
+
+import java.util.Map;
+
+import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeKeyValue;
 
 public class ActivityStartEvent extends Event implements HasFacilityId, HasPersonId, HasLinkId, BasicLocation{
 
@@ -91,7 +93,7 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 	@Override public Id<Person> getPersonId() {
 		return this.personId;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -108,5 +110,13 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 	public void setCoord( Coord coord ) {
 		// yy  this is to retrofit the coordinate into existing events that don't have it.  :-(  kai, mar'20
 		this.coord = coord;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes common attributes
+		writeXMLStart(out);
+		writeEncodedAttributeKeyValue(out, ATTRIBUTE_ACTTYPE, this.acttype);
+		writeXMLEnd(out);
 	}
 }

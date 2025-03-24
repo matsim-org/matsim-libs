@@ -74,6 +74,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 	@CommandLine.Option(names = "--tripType", description = "Set the tripType: OUTGOING, INCOMING, TRANSIT, INTERNAL, ALL", defaultValue = "ALL")
 	private TripType tripType;
 
+	@CommandLine.Option(names = "--LegMode", description = "Set leg mode for long distance freight legs.", defaultValue = "freight")
+	private String legMode;
+
 	private final SplittableRandom rnd = new SplittableRandom(4711);
 
 	private final List<Coord> fromCoords = new ArrayList<>();
@@ -161,7 +164,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			boolean destinationIsInside = relevantArea.contains(MGC.coord2Point(sct.transform(endCoord)));
 
 			Activity act0 = populationFactory.createActivityFromCoord("freight_start", null);
-			Leg leg = populationFactory.createLeg("freight");
+			Leg leg = populationFactory.createLeg(legMode);
 			Activity act1 = populationFactory.createActivityFromCoord("freight_end", null);
 
 			switch (tripType) {
@@ -312,7 +315,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 					timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
 				}
 				if (!isCoordSet) {
-					Coord originalCoord = route.links.get(0).getCoord();
+					Coord originalCoord = route.links.getFirst().getCoord();
 					act0.setCoord(ct.transform(originalCoord));
 					act0.setEndTime(departureTime);
 				}

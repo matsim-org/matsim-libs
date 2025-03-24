@@ -68,4 +68,11 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasV
 		// personId, vehicleId handled by superclass
 		return atts;
 	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes all common attributes
+		writeXMLStart(out);
+		writeXMLEnd(out);
+	}
 }

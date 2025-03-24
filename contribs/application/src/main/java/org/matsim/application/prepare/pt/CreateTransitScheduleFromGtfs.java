@@ -1,5 +1,6 @@
 package org.matsim.application.prepare.pt;
 
+import com.conveyal.gtfs.model.Route;
 import com.conveyal.gtfs.model.Stop;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -7,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -30,10 +32,8 @@ import picocli.CommandLine;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 
@@ -75,6 +75,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--include-stops", description = "Fully qualified class name to a Predicate<Stop> for filtering certain stops")
 	private Class<?> includeStops;
+
+	@CommandLine.Option(names = "--transform-stops", description = "Fully qualified class name to a Consumer<Stop> for transforming stops before usage")
+	private Class<?> transformStops;
+
+	@CommandLine.Option(names = "--transform-routes", description = "Fully qualified class name to a Consumer<Route> for transforming routes before usage")
+	private Class<?> transformRoutes;
+
+	@CommandLine.Option(names = "--transform-schedule", description = "Fully qualified class name to a Consumer<TransitSchedule> to be executed after the schedule was created", arity = "0..*", split = ",")
+	private List<Class<?>> transformSchedule;
 
 	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate")
 	private boolean mergeStops;
@@ -133,6 +142,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				log.info("Using prefix: {}", prefix);
 			}
 
+			if (transformStops != null) {
+				converter.setTransformStop(createConsumer(transformStops, Stop.class));
+			}
+
+			if (transformRoutes != null) {
+				converter.setTransformRoute(createConsumer(transformRoutes, Route.class));
+			}
+
+
 			converter.build().convert();
 			i++;
 		}
@@ -143,6 +161,24 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			TransitSchedulePostProcessTools.copyEarlyDeparturesToFollowingNight(scenario.getTransitSchedule(), 6 * 3600, "copied");
 		}
 
+		if (transformSchedule != null && !transformSchedule.isEmpty()) {
+			for (Class<?> c : transformSchedule) {
+				Consumer<TransitSchedule> f = createConsumer(c, TransitSchedule.class);
+				log.info("Applying {} to created schedule", c.getName());
+				f.accept(scenario.getTransitSchedule());
+			}
+		}
+
+		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+			List<TransitRoute> routes = new ArrayList<>(line.getRoutes().values());
+			for (TransitRoute route : routes) {
+				if (route.getDepartures().isEmpty()) {
+					log.warn("Route {} in line {} with no departures removed.", route.getId(), line.getId());
+					line.removeRoute(route);
+				}
+			}
+		}
+
 		Network network = NetworkUtils.readNetwork(networkFile);
 
 		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
@@ -150,11 +186,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		if (validate) {
 			//Check schedule and network
 			TransitScheduleValidator.ValidationResult checkResult = TransitScheduleValidator.validateAll(ptScenario.getTransitSchedule(), ptScenario.getNetwork());
+			List<String> warnings = checkResult.getWarnings();
+			if (!warnings.isEmpty())
+				log.warn("TransitScheduleValidator warnings: {}", String.join("\n", warnings));
+
 			if (checkResult.isValid()) {
 				log.info("TransitSchedule and Network valid according to TransitScheduleValidator");
-				log.warn("TransitScheduleValidator warnings: {}", checkResult.getWarnings());
 			} else {
-				log.error(checkResult.getErrors());
+				log.error("TransitScheduleValidator errors: {}", String.join("\n", checkResult.getErrors()));
 				throw new RuntimeException("TransitSchedule and/or Network invalid");
 			}
 		}
@@ -169,6 +208,12 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		return 0;
 	}
 
+	@SuppressWarnings({"unchecked", "unused"})
+	private <T> Consumer<T> createConsumer(Class<?> consumer, Class<T> type) throws ReflectiveOperationException {
+		return (Consumer<T>) consumer.getDeclaredConstructor().newInstance();
+	}
+
+	@SuppressWarnings("unchecked")
 	private Predicate<Stop> createFilter(int i) throws Exception {
 
 		Predicate<Stop> filter = (stop) -> true;
@@ -199,7 +244,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		Scenario scenario = builder.build();
 
 		// add pseudo network for pt
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "pt_", 0.1, 100000.0).createNetwork();
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), ptNetworkIdentifier, 0.1, 100000.0).createNetwork();
 
 		// create TransitVehicle types
 		// see https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-24/ for veh capacities
@@ -219,7 +264,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
 
 			addHbefaMapping(reRbVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
-
 			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
 		}
 		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));
@@ -230,6 +274,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(sBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(sBahnVehicleType, 1.0 / 24.0); // 1s per boarding agent, distributed on 8*3 doors
 			VehicleUtils.setEgressTime(sBahnVehicleType, 1.0 / 24.0); // 1s per alighting agent, distributed on 8*3 doors
+
+			addHbefaMapping(sBahnVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(sBahnVehicleType);
 		}
 		VehicleType uBahnVehicleType = vehicleFactory.createVehicleType(Id.create("U-Bahn_veh_type", VehicleType.class));
@@ -240,9 +286,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(uBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(uBahnVehicleType, 1.0 / 18.0); // 1s per boarding agent, distributed on 6*3 doors
 			VehicleUtils.setEgressTime(uBahnVehicleType, 1.0 / 18.0); // 1s per alighting agent, distributed on 6*3 doors
-			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
 
 			addHbefaMapping(uBahnVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
+			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
 
 		}
 		VehicleType tramVehicleType = vehicleFactory.createVehicleType(Id.create("Tram_veh_type", VehicleType.class));
@@ -253,6 +299,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(tramVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(tramVehicleType, 1.0 / 5.0); // 1s per boarding agent, distributed on 5 doors
 			VehicleUtils.setEgressTime(tramVehicleType, 1.0 / 5.0); // 1s per alighting agent, distributed on 5 doors
+
+			addHbefaMapping(tramVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(tramVehicleType);
 		}
 		VehicleType busVehicleType = vehicleFactory.createVehicleType(Id.create("Bus_veh_type", VehicleType.class));
@@ -263,7 +311,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(busVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(busVehicleType, 1.0 / 3.0); // 1s per boarding agent, distributed on 3 doors
 			VehicleUtils.setEgressTime(busVehicleType, 1.0 / 3.0); // 1s per alighting agent, distributed on 3 doors
+
+			addHbefaMapping(busVehicleType, HbefaVehicleCategory.URBAN_BUS);
 			scenario.getTransitVehicles().addVehicleType(busVehicleType);
+
 		}
 		VehicleType ferryVehicleType = vehicleFactory.createVehicleType(Id.create("Ferry_veh_type", VehicleType.class));
 		{
@@ -273,6 +324,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(ferryVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ferryVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+
+			addHbefaMapping(ferryVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(ferryVehicleType);
 		}
 
@@ -284,6 +337,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setDoorOperationMode(ptVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+
+			addHbefaMapping(ptVehicleType, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 			scenario.getTransitVehicles().addVehicleType(ptVehicleType);
 		}
 
@@ -432,6 +487,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		VehicleUtils.setHbefaTechnology(carEngineInformation, "average");
 		VehicleUtils.setHbefaSizeClass(carEngineInformation, "average");
 		VehicleUtils.setHbefaEmissionsConcept(carEngineInformation, "average");
+		vehicleType.setNetworkMode(TransportMode.pt);
 	}
 
 	private static void increaseLinkFreespeedIfLower(Link link, double newFreespeed) {

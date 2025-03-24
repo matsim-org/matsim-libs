@@ -21,6 +21,7 @@
 package org.matsim.pt.utils;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -45,13 +46,18 @@ public class CreateVehiclesForSchedule {
 		this.schedule = schedule;
 		this.vehicles = vehicles;
 	}
-
+	
 	public void run() {
+		run(TransportMode.car);
+	}
+
+	public void run(String networkMode) {
 		VehiclesFactory vb = this.vehicles.getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create("defaultTransitVehicleType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehicleType.getCapacity().setSeats( 101 );
 		vehicleType.getCapacity().setStandingRoom( 0 );
+		vehicleType.setNetworkMode(networkMode);
 //		vehicleType.setCapacity(capacity);
 		this.vehicles.addVehicleType(vehicleType);
 

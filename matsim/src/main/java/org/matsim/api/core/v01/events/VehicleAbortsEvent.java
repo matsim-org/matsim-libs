@@ -61,4 +61,10 @@ public class VehicleAbortsEvent extends Event implements  HasLinkId, HasVehicleI
 		// linkId, vehicleId handled by superclass
 		return atts;
 	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		writeXMLStart(out);
+		writeXMLEnd(out);
+	}
 }

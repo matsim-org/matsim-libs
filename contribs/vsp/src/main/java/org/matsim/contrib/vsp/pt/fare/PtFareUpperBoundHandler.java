@@ -61,7 +61,7 @@ public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMo
                 // Issue refund to person
                 events.processEvent(
                         new PersonMoneyEvent(getOrCalcCompensationTime(), personId, refund,
-                                PT_REFUND, TransportMode.pt, "Refund for person" + personId.toString()));
+                                PT_REFUND, TransportMode.pt, "Refund for person " + personId.toString()));
             }
         }
     }
