@@ -130,7 +130,6 @@ public final class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-
 	@Override
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
