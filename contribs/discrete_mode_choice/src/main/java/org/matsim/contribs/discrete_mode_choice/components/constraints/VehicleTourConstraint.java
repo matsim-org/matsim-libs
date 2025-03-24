@@ -16,7 +16,7 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraintF
 /**
  * This constraint makes sure that trips are continuous in the sense that
  * vehicles get not dumped somewhere in the network:
- * 
+ *
  * <ul>
  * <li>Vehicles can only be used where they have been moved to before.</li>
  * <li>Within one tour, vehicles must depart first from the home location.</li>
@@ -27,19 +27,28 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraintF
  * options: Either the location of the first activity is used (as it is for
  * SubtourModeChoice), or the location of first activity with a certain type
  * (default is "home") is used.
- * 
+ *
  * If a home location cannot be found in the tour, a mode must start and end at
  * the first and last location in the tour.
- * 
+ *
  * @author sebhoerl
  */
 public class VehicleTourConstraint implements TourConstraint {
 	private final Collection<String> restrictedModes;
-	private final Id<? extends BasicLocation> homeLocationId;
+	private final Id<? extends BasicLocation> vehicleLocationId;
 
-	public VehicleTourConstraint(Collection<String> restrictedModes, Id<? extends BasicLocation> homeLocationId) {
+	public VehicleTourConstraint(Collection<String> restrictedModes,
+								 Id<? extends BasicLocation> vehicleLocationId) {
 		this.restrictedModes = restrictedModes;
-		this.homeLocationId = homeLocationId;
+		this.vehicleLocationId = vehicleLocationId;
+	}
+
+	public Collection<String> getRestrictedModes() {
+		return restrictedModes;
+	}
+
+	public Id<? extends BasicLocation> getVehicleLocationId() {
+		return vehicleLocationId;
 	}
 
 	private int getFirstIndex(String mode, List<String> modes) {
@@ -64,33 +73,45 @@ public class VehicleTourConstraint implements TourConstraint {
 
 	@Override
 	public boolean validateBeforeEstimation(List<DiscreteModeChoiceTrip> tour, List<String> modes,
-			List<List<String>> previousModes) {
+											List<List<String>> previousModes) {
 		for (String restrictedMode : restrictedModes) {
 			if (modes.contains(restrictedMode)) {
+				// I) Make sure vehicle is picked up and dropped off at its predetermined home
+				// base. If the chain does not start at the vehicle base, the vehicle may also
+				// be picked up at the first activity. If the chain does not end at the vehicle
+				// base, the vehicle may still be dropped off at the last activity.
+
 				int firstIndex = getFirstIndex(restrictedMode, modes);
 				int lastIndex = getLastIndex(restrictedMode, modes);
 
-				if (homeLocationId != null) {
-					Id<? extends BasicLocation> startLocationId = LocationUtils
-							.getLocationId(tour.get(firstIndex).getOriginActivity());
-					Id<? extends BasicLocation> endLocationId = LocationUtils
-							.getLocationId(tour.get(lastIndex).getDestinationActivity());
+				Id<? extends BasicLocation> startLocationId = LocationUtils
+					.getLocationId(tour.get(firstIndex).getOriginActivity());
+				Id<? extends BasicLocation> endLocationId = LocationUtils
+					.getLocationId(tour.get(lastIndex).getDestinationActivity());
 
-					if (!startLocationId.equals(homeLocationId)) {
-						return false;
-					}
+				if (!startLocationId.equals(vehicleLocationId)) {
+					// Vehicle does not depart at the depot
 
-					if (!endLocationId.equals(homeLocationId)) {
-						return false;
-					}
-				} else {
-					if (firstIndex > 0 || lastIndex < modes.size() - 1) {
+					if (firstIndex > 0) {
+						// If vehicle starts at very first activity, we still allow this tour!
 						return false;
 					}
 				}
 
+				if (!endLocationId.equals(vehicleLocationId)) {
+					// Vehicle does not end at the depot
+
+					if (lastIndex < modes.size() - 1) {
+						// If vehicle ends at the very last activity, we still allow this tour!
+						return false;
+					}
+				}
+
+				// II) Make sure that in between the vehicle is only picked up at the location
+				// where it has been moved previously
+
 				Id<? extends BasicLocation> currentLocationId = LocationUtils
-						.getLocationId(tour.get(firstIndex).getDestinationActivity());
+					.getLocationId(tour.get(firstIndex).getDestinationActivity());
 
 				for (int index = firstIndex + 1; index <= lastIndex; index++) {
 					if (modes.get(index).equals(restrictedMode)) {
@@ -111,7 +132,7 @@ public class VehicleTourConstraint implements TourConstraint {
 
 	@Override
 	public boolean validateAfterEstimation(List<DiscreteModeChoiceTrip> tour, TourCandidate candidate,
-			List<TourCandidate> previousCandidates) {
+										   List<TourCandidate> previousCandidates) {
 		return true;
 	}
 
@@ -125,8 +146,8 @@ public class VehicleTourConstraint implements TourConstraint {
 		}
 
 		@Override
-		public TourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
-				Collection<String> availableModes) {
+		public VehicleTourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
+											   Collection<String> availableModes) {
 			return new VehicleTourConstraint(restrictedModes, homeFinder.getHomeLocationId(planTrips));
 		}
 	}

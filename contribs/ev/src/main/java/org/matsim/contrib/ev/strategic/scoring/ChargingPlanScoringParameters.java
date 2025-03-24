@@ -32,7 +32,7 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 	public double detourDistance_km = 0.0;
 
 	@Parameter
-	@Comment("scorign utility applied every time the SoC goes to zero")
+	@Comment("scoring utility applied every time the SoC goes to zero")
 	public double zeroSoc = -100.0;
 
 	@Parameter
