@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.extension.services;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -13,6 +12,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;

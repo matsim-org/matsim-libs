@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneImpl;
 import org.matsim.contrib.common.zones.ZoneSystemImpl;
+import org.matsim.contrib.drt.zonal.RandomDrtZoneTargetLinkSelector;
 import org.matsim.core.network.NetworkUtils;
 import org.mockito.ArgumentCaptor;
 

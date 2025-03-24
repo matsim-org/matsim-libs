@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
@@ -28,6 +27,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 
 /**

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,43 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.analysis.zonal;
-
-import static java.util.stream.Collectors.toMap;
-import static org.matsim.contrib.common.util.DistanceUtils.calculateSquaredDistance;
-
-import java.util.Comparator;
-import java.util.Map;
+package org.matsim.contrib.drt.zonal;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
-import org.matsim.contrib.common.zones.ZoneSystem;
 
-/**
- * @author tschlenther
- */
-public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
-	private final Map<Zone, Link> targetLinks;
+public interface DrtZoneTargetLinkSelector {
 
-	public MostCentralDrtZoneTargetLinkSelector(ZoneSystem zoneSystem) {
-		targetLinks = zoneSystem.getZones()
-				.values()
-				.stream()
-				.collect(toMap(zone -> zone, zone -> zoneSystem.getLinksForZoneId(zone.getId()).stream().min(
-						//1. choose links with the most central toNode (there may be several "most central" nodes)
-						//2. if there is more than one such link (which is usually the case),
-						//   choose one with the most central fromNode
-						Comparator.<Link>comparingDouble(link -> squaredDistance(zone, link.getToNode()))//
-								.thenComparing(link -> squaredDistance(zone, link.getFromNode()))).orElseThrow()));
-	}
+	Link selectTargetLink(Zone zone);
 
-	@Override
-	public Link selectTargetLink(Zone zone) {
-		return this.targetLinks.get(zone);
-	}
-
-	private double squaredDistance(Zone zone, Node node) {
-		return calculateSquaredDistance(zone.getCentroid(), node.getCoord());
-	}
 }

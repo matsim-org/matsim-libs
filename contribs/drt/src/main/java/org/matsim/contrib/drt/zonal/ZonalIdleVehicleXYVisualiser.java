@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.zonal;
 
 import com.opencsv.CSVWriter;
 import org.matsim.api.core.v01.Coord;

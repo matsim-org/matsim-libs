@@ -22,13 +22,13 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.zones.ZoneSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDrtDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;

@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.zonal;
 
 import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;

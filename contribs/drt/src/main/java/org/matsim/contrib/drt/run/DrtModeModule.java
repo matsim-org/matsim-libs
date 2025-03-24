@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
@@ -35,6 +34,7 @@ import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.drt.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
