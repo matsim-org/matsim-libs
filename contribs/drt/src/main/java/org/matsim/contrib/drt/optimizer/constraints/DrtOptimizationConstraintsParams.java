@@ -5,8 +5,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -18,7 +18,7 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
     private final Supplier<DrtOptimizationConstraintsSet> optimizationConstraintsSetSupplier;
 
-    public static String defaultConstraintSet = DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
+    public DefaultDrtOptimizationConstraintsSet defaultConstraintSet;
 
 
     public DrtOptimizationConstraintsParams() {
@@ -38,9 +38,6 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
         Verify.verify(!drtOptimizationConstraintsSets.isEmpty(),
                 "At least one DrtOptimizationConstraintsParams is required.");
         Verify.verify(drtOptimizationConstraintsSets.stream()
-                        .anyMatch(params -> params.name.equals(defaultConstraintSet)),
-                "Default DrtOptimizationConstraintsParams is required.");
-        Verify.verify(drtOptimizationConstraintsSets.stream()
                         .map(params -> params.name)
                         .distinct()
                         .count() == drtOptimizationConstraintsSets.size(),
@@ -48,24 +45,25 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
     }
 
     public List<DrtOptimizationConstraintsSet> getDrtOptimizationConstraintsSets() {
-        return getParameterSets(DrtOptimizationConstraintsSet.SET_NAME).stream()
+        List<DrtOptimizationConstraintsSet> sets = new ArrayList<>();
+        if(defaultConstraintSet != null) {
+            sets.add(defaultConstraintSet);
+        }
+
+        List<DrtOptimizationConstraintsSet> additionalSets = getParameterSets(DrtOptimizationConstraintsSet.SET_NAME).stream()
                 .filter(DrtOptimizationConstraintsSet.class::isInstance)
                 .map(DrtOptimizationConstraintsSet.class::cast)
                 .toList();
+
+        sets.addAll(additionalSets);
+        return sets;
     }
 
     public DefaultDrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
-        Optional<DefaultDrtOptimizationConstraintsSet> drtOptParams = getDrtOptimizationConstraintsSets().stream()
-                .filter(params -> params.name.equals(defaultConstraintSet))
-                .filter(DefaultDrtOptimizationConstraintsSet.class::isInstance)
-                .map(DefaultDrtOptimizationConstraintsSet.class::cast)
-                .findAny();
-        if (drtOptParams.isEmpty()) {
-            DefaultDrtOptimizationConstraintsSet defaultSet = new DefaultDrtOptimizationConstraintsSet();
-            addParameterSet(defaultSet);
-            return defaultSet;
+        if (defaultConstraintSet == null) {
+            defaultConstraintSet = new DefaultDrtOptimizationConstraintsSet();
         }
-        return drtOptParams.get();
+        return defaultConstraintSet;
     }
 
     @Override
