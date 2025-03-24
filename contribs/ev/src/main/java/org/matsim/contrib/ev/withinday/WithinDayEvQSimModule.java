@@ -38,9 +38,9 @@ public class WithinDayEvQSimModule extends AbstractQSimModule {
 		addMobsimScopeEventHandlerBinding().to(WithinDayEvEngine.class);
 
 		bind(Key.get(RoutingModule.class, Names.named(ROAD_MODE_BINDING)))
-				.to(Key.get(RoutingModule.class, Names.named(config.carMode)));
+				.to(Key.get(RoutingModule.class, Names.named(config.getCarMode())));
 		bind(Key.get(RoutingModule.class, Names.named(WALK_MODE_BINDING)))
-				.to(Key.get(RoutingModule.class, Names.named(config.walkMode)));
+				.to(Key.get(RoutingModule.class, Names.named(config.getWalkMode())));
 
 		bind(ChargingSlotProvider.class).toInstance(ChargingSlotProvider.NOOP);
 		bind(ChargingAlternativeProvider.class).toInstance(ChargingAlternativeProvider.NOOP);
