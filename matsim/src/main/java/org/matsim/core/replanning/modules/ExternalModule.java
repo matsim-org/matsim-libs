@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
@@ -58,9 +59,46 @@ import org.matsim.core.utils.misc.ExeRunner;
  */
 public class ExternalModule implements PlanStrategyModule {
 
-    interface ExeRunnerDelegate {
-        public boolean invoke();
-    }
+	interface ExeRunnerDelegate {
+		boolean invoke();
+	}
+
+	private static class ExternalConfigGroup extends ConfigGroup {
+
+		public ExternalConfigGroup() {
+			super(SCENARIO);
+		}
+
+		private String inputPlansFilename;
+		private String workingPlansFilename;
+		private String workingEventsTxtFilename;
+		private String networkFilename;
+
+		@Override
+		public Map<String, String> getParams() {
+			Map<String, String> map = super.getParams();
+			map.put(SCENARIO_INPUT_PLANS_FILENAME, this.inputPlansFilename);
+			map.put(SCENARIO_WORKING_PLANS_FILENAME, this.workingPlansFilename);
+			map.put(SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.workingEventsTxtFilename);
+			map.put(SCENARIO_NETWORK_FILENAME, this.networkFilename);
+			return map;
+		}
+
+		@Override
+		public void addParam(final String key, final String value) {
+			if (key.equals(SCENARIO_INPUT_PLANS_FILENAME)) {
+				this.inputPlansFilename = value;
+			} else if (key.equals(SCENARIO_WORKING_PLANS_FILENAME)) {
+				this.workingPlansFilename = value;
+			} else if (key.equals(SCENARIO_WORKING_EVENTS_TXT_FILENAME)) {
+				this.workingEventsTxtFilename = value;
+			} else if (key.equals(SCENARIO_NETWORK_FILENAME)) {
+				this.networkFilename = value;
+			} else {
+				throw new IllegalArgumentException("Unknown param: " + key);
+			}
+		}
+	}
 
 	private static final String SCENARIO = "scenario";
 	private static final String SCENARIO_INPUT_PLANS_FILENAME = "inputPlansFilename";
@@ -157,11 +195,13 @@ public class ExternalModule implements PlanStrategyModule {
 			reader.readFile(configFileName);
 		}
 		// Change scenario config according to given output- and input-filenames: events, plans, network
-		extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.modulePrefix + ExternalInFileName);
-		extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.modulePrefix + ExternalOutFileName);
-		extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getIterationFilename(this.currentIteration - 1, "events.txt"));
-		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
-		extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
+		String networkFilename = this.scenario.getConfig().network().getInputFile();
+		ExternalConfigGroup cfgGroup = new ExternalConfigGroup();
+		cfgGroup.inputPlansFilename = this.outFileRoot + "/" + this.modulePrefix + ExternalInFileName;
+		cfgGroup.workingPlansFilename = this.outFileRoot + "/" + this.modulePrefix + ExternalOutFileName;
+		cfgGroup.workingEventsTxtFilename = this.controler.getIterationFilename(this.currentIteration - 1, "events.txt");
+		cfgGroup.networkFilename = networkFilename;
+		extConfig.addModule(cfgGroup);
 		new ConfigWriter(extConfig).write(this.outFileRoot + this.modulePrefix + ExternalConfigFileName);
 	}
 
