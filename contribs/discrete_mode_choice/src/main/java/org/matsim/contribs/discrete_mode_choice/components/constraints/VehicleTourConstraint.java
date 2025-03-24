@@ -146,7 +146,7 @@ public class VehicleTourConstraint implements TourConstraint {
 		}
 
 		@Override
-		public TourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
+		public VehicleTourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
 											   Collection<String> availableModes) {
 			return new VehicleTourConstraint(restrictedModes, homeFinder.getHomeLocationId(planTrips));
 		}
