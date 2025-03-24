@@ -111,10 +111,25 @@ public class DrtRoute extends AbstractRoute {
 			this.routeDescription.setConstraints(constraints);
 			// Handle new routeDescription (json)
 		} else if (routeDescription.startsWith("{")) {
-			try {
-				this.routeDescription = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			if(!routeDescription.contains("constraints")) {
+				try {
+					RouteDescriptionV1 routeDescriptionV1 = RouteDescriptionV1.OBJECT_MAPPER_V1.readValue(routeDescription, RouteDescriptionV1.class);
+					RouteDescription description = new RouteDescription();
+					description.setUnsharedPath(routeDescriptionV1.getUnsharedPath());
+					description.setDirectRideTime(routeDescriptionV1.getDirectRideTime());
+					description.setConstraints(new DrtRouteConstraints(Double.POSITIVE_INFINITY, routeDescriptionV1.getMaxRideTime(),
+							routeDescriptionV1.maxWaitTime.orElse(Double.POSITIVE_INFINITY), Double.POSITIVE_INFINITY, 0.));
+					this.routeDescription = description;
+
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				try {
+					this.routeDescription = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		} else {
 			throw new RuntimeException("Unsupported RouteDescription");
@@ -178,6 +193,38 @@ public class DrtRoute extends AbstractRoute {
 
 		public void setUnsharedPath(List<String> unsharedPath) {
 			this.unsharedPath = unsharedPath;
+		}
+	}
+
+	//TODO: keep for backwards compatibility for now. nkuehnel Mar'25
+	@Deprecated
+	private final static class RouteDescriptionV1 {
+
+		private final static ObjectMapper OBJECT_MAPPER_V1 = new ObjectMapper();
+
+		private OptionalTime maxWaitTime = OptionalTime.undefined();
+		private OptionalTime directRideTime = OptionalTime.undefined();
+		private List<String> unsharedPath = new ArrayList<>();
+		private OptionalTime maxRideTime = OptionalTime.undefined();
+
+		@JsonProperty("directRideTime")
+		public double getDirectRideTime() {
+			return directRideTime.isUndefined() ? OptionalTime.undefined().seconds() : directRideTime.seconds();
+		}
+
+		@JsonProperty("maxRideTime")
+		public double getMaxRideTime() {
+			return maxRideTime.isUndefined() ? Double.POSITIVE_INFINITY : maxRideTime.seconds();
+		}
+
+		@JsonProperty("maxWaitTime")
+		public double getMaxWaitTime() {
+			return maxWaitTime.isUndefined() ? OptionalTime.undefined().seconds() : maxWaitTime.seconds();
+		}
+
+		@JsonProperty("unsharedPath")
+		public List<String> getUnsharedPath() {
+			return unsharedPath;
 		}
 	}
 }
