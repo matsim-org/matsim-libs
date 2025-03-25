@@ -1,4 +1,4 @@
-package org.matsim.core.scoring.functions.tasteVariations;
+package org.matsim.core.scoring.functions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,6 @@ import org.matsim.core.config.groups.TasteVariationsConfigParameterSet;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
 
 import java.util.EnumMap;
 import java.util.HashMap;

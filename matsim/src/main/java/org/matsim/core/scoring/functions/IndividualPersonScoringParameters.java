@@ -1,4 +1,4 @@
-package org.matsim.core.scoring.functions.tasteVariations;
+package org.matsim.core.scoring.functions;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -13,10 +13,6 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.TasteVariationsConfigParameterSet;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
