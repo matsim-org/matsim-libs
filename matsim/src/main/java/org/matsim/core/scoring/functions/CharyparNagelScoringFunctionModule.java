@@ -22,6 +22,7 @@
 
 package org.matsim.core.scoring.functions;
 
+import com.google.inject.Singleton;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
@@ -46,7 +47,9 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
 
 		// If there are taste variations, the individual scoring parameters are used
 		if (tasteVariations) {
-			bind(ScoringParametersForPerson.class).to(IndividualPersonScoringParameters.class);
+			bind(ScoringParametersForPerson.class).to(IndividualPersonScoringParameters.class).in(Singleton.class);
+			addControlerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(jakarta.inject.Singleton.class);
+
 		} else {
 			bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
 		}
