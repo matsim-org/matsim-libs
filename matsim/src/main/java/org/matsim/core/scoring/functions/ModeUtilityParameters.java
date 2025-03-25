@@ -59,6 +59,8 @@ public class ModeUtilityParameters {
 		private double dailyMoneyConstant = 0;
 		private double dailyUtilityConstant = 0;
 
+		public Builder() {}
+
 		public Builder(ScoringConfigGroup.ModeParams params) {
 			this.marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
 			this.marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
