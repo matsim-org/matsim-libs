@@ -69,8 +69,8 @@ public class ConfigBehaviorTest{
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();
                         DvrpConfigGroup dvrpConfigGroup = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-					dvrpConfigGroup.travelTimeEstimationAlpha = 1.23;
-					dvrpConfigGroup.travelTimeEstimationBeta = 4.56;
+					dvrpConfigGroup.setTravelTimeEstimationAlpha(1.23);
+					dvrpConfigGroup.setTravelTimeEstimationBeta(4.56);
 					ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config.xml" );
                 }
 
@@ -82,8 +82,8 @@ public class ConfigBehaviorTest{
                         DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 
                         // check if you are getting back the values from the config file:
-					Assertions.assertEquals( 1.23, dvrpConfig.travelTimeEstimationAlpha, Double.MIN_VALUE );
-					Assertions.assertEquals( 4.56, dvrpConfig.travelTimeEstimationBeta, Double.MIN_VALUE );
+					Assertions.assertEquals( 1.23, dvrpConfig.getTravelTimeEstimationAlpha(), Double.MIN_VALUE );
+					Assertions.assertEquals( 4.56, dvrpConfig.getTravelTimeEstimationBeta(), Double.MIN_VALUE );
                 }
         }
 
