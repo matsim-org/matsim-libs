@@ -10,14 +10,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingCapacityInitializer.LINK_OFF_STREET_SPOTS;
 import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingCapacityInitializer.LINK_ON_STREET_SPOTS;
 
@@ -73,7 +72,7 @@ class PlanBasedParkingCapacityInitializerTest {
 			population.addPerson(person);
 		}
 
-		PlanBasedParkingCapacityInitializer initializer = new PlanBasedParkingCapacityInitializer(network, population);
+		PlanBasedParkingCapacityInitializer initializer = new PlanBasedParkingCapacityInitializer(network, population, ConfigUtils.createConfig());
 		Map<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> initialize = initializer.initialize();
 
 		assertEquals(23, initialize.size());

@@ -2,7 +2,6 @@ package org.matsim.core.mobsim.qsim.qnetsimengine.parking;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.Extensions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -22,8 +21,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -131,7 +128,7 @@ class ParkingOccupancyObserverTest {
 		network.addNode(node1);
 		network.addLink(l);
 
-		ParkingCapacityInitializer parkingCapacityInitializer = new ZeroParkingCapacityInitializer(network);
+		ParkingCapacityInitializer parkingCapacityInitializer = new ZeroParkingCapacityInitializer(network, ConfigUtils.createConfig());
 
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
