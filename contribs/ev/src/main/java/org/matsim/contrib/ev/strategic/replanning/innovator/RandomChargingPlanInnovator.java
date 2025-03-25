@@ -137,7 +137,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		// remove if too short
 		legBased.removeIf(candidate -> {
-			return candidate.leg().getTravelTime().seconds() < minimumEnrouteDriveTime;
+			return timeInterpretation.decideOnLegTravelTime(candidate.leg()).seconds() < minimumEnrouteDriveTime;
 		});
 
 		// reduce slots that are incompatible with the selected activity-based ones
