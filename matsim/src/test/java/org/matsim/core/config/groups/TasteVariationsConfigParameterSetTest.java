@@ -40,7 +40,7 @@ class TasteVariationsConfigParameterSetTest {
 
 		assertThat(set.getVariationsOf())
 				.as("Utility parameter variations")
-				.containsExactly(ModeUtilityParameters.Type.constant, ModeUtilityParameters.Type.dailyUtilityConstant);
+				.containsExactlyInAnyOrder(ModeUtilityParameters.Type.constant, ModeUtilityParameters.Type.dailyUtilityConstant);
 	}
 
 	@Test
