@@ -233,7 +233,8 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Sets up scoring for a SEVC simulation
+     * Adds the activity scoring parameters to the 'normal' MATSim scoring config group.
+     * You still need to configure the ChargingPlanScoringParameters yourself!
      */
     static public void configureScoring(Config config) {
         for (String activityType : Arrays.asList(WithinDayEvEngine.PLUG_ACTIVITY_TYPE,
@@ -246,10 +247,12 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Sets up configuration for a SEVC simulation
-     * 
+     * Sets up configuration for a SEVC simulation.
+     *
+     * Things that still need to be done by the user:
      * <ul>
      * <li>Agents still need to be activated using the `activate` method</li>
+     * <li>The ChargingPlanScoringParameters still need to be added</li>
      * </ul>
      */
     static public void configure(Config config) {
@@ -274,7 +277,7 @@ public class StrategicChargingUtils {
      * <li>Agents still need to be activated using the `activate` method</li>
      * </ul>
      */
-    static public void configureStanadlone(Config config) {
+    static public void configureStandalone(Config config) {
         configure(config);
 
         config.replanning().setMaxAgentPlanMemorySize(1);
@@ -289,7 +292,7 @@ public class StrategicChargingUtils {
     /**
      * Sets up the controller
      */
-    static public void configureController(Controler controller) {
+    static public void configureController (Controler controller) {
         controller.addOverridingModule(new WithinDayEvModule());
         controller.addOverridingModule(new StrategicChargingModule());
     }

@@ -122,10 +122,10 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		this.scenario = scenario;
 		this.chargingStrategyFactory = chargingStrategyFactory;
 
-		this.chargingMode = config.carMode;
-		this.performAbort = config.abortAgents;
-		this.maximumQueueWaitTime = config.maximumQueueTime;
-		this.allowSpontaneousCharging = config.allowSpoantaneousCharging;
+		this.chargingMode = config.getCarMode();
+		this.performAbort = config.isAbortAgents();
+		this.maximumQueueWaitTime = config.getMaximumQueueTime();
+		this.allowSpontaneousCharging = config.isAllowSpoantaneousCharging();
 	}
 
 	// INITIALIZATION
@@ -637,8 +637,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 						// no upcoming plug activity is found, this is a completely spantaneous charging
 						// attempt
 
-						Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
-						ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+						ElectricVehicle vehicle = getElectricVehicle(plan);
 
 						ChargingAlternative alternative = alternativeProvider.findEnrouteAlternative(time,
 								plan.getPerson(), plan, vehicle, null);
@@ -659,6 +658,17 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		}
 
 		approaching.clear();
+	}
+
+	private ElectricVehicle getElectricVehicle(Plan plan) {
+		Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(plan.getPerson(), chargingMode);
+		if  (!electricFleet.getElectricVehicles().containsKey(vehicleId)){
+			throw new IllegalArgumentException("You have configured agent " + plan.getPerson().getId() + " to be active for charging" +
+					", and the mode " + chargingMode + " to be an electric vehicle mode, but the vehicle " + vehicleId + " is not an electric vehicle. " +
+					"In order to change that, you can call VehicleUtils.setHbefaTechnology(vehicle.getType().getEngineInformation(), ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY (see ElectricFleetUtils)." );
+		};
+		ElectricVehicle vehicle = electricFleet.getElectricVehicles().get(vehicleId);
+		return vehicle;
 	}
 
 	private void processPluggingProcesses(double now) {

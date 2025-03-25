@@ -13,7 +13,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * Defines a constraint that applies trip-based constraint on the tour level.
  * This means that the trip constraint must be fulfilled for each trip in the
  * tour for the tour to be feasible.
- * 
+ *
  * @author sebhoerl
  */
 public class TourFromTripConstraint implements TourConstraint {
@@ -22,6 +22,10 @@ public class TourFromTripConstraint implements TourConstraint {
 	TourFromTripConstraint(TripConstraint constraint) {
 		this.constraint = constraint;
 	}
+
+    public TripConstraint getConstraint() {
+        return this.constraint;
+    }
 
 	@Override
 	public boolean validateBeforeEstimation(List<DiscreteModeChoiceTrip> currentTourTrips,

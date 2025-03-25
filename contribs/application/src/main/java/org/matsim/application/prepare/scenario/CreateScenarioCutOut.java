@@ -135,6 +135,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
 	private boolean checkBeeline;
 
+	@CommandLine.Option(names = "--keep-capacities", description = "Additional check to keep the capacities of all links, even outside the shp file", defaultValue = "false")
+	private boolean keepCapacities;
+
 	@CommandLine.Mixin
 	private CrsOptions crs;
 
@@ -492,7 +495,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 
 			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
-			link.setCapacity(1_000_000);
+			if (!keepCapacities) {
+				link.setCapacity(1_000_000);
+			}
 
 			Double prevSpeed = null;
 
@@ -502,10 +507,16 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
 
+				// avoid that link speed is higher than the free speed of the link
+				if (freespeed >= link.getFreespeed()) {
+					freespeed = link.getFreespeed();
+				}
+
 				// Skip if the speed is the same as the previous speed
 				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
 					continue;
 				}
+
 
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));

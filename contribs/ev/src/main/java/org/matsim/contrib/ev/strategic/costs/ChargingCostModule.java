@@ -15,13 +15,13 @@ public class ChargingCostModule extends AbstractModule {
 		StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(getConfig());
 
 		if (config != null) {
-			if (config.costs == null) {
+			if (config.getCostParameters() == null) {
 				bind(ChargingCostCalculator.class).toInstance(new NoChargingCostCalculator());
-			} else if (config.costs instanceof DefaultChargingCostsParameters) {
+			} else if (config.getCostParameters() instanceof DefaultChargingCostsParameters) {
 				bind(ChargingCostCalculator.class).to(DefaultChargingCostCalculator.class);
-			} else if (config.costs instanceof AttributeBasedChargingCostsParameters) {
+			} else if (config.getCostParameters() instanceof AttributeBasedChargingCostsParameters) {
 				bind(ChargingCostCalculator.class).to(AttributeBasedChargingCostCalculator.class);
-			} else if (config.costs instanceof TariffBasedChargingCostsParameters) {
+			} else if (config.getCostParameters() instanceof TariffBasedChargingCostsParameters) {
 				bind(ChargingCostCalculator.class).to(TariffBasedChargingCostCalculator.class);
 			}
 		}
@@ -30,7 +30,7 @@ public class ChargingCostModule extends AbstractModule {
 	@Singleton
 	@Provides
 	DefaultChargingCostCalculator provideDefaultChargingCostCalculator(StrategicChargingConfigGroup config) {
-		return new DefaultChargingCostCalculator((DefaultChargingCostsParameters) config.costs);
+		return new DefaultChargingCostCalculator((DefaultChargingCostsParameters) config.getCostParameters());
 	}
 
 	@Singleton
@@ -45,7 +45,7 @@ public class ChargingCostModule extends AbstractModule {
 	TariffBasedChargingCostCalculator provideTariffBasedChargingCostCalculator(
 			ChargingInfrastructureSpecification infrastructure, Population population,
 			SubscriptionRegistry subscriptions, StrategicChargingConfigGroup config) {
-		TariffBasedChargingCostsParameters parameters = (TariffBasedChargingCostsParameters) config.costs;
+		TariffBasedChargingCostsParameters parameters = (TariffBasedChargingCostsParameters) config.getCostParameters();
 		return new TariffBasedChargingCostCalculator(parameters, infrastructure, population, subscriptions);
 	}
 }

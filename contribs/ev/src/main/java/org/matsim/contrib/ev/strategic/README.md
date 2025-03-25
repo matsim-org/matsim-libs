@@ -108,9 +108,11 @@ Additional attributes:
 
 ### Persons
 
-For a person to be covered by the SEVC contrib, it needs to be activated. Also, access to chargers can be defined:
+For a person to be covered by the SEVC contrib (i.e. for strategic replanning and scoring), it needs to be activated. This can be done by WithinDayEVEngine.activate(). Note that this does not necessarily activate within-day behavior for the agent.
 
-- `sevc:active` (*Boolean*, default `false`): only if set to true, an agent is simulated in SEVC, otherwise they are ignored
+- `wevc:active` (*Boolean*, default `false`): only if set to true, an agent performs strategic charging replanning and scoring in SEVC, otherwise they are ignored
+
+Further, the person's access to chargers can be defined:
 
 - `sevc:subscriptions` (*String*, comma-separated, optional): a list of subscription that the persons owns. In case a charger requires a subscription, it must be present in the list for the person to be eligible.
 

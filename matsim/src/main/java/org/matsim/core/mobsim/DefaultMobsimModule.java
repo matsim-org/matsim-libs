@@ -28,7 +28,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.MobsimScopeEventHandlingModule;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.hermes.HermesProvider;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSimModule;
 
 public class DefaultMobsimModule extends AbstractModule {
@@ -37,9 +36,8 @@ public class DefaultMobsimModule extends AbstractModule {
         if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
             install(new QSimModule());
 //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
-        } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.JDEQSim.toString())) {
-            bindMobsim().to(JDEQSimulation.class);
-            //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
+        } else if (getConfig().controller().getMobsim().equals("JDEQSim")) {
+						throw new IllegalArgumentException("JDEQSim is no longer supported as a mobsim. / March 2025");
         } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
             bindMobsim().toProvider(HermesProvider.class);
         } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
