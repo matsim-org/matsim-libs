@@ -28,8 +28,8 @@ public class DashboardTests {
 		config.controller().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
-		group.defaultParams().mapCenter = "11.891000, 48.911000";
+		group.setSampleSize(0.001);
+		group.defaultParams().setMapCenter("11.891000, 48.911000");
 
 		//we have 2 operators ('av' + 'drt'), configure one of them to be areaBased (the other remains stopBased)
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
