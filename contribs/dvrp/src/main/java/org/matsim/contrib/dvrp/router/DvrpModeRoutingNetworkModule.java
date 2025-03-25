@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
@@ -117,7 +116,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	}
 
 	public static void checkUseModeFilteredSubnetworkAllowed(Config config, String mode) {
-		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).networkModes;
+		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).getNetworkModes();
 		Preconditions.checkArgument(dvrpNetworkModes.isEmpty() || dvrpNetworkModes.contains(mode),
 				"DvrpConfigGroup.networkModes must either be empty or contain DVRP mode: %s when 'useModeFilteredSubnetwork' is enabled for this mode",
 				mode);

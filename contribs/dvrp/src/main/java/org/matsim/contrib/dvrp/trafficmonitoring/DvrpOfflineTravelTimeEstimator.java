@@ -72,7 +72,7 @@ public class DvrpOfflineTravelTimeEstimator
 										  @Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
 										  TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
 										  OutputDirectoryHierarchy outputDirectoryHierarchy, GlobalConfigGroup globalConfig) {
-		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.travelTimeEstimationAlpha,
+		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.getTravelTimeEstimationAlpha(),
 				outputDirectoryHierarchy, globalConfig.getDefaultDelimiter());
 	}
 

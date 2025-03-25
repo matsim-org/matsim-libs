@@ -53,7 +53,7 @@ public class DvrpOnlineTravelTimeEstimator
 		this.withinDayTT = withinDayTT;
 		this.offlineTTEstimator = offlineTTEstimator;
 
-		beta = dvrpConfig.travelTimeEstimationBeta;
+		beta = dvrpConfig.getTravelTimeEstimationBeta();
 		if (beta < 0) {
 			throw new IllegalArgumentException("travelTimeEstimationBeta must be zero or positive");
 		}

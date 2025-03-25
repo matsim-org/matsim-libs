@@ -193,7 +193,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
+			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, OnlineTrackerListener.NO_LISTENER,
 					timer);
 		})).in(Singleton.class);
 

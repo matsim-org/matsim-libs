@@ -44,9 +44,9 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		if (dvrpCfg.initialTravelTimesFile != null) {
+		if (dvrpCfg.getInitialTravelTimesFile() != null) {
 			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toProvider(() -> {
-				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.initialTravelTimesFile);
+				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.getInitialTravelTimesFile());
 				var timeDiscretizer = new TimeDiscretizer(getConfig().travelTimeCalculator());
 				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url,
 						getConfig().global().getDefaultDelimiter());
@@ -57,14 +57,14 @@ public class DvrpTravelTimeModule extends AbstractModule {
 					.asEagerSingleton();
 		}
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(
-				Key.get(TravelTime.class, Names.named(dvrpCfg.mobsimMode)));
+				Key.get(TravelTime.class, Names.named(dvrpCfg.getMobsimMode())));
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
 
 		bind(DvrpOfflineTravelTimeEstimator.class).asEagerSingleton();
 		addMobsimListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 		addControlerListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
 
-		if (dvrpCfg.travelTimeEstimationBeta > 0 && dvrpCfg.travelTimeEstimationAlpha > 0) {// online estimation
+		if (dvrpCfg.getTravelTimeEstimationBeta() > 0 && dvrpCfg.getTravelTimeEstimationAlpha() > 0) {// online estimation
 			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
 			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
 			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);
