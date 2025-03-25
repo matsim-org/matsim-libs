@@ -59,10 +59,10 @@ public class SimWrapperRunner implements MATSimAppCommand {
 			SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
 			if (exclude != null)
-				simWrapperConfigGroup.getExclude().addAll(exclude);
+				simWrapperConfigGroup.setExclude(exclude);
 
 			if (include != null)
-				simWrapperConfigGroup.getInclude().addAll(include);
+				simWrapperConfigGroup.setInclude(include);
 
 			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(config), config);
 			try {

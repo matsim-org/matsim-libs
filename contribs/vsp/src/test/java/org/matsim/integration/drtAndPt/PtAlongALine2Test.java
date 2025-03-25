@@ -222,7 +222,7 @@ public class PtAlongALine2Test {
 			// (configure full drt if applicable)
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-			dvrpConfig.networkModes = ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3"));
+			dvrpConfig.setNetworkModes(ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3")));
 			ConfigGroup zoneParams = dvrpConfig.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 			dvrpConfig.getTravelTimeMatrixParams().addParameterSet(zoneParams);
 

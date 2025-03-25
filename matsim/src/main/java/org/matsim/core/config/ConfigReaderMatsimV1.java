@@ -22,7 +22,6 @@ package org.matsim.core.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -112,9 +111,6 @@ import static org.matsim.core.config.ConfigV2XmlNames.NAME;
 		  //if there are type safe optional modules they have to be added here
 		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
 		    this.currmodule = this.config.qsim();
-		  } else if ( name.equals(ExternalMobimConfigGroup.GROUP_NAME) ) {
-			  this.currmodule = new ExternalMobimConfigGroup() ;
-			  this.config.addModule(this.currmodule);
 		  }
 		  //it must be a not type safe generic module
 		  else {
