@@ -105,11 +105,6 @@ public final class ControllerUtils{
 	    log.info("Checking consistency of config done.");
 	}
 
-	@Deprecated // use 	OutputDirectoryLogging.catchLogEntries() directly.  kai, mar'18
-	public static final void initializeOutputLogging() {
-		OutputDirectoryLogging.catchLogEntries();
-	}
-
 	public static void catchLogEntries() {
 		OutputDirectoryLogging.catchLogEntries();
 	}

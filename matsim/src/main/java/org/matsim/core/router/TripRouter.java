@@ -89,14 +89,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 		}
 	}
 
-//	@Deprecated // use the Builder instead.  kai, oct'17
-//	public TripRouter() {}
-//	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
-//	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
-//	// way to get around that again, and even to change the injected material later.
-//	// I would expect a Builder instead.
-//	// kai, sep'16
-
 	@Inject
 	TripRouter( Map<String, Provider<RoutingModule>> routingModuleProviders, Config config,
 			FallbackRoutingModule fallbackRoutingModule ) {
@@ -121,13 +113,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @param module the module to use with this mode
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
-	@Deprecated // use the Builder instead.  kai, oct'17
-	/* package-private */ RoutingModule setRoutingModule(
+	private RoutingModule setRoutingModule(
 			final String mainMode,
 			final RoutingModule module) {
-		RoutingModule old = routingModules.put( mainMode , module );
-
-		return old;
+		return routingModules.put( mainMode , module );
 	}
 
 	public RoutingModule getRoutingModule(final String mainMode) {

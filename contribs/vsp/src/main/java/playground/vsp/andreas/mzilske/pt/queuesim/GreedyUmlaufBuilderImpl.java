@@ -31,7 +31,6 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	public class UmlaufKey {
 
-		private final Id<TransitLine> lineId;
 		private final Id<TransitStopFacility> stopFacilityId;
 		private final double lastArrivalTime;
 		private final Id<Umlauf> umlaufId;
@@ -41,16 +40,11 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			return umlaufId;
 		}
 
-		UmlaufKey( Id<TransitLine> lineId, Id<TransitStopFacility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId ) {
+		UmlaufKey( Id<TransitStopFacility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId ) {
 			super();
-			this.lineId = lineId;
 			this.stopFacilityId = stopFacilityId;
 			this.lastArrivalTime = lastArrivalTime;
 			this.umlaufId = umlaufId;
-		}
-
-		public Id<TransitLine> getLineId() {
-			return lineId;
 		}
 
 		public Id<TransitStopFacility> getStopFacility() {
@@ -63,7 +57,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 		@Override
 		public String toString() {
-			return stopFacilityId + " at " + lastArrivalTime + "(" + getLineId() + ")";
+			return stopFacilityId + " at " + lastArrivalTime + "(" + getUmlaufId() + ")";
 		}
 
 
@@ -86,16 +80,11 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			if (c != 0) {
 				return c;
 			} else {
-				int cc = o1.getLineId().compareTo(o2.getLineId());
+				int cc = o1.getUmlaufId().compareTo(o2.getUmlaufId());
 				if (cc != 0) {
 					return cc;
 				} else {
-					int ccc = Double.compare(o1.getLastArrivalTime(), o2.getLastArrivalTime());
-					if (ccc != 0) {
-						return ccc;
-					} else {
-						return o1.getUmlaufId().compareTo(o2.getUmlaufId());
-					}
+					return Double.compare(o1.getLastArrivalTime(), o2.getLastArrivalTime());
 				}
 			}
 		}
@@ -175,14 +164,13 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private UmlaufKey getKey(Umlauf umlauf) {
-		return new UmlaufKey(umlauf.getLineId(), Id.create(getLastStopPostAreaId(umlauf), TransitStopFacility.class), getLastArrivalTime(umlauf), umlauf.getId());
+		return new UmlaufKey(Id.create(getLastStopPostAreaId(umlauf), TransitStopFacility.class), getLastArrivalTime(umlauf), umlauf.getId());
 	}
 
 	private Umlauf findFittingUmlauf(UmlaufStueck umlaufStueck) {
 		String firstStopPostAreaId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopAreaId().toString();
-		Id<TransitLine> lineId = umlaufStueck.getLine().getId();
-		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
-		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
+		UmlaufKey earliestAtPoint = new UmlaufKey(Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
+		UmlaufKey latestAtPoint = new UmlaufKey(Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
 		log.info("Looking between " + earliestAtPoint + " and " + latestAtPoint);
 		SortedMap<UmlaufKey,Umlauf> fittingUmlaeufe = umlaeufe.subMap(earliestAtPoint, latestAtPoint);
 		Umlauf fittingUmlauf;

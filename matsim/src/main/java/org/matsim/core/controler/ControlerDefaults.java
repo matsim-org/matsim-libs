@@ -43,12 +43,6 @@ public final class ControlerDefaults {
 
 	private ControlerDefaults(){} // should not be instantiated
 
-	/**
-	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
-	 */
-	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
-		return new CharyparNagelScoringFunctionFactory( scenario );
-	}
 
 	/**
 	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20

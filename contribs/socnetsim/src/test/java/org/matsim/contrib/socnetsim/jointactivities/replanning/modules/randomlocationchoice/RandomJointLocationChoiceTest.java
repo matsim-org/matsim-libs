@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
@@ -49,8 +49,8 @@ public class RandomJointLocationChoiceTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	void testBarycenterCalculation() {
-		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
-		final List<Activity> activities = new ArrayList<Activity>();
+		final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
+		final List<Activity> activities = new ArrayList<>();
 
 		addActivityAndFacility(
 				activities,
@@ -109,7 +109,7 @@ public class RandomJointLocationChoiceTest {
 
 	@Test
 	void testFacilityRetrieval() {
-		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		final List<Activity> activities = new ArrayList<Activity>();
 
 
@@ -228,7 +228,7 @@ public class RandomJointLocationChoiceTest {
 		public double angle;
 		public double distance;
 		public Id<ActivityFacility> expectedFacility;
-		
+
 		public FacilityFixture(
 				final double angle,
 				final double distance,

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AbstractFacilityAlgorithmTest {
@@ -38,7 +39,7 @@ public class AbstractFacilityAlgorithmTest {
 
 	@Test
 	void testRunAlgorithms() {
-		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		final ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();
 		// create 2 facilities
 		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(1.0, 1.0));
 		facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord(2.0, 2.0));

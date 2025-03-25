@@ -713,8 +713,7 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.
 	 */
-	@Deprecated // prefer the non-static methods
-	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+	private static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
 			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		log.debug( "entering replanFutureTrip for agentid=" + plan.getPerson().getId() ) ;
 

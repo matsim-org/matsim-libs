@@ -31,7 +31,7 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
 
@@ -49,7 +49,7 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility_addingTwice() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
 		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
@@ -70,7 +70,7 @@ public class ActivityFacilitiesImplTest {
 
 	@Test
 	void testAddActivityFacility_sameId() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
 		ActivityFacility facility2 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 300, (double) 4000));
@@ -93,7 +93,7 @@ public class ActivityFacilitiesImplTest {
 	 */
 	@Test
 	void testRemove() {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
 		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
