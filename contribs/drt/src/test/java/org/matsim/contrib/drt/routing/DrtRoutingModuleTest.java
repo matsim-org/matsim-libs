@@ -244,7 +244,16 @@ public class DrtRoutingModuleTest {
 	@Test
 	void testRouteDescriptionHandling() {
 		String oldRouteFormat = "600 400";
-		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+		String newRouteFormatV1 = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+
+		String newRouteFormatV2 = "{\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
+				"\"constraints\":{" +
+				"\"maxTravelTime\":\"Infinity\"," +
+				"\"maxRideTime\":\"Infinity\"," +
+				"\"maxWaitTime\":600.0," +
+				"\"maxPickupDelay\":\"Infinity\"," +
+				"\"lateDiversionThreshold\":0.0" +
+				"}}";
 
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();
@@ -259,11 +268,16 @@ public class DrtRoutingModuleTest {
 		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
 		drtRoute.setRouteDescription(oldRouteFormat);
-		Assertions.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
 		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
 
-		drtRoute.setRouteDescription(newRouteFormat);
-		Assertions.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		drtRoute.setRouteDescription(newRouteFormatV1);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
+		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
+		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
+
+		drtRoute.setRouteDescription(newRouteFormatV2);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
 		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
 		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 

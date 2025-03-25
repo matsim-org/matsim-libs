@@ -166,8 +166,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
-				defaultOptimizationConstraintsSet.maxAllowedPickupDelay)));
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor()));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		if (!drtCfg.updateRoutes) {

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -67,8 +67,6 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
 
-
-
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
 			Attributes tripAttributes, RouteFactories routeFactories) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
@@ -81,10 +79,8 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
-		route.setTravelTime(constraints.maxTravelTime());
-		route.setMaxRideTime(constraints.maxRideTime());
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(constraints.maxWaitTime());
+		route.setConstraints(constraints);
 
 		DvrpLoad load = loadFromPerson.getLoad(person, tripAttributes);
 		route.setLoad(load, loadType);
