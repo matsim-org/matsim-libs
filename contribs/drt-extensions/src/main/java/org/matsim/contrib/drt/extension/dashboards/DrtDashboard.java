@@ -113,7 +113,7 @@ public class DrtDashboard implements Dashboard {
 					}
 				}
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 				viz.width = 2.;
 			});
 
@@ -127,7 +127,7 @@ public class DrtDashboard implements Dashboard {
 				viz.addAggregation("OD", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 				viz.height = 7d;
 			})
 			.el(Hexagons.class, (viz, data) -> {
@@ -138,7 +138,7 @@ public class DrtDashboard implements Dashboard {
 				viz.addAggregation("rejections", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 			})
 		;
 

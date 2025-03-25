@@ -33,7 +33,7 @@ public class DashboardTests {
 		config.controller().setLastIteration(1);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
+		group.setSampleSize(0.001);
 
 		SimWrapper sw = SimWrapper.create(config);
 		for (Dashboard d : dashboards) {
