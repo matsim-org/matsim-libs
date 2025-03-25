@@ -17,72 +17,138 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev;
+ package org.matsim.contrib.ev;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-public final class EvConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "ev";
-
-	@SuppressWarnings("deprecation")
-	public static EvConfigGroup get(Config config) {
-		return (EvConfigGroup)config.getModule(GROUP_NAME);
-	}
-
-	@Parameter
-	@Comment("charging will be simulated every 'chargeTimeStep'-th time step")
-	// no need to simulate with 1-second time step
-	@Positive
-	public int chargeTimeStep = 15; // 15 s ==> 0.417% SOC when charging at 1C (i.e. full recharge in 1 hour)
-
-	@Parameter
-	@Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
-	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
-	@Positive
-	public int auxDischargeTimeStep = 60; // 1 min
-
-	@Parameter("minChargingTime")
-	@Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
-	public int minimumChargeTime = 1200;
-
-	@Parameter("enforceChargingInteractionDuration")
-	@Comment("If true, prolongs the charging interaction for the amount of time waiting in the charger queue (plus 1 second), i.e." +
-		"enforces that charging interactions are undertaken as long as initially planned (by EVNetworkRoutingModule). Default is false.")
-	public boolean enforceChargingInteractionDuration = false;
-
-	@Parameter
-	@Comment("Location of the chargers file")
-	@NotNull
-	public String chargersFile = null;
-
-	/**
-	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
-	 */
-	// output
-	@Parameter
-	@Comment("If true, charge/SoC time profile plots will be created")
-	public boolean timeProfiles = false;
-
-	@Parameter
-	@Comment("Number of individual time profiles to be created")
-	@Positive
-	public int numberOfIndividualTimeProfiles = 50;
-
-	/**
-	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
-	 */
-	@Parameter
-	@Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
-			+ "in iteration X+1 for each EV."
-			+ " If set to true, bear in mind that EV might start with 0% battery charge.")
-	public boolean transferFinalSoCToNextIteration = false;
-
-	public EvConfigGroup() {
-		super(GROUP_NAME);
-	}
-}
-
-
+ import java.util.Collections;
+ import java.util.Set;
+ 
+ import org.matsim.core.config.Config;
+ import org.matsim.core.config.ReflectiveConfigGroup;
+ 
+ import jakarta.validation.constraints.NotNull;
+ import jakarta.validation.constraints.Positive;
+ 
+ public final class EvConfigGroup extends ReflectiveConfigGroup {
+	 public static final String GROUP_NAME = "ev";
+ 
+	 public EvConfigGroup() {
+		 super(GROUP_NAME);
+	 }
+ 
+	 public static EvConfigGroup get(Config config) {
+		 return (EvConfigGroup) config.getModules().get(GROUP_NAME);
+	 }
+ 
+	 @Parameter
+	 @Comment("charging will be simulated every 'chargeTimeStep'-th time step")
+	 // no need to simulate with 1-second time step
+	 @Positive
+	 private int chargeTimeStep = 15; // 15 s ==> 0.417% SOC when charging at 1C (i.e. full recharge in 1 hour)
+ 
+	 @Parameter
+	 @Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
+	 // only used if SeparateAuxDischargingHandler is used, otherwise ignored
+	 @Positive
+	 private int auxDischargeTimeStep = 60; // 1 min
+ 
+	 @Parameter("minChargingTime")
+	 @Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
+	 private int minimumChargeTime = 1200;
+ 
+	 @Parameter("enforceChargingInteractionDuration")
+	 @Comment("If true, prolongs the charging interaction for the amount of time waiting in the charger queue (plus 1 second), i.e." +
+		 "enforces that charging interactions are undertaken as long as initially planned (by EVNetworkRoutingModule). Default is false.")
+	 private boolean enforceChargingInteractionDuration = false;
+ 
+	 @Parameter
+	 @Comment("Location of the chargers file")
+	 @NotNull
+	 private String chargersFile = null;
+ 
+	 public enum EvAnalysisOutput {
+		 TimeProfiles
+	 }
+ 
+	 @Parameter
+	 @Comment("Choose which outputs should be generated")
+	 private Set<EvAnalysisOutput> analysisOutputs = Collections.emptySet();
+ 
+	 @Parameter
+	 @Comment("Number of individual time profiles to be created")
+	 @Positive
+	 private int numberOfIndividualTimeProfiles = 50;
+ 
+	 public enum InitialSocBehavior {
+		 Keep, UpdateAfterIteration
+	 }
+ 
+	 @Parameter
+	 @Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
+			 + "in iteration X+1 for each EV.")
+	 public InitialSocBehavior initialSocBehavior = InitialSocBehavior.Keep;
+ 
+	 public int getChargeTimeStep() {
+		 return chargeTimeStep;
+	 }
+ 
+	 public void setChargeTimeStep(int chargeTimeStep) {
+		 this.chargeTimeStep = chargeTimeStep;
+	 }
+ 
+	 public int getAuxDischargeTimeStep() {
+		 return auxDischargeTimeStep;
+	 }
+ 
+	 public void setAuxDischargeTimeStep(int auxDischargeTimeStep) {
+		 this.auxDischargeTimeStep = auxDischargeTimeStep;
+	 }
+ 
+	 public int getMinimumChargeTime() {
+		 return minimumChargeTime;
+	 }
+ 
+	 public void setMinimumChargeTime(int minimumChargeTime) {
+		 this.minimumChargeTime = minimumChargeTime;
+	 }
+ 
+	 public boolean isEnforceChargingInteractionDuration() {
+		 return enforceChargingInteractionDuration;
+	 }
+ 
+	 public void setEnforceChargingInteractionDuration(boolean enforceChargingInteractionDuration) {
+		 this.enforceChargingInteractionDuration = enforceChargingInteractionDuration;
+	 }
+ 
+	 public String getChargersFile() {
+		 return chargersFile;
+	 }
+ 
+	 public void setChargersFile(String chargersFile) {
+		 this.chargersFile = chargersFile;
+	 }
+ 
+	 public Set<EvAnalysisOutput> getAnalysisOutputs() {
+		 return analysisOutputs;
+	 }
+ 
+	 public void setAnalysisOutputs(Set<EvAnalysisOutput> analysisOutputs) {
+		 this.analysisOutputs = analysisOutputs;
+	 }
+ 
+	 public int getNumberOfIndividualTimeProfiles() {
+		 return numberOfIndividualTimeProfiles;
+	 }
+ 
+	 public void setNumberOfIndividualTimeProfiles(int numberOfIndividualTimeProfiles) {
+		 this.numberOfIndividualTimeProfiles = numberOfIndividualTimeProfiles;
+	 }
+ 
+	 public InitialSocBehavior getInitialSocBehavior() {
+		 return initialSocBehavior;
+	 }
+ 
+	 public void setInitialSocBehavior(InitialSocBehavior initialSocBehavior) {
+		 this.initialSocBehavior = initialSocBehavior;
+	 }	
+ }
+ 

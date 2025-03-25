@@ -33,7 +33,7 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
@@ -199,7 +199,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
-		this(DefaultDrtOptimizationConstraintsSet::new);
+		this(DrtOptimizationConstraintsSetImpl::new);
 	}
 
 	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {

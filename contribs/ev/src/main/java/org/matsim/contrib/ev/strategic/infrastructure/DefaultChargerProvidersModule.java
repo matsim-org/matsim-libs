@@ -35,19 +35,19 @@ public class DefaultChargerProvidersModule extends AbstractChargerProviderModule
 	@Provides
 	public PersonChargerProvider provideHomeChargerProvider(ChargingInfrastructureSpecification infrastructure,
 			StrategicChargingConfigGroup config, Scenario scenario, ChargerAccess access) {
-		return PersonChargerProvider.build(infrastructure, config.chargerSearchRadius, scenario, access);
+		return PersonChargerProvider.build(infrastructure, config.getChargerSearchRadius(), scenario, access);
 	}
 
 	@Provides
 	public FacilityChargerProvider provideWorkChargerProvider(ChargingInfrastructureSpecification infrastructure,
 			StrategicChargingConfigGroup config, Scenario scenario, ChargerAccess access) {
-		return FacilityChargerProvider.build(infrastructure, config.chargerSearchRadius, scenario, access);
+		return FacilityChargerProvider.build(infrastructure, config.getChargerSearchRadius(), scenario, access);
 	}
 
 	@Provides
 	public PublicChargerProvider providePublicChargerProvider(Scenario scenario,
 			ChargingInfrastructureSpecification infrastructure, StrategicChargingConfigGroup config,
 			ChargerAccess access) {
-		return PublicChargerProvider.create(scenario, infrastructure, access, config.chargerSearchRadius);
+		return PublicChargerProvider.create(scenario, infrastructure, access, config.getChargerSearchRadius());
 	}
 }

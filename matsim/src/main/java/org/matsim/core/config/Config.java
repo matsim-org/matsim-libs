@@ -57,7 +57,6 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -146,7 +145,7 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, new TimeAllocationMutatorConfigGroup());
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
-		
+
 
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
@@ -163,12 +162,10 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
 		// only to provide error messages. kai, may'16
 
-		this.modules.put(JDEQSimConfigGroup.NAME, new JDEQSimConfigGroup());
-
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
-		
+
 		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
@@ -479,10 +476,6 @@ public final class Config implements MatsimExtensionPoint {
 		return (ChangeModeConfigGroup) this.getModule(ChangeModeConfigGroup.CONFIG_MODULE);
 	}
 
-	public JDEQSimConfigGroup jdeqSim() {
-		return (JDEQSimConfigGroup) this.getModule(JDEQSimConfigGroup.NAME);
-	}
-
 	public HermesConfigGroup hermes() {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
@@ -490,7 +483,7 @@ public final class Config implements MatsimExtensionPoint {
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
 	}
-	
+
 	public PlanInheritanceConfigGroup planInheritance() {
 		return (PlanInheritanceConfigGroup) this.getModule(PlanInheritanceConfigGroup.GROUP_NAME);
 	}

@@ -179,8 +179,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
-				defaultConstraintsSet.maxAllowedPickupDelay)));
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor()));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
 		if (!drtCfg.updateRoutes) {
@@ -208,7 +207,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
 			// Makes basic DrtActionCreator create legs with consumption tracker
-			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
+			return v -> EDrtActionCreator.createLeg(dvrpCfg.getMobsimMode(), v, timer);
 		})).in(Singleton.class);
 
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {

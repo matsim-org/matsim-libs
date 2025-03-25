@@ -22,7 +22,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -177,8 +177,8 @@ public class RunPrebookingShiftDrtScenarioIT {
     @NotNull
     private Controler prepare(DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup, MultiModeDrtConfigGroup multiModeDrtConfigGroup, String outputSuffix) {
         drtWithShiftsConfigGroup.mode = TransportMode.drt;
-        DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+        DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
         drtWithShiftsConfigGroup.stopDuration = 30.;
         defaultConstraintsSet.maxTravelTimeAlpha = 1.5;

@@ -20,9 +20,9 @@ public class DefaultChargingCostCalculator implements ChargingCostCalculator {
 
 	@Override
 	public double calculateChargingCost(Id<Person> personId, Id<Charger> charger, double duration, double energy) {
-		double blockingDuration_min = Math.max(duration / 60.0 - parameters.blockingDuration_min, 0.0);
-		return duration / 60.0 * parameters.costPerDuration_min
-				+ blockingDuration_min * parameters.costPerBlockingDuration_min +
-				+EvUnits.J_to_kWh(energy) * parameters.costPerEnergy_kWh + parameters.costPerUse;
+		double blockingDuration_min = Math.max(duration / 60.0 - parameters.getBlockingDuration_min(), 0.0);
+		return duration / 60.0 * parameters.getCostPerDuration_min()
+				+ blockingDuration_min * parameters.getCostPerBlockingDuration_min() +
+				+EvUnits.J_to_kWh(energy) * parameters.getCostPerEnergy_kWh() + parameters.getCostPerUse();
 	}
 }

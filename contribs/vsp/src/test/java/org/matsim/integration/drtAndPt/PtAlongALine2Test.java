@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -222,7 +222,7 @@ public class PtAlongALine2Test {
 			// (configure full drt if applicable)
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-			dvrpConfig.networkModes = ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3"));
+			dvrpConfig.setNetworkModes(ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3")));
 			ConfigGroup zoneParams = dvrpConfig.getTravelTimeMatrixParams().createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 			dvrpConfig.getTravelTimeMatrixParams().addParameterSet(zoneParams);
 
@@ -230,9 +230,9 @@ public class PtAlongALine2Test {
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = TransportMode.drt;
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
@@ -247,9 +247,9 @@ public class PtAlongALine2Test {
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt2";
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;
@@ -263,9 +263,9 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.mode = "drt3";
-				DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-						(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-								.addOrGetDefaultDrtOptimizationConstraintsSet();
+				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                                .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 				drtConfigGroup.stopDuration = 60.;

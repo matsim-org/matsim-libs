@@ -122,10 +122,10 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 		this.scenario = scenario;
 		this.chargingStrategyFactory = chargingStrategyFactory;
 
-		this.chargingMode = config.carMode;
-		this.performAbort = config.abortAgents;
-		this.maximumQueueWaitTime = config.maximumQueueTime;
-		this.allowSpontaneousCharging = config.allowSpoantaneousCharging;
+		this.chargingMode = config.getCarMode();
+		this.performAbort = config.isAbortAgents();
+		this.maximumQueueWaitTime = config.getMaximumQueueTime();
+		this.allowSpontaneousCharging = config.isAllowSpoantaneousCharging();
 	}
 
 	// INITIALIZATION

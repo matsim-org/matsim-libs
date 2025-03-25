@@ -454,15 +454,15 @@ public class TestScenarioBuilder {
 
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		config.addModule(evConfigGroup);
-		evConfigGroup.chargersFile = "none";
+		evConfigGroup.setChargersFile("none");
 
 		WithinDayEvConfigGroup withinDayConfig = new WithinDayEvConfigGroup();
 		config.addModule(withinDayConfig);
-		withinDayConfig.carMode = "car";
+		withinDayConfig.setCarMode("car");
 
 		if (enableStrategicCharging) {
 			StrategicChargingConfigGroup strategicConfig = new StrategicChargingConfigGroup();
-			strategicConfig.selectionStrategy = SelectionStrategy.Best; // to have a strong effect
+			strategicConfig.setSelectionStrategy(SelectionStrategy.Best); // to have a strong effect
 			config.addModule(strategicConfig);
 
 			ChargingPlanScoringParameters scoringParameters = new ChargingPlanScoringParameters();

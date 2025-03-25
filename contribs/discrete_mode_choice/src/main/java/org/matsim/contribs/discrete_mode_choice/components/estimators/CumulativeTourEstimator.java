@@ -17,7 +17,7 @@ import org.matsim.core.utils.timing.TimeTracker;
  * This class is a TourEstimator which is based on a TripEstimator. Every trip
  * in the tour is estimated by the underlying TripEstimator and utilities are
  * summed up to arrive at a total utility for the whole tour.
- * 
+ *
  * @author sebhoerl
  */
 public class CumulativeTourEstimator implements TourEstimator {
@@ -28,6 +28,10 @@ public class CumulativeTourEstimator implements TourEstimator {
 		this.delegate = delegate;
 		this.timeInterpretation = timeInterpretation;
 	}
+
+    public TripEstimator getDelegate() {
+        return this.delegate;
+    }
 
 	@Override
 	public TourCandidate estimateTour(Person person, List<String> modes, List<DiscreteModeChoiceTrip> trips,
