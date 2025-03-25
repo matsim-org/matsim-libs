@@ -64,6 +64,11 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 
 	private final Random random = new Random(1);
 
+	public static final String EST_RIDE_TIME = "est_ride_time";
+	public static final String EST_RIDE_DISTANCE = "est_ride_distance";
+	public static final String EST_WAIT_TIME = "est_wait_time";
+	public static final String EST_REJECTION_RATE = "est_rejection_rate";
+
 	/**
 	 * Request currently waiting for pickup.
 	 */
@@ -232,20 +237,20 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 	}
 
 	static double getEstimatedRideTime(Attributable element) {
-		return (double) element.getAttributes().getAttribute("est_ride_time");
+		return (double) element.getAttributes().getAttribute(EST_RIDE_TIME);
 		// Chengqi: there is a public static final String in the DRT contrib for est_ride_time. But it cannot be accessed here...
 	}
 
 	static double getEstimatedRideDistance(Attributable element) {
-		return (double) element.getAttributes().getAttribute("est_ride_distance");
+		return (double) element.getAttributes().getAttribute(EST_RIDE_DISTANCE);
 	}
 
 	static double getEstimatedWaitTime(Attributable element) {
-		return (double) element.getAttributes().getAttribute("est_wait_time");
+		return (double) element.getAttributes().getAttribute(EST_WAIT_TIME);
 	}
 
 	static double getEstimatedRejectionRate(Attributable element) {
-		return (double) element.getAttributes().getAttribute("est_rejection_rate");
+		return (double) element.getAttributes().getAttribute(EST_REJECTION_RATE);
 	}
 
 	/**

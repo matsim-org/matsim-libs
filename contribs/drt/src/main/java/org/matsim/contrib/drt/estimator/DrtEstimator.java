@@ -4,16 +4,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.utils.objectattributes.attributable.Attributable;
+
+import static org.matsim.contrib.dvrp.passenger.TeleportingEstimationPassengerEngine.*;
 
 /**
  * Interface to estimate a DRT service's detour, waiting time and costs.
  */
 public interface DrtEstimator extends ControlerListener {
-	String EST_RIDE_TIME = "est_ride_time";
-	String EST_RIDE_DISTANCE = "est_ride_distance";
-	String EST_WAIT_TIME = "est_wait_time";
-	String EST_REJECTION_RATE = "est_rejection_rate";
 	/**
 	 * Provide an estimate for a drt route with specific pickup and dropoff point.
 	 *
@@ -34,7 +31,6 @@ public interface DrtEstimator extends ControlerListener {
 	 * @param rejectionRate probability of a trip being rejected
 	 */
 	record Estimate(double rideDistance, double rideTime, double waitingTime, double rejectionRate) {
-
 	}
 
 	/**
