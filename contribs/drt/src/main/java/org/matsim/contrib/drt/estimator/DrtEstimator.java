@@ -10,10 +10,10 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * Interface to estimate a DRT service's detour, waiting time and costs.
  */
 public interface DrtEstimator extends ControlerListener {
-	public static final String EST_RIDE_TIME = "est_ride_time";
-	public static final String EST_RIDE_DISTANCE = "est_ride_distance";
-	public static final String EST_WAIT_TIME = "est_wait_time";
-	public static final String EST_REJECTION_RATE = "est_rejection_rate";
+	String EST_RIDE_TIME = "est_ride_time";
+	String EST_RIDE_DISTANCE = "est_ride_distance";
+	String EST_WAIT_TIME = "est_wait_time";
+	String EST_REJECTION_RATE = "est_rejection_rate";
 	/**
 	 * Provide an estimate for a drt route with specific pickup and dropoff point.
 	 *
