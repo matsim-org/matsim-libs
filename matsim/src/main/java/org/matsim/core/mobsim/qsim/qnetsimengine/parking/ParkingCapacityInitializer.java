@@ -11,6 +11,6 @@ public interface ParkingCapacityInitializer {
 
 	Map<Id<Link>, ParkingInitialCapacity> initialize();
 
-	record ParkingInitialCapacity(int capacity, int initial) {
+	record ParkingInitialCapacity(int capacity, int occupancy) {
 	}
 }

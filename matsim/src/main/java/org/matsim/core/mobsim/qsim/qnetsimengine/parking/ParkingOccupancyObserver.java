@@ -75,7 +75,7 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		initialize(event.getIteration() , network);
+		initialize(event.getIteration(), network);
 
 		//reset timer
 		lastTimeStep = -1;
@@ -123,8 +123,8 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 			int index = indexByLinkId.get(id);
 
 			capacity[index] = parkingInitialCapacity.capacity();
-			parkingOccupancyOfLastTimeStep[index] = parkingInitialCapacity.initial();
-			parkingOccupancy[index] = parkingInitialCapacity.initial();
+			parkingOccupancyOfLastTimeStep[index] = parkingInitialCapacity.occupancy();
+			parkingOccupancy[index] = parkingInitialCapacity.occupancy();
 		}
 	}
 
@@ -153,7 +153,7 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 				.setHeader(new String[]{"linkId", "capacity", "occupancy"}).build());
 
 			for (Map.Entry<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> entry : initialCapacities.entrySet()) {
-				csvPrinter.printRecord(entry.getKey(), entry.getValue().capacity(), entry.getValue().initial());
+				csvPrinter.printRecord(entry.getKey(), entry.getValue().capacity(), entry.getValue().occupancy());
 			}
 			csvPrinter.close();
 		} catch (Exception e) {
