@@ -20,13 +20,9 @@
 
 package org.matsim.contrib.zone.skims;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,13 +36,13 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.base.Verify;
-import com.google.common.collect.Sets;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -93,32 +89,38 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 	}
 
 	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrixFromCache(Network dvrpNetwork, ZoneSystem zoneSystem, DvrpTravelTimeMatrixParams params, int numberOfThreads, double qSimTimeStepSize, URL cachePath) {
+		Preconditions.checkState(cachePath != null);
 
-		FreeSpeedTravelTimeMatrix matrix;
-		if (cachePath != null) {
-            try {
-                return new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, cachePath);
-            } catch (FileNotFoundException e) {
-				log.warn("Freespeed matrix cache file not found, will use as output path for on-the-fly creation.");
-            }
-        }
-		matrix = createFreeSpeedMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, qSimTimeStepSize);
-		matrix.write(cachePath, dvrpNetwork);
-		return matrix;
+		// we need to do this weird test, because the IOUtils.getInputStream 
+		// only raises UncheckedIOException that we cannot catch here
+		try {
+			cachePath.openStream().close();
+		} catch (FileNotFoundException e) {
+			log.warn("Freespeed matrix cache file not found, will use as output path for on-the-fly creation.");
+            
+			var matrix = createFreeSpeedMatrix(dvrpNetwork, zoneSystem, params, numberOfThreads, qSimTimeStepSize);
+			matrix.write(cachePath, dvrpNetwork);
+			return matrix;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		InputStream inputStream = IOUtils.getInputStream(cachePath);
+		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, zoneSystem, inputStream);
 	}
 
-	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, URL cachePath) throws FileNotFoundException {
+	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, ZoneSystem zoneSystem, InputStream inputStream) {
 		this.zoneSystem = zoneSystem;
 
-		try (DataInputStream inputStream = new DataInputStream(IOUtils.getInputStream(cachePath))) {
+		try (DataInputStream dataStream = new DataInputStream(inputStream)) {
 			// number of zones
-			int numberOfZones = inputStream.readInt();
+			int numberOfZones = dataStream.readInt();
 			Verify.verify(numberOfZones == zoneSystem.getZones().size());
 
 			// read zone list
 			List<Id<Zone>> zoneIds = new ArrayList<>(numberOfZones);
 			for (int i = 0; i < numberOfZones; i++) {
-				zoneIds.add(Id.create(inputStream.readUTF(), Zone.class));
+				zoneIds.add(Id.create(dataStream.readUTF(), Zone.class));
 			}
 
 			IdSet<Zone> systemZones = new IdSet<>(Zone.class);
@@ -144,12 +146,12 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 				Zone fromZone = zoneArray[i];
 				for (int j = 0; j < numberOfZones; j++) {
 					Zone toZone = zoneArray[j];
-					freeSpeedTravelTimeMatrix.set(fromZone, toZone, inputStream.readInt());
+					freeSpeedTravelTimeMatrix.set(fromZone, toZone, dataStream.readInt());
 				}
 			}
 
 			// sparse matrix available?
-			boolean hasSparseMatrix = inputStream.readBoolean();
+			boolean hasSparseMatrix = dataStream.readBoolean();
 
 			if (!hasSparseMatrix) {
 				freeSpeedTravelTimeSparseMatrix = null;
@@ -157,26 +159,26 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 				freeSpeedTravelTimeSparseMatrix = new SparseMatrix();
 
 				// read nodes
-				int numberOfNodes = inputStream.readInt();
+				int numberOfNodes = dataStream.readInt();
 				Verify.verify(numberOfNodes == dvrpNetwork.getNodes().size());
 
 				List<Node> nodes = new ArrayList<>(numberOfNodes);
 				for (int i = 0; i < numberOfNodes; i++) {
-					Id<Node> nodeId = Id.createNodeId(inputStream.readUTF());
+					Id<Node> nodeId = Id.createNodeId(dataStream.readUTF());
 					nodes.add(Objects.requireNonNull(dvrpNetwork.getNodes().get(nodeId)));
 				}
 
 				// read rows
 				for (int i = 0; i < numberOfNodes; i++) {
 					Node from = nodes.get(i);
-					int numberOfElements = inputStream.readInt();
+					int numberOfElements = dataStream.readInt();
 
 					if (numberOfElements > 0) {
 						List<NodeAndTime> nodeTimeList = new ArrayList<>(numberOfElements);
 
 						for (int j = 0; j < numberOfElements; j++) {
-							Node to = nodes.get(inputStream.readInt());
-							int value = inputStream.readInt();
+							Node to = nodes.get(dataStream.readInt());
+							int value = dataStream.readInt();
 
 							nodeTimeList.add(new NodeAndTime(to.getId().index(), value));
 						}
@@ -186,61 +188,63 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 					}
 				}
 			}
-		} catch (FileNotFoundException e) {
-			throw e;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
 	public void write(URL outputPath, Network dvrpNetwork) {
-		try (DataOutputStream outputStream = new DataOutputStream(IOUtils.getOutputStream(outputPath, false))) {
-			// obtain fixed order of zones
+		try (DataOutputStream outputStream = new DataOutputStream(
+				new BufferedOutputStream(IOUtils.getOutputStream(outputPath, false)))) {
+
+			// Obtain fixed order of zones
 			List<Zone> zones = new ArrayList<>(zoneSystem.getZones().values());
 			outputStream.writeInt(zones.size());
 			for (Zone zone : zones) {
 				outputStream.writeUTF(zone.getId().toString());
 			}
 
-			// write matrix
-			for (var from : zones) {
-				for (var to : zones) {
-					int value = freeSpeedTravelTimeMatrix.get(from, to);
-					outputStream.writeInt(value);
+			// Write matrix
+			for (Zone from : zones) {
+				for (Zone to : zones) {
+					outputStream.writeInt(freeSpeedTravelTimeMatrix.get(from, to));
 				}
 			}
 
-			// write if sparse exists
+			// Write if sparse matrix exists
 			outputStream.writeBoolean(freeSpeedTravelTimeSparseMatrix != null);
 
 			if (freeSpeedTravelTimeSparseMatrix != null) {
-				// obtain fixed order of nodes
+				// Obtain fixed order of nodes
 				List<Node> nodes = new ArrayList<>(dvrpNetwork.getNodes().values());
 				outputStream.writeInt(nodes.size());
-				for (Node node : nodes) {
+
+				// Precompute node indices for fast lookup
+				Map<Node, Integer> nodeIndexMap = new HashMap<>(nodes.size());
+				for (int i = 0; i < nodes.size(); i++) {
+					Node node = nodes.get(i);
+					nodeIndexMap.put(node, i);
 					outputStream.writeUTF(node.getId().toString());
 				}
 
 				for (Node from : nodes) {
-					// write size of the matrix row
-					int rowSize = 0;
+					// Write size of the matrix row
+					List<Map.Entry<Integer, Integer>> nonZeroEntries = new ArrayList<>();
 
 					for (Node to : nodes) {
 						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
 						if (value >= 0) {
-							rowSize++;
+							nonZeroEntries.add(Map.entry(nodeIndexMap.get(to), value));
 						}
 					}
 
-					outputStream.writeInt(rowSize);
-					
-					// write matrix row
-					for (Node to : nodes) {
-						int value = freeSpeedTravelTimeSparseMatrix.get(from, to);
-						if (value >= 0) {
-							outputStream.writeInt(nodes.indexOf(to));
-							outputStream.writeInt(value);
-						}
+					// Write row size
+					outputStream.writeInt(nonZeroEntries.size());
+
+					// Write matrix row
+					for (var entry : nonZeroEntries) {
+						outputStream.writeInt(entry.getKey());
+						outputStream.writeInt(entry.getValue());
 					}
 				}
 			}

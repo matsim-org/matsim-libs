@@ -328,17 +328,16 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
                     double earliestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_START_IDX));
                     double latestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_END_IDX));
 
-                    CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, PopulationUtils.decideOnLinkIdForActivity(activity,scenario));
-                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
-                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
-					serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
+					int demand = Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX));
+					CarrierService service = CarrierService.Builder.newInstance(serviceId, PopulationUtils.decideOnLinkIdForActivity(activity,scenario), demand)
+						.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)))
+						.setServiceStartingTimeWindow(TimeWindow.newInstance(earliestStart,latestStart))
+						.build();
 
 					Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
-                        Carrier carrier = carriers.getCarriers().get(carrierId);
-                        CarrierService service = serviceBuilder.build();
-                        service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
-                        carrier.getServices().put(serviceId, service);
+						service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
+                        CarriersUtils.addService(carriers.getCarriers().get(carrierId), service);
                     } else {
                         throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString()
                                 + ". There is a wrong reference in activity attribute of person " + customer);

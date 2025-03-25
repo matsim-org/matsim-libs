@@ -97,7 +97,7 @@ public class FixedCostsTest  {
 			vehicleTypes.getVehicleTypes().put( carrierVehType_A.getId(), carrierVehType_A );
 		}
 		CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)"),
-				carrierVehType_A ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
+			carrierVehType_A ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 
 		//only fixed costs, no variable costs
 		final Id<VehicleType> vehicleTypeId1 = Id.create( "gridType_B", VehicleType.class );
@@ -112,30 +112,30 @@ public class FixedCostsTest  {
 			vehicleTypes.getVehicleTypes().put( carrierVehType_B.getId(), carrierVehType_B );
 		}
 		CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)"),
-				carrierVehType_B ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
+			carrierVehType_B ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).build();
 
 		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
 		CarrierCapabilities cc1 = CarrierCapabilities.Builder.newInstance()
-										     .addVehicle(carrierVehicle_A)
-										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
-										     .build();
+			.addVehicle(carrierVehicle_A)
+			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
+			.build();
 		carrier1.setCarrierCapabilities(cc1);
 		carriers.addCarrier(carrier1);
 
 		//carrier2: only vehicles of Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc2 = CarrierCapabilities.Builder.newInstance()
-										     .addVehicle(carrierVehicle_B)
-										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
-										     .build();
+			.addVehicle(carrierVehicle_B)
+			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
+			.build();
 		carrier2.setCarrierCapabilities(cc2);
 		carriers.addCarrier(carrier2);
 
 		//carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 		CarrierCapabilities cc3 = CarrierCapabilities.Builder.newInstance()
-										     .addVehicle(carrierVehicle_A)
-										     .addVehicle(carrierVehicle_B)
-										     .setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
-										     .build();
+			.addVehicle(carrierVehicle_A)
+			.addVehicle(carrierVehicle_B)
+			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE)
+			.build();
 		carrier3.setCarrierCapabilities(cc3);
 		carriers.addCarrier(carrier3);
 
@@ -143,7 +143,7 @@ public class FixedCostsTest  {
 
 		URL context = org.matsim.examples.ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 		URL networkURL = IOUtils.extendUrl(context, "grid9x9.xml");
-        Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readURL(networkURL);
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
@@ -164,7 +164,7 @@ public class FixedCostsTest  {
 			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 
 			//Routing bestPlan to Network
-			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(bestSolution) ;
 			NetworkRouter.routePlan(carrierPlan,netBasedCosts) ;
 			carrier.addPlan(carrierPlan) ;
 			carriersPlannedAndRouted.addCarrier(carrier);
@@ -192,18 +192,18 @@ public class FixedCostsTest  {
 	/*
 	 * carrier3: has both vehicles of Type A (no fixed costs, variable costs: 1 EUR/km) and Type B (fixed costs of 10 EUR/vehicle, no variable costs)
 	 * should use A for short trip (8 EUR) and B for the long trip (10.36 EUR)
-	*/
+	 */
 	@Test
 	final void test_carrier3CostsAreCorrectly() {
 		Assertions.assertEquals(-18.36, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier3", Carrier.class)).getSelectedPlan().getJspritScore(), MatsimTestUtils.EPSILON);
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private static CarrierService createMatsimService(String id, String to, int size) {
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
-						     .setCapacityDemand(size)
-						     .setServiceDuration(31.0);
-		return builder.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
-						     .build();
+		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class),size)
+			.setServiceDuration(31.0)
+			.setServiceStartingTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+			.build();
 	}
 
 }

@@ -394,7 +394,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 
-				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
+				/* We think the maxFlowFromFdiag must be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
+				* It's unit is (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s
+				* tilmann + theresa, feb'25 */
+				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
+					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
 				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
@@ -406,7 +410,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
 								"InflowCapacitySetting.INCREASE_NUMBER_OF_LANES or InflowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
 					}
-					if ( wrnCnt==5 ) { //this verbose warning is only given 5 times
+					if ( wrnCnt==10 ) { //this verbose warning is only given 10 times
 						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 					}
 
@@ -415,31 +419,26 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600* maxInflowUsedInQsim /context.qsimConfig.getTimeStepSize() );
 
 				} else  {
-					if ( maxFlowFromFdiag < flowCapacityPerTimeStep ){ //warnings
-						if (wrnCnt<10) {
-							wrnCnt++ ;
-							log.warn( "max flow from fdiag < flow cap in network file; linkId=" + qLinkInternalInterface.getId() +
-									"; network file flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
-									"; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
+					if (wrnCnt < 10) { // warnings
+						wrnCnt++;
+						log.warn("max flow from fdiag < flow cap in network file; linkId=" + qLinkInternalInterface.getId() +
+							"; network file flow cap/h=" + 3600. * flowCapacityPerTimeStep / context.qsimConfig.getTimeStepSize() +
+							"; max flow from fdiag/h=" + 3600 * maxFlowFromFdiag / context.qsimConfig.getTimeStepSize());
 
-							log.warn( "number of lanes from fdiag > number of lanes in network file; linkId=" + qLinkInternalInterface.getId() +
-									"; number of lanes in network file=" + this.effectiveNumberOfLanes +
-									"; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag ) ;
+						log.warn("number of lanes from fdiag > number of lanes in network file; linkId=" + qLinkInternalInterface.getId() +
+							"; number of lanes in network file=" + this.effectiveNumberOfLanes +
+							"; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag);
 
-							if ( wrnCnt==10 ) {
-								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
-							}
-						}
 						if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
-							if (wrnCnt<10) {
-								log.warn("The flow capacity will be reduced. See link attribute 'maxInflowUsedInQsim' written into the output network.");
-							}
+							log.warn("The flow capacity will be reduced. See link attribute 'maxInflowUsedInQsim' written into the output network.");
 						} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
-							if (wrnCnt<10) {
-								log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
-							}
+							log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
 						}
 					}
+					if (wrnCnt == 10) {
+						log.warn(Gbl.FUTURE_SUPPRESSED);
+					}
+
 					// now either correct the flow capacity or the number of lanes!
 					if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
 						this.maxInflowUsedInQsim = maxFlowFromFdiag;

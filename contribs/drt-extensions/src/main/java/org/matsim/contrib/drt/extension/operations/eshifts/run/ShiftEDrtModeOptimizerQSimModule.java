@@ -10,7 +10,6 @@ import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingSched
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtAssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.operations.eshifts.dispatcher.EDrtShiftStartLogic;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
@@ -22,13 +21,13 @@ import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicle
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
-import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -70,26 +69,27 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 								getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 								getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-								drtShiftParams, new EDrtShiftStartLogic(new DefaultShiftStartLogic()),
+								drtShiftParams, new DefaultShiftStartLogic(),
 								new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams),
 								getter.getModal(ShiftScheduler.class)),
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0),
+				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class)),
 						drtShiftParams.considerUpcomingShiftsForInsertion))).asEagerSingleton();
 
 
-		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class)))).in(Singleton.class);
+		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->
+						new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class),
+								drtShiftParams, getter.get(ChargingInfrastructure.class), getter.getModal(ChargingStrategy.Factory.class))))
+				.in(Singleton.class);
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams, getter.getModal(ChargingInfrastructure.class),
-						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class),
-						getter.getModal(ChargingStrategy.Factory.class))
+						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), drtShiftParams)
 		)).asEagerSingleton();
 
 		// See EDrtModeOptimizerQSimModule

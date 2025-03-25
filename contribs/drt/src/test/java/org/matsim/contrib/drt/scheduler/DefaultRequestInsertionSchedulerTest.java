@@ -1,6 +1,13 @@
 package org.matsim.contrib.drt.scheduler;
 
-import com.google.common.collect.ImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -12,15 +19,27 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.*;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
-import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.Fleets;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -30,13 +49,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author nkuehnel / MOIA
@@ -76,7 +89,7 @@ public class DefaultRequestInsertionSchedulerTest {
     private final DrtRequest existingRequest1 = request("r1", from1, to1, 0., R1_DO_TIME + ALLOWED_DETOUR, R1_PU_TIME, R1_PU_TIME);
     private final DrtRequest existingRequest2 = request("r2", from2, to2, 0., R2_DO_TIME + ALLOWED_DETOUR, R2_PU_TIME, R2_PU_TIME);
     private final DrtRequest newRequest = request("r3", from3, to3, CURRENT_TIME, R3_DO_TIME + ALLOWED_DETOUR, R3_PU_TIME, R3_PU_TIME);
-
+	private final IntegerLoadType integerLoadType = new IntegerLoadType("persons");
     private static final String mode = "DRT_MODE";
 
 
@@ -132,10 +145,10 @@ public class DefaultRequestInsertionSchedulerTest {
 
 
         // vehicle entry
-        Waypoint.Start start = start(null, CURRENT_TIME, startLink, 1);//not a STOP -> pickup cannot be appended
-        Waypoint.Stop stop0 = stop(stopTask0, 2);
-        Waypoint.Stop stop1 = stop(stopTask1, 1);
-        Waypoint.Stop stop2 = stop(stopTask2, 0);
+        Waypoint.Start start = start(null, CURRENT_TIME, startLink, integerLoadType.fromInt(1));//not a STOP -> pickup cannot be appended
+        Waypoint.Stop stop0 = stop(stopTask0, integerLoadType.fromInt(2));
+        Waypoint.Stop stop1 = stop(stopTask1, integerLoadType.fromInt(1));
+        Waypoint.Stop stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
         var vehicleEntry = entry(vehicle, start, stop0, stop1, stop2);
 
         InsertionWithDetourData.InsertionDetourData detour = detourData(0, 10, 10, 10.);
@@ -182,7 +195,7 @@ public class DefaultRequestInsertionSchedulerTest {
 
     private static DefaultRequestInsertionScheduler getDefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer) {
         MinimumStopDurationAdapter stopDuration = new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(StaticPassengerStopDurationProvider.of(STOP_DURATION, 0.0)), 60.);
-        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration));
+        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
         DefaultRequestInsertionScheduler insertionScheduler = new DefaultRequestInsertionScheduler(fleet, timer, TRAVEL_TIME, scheduleTimingUpdater,
                 new DrtTaskFactoryImpl(), stopDuration, true);
         return insertionScheduler;
@@ -213,12 +226,12 @@ public class DefaultRequestInsertionSchedulerTest {
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
 
-    private Waypoint.Start start(Task task, double time, Link link, int occupancy) {
+    private Waypoint.Start start(Task task, double time, Link link, DvrpLoad occupancy) {
         return new Waypoint.Start(task, link, time, occupancy);
     }
 
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, int outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy);
+    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
+        return new Waypoint.Stop(stopTask, outgoingOccupancy, integerLoadType);
     }
 
 

@@ -104,7 +104,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	private void initializeMultibinders() {
-		// We do need to make these calls here in order to register the multi binders. Otherwise, guice doesn't know, that they exist. In particular,
+		// We do need to make these calls here in order to register the multi binders. Otherwise, guice doesn't know that they exist. In particular,
 		// if none of the corresponding addXXXBinding methods was called, the set binder would not be registered, and guice would complain.
 		Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
@@ -222,11 +222,14 @@ public abstract class AbstractModule implements Module {
 	 */
 	@Deprecated
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
-		return bind(networkTravelTime());
+		return bind( carTravelTime() );
 	}
 
+	@Deprecated // please inline
+	protected final Key<TravelTime> networkTravelTime() { return carTravelTime(); }
+
 	@SuppressWarnings("static-method")
-	protected final Key<TravelTime> networkTravelTime() {
+	protected final Key<TravelTime> carTravelTime() {
 		return Key.get(TravelTime.class, Names.named(TransportMode.car));
 	}
 

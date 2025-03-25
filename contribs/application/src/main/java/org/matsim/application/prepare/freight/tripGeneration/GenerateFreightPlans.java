@@ -15,6 +15,7 @@ import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -65,7 +66,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
 
         log.info("Reading trip relations...");
         List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
-        log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
+		log.info("Trip relations successfully loaded. There are {} trip relations", tripRelations.size());
 
         log.info("Start generating population...");
         Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
@@ -76,7 +77,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             }
 
             if (i % 500000 == 0) {
-                log.info("Processing: " + i + " out of " + tripRelations.size() + " entries have been processed");
+				log.info("Processing: {} out of {} entries have been processed", i, tripRelations.size());
             }
         }
 
@@ -90,22 +91,27 @@ public class GenerateFreightPlans implements MATSimAppCommand {
 
         // Write down tsv file for visualisation and analysis
         String freightTripTsvPath = output.toString() + "/freight_trips_data.tsv";
-        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
-        tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
-        for (Person person : outputPopulation.getPersons().values()) {
-            List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-            Activity act0 = (Activity) planElements.get(0);
-            Activity act1 = (Activity) planElements.get(2);
-            Coord fromCoord = act0.getCoord();
-            Coord toCoord = act1.getCoord();
-            tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
-        }
-        tsvWriter.close();
 
-        return 0;
+		createOutput_tripOD_relations(freightTripTsvPath, outputPopulation);
+
+		return 0;
     }
 
-    public static void main(String[] args) {
+	public static void createOutput_tripOD_relations(String freightTripTsvPath, Population outputPopulation) throws IOException {
+		CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
+		tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+		for (Person person : outputPopulation.getPersons().values()) {
+			List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+			Activity act0 = (Activity) planElements.get(0);
+			Activity act1 = (Activity) planElements.get(2);
+			Coord fromCoord = act0.getCoord();
+			Coord toCoord = act1.getCoord();
+			tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+		}
+		tsvWriter.close();
+	}
+
+	public static void main(String[] args) {
         new GenerateFreightPlans().execute(args);
     }
 }

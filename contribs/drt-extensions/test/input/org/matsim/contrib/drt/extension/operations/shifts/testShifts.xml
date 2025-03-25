@@ -7,4 +7,6 @@
     </shift>
     <shift id="33" start="22400" end="53000">
     </shift>
+    <shift id="44" start="22400" end="53000" type="wav">
+    </shift>
 </shifts>

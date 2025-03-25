@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -49,6 +48,7 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
@@ -187,14 +187,13 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
     }
 
     log.info("Add LSP to the scenario");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
     return scenario;
   }
 
   private static LSP createLSP(Scenario scenario) {
     log.info("create LSP");
-    Network network = scenario.getNetwork();
 
     // A plan with a two hub chains is created
     LSPPlan multipleTwoEchelonChainsPlan;

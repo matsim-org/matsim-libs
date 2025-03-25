@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.extension.edrt.run;
 
 import java.net.URL;
 
+import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -64,8 +65,8 @@ public class RunEDrtScenario {
 			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
-					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+					bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
+							new EDrtVehicleDataEntryFactoryProvider(getMode(), MIN_RELATIVE_SOC));
 				}
 			});
 		}

@@ -24,6 +24,7 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
@@ -48,6 +49,7 @@ public class DrtRequest implements PassengerRequest {
 
 	private final Link fromLink;
 	private final Link toLink;
+	private final DvrpLoad load;
 
 	private DrtRequest(Builder builder) {
 		id = builder.id;
@@ -62,6 +64,7 @@ public class DrtRequest implements PassengerRequest {
 		toLink = builder.toLink;
 		maxPickupDelay = builder.maxPickupDelay;
 		lateDiversionThreshold = builder.lateDiversionThreshold;
+		this.load = builder.load;
 	}
 
 	public static Builder newBuilder() {
@@ -82,6 +85,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.toLink = copy.getToLink();
 		builder.maxPickupDelay = copy.getMaxPickupDelay();
 		builder.lateDiversionThreshold = copy.getLateDiversionThreshold();
+		builder.load = copy.load;
 		return builder;
 	}
 
@@ -138,8 +142,8 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public int getPassengerCount() {
-		return passengerIds.size();
+	public DvrpLoad getLoad() {
+		return this.load;
 	}
 
 	@Override
@@ -171,6 +175,7 @@ public class DrtRequest implements PassengerRequest {
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
+		private DvrpLoad load;
 
 		private Builder() {
 		}
@@ -232,6 +237,11 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder toLink(Link val) {
 			toLink = val;
+			return this;
+		}
+
+		public Builder load(DvrpLoad load) {
+			this.load = load;
 			return this;
 		}
 

@@ -37,6 +37,7 @@ import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
@@ -110,7 +111,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     log.warn("solutionType= {}", solutionType);
 
-    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+    config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 
     log.info("Starting ...");
     log.info("Set up required MATSim classes");
@@ -132,7 +133,7 @@ import org.matsim.vehicles.VehicleUtils;
     lsp.scheduleLogisticChains();
 
     log.info("Set up simulation controller and LSPModule");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(lsp)));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
 
     // @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll. Damit kann
     // man dann auch vollständig auf
@@ -184,19 +185,15 @@ import org.matsim.vehicles.VehicleUtils;
 
   private static LSP createInitialLSP(Scenario scenario, SolutionType solutionType) {
 
-    Network network = scenario.getNetwork();
 
     LSPUtils.LSPBuilder lspBuilder =
         switch (solutionType) {
-          case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(
-              Id.create("LSPwithReloading", LSP.class));
+          case onePlan_withHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class));
           case onePlan_direct, twoPlans_directAndHub -> LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
         };
 
-    //		lspBuilder.setSolutionScorer(new MyLSPScorer());
 
-    final Id<Link> depotLinkId =
-        Id.createLinkId("(4 2) (4 3)"); // TODO: Hochziehen aber non-static.
+    final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); // TODO: Hochziehen aber non-static.
     final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
 
     LogisticChainElement depotElement;
@@ -475,11 +472,11 @@ import org.matsim.vehicles.VehicleUtils;
 
   private static LSPPlan createLSPPlan_direct(
       LogisticChainElement depotElement, LogisticChainElement directDistributionElement) {
-    log.info("");
+
     log.info("The order of the logisticsSolutionElements is now specified");
     depotElement.connectWithNextElement(directDistributionElement);
 
-    log.info("");
+
     log.info("set up logistic Solution - direct distribution from the depot is created");
 
     LogisticChain completeSolutionDirect =
@@ -489,9 +486,7 @@ import org.matsim.vehicles.VehicleUtils;
             .addLogisticChainElement(directDistributionElement)
             .build();
 
-    log.info("");
-    log.info(
-        "The initial plan of the lsp is generated and the assigner and the solution from above are added");
+    log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
     return LSPUtils.createLSPPlan()
         .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
@@ -503,7 +498,7 @@ import org.matsim.vehicles.VehicleUtils;
       LogisticChainElement mainRunElement,
       LogisticChainElement hubElement,
       LogisticChainElement distributionElement) {
-    log.info("");
+
     log.info("set up logistic Solution - original with hub usage solution is created");
 
     // Das ist wichtig, damit er die Kette zur Verfügung hat.
@@ -520,9 +515,7 @@ import org.matsim.vehicles.VehicleUtils;
             .addLogisticChainElement(distributionElement)
             .build();
 
-    log.info("");
-    log.info(
-        "The initial plan of the lsp is generated and the assigner and the solution from above are added");
+    log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
     return LSPUtils.createLSPPlan()
         .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner())
