@@ -46,15 +46,15 @@ public class RunEDrtWithServicesScenarioIT {
 		final Config config = ServicesTestUtils.configure(outputDirectory, true);
 		var multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		var drtConfigGroup = multiModeDrtConfigGroup.getModalElements().stream().findFirst().orElseThrow();
-		drtConfigGroup.idleVehiclesReturnToDepots = true; // Required for standard eDrt
+		drtConfigGroup.setIdleVehiclesReturnToDepots(true); // Required for standard eDrt
 
 		DrtServicesParams drtServicesParams = new DrtServicesParams();
 
 		{
 			DrtServiceParams clean = new DrtServiceParams("clean");
-			clean.duration = 300;
-			clean.executionLimit = 2;
-			clean.enableTaskStacking = true;
+			clean.setDuration(300);
+			clean.setExecutionLimit(2);
+			clean.setEnableTaskStacking(true);
 			var condition1 = new ChargingStartedTriggerParam();
 			clean.addParameterSet(condition1);
 			drtServicesParams.addParameterSet(clean);
@@ -62,8 +62,8 @@ public class RunEDrtWithServicesScenarioIT {
 
 		{
 			DrtServiceParams clean = new DrtServiceParams("plug in/out");
-			clean.duration = 15;
-			clean.enableTaskStacking = false;
+			clean.setDuration(15);
+			clean.setEnableTaskStacking(false);
 			var condition1 = new ChargingStartedTriggerParam();
 			clean.addParameterSet(condition1);
 			drtServicesParams.addParameterSet(clean);
@@ -87,7 +87,7 @@ public class RunEDrtWithServicesScenarioIT {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
-				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
+				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_SOC));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, RELATIVE_SPEED));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

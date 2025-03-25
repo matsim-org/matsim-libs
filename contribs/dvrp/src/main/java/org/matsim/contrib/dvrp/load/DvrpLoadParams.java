@@ -22,6 +22,79 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
         super(SET_NAME);
     }
 
+    public @NotEmpty List<String> getDimensions() {
+        return dimensions;
+    }
+
+    public void setDimensions(@NotEmpty List<String> dimensions) {
+        this.dimensions = dimensions;
+    }
+
+    public String getMapVehicleTypeSeats() {
+        return mapVehicleTypeSeats;
+    }
+
+    public void setMapVehicleTypeSeats(String mapVehicleTypeSeats) {
+        this.mapVehicleTypeSeats = mapVehicleTypeSeats;
+    }
+
+    public String getMapVehicleTypeStandingRoom() {
+        return mapVehicleTypeStandingRoom;
+    }
+
+    public void setMapVehicleTypeStandingRoom(String mapVehicleTypeStandingRoom) {
+        this.mapVehicleTypeStandingRoom = mapVehicleTypeStandingRoom;
+    }
+
+    public String getMapVehicleTypeVolume() {
+        return mapVehicleTypeVolume;
+    }
+
+    public void setMapVehicleTypeVolume(String mapVehicleTypeVolume) {
+        this.mapVehicleTypeVolume = mapVehicleTypeVolume;
+    }
+
+    public String getMapVehicleTypeWeight() {
+        return mapVehicleTypeWeight;
+    }
+
+    public void setMapVehicleTypeWeight(String mapVehicleTypeWeight) {
+        this.mapVehicleTypeWeight = mapVehicleTypeWeight;
+    }
+
+    public String getMapVehicleTypeOther() {
+        return mapVehicleTypeOther;
+    }
+
+    public void setMapVehicleTypeOther(String mapVehicleTypeOther) {
+        this.mapVehicleTypeOther = mapVehicleTypeOther;
+    }
+
+    public String getMapFleetCapacity() {
+        return mapFleetCapacity;
+    }
+
+    public void setMapFleetCapacity(String mapFleetCapacity) {
+        this.mapFleetCapacity = mapFleetCapacity;
+    }
+
+    public String getDefaultRequestDimension() {
+        return defaultRequestDimension;
+    }
+
+    public void setDefaultRequestDimension(String defaultRequestDimension) {
+        this.defaultRequestDimension = defaultRequestDimension;
+    }
+
+    @PositiveOrZero
+    public int getAnalysisInterval() {
+        return analysisInterval;
+    }
+
+    public void setAnalysisInterval(@PositiveOrZero int analysisInterval) {
+        this.analysisInterval = analysisInterval;
+    }
+
     public enum VehicleCapacitySource {
         Attributes, VehicleTypeCapacity
     }
@@ -29,61 +102,61 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
     @Parameter
     @NotEmpty
     @Comment("the available capacity / load dimensions per vehicle / request")
-    public List<String> dimensions = new LinkedList<>(Collections.singleton("passengers"));
+    private List<String> dimensions = new LinkedList<>(Collections.singleton("passengers"));
 
     @Parameter
     @Comment("maps the seat capacity of the dvrp vehicle type to a specific dimension")
-    public String mapVehicleTypeSeats = "passengers";
+    private String mapVehicleTypeSeats = "passengers";
 
     @Parameter
     @Comment("maps the standing room capacity of the dvrp vehicle type to a specific dimension")
-    public String mapVehicleTypeStandingRoom = null;
+    private String mapVehicleTypeStandingRoom = null;
 
     @Parameter
     @Comment("maps the volume capacity of the dvrp vehicle type to a specific dimension")
-    public String mapVehicleTypeVolume = null;
+    private String mapVehicleTypeVolume = null;
 
     @Parameter
     @Comment("maps the weight capacity of a the dvrp vehicle type to a specific dimension")
-    public String mapVehicleTypeWeight = null;
+    private String mapVehicleTypeWeight = null;
 
     @Parameter
     @Comment("maps the other capacity of a the dvrp vehicle type to a specific dimension")
-    public String mapVehicleTypeOther = null;
+    private String mapVehicleTypeOther = null;
 
     @Parameter
     @Comment("maps the vehicle capacity when loading from dvrp fleet format to a specific dimension")
-    public String mapFleetCapacity = "passengers";
+    private String mapFleetCapacity = "passengers";
 
     @Parameter
     @Comment("if no other load information is given, each request obtains a unit load for the given dimension")
-    public String defaultRequestDimension = "passengers";
+    private String defaultRequestDimension = "passengers";
 
     @Parameter
     @Comment("Defines how often to write analysis on capacities and loads of the mode")
     @PositiveOrZero
-    public int analysisInterval = 0;
+    private int analysisInterval = 0;
 
     @Override
     public void checkConsistency(Config config) {
         super.checkConsistency(config);
 
-        Preconditions.checkState(mapVehicleTypeSeats == null || dimensions.contains(mapVehicleTypeSeats),
+        Preconditions.checkState(getMapVehicleTypeSeats() == null || getDimensions().contains(getMapVehicleTypeSeats()),
                 "the dimension configured for the vehicle type seat capacity does not exist");
 
-        Preconditions.checkState(mapVehicleTypeStandingRoom == null || dimensions.contains(mapVehicleTypeStandingRoom),
+        Preconditions.checkState(getMapVehicleTypeStandingRoom() == null || getDimensions().contains(getMapVehicleTypeStandingRoom()),
                 "the dimension configured for the vehicle type standing room capacity does not exist");
 
-        Preconditions.checkState(mapVehicleTypeVolume == null || dimensions.contains(mapVehicleTypeVolume),
+        Preconditions.checkState(getMapVehicleTypeVolume() == null || getDimensions().contains(getMapVehicleTypeVolume()),
                 "the dimension configured for the vehicle type volume capacity does not exist");
 
-        Preconditions.checkState(mapVehicleTypeWeight == null || dimensions.contains(mapVehicleTypeWeight),
+        Preconditions.checkState(getMapVehicleTypeWeight() == null || getDimensions().contains(getMapVehicleTypeWeight()),
                 "the dimension configured for the vehicle type weight capacity does not exist");
 
-        Preconditions.checkState(mapVehicleTypeOther == null || dimensions.contains(mapVehicleTypeOther),
+        Preconditions.checkState(getMapVehicleTypeOther() == null || getDimensions().contains(getMapVehicleTypeOther()),
                 "the dimension configured for the vehicle type other capacity does not exist");
 
-        Preconditions.checkState(mapFleetCapacity == null || dimensions.contains(mapFleetCapacity),
+        Preconditions.checkState(getMapFleetCapacity() == null || getDimensions().contains(getMapFleetCapacity()),
                 "the dimension configured for the dvrp fleet vehicle capacity does not exist");
     }
 }

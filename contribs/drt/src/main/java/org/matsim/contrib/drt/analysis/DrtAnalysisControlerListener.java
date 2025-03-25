@@ -224,7 +224,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				+ format.format(minCountAndShareIdleVehiclesOverDay.minCountIdleVehiclesOverDay);
 		String occStats = summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter, maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
-		if (drtCfg.plotDetailedCustomerStats) {
+		if (drtCfg.isPlotDetailedCustomerStats()) {
 			String header = String.join(delimiter, //
 					"submissionTime", //
 					"departureTime",//

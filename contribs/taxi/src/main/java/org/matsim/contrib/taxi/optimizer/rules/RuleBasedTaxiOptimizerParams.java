@@ -99,7 +99,7 @@ public final class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerPar
 	}
 
 	private void initDefault() {
-		((SquareGridZoneSystemParams) zoneSystemParams).cellSize = 1000.;
+		((SquareGridZoneSystemParams) zoneSystemParams).setCellSize(1000.);
 	}
 
 	public int getReoptimizationTimeStep() {

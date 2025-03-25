@@ -117,7 +117,7 @@ public class DvrpOfflineTravelTimes {
 
 		//header row
 		String[] headerLine = reader.readLine().split(delimiter);
-		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
+		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1, String.format("Expected %d columns"));
 		verify(headerLine[0].equals("linkId"));
 		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
 

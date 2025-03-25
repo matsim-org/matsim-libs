@@ -96,23 +96,23 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 		this.currentSolution = new Solution<>(initialSolution, Double.POSITIVE_INFINITY);;
 		this.bestSolution = currentSolution;
 		this.acceptedSolution = currentSolution;
-		this.currentTemperature = simAnCfg.initialTemperature;
+		this.currentTemperature = simAnCfg.getInitialTemperature();
 		listeners.add(perturbatorFactory);
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iteration = event.getIteration();
-		if(simAnCfg.firstIteration >= event.getIteration()) {
+		if(simAnCfg.getFirstIteration() >= event.getIteration()) {
 			return;
 		}
-		if (simAnCfg.lastIteration >= iteration && simAnCfg.lastIteration > iteration) {
-			if(iteration % simAnCfg.iterationRatio == 0) {
+		if (simAnCfg.getLastIteration() >= iteration && simAnCfg.getLastIteration() > iteration) {
+			if(iteration % simAnCfg.getIterationRatio() == 0) {
 				Perturbator<T> perturbator = perturbatorFactory.createPerturbator(iteration, currentTemperature);
 				T newSolution = perturbator.perturbate(acceptedSolution.solution);
 				currentSolution = new Solution<>(newSolution);
 			}
-		} else if(simAnCfg.lastIteration < iteration) {
+		} else if(simAnCfg.getLastIteration() < iteration) {
 			currentSolution = bestSolution;
 			acceptedSolution = bestSolution;
 			currentState = new SimulatedAnnealingIteration<>(bestSolution, acceptedSolution, currentSolution, currentTemperature);
@@ -123,12 +123,12 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		int iteration = event.getIteration();
 
-		if(simAnCfg.firstIteration > event.getIteration()) {
+		if(simAnCfg.getFirstIteration() > event.getIteration()) {
 			currentState = new SimulatedAnnealingIteration<>(bestSolution, acceptedSolution, currentSolution, currentTemperature);
 			return;
 		}
 
-		if (simAnCfg.lastIteration >= iteration) {
+		if (simAnCfg.getLastIteration() >= iteration) {
 			double cost = costCalculator.calculateCost(currentSolution.solution);
 			currentSolution = new Solution<>(currentSolution.solution, cost);
 			calcCurrentTemperature(currentSolution.getCost().orElse(Double.POSITIVE_INFINITY),
@@ -143,15 +143,15 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 					bestSolution = acceptedSolution;
 					logger.debug(String.format("Updated best solution {%s} with cost of %f in iteration %d",
 							bestSolution.solution.toString(), bestSolution.cost, iteration));
-					if (simAnCfg.resetUponBestSolution && simAnCfg.lastResetIteration > iteration){
+					if (simAnCfg.isResetUponBestSolution() && simAnCfg.getLastResetIteration() > iteration){
 						reset(iteration, false);
 						logger.debug("Reset of acceptor to current iteration");
 					}
 					iterationsWithoutImprovement = 0;
 				} else {
 					iterationsWithoutImprovement++;
-					if(iterationsWithoutImprovement >= simAnCfg.deadEndIterationReset
-							&& simAnCfg.lastResetIteration > iteration) {
+					if(iterationsWithoutImprovement >= simAnCfg.getDeadEndIterationReset()
+							&& simAnCfg.getLastResetIteration() > iteration) {
 						reset(iteration, false);
 					}
 				}
@@ -160,13 +160,13 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 				}
 			} else {
 				iterationsWithoutImprovement++;
-				if(iterationsWithoutImprovement >= simAnCfg.deadEndIterationReset
-						&& simAnCfg.lastResetIteration > iteration) {
+				if(iterationsWithoutImprovement >= simAnCfg.getDeadEndIterationReset()
+						&& simAnCfg.getLastResetIteration() > iteration) {
 					reset(iteration, false);
 				}
 			}
 
-			if(simAnCfg.lastResetIteration == iteration) {
+			if(simAnCfg.getLastResetIteration() == iteration) {
 				reset(iteration, true);
 			}
 
@@ -179,7 +179,7 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 			acceptedSolution = bestSolution;
 			return;
 		}
-		switch (simAnCfg.resetOption) {
+		switch (simAnCfg.getResetOption()) {
 			case temperatureOnly -> startIteration = iteration;
 			case solutionOnly -> acceptedSolution = new Solution<>(bestSolution.solution, Double.POSITIVE_INFINITY);
 			case temperatureAndSolution -> {
@@ -196,12 +196,12 @@ public final class SimulatedAnnealing<T> implements Provider<T>, BeforeMobsimLis
 
 	private void calcCurrentTemperature(double currentCost, double bestCost, int currentIteration) {
 
-		final double alpha = simAnCfg.alpha;
-		final double initialTemperature = simAnCfg.initialTemperature;
-		final double finalTemperature = simAnCfg.finalTemperature;
+		final double alpha = simAnCfg.getAlpha();
+		final double initialTemperature = simAnCfg.getInitialTemperature();
+		final double finalTemperature = simAnCfg.getFinalTemperature();
 
-		final int cycles = simAnCfg.nCoolingCycles;
-		final int iteration = (currentIteration - startIteration) / (simAnCfg.iterationsPerTemperature * simAnCfg.iterationRatio);
+		final int cycles = simAnCfg.getnCoolingCycles();
+		final int iteration = (currentIteration - startIteration) / (simAnCfg.getIterationsPerTemperature() * simAnCfg.getIterationRatio());
 
 		currentTemperature =  temperatureFunction.getTemperature(alpha, initialTemperature, finalTemperature,
 				cycles, iteration, currentCost, bestCost);
