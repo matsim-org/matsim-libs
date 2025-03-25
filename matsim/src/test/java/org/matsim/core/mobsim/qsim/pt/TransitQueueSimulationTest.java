@@ -62,7 +62,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
@@ -212,7 +211,6 @@ public class TransitQueueSimulationTest {
             schedule.addTransitLine(line);
         }
 
-        scenario.getConfig().addModule( new ExternalMobimConfigGroup() );
         scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
