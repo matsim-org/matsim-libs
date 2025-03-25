@@ -20,7 +20,6 @@
 package org.matsim.contrib.drt.analysis;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,18 +44,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
-import org.matsim.contrib.dvrp.load.IntegerLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -671,7 +667,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			DrtOptimizationConstraintsSet constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 			Pair<Double, Double> lineCoeffs = null;
-			if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultConstraintsSet) {
+			if(constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultConstraintsSet) {
                 lineCoeffs = Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
                         defaultConstraintsSet.maxTravelTimeBeta);
             }

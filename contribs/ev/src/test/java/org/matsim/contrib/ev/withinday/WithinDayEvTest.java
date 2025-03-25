@@ -681,7 +681,7 @@ public class WithinDayEvTest {
 				.build();
 
 		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(scenario.config());
-		config.abortAgents = true;
+		config.setAbortAgents(true);
 
 		Controler controller = scenario.controller();
 
@@ -746,7 +746,7 @@ public class WithinDayEvTest {
 				.build();
 
 		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(scenario.config());
-		config.abortAgents = true;
+		config.setAbortAgents(true);
 
 		Controler controller = scenario.controller();
 
@@ -1519,7 +1519,7 @@ public class WithinDayEvTest {
 				.build();
 
 		WithinDayEvConfigGroup config = WithinDayEvConfigGroup.get(scenario.config());
-		config.allowSpoantaneousCharging = true;
+		config.setAllowSpoantaneousCharging(true);
 
 		Controler controller = scenario.controller();
 

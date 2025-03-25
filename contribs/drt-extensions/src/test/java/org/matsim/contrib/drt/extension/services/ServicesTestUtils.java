@@ -7,7 +7,7 @@ import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -15,6 +15,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -48,9 +49,9 @@ public class ServicesTestUtils {
 		DrtWithExtensionsConfigGroup drtConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		drtConfigGroup.mode = TransportMode.drt;
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-			(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                    .addOrGetDefaultDrtOptimizationConstraintsSet();
 		drtConfigGroup.stopDuration = 30.;
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
@@ -149,9 +150,9 @@ public class ServicesTestUtils {
 		if(electrified)
 		{
 			final EvConfigGroup evConfigGroup = new EvConfigGroup();
-			evConfigGroup.chargersFile = chargersFile;
-			evConfigGroup.minimumChargeTime = 0;
-			evConfigGroup.timeProfiles = true;
+			evConfigGroup.setChargersFile(chargersFile);
+			evConfigGroup.setMinimumChargeTime(0);
+			evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
 			config.addModule(evConfigGroup);
 		}
 
