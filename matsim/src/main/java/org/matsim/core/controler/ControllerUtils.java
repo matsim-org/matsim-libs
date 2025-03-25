@@ -21,6 +21,7 @@ package org.matsim.core.controler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -98,6 +99,12 @@ public final class ControllerUtils{
 	    String newline = System.lineSeparator();// use native line endings for logfile
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
+
+		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
+			log.info("=== logging config.xml skipped ===");
+			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+		}
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");
 	    log.info("Checking consistency of config...");
