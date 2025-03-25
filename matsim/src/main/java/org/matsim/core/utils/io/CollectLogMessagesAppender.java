@@ -49,7 +49,7 @@ public class CollectLogMessagesAppender extends AbstractAppender {
 
 	@Override
 	public void append(LogEvent e) {
-		this.logEvents.add(e);
+		this.logEvents.add(e.toImmutable());
 	}
 
 	public Queue<LogEvent> getLogEvents() {
