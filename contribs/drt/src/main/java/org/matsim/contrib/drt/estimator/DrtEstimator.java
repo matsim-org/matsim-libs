@@ -10,7 +10,10 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * Interface to estimate a DRT service's detour, waiting time and costs.
  */
 public interface DrtEstimator extends ControlerListener {
-
+	public static final String EST_RIDE_TIME = "est_ride_time";
+	public static final String EST_RIDE_DISTANCE = "est_ride_distance";
+	public static final String EST_WAIT_TIME = "est_wait_time";
+	public static final String EST_REJECTION_RATE = "est_rejection_rate";
 	/**
 	 * Provide an estimate for a drt route with specific pickup and dropoff point.
 	 *
@@ -38,9 +41,10 @@ public interface DrtEstimator extends ControlerListener {
 	 * Write estimate information into the leg attributes.
 	 */
 	static void setEstimateAttributes(Leg leg, Estimate estimate) {
-		leg.getAttributes().putAttribute("est_ride_time", estimate.rideTime());
-		leg.getAttributes().putAttribute("est_ride_distance", estimate.rideDistance());
-		leg.getAttributes().putAttribute("est_wait_time", estimate.waitingTime());
+		leg.getAttributes().putAttribute(EST_RIDE_TIME, estimate.rideTime());
+		leg.getAttributes().putAttribute(EST_RIDE_DISTANCE, estimate.rideDistance());
+		leg.getAttributes().putAttribute(EST_WAIT_TIME, estimate.waitingTime());
+		leg.getAttributes().putAttribute(EST_REJECTION_RATE, estimate.rejectionRate());
 	}
 
 }
