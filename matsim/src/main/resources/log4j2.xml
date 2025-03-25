@@ -17,7 +17,16 @@
 	</Appenders>
 
 	<Loggers>
-		<Root level="info">
+		<!--
+		Here we set the log level from an environment variable called LOG_LEVEL, or defaults
+		to 'info' if not set.
+		You can set this locally by putting this into your ~/.bash_profile:
+		# macOS
+		export LOG_LEVEL='debug|info|warn';
+		# linux
+		set LOG_LEVEL='debug|info|warn';
+		-->
+		<Root level="${env:LOG_LEVEL:-info}">
 			<AppenderRef ref="stdout" />
 			<AppenderRef ref="stderr" />
 		</Root>
