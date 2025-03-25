@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyMessage1.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,21 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.jdeqsim.util;
+package org.matsim.core.mobsim.messagequeue;
 
-import org.matsim.core.mobsim.jdeqsim.Message;
+/**
+ * The scheduler of the micro-simulation.
+ *
+ * @author rashid_waraich
+ */
+public class Scheduler {
 
-public class DummyMessage1 extends Message {
+	protected final MessageQueue queue;
 
-	public Message messageToUnschedule=null;
-
-	@Override
-	public void handleMessage() {
-		this.getReceivingUnit().getScheduler().unschedule(messageToUnschedule);
+	public Scheduler(MessageQueue queue) {
+		this(queue, Double.MAX_VALUE);
 	}
 
-	@Override
-	public void processEvent() {
+	public Scheduler(MessageQueue messageQueue, double simulationEndTime) {
+		this.queue = messageQueue;
+	}
+
+	public void schedule(Message m) {
+		queue.putMessage(m);
 	}
 
 }

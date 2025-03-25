@@ -37,7 +37,7 @@ public class ChargingHandler implements MobsimAfterSimStepListener {
 	@Inject
 	ChargingHandler(ChargingInfrastructure chargingInfrastructure, EvConfigGroup evConfig) {
 		this.chargers = chargingInfrastructure.getChargers().values();
-		this.chargeTimeStep = evConfig.chargeTimeStep;
+		this.chargeTimeStep = evConfig.getChargeTimeStep();
 	}
 
 	@Override

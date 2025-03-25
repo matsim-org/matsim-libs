@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.fleet;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.EvConfigGroup.InitialSocBehavior;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -69,7 +70,7 @@ public final class ElectricFleetModule extends AbstractModule {
 					}
 				}).asEagerSingleton();
 
-				if (evCfg.transferFinalSoCToNextIteration) {
+				if (evCfg.getInitialSocBehavior().equals(InitialSocBehavior.UpdateAfterIteration)) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
 						@Inject private ElectricFleetSpecification electricFleetSpecification;
 						@Inject private ElectricFleet electricFleet;

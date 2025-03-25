@@ -5,9 +5,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
+
+import static org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
 
 /**
  * @author nkuehnel / MOIA
@@ -18,11 +20,10 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
     private final Supplier<DrtOptimizationConstraintsSet> optimizationConstraintsSetSupplier;
 
-    public static String defaultConstraintSet = DrtOptimizationConstraintsSet.DEFAULT_PARAMS_NAME;
-
+    public DrtOptimizationConstraintsSetImpl defaultConstraintSet;
 
     public DrtOptimizationConstraintsParams() {
-        this(DefaultDrtOptimizationConstraintsSet::new);
+        this(DrtOptimizationConstraintsSetImpl::new);
     }
 
     public DrtOptimizationConstraintsParams(Supplier<DrtOptimizationConstraintsSet> supplier) {
@@ -38,9 +39,6 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
         Verify.verify(!drtOptimizationConstraintsSets.isEmpty(),
                 "At least one DrtOptimizationConstraintsParams is required.");
         Verify.verify(drtOptimizationConstraintsSets.stream()
-                        .anyMatch(params -> params.name.equals(defaultConstraintSet)),
-                "Default DrtOptimizationConstraintsParams is required.");
-        Verify.verify(drtOptimizationConstraintsSets.stream()
                         .map(params -> params.name)
                         .distinct()
                         .count() == drtOptimizationConstraintsSets.size(),
@@ -48,22 +46,17 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
     }
 
     public List<DrtOptimizationConstraintsSet> getDrtOptimizationConstraintsSets() {
-        return getParameterSets(DrtOptimizationConstraintsSet.SET_NAME).stream()
+        return  getParameterSets(DrtOptimizationConstraintsSet.SET_NAME).stream()
                 .filter(DrtOptimizationConstraintsSet.class::isInstance)
                 .map(DrtOptimizationConstraintsSet.class::cast)
                 .toList();
     }
 
-    public DrtOptimizationConstraintsSet addOrGetDefaultDrtOptimizationConstraintsSet() {
-        Optional<DrtOptimizationConstraintsSet> drtOptParams = getDrtOptimizationConstraintsSets().stream()
-                .filter(params -> params.name.equals(defaultConstraintSet))
-                .findAny();
-        if (drtOptParams.isEmpty()) {
-            DrtOptimizationConstraintsSet defaultSet = optimizationConstraintsSetSupplier.get();
-            addParameterSet(defaultSet);
-            return defaultSet;
+    public DrtOptimizationConstraintsSetImpl addOrGetDefaultDrtOptimizationConstraintsSet() {
+        if (defaultConstraintSet == null) {
+            addParameterSet( new DrtOptimizationConstraintsSetImpl());
         }
-        return drtOptParams.get();
+        return defaultConstraintSet;
     }
 
     @Override
@@ -76,9 +69,23 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
         }
     }
 
-    /**
-     * for backwards compatibility with old drt config groups
-     */
+    public void addParameterSet(final ConfigGroup set) {
+        if(set instanceof DrtOptimizationConstraintsSetImpl defaultSetImpl) {
+            if(DEFAULT_PARAMS_NAME.equals(defaultSetImpl.name)) {
+                if(defaultConstraintSet == null) {
+                    defaultConstraintSet = defaultSetImpl;
+                } else {
+                    throw new IllegalArgumentException("Cannot have two optimization constraints sets with set name 'default'.");
+                }
+            }
+        }
+        super.addParameterSet(set);
+    }
+
+
+        /**
+         * for backwards compatibility with old drt config groups
+         */
     public void handleAddUnknownParam(final String paramName, final String value) {
         switch (paramName) {
             case "maxWaitTime":

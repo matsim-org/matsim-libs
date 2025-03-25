@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.estimator.impl;
 
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -22,7 +22,7 @@ public class PessimisticDrtEstimator implements DrtEstimator {
 		// If not estimates are present, use travel time alpha as detour
 		// beta is not used, because estimates are supposed to be minimums and not worst cases
 		DrtOptimizationConstraintsSet constraints = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		if(constraints instanceof DefaultDrtOptimizationConstraintsSet defaultConstraints) {
+		if(constraints instanceof DrtOptimizationConstraintsSetImpl defaultConstraints) {
 			double travelTime = Math.min(route.getDirectRideTime() + defaultConstraints.maxAbsoluteDetour,
 					route.getDirectRideTime() * defaultConstraints.maxTravelTimeAlpha);
 
