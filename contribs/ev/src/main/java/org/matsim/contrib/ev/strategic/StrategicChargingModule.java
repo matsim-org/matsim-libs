@@ -117,9 +117,9 @@ public class StrategicChargingModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ChargingPlanScoring provideChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
-			ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
+			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
 			StrategicChargingConfigGroup scConfig, WithinDayEvConfigGroup withinConfig, ScoringTracker tracker) {
-		return new ChargingPlanScoring(eventsManager, population, network, fleet, costCalculator, scConfig.getScoringParameters(),
+		return new ChargingPlanScoring(eventsManager, population, network, timeInterpretation, fleet, costCalculator, scConfig.getScoringParameters(),
 				withinConfig.getCarMode(), tracker);
 	}
 
