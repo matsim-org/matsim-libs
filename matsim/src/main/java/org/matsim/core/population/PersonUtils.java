@@ -148,7 +148,7 @@ public final class PersonUtils {
 			String valueStr = parts[1].trim();
 
 			// Split mode and parameter which are separated by underscore
-			int lastUnderscore = modeAndParam.lastIndexOf('_');
+			int lastUnderscore = modeAndParam.lastIndexOf('-');
 			if (lastUnderscore == -1) {
 				log.warn("Invalid mode_parameter format: {}", modeAndParam);
 				continue;
@@ -192,7 +192,7 @@ public final class PersonUtils {
 				ModeUtilityParameters.Type param = paramEntry.getKey();
 				Double value = paramEntry.getValue();
 
-				sb.append(mode).append("_").append(param.name()).append("=").append(value);
+				sb.append(mode).append("-").append(param.name()).append("=").append(value);
 			}
 		}
 

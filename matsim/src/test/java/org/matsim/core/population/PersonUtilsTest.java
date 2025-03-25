@@ -25,7 +25,8 @@ class PersonUtilsTest {
 				ModeUtilityParameters.Type.dailyUtilityConstant, -1.2
             ),
             "pt", Map.of(
-				ModeUtilityParameters.Type.dailyUtilityConstant, -0.8
+				ModeUtilityParameters.Type.dailyUtilityConstant, -0.8,
+				ModeUtilityParameters.Type.marginalUtilityOfTraveling_s, -0.1
             )
         );
 

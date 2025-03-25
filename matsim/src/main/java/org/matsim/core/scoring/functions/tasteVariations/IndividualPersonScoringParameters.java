@@ -21,6 +21,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,15 +60,16 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 		this.cache = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
 	}
 
-	private double computeAvgIncome(Population population) {
+	private double computeAvgIncome(Population population, String subpopulation) {
 		log.info("reading income attribute using " + PersonUtils.class + " of all agents and compute global average.\n" +
 			"Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
 			"Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMoney in their subpopulation's scoring params..");
 		OptionalDouble averageIncome = population.getPersons().values().stream()
 			//consider only agents that have a specific income provided
 			.filter(person -> PersonUtils.getIncome(person) != null)
+			.filter(person -> Objects.equals(PopulationUtils.getSubpopulation(person), subpopulation))
 			.mapToDouble(PersonUtils::getIncome)
-			.filter(dd -> dd > 0)
+			.filter(dd -> dd >= 0)
 			.average();
 
 		if (averageIncome.isEmpty()) {
@@ -75,7 +77,7 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 				"If you are not aiming for person-specific marginalUtilityOfMoney, better use other PersonScoringParams, e.g. SubpopulationPersonScoringParams, which have higher performance." +
 				"Otherwise, please provide income attributes in the population...");
 		} else {
-			log.info("global average income is " + averageIncome);
+			log.info("average income for {} is {}", subpopulation, averageIncome);
 			return averageIncome.getAsDouble();
 		}
 	}
@@ -86,10 +88,13 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 		return this.cache.computeIfAbsent(person.getId(), id -> {
 
 			String subpopulation = PopulationUtils.getSubpopulation(person);
-			ScoringConfigGroup.ScoringParameterSet scoringParameters = basicScoring.getScoringParameters(subpopulation);
+			ScoringConfigGroup.ScoringParameterSet scoringParameters = Objects.requireNonNull(basicScoring.getScoringParameters(subpopulation), () -> "No scoring parameters found for subpopulation " + subpopulation);
+
+			// For the act utils cache the subpopulation can not be null
+			String subPopKey = subpopulation == null ? "__null__" : subpopulation;
 
 			// Activity params can be reused per subpopulation
-			Map<String, ActivityUtilityParameters> activityParams = actUtils.computeIfAbsent(subpopulation, k -> {
+			Map<String, ActivityUtilityParameters> activityParams = actUtils.computeIfAbsent(subPopKey, k -> {
 				Map<String, ActivityUtilityParameters> ap = new TreeMap<>();
 				for (ScoringConfigGroup.ActivityParams params : scoringParameters.getActivityParams()) {
 					ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params);
@@ -115,7 +120,6 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 			ScoringParameters.Builder builder = new ScoringParameters.Builder(basicScoring,
 				scoringParameters, activityParams, scenario.getConfig().scenario());
 
-
 			TasteVariationsConfigParameterSet tasteVariationsParams = scoringParameters.getTasteVariationsParams();
 
 			// If there are no taste variations the parameters are ready
@@ -123,7 +127,7 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 				return builder.build();
 
 			Double personalIncome = PersonUtils.getIncome(person);
-			double refIncome = tasteVariationsParams.getIncomeExponent() > 0 ? avgIncome.putIfAbsent(subpopulation, computeAvgIncome(scenario.getPopulation())) : Double.NaN;
+			double refIncome = tasteVariationsParams.getIncomeExponent() > 0 ? avgIncome.computeIfAbsent(subPopKey, (k) -> computeAvgIncome(scenario.getPopulation(), subpopulation)) : Double.NaN;
 
 			// Income dependent scoring might be disabled
 			if (!Double.isNaN(refIncome) && personalIncome != null) {
@@ -149,7 +153,6 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 				String mode = kv.getKey();
 
 				ModeUtilityParameters.Builder modeParameters = new ModeUtilityParameters.Builder(builder.getModeParameters(mode));
-
 
 				Map<ModeUtilityParameters.Type, Double> variations = kv.getValue();
 
