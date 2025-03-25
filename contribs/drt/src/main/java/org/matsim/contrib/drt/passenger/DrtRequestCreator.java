@@ -19,15 +19,13 @@
 
 package org.matsim.contrib.drt.passenger;
 
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
@@ -37,7 +35,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
 
 /**
  * @author michalm
@@ -63,7 +61,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestArrivalTime = Double.POSITIVE_INFINITY;
 		double maxRideDuration = Double.POSITIVE_INFINITY;
         double maxPickupDelay = Double.POSITIVE_INFINITY;
-        double lateDiversionThreshold = Double.POSITIVE_INFINITY;
+        double lateDiversionThreshold = 0;
 		DvrpLoad load = emptyLoad;
 
 		Preconditions.checkArgument(!passengerIds.isEmpty());
@@ -75,7 +73,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
             latestArrivalTime = Math.min(latestArrivalTime, departureTime + constraints.maxTravelTime());
             maxRideDuration = Math.min(maxRideDuration, constraints.maxRideTime());
             maxPickupDelay = Math.min(maxPickupDelay, constraints.maxPickupDelay());
-            lateDiversionThreshold = Math.min(lateDiversionThreshold, constraints.lateDiversionThreshold());
+            lateDiversionThreshold = Math.max(lateDiversionThreshold, constraints.lateDiversionThreshold());
             load = load.add(drtRoute.getLoad(dvrpLoadType));
 		}
 
