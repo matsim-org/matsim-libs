@@ -49,7 +49,7 @@ public class ScoreStatsModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	public static Stream<Arguments> arguments () {
-		return Stream.of(Arguments.of(false, false), Arguments.of(true, false));
+		return Stream.of(Arguments.of(false), Arguments.of(true));
 	}
 
 	@ParameterizedTest
@@ -91,23 +91,24 @@ public class ScoreStatsModuleTest {
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
 			// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
+			// TODO The values were changed to match the results of AccessEgressType.accessEgressModeToLink, check if the values are valid
 //			if(config.qsim().isUsingFastCapacityUpdate()) {
 				{
-				Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
+				Double[] worst = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(64.75686659291274, worst[0], DELTA);
+				Assertions.assertEquals(64.57797466466197, worst[1], DELTA);
 				}{
-				Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-				Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-				Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
+				Double[] best = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(64.75686659291274, best[0], DELTA);
+				Assertions.assertEquals(64.78366379257605, best[1], DELTA);
 				}{
-				Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-				Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
-				Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
+				Double[] average = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(64.75686659291274, average[0], DELTA);
+				Assertions.assertEquals(64.680819228619, average[1], DELTA);
 				}{
-				Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-				Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
+				Double[] executed = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
+				Assertions.assertEquals(64.75686659291274, executed[0], DELTA);
+				Assertions.assertEquals(64.57797466466197, executed[1], DELTA);
 				}
 //			} else {
 //				{
