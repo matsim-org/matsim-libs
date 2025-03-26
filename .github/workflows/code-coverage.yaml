@@ -24,7 +24,7 @@ jobs:
 
       # Run unit and integration tests with jacoco profile
       - name: Create coverage report
-        run: mvn verify -P jacoco --batch-mode --also-make --projects matsim -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+        run: mvn verify -P jacoco --batch-mode --also-make -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
       - name: Push coverage to CodeCov
         uses: codecov/codecov-action@v5
