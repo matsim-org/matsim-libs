@@ -39,7 +39,7 @@ public class CarrierReaderFromCSVTest {
 	void carrierCreation() throws IOException {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(
-				"https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
+				"https://raw.githubusercontent.com/matsim-org/matsim/main/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				FreightCarriersConfigGroup.class);
