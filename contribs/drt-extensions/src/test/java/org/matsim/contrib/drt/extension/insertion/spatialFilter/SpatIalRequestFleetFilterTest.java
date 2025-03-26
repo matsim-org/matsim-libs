@@ -61,13 +61,13 @@ public class SpatIalRequestFleetFilterTest {
         DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
 
         DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
-        params.updateInterval = 1;
-        params.expansionFactor = 2;
+        params.setUpdateInterval(1);
+        params.setExpansionFactor(2);
 
         // mimic no finding of candidates by setting min higher by max (prevented by config consistency check in regular setup)
-        params.minExpansion = 1;
-        params.maxExpansion = 0;
-        params.returnAllIfEmpty = false;
+        params.setMinExpansion(1);
+        params.setMaxExpansion(0);
+        params.setReturnAllIfEmpty(false);
         SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isEmpty();
@@ -88,11 +88,11 @@ public class SpatIalRequestFleetFilterTest {
         DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
 
         DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
-        params.updateInterval = 1;
-        params.expansionFactor = 2;
-        params.minExpansion = 1;
-        params.maxExpansion = 0;
-        params.returnAllIfEmpty = true;
+        params.setUpdateInterval(1);
+        params.setExpansionFactor(2);
+        params.setMinExpansion(1);
+        params.setMaxExpansion(0);
+        params.setReturnAllIfEmpty(true);
         SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isNotEmpty();

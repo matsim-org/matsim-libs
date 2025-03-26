@@ -216,7 +216,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
 				viz.center = data.withDefaultContext().context().getCenter();
-				viz.zoom = data.withDefaultContext().context().mapZoomLevel;
+				viz.zoom = data.withDefaultContext().context().getMapZoomLevel();
 
 				viz.display.lineColor.dataset = "counts";
 				viz.display.lineColor.columnName = "quality";

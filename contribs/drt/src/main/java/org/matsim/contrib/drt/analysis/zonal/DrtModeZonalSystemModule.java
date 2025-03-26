@@ -58,9 +58,9 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			bindModal(ZoneSystem.class).toProvider(modalProvider(getter -> {
 				Network network = getter.getModal(Network.class);
 				Predicate<Zone> zoneFilter;
-				if(drtCfg.operationalScheme == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+				if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
 					List<PreparedGeometry> serviceAreaGeoms = ShpGeometryUtils.loadPreparedGeometries(
-							ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.drtServiceAreaShapeFile));
+							ConfigGroup.getInputFileURL(this.getConfig().getContext(), this.drtCfg.getDrtServiceAreaShapeFile()));
 					zoneFilter = zone -> serviceAreaGeoms.stream()
                             .anyMatch((serviceArea) -> serviceArea.intersects(zone.getPreparedGeometry().getGeometry()));
 				} else {
@@ -70,14 +70,14 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			})).asEagerSingleton();
 
 			bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter -> {
-				switch (params.targetLinkSelection) {
+				switch (params.getTargetLinkSelection()) {
 					case mostCentral:
 						return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					case random:
 						return new RandomDrtZoneTargetLinkSelector(getter.getModal(ZoneSystem.class));
 					default:
 						throw new RuntimeException(
-							"Unsupported target link selection = " + params.targetLinkSelection);
+							"Unsupported target link selection = " + params.getTargetLinkSelection());
 				}
 			})).asEagerSingleton();
 

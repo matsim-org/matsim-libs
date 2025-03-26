@@ -34,9 +34,18 @@ public class SelectiveInsertionSearchParams extends DrtInsertionSearchParams {
 	//violates time windows constraints (for existing passengers, given the actual path)
 	@Parameter
 	@Positive
-	public double restrictiveBeelineSpeedFactor = 0.5;
+	private double restrictiveBeelineSpeedFactor = 0.5;
 
 	public SelectiveInsertionSearchParams() {
 		super(SET_NAME);
+	}
+
+	@Positive
+	public double getRestrictiveBeelineSpeedFactor() {
+		return restrictiveBeelineSpeedFactor;
+	}
+
+	public void setRestrictiveBeelineSpeedFactor(@Positive double restrictiveBeelineSpeedFactor) {
+		this.restrictiveBeelineSpeedFactor = restrictiveBeelineSpeedFactor;
 	}
 }

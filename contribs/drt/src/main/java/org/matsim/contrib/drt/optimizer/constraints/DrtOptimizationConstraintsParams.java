@@ -20,7 +20,7 @@ public class DrtOptimizationConstraintsParams extends ReflectiveConfigGroup {
 
     private final Supplier<DrtOptimizationConstraintsSet> optimizationConstraintsSetSupplier;
 
-    public DrtOptimizationConstraintsSetImpl defaultConstraintSet;
+    private DrtOptimizationConstraintsSetImpl defaultConstraintSet;
 
     public DrtOptimizationConstraintsParams() {
         this(DrtOptimizationConstraintsSetImpl::new);

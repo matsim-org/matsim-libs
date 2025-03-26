@@ -79,7 +79,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.requestInserter = requestInserter;
 		this.insertionRetryQueue = insertionRetryQueue;
 
-		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.interval).orElse(null);
+		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.getInterval()).orElse(null);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);
 		}
 
-		relocateVehiclesToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
+		relocateVehiclesToDepot(drtCfg.getReturnToDepotEvaluationInterval(), drtCfg.getReturnToDepotTimeout());
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			if (!scheduleTimingUpdated) {
 				for (DvrpVehicle v : fleet.getVehicles().values()) {
@@ -134,7 +134,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	}
 
 	private void relocateVehiclesToDepot(double evaluationInterval, double timeout) {
-		if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
+		if (drtCfg.isIdleVehiclesReturnToDepots() && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
 			fleet.getVehicles().values().stream()
 				.filter(scheduleInquiry::isIdle)
 				.filter(v -> stayTimeoutExceeded(v, timeout))

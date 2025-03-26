@@ -35,7 +35,7 @@ public class NetDepartureReplenishDemandEstimator
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
-		timeBinSize = strategySpecificParams.timeBinSize;
+		timeBinSize = strategySpecificParams.getTimeBinSize();
 
 	}
 

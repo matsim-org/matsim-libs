@@ -82,7 +82,7 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 		if (sortedInsertions.isEmpty()) {
 			return Optional.empty();
 		}
-        return validateInsertionWithPathCalculation(sortedInsertions, drtRequest, insertionSearchParams.retryInsertion);
+        return validateInsertionWithPathCalculation(sortedInsertions, drtRequest, insertionSearchParams.getRetryInsertion());
 	}
 
     Optional<InsertionWithDetourData> validateInsertionWithPathCalculation(List<InsertionWithDetourData> selectedInsertionList,

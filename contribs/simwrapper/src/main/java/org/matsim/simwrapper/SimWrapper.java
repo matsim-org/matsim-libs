@@ -211,15 +211,15 @@ public final class SimWrapper {
 
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(configGroup.sampleSize);
+			runner.setSampleSize(configGroup.getSampleSize());
 
 			if (configPath != null)
 				runner.setConfigPath(configPath);
 
-			if (ctx.shp != null) {
+			if (ctx.getShp() != null) {
 
 				try {
-					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
+					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.getShp()).toURI();
 
 					if (path.getScheme().equals("file"))
 						runner.setShp(new File(path).getAbsoluteFile().toString());

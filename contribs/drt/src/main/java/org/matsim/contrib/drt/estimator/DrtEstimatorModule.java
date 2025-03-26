@@ -55,7 +55,7 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 
 		// Analyze quality of estimates, this is only useful if an online estimator is used
 		// TODO: updating estimation as in drt speed up is not fully implemented yet
-		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.fullSimulation) {
+		if (drtCfg.getSimulationType() == DrtConfigGroup.SimulationType.fullSimulation) {
 			bindModal(DrtEstimateAnalyzer.class)
 				.toProvider(
 					modalProvider(getter -> new DrtEstimateAnalyzer(getter.getModal(DrtEstimator.class),

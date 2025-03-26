@@ -229,16 +229,16 @@ public class PtAlongALine2Test {
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 			{
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-				drtConfigGroup.mode = TransportMode.drt;
+				drtConfigGroup.setMode(TransportMode.drt);
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
-				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.setStopDuration(60.);
 				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
 				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-				drtConfigGroup.useModeFilteredSubnetwork = true;
+				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
@@ -246,32 +246,32 @@ public class PtAlongALine2Test {
 			}
 			if (drt2) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-				drtConfigGroup.mode = "drt2";
+				drtConfigGroup.setMode("drt2");
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
-				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.setStopDuration(60.);
 				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
 				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-				drtConfigGroup.useModeFilteredSubnetwork = true;
+				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 			}
 			if (drt3) {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-				drtConfigGroup.mode = "drt3";
+				drtConfigGroup.setMode("drt3");
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
-				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.setStopDuration(60.);
 				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
 				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-				drtConfigGroup.useModeFilteredSubnetwork = true;
+				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);

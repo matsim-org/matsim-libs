@@ -15,7 +15,7 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		if (operationFacilitiesParams.operationFacilityInputFile != null) {
+		if (operationFacilitiesParams.getOperationFacilityInputFile() != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
 				new OperationFacilitiesReader(operationFacilitiesSpecification)

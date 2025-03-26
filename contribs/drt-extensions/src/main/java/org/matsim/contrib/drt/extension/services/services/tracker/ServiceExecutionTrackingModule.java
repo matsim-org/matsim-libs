@@ -31,7 +31,7 @@ public class ServiceExecutionTrackingModule extends AbstractDvrpModeModule {
 	DrtConfigGroup drtConfigGroup;
 
 	public ServiceExecutionTrackingModule(DrtConfigGroup drtConfigGroup) {
-		super(drtConfigGroup.mode);
+		super(drtConfigGroup.getMode());
 		this.drtConfigGroup = drtConfigGroup;
 	}
 

@@ -75,14 +75,14 @@ public class ServiceExecutionTracker implements DrtServiceEndedEventHandler, Drt
 
 	@Override
 	public void handleEvent(DrtServiceStartedEvent event) {
-		Verify.verify(drtConfigGroup.mode.equals(event.getMode()));
+		Verify.verify(drtConfigGroup.getMode().equals(event.getMode()));
 		Verify.verify(event.getVehicleId().equals(this.vehicleId));
 		drtServicesStartedMap.put(event.getDrtServiceId(), event);
 	}
 
 	@Override
 	public void handleEvent(DrtServiceScheduledEvent event) {
-		Verify.verify(drtConfigGroup.mode.equals(event.getMode()));
+		Verify.verify(drtConfigGroup.getMode().equals(event.getMode()));
 		Verify.verify(event.getVehicleId().equals(this.vehicleId));
 		scheduledServices.computeIfAbsent(event.getServiceType(), k -> new ArrayList<>()).add(event);
 	}

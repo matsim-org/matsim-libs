@@ -63,11 +63,11 @@ public class MultiModalDrtLegEstimator implements LegEstimator {
 		double fare = 0;
 		if (fareParams.containsKey(mode)) {
 			DrtFareParams fareParams = this.fareParams.get(mode);
-			fare = fareParams.distanceFare_m * route.getDistance()
-				+ fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
-				+ fareParams.baseFare;
+			fare = fareParams.getDistanceFare_m() * route.getDistance()
+				+ fareParams.getTimeFare_h() * route.getDirectRideTime() / 3600.0
+				+ fareParams.getBaseFare();
 
-			fare = Math.max(fare, fareParams.minFarePerTrip);
+			fare = Math.max(fare, fareParams.getMinFarePerTrip());
 		}
 
 		// By default, waiting time is scored as travel time

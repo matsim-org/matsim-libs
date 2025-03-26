@@ -35,7 +35,7 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 			NetDepartureReplenishDemandEstimator netDepartureReplenishDemandEstimator) {
 		this.zonalSystem = zonalSystem;
 		this.netDepartureReplenishDemandEstimator = netDepartureReplenishDemandEstimator;
-		timeBinSize = strategySpecificParams.timeBinSize;
+		timeBinSize = strategySpecificParams.getTimeBinSize();
 	}
 
 	private void calculateFeedforwardSignal() {

@@ -117,9 +117,11 @@ public class DvrpOfflineTravelTimes {
 
 		//header row
 		String[] headerLine = reader.readLine().split(delimiter);
-		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
-		verify(headerLine[0].equals("linkId"));
-		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
+		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1,
+				String.format("Expected %d columns in dvrp initial travel times ", timeDiscretizer.getIntervalCount() + 1));
+		verify(headerLine[0].equals("linkId"), "First column in initial travel times must be 'linkId'.");
+		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time,
+						String.format("Expected time %f as column %d in dvrp initial travel times.", time, bin)));
 
 		//regular rows
 		reader.lines().map(line -> line.split(delimiter)).forEach(cells -> {

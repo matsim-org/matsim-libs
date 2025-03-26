@@ -64,11 +64,11 @@ public class DrtTeleportationWithModeChoiceTest {
 		// Setting DRT config group
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.setSimulationType(DrtConfigGroup.SimulationType.estimateAndTeleport);
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
-		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
+		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
 			@Override
 			public void install() {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new

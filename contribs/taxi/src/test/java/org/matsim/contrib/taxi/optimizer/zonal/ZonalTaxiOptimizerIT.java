@@ -41,12 +41,12 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 99999;
 		rbParams.nearestVehiclesLimit = 99999;
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
-		zoneParams.cellSize = 99999.;
+		zoneParams.setCellSize(99999.);
 
 		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
+		zsParams.setZonesShpFile("zones/zones.shp");
+		zsParams.setZonesXmlFile("zones/zones.xml");
+		zsParams.setExpansionDistance(3000);
 
 		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
 		params.addParameterSet(zsParams);
@@ -62,12 +62,12 @@ public class ZonalTaxiOptimizerIT {
 		rbParams.nearestRequestsLimit = 10;
 		rbParams.nearestVehiclesLimit = 10;
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rbParams.getZoneSystemParams();
-		zoneParams.cellSize = 1000.;
+		zoneParams.setCellSize(1000.);
 
 		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
+		zsParams.setZonesShpFile("zones/zones.shp");
+		zsParams.setZonesXmlFile("zones/zones.xml");
+		zsParams.setExpansionDistance(3000);
 
 		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
 		params.addParameterSet(rbParams);

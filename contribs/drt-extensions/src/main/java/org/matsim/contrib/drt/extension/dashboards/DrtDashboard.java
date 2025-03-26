@@ -51,17 +51,17 @@ public class DrtDashboard implements Dashboard {
 		List<String> args = new ArrayList<>(List.of("--drt-mode", drtConfigGroup.getMode(), "--input-crs", crs));
 
 		//it might be, that a serviceArea file is provided in the config, but the drt service is configured to be stopBased, nevertheless
-		switch (drtConfigGroup.operationalScheme) {
+		switch (drtConfigGroup.getOperationalScheme()) {
 			case stopbased ->
 //				drtConfigGroup.transitStopFile can not be null, otherwise simulation crashed, earlier
-				args.addAll(List.of("--stops-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.transitStopFile).toString()));
+				args.addAll(List.of("--stops-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.getTransitStopFile()).toString()));
 			case door2door -> {
 				//TODO potentially show the entire drt network (all drt links have stops)
 			}
 			case serviceAreaBased ->
 //				drtConfigGroup.drtServiceAreaShapeFile can not be null, otherwise simulation crashed, earlier
 				//this copies the input shape file into the output directory. might not be ideal. but the input file might be anywhere (web, different local partition, ...) and simwrapper might not have access....
-				args.addAll(List.of("--area-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.drtServiceAreaShapeFile).toString()));
+				args.addAll(List.of("--area-file", ConfigGroup.getInputFileURL(matsimConfigContext, drtConfigGroup.getDrtServiceAreaShapeFile()).toString()));
 		}
 
 		return data.compute(DrtAnalysisPostProcessing.class, file, args.toArray(new String[0]));
@@ -71,7 +71,7 @@ public class DrtDashboard implements Dashboard {
 	public void configure(Header header, Layout layout) {
 
 		header.title = getTitle();
-		header.description = "Overview for the demand-responsive mode '" + drtConfigGroup.mode + "'";
+		header.description = "Overview for the demand-responsive mode '" + drtConfigGroup.getMode() + "'";
 
 		layout.row("Results")
 			.el(Table.class, (viz, data) -> {
@@ -91,7 +91,7 @@ public class DrtDashboard implements Dashboard {
 				viz.width = 1.;
 			})
 			.el(MapPlot.class, (viz, data) -> {
-				switch (drtConfigGroup.operationalScheme) {
+				switch (drtConfigGroup.getOperationalScheme()) {
 					case stopbased -> {
 						viz.title = "Map of stops";
 						viz.setShape(postProcess(data, "stops.shp"), "id");
@@ -113,7 +113,7 @@ public class DrtDashboard implements Dashboard {
 					}
 				}
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 				viz.width = 2.;
 			});
 
@@ -123,22 +123,22 @@ public class DrtDashboard implements Dashboard {
 				viz.title = "Spatial demand distribution";
 				viz.description = "Origins and destinations.";
 				viz.projection = this.crs;
-				viz.file = data.output("*output_drt_legs_" + drtConfigGroup.mode + ".csv");
+				viz.file = data.output("*output_drt_legs_" + drtConfigGroup.getMode() + ".csv");
 				viz.addAggregation("OD", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 				viz.height = 7d;
 			})
 			.el(Hexagons.class, (viz, data) -> {
 				viz.title = "Spatial rejection distribution";
 				viz.description = "Requested (and rejected) origins and destinations.";
 				viz.projection = this.crs;
-				viz.file = data.output("*rejections_" + drtConfigGroup.mode + ".csv");
+				viz.file = data.output("*rejections_" + drtConfigGroup.getMode() + ".csv");
 				viz.addAggregation("rejections", "origins", "fromX", "fromY", "destinations", "toX", "toY");
 
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 			})
 		;
 
@@ -158,8 +158,8 @@ public class DrtDashboard implements Dashboard {
 				viz.title = "Final Demand and Wait Stats over day time";
 				viz.description = "Number of rides (customers) is displayed in bars, wait statistics in lines";
 
-				Plotly.DataSet waitStats = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.mode + ".csv"));
-				Plotly.DataSet rejections = viz.addDataset(data.output("*drt_rejections_perTimeBin_" + drtConfigGroup.mode + ".csv"));
+				Plotly.DataSet waitStats = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.getMode() + ".csv"));
+				Plotly.DataSet rejections = viz.addDataset(data.output("*drt_rejections_perTimeBin_" + drtConfigGroup.getMode() + ".csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Time Bin").build())
@@ -222,7 +222,7 @@ public class DrtDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Vehicle occupancy"; //actually, without title the area plot won't work
 				viz.description = "Number of passengers on board at a time";
-				viz.dataset = data.output("/*occupancy_time_profiles_" + drtConfigGroup.mode + ".txt");
+				viz.dataset = data.output("/*occupancy_time_profiles_" + drtConfigGroup.getMode() + ".txt");
 				viz.x = "time";
 				viz.xAxisName = "Time";
 				viz.yAxisName = "Vehicles [1]";
@@ -240,7 +240,7 @@ public class DrtDashboard implements Dashboard {
 					viz.title = "Rides and rejections per iteration";
 					viz.description = "Number of rides (customers) and rejections over the course of the simulation";
 
-					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
+					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.getMode() + ".csv"));
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
@@ -270,7 +270,7 @@ public class DrtDashboard implements Dashboard {
 				.el(Line.class, (viz, data) -> {
 					viz.title = "Waiting time statistics per iteration";
 					viz.description = "";
-					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.getMode() + ".csv");
 					viz.x = "iteration";
 					viz.columns = List.of("wait_average", "wait_median", "wait_p95");
 					viz.legendName = List.of("Average", "Median", "95th Percentile");
@@ -284,7 +284,7 @@ public class DrtDashboard implements Dashboard {
 					viz.title = "Travel time components per iteration";
 					viz.description = "Comparing mean wait vs. mean in-vehicle travel time per customer";
 
-					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.mode + ".csv"));
+					Plotly.DataSet dataset = viz.addDataset(data.output("*_customer_stats_" + drtConfigGroup.getMode() + ".csv"));
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
@@ -315,7 +315,7 @@ public class DrtDashboard implements Dashboard {
 				})
 				.el(Line.class, (viz, data) -> {
 					viz.title = "Customer travel distance per iteration";
-					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.mode + ".csv");
+					viz.dataset = data.output("*customer_stats_" + drtConfigGroup.getMode() + ".csv");
 					viz.description = "Customer traveled distance versus customer direct distance";
 					viz.x = "iteration";
 					viz.columns = List.of("directDistance_m_mean", "distance_m_mean");
@@ -329,9 +329,9 @@ public class DrtDashboard implements Dashboard {
 			layout.row("Fleet Stats per Iteration")
 				.el(Plotly.class, (viz, data) -> {
 					viz.title = "Fleet stats per iteration";
-					viz.description = "Number of " + drtConfigGroup.mode + " vehicles (customers) is displayed as bars, distance stats as lines";
+					viz.description = "Number of " + drtConfigGroup.getMode() + " vehicles (customers) is displayed as bars, distance stats as lines";
 
-					Plotly.DataSet dataset = viz.addDataset(data.output("*_vehicle_stats_" + drtConfigGroup.mode + ".csv"));
+					Plotly.DataSet dataset = viz.addDataset(data.output("*_vehicle_stats_" + drtConfigGroup.getMode() + ".csv"));
 
 					viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 						.xAxis(Axis.builder().title("Iteration").build())
@@ -385,7 +385,7 @@ public class DrtDashboard implements Dashboard {
 				})
 				.el(Line.class, (viz, data) -> {
 					viz.title = "Relative Statistics per iteration";
-					viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.mode + ".csv");
+					viz.dataset = data.output("*vehicle_stats_" + drtConfigGroup.getMode() + ".csv");
 					viz.description = "Occupancy rate (Pax distance / Vehicle mileage), Detour ratio, and Empty Ratio";
 					viz.x = "iteration";
 					viz.columns = List.of("d_p/d_t", "l_det", "emptyRatio");

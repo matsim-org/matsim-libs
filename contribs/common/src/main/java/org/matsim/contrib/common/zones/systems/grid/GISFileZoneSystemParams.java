@@ -20,12 +20,21 @@ public class GISFileZoneSystemParams extends ZoneSystemParams {
 	@Parameter
 	@Comment("allows to configure zones. Used with zonesGeneration=ShapeFile")
 	@Nullable
-	public String zonesShapeFile = null;
+	private String zonesShapeFile = null;
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Verify.verify(zonesShapeFile != null, "GIS zone input file must not be null.");
+		Verify.verify(getZonesShapeFile() != null, "GIS zone input file must not be null.");
+	}
+
+	@Nullable
+	public String getZonesShapeFile() {
+		return zonesShapeFile;
+	}
+
+	public void setZonesShapeFile(@Nullable String zonesShapeFile) {
+		this.zonesShapeFile = zonesShapeFile;
 	}
 }

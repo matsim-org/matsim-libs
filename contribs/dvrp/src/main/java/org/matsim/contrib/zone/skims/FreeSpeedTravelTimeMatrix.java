@@ -66,8 +66,8 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
-		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.maxNeighborDistance,
-			params.maxNeighborTravelTime, 0).orElse(null);
+		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.getMaxNeighborDistance(),
+				params.getMaxNeighborTravelTime(), 0).orElse(null);
 	}
 
 	@Override

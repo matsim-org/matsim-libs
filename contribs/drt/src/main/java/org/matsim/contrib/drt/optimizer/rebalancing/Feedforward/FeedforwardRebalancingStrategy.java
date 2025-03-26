@@ -62,17 +62,17 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		this.drtZoneTargetLinkSelector = drtZoneTargetLinkSelector;
 		this.fastHeuristicRelocationCalculator = fastHeuristicRelocationCalculator;
 		this.fleet = fleet;
-		timeBinSize = strategySpecificParams.timeBinSize;
+		timeBinSize = strategySpecificParams.getTimeBinSize();
 
-		scaling = strategySpecificParams.feedforwardSignalStrength * (double)generalParams.interval / timeBinSize;
+		scaling = strategySpecificParams.getFeedforwardSignalStrength() * (double) generalParams.getInterval() / timeBinSize;
 		log.info("The feedforward signal strength is: "
-				+ strategySpecificParams.feedforwardSignalStrength);
+				+ strategySpecificParams.getFeedforwardSignalStrength());
 
 		feedforwardSignal = feedforwardSignalHandler.getFeedforwardSignal();
-		feedforwardSignalLead = strategySpecificParams.feedforwardSignalLead;
+		feedforwardSignalLead = strategySpecificParams.getFeedforwardSignalLead();
 
-		feedbackSwitch = strategySpecificParams.feedbackSwitch;
-		minNumVehiclesPerZone = strategySpecificParams.minNumVehiclesPerZone;
+		feedbackSwitch = strategySpecificParams.isFeedbackSwitch();
+		minNumVehiclesPerZone = strategySpecificParams.getMinNumVehiclesPerZone();
 
 		log.info("Rebalance strategy constructed: Feedforward Rebalancing Strategy is used");
 		log.info("Feedback switch is set to " + Boolean.toString(feedbackSwitch));

@@ -75,12 +75,12 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
                                      DrtSpatialRequestFleetFilterParams params) {
         this.fleet = fleet;
         this.mobsimTimer = mobsimTimer;
-        this.expansionIncrementFactor = params.expansionFactor;
-        this.minExpansion = params.minExpansion;
-        this.maxExpansion = params.maxExpansion;
-        this.returnAllIfEmpty = params.returnAllIfEmpty;
-        this.minCandidates = params.minCandidates;
-        this.updateInterval = params.updateInterval;
+        this.expansionIncrementFactor = params.getExpansionFactor();
+        this.minExpansion = params.getMinExpansion();
+        this.maxExpansion = params.getMaxExpansion();
+        this.returnAllIfEmpty = params.isReturnAllIfEmpty();
+        this.minCandidates = params.getMinCandidates();
+        this.updateInterval = params.getUpdateInterval();
     }
 
     @Override

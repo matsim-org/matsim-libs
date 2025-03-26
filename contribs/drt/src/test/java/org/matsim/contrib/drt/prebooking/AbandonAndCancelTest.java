@@ -78,7 +78,7 @@ public class AbandonAndCancelTest {
 
 		Controler controller = environment.build();
 		PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
-		parameters.maximumPassengerDelay = 500.0;
+		parameters.setMaximumPassengerDelay(500.0);
 		controller.run();
 
 		{
@@ -119,7 +119,7 @@ public class AbandonAndCancelTest {
 
 		Controler controller = environment.build();
 		PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
-		parameters.maximumPassengerDelay = 500.0;
+		parameters.setMaximumPassengerDelay(500.0);
 		controller.run();
 
 		{
@@ -286,7 +286,7 @@ public class AbandonAndCancelTest {
 
 		Controler controller = environment.build();
 		PrebookingParams prebookingParams = new PrebookingParams();
-		prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
+		prebookingParams.setUnschedulingMode(PrebookingParams.UnschedulingMode.Routing);
 		PrebookingTest.installPrebooking(controller, prebookingParams);
 
 		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {

@@ -79,7 +79,7 @@ public class RunEDrtScenario {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 
 				for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-					bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtCfg.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
+					bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtCfg.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				}
 			}
 		});

@@ -22,18 +22,17 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
-import org.matsim.contrib.common.zones.GridZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
+
 	public static final String SET_NAME = "zonalSystem";
 
 	public DrtZoneSystemParams() {
@@ -47,7 +46,7 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 	@Comment("Defines how the target link of a zone is determined (e.g. for rebalancing)."
 			+ " Possible values are [random,mostCentral]. Default behavior is mostCentral, where all vehicles are sent to the same link.")
 	@NotNull
-	public TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
+	private TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
 
 	private ZoneSystemParams zoneSystemParams;
 
@@ -107,7 +106,7 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 				} else {
 					squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
 				}
-				squareGridParams.cellSize = Double.parseDouble(value);
+				squareGridParams.setCellSize(Double.parseDouble(value));
 				break;
 			}
 			case "zonesShapeFile": {
@@ -118,7 +117,7 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 				} else {
 					gisFileParams = (GISFileZoneSystemParams) getZoneSystemParams();
 				}
-				gisFileParams.zonesShapeFile = value;
+				gisFileParams.setZonesShapeFile(value);
 				break;
 			}
 			case "h3Resolution": {
@@ -129,7 +128,7 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 				} else {
 					h3GridParams = (H3GridZoneSystemParams) getZoneSystemParams();
 				}
-				h3GridParams.h3Resolution = Integer.parseInt(value);
+				h3GridParams.setH3Resolution(Integer.parseInt(value));
 				break;
 			}
 			default:
@@ -139,5 +138,13 @@ public class DrtZoneSystemParams extends ReflectiveConfigGroupWithConfigurablePa
 
 	public ZoneSystemParams getZoneSystemParams() {
 		return zoneSystemParams;
+	}
+
+	public @NotNull TargetLinkSelection getTargetLinkSelection() {
+		return targetLinkSelection;
+	}
+
+	public void setTargetLinkSelection(@NotNull TargetLinkSelection targetLinkSelection) {
+		this.targetLinkSelection = targetLinkSelection;
 	}
 }

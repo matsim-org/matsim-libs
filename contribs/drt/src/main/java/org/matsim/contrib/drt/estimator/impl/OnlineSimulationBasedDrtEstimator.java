@@ -101,11 +101,11 @@ public class OnlineSimulationBasedDrtEstimator implements DrtOnlineEstimator, It
 			est.stdDetour = est.detour.getStandardDeviation();
 			est.rejectionRate = rejectionRate;
 		} else {
-			est.meanWait = config.decayFactor * est.waitTime.getMean() + (1 - config.decayFactor) * currentEst.waitTime.getMean();
-			est.stdWait = config.decayFactor * est.waitTime.getStandardDeviation() + (1 - config.decayFactor) * currentEst.waitTime.getStandardDeviation();
-			est.meanDetour = config.decayFactor * est.detour.getMean() + (1 - config.decayFactor) * currentEst.detour.getMean();
-			est.stdDetour = config.decayFactor * est.detour.getStandardDeviation() + (1 - config.decayFactor) * currentEst.detour.getStandardDeviation();
-			est.rejectionRate = config.decayFactor * rejectionRate + (1 - config.decayFactor) * currentEst.rejectionRate;
+			est.meanWait = config.getDecayFactor() * est.waitTime.getMean() + (1 - config.getDecayFactor()) * currentEst.waitTime.getMean();
+			est.stdWait = config.getDecayFactor() * est.waitTime.getStandardDeviation() + (1 - config.getDecayFactor()) * currentEst.waitTime.getStandardDeviation();
+			est.meanDetour = config.getDecayFactor() * est.detour.getMean() + (1 - config.getDecayFactor()) * currentEst.detour.getMean();
+			est.stdDetour = config.getDecayFactor() * est.detour.getStandardDeviation() + (1 - config.getDecayFactor()) * currentEst.detour.getStandardDeviation();
+			est.rejectionRate = config.getDecayFactor() * rejectionRate + (1 - config.getDecayFactor()) * currentEst.rejectionRate;
 		}
 
 		log.info("Calculated {}", est);
@@ -120,8 +120,8 @@ public class OnlineSimulationBasedDrtEstimator implements DrtOnlineEstimator, It
 			return initial.estimate(route, departureTime);
 		}
 
-		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
-		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
+		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.getRandomization() * currentEst.stdDetour));
+		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.getRandomization() * currentEst.stdWait));
 
 		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, currentEst.rejectionRate);
 	}

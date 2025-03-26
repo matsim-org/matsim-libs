@@ -63,7 +63,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
+		if (isNewDecisionEpoch(e, params.getSocCheckTimeStep())) {
 			@SuppressWarnings("unchecked")
 			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends DvrpVehicle>)idleTaxiRegistry.vehicles();
 			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
@@ -94,6 +94,6 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	private boolean isUndercharged(EvDvrpVehicle v) {
 		Battery b = v.getElectricVehicle().getBattery();
-		return b.getCharge() < params.minSoc * b.getCapacity();
+		return b.getCharge() < params.getMinSoc() * b.getCapacity();
 	}
 }

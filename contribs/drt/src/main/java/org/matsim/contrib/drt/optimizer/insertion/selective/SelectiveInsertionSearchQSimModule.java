@@ -52,7 +52,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
 			var insertionParams = (SelectiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
 			var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-					insertionParams.restrictiveBeelineSpeedFactor, getter.getModal(TravelTimeMatrix.class),
+                    insertionParams.getRestrictiveBeelineSpeedFactor(), getter.getModal(TravelTimeMatrix.class),
 					getter.getModal(TravelTime.class));
 			return restrictiveDetourTimeEstimator;
 		}));

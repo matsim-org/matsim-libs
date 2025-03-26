@@ -73,11 +73,11 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				zonalRegisters);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = ZoneSystemUtils.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
-				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
+		zones = ZoneSystemUtils.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.getZonesXmlFile()),
+				ConfigGroup.getInputFileURL(context, zonalSystemParams.getZonesShpFile()));
 		// TODO No conversion of SRS is done
 
-		this.linkToZone = ZoneSystemUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
+		this.linkToZone = ZoneSystemUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.getExpansionDistance()));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
 		// the zones used in ZonalTaxiOptim (for dispatching)

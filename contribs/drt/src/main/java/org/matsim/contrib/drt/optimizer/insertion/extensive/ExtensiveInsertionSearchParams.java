@@ -33,13 +33,31 @@ public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
 
 	@Parameter
 	@PositiveOrZero
-	public int nearestInsertionsAtEndLimit = 10;
+	private int nearestInsertionsAtEndLimit = 10;
 
 	@Parameter
 	@DecimalMin("1.0")
-	public double admissibleBeelineSpeedFactor = 1.0;
+	private double admissibleBeelineSpeedFactor = 1.0;
 
 	public ExtensiveInsertionSearchParams() {
 		super(SET_NAME);
+	}
+
+	@PositiveOrZero
+	public int getNearestInsertionsAtEndLimit() {
+		return nearestInsertionsAtEndLimit;
+	}
+
+	public void setNearestInsertionsAtEndLimit(@PositiveOrZero int nearestInsertionsAtEndLimit) {
+		this.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
+	}
+
+	@DecimalMin("1.0")
+	public double getAdmissibleBeelineSpeedFactor() {
+		return admissibleBeelineSpeedFactor;
+	}
+
+	public void setAdmissibleBeelineSpeedFactor(@DecimalMin("1.0") double admissibleBeelineSpeedFactor) {
+		this.admissibleBeelineSpeedFactor = admissibleBeelineSpeedFactor;
 	}
 }

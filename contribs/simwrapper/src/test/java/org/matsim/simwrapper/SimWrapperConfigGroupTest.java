@@ -19,7 +19,7 @@ public class SimWrapperConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		SimWrapperConfigGroup sw = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
-		sw.sampleSize = 0.5;
+		sw.setSampleSize(0.5);
 
 		SimWrapperConfigGroup.ContextParams p = sw.get("new");
 		p.set("dynamic", "value");

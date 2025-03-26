@@ -84,10 +84,10 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, List.of()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, List.of()).size();
 
-            switch (minCostFlowRebalancingStrategyParams.targetCoefficientSource) {
+            switch (minCostFlowRebalancingStrategyParams.getTargetCoefficientSource()) {
                 case Static -> {
-        			alpha = minCostFlowRebalancingStrategyParams.targetAlpha;
-        			beta = minCostFlowRebalancingStrategyParams.targetBeta;
+        			alpha = minCostFlowRebalancingStrategyParams.getTargetAlpha();
+        			beta = minCostFlowRebalancingStrategyParams.getTargetBeta();
                 }
                 case FromZoneAttribute -> {
 					alpha = (Double) z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_ALPHA);
@@ -95,11 +95,11 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
                 }
                 case FromZoneAttributeOrStatic -> {
 					Object alphaAttribute = z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_ALPHA);
-					alpha = alphaAttribute == null ? minCostFlowRebalancingStrategyParams.targetAlpha : (Double) alphaAttribute;
+					alpha = alphaAttribute == null ? minCostFlowRebalancingStrategyParams.getTargetAlpha() : (Double) alphaAttribute;
 					Object betaAttribute = z.getAttributes().getAttribute(REBALANCING_ZONAL_TARGET_BETA);
-					beta = betaAttribute == null ? minCostFlowRebalancingStrategyParams.targetBeta : (Double) betaAttribute;
+					beta = betaAttribute == null ? minCostFlowRebalancingStrategyParams.getTargetBeta() : (Double) betaAttribute;
                 }
-				default -> throw new IllegalStateException("Unknown target coefficient source " + minCostFlowRebalancingStrategyParams.targetCoefficientSource);
+				default -> throw new IllegalStateException("Unknown target coefficient source " + minCostFlowRebalancingStrategyParams.getTargetCoefficientSource());
             }
 
 			int target = (int)Math.floor(alpha * targetFunction.applyAsDouble(z) + beta);

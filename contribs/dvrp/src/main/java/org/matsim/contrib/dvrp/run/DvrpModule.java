@@ -94,11 +94,11 @@ public final class DvrpModule extends AbstractModule {
 				ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
 					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 				
-				if (params.cachePath == null) {
+				if (params.getCachePath() == null) {
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize());
 				} else {
-					URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), params.cachePath);
+					URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), params.getCachePath());
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize(), cachePath);
 				}

@@ -627,7 +627,7 @@ public class ComplexUnschedulerTest {
 			Mockito.when(this.lookup.lookupVehicle(Mockito.any())).thenReturn(vehicle);
 
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.stopDuration = 30.0;
+			drtConfig.setStopDuration(30.0);
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime = 600.0;
 
 			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);

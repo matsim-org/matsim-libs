@@ -138,7 +138,7 @@ public class RunDrtExampleIT {
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
 			// using exactly free-speed estimates
-			selectiveInsertionSearchParams.restrictiveBeelineSpeedFactor = 1;
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
@@ -179,7 +179,7 @@ public class RunDrtExampleIT {
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
 			// using adaptive travel time matrix
-			repeatedSelectiveInsertionSearchParams.retryInsertion = 5;
+			repeatedSelectiveInsertionSearchParams.setRetryInsertion(5);
 			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
 
 			//disable rejections
@@ -219,7 +219,7 @@ public class RunDrtExampleIT {
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//relatively high max age to prevent rejections
 			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-			drtRequestInsertionRetryParams.maxRequestAge = 7200;
+			drtRequestInsertionRetryParams.setMaxRequestAge(7200);
 			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 		}
 
@@ -378,7 +378,7 @@ public class RunDrtExampleIT {
 
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
 		PrebookingParams prebookingParams = new PrebookingParams();
-		prebookingParams.abortRejectedPrebookings = false;
+		prebookingParams.setAbortRejectedPrebookings(false);
 		drtConfig.addParameterSet(prebookingParams);
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -423,10 +423,10 @@ public class RunDrtExampleIT {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfig.updateRoutes = true;
+		drtConfig.setUpdateRoutes(true);
 
 		PrebookingParams prebookingParams = new PrebookingParams();
-		prebookingParams.abortRejectedPrebookings = false;
+		prebookingParams.setAbortRejectedPrebookings(false);
 		drtConfig.addParameterSet(prebookingParams);
 
 		Controler controller = DrtControlerCreator.createControler(config, false);

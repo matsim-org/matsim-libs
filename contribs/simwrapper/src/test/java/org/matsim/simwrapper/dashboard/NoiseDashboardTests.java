@@ -38,7 +38,7 @@ public class NoiseDashboardTests {
 
 		URL kelheim = ExamplesUtils.getTestScenarioURL("kelheim");
 
-		simWrapperConfigGroup.defaultParams().shp = IOUtils.extendUrl(kelheim, "area/area.shp").toString();
+		simWrapperConfigGroup.defaultParams().setShp(IOUtils.extendUrl(kelheim, "area/area.shp").toString());
 
 		SimWrapper sw = SimWrapper.create(config).addDashboard(new NoiseDashboard(config.global().getCoordinateSystem()));
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);

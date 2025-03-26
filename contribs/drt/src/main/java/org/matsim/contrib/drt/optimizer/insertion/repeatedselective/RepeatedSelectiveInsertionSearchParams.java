@@ -31,9 +31,18 @@ public class RepeatedSelectiveInsertionSearchParams extends DrtInsertionSearchPa
 
 	@Parameter
 	@Positive
-	public int retryInsertion = 5;
+	private int retryInsertion = 5;
 
 	public RepeatedSelectiveInsertionSearchParams() {
 		super(SET_NAME);
+	}
+
+	@Positive
+	public int getRetryInsertion() {
+		return retryInsertion;
+	}
+
+	public void setRetryInsertion(@Positive int retryInsertion) {
+		this.retryInsertion = retryInsertion;
 	}
 }

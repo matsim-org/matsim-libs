@@ -135,8 +135,8 @@ public class DefaultUnplannedRequestInserterTest {
 		int retryInterval = 10;
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
-		drtRequestInsertionRetryParams.retryInterval = retryInterval;
+		drtRequestInsertionRetryParams.setMaxRequestAge(Double.POSITIVE_INFINITY);
+		drtRequestInsertionRetryParams.setRetryInterval(retryInterval);
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				drtRequestInsertionRetryParams);//retry ON, empty queue
 		DrtInsertionSearch insertionSearch = //
@@ -173,8 +173,8 @@ public class DefaultUnplannedRequestInserterTest {
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 
 		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
-		drtRequestInsertionRetryParams.retryInterval = retryInterval;
+		drtRequestInsertionRetryParams.setMaxRequestAge(Double.POSITIVE_INFINITY);
+		drtRequestInsertionRetryParams.setRetryInterval(retryInterval);
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				drtRequestInsertionRetryParams);//retry ON
 		var oldRequest = request("r0", "from0", "to0");

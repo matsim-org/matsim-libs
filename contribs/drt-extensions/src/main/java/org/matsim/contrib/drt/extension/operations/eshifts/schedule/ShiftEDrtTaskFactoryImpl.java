@@ -108,7 +108,7 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
             // If battery is sufficiently charged or if there is a wait, use the standard task.
             double soc = evVehicle.getElectricVehicle().getBattery().getCharge() /
                     evVehicle.getElectricVehicle().getBattery().getCapacity();
-            if (soc <= shiftsParams.chargeDuringBreakThreshold == waitTime > 0) {
+            if (soc <= shiftsParams.getChargeDuringBreakThreshold() == waitTime > 0) {
                 // Otherwise, create a charging break task.
                 ChargingStrategy strategy = chargingStrategyFactory.createStrategy(chargerImpl.charger.getSpecification(), evVehicle.getElectricVehicle());
                 double energyCharge = ((BatteryCharging) evVehicle.getElectricVehicle().getChargingPower())
@@ -155,7 +155,7 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
             if (!chargerIds.isEmpty()) {
                 Optional<Charger> selectedCharger = chargerIds.stream()
                         .map(id -> chargingInfrastructure.getChargers().get(id))
-                        .filter(charger -> shiftsParams.breakChargerType.equals(charger.getChargerType()))
+                        .filter(charger -> shiftsParams.getBreakChargerType().equals(charger.getChargerType()))
                         .min((c1, c2) -> {
                             double waitTime1 = ChargingEstimations.estimateMaxWaitTimeForNextVehicle(c1);
                             double waitTime2 = ChargingEstimations.estimateMaxWaitTimeForNextVehicle(c2);

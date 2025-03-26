@@ -75,7 +75,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective)")
 	@NotBlank
-	public String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
+	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
 	@Parameter
 	@Comment("Limit the operation of vehicles to links (of the 'dvrp_routing'"
@@ -83,34 +83,110 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " For backward compatibility, the value is set to false by default"
 			+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
 			+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)")
-	public boolean useModeFilteredSubnetwork = false;
+	private boolean useModeFilteredSubnetwork = false;
 
 	@Parameter
 	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
-	public String travelTimeMatrixCachePath = null;
+	private String travelTimeMatrixCachePath = null;
 
 	@Parameter
 	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
-	public double stopDuration = Double.NaN;// seconds
+	private double stopDuration = Double.NaN;// seconds
 
 	@Parameter
 	@Comment("If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
 			+ "day at the link where it stopped operating the day before. False by default.")
-	public boolean changeStartLinkToLastLinkInSchedule = false;
+	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	@Parameter
 	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
-	public boolean idleVehiclesReturnToDepots = false;
+	private boolean idleVehiclesReturnToDepots = false;
 
 	@Parameter
 	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
 		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
-	public double returnToDepotTimeout = 60;
+	private double returnToDepotTimeout = 60;
 
 	@Parameter
 	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
-	public double returnToDepotEvaluationInterval = 60;
+	private double returnToDepotEvaluationInterval = 60;
+
+	public @NotNull OperationalScheme getOperationalScheme() {
+		return operationalScheme;
+	}
+
+	public void setOperationalScheme(@NotNull OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
+	}
+
+	@Nullable
+	public String getVehiclesFile() {
+		return vehiclesFile;
+	}
+
+	public void setVehiclesFile(@Nullable String vehiclesFile) {
+		this.vehiclesFile = vehiclesFile;
+	}
+
+	@Nullable
+	public String getTransitStopFile() {
+		return transitStopFile;
+	}
+
+	public void setTransitStopFile(@Nullable String transitStopFile) {
+		this.transitStopFile = transitStopFile;
+	}
+
+	@Nullable
+	public String getDrtServiceAreaShapeFile() {
+		return drtServiceAreaShapeFile;
+	}
+
+	public void setDrtServiceAreaShapeFile(@Nullable String drtServiceAreaShapeFile) {
+		this.drtServiceAreaShapeFile = drtServiceAreaShapeFile;
+	}
+
+	public boolean isPlotDetailedCustomerStats() {
+		return plotDetailedCustomerStats;
+	}
+
+	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
+		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
+	}
+
+	@Positive
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	public void setNumberOfThreads(@Positive int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
+
+	public boolean isStoreUnsharedPath() {
+		return storeUnsharedPath;
+	}
+
+	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
+		this.storeUnsharedPath = storeUnsharedPath;
+	}
+
+	public SimulationType getSimulationType() {
+		return simulationType;
+	}
+
+	public void setSimulationType(SimulationType simulationType) {
+		this.simulationType = simulationType;
+	}
+
+	public boolean isUpdateRoutes() {
+		return updateRoutes;
+	}
+
+	public void setUpdateRoutes(boolean updateRoutes) {
+		this.updateRoutes = updateRoutes;
+	}
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
@@ -119,7 +195,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default")
 	@NotNull
-	public OperationalScheme operationalScheme = OperationalScheme.door2door;
+	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
 	@Parameter
 	@Comment("An XML file specifying the vehicle fleet."
@@ -127,22 +203,22 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
 			+ " See FleetModule.")
 	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
-	public String vehiclesFile = null;
+	private String vehiclesFile = null;
 
 	@Parameter
 	@Comment("Stop locations file (transit schedule format, but without lines) for DRT stops. "
 			+ "Used only for the stopbased mode")
 	@Nullable
-	public String transitStopFile = null; // only for stopbased DRT scheme
+	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	@Parameter
 	@Comment("Allows to configure a service area per drt mode. Used with serviceArea Operational Scheme")
 	@Nullable
-	public String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
+	private String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
 
 	@Parameter("writeDetailedCustomerStats")
 	@Comment("Writes out detailed DRT customer stats in each iteration. True by default.")
-	public boolean plotDetailedCustomerStats = true;
+	private boolean plotDetailedCustomerStats = true;
 
 	@Parameter
 	@Comment("Number of threads used for parallel evaluation of request insertion into existing schedules."
@@ -150,11 +226,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " using up to 4 threads."
 			+ " Default value is the number of cores available to JVM.")
 	@Positive
-	public int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@Parameter
 	@Comment("Store planned unshared drt route as a link sequence")
-	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
+	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
@@ -162,11 +238,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Parameter
 	@Comment("Whether full simulation drt is employed")
-	public SimulationType simulationType = SimulationType.fullSimulation;
+	private SimulationType simulationType = SimulationType.fullSimulation;
 
 	@Parameter
 	@Comment("Defines whether routes along schedules are updated regularly")
-	public boolean updateRoutes = false;
+	private boolean updateRoutes = false;
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
@@ -299,38 +375,38 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
 		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
-			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
+			Verify.verify(constraintsSet.maxWaitTime >= getStopDuration(),
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 
-		Verify.verify(operationalScheme != OperationalScheme.stopbased || transitStopFile != null,
+		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 
-		Verify.verify(operationalScheme != OperationalScheme.serviceAreaBased || drtServiceAreaShapeFile != null,
+		Verify.verify(getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
 				"drtServiceAreaShapeFile must not be null when operationalScheme is "
 						+ OperationalScheme.serviceAreaBased);
 
-		Verify.verify(numberOfThreads <= Runtime.getRuntime().availableProcessors(),
+		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
 				"numberOfThreads is higher than the number of logical cores available to JVM");
 
-		if (config.global().getNumberOfThreads() < numberOfThreads) {
+		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
 					+ " in order to speed up the DRT route update during the replanning phase.");
 		}
 
-		if (this.idleVehiclesReturnToDepots && this.returnToDepotTimeout < this.returnToDepotEvaluationInterval) {
+		if (this.isIdleVehiclesReturnToDepots() && this.getReturnToDepotTimeout() < this.getReturnToDepotEvaluationInterval()) {
 			log.warn("idleVehiclesReturnToDepots is active and returnToDepotTimeout < returnToDepotEvaluationInterval. " +
-				"Vehicles will be send back to depot after {} seconds",returnToDepotEvaluationInterval);
+				"Vehicles will be send back to depot after {} seconds", getReturnToDepotEvaluationInterval());
 		}
 
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
 				"More than one rebalancing parameter sets is specified");
 
-		if (useModeFilteredSubnetwork) {
-			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
+		if (isUseModeFilteredSubnetwork()) {
+			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, getMode());
 		}
 
-		if (simulationType == SimulationType.estimateAndTeleport) {
+		if (getSimulationType() == SimulationType.estimateAndTeleport) {
 			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
 				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
 		}
@@ -404,5 +480,66 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	 */
 	public final void setDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);
+	}
+
+	public void setMode(@NotBlank String mode) {
+		this.mode = mode;
+	}
+
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+	}
+
+	public String getTravelTimeMatrixCachePath() {
+		return travelTimeMatrixCachePath;
+	}
+
+	public void setTravelTimeMatrixCachePath(String travelTimeMatrixCachePath) {
+		this.travelTimeMatrixCachePath = travelTimeMatrixCachePath;
+	}
+
+	@Positive
+	public double getStopDuration() {
+		return stopDuration;
+	}
+
+	public void setStopDuration(@Positive double stopDuration) {
+		this.stopDuration = stopDuration;
+	}
+
+	public boolean isChangeStartLinkToLastLinkInSchedule() {
+		return changeStartLinkToLastLinkInSchedule;
+	}
+
+	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
+		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
+	}
+
+	public boolean isIdleVehiclesReturnToDepots() {
+		return idleVehiclesReturnToDepots;
+	}
+
+	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
+		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
+	}
+
+	public double getReturnToDepotTimeout() {
+		return returnToDepotTimeout;
+	}
+
+	public void setReturnToDepotTimeout(double returnToDepotTimeout) {
+		this.returnToDepotTimeout = returnToDepotTimeout;
+	}
+
+	public double getReturnToDepotEvaluationInterval() {
+		return returnToDepotEvaluationInterval;
+	}
+
+	public void setReturnToDepotEvaluationInterval(double returnToDepotEvaluationInterval) {
+		this.returnToDepotEvaluationInterval = returnToDepotEvaluationInterval;
 	}
 }

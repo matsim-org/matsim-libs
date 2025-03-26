@@ -98,7 +98,7 @@ public class ExtensiveInsertionProviderTest {
 
 		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams();
-		params.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
+		params.setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
 		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, insertionGenerator,

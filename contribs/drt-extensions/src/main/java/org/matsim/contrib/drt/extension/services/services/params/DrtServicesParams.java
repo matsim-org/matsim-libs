@@ -52,7 +52,7 @@ public class DrtServicesParams extends ReflectiveConfigGroup {
 
 	public Optional<DrtServiceParams> getService(String serviceName)
 	{
-		return this.getParameterSets(DrtServiceParams.SET_TYPE).stream().map(s ->(DrtServiceParams) s ).filter(s -> s.name.equals(serviceName)).findFirst();
+		return this.getParameterSets(DrtServiceParams.SET_TYPE).stream().map(s ->(DrtServiceParams) s ).filter(s -> s.getServiceName().equals(serviceName)).findFirst();
 	}
 
 

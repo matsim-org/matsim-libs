@@ -29,6 +29,125 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 
 	private final static String NAME = "simulatedAnnealing";
 
+	public TemperatureFunction.DefaultFunctions getCoolingSchedule() {
+		return coolingSchedule;
+	}
+
+	public void setCoolingSchedule(TemperatureFunction.DefaultFunctions coolingSchedule) {
+		this.coolingSchedule = coolingSchedule;
+	}
+
+	@PositiveOrZero
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(@PositiveOrZero double alpha) {
+		this.alpha = alpha;
+	}
+
+	@PositiveOrZero
+	public double getInitialTemperature() {
+		return initialTemperature;
+	}
+
+	public void setInitialTemperature(@PositiveOrZero double initialTemperature) {
+		this.initialTemperature = initialTemperature;
+	}
+
+	@PositiveOrZero
+	public int getnCoolingCycles() {
+		return nCoolingCycles;
+	}
+
+	public void setnCoolingCycles(@PositiveOrZero int nCoolingCycles) {
+		this.nCoolingCycles = nCoolingCycles;
+	}
+
+	@PositiveOrZero
+	public double getFinalTemperature() {
+		return finalTemperature;
+	}
+
+	public void setFinalTemperature(@PositiveOrZero double finalTemperature) {
+		this.finalTemperature = finalTemperature;
+	}
+
+	@PositiveOrZero
+	public int getIterationsPerTemperature() {
+		return iterationsPerTemperature;
+	}
+
+	public void setIterationsPerTemperature(@PositiveOrZero int iterationsPerTemperature) {
+		this.iterationsPerTemperature = iterationsPerTemperature;
+	}
+
+	@PositiveOrZero
+	public int getIterationRatio() {
+		return iterationRatio;
+	}
+
+	public void setIterationRatio(@PositiveOrZero int iterationRatio) {
+		this.iterationRatio = iterationRatio;
+	}
+
+	@PositiveOrZero
+	public double getK() {
+		return k;
+	}
+
+	public void setK(@PositiveOrZero double k) {
+		this.k = k;
+	}
+
+	public boolean isResetUponBestSolution() {
+		return resetUponBestSolution;
+	}
+
+	public void setResetUponBestSolution(boolean resetUponBestSolution) {
+		this.resetUponBestSolution = resetUponBestSolution;
+	}
+
+	public int getDeadEndIterationReset() {
+		return deadEndIterationReset;
+	}
+
+	public void setDeadEndIterationReset(int deadEndIterationReset) {
+		this.deadEndIterationReset = deadEndIterationReset;
+	}
+
+	public ResetOption getResetOption() {
+		return resetOption;
+	}
+
+	public void setResetOption(ResetOption resetOption) {
+		this.resetOption = resetOption;
+	}
+
+	public int getLastResetIteration() {
+		return lastResetIteration;
+	}
+
+	public void setLastResetIteration(int lastResetIteration) {
+		this.lastResetIteration = lastResetIteration;
+	}
+
+	public int getLastIteration() {
+		return lastIteration;
+	}
+
+	public void setLastIteration(int lastIteration) {
+		this.lastIteration = lastIteration;
+	}
+
+	public int getFirstIteration() {
+		return firstIteration;
+	}
+
+	public void setFirstIteration(int firstIteration) {
+		this.firstIteration = firstIteration;
+	}
+
 	public enum ResetOption {temperatureOnly, solutionOnly, temperatureAndSolution}
 
 
@@ -38,69 +157,69 @@ public class SimulatedAnnealingConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Cooling Temperature schedule. Defines the shape of the cooling gradient. {linear, exponential}")
-	public TemperatureFunction.DefaultFunctions coolingSchedule = TemperatureFunction.DefaultFunctions.exponentialMultiplicative;// seconds
+	private TemperatureFunction.DefaultFunctions coolingSchedule = TemperatureFunction.DefaultFunctions.exponentialMultiplicative;// seconds
 
 	@Parameter
 	@Comment("Cooling parameter alpha. Used to control the speed of cooling. Should be >0. " +
 			"Typical values 0.8 <= alpha <= 0.9 for exponential cooling. alpha > 1 for logarithmic cooling.")
 	@PositiveOrZero
-	public double alpha = 0.85;
+	private double alpha = 0.85;
 
 	@Parameter
 	@Comment("Initial temperature T0, should be >0.")
 	@PositiveOrZero
-	public double initialTemperature = 1000;
+	private double initialTemperature = 1000;
 
 	@Parameter
 	@Comment("Number of cooling cycles n.")
 	@PositiveOrZero
-	public int nCoolingCycles = Integer.MAX_VALUE;
+	private int nCoolingCycles = Integer.MAX_VALUE;
 
 	@Parameter
 	@Comment("Final temperature Tn of the system. Should >=0.")
 	@PositiveOrZero
-	public double finalTemperature = 0;
+	private double finalTemperature = 0;
 
 	@Parameter
 	@Comment("Number of simulated annealing iterations (!= MATSim iterations, see iterationRatio) spent at each temperature.")
 	@PositiveOrZero
-	public int iterationsPerTemperature = 3;
+	private int iterationsPerTemperature = 3;
 
 	@Parameter
 	@Comment("Number of MATSim iterations for each simulated annealing iteration. This can make sense if other components" +
 			"of MATSim have to react to a new solution first before evaluating it (e.g., DRT rebalancing)")
 	@PositiveOrZero
-	public int iterationRatio = 1;
+	private int iterationRatio = 1;
 
 	@Parameter
 	@Comment("Tuning parameter k. See http://doi.org/10.5772/5560. If in doubt, set to 1.")
 	@PositiveOrZero
-	public double k = 1;
+	private double k = 1;
 
 	@Parameter
 	@Comment("Reset whenever a new best solution has been found. This may help to widen the search. See https://doi.org/10.3390/math9141625")
-	public boolean resetUponBestSolution = false;
+	private boolean resetUponBestSolution = false;
 
 	@Parameter
 	@Comment("Number of iterations without any improvement after which a reset occurs")
-	public int deadEndIterationReset = Integer.MAX_VALUE;
+	private int deadEndIterationReset = Integer.MAX_VALUE;
 
 	@Parameter
 	@Comment("Defines whether only temperature, only the current solution or both are reset.")
-	public ResetOption resetOption = ResetOption.temperatureOnly;
+	private ResetOption resetOption = ResetOption.temperatureOnly;
 
 	@Parameter
 	@Comment("Number of iterations after which there won't be any more resets.")
-	public int lastResetIteration = Integer.MAX_VALUE;
+	private int lastResetIteration = Integer.MAX_VALUE;
 
 	@Parameter
 	@Comment("Last iteration after which there will be no more optimization and the solution will be fixed to the best" +
 			"found solution.")
-	public int lastIteration = Integer.MAX_VALUE;
+	private int lastIteration = Integer.MAX_VALUE;
 
 	@Parameter
 	@Comment("First iteration from which the optimization starts.")
-	public int firstIteration = 0;
+	private int firstIteration = 0;
 
 
 	public static abstract class PerturbationParams extends ReflectiveConfigGroup implements MatsimParameters {

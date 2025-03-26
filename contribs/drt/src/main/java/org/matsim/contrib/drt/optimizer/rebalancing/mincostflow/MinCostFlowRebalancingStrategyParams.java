@@ -29,19 +29,20 @@ import jakarta.validation.constraints.PositiveOrZero;
  */
 public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfigGroup
 		implements RebalancingParams.RebalancingStrategyParams {
+
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
 	@Parameter
 	@Comment("alpha coefficient in linear target calculation."
 			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
 	@PositiveOrZero
-	public double targetAlpha = Double.NaN;
+	private double targetAlpha = Double.NaN;
 
 	@Parameter
 	@Comment("beta constant in linear target calculation."
 			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
 	@PositiveOrZero
-	public double targetBeta = Double.NaN;
+	private double targetBeta = Double.NaN;
 
 	public enum RebalancingTargetCalculatorType {
 		EstimatedDemand, EqualRebalancableVehicleDistribution, EqualVehicleDensity, EqualVehiclesToPopulationRatio
@@ -54,7 +55,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
 			+ " Current default is EstimatedDemand")
 	@NotNull
-	public RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
+	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
 
 	public enum TargetCoefficientSource {
@@ -67,7 +68,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " [FromZoneAttributeOrStatic] will fall back to the static coefficients if no attribute is found for a given zone."
 			+ " Use " + MinCostFlowRebalancingStrategy.REBALANCING_ZONAL_TARGET_ALPHA + " and " + MinCostFlowRebalancingStrategy.REBALANCING_ZONAL_TARGET_BETA
 			+ " to set values accordingly.")
-	public TargetCoefficientSource targetCoefficientSource = TargetCoefficientSource.Static;
+	private TargetCoefficientSource targetCoefficientSource = TargetCoefficientSource.Static;
 
 	public enum ZonalDemandEstimatorType {PreviousIterationDemand, None}
 
@@ -75,16 +76,67 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@Comment("Defines the methodology for demand estimation."
 			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand")
 	@NotNull
-	public ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
+	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
 	@Parameter
 	@Comment("Defines the time horizon for predicting the demand."
 			+ " Used when 'zonalDemandEstimatorType' is not set to 'None'."
 			+ " Default value is 1800 s.")
 	@PositiveOrZero
-	public int demandEstimationPeriod = 1800;
+	private int demandEstimationPeriod = 1800;
 
 	public MinCostFlowRebalancingStrategyParams() {
 		super(SET_NAME);
+	}
+
+	@PositiveOrZero
+	public double getTargetAlpha() {
+		return targetAlpha;
+	}
+
+	public void setTargetAlpha(@PositiveOrZero double targetAlpha) {
+		this.targetAlpha = targetAlpha;
+	}
+
+	@PositiveOrZero
+	public double getTargetBeta() {
+		return targetBeta;
+	}
+
+	public void setTargetBeta(@PositiveOrZero double targetBeta) {
+		this.targetBeta = targetBeta;
+	}
+
+	public @NotNull RebalancingTargetCalculatorType getRebalancingTargetCalculatorType() {
+		return rebalancingTargetCalculatorType;
+	}
+
+	public void setRebalancingTargetCalculatorType(@NotNull RebalancingTargetCalculatorType rebalancingTargetCalculatorType) {
+		this.rebalancingTargetCalculatorType = rebalancingTargetCalculatorType;
+	}
+
+	public TargetCoefficientSource getTargetCoefficientSource() {
+		return targetCoefficientSource;
+	}
+
+	public void setTargetCoefficientSource(TargetCoefficientSource targetCoefficientSource) {
+		this.targetCoefficientSource = targetCoefficientSource;
+	}
+
+	public @NotNull ZonalDemandEstimatorType getZonalDemandEstimatorType() {
+		return zonalDemandEstimatorType;
+	}
+
+	public void setZonalDemandEstimatorType(@NotNull ZonalDemandEstimatorType zonalDemandEstimatorType) {
+		this.zonalDemandEstimatorType = zonalDemandEstimatorType;
+	}
+
+	@PositiveOrZero
+	public int getDemandEstimationPeriod() {
+		return demandEstimationPeriod;
+	}
+
+	public void setDemandEstimationPeriod(@PositiveOrZero int demandEstimationPeriod) {
+		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 }

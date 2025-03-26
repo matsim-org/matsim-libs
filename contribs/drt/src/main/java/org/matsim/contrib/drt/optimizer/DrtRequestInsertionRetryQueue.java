@@ -41,7 +41,7 @@ public class DrtRequestInsertionRetryQueue {
 	private final Deque<RequestRetryEntry> requestQueue = new LinkedList<>();
 
 	public boolean tryAddFailedRequest(DrtRequest request, double now) {
-		if (request.getSubmissionTime() + params.maxRequestAge < now + params.retryInterval) {
+		if (request.getSubmissionTime() + params.getMaxRequestAge() < now + params.getRetryInterval()) {
 			return false;//request is too old, not eligible for retry
 		}
 		requestQueue.addLast(new RequestRetryEntry(request, now));
@@ -49,7 +49,7 @@ public class DrtRequestInsertionRetryQueue {
 	}
 
 	public boolean hasRequestsToRetryNow(double now) {
-		double maxLastAttemptTimeForRetry = now - params.retryInterval;
+		double maxLastAttemptTimeForRetry = now - params.getRetryInterval();
 		return !requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
 	}
 
