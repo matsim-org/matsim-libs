@@ -87,7 +87,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public final class PopulationUtils {
 	private static final Logger log = LogManager.getLogger(PopulationUtils.class);
-	private static final PopulationFactory populationFactory = createPopulation(new PlansConfigGroup(), null).getFactory();
+	private static final PopulationFactory populationFactory = createPopulation(
+			new PlansConfigGroup(), null, null).getFactory();
 
 	/**
 	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
@@ -110,7 +111,19 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config) {
-		return createPopulation(config, null);
+		return createPopulation(config, null, null);
+	}
+
+	/**
+	 * Creates a new Population container. Population instances need a Config, because they need to know
+	 * about the modes of transport.
+	 *
+	 * @param config the configuration which is used to create the Population.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Double scale) {
+		return createPopulation(config, null, scale);
 	}
 
 	/**
@@ -123,10 +136,34 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config, Network network) {
-		return createPopulation(config.plans(), network);
+		return createPopulation(config.plans(), network, null);
 	}
 
-	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param config  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Network network, Double scale) {
+		return createPopulation(config.plans(), network, scale);
+	}
+
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param plansConfigGroup  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network, Double scale) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
 		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
@@ -143,7 +180,7 @@ public final class PopulationUtils {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+        return new PopulationImpl(new PopulationFactoryImpl(routeFactory), scale);
 	}
 
 	public static Leg unmodifiableLeg(Leg leg) {
@@ -1265,11 +1302,11 @@ public final class PopulationUtils {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
 	}
 
-	public static Population getOrCreateAllpersons(Scenario scenario) {
+	public static Population getOrCreateAllPersons(Scenario scenario) {
 		Population map = (Population) scenario.getScenarioElement("allpersons");
 		if (map == null) {
 			log.info("adding scenario element for allpersons container");
-			map = new PopulationImpl(scenario.getPopulation().getFactory());
+			map = new PopulationImpl(scenario.getPopulation().getFactory(), null);
 			scenario.addScenarioElement("allpersons", map);
 		}
 		return map;
@@ -1278,7 +1315,7 @@ public final class PopulationUtils {
 	private static int tryStdCnt = 5;
 
 	public static Person findPerson(Id<Person> personId, Scenario scenario) {
-		Person person = getOrCreateAllpersons(scenario).getPersons().get(personId);
+		Person person = getOrCreateAllPersons(scenario).getPersons().get(personId);
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;
