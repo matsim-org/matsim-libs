@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RuleBasedTaxiOptimizerIT {
@@ -39,7 +38,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 99999;
 		params.nearestVehiclesLimit = 99999;
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) params.getZoneSystemParams();
-		zoneParams.cellSize = 99999.;
+		zoneParams.setCellSize(99999.);
 		runBenchmark(false, params, utils);
 	}
 
@@ -50,7 +49,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 10;
 		params.nearestVehiclesLimit = 10;
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) params.getZoneSystemParams();
-		zoneParams.cellSize = 1000.;
+		zoneParams.setCellSize(1000.);
 		runBenchmark(false, params, utils);
 	}
 
@@ -61,7 +60,7 @@ public class RuleBasedTaxiOptimizerIT {
 		params.nearestRequestsLimit = 1;
 		params.nearestVehiclesLimit = 1;
 		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) params.getZoneSystemParams();
-		zoneParams.cellSize = 100.;
+		zoneParams.setCellSize(100.);
 		runBenchmark(false, params, utils);
 	}
 }

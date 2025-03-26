@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -247,16 +247,16 @@ public class PrebookingTestEnvironment {
 
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
-		modeConfig.mode = "drt";
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = (DefaultDrtOptimizationConstraintsSet) modeConfig
+		modeConfig.setMode("drt");
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = modeConfig
 				.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxWaitTime = maximumWaitTime;
 		defaultConstraintsSet.maxTravelTimeAlpha = detourRelative;
 		defaultConstraintsSet.maxTravelTimeBeta = detourAbsolute;
-		modeConfig.stopDuration = stopDuration;
-		modeConfig.idleVehiclesReturnToDepots = false;
-		modeConfig.vehiclesFile = null;
+		modeConfig.setStopDuration(stopDuration);
+		modeConfig.setIdleVehiclesReturnToDepots(false);
+		modeConfig.setVehiclesFile(null);
 
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);

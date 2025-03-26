@@ -90,7 +90,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-		stopDuration = drtCfg.stopDuration;
+		stopDuration = drtCfg.getStopDuration();
 
 		initSchedules(fleet);
 	}

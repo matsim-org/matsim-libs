@@ -65,7 +65,7 @@ public class ODTripDashboard implements Dashboard {
 	private void definePlot(Hexagons viz, Data data) {
 		viz.projection = this.crs;
 		viz.center = data.context().getCenter();
-		viz.zoom = data.context().mapZoomLevel;
+		viz.zoom = data.context().getMapZoomLevel();
 		viz.height = 15.;
 
 		viz.maxHeight = 200d;

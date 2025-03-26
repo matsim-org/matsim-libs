@@ -20,12 +20,20 @@ public class SquareGridZoneSystemParams extends ZoneSystemParams {
 	@Comment("size of square cells used for demand aggregation."
 		+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m")
 	@Positive
-	public double cellSize = 200.;// [m]
+	private double cellSize = 200.;// [m]
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		Verify.verify(cellSize > 0 && Double.isFinite(cellSize), "cell size must be finite and positive.");
+		Verify.verify(getCellSize() > 0 && Double.isFinite(getCellSize()), "cell size must be finite and positive.");
 	}
 
+	@Positive
+	public double getCellSize() {
+		return cellSize;
+	}
+
+	public void setCellSize(@Positive double cellSize) {
+		this.cellSize = cellSize;
+	}
 }

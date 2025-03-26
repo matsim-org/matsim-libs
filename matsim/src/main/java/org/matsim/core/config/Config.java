@@ -56,7 +56,6 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -158,8 +157,6 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , new VehiclesConfigGroup() ) ;
 
 		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
-
-		this.modules.put(JDEQSimConfigGroup.NAME, new JDEQSimConfigGroup());
 
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
@@ -396,10 +393,6 @@ public final class Config implements MatsimExtensionPoint {
 
 	public ChangeModeConfigGroup changeMode() {
 		return (ChangeModeConfigGroup) this.getModule(ChangeModeConfigGroup.CONFIG_MODULE);
-	}
-
-	public JDEQSimConfigGroup jdeqSim() {
-		return (JDEQSimConfigGroup) this.getModule(JDEQSimConfigGroup.NAME);
 	}
 
 	public HermesConfigGroup hermes() {

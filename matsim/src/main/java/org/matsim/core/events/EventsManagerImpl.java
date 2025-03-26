@@ -130,18 +130,17 @@ public final class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-
 	@Override
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
-		log.info("adding Event-Handler: " + test.getName());
+		log.debug("adding Event-Handler: " + test.getName());
 		do {
 			for (Class<?> theInterface : test.getInterfaces()) {
 				if (EventHandler.class.isAssignableFrom(theInterface)) {
 					Class<? extends EventHandler> eventHandlerInterface = (Class<? extends EventHandler>)theInterface;
 					if (!addedHandlers.contains(theInterface)) {
-						log.info("  " + theInterface.getName());
+						log.debug("  " + theInterface.getName());
 						addHandlerInterfaces(handler, eventHandlerInterface);
 						addedHandlers.add(theInterface);
 					}
@@ -151,7 +150,7 @@ public final class EventsManagerImpl implements EventsManager {
 		} while ((EventHandler.class.isAssignableFrom(test)));
 
 		this.cacheHandlers.clear();
-		log.info("");
+		log.debug("");
 	}
 
 	@Override

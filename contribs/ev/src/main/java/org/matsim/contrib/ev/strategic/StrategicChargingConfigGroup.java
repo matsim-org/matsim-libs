@@ -59,53 +59,53 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 				});
 	}
 
-	public ChargingPlanScoringParameters scoring;
-	public ChargingCostsParameters costs;
+	private ChargingPlanScoringParameters scoring;
+	private ChargingCostsParameters costs;
 
 	@Parameter
 	@Comment("Minimum duration of the activity-based charging slots")
 	@PositiveOrZero
-	public double minimumActivityChargingDuration = 900.0;
+	private double minimumActivityChargingDuration = 900.0;
 
 	@Parameter
 	@Comment("Maximum duration of the activity-based charging slots")
 	@PositiveOrZero
-	public double maximumActivityChargingDuration = Double.POSITIVE_INFINITY;
+	private double maximumActivityChargingDuration = Double.POSITIVE_INFINITY;
 
 	@Parameter
 	@Comment("Minimum drive duration at which charging along the route is considered")
 	@PositiveOrZero
-	public double minimumEnrouteDriveTime = 3600.0;;
+	private double minimumEnrouteDriveTime = 3600.0;;
 
 	@Parameter
 	@Comment("Minimum duration of enroute charging. A random value between the minimum and this value is sampled.")
 	@PositiveOrZero
-	public double minimumEnrouteChargingDuration = 3600.0;
+	private double minimumEnrouteChargingDuration = 3600.0;
 
 	@Parameter
 	@Comment("Maximum duration of enroute charging. A random value between the minimum and this value is sampled.")
 	@PositiveOrZero
-	public double maximumEnrouteChargingDuration = 3600.0;
+	private double maximumEnrouteChargingDuration = 3600.0;
 
 	@Parameter
 	@Comment("Euclidean search radius to find candidates for charging")
 	@PositiveOrZero
-	public double chargerSearchRadius = 1000.0;
+	private double chargerSearchRadius = 1000.0;
 
 	@Parameter
 	@Comment("Defines the probability with which a charging plan is selected among the existing ones versus creating a new charging plan")
 	@DecimalMin("0.0")
 	@DecimalMax("1.0")
-	public double selectionProbability = 0.8;
+	private double selectionProbability = 0.8;
 
 	@Parameter
 	@Comment("Defines how many charging plans per regular plan can exist")
 	@Positive
-	public int maximumChargingPlans = 4;
+	private int maximumChargingPlans = 4;
 
 	@Parameter
 	@Comment("Defines the weight with which the charging score is added to the standard plan score")
-	public double chargingScoreWeight = 0.0;
+	private double chargingScoreWeight = 0.0;
 
 	public enum SelectionStrategy {
 		Best, Exponential, Random
@@ -113,7 +113,7 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 
 	@Parameter
 	@Comment("Defines the selection strategy for the charging plans")
-	public SelectionStrategy selectionStrategy = SelectionStrategy.Exponential;
+	private SelectionStrategy selectionStrategy = SelectionStrategy.Exponential;
 
 	public enum AlternativeSearchStrategy {
 		Naive, OccupancyBased, ReservationBased
@@ -121,27 +121,27 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 
 	@Parameter
 	@Comment("Defines the scaling factor for the exponential charging plan selection strategy")
-	public double exponentialSelectionBeta = 0.1;
+	private double exponentialSelectionBeta = 0.1;
 
 	@Parameter
 	@Comment("Defines what to do when planned charger is not available. Naive: Select any other eligible charger nearby. Occupancy: Check whether there is at least a free spot upon departure. Reservation: Select among chargers that can be prebooked for the planned charging slot.")
-	public AlternativeSearchStrategy onlineSearchStrategy = AlternativeSearchStrategy.Naive;
+	private AlternativeSearchStrategy onlineSearchStrategy = AlternativeSearchStrategy.Naive;
 
 	@Parameter
 	@Comment("Defines whether online search is applied proactively (when approaching a planned charging activity)")
-	public boolean useProactiveOnlineSearch = true;
+	private boolean useProactiveOnlineSearch = true;
 
 	@Parameter
 	@Comment("Defines how often to write out detailed information about charging scoring")
-	public int scoreTrackingInterval = 0;
+	private int scoreTrackingInterval = 0;
 
 	@Parameter
 	@Comment("Maximum attempts (excluding the initial one) that an agent tries to find a charger before the search is aborted")
-	int maximumAlternatives = 2;
+	private int maximumAlternatives = 2;
 
 	@Parameter
 	@Comment("Defines whether to precompute viable charger alternatives for each charging activity planned in an agent's plan. A value of -1 means no caching.")
-	int alternativeCacheSize = -1;
+	private int alternativeCacheSize = -1;
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -154,5 +154,141 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 			Verify.verify(maximumAlternatives == 1,
 					"When using alternative caching, only one alternative can be chosen, so maximumAlternatives must be set to 1!");
 		}
+	}
+
+	public ChargingPlanScoringParameters getScoringParameters() {
+		return scoring;
+	}
+
+	public ChargingCostsParameters getCostParameters() {
+		return costs;
+	}
+
+	public double getMinimumActivityChargingDuration() {
+		return minimumActivityChargingDuration;
+	}
+
+	public void setMinimumActivityChargingDuration(double minimumActivityChargingDuration) {
+		this.minimumActivityChargingDuration = minimumActivityChargingDuration;
+	}
+
+	public double getMaximumActivityChargingDuration() {
+		return maximumActivityChargingDuration;
+	}
+
+	public void setMaximumActivityChargingDuration(double maximumActivityChargingDuration) {
+		this.maximumActivityChargingDuration = maximumActivityChargingDuration;
+	}
+
+	public double getMinimumEnrouteDriveTime() {
+		return minimumEnrouteDriveTime;
+	}
+
+	public void setMinimumEnrouteDriveTime(double minimumEnrouteDriveTime) {
+		this.minimumEnrouteDriveTime = minimumEnrouteDriveTime;
+	}
+
+	public double getMinimumEnrouteChargingDuration() {
+		return minimumEnrouteChargingDuration;
+	}
+
+	public void setMinimumEnrouteChargingDuration(double minimumEnrouteChargingDuration) {
+		this.minimumEnrouteChargingDuration = minimumEnrouteChargingDuration;
+	}
+
+	public double getMaximumEnrouteChargingDuration() {
+		return maximumEnrouteChargingDuration;
+	}
+
+	public void setMaximumEnrouteChargingDuration(double maximumEnrouteChargingDuration) {
+		this.maximumEnrouteChargingDuration = maximumEnrouteChargingDuration;
+	}
+
+	public double getChargerSearchRadius() {
+		return chargerSearchRadius;
+	}
+
+	public void setChargerSearchRadius(double chargerSearchRadius) {
+		this.chargerSearchRadius = chargerSearchRadius;
+	}
+
+	public double getSelectionProbability() {
+		return selectionProbability;
+	}
+
+	public void setSelectionProbability(double selectionProbability) {
+		this.selectionProbability = selectionProbability;
+	}
+
+	public int getMaximumChargingPlans() {
+		return maximumChargingPlans;
+	}
+
+	public void setMaximumChargingPlans(int maximumChargingPlans) {
+		this.maximumChargingPlans = maximumChargingPlans;
+	}
+
+	public double getChargingScoreWeight() {
+		return chargingScoreWeight;
+	}
+
+	public void setChargingScoreWeight(double chargingScoreWeight) {
+		this.chargingScoreWeight = chargingScoreWeight;
+	}
+
+	public SelectionStrategy getSelectionStrategy() {
+		return selectionStrategy;
+	}
+
+	public void setSelectionStrategy(SelectionStrategy selectionStrategy) {
+		this.selectionStrategy = selectionStrategy;
+	}
+
+	public double getExponentialSelectionBeta() {
+		return exponentialSelectionBeta;
+	}
+
+	public void setExponentialSelectionBeta(double exponentialSelectionBeta) {
+		this.exponentialSelectionBeta = exponentialSelectionBeta;
+	}
+
+	public AlternativeSearchStrategy getOnlineSearchStrategy() {
+		return onlineSearchStrategy;
+	}
+
+	public void setOnlineSearchStrategy(AlternativeSearchStrategy onlineSearchStrategy) {
+		this.onlineSearchStrategy = onlineSearchStrategy;
+	}
+
+	public boolean isUseProactiveOnlineSearch() {
+		return useProactiveOnlineSearch;
+	}
+
+	public void setUseProactiveOnlineSearch(boolean useProactiveOnlineSearch) {
+		this.useProactiveOnlineSearch = useProactiveOnlineSearch;
+	}
+
+	public int getScoreTrackingInterval() {
+		return scoreTrackingInterval;
+	}
+
+	public void setScoreTrackingInterval(int scoreTrackingInterval) {
+		this.scoreTrackingInterval = scoreTrackingInterval;
+	}
+
+	public int getMaximumAlternatives() {
+		return maximumAlternatives;
+	}
+
+	public void setMaximumAlternatives(int maximumAlternatives) {
+		this.maximumAlternatives = maximumAlternatives;
+	}
+
+	public int getAlternativeCacheSize() {
+		return alternativeCacheSize;
+	}
+
+	public void setAlternativeCacheSize(int alternativeCacheSize) {
+		this.alternativeCacheSize = alternativeCacheSize;
 	}
 }
