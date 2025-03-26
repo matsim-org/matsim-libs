@@ -155,6 +155,7 @@ public class ParkingTest {
 				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
+				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 
@@ -232,6 +233,7 @@ public class ParkingTest {
 				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
+				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 

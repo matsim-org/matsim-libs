@@ -28,13 +28,10 @@ import java.util.Map;
 public class ParkingOccupancyObserver implements MobsimScopeEventHandler, VehicleEntersTrafficEventHandler, VehicleEndsParkingSearchEventHandler, BeforeMobsimListener, MobsimBeforeSimStepListener {
 	private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ParkingOccupancyObserver.class);
 
-	private static final String PARKING_INITIAL_FILE = "parkingInitialOccupancy.csv";
-
 	private ParkingCapacityInitializer parkingCapacityInitializer;
 	private Network network;
 	private OutputDirectoryHierarchy outputDirectoryHierarchy;
 	private Config config;
-
 
 	Map<Id<Link>, Integer> indexByLinkId;
 	int[] parkingOccupancyOfLastTimeStep;
@@ -143,7 +140,7 @@ public class ParkingOccupancyObserver implements MobsimScopeEventHandler, Vehicl
 	}
 
 	private void writeInitialParkingOccupancy(int iteration, Map<Id<Link>, ParkingCapacityInitializer.ParkingInitialCapacity> initialCapacities) {
-		String file = outputDirectoryHierarchy.getIterationFilename(iteration, PARKING_INITIAL_FILE);
+		String file = outputDirectoryHierarchy.getIterationFilename(iteration, ParkingUtils.PARKING_INITIAL_FILE);
 		BufferedWriter bufferedWriter = IOUtils.getBufferedWriter(file);
 
 		log.info("Writing initial parking occupancy to {}", file);
