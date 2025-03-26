@@ -33,6 +33,7 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -196,9 +197,11 @@ public final class ShpOptions {
 	 *
 	 * @return null if no shp configured.
 	 */
-	public List<SimpleFeature> readFeatures() {
+	public List<SimpleFeature> readFeatures() throws FileNotFoundException {
 		if (shp == null)
 			throw new IllegalStateException("Shape file path not specified");
+		if (!Files.exists(Path.of(shp)))
+			throw new FileNotFoundException(shp + " does not exist! Please double check the path for the shp!");
 
 		try {
 			DataStore ds = openDataStore(shp);
@@ -218,7 +221,7 @@ public final class ShpOptions {
 	/**
 	 * Return the union of all geometries in the shape file.
 	 */
-	public Geometry getGeometry() {
+	public Geometry getGeometry() throws FileNotFoundException {
 
 		Collection<SimpleFeature> features = readFeatures();
 		if (features.isEmpty()) {
@@ -260,6 +263,8 @@ public final class ShpOptions {
 
 		} catch (TransformException | FactoryException e) {
 			throw new IllegalStateException("Could not transform coordinates of the provided shape", e);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
