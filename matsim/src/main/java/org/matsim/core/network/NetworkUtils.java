@@ -1056,6 +1056,15 @@ public final class NetworkUtils {
 		link.setAllowedModes(modes);
 	}
 
+	public static boolean hasTurnRestrictions(Network network) {
+		for (Link link : network.getLinks().values()) {
+			if (getDisallowedNextLinks(link) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Removes the given modes from the links and runs the network cleaner afterwards. Thus, some more links may be restricted to keep the network consistent.
 	 * That means, each link can be reached from each other link.

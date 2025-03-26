@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
@@ -21,18 +20,15 @@ import java.util.stream.Collectors;
  *
  * @author nkuehnel / MOIA
  */
-public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
+public class TurnRestrictionsNetworkCleaner {
 
-
-    @Override
-    public void run(Network network) {
-        TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network);
+    public void run(Network network, String mode) {
+        TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network, mode);
         colorNetwork(network, turnRestrictions);
         new NetworkCleaner().run(network);
         collapseNetwork(network, turnRestrictions);
         reapplyRestrictions(network, turnRestrictions);
     }
-
 
     public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
 
