@@ -33,8 +33,8 @@ public class DrtServicesParamsIOTest {
 
 		{
 			DrtServiceParams clean = new DrtServiceParams("clean");
-			clean.executionLimit = 1;
-			clean.duration = 900;
+			clean.setExecutionLimit(1);
+			clean.setDuration(900);
 			var condition1 = new TimeOfDayReachedTriggerParam();
 			condition1.executionTime = 53205;
 			clean.addParameterSet(condition1);
@@ -43,8 +43,8 @@ public class DrtServicesParamsIOTest {
 
 		{
 			DrtServiceParams deepClean = new DrtServiceParams("deep clean");
-			deepClean.executionLimit = 1;
-			deepClean.duration = 1800;
+			deepClean.setExecutionLimit(1);
+			deepClean.setDuration(1800);
 			var condition1 = new TimeOfDayReachedTriggerParam();
 			condition1.executionTime = 53205;
 			deepClean.addParameterSet(condition1);
@@ -61,7 +61,7 @@ public class DrtServicesParamsIOTest {
 		var services = servicesParams.getServices();
 		var service = servicesParams.getService("deep clean").orElseThrow();
 
-		Assertions.assertEquals(1, service.executionLimit);
+		Assertions.assertEquals(1, service.getExecutionLimit());
 		Assertions.assertEquals(2, services.size());
 		Assertions.assertTrue(drtConfigGroup2.getServicesParams().isPresent());
 

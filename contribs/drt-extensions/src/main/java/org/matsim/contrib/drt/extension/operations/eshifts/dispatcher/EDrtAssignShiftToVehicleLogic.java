@@ -9,13 +9,10 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.AssignShiftToVehicleLogic;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.ev.fleet.Battery;
 
 /**
@@ -37,7 +34,7 @@ public class EDrtAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic 
 		// no, if below battery threshold
 		if (vehicle instanceof EvShiftDvrpVehicle) {
 			final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
-			if (battery.getCharge() / battery.getCapacity() < drtShiftParams.shiftAssignmentBatteryThreshold) {
+			if (battery.getCharge() / battery.getCapacity() < drtShiftParams.getShiftAssignmentBatteryThreshold()) {
 				return false;
 			}
 		}

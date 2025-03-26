@@ -35,29 +35,74 @@ public final class DrtFareParams extends ReflectiveConfigGroup {
 	@Parameter("basefare")
 	@Comment("Basefare per trip (positive or zero value)")
 	@PositiveOrZero
-	public double baseFare;
+	private double baseFare;
 
 	@Parameter
 	@Comment("Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
 	@PositiveOrZero
-	public double minFarePerTrip = 0.0;
+	private double minFarePerTrip = 0.0;
 
 	@Parameter
 	@Comment("Daily subscription fee (positive or zero value)")
 	@PositiveOrZero
-	public double dailySubscriptionFee;
+	private double dailySubscriptionFee;
 
 	@Parameter
 	@Comment("drt fare per hour (positive or zero value)")
 	@PositiveOrZero
-	public double timeFare_h;
+	private double timeFare_h;
 
 	@Parameter
 	@Comment("drt fare per meter (positive or zero value)")
 	@PositiveOrZero
-	public double distanceFare_m;
+	private double distanceFare_m;
 
 	public DrtFareParams() {
 		super(SET_NAME);
+	}
+
+	@PositiveOrZero
+	public double getBaseFare() {
+		return baseFare;
+	}
+
+	public void setBaseFare(@PositiveOrZero double baseFare) {
+		this.baseFare = baseFare;
+	}
+
+	@PositiveOrZero
+	public double getMinFarePerTrip() {
+		return minFarePerTrip;
+	}
+
+	public void setMinFarePerTrip(@PositiveOrZero double minFarePerTrip) {
+		this.minFarePerTrip = minFarePerTrip;
+	}
+
+	@PositiveOrZero
+	public double getDailySubscriptionFee() {
+		return dailySubscriptionFee;
+	}
+
+	public void setDailySubscriptionFee(@PositiveOrZero double dailySubscriptionFee) {
+		this.dailySubscriptionFee = dailySubscriptionFee;
+	}
+
+	@PositiveOrZero
+	public double getTimeFare_h() {
+		return timeFare_h;
+	}
+
+	public void setTimeFare_h(@PositiveOrZero double timeFare_h) {
+		this.timeFare_h = timeFare_h;
+	}
+
+	@PositiveOrZero
+	public double getDistanceFare_m() {
+		return distanceFare_m;
+	}
+
+	public void setDistanceFare_m(@PositiveOrZero double distanceFare_m) {
+		this.distanceFare_m = distanceFare_m;
 	}
 }

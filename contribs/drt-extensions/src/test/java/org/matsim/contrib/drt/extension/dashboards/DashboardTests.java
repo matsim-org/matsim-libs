@@ -35,8 +35,8 @@ public class DashboardTests {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
 			if (drtCfg.getMode().equals("av")){
-				drtCfg.operationalScheme = DrtConfigGroup.OperationalScheme.serviceAreaBased;
-				drtCfg.drtServiceAreaShapeFile = "drt-zones/drt-zonal-system.shp";
+				drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+				drtCfg.setDrtServiceAreaShapeFile("drt-zones/drt-zonal-system.shp");
 			}
 		}
 
