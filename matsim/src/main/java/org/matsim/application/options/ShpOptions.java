@@ -201,7 +201,9 @@ public final class ShpOptions {
 		if (shp == null)
 			throw new IllegalStateException("Shape file path not specified");
 		if (!Files.exists(Path.of(shp)))
-			throw new IllegalStateException(shp + " does not exist! Please double check the path for the shp!");
+			throw new RuntimeException(shp + " does not exist! Please double check the path for the shp!");
+			// I wanted to throw a FileNotFoundException, but it requires all the methods that call readFeatures() to include throw
+			// FileNotFoundException statement at the beginning.
 
 		try {
 			DataStore ds = openDataStore(shp);
