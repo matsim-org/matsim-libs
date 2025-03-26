@@ -16,7 +16,6 @@ import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -335,7 +334,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		// clean up network
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network);
 
 		Set<Id<Link>> ignored = new HashSet<>();
 
@@ -383,7 +382,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		// clean again (possibly with turn restrictions)
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network);
 
 		if (!ignored.isEmpty()) {
 			log.warn("Ignored turn restrictions for {} links with no connections: {}", ignored.size(), ignored);

@@ -34,7 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -397,7 +397,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
          * afterwards there is a route from every link to every other link. This may not
          * be the case in the initial network converted from OpenStreetMap.
          */
-        new NetworkCleaner().run(network);
+        NetworkUtils.cleanNetwork(network);
         new LanesAndSignalsCleaner().run(scenario);
 
 

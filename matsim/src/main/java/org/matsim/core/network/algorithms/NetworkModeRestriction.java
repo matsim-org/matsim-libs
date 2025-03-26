@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class changes the allowed modes of links in a network and cleans the network afterward.
- * I.e. for each mode, it removes by running the {@link NetworkCleaner} that mode for links, that are not reachable from all other links
+ * I.e. for each mode, it removes by running {@link NetworkUtils#cleanNetwork(Network)} that mode for links, that are not reachable from all other links
  * or from which all other links are not reachable.
  */
 public class NetworkModeRestriction implements NetworkRunnable {

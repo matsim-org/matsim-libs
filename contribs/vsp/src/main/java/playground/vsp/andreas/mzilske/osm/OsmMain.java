@@ -22,7 +22,7 @@ package playground.vsp.andreas.mzilske.osm;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
@@ -40,7 +40,7 @@ public class OsmMain {
 	
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
-		new NetworkCleaner().run(scenario.getNetwork());
+		NetworkUtils.cleanNetwork(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/sotm-paper/osm-work/network.xml");
 	}
 

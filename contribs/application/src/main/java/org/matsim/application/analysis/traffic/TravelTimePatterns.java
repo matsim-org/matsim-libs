@@ -23,7 +23,6 @@ import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -322,7 +321,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 			}
 
-			new NetworkCleaner().run(network);
+			NetworkUtils.cleanNetwork(network);
 
 			log.info("Writing network to {}", networkOutput);
 

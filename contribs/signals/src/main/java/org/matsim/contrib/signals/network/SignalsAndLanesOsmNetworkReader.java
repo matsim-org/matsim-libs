@@ -52,7 +52,6 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.OsmNetworkReader;
@@ -323,7 +322,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		LOG.info("Start pre-cleaning network before Creation of the Signal plans.");
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network);
 
 
 		for (Link link : network.getLinks().values()) {

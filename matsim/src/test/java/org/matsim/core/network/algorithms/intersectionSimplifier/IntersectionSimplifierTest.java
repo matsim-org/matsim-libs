@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.io.NetworkWriter;
@@ -156,7 +155,7 @@ public class IntersectionSimplifierTest {
 		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network1.xml");
 
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork);
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network2.xml");
 
 		Assertions.assertEquals(18L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
@@ -194,7 +193,7 @@ public class IntersectionSimplifierTest {
 		nct.run(simpleNetwork);
 		NetworkSimplifier ns = new NetworkSimplifier();
 		ns.run(simpleNetwork);
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork);
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
 
 		Assertions.assertEquals(12L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");

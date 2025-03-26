@@ -46,8 +46,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.LogInfoLevel;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.MergeType;
@@ -316,12 +316,12 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 			}
 		});
 		Network newRoadNetwork = nfm.applyFilters();
-		new NetworkCleaner().run(newRoadNetwork);
+		NetworkUtils.cleanNetwork(newRoadNetwork);
 
 		// Run Johan's intersection clustering algorithm
 		IntersectionSimplifier ns = new IntersectionSimplifier(pmin, epsilon);
 		Network newClusteredIntersectionsRoadNetwork = ns.simplify(newRoadNetwork);
-		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
+		NetworkUtils.cleanNetwork(newClusteredIntersectionsRoadNetwork);
 
 		// intersection clustering leaves some duplicate links (same start and end node), merge them
 		NetworkMergeDoubleLinks mergeDoubleLinks = new NetworkMergeDoubleLinks(MergeType.MAXIMUM, LogInfoLevel.NOINFO);
@@ -332,7 +332,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 		// Merge links with different attributes, because we will not use the output network for simulation
 		simplifier.setMergeLinkStats(true);
 		simplifier.run(newClusteredIntersectionsRoadNetwork);
-		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
+		NetworkUtils.cleanNetwork(newClusteredIntersectionsRoadNetwork);
 
 		return(newClusteredIntersectionsRoadNetwork);
 	}

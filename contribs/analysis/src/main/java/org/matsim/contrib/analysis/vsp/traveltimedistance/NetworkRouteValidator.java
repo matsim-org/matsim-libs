@@ -3,8 +3,8 @@ package org.matsim.contrib.analysis.vsp.traveltimedistance;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.SearchableNetwork;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -43,7 +43,7 @@ public class NetworkRouteValidator implements TravelTimeDistanceValidator {
 					network.removeLink(link.getId());
 			}
 
-			new NetworkCleaner().run(network);
+			NetworkUtils.cleanNetwork(network);
 		}
 
 		this.router = factory.createPathCalculator(network, new OnlyTimeDependentTravelDisutility(tt), tt);

@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -149,7 +149,7 @@ public class AccessibilityOsmNetworkReader {
 			throw new IllegalArgumentException("Either the input stream OR the input file should be defined, but not both.");
 		}
 		
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network);
 	}
 	
 	public void writeNetwork(String outputRoot, String networkFileName) {
