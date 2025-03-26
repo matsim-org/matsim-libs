@@ -35,8 +35,8 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.util.List;
 
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingCapacityInitializer.LINK_OFF_STREET_SPOTS;
-import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingCapacityInitializer.LINK_ON_STREET_SPOTS;
+import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_OFF_STREET_SPOTS;
+import static org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingUtils.LINK_ON_STREET_SPOTS;
 
 public class ParkingTest {
 	@RegisterExtension
@@ -165,7 +165,7 @@ public class ParkingTest {
 
 
 	@Test
-	void testParking_BellocheTime_MultipleAgents(){
+	void testParking_BellocheTime_MultipleAgents() {
 		Config config = getConfig(2);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		for (Link value : scenario.getNetwork().getLinks().values()) {
@@ -175,7 +175,7 @@ public class ParkingTest {
 
 		//shift first activity end of person 2 to 6:10, such that it is always behind the first activity end of person 1
 		Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId("2")).getPlans().getFirst();
-		((Activity) plan.getPlanElements().get(0)).setEndTime(6*3600+10);
+		((Activity) plan.getPlanElements().get(0)).setEndTime(6 * 3600 + 10);
 
 		Controller controller = ControllerUtils.createController(scenario);
 

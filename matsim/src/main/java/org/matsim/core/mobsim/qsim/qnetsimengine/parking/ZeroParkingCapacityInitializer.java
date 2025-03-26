@@ -24,9 +24,9 @@ public class ZeroParkingCapacityInitializer implements ParkingCapacityInitialize
 	public Map<Id<Link>, ParkingInitialCapacity> initialize() {
 		Map<Id<Link>, ParkingInitialCapacity> res = new HashMap<>(network.getLinks().size());
 		for (Link link : network.getLinks().values()) {
-			int onStreet = (int) Optional.ofNullable(link.getAttributes().getAttribute(LINK_ON_STREET_SPOTS)).orElse(0);
-			int offStreet = (int) Optional.ofNullable(link.getAttributes().getAttribute(LINK_OFF_STREET_SPOTS)).orElse(0);
-			
+			int onStreet = (int) Optional.ofNullable(link.getAttributes().getAttribute(ParkingUtils.LINK_ON_STREET_SPOTS)).orElse(0);
+			int offStreet = (int) Optional.ofNullable(link.getAttributes().getAttribute(ParkingUtils.LINK_OFF_STREET_SPOTS)).orElse(0);
+
 			int newCapacity = (int) Math.ceil((onStreet + offStreet) * config.qsim().getStorageCapFactor());
 			res.put(link.getId(), new ParkingInitialCapacity(newCapacity, 0));
 		}
