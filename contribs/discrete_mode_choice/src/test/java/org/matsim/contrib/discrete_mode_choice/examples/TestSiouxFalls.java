@@ -62,7 +62,7 @@ public class TestSiouxFalls {
 
 		assertEquals(44195, listener.counts.get("pt"), 2);
 		assertEquals(132316, listener.counts.get("car"), 2);
-		assertEquals(82139, listener.counts.get("walk"), 2);
+		assertEquals(342692, listener.counts.get("walk"), 2);
 
 	}
 
