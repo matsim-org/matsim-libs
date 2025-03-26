@@ -147,7 +147,7 @@ class ParkingOccupancyObserverTest {
 	}
 
 	private void checkFile(int iteration) {
-		BufferedReader bufferedReader = IOUtils.getBufferedReader(utils.getOutputDirectory() + "ITERS/it." + iteration + "/" + iteration + ".parkingInitialOccupancy.csv");
+		BufferedReader bufferedReader = IOUtils.getBufferedReader(utils.getOutputDirectory() + "ITERS/it." + iteration + "/" + iteration + ".parking_initial_occupancy.csv");
 		try {
 			assertEquals("linkId;capacity;occupancy", bufferedReader.readLine());
 			assertEquals("l;2;0", bufferedReader.readLine());
