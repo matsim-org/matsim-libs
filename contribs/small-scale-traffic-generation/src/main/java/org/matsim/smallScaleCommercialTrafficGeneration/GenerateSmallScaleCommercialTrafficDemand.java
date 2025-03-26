@@ -245,7 +245,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controller().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.runNetworkCleaner(scenario.getNetwork()); // e.g. for vulkaneifel network
+		NetworkUtils.cleanNetwork(scenario.getNetwork()); // e.g. for vulkaneifel network
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup;
 		switch (usedCreationOption) {

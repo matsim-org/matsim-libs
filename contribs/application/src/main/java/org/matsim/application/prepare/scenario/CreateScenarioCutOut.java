@@ -306,7 +306,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of nodes before cleaning: {}", scenario.getNetwork().getNodes().size());
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(scenario.getNetwork());
-		cleaner.removeNodesWithoutLinks();
+		NetworkUtils.removeNodesWithoutLinks(scenario.getNetwork());
 
 		for (String mode : modes) {
 			log.info("Cleaning mode {}", mode);

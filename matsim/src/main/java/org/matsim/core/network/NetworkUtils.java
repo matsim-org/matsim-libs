@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +44,8 @@ import org.matsim.core.network.algorithms.NetworkModeRestriction;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsNetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -826,12 +829,66 @@ public final class NetworkUtils {
 
 	public static final String ORIGID = "origid";
 
-	public static void runNetworkCleaner( Network network ) {
-		new org.matsim.core.network.algorithms.NetworkCleaner().run( network );
+	/**
+	 * This performs all currently recommended cleaning process on a network:
+	 * * clean network for all modes to ensure reachability during routing
+	 * * remove links without any allowed modes
+	 * * remove invalid DisallowedNextLinks
+	 * * remove nodes without links
+	 * 
+	 * @param network
+	 */
+	public static void cleanNetwork(Network network) {
+
+		// clean network for all modes to ensure reachability during routing
+		Set<String> modes = network.getLinks().values().stream()
+				.flatMap(l -> l.getAllowedModes().stream())
+				.collect(Collectors.toSet());
+		for (String mode : modes) {
+			new TurnRestrictionsNetworkCleaner().run(network, mode);
+		}
+
+		// remove links without any allowed modes
+		removeLinksWithoutModes(network);
+
+		// remove invalid DisallowedNextLinks
+		DisallowedNextLinksUtils.clean(network);
+
+		// remove nodes without links
+		removeNodesWithoutLinks(network);
 	}
+
+	/**
+	 * Removes nodes from the network that have no incoming or outgoing links
+	 * attached to them.
+	 * 
+	 * @param network
+	 */
+	public static void removeNodesWithoutLinks(Network network) {
+		List<Id<Node>> nodeIdsToRemove = network.getNodes().values().stream()
+				.filter(node -> node.getInLinks().isEmpty() && node.getOutLinks().isEmpty())
+				.map(Node::getId)
+				.toList();
+		nodeIdsToRemove.forEach(network::removeNode);
+	}
+
+	/**
+	 * Removes links from the network that have no allowed modes.
+	 * 
+	 * @param network
+	 */
+	public static void removeLinksWithoutModes(Network network) {
+		List<Id<Link>> linkIdsToRemove = network.getLinks().values().stream()
+				.filter(link -> link.getAllowedModes().isEmpty())
+				.map(Link::getId)
+				.toList();
+		linkIdsToRemove.forEach(network::removeLink);
+	}
+
 	public static void runNetworkSimplifier( Network network ) {
 		new NetworkSimplifier().run(network) ;
 	}
+
 	public static void writeNetwork(Network network, String string) {
 		new NetworkWriter(network).write(string) ;
 	}

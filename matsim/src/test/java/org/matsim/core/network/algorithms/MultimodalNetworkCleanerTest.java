@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -343,7 +344,7 @@ public class MultimodalNetworkCleanerTest {
 		Assertions.assertEquals(8, network.getLinks().size(), "wrong number of links after cleaning.");
 		Assertions.assertEquals(7, network.getNodes().size(), "empty node should not be removed by cleaning.");
 
-		cleaner.removeNodesWithoutLinks();
+		NetworkUtils.removeNodesWithoutLinks(network);
 
 		Assertions.assertEquals(8, network.getLinks().size(), "wrong number of links after cleaning.");
 		Assertions.assertEquals(6, network.getNodes().size(), "wrong number of nodes after cleaning.");

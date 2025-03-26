@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 
@@ -37,9 +36,8 @@ public class NetworkModeRestriction implements NetworkRunnable {
 		Map<String, Long> modeCountBefore = countModes(network);
 
 		applyModeChanges(network);
-		cleanNetworkPerMode(network);
-		removeLinksWithNoModes(network);
-		removeNodesWithNoLinks(network);
+
+		NetworkUtils.cleanNetwork(network);
 
 		Map<String, Long> modeCountAfter = countModes(network);
 		logModeCountDifference(modeCountBefore, modeCountAfter);
@@ -49,28 +47,6 @@ public class NetworkModeRestriction implements NetworkRunnable {
 		for (Map.Entry<Id<Link>, ? extends Link> link : network.getLinks().entrySet()) {
 			this.modesToRemoveByLinkId.apply(link.getKey()).forEach(m -> NetworkUtils.removeAllowedMode(link.getValue(), m));
 		}
-	}
-
-	private void cleanNetworkPerMode(Network network) {
-		Set<String> modes = network.getLinks().values().stream().flatMap(l -> l.getAllowedModes().stream()).collect(Collectors.toSet());
-		for (String mode : modes) {
-			MultimodalNetworkCleaner multimodalNetworkCleaner = new MultimodalNetworkCleaner(network);
-			multimodalNetworkCleaner.run(Set.of(mode));
-		}
-	}
-
-	private void removeLinksWithNoModes(Network network) {
-		network.getLinks().values().stream()
-			   .filter(l -> l.getAllowedModes().isEmpty())
-			   .map(Link::getId)
-			   .forEach(network::removeLink);
-	}
-
-	private void removeNodesWithNoLinks(Network network) {
-		network.getNodes().values().stream()
-			   .filter(n -> n.getInLinks().isEmpty() && n.getOutLinks().isEmpty())
-			   .map(Node::getId)
-			   .forEach(network::removeNode);
 	}
 
 	private void logModeCountDifference(Map<String, Long> modeCountBefore, Map<String, Long> modeCountAfter) {
