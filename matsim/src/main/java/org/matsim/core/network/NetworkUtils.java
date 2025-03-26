@@ -841,6 +841,7 @@ public final class NetworkUtils {
 	public static void cleanNetwork(Network network) {
 
 		// clean network for all modes to ensure reachability during routing
+		DisallowedNextLinksUtils.clean(network); // ensure only valid turn restrictions
 		Set<String> modes = network.getLinks().values().stream()
 				.flatMap(l -> l.getAllowedModes().stream())
 				.collect(Collectors.toSet());
@@ -851,7 +852,7 @@ public final class NetworkUtils {
 		// remove links without any allowed modes
 		removeLinksWithoutModes(network);
 
-		// remove invalid DisallowedNextLinks
+		// removing links could have made some DisallowedNextLinks invalid
 		DisallowedNextLinksUtils.clean(network);
 
 		// remove nodes without links
