@@ -42,20 +42,20 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	@Comment("Specifies how often empty vehicle rebalancing is executed."
 			+ " Must be positive. Default is 1800 s. Expects an Integer Value")
 	@Positive
-	public int interval = 1800;// [s]
+	private int interval = 1800;// [s]
 
 	@Parameter
 	@Comment(
 			"Minimum remaining service time of an idle/busy vehicle to be considered as rebalancable/soon-idle (respectively)."
 					+ " Default is 3600 s. In general, should be higher than interval (e.g. 2 x interval).")
 	@Positive
-	public double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 2 * getInterval();// [s]
 
 	@Parameter
 	@Comment("Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
 			+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)")
 	@PositiveOrZero
-	public double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 0.5 * getInterval();// [s], if 0 then soon-idle vehicle will not be considered
 
 	public interface RebalancingStrategyParams {
 	}
@@ -88,11 +88,38 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Preconditions.checkArgument(minServiceTime > maxTimeBeforeIdle,
+		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
 				"minServiceTime must be greater than maxTimeBeforeIdle");
 	}
 
 	public RebalancingStrategyParams getRebalancingStrategyParams() {
 		return rebalancingStrategyParams;
+	}
+
+	@Positive
+	public int getInterval() {
+		return interval;
+	}
+
+	public void setInterval(@Positive int interval) {
+		this.interval = interval;
+	}
+
+	@Positive
+	public double getMinServiceTime() {
+		return minServiceTime;
+	}
+
+	public void setMinServiceTime(@Positive double minServiceTime) {
+		this.minServiceTime = minServiceTime;
+	}
+
+	@PositiveOrZero
+	public double getMaxTimeBeforeIdle() {
+		return maxTimeBeforeIdle;
+	}
+
+	public void setMaxTimeBeforeIdle(@PositiveOrZero double maxTimeBeforeIdle) {
+		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
 	}
 }

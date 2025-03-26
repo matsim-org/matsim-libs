@@ -67,7 +67,7 @@ public class ETaxiToPlugAssignmentCostProvider {
 
 	private double calcArrivalTime(VehicleData.Entry departure, PathData pathData) {
 		double travelTime = pathData == null ?
-				params.getAssignmentTaxiOptimizerParams().nullPathCost :
+                params.getAssignmentTaxiOptimizerParams().getNullPathCost() :
 				pathData.getTravelTime();
 		return departure.time + travelTime;
 	}

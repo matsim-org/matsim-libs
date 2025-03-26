@@ -122,8 +122,8 @@ public class DefaultDvrpLoadFromVehicle implements DvrpLoadFromVehicle {
 	public static record CapacityMapping(
 			String seats, String standingRoom, String volume, String weight, String other) {
 		static public CapacityMapping build(DvrpLoadParams parameters) {
-			return new CapacityMapping(parameters.mapVehicleTypeSeats, parameters.mapVehicleTypeStandingRoom,
-					parameters.mapVehicleTypeVolume, parameters.mapVehicleTypeWeight, parameters.mapVehicleTypeOther);
+			return new CapacityMapping(parameters.getMapVehicleTypeSeats(), parameters.getMapVehicleTypeStandingRoom(),
+					parameters.getMapVehicleTypeVolume(), parameters.getMapVehicleTypeWeight(), parameters.getMapVehicleTypeOther());
 		}
 	}
 }

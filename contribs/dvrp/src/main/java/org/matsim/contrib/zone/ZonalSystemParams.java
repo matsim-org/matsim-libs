@@ -31,20 +31,45 @@ public final class ZonalSystemParams extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("An XML file specifying the zonal system")
 	@NotBlank
-	public String zonesXmlFile;
+	private String zonesXmlFile;
 
 	@Parameter
 	@Comment("A shape file specifying the geometries of zones")
 	@NotBlank
-	public String zonesShpFile;
+	private String zonesShpFile;
 
 	@Parameter
 	@Comment("Expands the envelope by a given distance in all directions."
 			+ " Used in ZoneFinderImpl.findZone(). The default value is 0")
 	@PositiveOrZero
-	public double expansionDistance = 0;
+	private double expansionDistance = 0;
 
 	public ZonalSystemParams() {
 		super(SET_NAME);
+	}
+
+	public @NotBlank String getZonesXmlFile() {
+		return zonesXmlFile;
+	}
+
+	public void setZonesXmlFile(@NotBlank String zonesXmlFile) {
+		this.zonesXmlFile = zonesXmlFile;
+	}
+
+	public @NotBlank String getZonesShpFile() {
+		return zonesShpFile;
+	}
+
+	public void setZonesShpFile(@NotBlank String zonesShpFile) {
+		this.zonesShpFile = zonesShpFile;
+	}
+
+	@PositiveOrZero
+	public double getExpansionDistance() {
+		return expansionDistance;
+	}
+
+	public void setExpansionDistance(@PositiveOrZero double expansionDistance) {
+		this.expansionDistance = expansionDistance;
 	}
 }

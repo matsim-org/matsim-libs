@@ -148,8 +148,8 @@ class RunJointDemandDRTExample {
         defaultConstraintsSet.maxWaitTime = 2 * 3600;
 		defaultConstraintsSet.maxTravelTimeAlpha = 5;
 		defaultConstraintsSet.maxTravelTimeBeta = 15 * 60;
-        drtCfg.stopDuration = 60;
-        drtCfg.vehiclesFile = "jointDemand_vehicles.xml";
+        drtCfg.setStopDuration(60);
+        drtCfg.setVehiclesFile("jointDemand_vehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
         drtCfg.addDrtInsertionSearchParams(new ExtensiveInsertionSearchParams() {});
 

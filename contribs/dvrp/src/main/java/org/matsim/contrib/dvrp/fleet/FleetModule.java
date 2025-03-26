@@ -83,7 +83,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 		bindModal(DefaultDvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromFleet(loadType, loadParams.mapFleetCapacity);
+			return new DefaultDvrpLoadFromFleet(loadType, loadParams.getMapFleetCapacity());
 		})).in(Singleton.class);
 
 		bindModal(DvrpLoadFromFleet.class).to(modalKey(DefaultDvrpLoadFromFleet.class));

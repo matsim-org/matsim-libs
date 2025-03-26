@@ -109,8 +109,8 @@ public class PtAlongALineTest {
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.mode = "drt_A";
-			drtConfig.stopDuration = 60.;
+			drtConfig.setMode("drt_A");
+			drtConfig.setStopDuration(60.);
 			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                     drtConfig.addOrGetDrtOptimizationConstraintsParams()
 							.addOrGetDefaultDrtOptimizationConstraintsSet();
@@ -118,7 +118,7 @@ public class PtAlongALineTest {
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
 			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-			drtConfig.changeStartLinkToLastLinkInSchedule = true;
+			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 
@@ -251,7 +251,7 @@ public class PtAlongALineTest {
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.stopDuration = 60.;
+			drtConfig.setStopDuration(60.);
 			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                     drtConfig.addOrGetDrtOptimizationConstraintsParams()
                             .addOrGetDefaultDrtOptimizationConstraintsSet();
@@ -259,7 +259,7 @@ public class PtAlongALineTest {
 			defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 			defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
 			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-			drtConfig.mode = TransportMode.drt;
+			drtConfig.setMode(TransportMode.drt);
 			mm.addParameterSet(drtConfig);
 		}
 

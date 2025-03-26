@@ -51,7 +51,7 @@ public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 		}
 
 		// If the new solution is worse, calculate an acceptance probability
-		double acceptanceProbability = Math.exp(-(simAnCfg.k * (currentCost - acceptedCost) / temperature));
+		double acceptanceProbability = Math.exp(-(simAnCfg.getK() * (currentCost - acceptedCost) / temperature));
 
 		return random.nextDouble() < acceptanceProbability;
 	}

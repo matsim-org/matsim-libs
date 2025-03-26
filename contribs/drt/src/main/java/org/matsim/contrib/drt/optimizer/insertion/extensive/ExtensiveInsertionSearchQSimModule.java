@@ -51,7 +51,7 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
 			var insertionParams = (ExtensiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
 			var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-					insertionParams.admissibleBeelineSpeedFactor, getter.getModal(TravelTimeMatrix.class),
+                    insertionParams.getAdmissibleBeelineSpeedFactor(), getter.getModal(TravelTimeMatrix.class),
 					getter.getModal(TravelTime.class));
 			return admissibleTimeEstimator;
 		}));
