@@ -58,12 +58,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private static final Logger log = LogManager.getLogger(TripRouter.class );
 
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	private final FallbackRoutingModule fallbackRoutingModule;
 
-	private Config config;
+	private final Config config;
 	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
 	// injected, I cannot get it there directly.  kai, oct'17)
 
@@ -77,9 +76,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 		public Builder setRoutingModule(String mainMode, RoutingModule routingModule ) {
 			// the initial API accepted routing modules.  injection, however, takes routing module providers.  (why?)
 			// trying to bring these two into line here.  maybe some other approach would be preferred, don't know.  kai, jun'18
-			this.routingModuleProviders.put( mainMode, new Provider<RoutingModule>(){
-				@Override public RoutingModule get() {
-					return routingModule ;
+			this.routingModuleProviders.put( mainMode, new Provider<>() {
+				@Override
+				public RoutingModule get() {
+					return routingModule;
 				}
 			} ) ;
 			return this ;

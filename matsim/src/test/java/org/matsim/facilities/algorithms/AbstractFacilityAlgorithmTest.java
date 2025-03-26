@@ -33,10 +33,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class AbstractFacilityAlgorithmTest {
 
-	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
-
-
 	@Test
 	void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();

@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	private static final Logger log = LogManager.getLogger( GreedyUmlaufBuilderImpl.class );
 
-	public class UmlaufKey {
+	public static class UmlaufKey {
 
 		private final Id<TransitStopFacility> stopFacilityId;
 		private final double lastArrivalTime;
@@ -63,7 +63,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	}
 
-	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
+	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<>() {
 
 		@Override
 		public int compare(UmlaufStueck o1, UmlaufStueck o2) {
@@ -72,7 +72,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	};
 
-	private static final Comparator<UmlaufKey> umlaufKeyComparator = new Comparator<UmlaufKey>() {
+	private static final Comparator<UmlaufKey> umlaufKeyComparator = new Comparator<>() {
 
 		@Override
 		public int compare(UmlaufKey o1, UmlaufKey o2) {
@@ -151,12 +151,11 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	private static TransitRouteStop getLastStop( UmlaufStueckI umlaufStueck ) {
 		List<TransitRouteStop> stops = umlaufStueck.getRoute().getStops();
-		TransitRouteStop previousStop = stops.get(stops.size() - 1);
-		return previousStop;
+		return stops.getLast();
 	}
 
 	private static UmlaufStueckI getLastUmlaufStueck( Umlauf umlauf ) {
-		return umlauf.getUmlaufStuecke().get(umlauf.getUmlaufStuecke().size() - 1);
+		return umlauf.getUmlaufStuecke().getLast();
 	}
 
 	private static String getLastStopPostAreaId( Umlauf umlauf ) {
@@ -168,7 +167,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private Umlauf findFittingUmlauf(UmlaufStueck umlaufStueck) {
-		String firstStopPostAreaId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopAreaId().toString();
+		String firstStopPostAreaId = umlaufStueck.getRoute().getStops().getFirst().getStopFacility().getStopAreaId().toString();
 		UmlaufKey earliestAtPoint = new UmlaufKey(Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
 		UmlaufKey latestAtPoint = new UmlaufKey(Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
 		log.info("Looking between " + earliestAtPoint + " and " + latestAtPoint);
@@ -184,18 +183,16 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private void createUmlaufStuecke() {
-		int i=0;
-		this.umlaufStuecke = new ArrayList<UmlaufStueck>();
+		this.umlaufStuecke = new ArrayList<>();
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					umlaufStuecke.add(umlaufStueck);
-					++i;
 				}
 			}
 		}
-		Collections.sort(this.umlaufStuecke, departureTimeComparator);
+		this.umlaufStuecke.sort(departureTimeComparator);
 	}
 
 

@@ -91,7 +91,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 
 	private String mapLayer = "";
 
-	private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	private final List<ZoomEntry> zooms = new ArrayList<>();
 
 	private boolean scaleQuadTreeRect;
 

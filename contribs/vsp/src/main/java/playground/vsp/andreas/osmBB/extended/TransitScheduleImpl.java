@@ -39,8 +39,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author aneumann
  */
 public class TransitScheduleImpl implements TransitSchedule {
-	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<Id<TransitLine>, TransitLine>();
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
+	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<>();
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 	private final TransitScheduleFactory factory;
 
 	public TransitScheduleImpl(final TransitScheduleFactory builder) {
@@ -49,7 +49,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
+		final Id<TransitLine> id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
 		}
@@ -63,7 +63,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
+		final Id<TransitStopFacility> id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
 		}

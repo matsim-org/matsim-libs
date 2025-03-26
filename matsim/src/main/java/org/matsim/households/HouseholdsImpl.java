@@ -33,7 +33,7 @@ public class HouseholdsImpl implements Households {
 
 	private HouseholdsFactory factory;
 
-	private Map<Id<Household>, Household> households;
+	private final Map<Id<Household>, Household> households;
 
 	public HouseholdsImpl(){
 		this.households = new LinkedHashMap<>();
@@ -45,7 +45,7 @@ public class HouseholdsImpl implements Households {
 	 * Adds the household to the container. If streaming is set, the household
 	 * is added, the algorithms are run on the household, and it is subsequently
 	 * removed. If not, the household is added incrementally to the container.
-	 * @param household
+	 *
 	 * @throws IllegalArgumentException if the container already includes the
 	 * 		{@link Id} of the household being added.
 	 */

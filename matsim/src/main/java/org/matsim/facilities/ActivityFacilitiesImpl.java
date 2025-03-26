@@ -104,12 +104,10 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	@Override
 	public final TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
 		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<>();
-		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
-		while (iter.hasNext()){
-			ActivityFacility f = iter.next();
+		for (ActivityFacility f : this.facilities.values()) {
 			Map<String, ? extends ActivityOption> a = f.getActivityOptions();
-			if(a.containsKey(act_type)){
-				facs.put(f.getId(),f);
+			if (a.containsKey(act_type)) {
+				facs.put(f.getId(), f);
 			}
 		}
 		return facs;

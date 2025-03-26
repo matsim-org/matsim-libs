@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package playground.vsp.parkAndRide;
 
 import java.util.Map;

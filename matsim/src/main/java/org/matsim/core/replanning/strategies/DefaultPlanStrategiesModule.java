@@ -45,7 +45,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
-    private static final Logger log = LogManager.getLogger( DefaultPlanStrategiesModule.class );
 
     public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }
@@ -163,7 +162,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         @Override
         public ExpBetaPlanChanger<Plan, Person> get() {
-            return new ExpBetaPlanChanger<>( - config.getBrainExpBeta());
+            return new ExpBetaPlanChanger.Factory<Plan, Person>().setBetaValue(-config.getBrainExpBeta()).build();
         }
     }
 
