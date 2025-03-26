@@ -21,10 +21,6 @@ package org.matsim.contrib.drt.extension.services.analysis;
 
 
 import org.matsim.contrib.common.timeprofile.ProfileWriter;
-import org.matsim.contrib.drt.extension.services.analysis.DrtServiceProfileCalculator;
-import org.matsim.contrib.drt.extension.services.analysis.DrtServiceProfileView;
-import org.matsim.contrib.drt.extension.services.tasks.DefaultStackableTasksImpl;
-import org.matsim.contrib.drt.extension.services.tasks.StackableTasks;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -39,7 +35,7 @@ public class ServiceAnalysisModule extends AbstractDvrpModeModule {
 	DrtConfigGroup drtConfigGroup;
 
 	public ServiceAnalysisModule(DrtConfigGroup drtConfigGroup) {
-		super(drtConfigGroup.mode);
+		super(drtConfigGroup.getMode());
 		this.drtConfigGroup = drtConfigGroup;
 	}
 

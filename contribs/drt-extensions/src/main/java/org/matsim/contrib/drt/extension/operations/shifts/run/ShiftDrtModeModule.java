@@ -86,7 +86,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		ShiftsParams shiftsParams = drtOperationsParams.getShiftsParams().orElseThrow();
 
 		DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
-		if (shiftsParams.shiftInputFile != null) {
+		if (shiftsParams.getShiftInputFile() != null) {
 			new DrtShiftsReader(drtShiftsSpecification).readURL(shiftsParams.getShiftInputUrl(getConfig().getContext()));
 		}
 

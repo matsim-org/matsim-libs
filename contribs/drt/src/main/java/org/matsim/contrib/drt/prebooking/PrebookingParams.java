@@ -17,7 +17,7 @@ public class PrebookingParams extends ReflectiveConfigGroup {
 			+ " (prebooked) future task and wait for the planned stop to begin, or wait at the current"
 			+ " position and depart to arrive on time at the following stop. The latter behavior (not"
 			+ " the default) may lead to larger ucnertainty in highly congested scenarios.")
-	public boolean scheduleWaitBeforeDrive = false; // in the future, this could also become a double value indicating
+	private boolean scheduleWaitBeforeDrive = false; // in the future, this could also become a double value indicating
 													// how many minutes before the next stop the vehicle should plan to
 													// be there
 
@@ -25,7 +25,7 @@ public class PrebookingParams extends ReflectiveConfigGroup {
 	@Comment("Request gets rejected if a vehicle waits longer than the indicated duration at the stop")
 	@NotNull
 	@Positive
-	public double maximumPassengerDelay = Double.POSITIVE_INFINITY;
+	private double maximumPassengerDelay = Double.POSITIVE_INFINITY;
 
 	public enum UnschedulingMode {
 		StopBased, Routing
@@ -36,12 +36,48 @@ public class PrebookingParams extends ReflectiveConfigGroup {
 			+ " we either simply remove the requests from the planned stops"
 			+ " along the vehicle's schedule or we adaptively reconfigure and reroute the vehicle's schedule.")
 	@NotNull
-	public UnschedulingMode unschedulingMode = UnschedulingMode.StopBased;
+	private UnschedulingMode unschedulingMode = UnschedulingMode.StopBased;
 
 	@Parameter
 	@Comment("Defines whether agents are set to stuck and abort when a prebooked request is rejected." +
 			"If false, prebooked agents will re-attempt to ride at their initially planned departure time." +
 			"Note that additional passenger events for submission, scheduling etc. will occur for re-attempts.")
-	public boolean abortRejectedPrebookings = true;
+	private boolean abortRejectedPrebookings = true;
+
+
+	public boolean isScheduleWaitBeforeDrive() {
+		return scheduleWaitBeforeDrive;
+	}
+
+	public void setScheduleWaitBeforeDrive(boolean scheduleWaitBeforeDrive) {
+		this.scheduleWaitBeforeDrive = scheduleWaitBeforeDrive;
+	}
+
+	@NotNull
+	@Positive
+	public double getMaximumPassengerDelay() {
+		return maximumPassengerDelay;
+	}
+
+	public void setMaximumPassengerDelay(@NotNull @Positive double maximumPassengerDelay) {
+		this.maximumPassengerDelay = maximumPassengerDelay;
+	}
+
+
+	public @NotNull UnschedulingMode getUnschedulingMode() {
+		return unschedulingMode;
+	}
+
+	public void setUnschedulingMode(@NotNull UnschedulingMode unschedulingMode) {
+		this.unschedulingMode = unschedulingMode;
+	}
+
+	public boolean isAbortRejectedPrebookings() {
+		return abortRejectedPrebookings;
+	}
+
+	public void setAbortRejectedPrebookings(boolean abortRejectedPrebookings) {
+		this.abortRejectedPrebookings = abortRejectedPrebookings;
+	}
 
 }
