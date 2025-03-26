@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdCollectors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -56,13 +59,18 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 		dynAgents.addAll(newDynAgents);
 		newDynAgents.clear();
 
+		// computing end times is the heaviest part here and can be parallelized
+		// Todo: use forkJoinPool and respect globalThreads property
+		Map<Id<Person>, Double> activityEndTimes = dynAgents.parallelStream()
+				.collect(Collectors.toMap(MobsimAgent::getId, MobsimAgent::getActivityEndTime));
+
 		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
 		while (dynAgentIter.hasNext()) {
 			DynAgent agent = dynAgentIter.next();
 			Preconditions.checkState(agent.getState() == State.ACTIVITY);
 			agent.doSimStep(time);
 			// ask agents about the current activity end time;
-			double currentEndTime = agent.getActivityEndTime();
+			double currentEndTime = activityEndTimes.get(agent.getId());
 
 			if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
 				unregisterAgentAtActivityLocation(agent);
