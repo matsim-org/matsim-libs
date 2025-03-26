@@ -105,7 +105,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.numberOfThreads));
+				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
 
 		bindModal(RequestFleetFilter.class).toProvider(modalProvider(getter -> RequestFleetFilter.none));
 
@@ -158,7 +158,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
@@ -169,7 +169,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor()));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
-		if (!drtCfg.updateRoutes) {
+		if (!drtCfg.isUpdateRoutes()) {
 			bindModal(DriveTaskUpdater.class).toInstance(DriveTaskUpdater.NOOP);
 		} else {
 			bindModal(DriveTaskUpdater.class).toProvider(modalProvider(getter -> {
@@ -193,7 +193,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
+			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, OnlineTrackerListener.NO_LISTENER,
 					timer);
 		})).in(Singleton.class);
 

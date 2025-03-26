@@ -48,7 +48,7 @@ public class SimulatedAnnealingTest {
 
 		TemperatureFunction temperatureFunction = new NonMonotonicAdaptiveTemperatureFunction(TemperatureFunction.DefaultFunctions.exponentialMultiplicative);
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		simAnCfg.k = 3;
+		simAnCfg.setK(3);
 		Acceptor<String> acceptor = acceptor(simAnCfg);
 
 		CostCalculator<String> costCalculator = costCalculator();

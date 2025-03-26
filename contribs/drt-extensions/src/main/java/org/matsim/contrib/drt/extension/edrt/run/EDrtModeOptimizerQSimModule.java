@@ -123,7 +123,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.numberOfThreads));
+				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
 
 		bindModal(RequestFleetFilter.class).toProvider(modalProvider(getter -> RequestFleetFilter.none));
 
@@ -171,7 +171,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
@@ -182,7 +182,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor()));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
 
-		if (!drtCfg.updateRoutes) {
+		if (!drtCfg.isUpdateRoutes()) {
 			bindModal(DriveTaskUpdater.class).toInstance(DriveTaskUpdater.NOOP);
 		} else {
 			bindModal(DriveTaskUpdater.class).toProvider(modalProvider(getter -> {
@@ -207,7 +207,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
 			// Makes basic DrtActionCreator create legs with consumption tracker
-			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
+			return v -> EDrtActionCreator.createLeg(dvrpCfg.getMobsimMode(), v, timer);
 		})).in(Singleton.class);
 
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {

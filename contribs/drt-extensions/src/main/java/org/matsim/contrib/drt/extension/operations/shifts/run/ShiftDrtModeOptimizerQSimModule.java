@@ -110,7 +110,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType), shiftsParams.considerUpcomingShiftsForInsertion);
+			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType), shiftsParams.isConsiderUpcomingShiftsForInsertion());
 		}));
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class))));
@@ -137,7 +137,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
+			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, OnlineTrackerListener.NO_LISTENER,
 					timer);
 		})).in(Singleton.class);
 

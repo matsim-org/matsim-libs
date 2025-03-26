@@ -53,19 +53,19 @@ class DrtTeleportationTest {
 		defaultConstraintsSet.maxTravelTimeBeta = 600;
 		defaultConstraintsSet.maxWaitTime = 300;
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.baseFare = 1.0;
-		fareParams.distanceFare_m = 0.001;
+		fareParams.setBaseFare(1.0);
+		fareParams.setDistanceFare_m(0.001);
 		drtConfigGroup.addParameterSet(fareParams);
 
 		// Setup to enable estimator and teleportation
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.setSimulationType(DrtConfigGroup.SimulationType.estimateAndTeleport);
 		drtConfigGroup.addParameterSet(new DrtEstimatorParams());
 
 		// This uses the helper method to bind an estimator. Alternatively a separate modal module could also be created.
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.mode).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
+				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.getMode()).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
 			}
 		});
 
