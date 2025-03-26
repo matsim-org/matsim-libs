@@ -3,7 +3,6 @@ package org.matsim.application.options;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
@@ -69,9 +68,9 @@ public final class CsvOptions {
 					semicolon[i] = 0;
 					tab[i] = 0;
 				} else {
-					comma[i] = StringUtils.countMatches(lines[i], ",");
-					semicolon[i] = StringUtils.countMatches(lines[i], ";");
-					tab[i] = StringUtils.countMatches(lines[i], "\t");
+					comma[i] = countOccurrences(lines[i], ',');
+					semicolon[i] = countOccurrences(lines[i], ';');
+					tab[i] = countOccurrences(lines[i], '\t');
 				}
 			}
 
@@ -125,4 +124,13 @@ public final class CsvOptions {
 		return new CSVPrinter(IOUtils.getBufferedWriter(path.toUri().toURL(), csvCharset, false), getFormat());
 	}
 
+	private static int countOccurrences(String str, char ch) {
+		int count = 0;
+		for (char c : str.toCharArray()) {
+			if (c == ch) {
+				count++;
+			}
+		}
+		return count;
+	}
 }
