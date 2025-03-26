@@ -1,6 +1,7 @@
 package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.rng.UniformRandomProvider;
@@ -9,7 +10,6 @@ import org.apache.commons.rng.sampling.distribution.ZigguratSampler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.TasteVariationsConfigParameterSet;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.SplittableRandom;
@@ -24,17 +24,16 @@ public final class PseudoRandomScorer {
 	 */
 	private static final int WARMUP_ITERATIONS = 100;
 
-	private final PseudoRandomTripError tripScore;
 	private final long seed;
-	private final double scale;
-	private final TasteVariationsConfigParameterSet.VariationType distribution;
+
+	private final PseudoRandomTripError tripScore;
+	private final DistributionConfig tripConfig;
 
 	@Inject
-	public PseudoRandomScorer(PseudoRandomTripError tripScore, Config config, double scale,
-							  TasteVariationsConfigParameterSet.VariationType distribution) {
+	PseudoRandomScorer(PseudoRandomTripError tripScore, Config config,
+					   @Named(PseudoRandomScoringModule.TRIP) DistributionConfig tripConfig) {
 		this.tripScore = tripScore;
-		this.distribution = distribution;
-		this.scale = scale;
+		this.tripConfig = tripConfig;
 
 		SplittableRandom rnd = new SplittableRandom(config.global().getRandomSeed());
 		for (int i = 0; i < WARMUP_ITERATIONS; i++) {
@@ -50,7 +49,7 @@ public final class PseudoRandomScorer {
 	 */
 	public double scoreTrip(Id<Person> personId, String mainMode, TripStructureUtils.Trip trip) {
 
-		if (tripScore == null || scale == 0)
+		if (tripConfig.distribution() == null || tripConfig.scale() == 0)
 			return 0;
 
 		long tripSeed = tripScore.getSeed(personId, mainMode, trip);
@@ -61,10 +60,10 @@ public final class PseudoRandomScorer {
 			rng.nextLong();
 		}
 
-		return switch (distribution) {
-			case gumbel -> sampleGumbel(rng, 0, scale);
-			case normal -> sampleNormal(rng, 0, scale);
-			default -> throw new IllegalStateException("Unsupported distribution: " + distribution);
+		return switch (tripConfig.distribution()) {
+			case gumbel -> sampleGumbel(rng, 0, tripConfig.scale());
+			case normal -> sampleNormal(rng, 0, tripConfig.scale());
+			default -> throw new IllegalStateException("Unsupported distribution: " + tripConfig.distribution());
 		};
 	}
 
