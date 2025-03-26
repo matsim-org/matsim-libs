@@ -80,7 +80,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
 				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class)),
-						drtShiftParams.considerUpcomingShiftsForInsertion))).asEagerSingleton();
+                        drtShiftParams.isConsiderUpcomingShiftsForInsertion()))).asEagerSingleton();
 
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->
@@ -101,7 +101,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
 			// Makes basic DrtActionCreator create legs with consumption tracker
-			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
+			return v -> EDrtActionCreator.createLeg(dvrpCfg.getMobsimMode(), v, timer);
 		})).in(Singleton.class);
 
 		bindModal(ShiftEDrtActionCreator.class).toProvider(modalProvider(getter -> {

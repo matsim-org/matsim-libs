@@ -135,7 +135,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
 	private boolean checkBeeline;
 
-	@CommandLine.Option(names = "--keep-capacities", description = "Additional check to keep the capacities of all links, even outside the shp file", defaultValue = "false")
+	@CommandLine.Option(names = "--keep-capacities", description = "Keep the capacities of all links, even outside the shp file", defaultValue = "false")
 	private boolean keepCapacities;
 
 	@CommandLine.Mixin
@@ -497,6 +497,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
 			if (!keepCapacities) {
 				link.setCapacity(1_000_000);
+				// Increase the number of lanes which increases the storage capacity
+				link.setNumberOfLanes(10_000);
 			}
 
 			Double prevSpeed = null;
