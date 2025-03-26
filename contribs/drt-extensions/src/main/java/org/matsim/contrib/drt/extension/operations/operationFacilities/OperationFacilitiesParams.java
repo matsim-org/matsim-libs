@@ -14,15 +14,23 @@ public class OperationFacilitiesParams extends ReflectiveConfigGroupWithConfigur
 
 	@Parameter
 	@Comment("path to operation facility xml")
-	public String operationFacilityInputFile;
+	private String operationFacilityInputFile;
 
 	public OperationFacilitiesParams() {
 		super(SET_NAME);
 	}
 
 	public URL getOperationFacilityInputUrl(URL context) {
-		return operationFacilityInputFile == null ?
+		return getOperationFacilityInputFile() == null ?
 				null :
-				ConfigGroup.getInputFileURL(context, operationFacilityInputFile);
+				ConfigGroup.getInputFileURL(context, getOperationFacilityInputFile());
+	}
+
+	public String getOperationFacilityInputFile() {
+		return operationFacilityInputFile;
+	}
+
+	public void setOperationFacilityInputFile(String operationFacilityInputFile) {
+		this.operationFacilityInputFile = operationFacilityInputFile;
 	}
 }

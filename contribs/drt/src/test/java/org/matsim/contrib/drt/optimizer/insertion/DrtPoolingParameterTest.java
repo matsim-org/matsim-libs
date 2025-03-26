@@ -232,7 +232,7 @@ public class DrtPoolingParameterTest {
 			defaultConstraintsSet.maxWaitTime = maxWaitTime;
 			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
 			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
-			x.stopDuration = 1.;
+			x.setStopDuration(1.);
 		});
 
 		Controler controler = DrtControlerCreator.createControler(config, false);

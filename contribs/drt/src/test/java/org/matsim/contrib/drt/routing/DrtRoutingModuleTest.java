@@ -85,7 +85,7 @@ public class DrtRoutingModuleTest {
 				networkTravelSpeed, beelineFactor);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
-		drtCfg.mode = drtMode;
+		drtCfg.setMode(drtMode);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
@@ -290,7 +290,7 @@ public class DrtRoutingModuleTest {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
-		drtConfigGroup.transitStopFile = utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz";
+		drtConfigGroup.setTransitStopFile(utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz");
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 		config.addModule(multiModeDrtConfigGroup);
@@ -299,7 +299,7 @@ public class DrtRoutingModuleTest {
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				utils.getClassInputDirectory() + "testCottbus/network.xml.gz");
-		new TransitScheduleReader(scenario).readFile(drtConfigGroup.transitStopFile);
+		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);
 		return scenario;
 	}

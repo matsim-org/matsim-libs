@@ -51,12 +51,12 @@ public class RunDrtWithH3ZonalSystemIT {
 			DrtZoneSystemParams drtZoneSystemParams = drtConfig.getZonalSystemParams().get();
 			drtZoneSystemParams.removeParameterSet(drtZoneSystemParams.getZoneSystemParams());
 			ConfigGroup zoneSystemParams = drtZoneSystemParams.createParameterSet(H3GridZoneSystemParams.SET_NAME);
-			((H3GridZoneSystemParams) zoneSystemParams).h3Resolution = 9;
+			((H3GridZoneSystemParams) zoneSystemParams).setH3Resolution(9);
 			drtZoneSystemParams.addParameterSet(zoneSystemParams);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					install(new AbstractDvrpModeModule(drtConfig.mode) {
+					install(new AbstractDvrpModeModule(drtConfig.getMode()) {
 						@Override
 						public void install() {
 							bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(

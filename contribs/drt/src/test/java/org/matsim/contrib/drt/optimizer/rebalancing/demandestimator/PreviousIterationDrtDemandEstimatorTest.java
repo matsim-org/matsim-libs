@@ -173,7 +173,7 @@ public class PreviousIterationDrtDemandEstimatorTest {
 
 	private PreviousIterationDrtDemandEstimator createEstimator() {
 		RebalancingParams rebalancingParams = new RebalancingParams();
-		rebalancingParams.interval = ESTIMATION_PERIOD;
+		rebalancingParams.setInterval(ESTIMATION_PERIOD);
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.addParameterSet(rebalancingParams);

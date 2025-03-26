@@ -83,7 +83,7 @@ public class CapacityReconfigurationTest {
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		prepareLoads(controller.getScenario().getPopulation());
 
-		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.mode, 300));
+		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.getMode(), 300));
 		SimpleReconfigurationLogic.install(controller, drtConfig.getMode());
 
 		ReconfigurationTracker tracker = ReconfigurationTracker.install(controller);
@@ -113,7 +113,7 @@ public class CapacityReconfigurationTest {
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		prepareLoads(controller.getScenario().getPopulation());
 
-		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.mode, 300));
+		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.getMode(), 300));
 
 		DefaultCapacityReconfigurationLogic.install(controller, drtConfig.getMode(), loadType -> {
 			return Set.of( //
@@ -149,7 +149,7 @@ public class CapacityReconfigurationTest {
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		prepareLoads(controller.getScenario().getPopulation());
 
-		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.mode, 300));
+		controller.addOverridingModule(new CapacityReconfigurationModule(drtConfig.getMode(), 300));
 
 		DefaultCapacityReconfigurationLogic.install(controller, drtConfig.getMode(), loadType -> {
 			return Set.of( //
@@ -176,10 +176,10 @@ public class CapacityReconfigurationTest {
 		DvrpLoadParams loadParams = drtConfig.addOrGetLoadParams();
 
 		// produce analysis output on capacities and loads
-		loadParams.analysisInterval = 1;
+		loadParams.setAnalysisInterval(1);
 
 		// set up two dimensions
-		loadParams.dimensions = List.of("passengers", "goods");
+		loadParams.setDimensions(List.of("passengers", "goods"));
 
 		return drtConfig;
 	}

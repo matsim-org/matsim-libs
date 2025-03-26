@@ -86,13 +86,15 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	private final String chargingMode;
 
 	private final ScoringTracker tracker;
+	private final TimeInterpretation timeInterpretation;
 
 	public ChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
-			ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
+							   TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
 			ChargingPlanScoringParameters parameters, String chargingMode, ScoringTracker tracker) {
 		this.eventsManager = eventsManager;
 		this.population = population;
 		this.network = network;
+		this.timeInterpretation = timeInterpretation;
 		this.fleet = fleet;
 		this.costCalculator = costCalculator;
 		this.parameters = parameters;
@@ -453,12 +455,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				// TODO: include detour of access and egress in ChargingPlanScoring !?
 				if (! leg.getMode().equals(chargingMode)) continue;
 
-				//would be better to use a TimeInterpretation object here, but we would need the MATSim config to instantiate it.
-				OptionalTime plannedLegTravelTime =  leg.getRoute().getTravelTime().or(leg.getTravelTime());
-				if (plannedLegTravelTime.isUndefined()){
-					throw new IllegalStateException("Leg " + leg + "  of person + " + person + " has no travel time.");
-				}
-				plannedTotalTravelTime.addAndGet(plannedLegTravelTime.seconds());
+				plannedTotalTravelTime.addAndGet(this.timeInterpretation.decideOnLegTravelTime(leg).seconds());
 				plannedTotalTravelDistance.addAndGet(-leg.getRoute().getDistance());
 			}
 
