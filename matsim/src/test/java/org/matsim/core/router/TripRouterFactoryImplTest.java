@@ -46,6 +46,9 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import jakarta.inject.Provider;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,6 +105,16 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2pt );
 		net.addLink( l3 );
 
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
@@ -127,12 +140,10 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
+				p, new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
+
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
@@ -181,6 +192,16 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2short );
 		net.addLink( l3 );
 
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+
 		// create the factory, get a router, route.
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
@@ -204,12 +225,9 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
+				p, new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
