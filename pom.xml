@@ -200,6 +200,12 @@
                 <artifactId>jts-core</artifactId>
                 <version>${jts.version}</version>
             </dependency>
+			<!-- Command line parser -->
+			<dependency>
+				<groupId>info.picocli</groupId>
+				<artifactId>picocli</artifactId>
+				<version>4.7.6</version>
+			</dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
