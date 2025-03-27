@@ -8,11 +8,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class RunCreateFacilities {
 	
@@ -125,6 +128,11 @@ public class RunCreateFacilities {
 	}
 		
 	public void write() {
-		new FacilitiesWriter(this.scenario.getActivityFacilities()).write("./output/facilities.xml");
+        try {
+            Files.createDirectories(Paths.get("output"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        new FacilitiesWriter(this.scenario.getActivityFacilities()).write("./output/facilities.xml");
 	}
 }
