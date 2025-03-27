@@ -831,20 +831,18 @@ public final class NetworkUtils {
 
 	/**
 	 * This performs all currently recommended cleaning process on a network:
-	 * * clean network for all modes to ensure reachability during routing
+	 * * clean network for selected modes to ensure reachability during routing
 	 * * remove links without any allowed modes
 	 * * remove invalid DisallowedNextLinks
 	 * * remove nodes without links
 	 * 
 	 * @param network
+	 * @param modes   set of modes to clean network (e.g. modes which are routed)
 	 */
-	public static void cleanNetwork(Network network) {
+	public static void cleanNetwork(Network network, Set<String> modes) {
 
 		// clean network for all modes to ensure reachability during routing
 		DisallowedNextLinksUtils.clean(network); // ensure only valid turn restrictions
-		Set<String> modes = network.getLinks().values().stream()
-				.flatMap(l -> l.getAllowedModes().stream())
-				.collect(Collectors.toSet());
 		for (String mode : modes) {
 			new TurnRestrictionsNetworkCleaner().run(network, mode);
 		}
@@ -857,6 +855,24 @@ public final class NetworkUtils {
 
 		// remove nodes without links
 		removeNodesWithoutLinks(network);
+	}
+
+	/**
+	 * This performs all currently recommended cleaning process on a network:
+	 * * clean network for *all* modes to ensure reachability during routing
+	 * * remove links without any allowed modes
+	 * * remove invalid DisallowedNextLinks
+	 * * remove nodes without links
+	 * 
+	 * @param network
+	 * @deprecated Better use {@link #cleanNetwork(Network, Set)}, really!
+	 */
+	@Deprecated(forRemoval = false)
+	public static void cleanNetwork(Network network) {
+		Set<String> modes = network.getLinks().values().stream()
+				.flatMap(l -> l.getAllowedModes().stream())
+				.collect(Collectors.toSet());
+		cleanNetwork(network, modes);
 	}
 
 	/**
