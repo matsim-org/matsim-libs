@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 3 * * 0' # Sun 3:30 UTC
+  pull_request:
+    paths:
+      - '.github/workflows/code-coverage.yaml' # so that it also runs on PRs that change this file
 
 jobs:
   code-coverage:
@@ -22,14 +25,38 @@ jobs:
           distribution: 'zulu'
           cache: 'maven'
 
-      # Run unit and integration tests with jacoco profile
+      # Run unit and integration tests for core with jacoco profile
       - name: Create coverage report
-        run: mvn verify -P jacoco --batch-mode --also-make -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+        run: mvn verify -P jacoco -pl matsim --batch-mode --also-make -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
-      - name: Push coverage to CodeCov
+      - name: Push core code coverage to CodeCov
         uses: codecov/codecov-action@v5
         with:
           files: ./matsim/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: core
+          fail_ci_if_error: true
+
+      # Prepare list of contrib modules to run tests on
+      - name: Detect contrib modules (excluding _template)
+        run: |
+          MODULES=$(find contribs -name pom.xml -exec dirname {} \; | grep -v 'contribs/_template' | paste -sd, -)
+          echo "contribs_modules=$MODULES" >> "$GITHUB_OUTPUT"
+
+      # Run package for each contrib without tests. This is needed, as some of the contribs have dependencies on each other.
+      - name: Run package for each contrib without tests
+        run: mvn package -pl ${{ steps.contribs.outputs.contribs_modules }} --batch-mode -Dmaven.test.skip=true -Dmatsim.preferLocalDtds=true
+
+      # Run unit and integration tests for contrib modules with jacoco profile
+      - name: Create coverage report for contrib modules
+        run: mvn verify -P jacoco -pl ${{ steps.contribs.outputs.contribs_modules }} --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+
+      - name: Push contribs code coverage to CodeCov
+        uses: codecov/codecov-action@v5
+        with:
+          files: |
+            contribs/*/target/site/jacoco/jacoco.xml
+          flags: contribs
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
 
