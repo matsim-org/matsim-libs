@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -67,7 +67,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	public ParkingSlotVisualiser(Scenario scenario) {
 		this.network = scenario.getNetwork();
 		Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(
-			ParkingUtils.ParkingStageInteractionType);
+			ParkingSearchUtils.ParkingStageInteractionType);
 		initialize(parkingFacilities);
 	}
 
@@ -81,9 +81,9 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		for (ActivityFacility fac : parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
 			if (nrOfSlotsPerLink.containsKey(linkId)) {
-				nrOfSlotsPerLink.get(linkId).add(fac.getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity());
+				nrOfSlotsPerLink.get(linkId).add(fac.getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType).getCapacity());
 			} else {
-				nrOfSlotsPerLink.put(linkId, new MutableDouble(fac.getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity()));
+				nrOfSlotsPerLink.put(linkId, new MutableDouble(fac.getActivityOptions().get(ParkingSearchUtils.ParkingStageInteractionType).getCapacity()));
 			}
 		}
 
