@@ -39,6 +39,7 @@ jobs:
 
       # Prepare list of contrib modules to run tests on
       - name: Detect contrib modules (excluding _template)
+        id: contribs
         run: |
           MODULES=$(find contribs -name pom.xml -exec dirname {} \; | grep -v 'contribs/_template' | paste -sd, -)
           echo "contribs_modules=$MODULES" >> "$GITHUB_OUTPUT"
