@@ -274,7 +274,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	private ZoneSystemParams analysisZoneSystemParams;
 
-
 	public DrtConfigGroup() {
 		this(DrtOptimizationConstraintsSetImpl::new);
 	}
@@ -572,8 +571,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return analysisZoneSystemParams;
 	}
 
-	// required for backwards compatibility. Remove at some later point (introduced during code sprint March '25, nkuehnel)
-	// only works as long as empty param sets are not written out
+	/** required for backwards compatibility. Remove at some later point (introduced during code sprint March '25, nkuehnel)
+	 only works as long as empty param sets are not written out.
+	 Old config formats should automatically be written in the new format (see ReadOldConfigTest)*/
 	@Deprecated
 	private final class ZonalSystemWrapper extends ZoneSystemParams {
 
@@ -601,6 +601,72 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
 					() -> delegate,
 					params -> delegate = (GeometryFreeZoneSystemParams)params);
+		}
+
+
+		@Override
+		public void handleAddUnknownParam(String paramName, String value) {
+			switch (paramName) {
+				case "zonesGeneration": {
+					if (delegate == null) {
+						switch (value) {
+							case "ShapeFile": {
+								addParameterSet(createParameterSet(GISFileZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GridFromNetwork": {
+								addParameterSet(createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "H3": {
+								addParameterSet(createParameterSet(H3GridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GeometryFree":{
+								addParameterSet(createParameterSet(GeometryFreeZoneSystemParams.SET_NAME));
+							}
+							default:
+								super.handleAddUnknownParam(paramName, value);
+						}
+					}
+					break;
+				}
+				case "cellSize": {
+					SquareGridZoneSystemParams squareGridParams;
+					if(delegate == null) {
+						squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+						addParameterSet(squareGridParams);
+					} else {
+						squareGridParams = (SquareGridZoneSystemParams) delegate;
+					}
+					squareGridParams.setCellSize(Double.parseDouble(value));
+					break;
+				}
+				case "zonesShapeFile": {
+					GISFileZoneSystemParams gisFileParams;
+					if(delegate == null) {
+						gisFileParams = (GISFileZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(gisFileParams);
+					} else {
+						gisFileParams = (GISFileZoneSystemParams) delegate;
+					}
+					gisFileParams.setZonesShapeFile(value);
+					break;
+				}
+				case "h3Resolution": {
+					H3GridZoneSystemParams h3GridParams;
+					if(delegate == null) {
+						h3GridParams = (H3GridZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(h3GridParams);
+					} else {
+						h3GridParams = (H3GridZoneSystemParams) delegate;
+					}
+					h3GridParams.setH3Resolution(Integer.parseInt(value));
+					break;
+				}
+				default:
+					super.handleAddUnknownParam(paramName, value);
+			}
 		}
 	}
 }
