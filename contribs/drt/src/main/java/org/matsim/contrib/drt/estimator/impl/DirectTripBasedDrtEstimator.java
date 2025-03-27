@@ -54,7 +54,7 @@ public final class DirectTripBasedDrtEstimator implements DrtEstimator {
 			return this;
 		}
 
-		Builder setRejectionRateEstimator(RejectionRateEstimator rejectionRateEstimator) {
+		public Builder setRejectionRateEstimator(RejectionRateEstimator rejectionRateEstimator) {
 			this.rejectionRateEstimator = rejectionRateEstimator;
 			return this;
 		}
