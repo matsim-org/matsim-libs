@@ -81,7 +81,7 @@ public class PrepareCountingData implements MATSimAppCommand {
 					Coord coord = crs.getTransformation().transform(originalCoord);
 
 					Link link = NetworkUtils.getNearestLink(network, coord);
-					assert link != null;
+					assert link != null : "link nearest to " + coord + " is null.";
 					double distance = CoordUtils.distancePointLinesegment
 						(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 
