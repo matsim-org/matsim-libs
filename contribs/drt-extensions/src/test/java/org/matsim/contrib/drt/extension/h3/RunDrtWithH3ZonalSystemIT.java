@@ -7,7 +7,6 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -48,11 +47,9 @@ public class RunDrtWithH3ZonalSystemIT {
 		MultiModeDrtConfigGroup drtConfigs = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtConfig : drtConfigs.getModalElements()) {
 
-			DrtZoneSystemParams drtZoneSystemParams = drtConfig.getZonalSystemParams().get();
-			drtZoneSystemParams.removeParameterSet(drtZoneSystemParams.getZoneSystemParams());
-			ConfigGroup zoneSystemParams = drtZoneSystemParams.createParameterSet(H3GridZoneSystemParams.SET_NAME);
+			ConfigGroup zoneSystemParams = drtConfig.createParameterSet(H3GridZoneSystemParams.SET_NAME);
 			((H3GridZoneSystemParams) zoneSystemParams).setH3Resolution(9);
-			drtZoneSystemParams.addParameterSet(zoneSystemParams);
+			drtConfig.addParameterSet(zoneSystemParams);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
