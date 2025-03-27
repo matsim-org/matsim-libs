@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  */
 public class TurnRestrictionsNetworkCleaner {
 
+    @SuppressWarnings("deprecation")
     public void run(Network network, String mode) {
         TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network, mode);
         colorNetwork(network, turnRestrictions);

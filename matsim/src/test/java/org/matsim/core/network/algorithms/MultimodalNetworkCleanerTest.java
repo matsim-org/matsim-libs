@@ -43,6 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MultimodalNetworkCleanerTest {
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -62,6 +63,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_separateLink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -106,6 +108,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleInexistantMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -126,6 +129,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_singleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -179,6 +183,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_singleSinkIntegrated() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -221,6 +226,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_doubleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -278,6 +284,7 @@ public class MultimodalNetworkCleanerTest {
 
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_singleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -331,6 +338,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRemoveNodesWithoutLinks() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -351,6 +359,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleMode_doubleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -407,6 +416,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_multipleModes() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
@@ -431,6 +441,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_multipleModes_doubleSink() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
@@ -465,6 +476,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_multipleModes_doubleSource() {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
@@ -499,6 +511,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_emptyModes() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -520,6 +533,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_unknownMode() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
@@ -541,6 +555,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleLinkNetwork() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
@@ -566,6 +581,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_singleModeWithConnectivity() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
@@ -577,6 +593,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_withConnectivity_connectedSource() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
@@ -597,6 +614,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_withConnectivity_connectedSink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
@@ -617,6 +635,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_withConnectivity_unconnectedSource() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
@@ -638,6 +657,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_withConnectivity_unconnectedSink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
@@ -659,6 +679,7 @@ public class MultimodalNetworkCleanerTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void testRun_withConnectivity_unconnectedLink() {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
