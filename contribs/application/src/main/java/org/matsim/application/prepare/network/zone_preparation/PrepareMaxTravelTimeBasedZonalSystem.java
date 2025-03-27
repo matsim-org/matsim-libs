@@ -52,7 +52,7 @@ public class PrepareMaxTravelTimeBasedZonalSystem implements MATSimAppCommand {
 		}
 
 		// clean the network after the filter process
-		NetworkUtils.cleanNetwork(subNetwork);
+		NetworkUtils.cleanNetwork(subNetwork, new HashSet<>(networkModes));
 
 		// perform zone-generation on the subnetwork (zone information will be written directly to the attributes of the links in the subnetwork)
 		MaxTravelTimeBasedZoneGenerator.Builder builder = new MaxTravelTimeBasedZoneGenerator.Builder(subNetwork);

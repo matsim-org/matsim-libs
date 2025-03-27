@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.runSignalsAndLanesOsmNetworkReader;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -97,7 +100,7 @@ public class RunSignalsAndLanesOsmNetworkReader {
          * afterwards there is a route from every link to every other link. This may not
          * be the case in the initial network converted from OpenStreetMap.
          */
-		NetworkUtils.cleanNetwork(network);
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
 		new LanesAndSignalsCleaner().run(scenario);
 
 		// write the files out

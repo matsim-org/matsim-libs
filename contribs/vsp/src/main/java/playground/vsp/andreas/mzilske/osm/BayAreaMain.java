@@ -20,6 +20,7 @@
 package playground.vsp.andreas.mzilske.osm;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -41,7 +42,7 @@ public class BayAreaMain {
 	public static void main(String[] args) {
 		for (int hierarchyLevel=1; hierarchyLevel <= 6; hierarchyLevel++) {
 			Scenario scenario = createScenario("/Users/zilske/Documents/osm-bayarea/bayarea-"+hierarchyLevel+".osm.xml");
-			NetworkUtils.cleanNetwork(scenario.getNetwork());
+			NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car));
 			new NetworkWriter(scenario.getNetwork()).write("/Users/zilske/Documents/osm-bayarea/network-"+hierarchyLevel+".xml");
 		}
 	}

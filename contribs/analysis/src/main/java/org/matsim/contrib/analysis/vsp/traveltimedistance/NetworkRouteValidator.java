@@ -14,6 +14,7 @@ import org.matsim.core.utils.collections.Tuple;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Validator that performs the routing on a time variant network.
@@ -43,7 +44,7 @@ public class NetworkRouteValidator implements TravelTimeDistanceValidator {
 					network.removeLink(link.getId());
 			}
 
-			NetworkUtils.cleanNetwork(network);
+			NetworkUtils.cleanNetwork(network, Set.of(mode));
 		}
 
 		this.router = factory.createPathCalculator(network, new OnlyTimeDependentTravelDisutility(tt), tt);

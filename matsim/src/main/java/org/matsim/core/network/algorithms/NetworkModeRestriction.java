@@ -8,20 +8,26 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * This class changes the allowed modes of links in a network and cleans the network afterward.
- * I.e. for each mode, it removes by running {@link NetworkUtils#cleanNetwork(Network)} that mode for links, that are not reachable from all other links
- * or from which all other links are not reachable.
+ * This class changes the allowed modes of links in a network and cleans the
+ * network afterward.
+ * I.e. for each mode, it removes by running
+ * {@link NetworkUtils#cleanNetwork(Network, Set)} that mode for links, that are
+ * not reachable from all other links or from which all other links are not
+ * reachable.
  */
 public class NetworkModeRestriction implements NetworkRunnable {
 	private static final Logger log = LogManager.getLogger(NetworkModeRestriction.class);
 
 	private final Function<Id<Link>, Set<String>> modesToRemoveByLinkId;
+
+	private Set<String> removedModes;
 
 	public NetworkModeRestriction(Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
 		this.modesToRemoveByLinkId = modesToRemoveByLinkId;
@@ -37,15 +43,20 @@ public class NetworkModeRestriction implements NetworkRunnable {
 
 		applyModeChanges(network);
 
-		NetworkUtils.cleanNetwork(network);
+		log.info("Cleaning network for mdoes: {}", this.removedModes);
+		NetworkUtils.cleanNetwork(network, this.removedModes);
 
 		Map<String, Long> modeCountAfter = countModes(network);
 		logModeCountDifference(modeCountBefore, modeCountAfter);
 	}
 
 	private void applyModeChanges(Network network) {
+		this.removedModes = new HashSet<>();
 		for (Map.Entry<Id<Link>, ? extends Link> link : network.getLinks().entrySet()) {
-			this.modesToRemoveByLinkId.apply(link.getKey()).forEach(m -> NetworkUtils.removeAllowedMode(link.getValue(), m));
+			this.modesToRemoveByLinkId.apply(link.getKey()).forEach(m -> {
+				NetworkUtils.removeAllowedMode(link.getValue(), m);
+				removedModes.add(m);
+			});
 		}
 	}
 

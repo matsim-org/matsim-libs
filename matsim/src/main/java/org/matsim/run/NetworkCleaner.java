@@ -21,6 +21,7 @@
 package org.matsim.run;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -32,10 +33,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
- * Reads a network from file and "cleans" it to ensure the network is suited for simulation. Currently,
- * it is ensured that every link can be reached by every other link.
+ * Reads a network from file and "cleans" it to ensure the network is suited for
+ * simulation. Currently, it is ensured that for every mode, every link can be
+ * reached by every other link with that mode.
  *
  * @author mrieser
+ * @deprecated Not deprecated, but consider using
+ *             {@link NetworkUtils#cleanNetwork(Network, Set)} and specify your
+ *             modes to clean explicitly
  */
 public class NetworkCleaner {
 	
@@ -68,7 +73,8 @@ public class NetworkCleaner {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 
-		NetworkUtils.cleanNetwork(network);
+		// ! Better specify cleaning modes explicitly as pt usually should not be cleaned
+		NetworkUtils.cleanNetwork(network, NetworkUtils.getModes(network));
 
 		new NetworkWriter(network).write(outputNetworkFile);
 	}

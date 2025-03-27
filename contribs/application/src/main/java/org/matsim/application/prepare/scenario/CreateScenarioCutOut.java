@@ -20,7 +20,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.population.PopulationUtils;
@@ -305,19 +304,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of links before cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes before cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(scenario.getNetwork());
-		NetworkUtils.removeNodesWithoutLinks(scenario.getNetwork());
+		log.info("Cleaning modes {}", modes);
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), modes);
 
-		for (String mode : modes) {
-			log.info("Cleaning mode {}", mode);
-			cleaner.run(Set.of(mode));
-		}
-
-		if (cleanModes != null) {
-			for (String mode : cleanModes) {
-				log.info("Cleaning mode {}", mode);
-				cleaner.run(Set.of(mode));
-			}
+		if (cleanModes != null && !cleanModes.isEmpty()) {
+			log.info("Cleaning modes {}", cleanModes);
+			NetworkUtils.cleanNetwork(scenario.getNetwork(), cleanModes);
 		}
 
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());

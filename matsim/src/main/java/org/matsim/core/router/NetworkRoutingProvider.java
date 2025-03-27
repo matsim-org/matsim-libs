@@ -41,6 +41,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import com.google.inject.name.Named;
 
 import java.util.Map;
+import java.util.Set;
 
 public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
@@ -151,7 +152,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 		int nLinks = filteredNetwork.getLinks().size();
 		int nNodes = filteredNetwork.getNodes().size();
-		NetworkUtils.cleanNetwork(filteredNetwork);
+		NetworkUtils.cleanNetwork(filteredNetwork, Set.of(this.routingMode));
 		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
 
 		if(changed) {

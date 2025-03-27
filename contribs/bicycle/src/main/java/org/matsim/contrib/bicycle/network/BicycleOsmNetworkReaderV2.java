@@ -95,7 +95,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		
 		bicycleNetworkReader.stats(network);
 
-		NetworkUtils.cleanNetwork(network);
+		NetworkUtils.cleanNetwork(network, Set.of("bicycle", TransportMode.bike, TransportMode.car));
 		new NetworkWriter(network).write(outputXML);
 	}
 

@@ -20,6 +20,7 @@
 package playground.vsp.andreas.mzilske.osm;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -40,7 +41,7 @@ public class OsmMain {
 	
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
-		NetworkUtils.cleanNetwork(scenario.getNetwork());
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car));
 		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/sotm-paper/osm-work/network.xml");
 	}
 

@@ -237,6 +237,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			 */
 
 			Set<String> written = new HashSet<>();
+			Set<String> allModes = new HashSet<>();
 
 			for (CSVRecord record : attrs.getRecords()) {
 
@@ -259,6 +260,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 				Set<String> modes = HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
 						.map(Object::toString).collect(Collectors.toSet());
+				allModes.addAll(modes);
 
 				// create links for both directions
 				if (t.equals("B")) {
@@ -321,7 +323,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 			}
 
-			NetworkUtils.cleanNetwork(network);
+			NetworkUtils.cleanNetwork(network, allModes);
 
 			log.info("Writing network to {}", networkOutput);
 

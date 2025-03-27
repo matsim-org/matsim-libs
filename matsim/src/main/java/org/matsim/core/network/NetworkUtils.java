@@ -858,24 +858,6 @@ public final class NetworkUtils {
 	}
 
 	/**
-	 * This performs all currently recommended cleaning process on a network:
-	 * * clean network for *all* modes to ensure reachability during routing
-	 * * remove links without any allowed modes
-	 * * remove invalid DisallowedNextLinks
-	 * * remove nodes without links
-	 * 
-	 * @param network
-	 * @deprecated Better use {@link #cleanNetwork(Network, Set)}, really!
-	 */
-	@Deprecated(forRemoval = false)
-	public static void cleanNetwork(Network network) {
-		Set<String> modes = network.getLinks().values().stream()
-				.flatMap(l -> l.getAllowedModes().stream())
-				.collect(Collectors.toSet());
-		cleanNetwork(network, modes);
-	}
-
-	/**
 	 * Removes nodes from the network that have no incoming or outgoing links
 	 * attached to them.
 	 * 
@@ -900,6 +882,12 @@ public final class NetworkUtils {
 				.map(Link::getId)
 				.toList();
 		linkIdsToRemove.forEach(network::removeLink);
+	}
+
+	public static Set<String> getModes(Network network) {
+		return network.getLinks().values().stream()
+				.flatMap(l -> l.getAllowedModes().stream())
+				.collect(Collectors.toSet());
 	}
 
 	public static void runNetworkSimplifier( Network network ) {

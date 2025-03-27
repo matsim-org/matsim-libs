@@ -43,7 +43,7 @@ import org.matsim.core.network.NetworkUtils;
  * Nodes with no incoming or outgoing links are removed as well from the
  * network.
  *
- * @deprecated Use {@link NetworkUtils#cleanNetwork(Network)}
+ * @deprecated Use {@link NetworkUtils#cleanNetwork(Network, Set)}
  * @author mrieser
  * @author balmermi
  */
