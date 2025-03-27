@@ -434,7 +434,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		if ( usingLocationChoice ) {
-			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent" );
+			final String samplePercent = config.getModule("locationchoice").getParams().get("destinationSamplePercent");
 			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
 				problem = true ;
 				System.out.flush() ;
