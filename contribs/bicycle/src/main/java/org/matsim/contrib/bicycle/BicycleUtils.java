@@ -47,7 +47,12 @@ public final class BicycleUtils {
 		return (String) link.getAttributes().getAttribute( SURFACE );
 	}
 
-//	TODO: deprecate this with detailed depracate npte
+	/**
+	 * @deprecated
+	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
+	 * Please have a look at getCyclewaytype(link) as an example.
+	 */
+	@Deprecated()
 	public static String getUserDefinedNetworkAttribute( Link link, String nameOfUserDefinedNetworkAttribute ) {
 		return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
 	}
@@ -56,9 +61,12 @@ public final class BicycleUtils {
 		return new AdditionalBicycleLinkScoreDefaultImpl( scenario );
 	}
 
-
-
-//	TODO: die methode vlt. loswerden und ausprogrammieren lassen..
+	/**
+	 * @deprecated
+	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
+	 * Please have a look at getCyclewaytype(link) as an example.
+	 */
+	@Deprecated()
 	/* package */  static double getUserDefinedNetworkAttributeFactor( String userDefinedNetworkAttributeString, double userDefinedNetworkAttributeDefaultValue ) {
 		double userDefinedNetworkAttributeFactor = userDefinedNetworkAttributeDefaultValue;
 
