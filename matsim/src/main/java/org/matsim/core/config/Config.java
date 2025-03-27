@@ -35,6 +35,7 @@ import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.AnalysisConfigGroup;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -145,7 +146,6 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
 
-
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());
@@ -163,6 +163,8 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
 
 		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
+
+		this.modules.put(AnalysisConfigGroup.GROUP_NAME, new AnalysisConfigGroup());
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
@@ -401,6 +403,10 @@ public final class Config implements MatsimExtensionPoint {
 
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
+	}
+
+	public AnalysisConfigGroup analysis() {
+		return (AnalysisConfigGroup) this.getModule(AnalysisConfigGroup.GROUP_NAME);
 	}
 
 	public PlanInheritanceConfigGroup planInheritance() {

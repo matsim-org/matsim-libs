@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.groups.AnalysisConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -41,28 +42,35 @@ import jakarta.inject.Inject;
 final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
 	@Inject private LegHistogram histogram;
+	@Inject private AnalysisConfigGroup analysisConfigGroup;
 	@Inject private ControllerConfigGroup controllerConfigGroup;
-	@Inject private OutputDirectoryHierarchy controlerIO;
+	@Inject private OutputDirectoryHierarchy controllerIO;
 
 	static private final Logger log = LogManager.getLogger(LegHistogramListener.class);
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.histogram.reset(event.getIteration());
+		int interval = analysisConfigGroup.getLegHistogramInterval();
+		if (interval > 0 && event.getIteration() % interval == 0) {
+			this.histogram.reset(event.getIteration());
+			event.getServices().getEvents().addHandler(this.histogram);
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
-		this.printStats();
-		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
-		if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
-			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
-			for (String legMode : this.histogram.getLegModes()) {
-				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+		int interval = analysisConfigGroup.getLegHistogramInterval();
+		if (interval > 0 && event.getIteration() % interval == 0) {
+			this.histogram.write(controllerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
+			this.printStats();
+			int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+			if (createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0) {
+				LegHistogramChart.writeGraphic(this.histogram, controllerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
+				for (String legMode : this.histogram.getLegModes()) {
+					LegHistogramChart.writeGraphic(this.histogram, controllerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+				}
 			}
 		}
-
 	}
 
 	private void printStats() {
