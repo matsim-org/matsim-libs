@@ -61,14 +61,8 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		return addQSimComponentBinding(Names.named(name));
 	}
 
-	// Use methods above
-	@Deprecated
-	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		addQSimComponentBinding(name).to(componentClass);
-	}
-
-	protected LinkedBindingBuilder<MobsimScopeEventHandler> addMobsimScopeEventHandlerBinding() {
-		return Multibinder.newSetBinder(binder(), MobsimScopeEventHandler.class).addBinding();
+	protected LinkedBindingBuilder<MobsimScopeEventHandler> addMobsimScopeEventHandlerBinding(){
+		return Multibinder.newSetBinder( binder(), MobsimScopeEventHandler.class ).addBinding();
 	}
 
 	protected abstract void configureQSim();
