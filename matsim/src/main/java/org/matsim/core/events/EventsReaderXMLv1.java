@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonCreationEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
@@ -241,6 +242,15 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<TransitStopFacility> waitStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP), TransitStopFacility.class);
 			Id<TransitStopFacility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), TransitStopFacility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
+		} else if (PersonCreationEvent.EVENT_TYPE.equals(eventType)){
+			Id<Person> personId = Id.create(atts.getValue(PersonCreationEvent.ATTRIBUTE_PERSON), Person.class);
+			Coord coord = null;
+			if (atts.getValue(Event.ATTRIBUTE_X ) != null) {
+				double xx = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_X));
+				double yy = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_Y));
+				coord = new Coord(xx, yy) ;
+			}
+			this.events.processEvent(new PersonCreationEvent(time, personId, coord));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);
 			for ( int ii=0; ii<atts.getLength(); ii++ ) {
