@@ -203,7 +203,7 @@ public final class Config implements MatsimExtensionPoint {
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final ConfigGroup createModule(final String name) {
+	public ConfigGroup createModule(final String name) {
 		if (this.modules.containsKey(name)) {
 			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
@@ -222,7 +222,7 @@ public final class Config implements MatsimExtensionPoint {
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final void addModule(final ConfigGroup specializedConfigModule) {
+	public void addModule(final ConfigGroup specializedConfigModule) {
 		String name = specializedConfigModule.getName();
 		if (name == null || name.isEmpty()) {
 			throw new RuntimeException("cannot insert module with empty name") ;
@@ -269,7 +269,7 @@ public final class Config implements MatsimExtensionPoint {
 	 * @param name
 	 *
 	 */
-	public final void removeModule(final String name) {
+	public void removeModule(final String name) {
 		if (this.modules.containsKey(name)) {
 			this.modules.remove(name);
 			log.warn("Module \"" + name + "\" is removed manually from config");
@@ -281,7 +281,7 @@ public final class Config implements MatsimExtensionPoint {
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 
-	public final TreeMap<String, ConfigGroup> getModules() {
+	public TreeMap<String, ConfigGroup> getModules() {
 		return this.modules;
 	}
 
@@ -294,7 +294,7 @@ public final class Config implements MatsimExtensionPoint {
 	 * @return requested module
 	 */
 	@Deprecated // please try to use the "typed" access structures.  kai, nov'16
-	public final ConfigGroup getModule(final String moduleName) {
+	public ConfigGroup getModule(final String moduleName) {
 		return this.modules.get(moduleName);
 	}
 
@@ -303,7 +303,7 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "[nof_modules=" + this.modules.size() + "]";
 	}
 
@@ -311,39 +311,39 @@ public final class Config implements MatsimExtensionPoint {
 	// direct access to modules / groups
 	// ////////////////////////////////////////////////////////////////////
 
-	public final GlobalConfigGroup global() {
+	public GlobalConfigGroup global() {
 		return (GlobalConfigGroup) this.getModule(GlobalConfigGroup.GROUP_NAME);
 	}
 
-	public final ControllerConfigGroup controller() {
+	public ControllerConfigGroup controller() {
 		return (ControllerConfigGroup) this.getModule(ControllerConfigGroup.GROUP_NAME);
 	}
 
-	public final CountsConfigGroup counts() {
+	public CountsConfigGroup counts() {
 		return (CountsConfigGroup) this.getModule(CountsConfigGroup.GROUP_NAME);
 	}
 
-	public final ScoringConfigGroup scoring() {
+	public ScoringConfigGroup scoring() {
 		return (ScoringConfigGroup) this.getModule(ScoringConfigGroup.GROUP_NAME);
 	}
 
-	public final NetworkConfigGroup network() {
+	public NetworkConfigGroup network() {
 		return (NetworkConfigGroup) this.getModule(NetworkConfigGroup.GROUP_NAME);
 	}
 
-	public final PlansConfigGroup plans() {
+	public PlansConfigGroup plans() {
 		return (PlansConfigGroup) this.getModule(PlansConfigGroup.GROUP_NAME);
 	}
 
-	public final HouseholdsConfigGroup households() {
+	public HouseholdsConfigGroup households() {
 		return (HouseholdsConfigGroup) this.getModule(HouseholdsConfigGroup.GROUP_NAME);
 	}
 
-	public final FacilitiesConfigGroup facilities() {
+	public FacilitiesConfigGroup facilities() {
 		return (FacilitiesConfigGroup) this.getModule(FacilitiesConfigGroup.GROUP_NAME);
 	}
 
-    public final ReplanningConfigGroup replanning() {
+    public ReplanningConfigGroup replanning() {
 		return (ReplanningConfigGroup) this.getModule(ReplanningConfigGroup.GROUP_NAME);
 	}
 
@@ -410,17 +410,13 @@ public final class Config implements MatsimExtensionPoint {
 	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
-		boolean alreadyExists = false;
 		for (ConfigConsistencyChecker ch : consistencyCheckers) {
 			if (ch.getClass().equals(checker.getClass())) {
-				alreadyExists = true;
+				log.info( "ConfigConsistencyChecker with runtime type=" + checker.getClass() + " was already added; not adding it a second time" ) ;
+				return;
 			}
 		}
-		if ( !alreadyExists ) {
-			this.consistencyCheckers.add(checker);
-		} else {
-			log.info( "ConfigConsistencyChecker with runtime type=" + checker.getClass() + " was already added; not adding it a second time" ) ;
-		}
+		this.consistencyCheckers.add(checker);
 	}
 
 	public void removeConfigConsistencyChecker( final Class clazz ) {
@@ -429,31 +425,15 @@ public final class Config implements MatsimExtensionPoint {
 		consistencyCheckers.removeIf( ch -> ch.getClass().equals( clazz ) );
 	}
 
-	public final boolean isLocked() {
+	public boolean isLocked() {
 		return this.locked;
 	}
 
-	public final void setLocked(boolean locked) {
+	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
 
-	private void checkIfLocked() {
-		if ( this.isLocked() ) {
-			log.error("too late in execution sequence to set config items. Use");
-			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
-			log.error("   config.xxx().setYyy(...); ");
-			log.error("   Controler ctrl = new Controler( config );");
-			log.error("or") ;
-			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
-			log.error("   config.xxx().setYyy(...); ");
-			log.error("   Scenario scenario = ScenarioUtils.loadScenario(config);") ;
-			log.error("   // do something with scenario") ;
-			log.error("   Controler ctrl = new Controler( scenario );");
-			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
-		}
-	}
-
-	public final VehiclesConfigGroup vehicles() {
+	public VehiclesConfigGroup vehicles() {
 		return (VehiclesConfigGroup) this.getModule(VehiclesConfigGroup.GROUP_NAME);
 	}
 
