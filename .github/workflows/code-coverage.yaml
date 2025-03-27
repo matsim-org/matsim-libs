@@ -51,7 +51,7 @@ jobs:
         run: mvn verify -P jacoco -pl ${{ steps.contribs.outputs.contribs_modules }} --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
       - name: Push contribs code coverage to CodeCov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: |
             contribs/*/target/site/jacoco/jacoco.xml
