@@ -51,8 +51,8 @@ public class MultiModalDrtLegEstimatorTest {
 			public void install() {
 
 				for (DrtConfigGroup el : drtConfig.getModalElements()) {
-					install(new DrtEstimatorModule(el.mode, el, el.getDrtEstimatorParams().get()));
-					DrtEstimatorModule.bindEstimator(binder(), el.mode).toInstance(new DirectTripBasedDrtEstimator.Builder().build());
+					install(new DrtEstimatorModule(el.getMode(), el, el.getDrtEstimatorParams().get()));
+					DrtEstimatorModule.bindEstimator(binder(), el.getMode()).toInstance(new DirectTripBasedDrtEstimator.Builder().build());
 				}
 			}
 		});
