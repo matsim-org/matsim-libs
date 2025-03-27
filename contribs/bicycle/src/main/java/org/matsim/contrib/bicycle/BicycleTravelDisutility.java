@@ -69,15 +69,16 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
-													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization) {
-		final ScoringConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
-		if (bicycleParams == null) {
+													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
+		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
+		if (bicycleModeParams == null) {
 			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
 
-		this.marginalCostOfDistance_m = -(bicycleParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
-				- bicycleParams.getMarginalUtilityOfDistance();
-		this.marginalCostOfTime_s = -(bicycleParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
+		this.bicycleParams = bicycleParams;
+		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
+				- bicycleModeParams.getMarginalUtilityOfDistance();
+		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
