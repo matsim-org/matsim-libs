@@ -48,7 +48,9 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 	PopulationImpl(PopulationFactory populationFactory, Double scale) {
 		this.populationFactory = populationFactory ;
-		ScenarioUtils.putScale(this, scale);
+		if(scale != null) {
+			ScenarioUtils.putScale(this, scale);
+		}
 	}
 
 	@Override
