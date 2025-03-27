@@ -132,26 +132,34 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void handleFirstActivity(Activity act) {
-
+			endActivity(act.getEndTime().seconds(), act);
 		}
 
 		@Override
 		public void handleActivity(Activity act) {
-			double time = act.getStartTime().seconds();
+			startActivity(act.getStartTime().seconds(), act);
+			endActivity(act.getEndTime().seconds(), act);
+		}
+
+		@Override
+		public void handleLastActivity(Activity act) {
+			startActivity(act.getStartTime().seconds(), act);
+		}
+
+
+		private void startActivity(double time, Activity act) {
 			if(!act.getType().equals(CarrierConstants.END)){
 				System.out.println("act_start="+ Time.writeTime(time)+" act="+act);
 				startCurrentAct = time;
 			}
+		}
+
+		private void endActivity(double time, Activity act) {
 			if(!act.getType().equals("start")){
 				System.out.println("act_end="+Time.writeTime(time)+" act="+act);
 				time_at_activities += time - startCurrentAct;
 				System.out.println("time_at_activities="+time_at_activities);
 			}
-		}
-
-		@Override
-		public void handleLastActivity(Activity act) {
-
 		}
 
 		@Override
