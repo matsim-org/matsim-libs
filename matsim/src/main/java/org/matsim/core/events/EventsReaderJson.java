@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonInitializedEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
@@ -332,6 +333,15 @@ public final class EventsReaderJson {
 			Id<TransitStopFacility> waitStopId = Id.create(o.get(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP).asText(), TransitStopFacility.class);
 			Id<TransitStopFacility> destinationStopId = Id.create(o.get(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP).asText(), TransitStopFacility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
+		} else if (PersonInitializedEvent.EVENT_TYPE.equals(eventType)){
+			Id<Person> personId = Id.create(o.get(PersonInitializedEvent.ATTRIBUTE_PERSON).asText(), Person.class);
+			Coord coord = null;
+			if (o.get(Event.ATTRIBUTE_X ) != null) {
+				double xx = o.get(Event.ATTRIBUTE_X).asDouble();
+				double yy = o.get(Event.ATTRIBUTE_Y).asDouble();
+				coord = new Coord(xx, yy) ;
+			}
+			this.events.processEvent(new PersonInitializedEvent(time, personId, coord));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);
 
