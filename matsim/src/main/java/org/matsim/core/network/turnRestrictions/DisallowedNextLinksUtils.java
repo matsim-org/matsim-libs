@@ -19,7 +19,7 @@ import org.matsim.core.network.NetworkUtils;
  * 
  * @author hrewald
  */
-public class DisallowedNextLinksUtils {
+public final class DisallowedNextLinksUtils {
 
 	private static final Logger LOG = LogManager.getLogger(DisallowedNextLinksUtils.class);
 
@@ -114,6 +114,39 @@ public class DisallowedNextLinksUtils {
 		});
 	}
 
+	/**
+	 * Returns a list of link id sequences that are not allowed to be traveled due
+	 * to turn restrictions.
+	 * 
+	 * @param network
+	 * @param mode    use turn restrictions of that mode
+	 * @return
+	 */
+	public static List<List<Id<Link>>> getDisallowedLinkIdSequences(Network network, String mode) {
+		return network.getLinks().values().stream()
+				.map(link -> {
+					DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
+					List<List<Id<Link>>> disallowedLinkSequences = Collections.emptyList();
+					if (dnl != null) {
+						disallowedLinkSequences = dnl.getDisallowedLinkSequences(mode);
+					}
+					return Map.entry(link.getId(), disallowedLinkSequences);
+				})
+				.filter(e -> !e.getValue().isEmpty())
+				.map(e -> {
+					List<List<Id<Link>>> linkSequences = new ArrayList<>(e.getValue().size());
+					for (List<Id<Link>> disallowedNextLinks : e.getValue()) {
+						List<Id<Link>> linkIds = new ArrayList<>(disallowedNextLinks.size() + 1);
+						linkIds.add(e.getKey()); // add this link at start of link id sequence
+						linkIds.addAll(disallowedNextLinks);
+						linkSequences.add(linkIds);
+					}
+					return linkSequences;
+				})
+				.flatMap(List::stream)
+				.toList();
+	}
+
 	// Helpers
 
 	private static List<String> getErrors(Map<Id<Link>, ? extends Link> links, Id<Link> linkId,
@@ -186,39 +219,6 @@ public class DisallowedNextLinksUtils {
 		}
 
 		return messages;
-	}
-
-	/**
-	 * Returns a list of link id sequences that are not allowed to be traveled due
-	 * to turn restrictions.
-	 * 
-	 * @param network
-	 * @param mode    use turn restrictions of that mode
-	 * @return
-	 */
-	public static List<List<Id<Link>>> getDisallowedLinkIdSequences(Network network, String mode) {
-		return network.getLinks().values().stream()
-				.map(link -> {
-					DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
-					List<List<Id<Link>>> disallowedLinkSequences = Collections.emptyList();
-					if (dnl != null) {
-						disallowedLinkSequences = dnl.getDisallowedLinkSequences(mode);
-					}
-					return Map.entry(link.getId(), disallowedLinkSequences);
-				})
-				.filter(e -> !e.getValue().isEmpty())
-				.map(e -> {
-					List<List<Id<Link>>> linkSequences = new ArrayList<>(e.getValue().size());
-					for (List<Id<Link>> disallowedNextLinks : e.getValue()) {
-						List<Id<Link>> linkIds = new ArrayList<>(disallowedNextLinks.size() + 1);
-						linkIds.add(e.getKey()); // add this link at start of link id sequence
-						linkIds.addAll(disallowedNextLinks);
-						linkSequences.add(linkIds);
-					}
-					return linkSequences;
-				})
-				.flatMap(List::stream)
-				.toList();
 	}
 
 }
