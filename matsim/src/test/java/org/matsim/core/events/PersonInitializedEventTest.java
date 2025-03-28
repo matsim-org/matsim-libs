@@ -153,6 +153,12 @@ public class PersonInitializedEventTest {
 		}
 	}
 	
+	/**
+	 * Creates a scenario with two agents, one doing home all day, one switching its location from one act to another.
+	 * Also simulates a simple pt setup to ensure that the driver agents wont cause events
+	 * 
+	 * @return
+	 */
 	private static Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams homeParams = new ActivityParams("home");

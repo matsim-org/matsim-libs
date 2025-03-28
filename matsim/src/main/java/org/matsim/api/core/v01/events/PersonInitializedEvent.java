@@ -25,6 +25,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
+/**
+ * The idea of this event is to have a list of all Persons in the beginning of the events file
+ * 
+ * @author tkohl / senozon
+ */
 public class PersonInitializedEvent extends Event implements HasPersonId, BasicLocation {
 
 	public static final String EVENT_TYPE = "personInitialized";
