@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 
@@ -37,6 +36,7 @@ import org.matsim.examples.ExamplesUtils;
 import com.google.inject.Key;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class RunEShiftDrtScenarioIT {
@@ -86,14 +86,15 @@ public class RunEShiftDrtScenarioIT {
 		strategyParams.setTargetAlpha(0.3);
 		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		Optional<RebalancingParams> rebalancingParams = drtConfigGroup.getRebalancingParams();
+		rebalancingParams.get().addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		ConfigGroup parameterSet = drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		ConfigGroup parameterSet = rebalancing.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
 		((SquareGridZoneSystemParams) parameterSet).setCellSize(500.);
-		drtZoneSystemParams.addParameterSet(parameterSet);
-		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		rebalancing.addParameterSet(parameterSet);
+		rebalancingParams.get().setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
+		drtWithShiftsConfigGroup.addParameterSet(parameterSet);
+
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 

@@ -18,7 +18,7 @@ public class GISFileZoneSystemParams extends ZoneSystemParams {
 	}
 
 	@Parameter
-	@Comment("allows to configure zones. Used with zonesGeneration=ShapeFile")
+	@Comment("allows to configure zones based on a GIS file")
 	@Nullable
 	private String zonesShapeFile = null;
 

@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -202,10 +201,8 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         SquareGridZoneSystemParams zoneParams = new SquareGridZoneSystemParams();
         zoneParams.setCellSize(500.);
-
-        DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-        drtZoneSystemParams.addParameterSet(zoneParams);
-        drtWithShiftsConfigGroup.addParameterSet(drtZoneSystemParams);
+        rebalancing.addParameterSet(zoneParams);
+        drtWithShiftsConfigGroup.addParameterSet(zoneParams);
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
