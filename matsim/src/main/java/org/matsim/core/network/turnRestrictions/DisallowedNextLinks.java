@@ -131,6 +131,10 @@ public class DisallowedNextLinks {
 				.collect(Collectors.toMap(Entry::getKey, e -> Collections.unmodifiableList(e.getValue())));
 	}
 
+	public DisallowedNextLinks copy() {
+		return copyOnlyModes(this.linkIdSequencesMap.keySet());
+	}
+
     public DisallowedNextLinks copyOnlyModes(final Collection<String> modes) {
         final DisallowedNextLinks newInstance = new DisallowedNextLinks();
 

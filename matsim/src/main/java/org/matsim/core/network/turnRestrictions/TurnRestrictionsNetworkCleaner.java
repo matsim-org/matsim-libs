@@ -6,33 +6,32 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A network cleaner that ensures strongly connected components in the presence of turn restrictions.
- * Uses the routing graph expansion of {@link TurnRestrictionsContext} to identify disconnected elements using
- * the original {@link org.matsim.core.network.algorithms.NetworkCleaner}.
+ * A network cleaner that ensures strongly connected components in the presence
+ * of {@link DisallowedNextLinks} aka turn restrictions.
+ * Uses the routing graph expansion of {@link TurnRestrictionsContext} to
+ * identify disconnected elements using the original
+ * {@link MultimodalNetworkCleaner}.
  * Only keeps turn restrictions that do not disconnect the network.
  *
  * @author nkuehnel / MOIA
  */
-public class TurnRestrictionsNetworkCleaner implements NetworkRunnable {
+public class TurnRestrictionsNetworkCleaner {
 
-
-    @Override
-    public void run(Network network) {
-        TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network);
+    @SuppressWarnings("deprecation")
+    public void run(Network network, String mode) {
+        TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network, mode);
         colorNetwork(network, turnRestrictions);
-        new NetworkCleaner().run(network);
+        new MultimodalNetworkCleaner(network).run(Set.of(mode));
         collapseNetwork(network, turnRestrictions);
         reapplyRestrictions(network, turnRestrictions);
     }
-
 
     public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
 
