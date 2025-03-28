@@ -81,10 +81,12 @@ public class AnalysisConfigGroupIT {
 	private MatsimTestUtils util = new MatsimTestUtils();
 
 	private void assertFileStatus(int maxIterations, String outputDirectory, int interval, String filename) {
-		for (int iteration = 0; iteration <= maxIterations; iteration++) {
+		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			boolean exists = (iteration % interval) == 0;
 			Assertions.assertEquals(exists, new File(outputDirectory + "ITERS/it." + iteration + "/" + iteration + "." + filename).exists());
 		}
+		// it should always exist in the last iteration
+		Assertions.assertTrue(new File(outputDirectory + "ITERS/it." + maxIterations + "/" + maxIterations + "." + filename).exists());
 	}
 
 	private static class DummyMobsim implements Mobsim {

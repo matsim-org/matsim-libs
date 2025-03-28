@@ -23,6 +23,7 @@ package org.matsim.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.AnalysisConfigGroup;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -51,30 +52,26 @@ class LegTimesControlerListener implements AfterMobsimListener, IterationStartsL
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		int interval = analysisConfigGroup.getLegDurationsInterval();
-		if (interval > 0 && event.getIteration() % interval == 0) {
+		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
 			event.getServices().getEvents().addHandler(this.legTimes);
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		int interval = analysisConfigGroup.getLegDurationsInterval();
-		if (interval > 0 && event.getIteration() % interval == 0) {
+		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
 			event.getServices().getEvents().removeHandler(this.legTimes);
 		}
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		int interval = analysisConfigGroup.getLegDurationsInterval();
-		if (interval > 0 && event.getIteration() % interval == 0) {
+		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
 			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
 			// - print averages in log
 			// it is a leg duration, not a trip duration
 			log.info("[{}] average leg duration is: {} seconds = {}", event.getIteration(), (int) legTimes.getAverageLegDuration(), Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
 		}
-
 	}
 
 }

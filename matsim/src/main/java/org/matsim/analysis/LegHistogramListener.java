@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.AnalysisConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -50,8 +51,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		int interval = analysisConfigGroup.getLegHistogramInterval();
-		if (interval > 0 && event.getIteration() % interval == 0) {
+		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegHistogramInterval())) {
 			this.histogram.reset(event.getIteration());
 			event.getServices().getEvents().addHandler(this.histogram);
 		}
@@ -59,8 +59,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		int interval = analysisConfigGroup.getLegHistogramInterval();
-		if (interval > 0 && event.getIteration() % interval == 0) {
+		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegHistogramInterval())) {
 			this.histogram.write(controllerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 			this.printStats();
 			int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();

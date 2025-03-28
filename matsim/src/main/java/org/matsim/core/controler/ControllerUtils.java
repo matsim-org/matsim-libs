@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.events.AbstractIterationEvent;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**
@@ -111,6 +112,17 @@ public final class ControllerUtils{
 
 	public static Controller createController( Scenario scenario ) {
 		return new Controler( scenario );
+	}
+
+	/**
+	 * Decides if some functionality should be active in the current iteration if it is
+	 * configured to run only at a specific iteration-interval.
+	 */
+	public static boolean isIterationActive(AbstractIterationEvent event, int interval) {
+		if (interval <= 0) {
+			return false;
+		}
+		return event.isLastIteration() || (event.getIteration() % interval == 0);
 	}
 
 }
