@@ -91,7 +91,7 @@ public class RunSignalsAndLanesOsmNetworkReader {
 		reader.parse(inputOSM);
 
         // Simplify the network except the junctions with signals as this might mess up already created plans
-		NetworkSimplifier netSimplify = new NetworkSimplifier();
+		NetworkSimplifier netSimplify = NetworkSimplifier.createNetworkSimplifier(network);
 		netSimplify.setNodesNotToMerge(reader.getNodesNotToMerge());
 		netSimplify.run(network);
 

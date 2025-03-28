@@ -61,7 +61,7 @@ public class RunIntersectionSimplifier {
 		nct.run(newNetwork);
 
 		LOG.info("Simplifying the network...");
-		new NetworkSimplifier().run(newNetwork);
+		NetworkUtils.simplifyNetwork(newNetwork);
 		LOG.info("Cleaning the network...");
 		NetworkUtils.cleanNetwork(newNetwork, Set.of(TransportMode.car));
 

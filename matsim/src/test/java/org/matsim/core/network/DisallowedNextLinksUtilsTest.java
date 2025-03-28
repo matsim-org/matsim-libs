@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
+
+import com.google.common.base.Verify;
 
 class DisallowedNextLinksUtilsTest {
 
@@ -214,6 +218,122 @@ class DisallowedNextLinksUtilsTest {
 		Assertions.assertTrue(network.getLinks().values().stream()
 				.map(NetworkUtils::getDisallowedNextLinks)
 				.allMatch(Objects::isNull));
+
+	}
+
+	@Test
+	void testMergeLastNextLinkWithFollowing() {
+
+		Network network = createNetwork();
+
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12")));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		// Simplify
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
+
+		// * --------------------------------------------------
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("12-23-34"))),
+				NetworkUtils.getDisallowedNextLinks(l01).getDisallowedLinkSequences(TransportMode.car));
+
+	}
+
+	@Test
+	void testMergeLastNextLinkWithFollowingAndOverlap() {
+
+		Network network = createNetwork();
+
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12")));
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12"), Id.createLinkId("23")));
+
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		// Simplify
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
+
+		// * --------------------------------------------------
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+		Assertions.assertEquals(List.of(
+				// List.of(Id.createLinkId("12-23")), // is removed, because subset of next
+				List.of(Id.createLinkId("12-23-34"))),
+				NetworkUtils.getDisallowedNextLinks(l01).getDisallowedLinkSequences(TransportMode.car));
+
+	}
+
+	@Test
+	void testMergeLastNextLinkWithFollowingAndOverlap2() {
+
+		Network network = createNetwork();
+
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12"), Id.createLinkId("23")));
+
+		Link l12 = network.getLinks().get(Id.createLinkId("12"));
+		DisallowedNextLinks dnl12 = NetworkUtils.getOrCreateDisallowedNextLinks(l12);
+		dnl12.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("23"), Id.createLinkId("34")));
+
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		// Simplify
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
+
+		// * --------------------------------------------------
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+		// this could be optimized a bit more, but it's fine for now
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("12"), Id.createLinkId("23"))),
+				NetworkUtils.getDisallowedNextLinks(l01).getDisallowedLinkSequences(TransportMode.car));
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("23"), Id.createLinkId("34"))),
+				NetworkUtils.getDisallowedNextLinks(l12).getDisallowedLinkSequences(TransportMode.car));
+
+	}
+
+	@Test
+	void testOverlappingDisallowedLinks() {
+
+		Network network = createNetwork();
+
+		Link l01 = network.getLinks().get(Id.createLinkId("01"));
+		DisallowedNextLinks dnl01 = NetworkUtils.getOrCreateDisallowedNextLinks(l01);
+		dnl01.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("12"), Id.createLinkId("23")));
+
+		Link l23 = network.getLinks().get(Id.createLinkId("23"));
+		DisallowedNextLinks dnl23 = NetworkUtils.getOrCreateDisallowedNextLinks(l23);
+		dnl23.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("34"), Id.createLinkId("41")));
+
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		// Simplify
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
+
+		// * --------------------------------------------------
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("12"), Id.createLinkId("23"))),
+				NetworkUtils.getDisallowedNextLinks(l01).getDisallowedLinkSequences(TransportMode.car));
+
+		Assertions.assertEquals(List.of(List.of(Id.createLinkId("34"), Id.createLinkId("41"))),
+				NetworkUtils.getDisallowedNextLinks(l23).getDisallowedLinkSequences(TransportMode.car));
 
 	}
 
