@@ -235,6 +235,15 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<Vehicle> vehicleId = Id.createVehicleId(atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_VEHICLE));
 			String networkMode = atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_NETWORKMODE);
 			this.events.processEvent(new VehicleEndsParkingSearch(time, driverId, linkId, vehicleId, networkMode));
+		} else if (PersonInitializedEvent.EVENT_TYPE.equals(eventType)){
+			Id<Person> personId = Id.create(atts.getValue(PersonInitializedEvent.ATTRIBUTE_PERSON), Person.class);
+			Coord coord = null;
+			if (atts.getValue(Event.ATTRIBUTE_X ) != null) {
+				double xx = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_X));
+				double yy = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_Y));
+				coord = new Coord(xx, yy) ;
+			}
+			this.events.processEvent(new PersonInitializedEvent(time, personId, coord));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);
 			for (int ii = 0; ii < atts.getLength(); ii++) {
