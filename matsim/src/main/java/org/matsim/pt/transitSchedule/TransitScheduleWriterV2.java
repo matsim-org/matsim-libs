@@ -42,7 +42,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
@@ -124,11 +123,11 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 				attributes.add(createTuple(Constants.STOP_AREA_ID, stop.getStopAreaId().toString()));
 			}
 			attributes.add(createTuple("isBlocking", stop.getIsBlockingLane()));
-			if (AttributesUtils.isEmpty(stop.getAttributes())) {
+			if (stop.getAttributes().isEmpty()) {
 				this.writeStartTag(Constants.STOP_FACILITY, attributes, true);
 			} else {
 				this.writeStartTag(Constants.STOP_FACILITY, attributes, false);
-				if (!AttributesUtils.isEmpty(stop.getAttributes())) {
+				if (!stop.getAttributes().isEmpty()) {
 					this.writer.write(NL);
 					this.attributesWriter.writeAttributes("\t\t\t", this.writer, stop.getAttributes());
 				}
@@ -164,7 +163,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			attributes.add(createTuple(Constants.NAME, line.getName()));
 		}
 		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
-		if (!AttributesUtils.isEmpty(line.getAttributes())) {
+		if (!line.getAttributes().isEmpty()) {
 			this.writer.write(NL);
 			this.attributesWriter.writeAttributes("\t\t", this.writer, line.getAttributes());
 		}
@@ -181,7 +180,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		attributes.add(createTuple(Constants.ID, route.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
 
-		if (!AttributesUtils.isEmpty(route.getAttributes())) {
+		if (!route.getAttributes().isEmpty()) {
 			this.writer.write(NL);
 			this.attributesWriter.writeAttributes("\t\t\t", this.writer, route.getAttributes());
 		}
@@ -265,7 +264,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			if (dep.getVehicleId() != null) {
 				attributes.add(createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
 			}
-			if (AttributesUtils.isEmpty(dep.getAttributes())) {
+			if (dep.getAttributes().isEmpty()) {
 				this.writeStartTag(Constants.DEPARTURE, attributes, true);
 			} else {
 				this.writeStartTag(Constants.DEPARTURE, attributes, false);

@@ -56,7 +56,7 @@ public class ChangeLegModeTest {
 	void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
@@ -67,8 +67,8 @@ public class ChangeLegModeTest {
 	void test_behavior_allowSwitchFromListedModesOnly() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromSpecifiedModesToSpecifiedModes");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.changeMode().addParam(ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromSpecifiedModesToSpecifiedModes");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car};
@@ -79,8 +79,8 @@ public class ChangeLegModeTest {
 	void test_behavior_fromAllModesToSpecifiedModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromAllModesToSpecifiedModes");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.changeMode().addParam(ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromAllModesToSpecifiedModes");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.pt, TransportMode.bike, TransportMode.walk};
@@ -98,8 +98,8 @@ public class ChangeLegModeTest {
 	void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};

@@ -100,7 +100,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle);
 		if(path == null) {
 			LOG.warn("No route was found from link " + fromLink.getId() + " to link " + toLink.getId() + ". Some possible reasons:");
-			LOG.warn("  * Network is not connected.  Run NetworkCleaner().");
+		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
 			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
 			LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
 			LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
@@ -112,11 +112,11 @@ public class SpeedyALT implements LeastCostPathCalculator {
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
 		Path path = calcLeastCostPathImpl(startNode.getId().index(), endNode.getId().index(), startTime, person, vehicle);
 		if(path == null) {
-			LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
-			LOG.warn("  * Network is not connected.  Run NetworkCleaner().");
-			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
-			LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
-			LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
+      LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
+		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
+		  LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+		  LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+		  LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
 		}
 		return path;
 	}
