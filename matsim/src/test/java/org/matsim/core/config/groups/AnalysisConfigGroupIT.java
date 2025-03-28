@@ -44,9 +44,6 @@ import java.io.File;
  */
 public class AnalysisConfigGroupIT {
 
-	@RegisterExtension
-	private MatsimTestUtils util = new MatsimTestUtils();
-
 	@Test
 	public void testAnalysisConfigSettings() {
 		Config config = this.util.loadConfig((String) null);
@@ -54,6 +51,7 @@ public class AnalysisConfigGroupIT {
 		AnalysisConfigGroup ac = config.analysis();
 
 		ac.setLegHistogramInterval(2);
+		ac.setLegDurationsInterval(3);
 
 		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
@@ -76,7 +74,11 @@ public class AnalysisConfigGroupIT {
 		controler.run();
 
 		assertFileStatus(maxIterations, config.controller().getOutputDirectory(), ac.getLegHistogramInterval(), "legHistogram.txt");
+		assertFileStatus(maxIterations, config.controller().getOutputDirectory(), ac.getLegDurationsInterval(), "legdurations.txt");
 	}
+
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	private void assertFileStatus(int maxIterations, String outputDirectory, int interval, String filename) {
 		for (int iteration = 0; iteration <= maxIterations; iteration++) {

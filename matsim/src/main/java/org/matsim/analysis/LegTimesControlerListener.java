@@ -22,37 +22,58 @@ package org.matsim.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.groups.AnalysisConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.misc.Time;
 
 import jakarta.inject.Inject;
 
-class LegTimesControlerListener implements AfterMobsimListener {
+class LegTimesControlerListener implements AfterMobsimListener, IterationStartsListener, IterationEndsListener {
 
 	private static final  Logger log = LogManager.getLogger(LegTimesControlerListener.class);
 
 	private final CalcLegTimes legTimes;
-
 	private final OutputDirectoryHierarchy controlerIO;
+	private final AnalysisConfigGroup analysisConfigGroup;
 
 	@Inject
-    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
+    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO, AnalysisConfigGroup analysisConfigGroup) {
 		this.legTimes = legTimes;
 		this.controlerIO = controlerIO;
+		this.analysisConfigGroup = analysisConfigGroup;
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		int interval = analysisConfigGroup.getLegDurationsInterval();
+		if (interval > 0 && event.getIteration() % interval == 0) {
+			event.getServices().getEvents().addHandler(this.legTimes);
+		}
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		int interval = analysisConfigGroup.getLegDurationsInterval();
+		if (interval > 0 && event.getIteration() % interval == 0) {
+			event.getServices().getEvents().removeHandler(this.legTimes);
+		}
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-
-		legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
-		// - print averages in log
-		log.info("[" + event.getIteration() + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageLegDuration()
-				+ " seconds = " + Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
-		// trips are from "true" activity to "true" activity.  legs may also go
-		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
-		// kai, jul'11
+		int interval = analysisConfigGroup.getLegDurationsInterval();
+		if (interval > 0 && event.getIteration() % interval == 0) {
+			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
+			// - print averages in log
+			// it is a leg duration, not a trip duration
+			log.info("[{}] average leg duration is: {} seconds = {}", event.getIteration(), (int) legTimes.getAverageLegDuration(), Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
+		}
 
 	}
 
