@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +37,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonCreationEvent;
-import org.matsim.api.core.v01.events.handler.PersonCreationEventHandler;
+import org.matsim.api.core.v01.events.PersonInitializedEvent;
+import org.matsim.api.core.v01.events.handler.PersonInitializedEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
@@ -50,7 +49,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.PersonCreationEventsSetting;
+import org.matsim.core.config.groups.QSimConfigGroup.PersonInitializedEventsSetting;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -67,7 +66,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-public class PersonCreationEventTest {
+public class PersonInitializedEventTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -75,8 +74,8 @@ public class PersonCreationEventTest {
 
 	@Test
 	void testWriteReadXml() {
-		final PersonCreationEvent event1 = new PersonCreationEvent(0, Id.createPersonId("testPerson"));
-		final PersonCreationEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"));
+		final PersonInitializedEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertNull(event2.getCoord());
@@ -84,8 +83,8 @@ public class PersonCreationEventTest {
 	
 	@Test
 	void testWriteReadXmlWithCoord() {
-		final PersonCreationEvent event1 = new PersonCreationEvent(0, Id.createPersonId("testPerson"), new Coord(12345, 67890));
-		final PersonCreationEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+		final PersonInitializedEvent event1 = new PersonInitializedEvent(0, Id.createPersonId("testPerson"), new Coord(12345, 67890));
+		final PersonInitializedEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getCoord(), event2.getCoord());
@@ -93,17 +92,17 @@ public class PersonCreationEventTest {
 	
 	@ParameterizedTest
 	@EnumSource
-	void testQSimSettings(PersonCreationEventsSetting setting) {
+	void testQSimSettings(PersonInitializedEventsSetting setting) {
 		Controler controler = new Controler(createScenario());
 		Config config = controler.getConfig();
-		config.qsim().setPersonCreationEventsSetting(setting);
+		config.qsim().setPersonInitializedEventsSetting(setting);
 		config.controller().setCreateGraphsInterval(0);
 		config.controller().setDumpDataAtEnd(true);
 		config.controller().setWritePlansInterval(0);
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/" + setting.name());
 		
-		PersonCreationEventCollector collector = new PersonCreationEventCollector();
+		PersonInitializedEventCollector collector = new PersonInitializedEventCollector();
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
 				this.addEventHandlerBinding().toInstance(collector);
@@ -118,7 +117,7 @@ public class PersonCreationEventTest {
 		case singleActAgentsOnly:
 		{
 			assertEquals(1, collector.events.size());
-			PersonCreationEvent stationaryPersonEvent = collector.events.get("stationary");
+			PersonInitializedEvent stationaryPersonEvent = collector.events.get("stationary");
 			assertNotNull(stationaryPersonEvent);
 			assertEquals(0, stationaryPersonEvent.getTime(), 0);
 			assertEquals(new Coord(0, 0), stationaryPersonEvent.getCoord());
@@ -127,11 +126,11 @@ public class PersonCreationEventTest {
 		case all:
 		{
 			assertEquals(2, collector.events.size());
-			PersonCreationEvent stationaryPersonEvent = collector.events.get("stationary");
+			PersonInitializedEvent stationaryPersonEvent = collector.events.get("stationary");
 			assertNotNull(stationaryPersonEvent);
 			assertEquals(0, stationaryPersonEvent.getTime(), 0);
 			assertEquals(new Coord(0, 0), stationaryPersonEvent.getCoord());
-			PersonCreationEvent mobilePersonEvent = collector.events.get("mobile");
+			PersonInitializedEvent mobilePersonEvent = collector.events.get("mobile");
 			assertNotNull(mobilePersonEvent);
 			assertEquals(0, mobilePersonEvent.getTime(), 0);
 			assertEquals(new Coord(-100, 0), mobilePersonEvent.getCoord());
@@ -142,14 +141,14 @@ public class PersonCreationEventTest {
 		}
 	}
 	
-	private static class PersonCreationEventCollector implements PersonCreationEventHandler {
-		Map<String, PersonCreationEvent> events = new HashMap<>();
+	private static class PersonInitializedEventCollector implements PersonInitializedEventHandler {
+		Map<String, PersonInitializedEvent> events = new HashMap<>();
 		@Override
 		public void reset(int iteration) {
 			events.clear();
 		}
 		@Override
-		public void handleEvent(PersonCreationEvent event) {
+		public void handleEvent(PersonInitializedEvent event) {
 			events.put(event.getPersonId().toString(), event);
 		}
 	}

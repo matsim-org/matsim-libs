@@ -23,12 +23,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonCreationEvent;
+import org.matsim.api.core.v01.events.PersonInitializedEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.PersonCreationEventsSetting;
+import org.matsim.core.config.groups.QSimConfigGroup.PersonInitializedEventsSetting;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -54,7 +54,7 @@ public final class PopulationAgentSource implements AgentSource {
 	private final QVehicleFactory qVehicleFactory;
 	private final QSim qsim;
 	private final Collection<String> mainModes;
-	private final PersonCreationEventsSetting personHelloEventsSetting;
+	private final PersonInitializedEventsSetting personHelloEventsSetting;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
     private int warnCnt = 0;
 
@@ -65,7 +65,7 @@ public final class PopulationAgentSource implements AgentSource {
 		this.qVehicleFactory = qVehicleFactory;
 		this.qsim = qsim;
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
-		this.personHelloEventsSetting = qsim.getScenario().getConfig().qsim().getPersonCreationEventsSetting();
+		this.personHelloEventsSetting = qsim.getScenario().getConfig().qsim().getPersonInitializedEventsSetting();
 	}
 
 	@Override
@@ -73,10 +73,10 @@ public final class PopulationAgentSource implements AgentSource {
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			qsim.insertAgentIntoMobsim(agent);
-			if (this.personHelloEventsSetting == PersonCreationEventsSetting.all
-					|| (this.personHelloEventsSetting == PersonCreationEventsSetting.singleActAgentsOnly && p.getSelectedPlan().getPlanElements().size() == 1)) {
+			if (this.personHelloEventsSetting == PersonInitializedEventsSetting.all
+					|| (this.personHelloEventsSetting == PersonInitializedEventsSetting.singleActAgentsOnly && p.getSelectedPlan().getPlanElements().size() == 1)) {
 				Coord firstActCoord = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
-				this.qsim.getEventsManager().processEvent(new PersonCreationEvent(0, p.getId(), firstActCoord));
+				this.qsim.getEventsManager().processEvent(new PersonInitializedEvent(0, p.getId(), firstActCoord));
 			}
 		}
 		for (Person p : population.getPersons().values()) {

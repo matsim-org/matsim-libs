@@ -25,18 +25,18 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-public class PersonCreationEvent extends Event implements HasPersonId, BasicLocation {
+public class PersonInitializedEvent extends Event implements HasPersonId, BasicLocation {
 
-	public static final String EVENT_TYPE = "personCreation";
+	public static final String EVENT_TYPE = "personInitialized";
 	
 	private final Id<Person> personId;
 	private final Coord coord;
 	
-	public PersonCreationEvent(double time, Id<Person> personId) {
+	public PersonInitializedEvent(double time, Id<Person> personId) {
 		this(time, personId, null);
 	}
 	
-	public PersonCreationEvent(double time, Id<Person> personId, Coord coord) {
+	public PersonInitializedEvent(double time, Id<Person> personId, Coord coord) {
 		super(time);
 		this.personId = personId;
 		this.coord = coord;

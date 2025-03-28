@@ -20,10 +20,10 @@
 
 package org.matsim.api.core.v01.events.handler;
 
-import org.matsim.api.core.v01.events.PersonCreationEvent;
+import org.matsim.api.core.v01.events.PersonInitializedEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-public interface PersonCreationEventHandler extends EventHandler {
+public interface PersonInitializedEventHandler extends EventHandler {
 
-	public void handleEvent(PersonCreationEvent event);
+	public void handleEvent(PersonInitializedEvent event);
 }
