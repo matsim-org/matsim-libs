@@ -411,7 +411,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		return c;
 	}
 
-	private Node getFromNode(Network network, Trip trip) {
+	private Link getFromLink(Network network, Trip trip) {
 		if (network.getLinks().isEmpty()) {
 			if (emptyNetworkWarnings++ < 10)
 				log.warn("Tried to get a from-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
@@ -421,13 +421,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getOriginActivity().getLinkId() != null && modeLinks.get(trip.getOriginActivity().getLinkId()) != null) {
-			return modeLinks.get(trip.getOriginActivity().getLinkId()).getFromNode();
+			return modeLinks.get(trip.getOriginActivity().getLinkId());
 		} else {
-			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getOriginActivity())).getFromNode();
+			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getOriginActivity()));
 		}
 	}
 
-	private Node getToNode(Network network, Trip trip) {
+	private Link getToLink(Network network, Trip trip) {
 		if (network.getLinks().isEmpty()) {
 			if (emptyNetworkWarnings++ < 10)
 				log.warn("Tried to get a to-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
@@ -436,9 +436,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getDestinationActivity().getLinkId() != null && modeLinks.get(trip.getDestinationActivity().getLinkId()) != null) {
-			return modeLinks.get(trip.getDestinationActivity().getLinkId()).getToNode();
+			return modeLinks.get(trip.getDestinationActivity().getLinkId());
 		} else {
-			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity())).getToNode();
+			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity()));
 		}
 	}
 
@@ -448,13 +448,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private LeastCostPathCalculator.Path getModeNetworkPath(Network network, String mode, Trip trip) {
 		LeastCostPathCalculator router = createRouter(network, mode);
 
-		Node fromNode = getFromNode(network, trip);
-		Node toNode = getToNode(network, trip);
+		Link fromLink = getFromLink(network, trip);
+		Link toLink = getToLink(network, trip);
 
-		if (fromNode == null || toNode == null)
+		if (fromLink == null || toLink == null)
 			return null;
 
-		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
+		return router.calcLeastCostPath(fromLink, toLink, 0, null, null);
 	}
 
 	/**

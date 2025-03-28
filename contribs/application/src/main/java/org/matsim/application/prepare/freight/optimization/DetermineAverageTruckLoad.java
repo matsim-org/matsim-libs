@@ -250,8 +250,8 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 				Id<Link> fromLink = verkehrszelleToLinkIdMapping.get(from);
 				Id<Link> toLink = verkehrszelleToLinkIdMapping.get(to);
 				if (fromLink != null && toLink != null) {
-					List<Id<Link>> route = router.calcLeastCostPath(network.getLinks().get(fromLink).getToNode(),
-							network.getLinks().get(toLink).getToNode(), 0, null, null).links.
+					List<Id<Link>> route = router.calcLeastCostPath(network.getLinks().get(fromLink),
+							network.getLinks().get(toLink), 0, null, null).links.
 						stream().map(Identifiable::getId).collect(Collectors.toList());
 					route.retainAll(countingStations);
 					routesMap.get(from).put(to, route);
