@@ -29,7 +29,20 @@ import org.matsim.vehicles.Vehicle;
 
 public interface LeastCostPathCalculator {
 
-	Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle);
+	/**
+	 * Despite most routing algorithms operating at the node level we deliberately decided to change this interface
+	 * to query from link to link. MATSim usually thinks in "links" instead of "nodes". The underlying implementations
+	 * may still operate on the links' from and to nodes. Using links has the advantage that the start link may be considered
+	 * in existing turn restriction sequences that may start at that link.
+	 * Please use the link-based method from now on.
+	 * nkuehnel, after discussions at the code sprint March '25
+	 */
+	@Deprecated
+	Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, final Person person, final Vehicle vehicle);
+
+	default Path calcLeastCostPath(Link fromLink, Link toLink, double startTime, final Person person, final Vehicle vehicle) {
+		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), startTime, person, vehicle);
+	}
 
 	class Path {
 		public List<Node> nodes;

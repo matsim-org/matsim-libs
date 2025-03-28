@@ -85,7 +85,7 @@ public class RailsimTestUtils {
 		Link fromLink = test.network.getLinks().get(Id.createLinkId(from));
 		Link toLink = test.network.getLinks().get(Id.createLinkId(to));
 
-		LeastCostPathCalculator.Path path = lcp.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0, null, null);
+		LeastCostPathCalculator.Path path = lcp.calcLeastCostPath(fromLink, toLink, 0, null, null);
 		NetworkRoute route = RouteUtils.createNetworkRoute(path.links.stream().map(Link::getId).toList());
 
 		System.out.println("Creating departure with route" + route);

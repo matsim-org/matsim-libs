@@ -58,7 +58,7 @@ public class WithinDayParkingRouter implements ParkingRouter {
 		Link startLink = this.network.getLinks().get(startLinkId);
 		Link endLink = this.network.getLinks().get(destinationLinkId);
 
-		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), departureTime,
+		Path path = this.pathCalculator.calcLeastCostPath(startLink, endLink, departureTime,
 				null, null);
 		NetworkRoute carRoute = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLink.getId());
 		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());

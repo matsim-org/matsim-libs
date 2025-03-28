@@ -38,9 +38,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class OneToManyPathSearch {
-	public static OneToManyPathSearch createSearch(SpeedyGraph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
+	public static OneToManyPathSearch createSearch(SpeedyGraph graph, TravelTime travelTime,
 			TravelDisutility travelDisutility, boolean lazyPathCreation) {
-		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility), travelTime,
+		return new OneToManyPathSearch(new LeastCostPathTree(graph, travelTime, travelDisutility), travelTime,
 				lazyPathCreation);
 	}
 
@@ -83,14 +83,12 @@ public class OneToManyPathSearch {
 		}
 	}
 
-	private final IdMap<Node, Node> nodeMap;
 	private final LeastCostPathTree dijkstraTree;
 	private final TravelTime travelTime;
 	private final boolean lazyPathCreation;
 
-	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
+	private OneToManyPathSearch(LeastCostPathTree dijkstraTree, TravelTime travelTime,
 			boolean lazyPathCreation) {
-		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
 		this.travelTime = travelTime;
 		this.lazyPathCreation = lazyPathCreation;
@@ -102,7 +100,7 @@ public class OneToManyPathSearch {
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
 			double maxTravelTime) {
-		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime,
+		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(dijkstraTree, travelTime,
 				forward, fromLink, startTime);
 		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataArray(toLinks, pathConstructor);
@@ -115,7 +113,7 @@ public class OneToManyPathSearch {
 
 	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			boolean forward, double maxTravelTime) {
-		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, forward,
+		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(dijkstraTree, travelTime, forward,
 				fromLink, startTime);
 		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataMap(toLinks, pathCalculator);
