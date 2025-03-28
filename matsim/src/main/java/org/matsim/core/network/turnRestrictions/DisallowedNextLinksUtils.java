@@ -115,6 +115,30 @@ public final class DisallowedNextLinksUtils {
 	}
 
 	/**
+	 * Copy link sequences of DisallowedNextLinks attributes from one mode to
+	 * another e.g., from car to ride.
+	 * 
+	 * @param network
+	 * @param fromMode
+	 * @param toMode
+	 * @see {@link #clean(Network)}
+	 */
+	public static void copy(Network network, String fromMode, String toMode) {
+		network.getLinks().values().forEach(link -> {
+
+			DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
+			if (dnl == null) {
+				return;
+			}
+
+			for (List<Id<Link>> linkSequence : dnl.getDisallowedLinkSequences(fromMode)) {
+				dnl.addDisallowedLinkSequence(toMode, linkSequence);
+			}
+
+		});
+	}
+
+	/**
 	 * Returns a list of link id sequences that are not allowed to be traveled due
 	 * to turn restrictions.
 	 * 
