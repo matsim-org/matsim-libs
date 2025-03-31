@@ -7,6 +7,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,9 +40,11 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.collections.ArrayMap;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.vehicles.Vehicle;
 import picocli.CommandLine;
 
 import java.util.*;
@@ -101,7 +107,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--events", description = "Input events used for travel time calculation. NOTE: Making a cutout without the events file will make the scenario inaccurate!", required = false)
 	private String eventPath;
 
-	@CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "5000")
+	@CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "0") // TODO Set default-value to appropriate value
 	private double buffer;
 
 	@CommandLine.Option(names = "--output-network", description = "Path to output network", required = true)
@@ -143,9 +149,59 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
+	// inner class  for capacity calculation TODO check if this calculator works properly!
+	static class CutoutCapacityCalculator implements LinkLeaveEventHandler {
+		Scenario scenario;
+		double interval;
+		Map<Id<Link>, Map<Integer, List<Id<Vehicle>>>> linkId2timeslice2listOfVehIds = new HashMap<>();
+
+		private CutoutCapacityCalculator(Scenario scenario, double interval){
+			this.scenario = scenario;
+			this.interval = interval;
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			int timeslice = (int) Math.floor(event.getTime() / interval);
+
+			linkId2timeslice2listOfVehIds.putIfAbsent(event.getLinkId(), new ArrayMap<>());
+			linkId2timeslice2listOfVehIds.get(event.getLinkId()).putIfAbsent(timeslice, new ArrayList<>());
+			linkId2timeslice2listOfVehIds.get(event.getLinkId()).get(timeslice).add(event.getVehicleId());
+		}
+
+		/**
+		 * Returns total number of vehicles, that have used (entered) this link
+		 */
+		public int getTotalLinkUsage(Id<Link> linkId, double time){
+			int timeslice = (int) Math.floor(time / interval);
+
+			linkId2timeslice2listOfVehIds.putIfAbsent(linkId, new ArrayMap<>());
+			linkId2timeslice2listOfVehIds.get(linkId).putIfAbsent(timeslice, new ArrayList<>());
+			return linkId2timeslice2listOfVehIds.get(linkId).get(timeslice).size();
+		}
+
+		/**
+		 * Returns number of vehicles, that used this link which will be in the cutout-scenario
+		 */
+		public int getCutoutLinkUsage(Id<Link> linkId, double time){
+			int timeslice = (int) Math.floor(time / interval);
+
+			linkId2timeslice2listOfVehIds.putIfAbsent(linkId, new ArrayMap<>());
+			linkId2timeslice2listOfVehIds.get(linkId).putIfAbsent(timeslice, new ArrayList<>());
+			return (int) linkId2timeslice2listOfVehIds
+				.get(linkId)
+				.get(timeslice)
+				.stream()
+				.filter(id -> scenario.getVehicles().getVehicles().containsKey(id))
+				.count();
+		}
+
+	}
+
 	// External classes
 	private final GeometryFactory geoFactory = new GeometryFactory();
 	private TravelTimeCalculator tt;
+	private CutoutCapacityCalculator cc;
 
 	// Variables used for processing
 	/**
@@ -241,11 +297,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
 			builder.setTimeslice(changeEventsInterval);
 			builder.setMaxTime(changeEventsMaxTime);
+			tt = builder.build();
+
+			cc = new CutoutCapacityCalculator(scenario, (int) changeEventsInterval);
 
 			EventsManager manager = EventsUtils.createEventsManager();
-
-			tt = builder.build();
 			manager.addHandler(tt);
+			manager.addHandler(cc);
 
 			manager.initProcessing();
 			EventsUtils.readEvents(manager, eventPath);
@@ -477,7 +535,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 
-			// Don't generate events for links thar are in the shapefile + buffer
+			// Don't generate events for links that are in the shapefile + buffer TODO rethink purpose of the buffer! it is currently useless
 			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
 				continue;
 
@@ -485,15 +543,15 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			if (link.getAllowedModes().equals(keepModes))
 				continue;
 
-
-			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
-			if (!keepCapacities) {
+			// Setting capacity outside shapefile (and buffer) to an approximation, which will fit the actual capacity before the cutout, not max value, as this causes problem in the qsim
+			/*if (!keepCapacities) {
 				link.setCapacity(1_000_000);
 				// Increase the number of lanes which increases the storage capacity
 				link.setNumberOfLanes(10_000);
-			}
+			}*/
 
 			Double prevSpeed = null;
+			Double prevCapacity = null;
 
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
@@ -506,19 +564,32 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					freespeed = link.getFreespeed();
 				}
 
-				// Skip if the speed is the same as the previous speed
-				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
+				// Setting capacity to the link usage
+				/*
+				TODO While this method accurately depicts the relative usage of the link after the cutout, it can greatly reduce the remaining capacity
+				TODO Check if it would be better to just subtract the "lost" vehicles from the capacity (-> depends on how the "slowdown" on overusage is computed)
+				 */
+				double capacity = (((double) cc.getCutoutLinkUsage(link.getId(), time) / (double) cc.getTotalLinkUsage(link.getId(), time))*((changeEventsInterval/3600)*link.getCapacity()));
+
+				boolean speedSame = prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6;
+				boolean capacitySame = prevCapacity != null && Math.abs(capacity - prevCapacity) < 1e-6;
+
+				// Skip if the speed and capacity is the same as previous
+				if (speedSame && capacitySame) {
 					continue;
 				}
 
-
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
-				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
+				if(!speedSame)
+					event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
+				if(!capacitySame)
+					event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, capacity));
 				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
 
 				prevSpeed = freespeed;
+				prevCapacity = capacity;
 			}
 		}
 
