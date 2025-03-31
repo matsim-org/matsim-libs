@@ -233,9 +233,9 @@ import org.matsim.vehicles.VehicleType;
 
 		//add all shipments.
 		for (LspShipment lspShipment : shipmentsToSchedule) {
-			lspShipment.getShipmentLog().getMostRecentEntry(); // todo mal mit Debugger hier rein stellen
 			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
 			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
+			CarriersUtils.addShipment(auxCarrier, carrierShipment);
 		}
 
 		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
