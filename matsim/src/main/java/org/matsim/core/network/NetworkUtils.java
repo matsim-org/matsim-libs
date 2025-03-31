@@ -887,8 +887,17 @@ public final class NetworkUtils {
 				.collect(Collectors.toSet());
 	}
 
-	public static void runNetworkSimplifier( Network network ) {
-		new NetworkSimplifier().run(network) ;
+	/**
+	 * Simplifies the network considering turn restrictions aka
+	 * {@link DisallowedNextLinks}
+	 * 
+	 * @param network
+	 * @see {@link DisallowedNextLinksUtils#clean(Network)},
+	 *      {@link #cleanNetwork(Network, Set)},
+	 *      {@link NetworkSimplifier#createNetworkSimplifier(Network)}
+	 */
+	public static void simplifyNetwork(Network network) {
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
 	}
 
 	public static void writeNetwork(Network network, String string) {
