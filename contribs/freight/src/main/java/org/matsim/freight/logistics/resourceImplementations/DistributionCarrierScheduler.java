@@ -198,7 +198,7 @@ import org.matsim.vehicles.VehicleType;
 			}
 		}
 
-		CarrierPlan plan = new CarrierPlan(carrier, scheduledToursUnified); //TODO: Why do we need the carrier here to create the CarrierPlan? KMT feb'25
+		CarrierPlan plan = new CarrierPlan(scheduledToursUnified);
 		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		plan.setJspritScore(CarrierSchedulerUtils.sumUpJspritScore(scheduledPlans));
 		carrier.addPlan(plan);
@@ -242,7 +242,7 @@ import org.matsim.vehicles.VehicleType;
 
 		//Copy infos over to the Carrier.
 
-		CarrierPlan plan = new CarrierPlan(carrier, auxCarrier.getSelectedPlan().getScheduledTours()); //TODO: Why do we need the carrier here to create the CarrierPlan? KMT feb'25
+		CarrierPlan plan = new CarrierPlan(auxCarrier.getSelectedPlan().getScheduledTours());
 		plan.setScore(auxCarrier.getSelectedPlan().getScore());
    		plan.setJspritScore(auxCarrier.getSelectedPlan().getJspritScore());
 		carrier.getShipments().putAll(auxCarrier.getShipments());
