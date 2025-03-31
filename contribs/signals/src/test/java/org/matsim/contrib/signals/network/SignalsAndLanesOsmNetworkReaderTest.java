@@ -389,7 +389,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
         signalReader.parse(inputfile.toString());
 
-        NetworkSimplifier netsimplify = new NetworkSimplifier();
+		NetworkSimplifier netsimplify = NetworkSimplifier.createNetworkSimplifier(network);
         netsimplify.setNodesNotToMerge(signalReader.getNodesNotToMerge());
         netsimplify.run(network);
 
