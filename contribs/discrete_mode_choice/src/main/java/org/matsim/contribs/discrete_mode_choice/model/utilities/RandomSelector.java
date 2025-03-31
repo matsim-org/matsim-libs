@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * The RandomSelector does what the name says: It collects a set of candidates
  * and then selects one randomly.
- * 
+ *
  * @author sebhoerl
  */
 public class RandomSelector implements UtilitySelector {
@@ -21,7 +21,7 @@ public class RandomSelector implements UtilitySelector {
 
 	@Override
 	public Optional<UtilityCandidate> select(Random random) {
-		if (candidates.size() == 0) {
+		if (candidates.isEmpty()) {
 			return Optional.empty();
 		}
 
@@ -30,7 +30,7 @@ public class RandomSelector implements UtilitySelector {
 
 	static public class Factory implements UtilitySelectorFactory {
 		@Override
-		public UtilitySelector createUtilitySelector() {
+		public RandomSelector createUtilitySelector() {
 			return new RandomSelector();
 		}
 	}

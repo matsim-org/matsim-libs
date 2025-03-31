@@ -42,7 +42,7 @@ public class AttributesUtils {
 	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object
 	 * themselves, which should be fine for 99.9% of the usecases of Attributes
 	 * (value objects).
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @param exceptAttribute does not copy attribute with that name
@@ -68,7 +68,7 @@ public class AttributesUtils {
 	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object
 	 * themselves, which should be fine for 99.9% of the usecases of Attributes
 	 * (value objects).
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @param exceptAttribute does not copy attribute with that name
@@ -77,13 +77,4 @@ public class AttributesUtils {
 		copyToExcept(from.getAttributes(), to.getAttributes(), exceptAttribute);
 	}
 
-	/**
-	 * @param attributes collection of attributes
-	 * @return <code>true</code> if the attributes collection does not contain any attribute
-	 * @deprecated use {@link Attributes#isEmpty()} instead
-	 */
-	@Deprecated
-	public static boolean isEmpty(Attributes attributes) {
-		return attributes.size() == 0;
-	}
 }

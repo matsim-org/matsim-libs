@@ -30,7 +30,7 @@ class TurnRestrictionsNetworkCleanerTest {
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
-		trc.run(network);
+		trc.run(network, TransportMode.car);
 
 		// * --------------------------------------------------
 
@@ -51,7 +51,7 @@ class TurnRestrictionsNetworkCleanerTest {
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
-		trc.run(network);
+		trc.run(network, TransportMode.car);
 
 		// * --------------------------------------------------
 
@@ -72,7 +72,7 @@ class TurnRestrictionsNetworkCleanerTest {
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
-		trc.run(network);
+		trc.run(network, TransportMode.car);
 
 		// * --------------------------------------------------
 

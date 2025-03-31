@@ -17,7 +17,7 @@ public class DashboardUtils {
 		viz.maxHeight = 15;
 		viz.projection = crs;
 		viz.center = data.context().getCenter();
-		viz.zoom = data.context().mapZoomLevel;
+		viz.zoom = data.context().getMapZoomLevel();
 		viz.setColorRamp(new double[]{30, 40, 50, 60, 70}, new String[]{DARK_BLUE, LIGHT_BLUE, YELLOW, SAND, ORANGE, RED});
 	}
 }

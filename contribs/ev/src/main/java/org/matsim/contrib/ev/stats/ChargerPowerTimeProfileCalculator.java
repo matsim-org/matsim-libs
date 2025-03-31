@@ -36,7 +36,7 @@ public final class ChargerPowerTimeProfileCalculator implements ChargingStartEve
 	 */
 	@Inject
 	ChargerPowerTimeProfileCalculator(Config config) {
-		int chargeTimeStep = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).chargeTimeStep;
+		int chargeTimeStep = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).getChargeTimeStep();
 		qsimEndTime = ConfigUtils.addOrGetModule(config, QSimConfigGroup.class).getEndTime().orElse(0.0);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(qsimEndTime), chargeTimeStep);
 	}

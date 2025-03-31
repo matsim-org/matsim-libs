@@ -70,7 +70,7 @@ public final class IdleDischargingHandler
 	@Inject
 	IdleDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg, EventsManager eventsManager) {
 		this.vehicleProvider = vehicleProvider;
-		this.auxDischargeTimeStep = evCfg.auxDischargeTimeStep;
+		this.auxDischargeTimeStep = evCfg.getAuxDischargeTimeStep();
 		this.eventsManager = eventsManager;
 	}
 

@@ -77,7 +77,7 @@ public final class Injector {
 	}
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
-		Level level = Level.INFO ;
+		Level level = Level.DEBUG ;
 		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
 			if ( entry.getKey().toString().contains("type=org.matsim") ) {

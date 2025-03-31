@@ -21,15 +21,24 @@
 
  package org.matsim.core.config.consistency;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
 public class UnmaterializedConfigGroupChecker implements ConfigConsistencyChecker {
+
+	private final static Logger LOG = LogManager.getLogger(UnmaterializedConfigGroupChecker.class);
+
 	@Override
 	public void checkConsistency(Config config) {
 		for (ConfigGroup configGroup : config.getModules().values()) {
 			if (configGroup.getClass().equals(ConfigGroup.class)) {
-				throw new RuntimeException("Unmaterialized config group: "+configGroup.getName());
+				if (configGroup.getName().equals("jdeqsim")) {
+					LOG.warn("jdeqsim is no longer supported. Please remove the jdeqsim module from your config.");
+				} else {
+					throw new RuntimeException("Unmaterialized config group: "+configGroup.getName());
+				}
 			}
 		}
 	}

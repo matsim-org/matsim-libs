@@ -61,14 +61,14 @@ public class TariffBasedChargingCostCalculator implements ChargingCostCalculator
 
 		double best = Double.POSITIVE_INFINITY;
 		for (TariffParameters tariff : tariffs) {
-			if (tariff.subscriptions.size() == 0 || Sets
-					.intersection(tariff.subscriptions, subscriptions.getPersonSubscriptions(person)).size() > 0) {
-				double blockingDuration_min = Math.max(duration / 60.0 - tariff.blockingDuration_min, 0.0);
+			if (tariff.getSubscriptions().size() == 0 || Sets
+					.intersection(tariff.getSubscriptions(), subscriptions.getPersonSubscriptions(person)).size() > 0) {
+				double blockingDuration_min = Math.max(duration / 60.0 - tariff.getBlockingDuration_min(), 0.0);
 
 				best = Math.min(best,
-						duration / 60.0 * tariff.costPerDuration_min
-								+ blockingDuration_min * tariff.costPerBlockingDuration_min +
-								+EvUnits.J_to_kWh(energy) * tariff.costPerEnergy_kWh + tariff.costPerUse);
+						duration / 60.0 * tariff.getCostPerDuration_min()
+								+ blockingDuration_min * tariff.getCostPerBlockingDuration_min() +
+								+EvUnits.J_to_kWh(energy) * tariff.getCostPerEnergy_kWh() + tariff.getCostPerUse());
 			}
 		}
 

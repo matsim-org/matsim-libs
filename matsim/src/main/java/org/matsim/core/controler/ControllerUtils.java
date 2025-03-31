@@ -98,16 +98,11 @@ public final class ControllerUtils{
 	    String newline = System.lineSeparator();// use native line endings for logfile
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-	    log.info(newline + newline + writer.getBuffer().toString());
+	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");
 	    log.info("Checking consistency of config...");
 	    config.checkConsistency();
 	    log.info("Checking consistency of config done.");
-	}
-
-	@Deprecated // use 	OutputDirectoryLogging.catchLogEntries() directly.  kai, mar'18
-	public static final void initializeOutputLogging() {
-		OutputDirectoryLogging.catchLogEntries();
 	}
 
 	public static void catchLogEntries() {
