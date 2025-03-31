@@ -42,6 +42,7 @@ public class CarrierCapabilitiesCheckTest {
 
 		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl),"At least one check failed.");
 	}
+
 	@Test
 	void CarrierCapabilitiesCheck_fails() {
 		Config config = ConfigUtils.createConfig();
