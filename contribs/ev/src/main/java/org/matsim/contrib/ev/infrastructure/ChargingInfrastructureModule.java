@@ -69,7 +69,7 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 				ChargerReader reader = new ChargerReader(chargingInfrastructureSpecification);
 				reader.putAttributeConverters(attributeConverters);
 				reader.parse(
-						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
+						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getChargersFile()));
 						
 				return chargingInfrastructureSpecification;
 			}

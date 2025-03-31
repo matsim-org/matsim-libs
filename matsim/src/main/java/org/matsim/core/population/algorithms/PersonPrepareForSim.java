@@ -22,6 +22,7 @@ package org.matsim.core.population.algorithms;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -204,13 +205,15 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			return;
 		}
 
-		Optional<? extends Link> inconsistentLink = networkRoute.getLinkIds().stream()
-												  .map(l -> scenario.getNetwork().getLinks().get(l))
-												  .filter(l -> !l.getAllowedModes().contains(leg.getMode()))
+		Optional<Id<Link>> inconsistentLink = networkRoute.getLinkIds().stream()
+												  .filter(linkId -> {
+													  Link link = scenario.getNetwork().getLinks().get(linkId);
+													  return link == null || !link.getAllowedModes().contains(leg.getMode());
+												  })
 			.findFirst();
 
 		if (inconsistentLink.isPresent()) {
-			String errorMessage = "Route inconsistent with link modes for: Link: " + inconsistentLink.get() + " Person " + person.getId() + "; Leg '" + leg + "'";
+			String errorMessage = "Route inconsistent with link modes for link: " + inconsistentLink.get() + " Person " + person.getId() + "; Leg '" + leg + "'";
 			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset()." +
 				"\n If this is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
 			throw new RuntimeException(errorMessage);

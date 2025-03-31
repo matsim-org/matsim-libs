@@ -435,9 +435,13 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 			Id<Person> personId = stuckIterator.next();
 			MobsimAgent agent = internalInterface.getMobsim().getAgents().get(personId);
 
-			PlanElement planElement = WithinDayAgentUtils.getCurrentPlanElement(agent);
-			if (planElement instanceof Activity activity) {
-				abortAgent(agent, activity, now);
+			if(agent != null) {
+                if (WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity activity) {
+					abortAgent(agent, activity, now);
+					stuckIterator.remove();
+				}
+			} else {
+				// the agent no longer exists in the mobsim, we assume it is already been handled elsewhere. nkuehnel, march'25
 				stuckIterator.remove();
 			}
 		}

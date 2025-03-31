@@ -53,27 +53,27 @@ public final class DownstreamSensor {
 	private final double carSize;
 	private final double storageCapacityFactor;
 	private final SignalsData signalsData;
-	
+
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
-	
+
 	/* the controller will allow a delay of at most this factor times the free speed travel time */
 	private final double maxDelayFactor = 1;
 	/* the controller will allow a link occupation of at most this factor times the maximum number of vehicles regarding to the storage capacity */
 	private final double maxStorageFactor = 0.75;
 	// TODO make this adjustable per downstream config?! (add config to constructor parameter)
-	
+
 	@Inject
 	public DownstreamSensor(LinkSensorManager sensorManager, Scenario scenario) {
 		this.sensorManager = sensorManager;
 		this.network = scenario.getNetwork();
 		this.lanes = scenario.getLanes();
-		this.carSize = scenario.getConfig().jdeqSim().getCarSize();
+		this.carSize = 7.5; // assumed vehicle size, see NetworkImpl.DEFAULT_EFFECTIVE_CELL_SIZE
 		this.storageCapacityFactor = scenario.getConfig().qsim().getStorageCapFactor();
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		init();
 	}
-	
+
 	private void init() {
 		// determine different occupancy criterion for links, i.e. maximum number of vehicles
 		linkMaxNoCarsForStorage = new HashMap<>();
@@ -88,17 +88,17 @@ public final class DownstreamSensor {
 //			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
 		}
 	}
-	
+
 	public void registerDownstreamSensor(Id<Link> downstreamLinkId){
 		this.sensorManager.registerNumberOfCarsMonitoring(downstreamLinkId);
 	}
-	
+
 	public void registerDownstreamSensors(Set<Id<Link>> downstreamLinkIds){
 		for (Id<Link> downstreamLinkId : downstreamLinkIds){
 			registerDownstreamSensor(downstreamLinkId);
 		}
 	}
-	
+
 	public void registerDownstreamSensors(SignalSystem signalSystem){
 		for (Signal signal : signalSystem.getSignals().values()){
 			Node systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
@@ -108,7 +108,7 @@ public final class DownstreamSensor {
 			break; // systemNode is the same for all signals of the system
 		}
 	}
-	
+
 	public boolean linkEmpty(Id<Link> downstreamLinkId) {
 		// TODO try around with different regimes
 		// stop green if one of the numbers is exceeded
@@ -121,15 +121,15 @@ public final class DownstreamSensor {
 		}
 		return true;
 	}
-	
+
 	public boolean allLinksEmpty(Set<Id<Link>> downstreamLinkIds) {
 		for (Id<Link> downstreamLinkId : downstreamLinkIds){
 			if (!linkEmpty(downstreamLinkId))
 				return false;
 		}
-		return true;			
+		return true;
 	}
-	
+
 	public boolean allDownstreamLinksEmpty(SignalData signal){
 		if (signal.getTurningMoveRestrictions() != null) {
 			return allLinksEmpty(signal.getTurningMoveRestrictions());
@@ -146,7 +146,7 @@ public final class DownstreamSensor {
 		Node systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
 		return allLinksEmpty(systemNode.getOutLinks().keySet());
 	}
-	
+
 	public boolean allDownstreamLinksEmpty(Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId){
 		for (Id<Signal> signalId : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystemId).get(signalGroupId).getSignalIds()){
 			SignalData signal = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId).getSignalData().get(signalId);
@@ -155,5 +155,5 @@ public final class DownstreamSensor {
 		}
 		return true;
 	}
-	
+
 }

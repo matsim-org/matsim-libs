@@ -20,12 +20,12 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * level. Here the case is more difficult than on the tour-level and not all of
  * the dynamic can be enforced. Have a look at the code for the exact
  * implementation.
- * 
+ *
  * Attention! This is not tested and may be faulty. Feel free to add some test
  * cases to see if this actually does what it is supposed to do.
- * 
+ *
  * TODO: Revise this and check if it makes sense!
- * 
+ *
  * This class ensures that the vehicle needs to be returned home if it was taken
  * in the first place. However, it must be noted that if the person start a tour
  * with a certain vehicle it needs to bring it back at the end of the tour. This
@@ -34,7 +34,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * take a car back home. The agent will be forced to being the car back home in
  * the first tour. This was done in order to have easier implementation. If this
  * has an effect on the results is not clear.
- * 
+ *
  * @author Milos Balac <milos.balac@ivt.baug.ethz.ch>
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
@@ -127,8 +127,8 @@ public class VehicleTripConstraint implements TripConstraint {
 	}
 
 	static public class Factory implements TripConstraintFactory {
-		private Collection<String> restrictedModes;
-		private boolean isAdvanced;
+		private final Collection<String> restrictedModes;
+		private final boolean isAdvanced;
 		private final HomeFinder homeFinder;
 
 		public Factory(Collection<String> restrictedModes, boolean isAdvanced, HomeFinder homeFinder) {
@@ -138,7 +138,7 @@ public class VehicleTripConstraint implements TripConstraint {
 		}
 
 		@Override
-		public TripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
+		public VehicleTripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
 				Collection<String> availableModes) {
 			logger.warn("VehicleTripConstraint is not tested. Use at own risk!");
 

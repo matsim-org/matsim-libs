@@ -75,7 +75,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 					Node originNode = originZoneEntry.getValue();
 					Node destinationNode = destinationZoneEntry.getValue();
 					if (DistanceUtils.calculateSquaredDistance(originNode.getCoord(),
-							destinationNode.getCoord()) < (params.maxNeighborDistance * params.maxNeighborDistance)) {
+							destinationNode.getCoord()) < (params.getMaxNeighborDistance() * params.getMaxNeighborDistance())) {
 						SparseTravelTimeKey key = getSparseTravelTimeKey(originNode, destinationNode, bin);
 						double freeSpeedTravelTime = freeSpeedMatrix.getTravelTime(originNode, destinationNode, Double.NaN);
 						this.sparseTravelTimeCache.computeIfAbsent(key, k -> freeSpeedTravelTime);

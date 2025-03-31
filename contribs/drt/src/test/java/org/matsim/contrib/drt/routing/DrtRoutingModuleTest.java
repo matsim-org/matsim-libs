@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -85,10 +85,10 @@ public class DrtRoutingModuleTest {
 				networkTravelSpeed, beelineFactor);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
-		drtCfg.mode = drtMode;
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtCfg.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		drtCfg.setMode(drtMode);
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtCfg.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 5 * 60;
 		defaultConstraintsSet.maxWaitTime = 5 * 60;
@@ -244,7 +244,16 @@ public class DrtRoutingModuleTest {
 	@Test
 	void testRouteDescriptionHandling() {
 		String oldRouteFormat = "600 400";
-		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+		String newRouteFormatV1 = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+
+		String newRouteFormatV2 = "{\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
+				"\"constraints\":{" +
+				"\"maxTravelTime\":\"Infinity\"," +
+				"\"maxRideTime\":\"Infinity\"," +
+				"\"maxWaitTime\":600.0," +
+				"\"maxPickupDelay\":\"Infinity\"," +
+				"\"lateDiversionThreshold\":0.0" +
+				"}}";
 
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();
@@ -259,11 +268,16 @@ public class DrtRoutingModuleTest {
 		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
 		drtRoute.setRouteDescription(oldRouteFormat);
-		Assertions.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
 		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
 
-		drtRoute.setRouteDescription(newRouteFormat);
-		Assertions.assertTrue(drtRoute.getMaxWaitTime() == 600.);
+		drtRoute.setRouteDescription(newRouteFormatV1);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
+		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
+		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
+
+		drtRoute.setRouteDescription(newRouteFormatV2);
+		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
 		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
 		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 
@@ -276,7 +290,7 @@ public class DrtRoutingModuleTest {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
-		drtConfigGroup.transitStopFile = utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz";
+		drtConfigGroup.setTransitStopFile(utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz");
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 		config.addModule(multiModeDrtConfigGroup);
@@ -285,7 +299,7 @@ public class DrtRoutingModuleTest {
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				utils.getClassInputDirectory() + "testCottbus/network.xml.gz");
-		new TransitScheduleReader(scenario).readFile(drtConfigGroup.transitStopFile);
+		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);
 		return scenario;
 	}

@@ -31,7 +31,9 @@ import org.matsim.core.utils.misc.StringUtils;
  * @author steffenaxer
  */
 public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
+
 	private static final char DEFAULT_COLLECTION_DELIMITER = ',';
+
 	public static final String SET_NAME = "companions";
 	private static final String DRT_COMPANION_SAMPLING_WEIGHTS_NAME = "drtCompanionSamplingWeights";
 
@@ -84,6 +86,4 @@ public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurablePar
 			throw new IllegalStateException("drtCompanionSamplingWeights can not be empty. Please check configurations");
 		}
 	}
-
-
 }

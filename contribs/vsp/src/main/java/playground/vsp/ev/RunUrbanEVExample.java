@@ -44,16 +44,19 @@ package playground.vsp.ev;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -97,8 +100,8 @@ public class RunUrbanEVExample {
 	private static Config prepareConfig( String[] args ){
 		Config config = ConfigUtils.loadConfig( args );
 		EvConfigGroup evConfigGroup = ConfigUtils.addOrGetModule( config, EvConfigGroup.class );
-		evConfigGroup.timeProfiles = true;
-		evConfigGroup.chargersFile = "chargers.xml";
+		evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
+		evConfigGroup.setChargersFile("chargers.xml");
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
@@ -142,9 +145,10 @@ public class RunUrbanEVExample {
 
 			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(),
 					VehicleType.class)); //TODO should at least have a suffix "_car"
-			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
+
+			ElectricFleetUtils.setElectricVehicleType(carVehicleType);	//alternatively you can do VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), CAR_BATTERY_CAPACITY_kWh);
-			ElectricFleetUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default" ) );
+			ElectricFleetUtils.setChargerTypes(carVehicleType, Arrays.asList("a", "b", "default" ) );
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			carVehicleType.setNetworkMode(TransportMode.car);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),

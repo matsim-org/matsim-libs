@@ -88,16 +88,16 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		this.plan = PopulationUtils.unmodifiablePlan(plan2) ;
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 
-		this.scenario = scenario ;
-		this.events = events ;
-		this.simTimer = simTimer ;
+		this.scenario = scenario;
+		this.events = events;
+		this.simTimer = simTimer;
 		this.timeInterpretation = timeInterpretation;
 
 		List<PlanElement> planElements = this.plan.getPlanElements();
 		Preconditions.checkArgument(!planElements.isEmpty(), "Plan must consist of at least one activity");
 		Activity firstAct = (Activity) planElements.get(0);
 		//this.setCurrentLinkId( firstAct.getLinkId() ) ;
-		final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
+		final Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity(firstAct, scenario);
 		this.setCurrentLinkId( linkId );
 		this.setState(State.ACTIVITY) ;
 		calculateAndSetDepartureTime(firstAct);

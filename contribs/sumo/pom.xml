@@ -18,12 +18,5 @@
 			<artifactId>osm</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
-		<!-- Command line parser -->
-		<dependency>
-			<groupId>info.picocli</groupId>
-			<artifactId>picocli</artifactId>
-			<version>4.7.6</version>
-		</dependency>
 	</dependencies>
 </project>

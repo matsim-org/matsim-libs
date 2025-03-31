@@ -1,3 +1,22 @@
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2025 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
+ */
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
 import com.google.common.base.Verify;
@@ -128,7 +147,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     @Override
     public void dispatch(double timeStep) {
-        if(timeStep % drtShiftParams.loggingInterval == 0) {
+        if(timeStep % drtShiftParams.getLoggingInterval() == 0) {
             logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
                     activeShifts.size(), assignedShifts.size(), unAssignedShifts.size()));
             StringJoiner print = new StringJoiner(" | ");
@@ -138,7 +157,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             logger.info(print.toString());
         }
         endShifts(timeStep);
-        if (timeStep % (drtShiftParams.updateShiftEndInterval) == 0) {
+        if (timeStep % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
             updateShiftEnds(timeStep);
         }
         scheduleShifts(timeStep, this.fleet);
@@ -210,7 +229,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private void assignShifts(double timeStep) {
         // Remove elapsed shifts
         unAssignedShifts.removeIf(shift -> {
-            if (shift.getStartTime() + drtShiftParams.maxUnscheduledShiftDelay < timeStep ) {
+            if (shift.getStartTime() + drtShiftParams.getMaxUnscheduledShiftDelay() < timeStep ) {
                 logger.warn("Shift with ID " + shift.getId() + " could not be assigned and is being removed as start time is longer in the past than defined by maxUnscheduledShiftDelay.");
                 return true;
             }
@@ -326,7 +345,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         while (iterator.hasNext()) {
             final ShiftEntry next = iterator.next();
 
-            if (timeStep + drtShiftParams.shiftEndLookAhead < next.shift().getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndLookAhead() < next.shift().getEndTime()) {
                 continue;
             }
 
@@ -351,7 +370,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 endingShiftsIterator.remove();
                 continue;
             }
-            if (timeStep + drtShiftParams.shiftEndRescheduleLookAhead > next.shift().getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndRescheduleLookAhead() > next.shift().getEndTime()) {
                 if (next.vehicle().getShifts().size() > 1) {
                     updateShiftEnd(next);
                 }
@@ -410,7 +429,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
 
         final Optional<OperationFacility> maybeFacility;
-        if (drtShiftParams.allowInFieldChangeover) {
+        if (drtShiftParams.isAllowInFieldChangeover()) {
             maybeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
         } else {
             maybeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
@@ -539,7 +558,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
-        return shift.getStartTime() <= timeStep + drtShiftParams.shiftScheduleLookAhead;
+        return shift.getStartTime() <= timeStep + drtShiftParams.getShiftScheduleLookAhead();
     }
 
     private boolean hasSchedulableBreak(DrtShift shift, double timeStep) {

@@ -10,7 +10,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.EDrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -19,6 +19,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
@@ -41,7 +42,6 @@ import java.util.Set;
 public class RunEShiftDrtScenarioIT {
 
 	private static final double MAX_RELATIVE_SOC = 0.9;// charge up to 80% SOC
-	private static final double MIN_RELATIVE_SOC = 0.15;// send to chargers vehicles below 20% SOC
 	private static final double TEMPERATURE = 20;// oC
 
 	@Test
@@ -60,39 +60,39 @@ public class RunEShiftDrtScenarioIT {
 		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
-		drtConfigGroup.mode = TransportMode.drt;
-		DefaultDrtOptimizationConstraintsSet constraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		drtConfigGroup.setMode(TransportMode.drt);
+		DrtOptimizationConstraintsSetImpl constraintsSet =
+                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsSet.maxTravelTimeAlpha = 1.5;
         constraintsSet.maxTravelTimeBeta = 10. * 60.;
-		drtConfigGroup.stopDuration = 30.;
+		drtConfigGroup.setStopDuration(30.);
         constraintsSet.maxWaitTime = 600.;
         constraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
+		drtConfigGroup.setUseModeFilteredSubnetwork(false);
+		drtConfigGroup.setVehiclesFile(fleetFile);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtConfigGroup.setPlotDetailedCustomerStats(true);
         constraintsSet.maxWalkDistance = 1000.;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).interval = 600;
+		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.targetAlpha = 0.3;
-		strategyParams.targetBeta = 0.3;
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
 		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
 		ConfigGroup parameterSet = drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		((SquareGridZoneSystemParams) parameterSet).cellSize = 500.;
+		((SquareGridZoneSystemParams) parameterSet).setCellSize(500.);
 		drtZoneSystemParams.addParameterSet(parameterSet);
-		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
+		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
@@ -155,22 +155,22 @@ public class RunEShiftDrtScenarioIT {
 		operationsParams.addParameterSet(shiftsParams);
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
-		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
-		shiftsParams.shiftInputFile = shiftsFile;
-		shiftsParams.allowInFieldChangeover = true;
+		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftsParams.setShiftInputFile(shiftsFile);
+		shiftsParams.setAllowInFieldChangeover(true);
 
 		//e shifts
-		shiftsParams.shiftAssignmentBatteryThreshold= 0.6;
-		shiftsParams.chargeAtHubThreshold = 0.8;
-		shiftsParams.outOfShiftChargerType = "slow";
-		shiftsParams.breakChargerType = "fast";
+		shiftsParams.setShiftAssignmentBatteryThreshold(0.6);
+		shiftsParams.setChargeAtHubThreshold(0.8);
+		shiftsParams.setOutOfShiftChargerType("slow");
+		shiftsParams.setBreakChargerType("fast");
 
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.chargersFile = chargersFile;
-		evConfigGroup.minimumChargeTime = 0;
-		evConfigGroup.timeProfiles = true;
+		evConfigGroup.setChargersFile(chargersFile);
+		evConfigGroup.setMinimumChargeTime(0);
+		evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
 		config.addModule(evConfigGroup);
 
 		config.vehicles().setVehiclesFile(evsFile);
@@ -181,7 +181,7 @@ public class RunEShiftDrtScenarioIT {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
-				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
+				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

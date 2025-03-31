@@ -3,7 +3,6 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
@@ -32,7 +31,7 @@ public class OverviewDashboard implements Dashboard {
 
 			viz.title = "Simulated traffic volume";
 			viz.center = data.context().getCenter();
-			viz.zoom = data.context().mapZoomLevel;
+			viz.zoom = data.context().getMapZoomLevel();
 			viz.height = 7.5;
 			viz.width = 2.0;
 

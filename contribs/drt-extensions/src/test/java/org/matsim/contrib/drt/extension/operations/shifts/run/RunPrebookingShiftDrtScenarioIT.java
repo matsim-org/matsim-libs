@@ -22,7 +22,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -87,10 +87,10 @@ public class RunPrebookingShiftDrtScenarioIT {
         });
 
         PrebookingParams prebookingParams = new PrebookingParams();
-        prebookingParams.maximumPassengerDelay = 600;
-        prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
-        prebookingParams.scheduleWaitBeforeDrive = true;
-        prebookingParams.abortRejectedPrebookings = false;
+        prebookingParams.setMaximumPassengerDelay(600);
+        prebookingParams.setUnschedulingMode(PrebookingParams.UnschedulingMode.Routing);
+        prebookingParams.setScheduleWaitBeforeDrive(true);
+        prebookingParams.setAbortRejectedPrebookings(false);
         drtWithShiftsConfigGroup.addParameterSet(prebookingParams);
 
         run.addOverridingQSimModule(new PrebookingModeQSimModule(drtWithShiftsConfigGroup.getMode(),
@@ -141,10 +141,10 @@ public class RunPrebookingShiftDrtScenarioIT {
         });
 
         PrebookingParams prebookingParams = new PrebookingParams();
-        prebookingParams.maximumPassengerDelay = 600;
-        prebookingParams.unschedulingMode = PrebookingParams.UnschedulingMode.Routing;
-        prebookingParams.scheduleWaitBeforeDrive = true;
-        prebookingParams.abortRejectedPrebookings = true;
+        prebookingParams.setMaximumPassengerDelay(600);
+        prebookingParams.setUnschedulingMode(PrebookingParams.UnschedulingMode.Routing);
+        prebookingParams.setScheduleWaitBeforeDrive(true);
+        prebookingParams.setAbortRejectedPrebookings(true);
         drtWithShiftsConfigGroup.addParameterSet(prebookingParams);
 
         run.addOverridingQSimModule(new PrebookingModeQSimModule(drtWithShiftsConfigGroup.getMode(),
@@ -176,32 +176,32 @@ public class RunPrebookingShiftDrtScenarioIT {
 
     @NotNull
     private Controler prepare(DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup, MultiModeDrtConfigGroup multiModeDrtConfigGroup, String outputSuffix) {
-        drtWithShiftsConfigGroup.mode = TransportMode.drt;
-        DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+        drtWithShiftsConfigGroup.setMode(TransportMode.drt);
+        DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-        drtWithShiftsConfigGroup.stopDuration = 30.;
+        drtWithShiftsConfigGroup.setStopDuration(30.);
         defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
         defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
         defaultConstraintsSet.maxWaitTime = 600.;
         defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
         defaultConstraintsSet.maxWalkDistance = 1000.;
-        drtWithShiftsConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
+        drtWithShiftsConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
 
         drtWithShiftsConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
         ConfigGroup rebalancing = drtWithShiftsConfigGroup.createParameterSet("rebalancing");
         drtWithShiftsConfigGroup.addParameterSet(rebalancing);
-        ((RebalancingParams) rebalancing).interval = 600;
+        ((RebalancingParams) rebalancing).setInterval(600);
 
         MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-        strategyParams.targetAlpha = 0.3;
-        strategyParams.targetBeta = 0.3;
+        strategyParams.setTargetAlpha(0.3);
+        strategyParams.setTargetBeta(0.3);
 
         drtWithShiftsConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
         SquareGridZoneSystemParams zoneParams = new SquareGridZoneSystemParams();
-        zoneParams.cellSize = 500.;
+        zoneParams.setCellSize(500.);
 
         DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
         drtZoneSystemParams.addParameterSet(zoneParams);
@@ -253,8 +253,8 @@ public class RunPrebookingShiftDrtScenarioIT {
         operationsParams.addParameterSet(shiftsParams);
         operationsParams.addParameterSet(operationFacilitiesParams);
 
-        shiftsParams.considerUpcomingShiftsForInsertion = true;
-        shiftsParams.shiftEndLookAhead = 900.;
+        shiftsParams.setConsiderUpcomingShiftsForInsertion(true);
+        shiftsParams.setShiftEndLookAhead(900.);
         drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 

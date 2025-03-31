@@ -12,7 +12,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintF
 
 /**
  * Creates a CompositeTripConstraint.
- * 
+ *
  * @author sebhoerl
  */
 public class CompositeTripConstraintFactory implements TripConstraintFactory {
@@ -30,7 +30,7 @@ public class CompositeTripConstraintFactory implements TripConstraintFactory {
 	}
 
 	@Override
-	public TripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
+	public CompositeTripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
 			Collection<String> availableModes) {
 		List<TripConstraint> constraints = new ArrayList<>(factories.size());
 		factories.forEach(f -> constraints.add(f.createConstraint(person, planTrips, availableModes)));

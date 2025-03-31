@@ -1,16 +1,13 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultAssignShiftToVehicleLogic;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftStartLogic;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
+import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftDrtOptimizer;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
@@ -22,11 +19,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskF
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
@@ -56,13 +49,12 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Singleton;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -86,32 +78,39 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> {
 					return new ShiftDrtOptimizer(
-						new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-							getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-							getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
-							getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
-							getter.getModal(DrtRequestInsertionRetryQueue.class)
-						),
-						getter.getModal(DrtShiftDispatcher.class),
-						getter.getModal(ScheduleTimingUpdater.class));
+							new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+									getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
+									getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+									getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
+									getter.getModal(DrtRequestInsertionRetryQueue.class)
+							),
+							getter.getModal(DrtShiftDispatcher.class),
+							getter.getModal(ScheduleTimingUpdater.class));
 				}));
+
+		bindModal(AssignShiftToVehicleLogic.class).toProvider(modalProvider(getter ->
+				(new DefaultAssignShiftToVehicleLogic(shiftsParams))
+		));
 
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-						shiftsParams, new DefaultShiftStartLogic(), new DefaultAssignShiftToVehicleLogic(shiftsParams),
+						shiftsParams, new DefaultShiftStartLogic(), getter.getModal(AssignShiftToVehicleLogic.class),
 						getter.getModal(ShiftScheduler.class)))
 		).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
 				getter -> new ShiftInsertionCostCalculator(getter.get(MobsimTimer.class),
 						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class),
-								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet()))));
+								drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet()),
+						getter.getModal(OperationFacilities.class),
+						getter.getModal(Network.class),
+						getter.getModal(TravelTimeMatrix.class))));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType), shiftsParams.considerUpcomingShiftsForInsertion); 
+			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType), shiftsParams.isConsiderUpcomingShiftsForInsertion());
 		}));
 
 		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class))));
@@ -121,8 +120,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				getter -> new ShiftTaskSchedulerImpl(getter.getModal(Network.class),
 						getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), shiftsParams,
-						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class)))
+						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), shiftsParams))
 		).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
@@ -130,8 +128,8 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
 						new ShiftDrtStayTaskEndTimeCalculator(shiftsParams,
-								new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))), 
-								getter.getModal(DriveTaskUpdater.class)))
+								new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))),
+						getter.getModal(DriveTaskUpdater.class)))
 		).asEagerSingleton();
 
 		// see DrtModeOptimizerQSimModule
@@ -139,7 +137,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
+			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, OnlineTrackerListener.NO_LISTENER,
 					timer);
 		})).in(Singleton.class);
 

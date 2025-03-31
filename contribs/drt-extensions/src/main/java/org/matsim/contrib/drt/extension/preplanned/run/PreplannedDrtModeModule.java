@@ -57,20 +57,20 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
-		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
+		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.getStopDuration()));
 
 		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().defaultRequestDimension);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().getDefaultRequestDimension());
 		})).asEagerSingleton();
 
-		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile() == null ?
 				null :
-				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.addOrGetLoadParams()));
+				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.getVehiclesFile()),
+				drtCfg.isChangeStartLinkToLastLinkInSchedule(), drtCfg.addOrGetLoadParams()));
 
 		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
 				+ " It would interfere with simulation of pre-calculated vehicle schedules."

@@ -71,7 +71,7 @@ public class TrafficDashboard implements Dashboard {
 
 			viz.title = "Traffic statistics";
 			viz.center = data.context().getCenter();
-			viz.zoom = data.context().mapZoomLevel;
+			viz.zoom = data.context().getMapZoomLevel();
 
 			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro"), "id");
 

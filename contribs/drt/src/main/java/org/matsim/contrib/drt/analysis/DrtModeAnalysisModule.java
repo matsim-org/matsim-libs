@@ -146,7 +146,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 			getter.getModal(FleetSpecification.class), //
 			getter.get(OutputDirectoryHierarchy.class), //
 			getter.get(EventsManager.class), //
-			drtCfg.addOrGetLoadParams().analysisInterval, //
+                    drtCfg.addOrGetLoadParams().getAnalysisInterval(), //
 			getter.getModal(DvrpLoadType.class))));
 	}
 }
