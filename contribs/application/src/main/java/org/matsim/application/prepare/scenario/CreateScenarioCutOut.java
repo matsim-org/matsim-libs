@@ -3,10 +3,7 @@ package org.matsim.application.prepare.scenario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.*;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -43,6 +40,7 @@ import picocli.CommandLine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
@@ -146,7 +144,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	// External classes
 	private final GeometryFactory geoFactory = new GeometryFactory();
 	private TravelTimeCalculator tt;
-	private CutoutVolumeCalculator cc;
+	private CutoutVolumeCalculator cv;
 
 	// Variables used for processing
 	/**
@@ -238,24 +236,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		for (String mode : modes)
 			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(scenario.getNetwork(), mode));
 
-		// TODO: move whole block after set of cutout agents was generated
-		if (eventPath != null) {
-			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
-			builder.setTimeslice(changeEventsInterval);
-			builder.setMaxTime(changeEventsMaxTime);
-			tt = builder.build();
-
-			cc = new CutoutVolumeCalculator((int) changeEventsInterval);
-
-			EventsManager manager = EventsUtils.createEventsManager();
-			manager.addHandler(tt);
-			manager.addHandler(cc);
-
-			manager.initProcessing();
-			EventsUtils.readEvents(manager, eventPath);
-			manager.finishProcessing();
-		}
-
 		// Cut out the network: Filter for links inside the shapefile
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (geom.contains(MGC.coord2Point(link.getCoord()))
@@ -334,6 +314,24 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		if (eventPath != null) {
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
+			builder.setTimeslice(changeEventsInterval);
+			builder.setMaxTime(changeEventsMaxTime);
+			tt = builder.build();
+
+			cv = new CutoutVolumeCalculator(
+				changeEventsInterval,
+				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet())
+			);
+
+			EventsManager manager = EventsUtils.createEventsManager();
+			manager.addHandler(tt);
+			manager.addHandler(cv);
+
+			manager.initProcessing();
+			EventsUtils.readEvents(manager, eventPath);
+			manager.finishProcessing();
+
 			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
 			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
@@ -510,12 +508,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					freespeed = link.getFreespeed();
 				}
 
-				// Setting capacity to the link usage
-				/*
-				TODO While this method accurately depicts the relative usage of the link after the cutout, it can greatly reduce the remaining capacity
-				TODO Check if it would be better to just subtract the "lost" vehicles from the capacity (-> depends on how the "slowdown" on overusage is computed)
-				 */
-				double capacity = (((double) cc.getCutoutLinkUsage(link.getId(), time) / (double) cc.getTotalLinkUsage(link.getId(), time))*((changeEventsInterval/3600)*link.getCapacity()));
+				// Adjusting capacity to the link usage
+				double capacity = link.getCapacity();
+				if (capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities)
+					 capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time))*((changeEventsInterval/3600)*link.getCapacity()));
+				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
+					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
 
 				boolean speedSame = prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6;
 				boolean capacitySame = prevCapacity != null && Math.abs(capacity - prevCapacity) < 1e-6;
@@ -651,6 +649,16 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		 */
 		keepCapacities,
 
+		/**
+		 * Subtracts the amount of vehicles, that will be lost after the cutout, from the original capacity.
+		 */
+		subtractLostVehiclesCapacities,
+
+		/**
+		 * Calculates the proportion of the original number of vehicles remaining after the cutout and multiplies this to the original capacity. <br>
+		 * This method will keep the relative capacity utilization, but the individual vehicle is weighted more than before.
+		 */
+		relativeAdjustmentOfCapacities
 
 	}
 
