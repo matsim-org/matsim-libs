@@ -3,14 +3,12 @@ package org.matsim.application.prepare.scenario;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.collections.ArrayMap;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -66,28 +64,23 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 	/**
 	 * Returns total number of vehicles, that have used (entered) this link
 	 */
-	public int getTotalLinkUsage(Id<Link> linkId, double time) {
+	public int getTotalLinkVolume(Id<Link> linkId, double time) {
 		int timeslice = (int) Math.floor(time / interval);
 
-		linkId2timeslice2listOfVehIds.putIfAbsent(linkId, new ArrayMap<>());
-		linkId2timeslice2listOfVehIds.get(linkId).putIfAbsent(timeslice, new ArrayList<>());
-		return linkId2timeslice2listOfVehIds.get(linkId).get(timeslice).size();
+		linkId2timeslice2volume.computeIfAbsent(linkId, k -> new Int2ObjectOpenHashMap<>());
+		linkId2timeslice2volume.get(linkId).computeIfAbsent(timeslice, k -> new CutoutVolume());
+		return linkId2timeslice2volume.get(linkId).get(timeslice).totalVolume;
 	}
 
 	/**
 	 * Returns number of vehicles, that used this link which will be in the cutout-scenario
 	 */
-	public int getCutoutLinkUsage(Id<Link> linkId, double time) {
+	public int getCutoutLinkVolume(Id<Link> linkId, double time) {
 		int timeslice = (int) Math.floor(time / interval);
 
-		linkId2timeslice2listOfVehIds.putIfAbsent(linkId, new ArrayMap<>());
-		linkId2timeslice2listOfVehIds.get(linkId).putIfAbsent(timeslice, new ArrayList<>());
-		return (int) linkId2timeslice2listOfVehIds
-			.get(linkId)
-			.get(timeslice)
-			.stream()
-			.filter(id -> scenario.getVehicles().getVehicles().containsKey(id))
-			.count();
+		linkId2timeslice2volume.computeIfAbsent(linkId, k -> new Int2ObjectOpenHashMap<>());
+		linkId2timeslice2volume.get(linkId).computeIfAbsent(timeslice, k -> new CutoutVolume());
+		return linkId2timeslice2volume.get(linkId).get(timeslice).cutoutVolume;
 	}
 
 	private static final class CutoutVolume {
