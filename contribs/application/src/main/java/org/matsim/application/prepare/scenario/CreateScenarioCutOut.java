@@ -135,6 +135,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--capacity-calculation", description = "Define how capacities outside the shp file are calculated", defaultValue = "keepCapacities")
 	private CapacityCalculation capacityCalculation;
 
+	// TODO DEBUG
+	@CommandLine.Option(names = "--keep-freespeeds", description = "Keeps freespeeds outside of the shp file", defaultValue = "false")
+	private boolean keepFreespeeds;
+
+
 	@CommandLine.Mixin
 	private CrsOptions crs;
 
@@ -524,7 +529,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				}
 
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
-				if(!speedSame)
+				if(!speedSame && !keepFreespeeds)
 					event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
 				if(!capacitySame)
 					event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, capacity));
