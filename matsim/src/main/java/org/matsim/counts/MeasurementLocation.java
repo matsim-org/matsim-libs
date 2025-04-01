@@ -50,6 +50,10 @@ public final class MeasurementLocation<T> implements Attributable, Iterable<Meas
 		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	@Override
 	public Attributes getAttributes() {
 		return attributes;
@@ -108,6 +112,10 @@ public final class MeasurementLocation<T> implements Attributable, Iterable<Meas
 		return stationName;
 	}
 
+	public void setStationName(String stationName) {
+		this.stationName = stationName;
+	}
+
 	/**
 	 * Returns the display name of this location. If the station name is set, it is returned. Otherwise the id is returned.
 	 */
@@ -118,14 +126,6 @@ public final class MeasurementLocation<T> implements Attributable, Iterable<Meas
 			return id;
 
 		return description;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public void setStationName(String stationName) {
-		this.stationName = stationName;
 	}
 
 	public Coord getCoordinates() {
@@ -172,7 +172,7 @@ public final class MeasurementLocation<T> implements Attributable, Iterable<Meas
 	/**
 	 * Stores the measurable type and mode of a {@link Measurable}.
 	 */
-	public final record TypeAndMode(String type, String mode) {
+	public record TypeAndMode(String type, String mode) {
 	}
 
 }

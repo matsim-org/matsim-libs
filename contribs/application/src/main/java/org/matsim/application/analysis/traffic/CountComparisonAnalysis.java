@@ -15,11 +15,18 @@ import org.matsim.application.options.SampleOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.counts.*;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Counts;
+import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.Measurable;
+import org.matsim.counts.MeasurementLocation;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.selection.Selection;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -28,7 +35,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv"})
+	produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv", "count_speed_volume.csv.gz"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -67,8 +74,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	/**
 	 * Sum two arrays element-wise into new array.
 	 */
-	private static int[] sum(int[] a, int[] b) {
-		int[] counts = new int[a.length];
+	private static double[] sum(double[] a, double[] b) {
+		double[] counts = new double[a.length];
 		for (int i = 0; i < counts.length; i++) {
 			counts[i] = a[i] + b[i];
 		}
@@ -86,6 +93,33 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return Math.sqrt(2 * diff * diff / sum);
 	}
 
+	/**
+	 * Aggregate observed counts by hour. Starting at 0.
+	 */
+	private static Int2DoubleMap aggregateObserved(MeasurementLocation<Link> m, Set<String> modes) {
+
+		Int2DoubleOpenHashMap map = new Int2DoubleOpenHashMap();
+
+		for (String mode : modes) {
+			Measurable volumes = m.getVolumesForMode(mode);
+			if (volumes == null)
+				continue;
+
+			if (volumes.supportsHourlyAggregate()) {
+				for (int i = 0; i < 24; i++) {
+					OptionalDouble v = volumes.aggregateAtHour(i);
+					if (v.isPresent())
+						map.mergeDouble(i, v.getAsDouble(), Double::sum);
+				}
+			} else {
+				// Daily value is stored under separate key
+				map.mergeDouble(24, volumes.aggregateDaily(), Double::sum);
+			}
+		}
+
+		return map;
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -93,9 +127,18 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 		Network network = input.getNetwork();
 
-		VolumesAnalyzer volume = new VolumesAnalyzer(3600, 86400, network, true);
+		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network)
+			.setFilterModes(false)
+			.setCalculateLinkTravelTimes(true)
+			.setMaxTime(86400)
+			.setTimeslice(900);
+
+		TravelTimeCalculator travelTimes = builder.build();
+
+		VolumesAnalyzer volume = new VolumesAnalyzer(900, 86400, network, true);
 
 		eventsManager.addHandler(volume);
+		eventsManager.addHandler(travelTimes);
 
 		eventsManager.initProcessing();
 
@@ -111,6 +154,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 
 		writeErrorMetrics(byHour, output.getPath("count_error_by_hour.csv"));
 
+		writeCountSpeedVolume(volume, travelTimes, counts, output.getPath("count_speed_volume.csv.gz"));
 		return 0;
 	}
 
@@ -139,7 +183,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
 			Id<Link> key = entry.getKey();
 
-			Int2DoubleMap countVolume =  aggregateObserved(entry.getValue(), modes);
+			Int2DoubleMap countVolume = aggregateObserved(entry.getValue(), modes);
 
 			String name = entry.getValue().getDisplayName();
 
@@ -149,14 +193,14 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			if (countVolume.isEmpty())
 				continue;
 
-			Optional<int[]> opt = modes.stream()
-				.map(mode -> volumes.getVolumesForLink(key, mode))
+			Optional<double[]> opt = modes.stream()
+				.map(mode -> volumes.getVolumesPerHourForLink(key, mode))
 				.filter(Objects::nonNull)
 				.reduce(CountComparisonAnalysis::sum);
 
-			int[] volumesForLink;
+			double[] volumesForLink;
 			if (countVolume.isEmpty() || opt.isEmpty()) {
-				volumesForLink = new int[24];
+				volumesForLink = new double[24];
 			} else {
 				volumesForLink = opt.get();
 			}
@@ -170,7 +214,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 				for (int hour = 0; hour < 24; hour++) {
 
 					double observedTrafficVolumeAtHour = countVolume.get(hour);
-					double simulatedTrafficVolumeAtHour = (double) volumesForLink[hour] / this.sample.getSample();
+					double simulatedTrafficVolumeAtHour = volumesForLink[hour] / this.sample.getSample();
 
 					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
 					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
@@ -242,33 +286,6 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return byHour;
 	}
 
-	/**
-	 * Aggregate observed counts by hour. Starting at 0.
-	 */
-	private static Int2DoubleMap aggregateObserved(MeasurementLocation<Link> m, Set<String> modes) {
-
-		Int2DoubleOpenHashMap map = new Int2DoubleOpenHashMap();
-
-		for (String mode : modes) {
-			Measurable volumes = m.getVolumesForMode(mode);
-			if (volumes == null)
-				continue;
-
-			if (volumes.supportsHourlyAggregate()) {
-				for (int i = 0; i < 24; i++) {
-					OptionalDouble v = volumes.aggregateAtHour(i);
-					if (v.isPresent())
-						map.mergeDouble(i, v.getAsDouble(), Double::sum);
-				}
-			} else {
-				// Daily value is stored under separate key
-				map.mergeDouble(24, volumes.aggregateDaily(), Double::sum);
-			}
-		}
-
-		return map;
-	}
-
 	private void writeErrorMetrics(Table byHour, Path path) {
 
 		byHour.addColumns(
@@ -299,4 +316,62 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		aggr.write().csv(path.toFile());
 	}
 
+	private void writeCountSpeedVolume(VolumesAnalyzer volume, TravelTimeCalculator travelTimes, Counts<Link> counts, Path path) throws IOException {
+		Network network = input.getNetwork();
+
+		TrafficStatsCalculator calc = new TrafficStatsCalculator(network, travelTimes.getLinkTravelTimes(), 900);
+
+		Table table = Table.create(
+			StringColumn.create("link_id"),
+			StringColumn.create("station_id"),
+			StringColumn.create("station_name"),
+			IntColumn.create("time_step"),
+			DoubleColumn.create("hourly_volume"),
+			DoubleColumn.create("avg_speed")
+		);
+
+		int numSlots = 86400 / 900; // Number of 15-minute time slots in per day
+
+		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> e : counts.getMeasureLocations().entrySet()) {
+
+			Id<Link> linkId = e.getKey();
+			Link link = network.getLinks().get(linkId);
+			int[] volumes = volume.getVolumesForLink(linkId);
+
+			MeasurementLocation<Link> location = e.getValue();
+
+			if (volumes == null) continue;
+
+			for (int slot = 0; slot < numSlots; slot++) {
+				int time = slot * 900;
+				double linkVolume = volumes[slot];
+
+				// Scale volume by sample rate
+				linkVolume = linkVolume * this.sample.getUpscaleFactor();
+
+				// Skip intervals without volume
+				if (linkVolume == 0.0)
+					continue;
+
+				// Calculate speed
+				double speed = calc.getAvgSpeed(link, time, time + 900) * 3.6;
+
+				Row row = table.appendRow();
+				row.setString("link_id", linkId.toString());
+				row.setString("station_id", location.getId());
+				row.setString("station_name", location.getDisplayName());
+				row.setInt("time_step", time);
+				// Scale up to hourly volume
+				row.setDouble("hourly_volume", linkVolume * 4);
+				row.setDouble("avg_speed", linkVolume > 0 ? speed : 0);
+			}
+		}
+
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(path.toString())) {
+			table.write().csv(writer);
+		}
+	}
+
 }
+
+

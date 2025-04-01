@@ -56,7 +56,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		new TrafficAnalysis().execute(args);
 	}
 
-	private static Table normalizeColumns(Table table) {
+	static Table normalizeColumns(Table table) {
 		for (Column<?> c : table.columns()) {
 			int start = c.name().indexOf("[");
 			int end = c.name().indexOf("]");
