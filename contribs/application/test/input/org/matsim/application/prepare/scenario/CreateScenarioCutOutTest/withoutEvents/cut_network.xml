@@ -417,18 +417,6 @@
 				<attribute name="type" class="java.lang.String">1</attribute>
 			</attributes>
 		</link>
-		<link id="130" from="85" to="84" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
-			<attributes>
-				<attribute name="origid" class="java.lang.String">130</attribute>
-				<attribute name="type" class="java.lang.String">1</attribute>
-			</attributes>
-		</link>
-		<link id="131" from="86" to="85" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
-			<attributes>
-				<attribute name="origid" class="java.lang.String">131</attribute>
-				<attribute name="type" class="java.lang.String">1</attribute>
-			</attributes>
-		</link>
 		<link id="132" from="87" to="86" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
 			<attributes>
 				<attribute name="origid" class="java.lang.String">132</attribute>
@@ -651,12 +639,6 @@
 				<attribute name="type" class="java.lang.String">1</attribute>
 			</attributes>
 		</link>
-		<link id="167" from="75" to="76" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
-			<attributes>
-				<attribute name="origid" class="java.lang.String">167</attribute>
-				<attribute name="type" class="java.lang.String">1</attribute>
-			</attributes>
-		</link>
 		<link id="168" from="76" to="77" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
 			<attributes>
 				<attribute name="origid" class="java.lang.String">168</attribute>
@@ -672,12 +654,6 @@
 		<link id="17" from="73" to="83" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
 			<attributes>
 				<attribute name="origid" class="java.lang.String">17</attribute>
-				<attribute name="type" class="java.lang.String">1</attribute>
-			</attributes>
-		</link>
-		<link id="170" from="78" to="79" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
-			<attributes>
-				<attribute name="origid" class="java.lang.String">170</attribute>
 				<attribute name="type" class="java.lang.String">1</attribute>
 			</attributes>
 		</link>
@@ -804,12 +780,6 @@
 		<link id="27" from="85" to="95" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
 			<attributes>
 				<attribute name="origid" class="java.lang.String">27</attribute>
-				<attribute name="type" class="java.lang.String">1</attribute>
-			</attributes>
-		</link>
-		<link id="28" from="7" to="17" length="1000.0" freespeed="7.5" capacity="10.0" permlanes="1.0" oneway="1" modes="car" >
-			<attributes>
-				<attribute name="origid" class="java.lang.String">28</attribute>
 				<attribute name="type" class="java.lang.String">1</attribute>
 			</attributes>
 		</link>
