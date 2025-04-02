@@ -1,6 +1,7 @@
 name: weekly-code-coverage
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '30 3 * * 0' # Sun 3:30 UTC
 
