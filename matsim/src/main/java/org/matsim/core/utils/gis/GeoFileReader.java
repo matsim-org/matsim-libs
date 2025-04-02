@@ -50,7 +50,7 @@ import java.util.*;
  * @author glaemmel
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
- * @author nkuehnel / MOIA // add gpkg suuport
+ * @author nkuehnel / MOIA // add gpkg support
  */
 public class GeoFileReader implements MatsimSomeReader {
     	private static final Logger log = LogManager.getLogger(GeoFileReader.class);
@@ -73,6 +73,19 @@ public class GeoFileReader implements MatsimSomeReader {
 		return getAllFeatures(filename, null);
 	}
 
+	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
+		try {
+			log.info( "will try to read from " + url.getPath() ) ;
+			if (url.getFile().endsWith(".gpkg")) {
+				return getAllFeatures(urlToFile(url).getAbsolutePath());
+			}
+			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
 
 	public static Collection<SimpleFeature> getAllFeatures(final String filename, Name layerName) {
 		try {
@@ -83,12 +96,7 @@ public class GeoFileReader implements MatsimSomeReader {
                 FileDataStore dataStore = FileDataStoreFinder.getDataStore(dataFile);
 				return getSimpleFeatures(dataStore);
 			} else if(filename.endsWith(".gpkg")){
-				Gbl.assertNotNull(layerName);
-				Map<String, Object> params = new HashMap<>();
-				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
-				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
-				DataStore dataStore = DataStoreFinder.getDataStore(params);
+				DataStore dataStore = getGpkgDataStore(filename);
 				return getSimpleFeatures(dataStore, layerName);
 			} else {
 				throw new RuntimeException("Unsupported file type.");
@@ -98,15 +106,13 @@ public class GeoFileReader implements MatsimSomeReader {
 		}
 	}
 
-
-
-	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
+	public static Collection<SimpleFeature> getAllFeatures(final URL url, Name layerName) {
 		try {
 			log.info( "will try to read from " + url.getPath() ) ;
 			if (url.getFile().endsWith(".gpkg")) {
-				return getAllFeaturesGPKG(url);
+				return getAllFeatures(urlToFile(url).getAbsolutePath(), layerName);
 			}
-			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url));
+			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url), layerName);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} catch (URISyntaxException e) {
@@ -114,11 +120,8 @@ public class GeoFileReader implements MatsimSomeReader {
 		}
 	}
 
-	/**
-	 * Loads geo package like normal shape files using the first layer found in the file.
-	 */
-	private static Collection<SimpleFeature> getAllFeaturesGPKG(final URL url) throws URISyntaxException, IOException {
 
+	private static File urlToFile(URL url) throws IOException, URISyntaxException {
 		File file;
 		// Remote files have to be downloaded
 		if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar")) {
@@ -130,19 +133,47 @@ public class GeoFileReader implements MatsimSomeReader {
 
 			file = tmp.toFile();
 			file.deleteOnExit();
-		} else
-		 	file = new File(url.toURI());
+		} else {
+			file = new File(url.toURI());
+		}
+		return file;
+	}
 
+	public static Map<Name, List<SimpleFeature>> getAllFeaturesByLayer(final String filename) {
+		try {
+			if(filename.endsWith(".gpkg")){
+				List<Name> layerNames = getLayerNames(filename);
+				DataStore dataStore = getGpkgDataStore(filename);
+				Map<Name, List<SimpleFeature>> features = new HashMap<>();
+				for (Name layerName : layerNames) {
+					features.put(layerName, getSimpleFeatures(dataStore, layerName));
+                }
+				dataStore.dispose();
+				return features;
+			} else {
+				throw new RuntimeException("Unsupported file type. Currently works for .gpkg (geopackage only).");
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Returns the layer names of the given file.
+	 */
+	public static List<Name> getLayerNames(String file) throws IOException {
+		DataStore dataStore = getGpkgDataStore(file);
+		List<Name> names = dataStore.getNames();
+		dataStore.dispose();
+		return names;
+	}
+
+	private static DataStore getGpkgDataStore(String file) throws IOException {
 		Map<String, Object> params = new HashMap<>();
 		params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
-		params.put(GeoPkgDataStoreFactory.DATABASE.key, file.toString());
+		params.put(GeoPkgDataStoreFactory.DATABASE.key, file);
 		params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
-		DataStore dataStore = DataStoreFinder.getDataStore(params);
-
-		String[] typeNames = dataStore.getTypeNames();
-
-		// Use first layer
-		return getSimpleFeatures(dataStore, typeNames[0]);
+        return DataStoreFinder.getDataStore(params);
 	}
 
 	/**
@@ -161,6 +192,10 @@ public class GeoFileReader implements MatsimSomeReader {
 	 * @return list of contained features.
 	 */
 	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore, Name layerName) throws IOException {
+		if(layerName == null) {
+			layerName = dataStore.getNames().getFirst();
+			log.info("No layer specified. Will use first layer: " + layerName);
+		}
 		SimpleFeatureSource featureSource = dataStore.getFeatureSource(layerName);
 		Gbl.assertNotNull(featureSource);
 		List<SimpleFeature> featureSet = getSimpleFeatures(featureSource);
@@ -174,6 +209,10 @@ public class GeoFileReader implements MatsimSomeReader {
 	 * @see #getSimpleFeatures(DataStore, Name)
 	 */
 	public static List<SimpleFeature> getSimpleFeatures(DataStore dataStore, String layerName) throws IOException {
+		if(layerName == null) {
+			layerName = dataStore.getTypeNames()[0];
+			log.info("No layer specified. Will use first layer: " + layerName);
+		}
 		SimpleFeatureSource featureSource = dataStore.getFeatureSource(layerName);
 		Gbl.assertNotNull(featureSource);
 		List<SimpleFeature> featureSet = getSimpleFeatures(featureSource);
@@ -272,12 +311,7 @@ public class GeoFileReader implements MatsimSomeReader {
                 featureSource = store.getFeatureSource();
             } else if(filename.endsWith(".gpkg")) {
 				Gbl.assertNotNull(layerName);
-				Map<String, Object> params = new HashMap<>();
-				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
-				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
-
-				DataStore datastore = DataStoreFinder.getDataStore(params);
+				DataStore datastore = getGpkgDataStore(filename);
 				featureSource = datastore.getFeatureSource(layerName);
 				Gbl.assertNotNull(featureSource);
 			} else {
