@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
 import com.google.common.base.Preconditions;
@@ -76,13 +75,14 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	public void install() {
 		if (useModeFilteredSubnetwork) {
 			//filter out the subnetwork
-			checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
+			String mode = getMode();
+			checkUseModeFilteredSubnetworkAllowed(getConfig(), mode);
 			bindModal(Network.class).toProvider(modalProvider(getter -> {
 				Network subnetwork = NetworkUtils.createNetwork(getConfig().network());
 				new TransportModeNetworkFilter(
 						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).filter(
-						subnetwork, Collections.singleton(getMode()));
-				new NetworkCleaner().run(subnetwork);
+								subnetwork, Collections.singleton(mode));
+				NetworkUtils.cleanNetwork(subnetwork, Set.of(mode));
 				return subnetwork;
 			})).asEagerSingleton();
 

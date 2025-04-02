@@ -72,8 +72,7 @@ public class DrtTeleportationWithModeChoiceTest {
 			@Override
 			public void install() {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new
-					EuclideanDistanceBasedDrtEstimator(getter.getModal(Network.class), 2.0, 0.1577493,
-					103.0972273, 120, 0.3, -0.1, 0.28)));
+					EuclideanDistanceBasedDrtEstimator.Builder(getter.getModal(Network.class), 2.0).build()));
 			}
 		});
 
