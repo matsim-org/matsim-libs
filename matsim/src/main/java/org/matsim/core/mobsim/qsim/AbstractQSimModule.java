@@ -21,49 +21,44 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.List;
-
-import org.matsim.core.events.MobsimScopeEventHandler;
-import org.matsim.core.mobsim.framework.AbstractMobsimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
-
 import com.google.inject.Module;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
+import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.framework.AbstractMobsimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 
-public abstract class AbstractQSimModule extends AbstractMobsimModule{
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
+
+public abstract class AbstractQSimModule extends AbstractMobsimModule {
 	@Override
-	protected final void configureMobsim(){
+	protected final void configureMobsim() {
 		configureQSim();
 	}
 
 	@Deprecated // for experts only
-	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Annotation annotation ){
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class, annotation );
+	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
 	@Deprecated // for experts only
-	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Class<? extends Annotation> annotationClass ){
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder( binder(), QSimComponent.class, annotationClass );
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Class<? extends Annotation> annotationClass) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotationClass);
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
-	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( String name ){
-		return addQSimComponentBinding( Names.named( name ) );
-	}
-
-	// Use methods above
-	@Deprecated
-	protected <T extends QSimComponent> void addNamedComponent( Class<T> componentClass, String name ){
-		addQSimComponentBinding( name ).to( componentClass );
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(String name) {
+		return addQSimComponentBinding(Names.named(name));
 	}
 
 	protected LinkedBindingBuilder<MobsimScopeEventHandler> addMobsimScopeEventHandlerBinding(){
@@ -72,24 +67,24 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule{
 
 	protected abstract void configureQSim();
 
-	protected void install( AbstractQSimModule module ){
-		module.setParent( this );
-		super.install( module );
+	protected void install(AbstractQSimModule module) {
+		module.setParent(this);
+		super.install(module);
 	}
 
-	public static AbstractQSimModule overrideQSimModules( Collection<AbstractQSimModule> base,
-							      List<AbstractQSimModule> overrides ){
-		Module composite = Modules.override( base ).with( overrides );
+	public static AbstractQSimModule overrideQSimModules(Collection<AbstractQSimModule> base,
+														 List<AbstractQSimModule> overrides) {
+		Module composite = Modules.override(base).with(overrides);
 
-		AbstractQSimModule wrapper = new AbstractQSimModule(){
+		AbstractQSimModule wrapper = new AbstractQSimModule() {
 			@Override
-			protected void configureQSim(){
-				install( composite );
+			protected void configureQSim() {
+				install(composite);
 			}
 		};
 
-		base.forEach( m -> m.setParent( wrapper ) );
-		overrides.forEach( m -> m.setParent( wrapper ) );
+		base.forEach(m -> m.setParent(wrapper));
+		overrides.forEach(m -> m.setParent(wrapper));
 
 		return wrapper;
 	}
@@ -105,7 +100,15 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule{
 	 * for the other ways to configure {@link org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory},
 	 * and then the latter could be deprecated.</p>
 	 */
-	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculatorBinding(){
-		return Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding();
+	protected LinkedBindingBuilder<LinkSpeedCalculator> addLinkSpeedCalculatorBinding() {
+		return Multibinder.newSetBinder(this.binder(), LinkSpeedCalculator.class).addBinding();
+	}
+
+	protected LinkedBindingBuilder<VehicleHandler> addVehicleHandlerBinding() {
+		return Multibinder.newSetBinder(this.binder(), VehicleHandler.class).addBinding();
+	}
+
+	protected LinkedBindingBuilder<ParkingSearchTimeCalculator> addParkingSearchTimeCalculatorBinding() {
+		return Multibinder.newSetBinder(this.binder(), ParkingSearchTimeCalculator.class).addBinding();
 	}
 }
