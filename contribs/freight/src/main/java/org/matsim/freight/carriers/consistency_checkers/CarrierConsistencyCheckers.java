@@ -3,39 +3,42 @@ package org.matsim.freight.carriers.consistency_checkers;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
-	/**
-	 * @author antonstock
-	 * contains methods to determine possible inconsistencies before and after tour planning, i.e. jobs which are too big for all vehicles, jobs with incompatible time windows, jobs not assigned to a tour
-	 */
+/**
+ * @author antonstock
+ * contains methods to determine possible inconsistencies before and after tour planning, i.e. jobs which are too big for all vehicles, jobs with incompatible time windows, jobs not assigned to a tour
+ */
 public class CarrierConsistencyCheckers {
 	public enum CheckResult {
 		CHECK_SUCCESSFUL, CHECK_FAILED, ERROR
 	}
-	public enum AllJobsInToursDetailedCheckResult {
+
+	private enum AllJobsInToursDetailedCheckResult {
 		ALL_JOBS_IN_TOURS, NOT_ALL_JOBS_IN_TOURS, JOBS_SCHEDULED_MULTIPLE_TIMES, JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED, JOBS_IN_TOUR_BUT_NOT_LISTED, CHECK_SUCCESSFUL, CHECK_FAILED, ERROR
 	}
 	//needed for log messages, log level etc.
 	private static final Logger log = LogManager.getLogger(CarrierConsistencyCheckers.class);
-		public static Level setInternalLogLevel(Level level) {
-			if (level == Level.FATAL) {
-				return Level.ERROR;
-			} else {
-				return level;
-			}
+
+	private static Level setInternalLogLevel(Level level) {
+		if (level == Level.FATAL) {
+			return Level.ERROR;
+		} else {
+			return level;
 		}
+	}
 
 	private static boolean doesJobFitInVehicle(Double capacity, Double demand) {
 		return demand <= capacity;
 	}
+
 	private static boolean doTimeWindowsOverlap(TimeWindow tw1, TimeWindow tw2) {
 		return tw1.getStart() <= tw2.getEnd() && tw2.getStart() <= tw1.getEnd();
 	}
+
 	private record VehicleInfo(TimeWindow operationWindow, double capacity) {
 	}
 	private record ShipmentPickupInfo(TimeWindow pickupWindow, double capacityDemand) {
@@ -47,42 +50,40 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * this method will run through both vehicleCapacityCheck and vehicleScheduleCheck to check, if all carriers are able to handle given jobs.
-	 * @param carriers
-	 * @param lvl
+	 * @param carriers Carriers to check
+	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	public static CheckResult carrierCapabilitiesCheck(Carriers carriers, Level lvl) {
-		Level level = setInternalLogLevel(lvl);
-		int checkFailed = 0;
-		if (vehicleCapacityCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
-			checkFailed++;
+		int nuOfChecksFailed = 0;
+		if (vehicleCapacityCheck(carriers, lvl) == CheckResult.CHECK_FAILED) {
+			nuOfChecksFailed++;
 		}
-		if (vehicleScheduleCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
-			checkFailed++;
+		if (vehicleScheduleCheck(carriers, lvl) == CheckResult.CHECK_FAILED) {
+			nuOfChecksFailed++;
 		}
-		if (checkFailed==0) {
+		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
 			return CheckResult.CHECK_FAILED;
 		}
 	}
 
-  /**
-   * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
-   * allJobsInToursCheck
-   *
-   * @param carriers Carriers to check
-   * @param lvl level of log messages / errors
-   * @return CheckResult 'CHECK_SUCCESSFUL' if allJobsInToursCheck returns CHECK_SUCCESSFUL
-   * 		 and 'CHECK_FAILED' if allJobsInToursCheck returns CHECK_FAIL
-   */
-  public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
-	  Level level = setInternalLogLevel(lvl);
-		int checkFailed = 0;
+	/**
+	 * this method will run through allJobsInToursCheck to check, if every job is part of only one tour
+	 * allJobsInToursCheck
+	 *
+	 * @param carriers Carriers to check
+	 * @param lvl level of log messages / errors
+	 * @return CheckResult 'CHECK_SUCCESSFUL' if allJobsInToursCheck returns CHECK_SUCCESSFUL
+	 * 		 and 'CHECK_FAILED' if allJobsInToursCheck returns CHECK_FAIL
+	 */
+	public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
+		int nuOfChecksFailed = 0;
 		if (allJobsInToursCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
-			checkFailed++;
+			nuOfChecksFailed++;
 		}
-		if (checkFailed==0) {
+		if (nuOfChecksFailed == 0) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
 			return CheckResult.CHECK_FAILED;
@@ -94,8 +95,8 @@ public class CarrierConsistencyCheckers {
 	 * = CHECK_SUCCESSFUL: the highest vehicle capacity is greater or equal to the highest capacity demand
 	 * = CHECK_FAILED: the highest vehicle capacity is less than the highest capacity demand
 	 * <p>
-	 * @param carriers
-	 * @param lvl
+	 * @param carriers Carriers to check
+	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult vehicleCapacityCheck(Carriers carriers, Level lvl) {
@@ -158,8 +159,8 @@ public class CarrierConsistencyCheckers {
 	 * CHECK_SUCCESSFUL if all jobs can be handled
 	 * CHECK_FAILED if at least one job can not be handled
 	 * <p>
-	 * @param carriers
-	 * @param lvl
+	 * @param carriers Carriers to check
+	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 
@@ -271,7 +272,7 @@ public class CarrierConsistencyCheckers {
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
 		isCarrierCapable.forEach((carrierId, value) -> {
 			if (!value) {
-				log.log(level,"Carrier " + carrierId + " can not handle all jobs.");
+				log.log(level,"Carrier {} can not handle all jobs.", carrierId);
 			}
 		});
 		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
@@ -286,8 +287,8 @@ public class CarrierConsistencyCheckers {
 	 * (if the job is a shipment, pickup and delivery are two different jobs).
 	 * CHECK_SUCCESSFUL if all jobs occur only once
 	 * CHECK_FAILED in all other cases
-	 * @param carriers
-	 * @param lvl
+	 * @param carriers Carriers to check
+	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
 	/*package-private*/ static CheckResult allJobsInToursCheck(Carriers carriers, Level lvl) {
@@ -371,11 +372,14 @@ public class CarrierConsistencyCheckers {
 			if (!serviceList.isEmpty() || !shipmentList.isEmpty()) {
 				if (jobInToursMoreThanOnce && !jobIsMissing) {
 					isCarrierCapable.put(carrier.getId(), AllJobsInToursDetailedCheckResult.JOBS_SCHEDULED_MULTIPLE_TIMES);
-				} else if (!jobInToursMoreThanOnce && jobIsMissing) {
+				}
+				if (!jobInToursMoreThanOnce && jobIsMissing) {
 					isCarrierCapable.put(carrier.getId(), AllJobsInToursDetailedCheckResult.NOT_ALL_JOBS_IN_TOURS);
-				} else if (jobInToursMoreThanOnce && jobIsMissing) {
+				}
+				if (jobInToursMoreThanOnce && jobIsMissing) {
 					isCarrierCapable.put(carrier.getId(), AllJobsInToursDetailedCheckResult.JOBS_MISSING_AND_OTHERS_MULTIPLE_TIMES_SCHEDULED);
 				}
+				//TODO KMT: Fehlt hier noch ein Ast? Prüfen.
 				//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
 				log.log(level,"Carrier '{}': All jobs are scheduled once.", carrier.getId());
