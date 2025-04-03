@@ -89,7 +89,7 @@ public final class CarrierImpl implements Carrier {
 	public boolean addPlan(CarrierPlan carrierPlan) {
 		// Make sure there is a selected carrierPlan if there is at least one carrierPlan
 		if (this.selectedPlan == null) this.selectedPlan = carrierPlan;
-		carrierPlan.setCarrier(this); //TODO Add this here as backpointer. (Comment from Kai/Kai Mtg)
+		carrierPlan.setCarrier(this);
 		return this.plans.add(carrierPlan);
 	}
 
