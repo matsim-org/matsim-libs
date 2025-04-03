@@ -136,10 +136,8 @@ public class SingleInsertionDetourPathCalculatorTest {
 	}
 
 	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
-		var fromNode = fromLink.getToNode();
-		var toNode = toLink.getFromNode();
-		var path = new Path(List.of(fromNode, toNode), List.of(), pathTravelTime, pathTravelTime + 1000);
-		when(pathCalculator.calcLeastCostPath(eq(fromNode), eq(toNode), eq(startTimeArg + FIRST_LINK_TT), isNull(),
+		var path = new Path(List.of(fromLink.getToNode(), toLink.getFromNode()), List.of(), pathTravelTime, pathTravelTime + 1000);
+		when(pathCalculator.calcLeastCostPath(eq(fromLink), eq(toLink), eq(startTimeArg + FIRST_LINK_TT), isNull(),
 				isNull())).thenReturn(path);
 		return path;
 	}

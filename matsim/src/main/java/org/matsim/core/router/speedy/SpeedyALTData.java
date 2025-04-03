@@ -263,7 +263,7 @@ class SpeedyALTData {
 			}
 		}
 
-		if(graph.hasTurnRestrictions()) {
+		if(graph.getTurnRestrictions().isPresent()) {
 			consolidateColoredNodes(data);
 		}
 
@@ -302,7 +302,7 @@ class SpeedyALTData {
 			}
 		}
 
-		if(graph.hasTurnRestrictions()) {
+		if(graph.getTurnRestrictions().isPresent()) {
 			consolidateColoredNodes(data);
 		}
 

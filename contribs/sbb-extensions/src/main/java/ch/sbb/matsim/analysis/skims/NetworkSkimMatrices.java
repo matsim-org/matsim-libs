@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package ch.sbb.matsim.analysis.skims;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.speedy.LeastCostPathTree;
 import java.util.HashMap;
@@ -60,16 +61,16 @@ public final class NetworkSkimMatrices {
     public static <T> NetworkIndicators<T> calculateSkimMatrices(Network xy2lNetwork, Network routingNetwork, Map<T, Coord[]> coordsPerZone, double departureTime, TravelTime travelTime,
             TravelDisutility travelDisutility, int numberOfThreads) {
         SpeedyGraph routingGraph = SpeedyGraphBuilder.build(routingNetwork);
-        Map<T, Node[]> nodesPerZone = new HashMap<>();
+        Map<T, Link[]> linksPerZone = new HashMap<>();
         for (Map.Entry<T, Coord[]> e : coordsPerZone.entrySet()) {
             T zoneId = e.getKey();
             Coord[] coords = e.getValue();
-            Node[] nodes = new Node[coords.length];
-            nodesPerZone.put(zoneId, nodes);
+            Link[] links = new Link[coords.length];
+            linksPerZone.put(zoneId, links);
             for (int i = 0; i < coords.length; i++) {
                 Coord coord = coords[i];
-                Node node = NetworkUtils.getNearestLink(xy2lNetwork, coord).getToNode();
-                nodes[i] = routingNetwork.getNodes().get(node.getId());
+                Link link = NetworkUtils.getNearestLink(xy2lNetwork, coord);
+                links[i] = routingNetwork.getLinks().get(link.getId());
             }
         }
 
@@ -85,7 +86,7 @@ public final class NetworkSkimMatrices {
         Counter counter = new Counter("CAR-TravelTimeMatrix-" + Time.writeTime(departureTime) + " zone ", " / " + coordsPerZone.size());
         Thread[] threads = new Thread[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++) {
-            RowWorker<T> worker = new RowWorker<>(originZones, coordsPerZone.keySet(), routingGraph, nodesPerZone, networkIndicators, departureTime, travelTime, travelDisutility, counter);
+            RowWorker<T> worker = new RowWorker<>(originZones, coordsPerZone.keySet(), routingGraph, linksPerZone, networkIndicators, departureTime, travelTime, travelDisutility, counter);
             threads[i] = new Thread(worker, "CAR-TravelTimeMatrix-" + Time.writeTime(departureTime) + "-" + i);
             threads[i].start();
         }
@@ -112,19 +113,19 @@ public final class NetworkSkimMatrices {
         private final ConcurrentLinkedQueue<T> originZones;
         private final Set<T> destinationZones;
         private final SpeedyGraph graph;
-        private final Map<T, Node[]> nodesPerZone;
+        private final Map<T, Link[]> linksPerZone;
         private final NetworkIndicators<T> networkIndicators;
         private final TravelTime travelTime;
         private final TravelDisutility travelDisutility;
         private final double departureTime;
         private final Counter counter;
 
-        RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, SpeedyGraph graph, Map<T, Node[]> nodesPerZone, NetworkIndicators<T> networkIndicators, double departureTime,
+        RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, SpeedyGraph graph, Map<T, Link[]> linksPerZone, NetworkIndicators<T> networkIndicators, double departureTime,
                   TravelTime travelTime, TravelDisutility travelDisutility, Counter counter) {
             this.originZones = originZones;
             this.destinationZones = destinationZones;
             this.graph = graph;
-            this.nodesPerZone = nodesPerZone;
+            this.linksPerZone = linksPerZone;
             this.networkIndicators = networkIndicators;
             this.departureTime = departureTime;
             this.travelTime = travelTime;
@@ -142,16 +143,16 @@ public final class NetworkSkimMatrices {
                 }
 
                 this.counter.incCounter();
-                Node[] fromNodes = this.nodesPerZone.get(fromZoneId);
-                if (fromNodes != null) {
-                    for (Node fromNode : fromNodes) {
-                        lcpTree.calculate(fromNode.getId().index(), this.departureTime, PERSON, VEHICLE);
+                Link[] fromLinks = this.linksPerZone.get(fromZoneId);
+                if (fromLinks != null) {
+                    for (Link fromLink : fromLinks) {
+                        lcpTree.calculate(fromLink, this.departureTime, PERSON, VEHICLE);
 
                         for (T toZoneId : this.destinationZones) {
-                            Node[] toNodes = this.nodesPerZone.get(toZoneId);
-                            if (toNodes != null) {
-                                for (Node toNode : toNodes) {
-                                    int nodeIndex = toNode.getId().index();
+                            Link[] toLinks = this.linksPerZone.get(toZoneId);
+                            if (toLinks != null) {
+                                for (Link toLink : toLinks) {
+                                    int nodeIndex = toLink.getFromNode().getId().index();
                                     OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
                                     double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
                                     double tt = currTime - this.departureTime;
