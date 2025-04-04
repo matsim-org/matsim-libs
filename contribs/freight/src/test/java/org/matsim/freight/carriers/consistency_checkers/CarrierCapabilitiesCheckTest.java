@@ -40,7 +40,7 @@ public class CarrierCapabilitiesCheckTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl),"At least one check failed.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.checkBeforePlanning(carriers, lvl),"At least one check failed.");
 	}
 
 	@Test
@@ -54,6 +54,6 @@ public class CarrierCapabilitiesCheckTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.carrierCapabilitiesCheck(carriers, lvl),"All checks passed.");
+		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.checkBeforePlanning(carriers, lvl),"All checks passed.");
 	}
 }

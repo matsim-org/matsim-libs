@@ -42,7 +42,7 @@ public class TourPlanningCheckTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.tourPlanningCheck(carriers, lvl),"At least one check failed.");
+		Assertions.assertEquals(CHECK_SUCCESSFUL, CarrierConsistencyCheckers.checkAfterResults(carriers, lvl),"At least one check failed.");
 	}
 
 	@Test
@@ -56,6 +56,6 @@ public class TourPlanningCheckTest {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 		Carriers carriers = CarriersUtils.getCarriers(scenario);
 
-		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.tourPlanningCheck(carriers, lvl),"All checks passed.");
+		Assertions.assertEquals(CHECK_FAILED, CarrierConsistencyCheckers.checkAfterResults(carriers, lvl),"All checks passed.");
 	}
 }

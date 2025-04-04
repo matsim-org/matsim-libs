@@ -1,4 +1,4 @@
-package org.matsim.freight.logistics.consistency_checker;
+package org.matsim.freight.logistics.consistency_checkers;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -11,10 +11,8 @@ import org.matsim.freight.logistics.LSPs;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author anton stock
@@ -29,11 +27,38 @@ public class LogisticsConsistencyChecker {
 	//needed for log messages, log level etc.
 	private static final Logger log = LogManager.getLogger(LogisticsConsistencyChecker.class);
 
-	public static Level setInternalLogLevel(Level level) {
+	private static Level setInternalLogLevel(Level level) {
 		if (level == Level.FATAL) {
 			return Level.ERROR;
 		} else {
 			return level;
+		}
+	}
+
+	public static CheckResult checkBeforePlanning(LSPs lsps, Level lvl) {
+		Level level = setInternalLogLevel(lvl);
+		log.log(level, "Checking if all resource Ids are unique.");
+		CheckResult result = resourcesAreUnique(lsps, level);
+		if (result == CheckResult.CHECK_FAILED) {
+			log.log(level, "Check failed. Please check the log messages for more information.");
+			return CheckResult.CHECK_FAILED;
+		}
+		log.log(level, "All resource Ids are unique.");
+		return CheckResult.CHECK_SUCCESSFUL;
+	}
+
+	public static CheckResult checkAfterPlanning(LSPs lsps, Level lvl) {
+		int nuOfChecksFailed = 0;
+		if (shipmentForEveryShipmentPlanAllPlans(lsps, lvl) == CheckResult.CHECK_FAILED) {
+			nuOfChecksFailed++;
+		}
+		if (shipmentPlanForEveryShipmentAllPlans(lsps, lvl) == CheckResult.CHECK_FAILED) {
+			nuOfChecksFailed++;
+		}
+		if (nuOfChecksFailed == 0) {
+			return CheckResult.CHECK_SUCCESSFUL;
+		} else {
+			return CheckResult.CHECK_FAILED;
 		}
 	}
 
@@ -44,7 +69,7 @@ public class LogisticsConsistencyChecker {
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
+	/*package-private*/ static CheckResult resourcesAreUnique(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
 		//all resource ids are being saved in this list
 		List<Id<LSPResource>> lspResourceList = new LinkedList<>();
@@ -77,7 +102,7 @@ public class LogisticsConsistencyChecker {
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult shipmentPlanForEveryShipmentSelectedPlanOnly(LSPs lsps, Level lvl) {
+	/*package-private*/ static CheckResult shipmentPlanForEveryShipmentSelectedPlanOnly(LSPs lsps, Level lvl) {
 		//lists for plan Ids, shipment Ids
 		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
 		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
@@ -115,7 +140,7 @@ public class LogisticsConsistencyChecker {
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult shipmentPlanForEveryShipmentAllPlans(LSPs lsps, Level lvl) {
+	/*package-private*/ static CheckResult shipmentPlanForEveryShipmentAllPlans(LSPs lsps, Level lvl) {
 		//all resource Ids are being saved in this list
 		List<Id<LspShipment>> lspShipmentPlansList = new LinkedList<>();
 		List<Id<LspShipment>> lspShipmentsList = new LinkedList<>();
@@ -147,6 +172,7 @@ public class LogisticsConsistencyChecker {
 			return CheckResult.CHECK_SUCCESSFUL;
 		}
 	}
+
 	/**
 	 * this method will check if every shipmentPlan has got a shipment (selected plan only)
 	 *
@@ -154,7 +180,7 @@ public class LogisticsConsistencyChecker {
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult shipmentForEveryShipmentPlanSelectedPlanOnly(LSPs lsps, Level lvl) {
+	/*package-private*/ static CheckResult shipmentForEveryShipmentPlanSelectedPlanOnly(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
 
 		List<Id<LspShipment>> shipmentPlans = new LinkedList<>();
@@ -194,7 +220,7 @@ public class LogisticsConsistencyChecker {
 	 * @param lvl  level of log messages / errors
 	 * @return CheckResult
 	 */
-	public static CheckResult shipmentForEveryShipmentPlanAllPlans(LSPs lsps, Level lvl) {
+	/*package-private*/ static CheckResult shipmentForEveryShipmentPlanAllPlans(LSPs lsps, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
 		List<Id<LspShipment>> shipmentPlanIds = new LinkedList<>();
 		List<Id<LspShipment>> shipmentIds = new LinkedList<>();

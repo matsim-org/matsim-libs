@@ -50,11 +50,12 @@ public class CarrierConsistencyCheckers {
 
 	/**
 	 * this method will run through both vehicleCapacityCheck and vehicleScheduleCheck to check, if all carriers are able to handle given jobs.
+	 * Run this check BEFORE the tour planning process.
 	 * @param carriers Carriers to check
 	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
-	public static CheckResult carrierCapabilitiesCheck(Carriers carriers, Level lvl) {
+	public static CheckResult checkBeforePlanning(Carriers carriers, Level lvl) {
 		int nuOfChecksFailed = 0;
 		if (vehicleCapacityCheck(carriers, lvl) == CheckResult.CHECK_FAILED) {
 			nuOfChecksFailed++;
@@ -78,7 +79,7 @@ public class CarrierConsistencyCheckers {
 	 * @return CheckResult 'CHECK_SUCCESSFUL' if allJobsInToursCheck returns CHECK_SUCCESSFUL
 	 * 		 and 'CHECK_FAILED' if allJobsInToursCheck returns CHECK_FAIL
 	 */
-	public static CheckResult tourPlanningCheck(Carriers carriers, Level lvl) {
+	public static CheckResult checkAfterResults(Carriers carriers, Level lvl) {
 		int nuOfChecksFailed = 0;
 		if (allJobsInToursCheck(carriers, lvl)==CheckResult.CHECK_FAILED) {
 			nuOfChecksFailed++;
