@@ -132,7 +132,7 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 
     private void buildTree() {
         tree = new STRtree();
-        for (DvrpVehicle vehicle : fleet.getVehicles()) {
+        for (DvrpVehicle vehicle : fleet.getVehicles().values()) {
             Schedule schedule = vehicle.getSchedule();
             Task startTask;
 
