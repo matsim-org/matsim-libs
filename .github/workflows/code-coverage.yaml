@@ -46,7 +46,7 @@ jobs:
 
       # Run package for each contrib without tests. This is needed, as some of the contribs have dependencies on each other.
       - name: Run package for each contrib without tests
-        run: mvn package -pl ${{ steps.contribs.outputs.contribs_modules }} --batch-mode -Dmaven.test.skip=true -Dmatsim.preferLocalDtds=true
+        run: mvn package -pl ${{ steps.contribs.outputs.contribs_modules }} --also-make --batch-mode -Dmaven.test.skip=true -Dmatsim.preferLocalDtds=true
 
       # Run unit and integration tests for contrib modules with jacoco profile
       - name: Create coverage report for contrib modules
