@@ -607,6 +607,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		@Override
 		public void handleAddUnknownParam(String paramName, String value) {
 			switch (paramName) {
+				case "zoneTargetLinkSelection": {
+					log.warn("Param " + paramName + " is no longer supported as part of the deprecated zonal system params. Please set this param in the" +
+							" rebalancing params section in the future. The setting will be IGNORED in this execution.");
+					break;
+				}
 				case "zonesGeneration": {
 					if (delegate == null) {
 						switch (value) {
