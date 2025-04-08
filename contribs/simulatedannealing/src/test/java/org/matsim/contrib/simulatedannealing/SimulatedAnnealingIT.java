@@ -63,7 +63,7 @@ public class SimulatedAnnealingIT {
 					@Override
 					public SimulatedAnnealing<VolumeEstimator> get() {
 						return new SimulatedAnnealing<>(costCalculator, new DefaultAnnealingAcceptor<>(simAnCfg),
-								perturbatorFactory, new VolumeEstimator(0), simAnCfg.coolingSchedule, simAnCfg);
+								perturbatorFactory, new VolumeEstimator(0), simAnCfg.getCoolingSchedule(), simAnCfg);
 					}
 				}).asEagerSingleton();
 
@@ -81,7 +81,7 @@ public class SimulatedAnnealingIT {
 								.add((iteration, temperature) -> current -> {
 									return new VolumeEstimator(current.estimation + MatsimRandom.getRandom().nextInt(10) - 5);
 								}, 1)
-								.initialTemperature(simAnCfg.initialTemperature)
+								.initialTemperature(simAnCfg.getInitialTemperature())
 								.maxPerturbations(3)
 								.minPerturbations(1)
 								.build()

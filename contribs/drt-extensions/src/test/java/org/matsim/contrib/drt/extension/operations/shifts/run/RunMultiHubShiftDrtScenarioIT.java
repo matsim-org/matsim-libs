@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.operations.shifts.run;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -45,40 +44,40 @@ public class RunMultiHubShiftDrtScenarioIT {
 		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
-		drtConfigGroup.mode = TransportMode.drt;
+		drtConfigGroup.setMode(TransportMode.drt);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-		drtConfigGroup.stopDuration = 30.;
+		drtConfigGroup.setStopDuration(30.);
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
         defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
         defaultConstraintsSet.maxWaitTime = 600.;
         defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
         defaultConstraintsSet.maxWalkDistance = 1000.;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+		drtConfigGroup.setUseModeFilteredSubnetwork(false);
+		drtConfigGroup.setVehiclesFile(fleetFile);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtConfigGroup.setPlotDetailedCustomerStats(true);
+		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).interval = 600;
+		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.targetAlpha = 0.3;
-		strategyParams.targetBeta = 0.3;
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		RebalancingParams rebalancingParams = drtConfigGroup.getRebalancingParams().get();
+		rebalancingParams.addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		zoneParams.cellSize = 500.;
-		drtZoneSystemParams.addParameterSet(zoneParams);
-		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		zoneParams.setCellSize(500.);
+		rebalancingParams.addParameterSet(zoneParams);
+		rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
+		drtWithShiftsConfigGroup.addParameterSet(zoneParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
@@ -141,9 +140,9 @@ public class RunMultiHubShiftDrtScenarioIT {
 		operationsParams.addParameterSet(operationFacilitiesParams);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
-		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
-		shiftsParams.shiftInputFile = shiftsFile;
-		shiftsParams.allowInFieldChangeover = true;
+		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftsParams.setShiftInputFile(shiftsFile);
+		shiftsParams.setAllowInFieldChangeover(true);
 
 		final Controler run = DrtOperationsControlerCreator.createControler(config, false);
 		run.run();

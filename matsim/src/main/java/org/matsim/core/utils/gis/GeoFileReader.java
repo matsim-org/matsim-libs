@@ -50,7 +50,7 @@ import java.util.*;
  * @author glaemmel
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
- * @author nkuehnel / MOIA // add gpkg suuport
+ * @author nkuehnel / MOIA // add gpkg support
  */
 public class GeoFileReader implements MatsimSomeReader {
     	private static final Logger log = LogManager.getLogger(GeoFileReader.class);

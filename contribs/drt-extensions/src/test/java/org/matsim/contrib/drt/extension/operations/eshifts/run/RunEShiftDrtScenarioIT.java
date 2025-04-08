@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.operations.eshifts.run;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 
@@ -37,6 +36,7 @@ import org.matsim.examples.ExamplesUtils;
 import com.google.inject.Key;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class RunEShiftDrtScenarioIT {
@@ -60,40 +60,41 @@ public class RunEShiftDrtScenarioIT {
 		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
-		drtConfigGroup.mode = TransportMode.drt;
+		drtConfigGroup.setMode(TransportMode.drt);
 		DrtOptimizationConstraintsSetImpl constraintsSet =
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsSet.maxTravelTimeAlpha = 1.5;
         constraintsSet.maxTravelTimeBeta = 10. * 60.;
-		drtConfigGroup.stopDuration = 30.;
+		drtConfigGroup.setStopDuration(30.);
         constraintsSet.maxWaitTime = 600.;
         constraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
+		drtConfigGroup.setUseModeFilteredSubnetwork(false);
+		drtConfigGroup.setVehiclesFile(fleetFile);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtConfigGroup.setPlotDetailedCustomerStats(true);
         constraintsSet.maxWalkDistance = 1000.;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).interval = 600;
+		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.targetAlpha = 0.3;
-		strategyParams.targetBeta = 0.3;
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		Optional<RebalancingParams> rebalancingParams = drtConfigGroup.getRebalancingParams();
+		rebalancingParams.get().addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		ConfigGroup parameterSet = drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		((SquareGridZoneSystemParams) parameterSet).cellSize = 500.;
-		drtZoneSystemParams.addParameterSet(parameterSet);
-		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		ConfigGroup parameterSet = rebalancing.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		((SquareGridZoneSystemParams) parameterSet).setCellSize(500.);
+		rebalancing.addParameterSet(parameterSet);
+		rebalancingParams.get().setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
+		drtWithShiftsConfigGroup.addParameterSet(parameterSet);
+
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
@@ -155,15 +156,15 @@ public class RunEShiftDrtScenarioIT {
 		operationsParams.addParameterSet(shiftsParams);
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
-		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
-		shiftsParams.shiftInputFile = shiftsFile;
-		shiftsParams.allowInFieldChangeover = true;
+		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftsParams.setShiftInputFile(shiftsFile);
+		shiftsParams.setAllowInFieldChangeover(true);
 
 		//e shifts
-		shiftsParams.shiftAssignmentBatteryThreshold= 0.6;
-		shiftsParams.chargeAtHubThreshold = 0.8;
-		shiftsParams.outOfShiftChargerType = "slow";
-		shiftsParams.breakChargerType = "fast";
+		shiftsParams.setShiftAssignmentBatteryThreshold(0.6);
+		shiftsParams.setChargeAtHubThreshold(0.8);
+		shiftsParams.setOutOfShiftChargerType("slow");
+		shiftsParams.setBreakChargerType("fast");
 
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
@@ -181,7 +182,7 @@ public class RunEShiftDrtScenarioIT {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
-				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
+				bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtConfigGroup.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

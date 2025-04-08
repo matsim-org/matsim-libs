@@ -78,11 +78,11 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 
 			if (shp.isDefined()) {
 				//not sure if this is the best way to go, might be that the shape file would be automatically read by providing the --shp command line option
-				simwrapperCfg.defaultParams().shp = shp.getShapeFile();
+				simwrapperCfg.defaultParams().setShp(shp.getShapeFile());
 			}
 
 			//skip default dashboards
-			simwrapperCfg.defaultDashboards = SimWrapperConfigGroup.Mode.disabled;
+			simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 
 			//add dashboard
 			switch (dashboardType) {

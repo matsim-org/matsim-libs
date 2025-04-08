@@ -434,7 +434,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
 		if ( agent instanceof HasPerson ){
-			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			final Population allpersons = PopulationUtils.getOrCreateAllPersons( scenario );
 			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
 				allpersons.addPerson( ((HasPerson) agent).getPerson() );
 			}

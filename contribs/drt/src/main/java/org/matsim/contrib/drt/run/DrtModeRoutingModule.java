@@ -88,7 +88,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 
-		switch (drtCfg.simulationType){
+		switch (drtCfg.getSimulationType()){
 			case fullSimulation -> addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 			case estimateAndTeleport -> addRoutingModuleBinding(getMode()).toProvider(new EstimationRoutingModuleProvider(getMode()));// not singleton
 		}
@@ -115,7 +115,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 						-> Optional.of(optimizationConstraintsSet)
 		).in(Singleton.class);
 
-		switch( drtCfg.operationalScheme ){
+		switch(drtCfg.getOperationalScheme()){
 			case door2door -> bindModal( AccessEgressFacilityFinder.class ).toProvider(
 												       modalProvider( getter -> new DecideOnLinkAccessEgressFacilityFinder( getter.getModal( Network.class ) ) ) )
 										       .asEagerSingleton();
@@ -127,7 +127,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 													     QuadTrees.createQuadTree( getter.getModal( DrtStopNetwork.class ).getDrtStops().values() ) ) ) )
 									     .asEagerSingleton();
 			}
-			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.operationalScheme );
+			default -> throw new IllegalStateException( "Unexpected value: " + drtCfg.getOperationalScheme());
 		}
 
 		// this is, we think, updating the max travel time based on congested travel time and the alpha-beta thing:
@@ -143,7 +143,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			public DefaultDrtRouteUpdater get() {
 				var network = getModalInstance(Network.class);
 				var routeCreatorProvider = getModalProvider(DefaultMainLegRouter.RouteCreator.class);
-				DrtEstimator drtEstimator = drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport?
+				DrtEstimator drtEstimator = drtCfg.getSimulationType() == DrtConfigGroup.SimulationType.estimateAndTeleport?
 					getModalInstance(DrtEstimator.class) : null;
 				return new DefaultDrtRouteUpdater(drtCfg, network, population, config, routeCreatorProvider::get, drtEstimator);
 			}
@@ -188,7 +188,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtStopNetwork get() {
-			switch (drtCfg.operationalScheme) {
+			switch (drtCfg.getOperationalScheme()) {
 				case door2door:
 					return ImmutableMap::of;
 				case stopbased:
@@ -196,7 +196,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 				case serviceAreaBased:
 					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
 				default:
-					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.operationalScheme);
+					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.getOperationalScheme());
 			}
 		}
 	}
@@ -204,7 +204,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	private static DrtStopNetwork createDrtStopNetworkFromServiceArea(Config config, DrtConfigGroup drtCfg,
 			Network drtNetwork) {
 		final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-				ConfigGroup.getInputFileURL(config.getContext(), drtCfg.drtServiceAreaShapeFile));
+				ConfigGroup.getInputFileURL(config.getContext(), drtCfg.getDrtServiceAreaShapeFile()));
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = drtNetwork.getLinks()
 				.values()
 				.stream()
@@ -216,7 +216,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 	}
 
 	private static DrtStopNetwork createDrtStopNetworkFromTransitSchedule(Config config, DrtConfigGroup drtCfg) {
-		URL url = ConfigGroup.getInputFileURL(config.getContext(), drtCfg.transitStopFile);
+		URL url = ConfigGroup.getInputFileURL(config.getContext(), drtCfg.getTransitStopFile());
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()

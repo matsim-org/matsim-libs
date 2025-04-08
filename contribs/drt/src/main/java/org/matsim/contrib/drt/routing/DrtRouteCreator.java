@@ -85,7 +85,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		DvrpLoad load = loadFromPerson.getLoad(person, tripAttributes);
 		route.setLoad(load, loadType);
 
-		if (this.drtCfg.storeUnsharedPath) {
+		if (this.drtCfg.isStoreUnsharedPath()) {
 			route.setUnsharedPath(unsharedPath);
 		}
 

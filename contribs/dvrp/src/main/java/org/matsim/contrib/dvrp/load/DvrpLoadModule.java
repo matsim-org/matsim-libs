@@ -17,10 +17,10 @@ public class DvrpLoadModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		if (params.dimensions.size() == 1) {
-			bindModal(DvrpLoadType.class).toInstance(new IntegerLoadType(params.dimensions.get(0)));
+		if (params.getDimensions().size() == 1) {
+			bindModal(DvrpLoadType.class).toInstance(new IntegerLoadType(params.getDimensions().get(0)));
 		} else {
-			String[] dimensions = params.dimensions.toArray(new String[params.dimensions.size()]);
+			String[] dimensions = params.getDimensions().toArray(new String[params.getDimensions().size()]);
 			bindModal(DvrpLoadType.class).toInstance(new IntegersLoadType(dimensions));
 		}
 	}

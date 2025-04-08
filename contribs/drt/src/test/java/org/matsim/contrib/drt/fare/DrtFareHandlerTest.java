@@ -45,11 +45,11 @@ public class DrtFareHandlerTest {
 	void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.baseFare = 1;
-		fareParams.minFarePerTrip = 1.5;
-		fareParams.dailySubscriptionFee = 1;
-		fareParams.distanceFare_m = 1.0 / 1000.0;
-		fareParams.timeFare_h = 15;
+		fareParams.setBaseFare(1);
+		fareParams.setMinFarePerTrip(1.5);
+		fareParams.setDailySubscriptionFee(1);
+		fareParams.setDistanceFare_m(1.0 / 1000.0);
+		fareParams.setTimeFare_h(15);
 
 		ParallelEventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new DrtFareHandler(mode, fareParams, events));

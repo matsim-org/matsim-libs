@@ -84,7 +84,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 
-		if (!drtCfg.updateRoutes) {
+		if (!drtCfg.isUpdateRoutes()) {
 			bindModal(DriveTaskUpdater.class).toInstance(DriveTaskUpdater.NOOP);
 		} else {
 			bindModal(DriveTaskUpdater.class).toProvider(modalProvider(getter -> {

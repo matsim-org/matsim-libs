@@ -21,8 +21,6 @@ package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-import org.matsim.core.config.ConfigGroup;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Positive;
@@ -39,7 +37,7 @@ public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerP
 	// (for approx. 20 km => 3kWh) with 3 kW-heating on
 	@Positive
 	@DecimalMax("1.0")
-	public double minSoc = 0.3;
+	private double minSoc = 0.3;
 
 	@Parameter
 	@Comment("Specifies how often idle vehicles are checked if they have become"
@@ -47,7 +45,7 @@ public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerP
 			+ " The default value is 300 (used for simulating Nissan Leaf taxis).")
 	// in cold winter, 3kW heating consumes 1.25% SOC every 5 min
 	@Positive
-	public int socCheckTimeStep = 300;
+	private int socCheckTimeStep = 300;
 
 	private AssignmentTaxiOptimizerParams assignmentTaxiOptimizerParams;
 
@@ -70,5 +68,24 @@ public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerP
 	@Override
 	public int getReoptimizationTimeStep() {
 		return assignmentTaxiOptimizerParams.getReoptimizationTimeStep();
+	}
+
+	@Positive
+	@DecimalMax("1.0")
+	public double getMinSoc() {
+		return minSoc;
+	}
+
+	public void setMinSoc(@Positive @DecimalMax("1.0") double minSoc) {
+		this.minSoc = minSoc;
+	}
+
+	@Positive
+	public int getSocCheckTimeStep() {
+		return socCheckTimeStep;
+	}
+
+	public void setSocCheckTimeStep(@Positive int socCheckTimeStep) {
+		this.socCheckTimeStep = socCheckTimeStep;
 	}
 }

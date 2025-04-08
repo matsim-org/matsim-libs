@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.extension.services;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
@@ -48,40 +47,39 @@ public class ServicesTestUtils {
 
 		DrtWithExtensionsConfigGroup drtConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
-		drtConfigGroup.mode = TransportMode.drt;
+		drtConfigGroup.setMode(TransportMode.drt);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                     .addOrGetDefaultDrtOptimizationConstraintsSet();
-		drtConfigGroup.stopDuration = 30.;
+		drtConfigGroup.setStopDuration(30.);
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
 		defaultConstraintsSet.maxWaitTime = 600.;
 		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		defaultConstraintsSet.maxWalkDistance = 1000.;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+		drtConfigGroup.setUseModeFilteredSubnetwork(false);
+		drtConfigGroup.setVehiclesFile(fleetFile);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtConfigGroup.setPlotDetailedCustomerStats(true);
+		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).interval = 600;
+		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.targetAlpha = 0.3;
-		strategyParams.targetBeta = 0.3;
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
-		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+		RebalancingParams rebalancingParams = drtConfigGroup.getRebalancingParams().get();
+		rebalancingParams.addParameterSet(strategyParams);
 
-		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		zoneParams.cellSize = 500.;
-		drtZoneSystemParams.addParameterSet(zoneParams);
-		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
-		drtConfigGroup.addParameterSet(drtZoneSystemParams);
+		SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+		zoneParams.setCellSize(500.);
+		rebalancingParams.addParameterSet(zoneParams);
+		rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
 
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
@@ -139,12 +137,12 @@ public class ServicesTestUtils {
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		OperationFacilitiesParams operationFacilitiesParams = (OperationFacilitiesParams) operationsParams.createParameterSet(OperationFacilitiesParams.SET_NAME);
 		operationsParams.addParameterSet(operationFacilitiesParams);
-		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
+		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
 		drtConfigGroup.addParameterSet(operationsParams);
 
 		DrtFareParams drtFareParams = new DrtFareParams();
-		drtFareParams.baseFare = 1.;
-		drtFareParams.distanceFare_m = 1. / 1000;
+		drtFareParams.setBaseFare(1.);
+		drtFareParams.setDistanceFare_m(1. / 1000);
 		drtConfigGroup.addParameterSet(drtFareParams);
 
 		if(electrified)
