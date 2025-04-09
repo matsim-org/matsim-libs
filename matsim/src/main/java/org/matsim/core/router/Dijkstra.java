@@ -305,7 +305,7 @@ import org.matsim.vehicles.Vehicle;
 
 			if (outNode == null) {
 				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". " + createInfoMessage( person, vehicle ) + "Some possible reasons:" );
-				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
+				log.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes)s.") ;
 				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
 				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
 				log.warn("This will now return null, but it may fail later with a null pointer exception.");

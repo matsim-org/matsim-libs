@@ -75,7 +75,7 @@ public class ScoringFunctionsForPopulationStressIT {
 					config
 			);
 			controlerListenerManager.fireControlerIterationStartsEvent(0, false);
-			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
+			events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator", null));
 			scoringFunctionsForPopulation.finishScoringFunctions();
 		});
 	}
@@ -378,7 +378,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator", null));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));
