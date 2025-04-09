@@ -107,7 +107,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 				relevantNutsIds.add(nutsId);
 				Coord coord = new Coord(Double.parseDouble(record.get(5)), Double.parseDouble(record.get(6)));
 				Link link = NetworkUtils.getNearestLink(network, ct.transform(coord));
-				assert link != null;
+				assert link != null : "getNearestLink link to " + coord + " is null.";
 				cellToLinkIdMapping.put(cell, link.getId());
 			}
 		}
@@ -131,7 +131,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 					Coord coord = new Coord(Double.parseDouble(xString),
 						Double.parseDouble(yString)); // This coord is in EPSG:25832, which is same as the network coordinate
 					Link link = NetworkUtils.getNearestLink(network, coord);
-					assert link != null;
+					assert link != null : "link nearest to " + coord + " is null.";
 					double distance = CoordUtils.distancePointLinesegment
 						(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 					if (distance > 1000 || referenceCounts.containsKey(link.getId())) {
