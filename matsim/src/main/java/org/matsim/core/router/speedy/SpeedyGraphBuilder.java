@@ -87,7 +87,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, true);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, context);
 	}
 
 	private SpeedyGraph buildWithoutTurnRestrictions(Network network) {
@@ -112,7 +112,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, false);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, null);
 	}
 
 	private void addLink(Link link) {
