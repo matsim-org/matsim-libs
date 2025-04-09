@@ -161,10 +161,25 @@ public final class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
 				.calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption may be negative on links with negative slope
-			ev.getBattery()
-				.dischargeEnergy(energy,
-					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));
-			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, energy, ev.getBattery().getCharge()));
+			if (energy < 0) {
+				double currentCharge = ev.getBattery().getCharge();
+				double maxCharge = ev.getBattery().getCapacity();
+
+				if (currentCharge < maxCharge) {
+					// Limit recuperation to not exceed max SOC
+					double cappedEnergy = Math.max(energy, -1.0 * (maxCharge - currentCharge));
+					ev.getBattery().dischargeEnergy(cappedEnergy, missingEnergy ->
+						this.eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));
+					this.eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, cappedEnergy, ev.getBattery().getCharge()));
+				} else {
+					// Skip recuperation entirely
+					this.eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, 0.0, currentCharge));
+				}
+			} else {
+				ev.getBattery().dischargeEnergy(energy, missingEnergy ->
+					this.eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));
+				this.eventsManager.processEvent(new DrivingEnergyConsumptionEvent(now, vehicleId, linkId, energy, ev.getBattery().getCharge()));
+			}
 		}
 		return evDrive;
 	}
