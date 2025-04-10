@@ -22,7 +22,7 @@ package org.matsim.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.groups.AnalysisConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -41,32 +41,32 @@ class LegTimesControlerListener implements AfterMobsimListener, IterationStartsL
 
 	private final CalcLegTimes legTimes;
 	private final OutputDirectoryHierarchy controlerIO;
-	private final AnalysisConfigGroup analysisConfigGroup;
+	private final ControllerConfigGroup controllerConfigGroup;
 
 	@Inject
-    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO, AnalysisConfigGroup analysisConfigGroup) {
+    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO, ControllerConfigGroup controllerConfigGroup) {
 		this.legTimes = legTimes;
 		this.controlerIO = controlerIO;
-		this.analysisConfigGroup = analysisConfigGroup;
+		this.controllerConfigGroup = controllerConfigGroup;
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
+		if (ControllerUtils.isIterationActive(event, controllerConfigGroup.getLegDurationsInterval())) {
 			event.getServices().getEvents().addHandler(this.legTimes);
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
+		if (ControllerUtils.isIterationActive(event, controllerConfigGroup.getLegDurationsInterval())) {
 			event.getServices().getEvents().removeHandler(this.legTimes);
 		}
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		if (ControllerUtils.isIterationActive(event, analysisConfigGroup.getLegDurationsInterval())) {
+		if (ControllerUtils.isIterationActive(event, controllerConfigGroup.getLegDurationsInterval())) {
 			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
 			// - print averages in log
 			// it is a leg duration, not a trip duration
