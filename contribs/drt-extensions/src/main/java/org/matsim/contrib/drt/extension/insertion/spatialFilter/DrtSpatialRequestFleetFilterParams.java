@@ -64,7 +64,7 @@ public class DrtSpatialRequestFleetFilterParams extends ReflectiveConfigGroupWit
 	@Parameter
 	@PositiveOrZero
 	@Comment("Update interval of the periodically built spatial search tree of vehicle positions.")
-	private double updateInterval = 5 * 600;
+	private double updateInterval = 5 * 60;
 
 	@Override
 	protected void checkConsistency(Config config) {

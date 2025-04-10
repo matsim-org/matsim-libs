@@ -245,7 +245,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		output = Path.of(config.controller().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.runNetworkCleaner(scenario.getNetwork()); // e.g. for vulkaneifel network
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car)); // e.g. for vulkaneifel network
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup;
 		switch (usedCreationOption) {
@@ -648,7 +648,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 						// use only types of the possibleTypes which are in the given types file
 						List<String> vehicleTypes = new ArrayList<>();
-						assert odMatrixEntry.possibleVehicleTypes != null;
+						assert odMatrixEntry.possibleVehicleTypes != null: "possibleVehicleTypes is null for odMatrixEntry:" + odMatrixEntry;
 
 						for (String possibleVehicleType : odMatrixEntry.possibleVehicleTypes) {
 							if (CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
