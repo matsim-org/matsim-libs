@@ -65,7 +65,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING = "intermodalLegOnlyHandling";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING_DESC = "Define how routes containing only intermodal legs are handled: Useful options: alllow, avoid, forbid";
     private static final String PARAM_TRANSFER_CALCULATION = "transferCalculation";
-    private static final String PARAM_TRANFER_CALCULATION_DESC = "Defines whether all potential transfers are precomputed at the beginning of the simulation (Initial) or whether they are constructed on-demand when needed (Adaptive). The former incurs potentially long up-front caclulations, but quicker routing. The latter avoids any initial computation, but may require longer routing time.";
+    private static final String PARAM_TRANFER_CALCULATION_DESC = "Defines whether all potential transfers are precomputed at the beginning of the simulation (Initial) or whether they are constructed on-demand when needed (Adaptive). The former incurs potentially long up-front caclulations, but quicker routing. The latter avoids any initial computation, but may require longer routing time. Additionally, you may use Online, which will not cache adaptively calculated transfers. This will lead to largely reduced memory use, but drastically increased routing times.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
