@@ -312,7 +312,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// added jan'13
-		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+		if ( actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
@@ -434,7 +434,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		if ( usingLocationChoice ) {
-			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent" );
+			final String samplePercent = config.getModule("locationchoice").getParams().get("destinationSamplePercent");
 			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
 				problem = true ;
 				System.out.flush() ;

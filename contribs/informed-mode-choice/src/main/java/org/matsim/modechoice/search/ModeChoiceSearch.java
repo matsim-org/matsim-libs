@@ -56,7 +56,7 @@ final class ModeChoiceSearch {
 	 */
 	public ModeIterator iter(String[] result) {
 
-		assert result.length == estimates.length;
+		assert result.length == estimates.length : String.format("result.length (%d) != estimates.length (%d)", result.length, estimates.length);
 
 		byte[] path = new byte[result.length];
 

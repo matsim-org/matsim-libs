@@ -27,11 +27,11 @@ public class ChainedPerturbatorParams extends SimulatedAnnealingConfigGroup.Pert
 
 	@Parameter
 	@Comment("Maximum number of perturbations per perturbator iteration.")
-	public int maxPerturbations = 10;
+	private int maxPerturbations = 10;
 
 	@Parameter
 	@Comment("Minimum number of perturbations per perturbator iteration.")
-	public int minPerturbations = 1;
+	private int minPerturbations = 1;
 
 
 	public ChainedPerturbatorParams() {
@@ -77,5 +77,21 @@ public class ChainedPerturbatorParams extends SimulatedAnnealingConfigGroup.Pert
 			}
 		}
 		return collection;
+	}
+
+	public int getMaxPerturbations() {
+		return maxPerturbations;
+	}
+
+	public void setMaxPerturbations(int maxPerturbations) {
+		this.maxPerturbations = maxPerturbations;
+	}
+
+	public int getMinPerturbations() {
+		return minPerturbations;
+	}
+
+	public void setMinPerturbations(int minPerturbations) {
+		this.minPerturbations = minPerturbations;
 	}
 }

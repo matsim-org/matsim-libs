@@ -28,7 +28,6 @@ import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneS
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -46,7 +45,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
 			+ " The unit is meters. Default value is 1000 m.")
 	@PositiveOrZero
-	public double maxNeighborDistance = 1000; //[m]
+	private double maxNeighborDistance = 1000; //[m]
 
 	@Parameter
 	@Comment("Max network travel time from node A to node B for B to be considered a neighbor of A."
@@ -56,19 +55,19 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
 			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
 	@PositiveOrZero
-	public double maxNeighborTravelTime = 0; //[s]
+	private double maxNeighborTravelTime = 0; //[s]
+
 	@NotNull
 	private ZoneSystemParams zoneSystemParams;
 
 	@Parameter
 	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
-	public String cachePath = null;
+	private String cachePath = null;
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
 		initSingletonParameterSets();
 	}
-
 
 	private void initSingletonParameterSets() {
 
@@ -100,7 +99,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 			} else {
 				squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
 			}
-			squareGridParams.cellSize = Double.parseDouble(value);
+			squareGridParams.setCellSize(Double.parseDouble(value));
 		} else {
 			super.handleAddUnknownParam(paramName, value);
 		}
@@ -109,9 +108,35 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigu
 	public ZoneSystemParams getZoneSystemParams() {
 		if(this.zoneSystemParams == null) {
 			SquareGridZoneSystemParams squareGridZoneSystemParams = new SquareGridZoneSystemParams();
-			squareGridZoneSystemParams.cellSize = 200;
+			squareGridZoneSystemParams.setCellSize(200);
 			this.zoneSystemParams = squareGridZoneSystemParams;
 		}
 		return zoneSystemParams;
+	}
+
+	@PositiveOrZero
+	public double getMaxNeighborDistance() {
+		return maxNeighborDistance;
+	}
+
+	public void setMaxNeighborDistance(@PositiveOrZero double maxNeighborDistance) {
+		this.maxNeighborDistance = maxNeighborDistance;
+	}
+
+	@PositiveOrZero
+	public double getMaxNeighborTravelTime() {
+		return maxNeighborTravelTime;
+	}
+
+	public void setMaxNeighborTravelTime(@PositiveOrZero double maxNeighborTravelTime) {
+		this.maxNeighborTravelTime = maxNeighborTravelTime;
+	}
+
+	public String getCachePath() {
+		return cachePath;
+	}
+
+	public void setCachePath(String cachePath) {
+		this.cachePath = cachePath;
 	}
 }

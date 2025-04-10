@@ -10,10 +10,10 @@ public class DefaultCommercialServiceScoreTest {
 	void calcScore() {
         DefaultCommercialServiceScore serviceScore = new DefaultCommercialServiceScore(6, -6, 1800);
 
-        Assertions.assertEquals(serviceScore.calcScore(0), 6., 0.001);
-        Assertions.assertEquals(serviceScore.calcScore(1800), 0, 0.001);
-        Assertions.assertEquals(serviceScore.calcScore(3600), -6., 0.001);
-        Assertions.assertEquals(serviceScore.calcScore(7200), -6., 0.001);
+        Assertions.assertEquals(6., serviceScore.calcScore(0), 0.001);
+        Assertions.assertEquals(0, serviceScore.calcScore(1800), 0.001);
+        Assertions.assertEquals(-6., serviceScore.calcScore(3600), 0.001);
+        Assertions.assertEquals(-6., serviceScore.calcScore(7200), 0.001);
 
     }
 }

@@ -3,7 +3,7 @@ name: deploy-on-pr-merge
 on:
   pull_request_target: # pr-labelled deployment
     branches:
-      - master
+      - main
     types:
       - closed
 
@@ -49,4 +49,4 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v4
 
     env:
-      MAVEN_OPTS: -Xmx6g
+      MAVEN_OPTS: -Xmx2g

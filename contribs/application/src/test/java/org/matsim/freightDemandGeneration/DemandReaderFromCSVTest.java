@@ -2,10 +2,7 @@ package org.matsim.freightDemandGeneration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +43,7 @@ public class DemandReaderFromCSVTest {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
 		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
-		HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
+		HashMap<Id<Person>, TreeMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 		for (Person person :  population.getPersons().values()) {
 			DemandReaderFromCSV.findLinksForPerson(scenario, nearestLinkPerPerson, person);
 		}
@@ -367,19 +364,19 @@ public class DemandReaderFromCSVTest {
 		Carrier testCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers()
 			.get(Id.create("testCarrier1", Carrier.class));
 
-		Assertions.assertEquals(3, testCarrier1.getShipments().values().stream().mapToInt(CarrierShipment::getSize).sum());
+		Assertions.assertEquals(3, testCarrier1.getShipments().values().stream().mapToInt(carrierShipment -> carrierShipment.getCapacityDemand()).sum());
 		Map<String, Set<String>> locationsPerShipmentElement = new HashMap<>();
 		for (CarrierShipment shipment : testCarrier1.getShipments().values()) {
-			Assertions.assertEquals("i(2,0)", shipment.getFrom().toString());
-			Assertions.assertEquals(1, shipment.getSize());
-			Assertions.assertEquals(0, shipment.getPickupServiceTime(), MatsimTestUtils.EPSILON);
-			Assertions.assertEquals(180, shipment.getDeliveryServiceTime(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals("i(2,0)", shipment.getPickupLinkId().toString());
+			Assertions.assertEquals(1, shipment.getCapacityDemand());
+			Assertions.assertEquals(0, shipment.getPickupDuration(), MatsimTestUtils.EPSILON);
+			Assertions.assertEquals(180, shipment.getDeliveryDuration(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getPickupTimeWindow());
-			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getDeliveryTimeWindow());
+			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getDeliveryStartingTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
-				.add(shipment.getFrom().toString());
+				.add(shipment.getPickupLinkId().toString());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_delivery", (k) -> new HashSet<>())
-				.add(shipment.getTo().toString());
+				.add(shipment.getDeliveryLinkId().toString());
 		}
 		Assertions.assertEquals(1, locationsPerShipmentElement.get("ShipmentElement1_pickup").size());
 		Assertions.assertEquals(3, locationsPerShipmentElement.get("ShipmentElement1_delivery").size());

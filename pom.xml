@@ -30,7 +30,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.24.0</log4j.version>
+        <log4j.version>2.24.2</log4j.version>
         <geotools.version>31.3</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
@@ -115,6 +115,21 @@
                 <artifactId>commons-math3</artifactId>
                 <version>3.6.1</version>
             </dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-rng-simple</artifactId>
+				<version>1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-statistics-distribution</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>1.11.0</version>
+			</dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
@@ -185,6 +200,12 @@
                 <artifactId>jts-core</artifactId>
                 <version>${jts.version}</version>
             </dependency>
+			<!-- Command line parser -->
+			<dependency>
+				<groupId>info.picocli</groupId>
+				<artifactId>picocli</artifactId>
+				<version>4.7.6</version>
+			</dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
@@ -260,7 +281,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.2</version>
             </dependency>
 
             <dependency>
@@ -308,7 +329,7 @@
 			<dependency>
 				<groupId>it.unimi.dsi</groupId>
 				<artifactId>fastutil</artifactId>
-				<version>8.5.14</version>
+				<version>8.5.15</version>
 			</dependency>
 
             <dependency>
@@ -468,7 +489,7 @@
                         <doCheck>false</doCheck>
                         <doUpdate>false</doUpdate>
                         <revisionOnScmFailure>unknown</revisionOnScmFailure>
-                        <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                        <timestampFormat>{yyyy-MM-dd HH:mm:ss}</timestampFormat>
                     </configuration>
                 </plugin>
             </plugins>

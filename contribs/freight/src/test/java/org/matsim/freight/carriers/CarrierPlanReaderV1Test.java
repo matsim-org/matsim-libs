@@ -69,7 +69,7 @@ public class CarrierPlanReaderV1Test {
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
 		Assertions.assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
 		Leg leg = (Leg) carrier.getSelectedPlan().getScheduledTours()
-				.iterator().next().getTour().getTourElements().get(0);
+				.iterator().next().getTour().getTourElements().getFirst();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Assertions.assertEquals(3, route.getLinkIds().size());
 		Assertions.assertEquals("23", route.getStartLinkId().toString());

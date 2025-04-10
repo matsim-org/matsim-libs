@@ -37,7 +37,6 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controller.CarrierAgentTracker;

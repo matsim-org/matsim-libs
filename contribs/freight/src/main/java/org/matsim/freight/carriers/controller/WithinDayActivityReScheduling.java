@@ -70,7 +70,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 	}
 
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		Collection<MobsimAgent> agentsToReplan = freightAgentSource.getMobSimAgents();
 		for (MobsimAgent pa : agentsToReplan) {
 			doReplanning(pa, e.getSimulationTime(), e.getQueueSimulation());

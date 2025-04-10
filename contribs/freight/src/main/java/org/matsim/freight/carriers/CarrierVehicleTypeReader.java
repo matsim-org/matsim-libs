@@ -54,11 +54,11 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 
 	@Override
 	public void readFile( String filename ){
-		log.info(MSG) ;
 		try {
 			reader.setValidating(true) ;
 			reader.readFile( filename );
 		} catch (Exception e) {
+			log.info(MSG) ;
 			log.warn("### Exception: Message={} ; cause={} ; class={}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation. filename: {}", filename);
@@ -72,14 +72,12 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 
 	@Override
 	public void readURL( URL url ){
-		log.info(MSG) ;
 		try {
 			reader.setValidating(true) ;
 			reader.readURL(url);
 		}  catch (Exception e) {
-			log.warn("### Exception: Message={}", e.getMessage());
-			log.warn("### Exception: Cause={}", e.getCause().toString());
-			log.warn("### Exception: Class={}", e.getClass());
+			log.info(MSG) ;
+			log.warn("### Exception found while trying to read Carrier Vehicle Type: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: {}", url.toString());
 				reader.setValidating(false);
@@ -91,12 +89,11 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 	}
 
 	public void readStream( InputStream inputStream ){
-		log.info(MSG) ;
 		try {
 			reader.setValidating(true) ;
 			reader.parse( inputStream ) ;
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
+			log.info(MSG) ;
 			log.warn("### Exception found while trying to read Carrier Vehicle Type: Message: {} ; cause: {} ; class {}", e.getMessage(), e.getCause(), e.getClass());
 			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... ");

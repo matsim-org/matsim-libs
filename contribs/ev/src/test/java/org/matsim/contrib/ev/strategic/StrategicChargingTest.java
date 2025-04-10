@@ -37,11 +37,11 @@ public class StrategicChargingTest {
                 .build();
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
-        config.scoreTrackingInterval = 1;
-        config.scoring.zeroSoc = -1000.0; // incentivize agent to charge at work
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
 
         // motivate agent to charge at activity
-        config.minimumEnrouteDriveTime = Double.POSITIVE_INFINITY;
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
 
         Controler controller = scenario.controller();
         controller.run();
@@ -88,15 +88,15 @@ public class StrategicChargingTest {
                 .build();
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
-        config.scoring.zeroSoc = -1000.0; // incentivize agent to charge
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
 
         // motivate agent to charge enroute
-        config.maximumActivityChargingDuration = 0.0;
-        config.minimumEnrouteDriveTime = 0;
+        config.setMaximumActivityChargingDuration(0.0);
+        config.setMinimumEnrouteDriveTime(0.0);
 
         // define charging duration
-        config.minimumEnrouteChargingDuration = 1800.0;
-        config.maximumEnrouteChargingDuration = 1800.0;
+        config.setMinimumEnrouteChargingDuration(1800.0);
+        config.setMaximumEnrouteChargingDuration(1800.0);
 
         Controler controller = scenario.controller();
         controller.run();
@@ -129,14 +129,14 @@ public class StrategicChargingTest {
                 .build();
 
         WithinDayEvConfigGroup wdConfig = WithinDayEvConfigGroup.get(scenario.config());
-        wdConfig.allowSpoantaneousCharging = true;
+        wdConfig.setAllowSpoantaneousCharging(true);
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
-        config.scoring.zeroSoc = -1000.0; // incentivize agent to charge
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
 
         // disallow enroute and activity charging
-        config.minimumEnrouteDriveTime = Double.POSITIVE_INFINITY;
-        config.minimumActivityChargingDuration = Double.POSITIVE_INFINITY;
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
+        config.setMinimumActivityChargingDuration(Double.POSITIVE_INFINITY);
 
         // set critical soc
         scenario.scenario().getPopulation().getPersons().get(Id.createPersonId("person")).getAttributes()

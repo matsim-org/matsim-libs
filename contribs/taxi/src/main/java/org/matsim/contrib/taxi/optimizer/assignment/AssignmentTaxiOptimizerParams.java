@@ -34,7 +34,7 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " See comments in TaxiToRequestAssignmentCostProvider."
 			+ " The default mode is ARRIVAL_TIME (used fro simulating taxis in Berlin).")
 	@NotNull
-	public Mode mode = Mode.ARRIVAL_TIME;
+	private Mode mode = Mode.ARRIVAL_TIME;
 
 	@Parameter
 	@Comment("Vehicle planning horizon in the case of oversupply."
@@ -44,7 +44,7 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " Discussion: M. Maciejewski, J. Bischoff, K. Nagel: An assignment-based approach to efficient real-time"
 			+ " city-scale taxi dispatching. IEEE Intelligent Systems, 2016.")
 	@Positive
-	public double vehPlanningHorizonOversupply = 120;
+	private double vehPlanningHorizonOversupply = 120;
 
 	@Parameter
 	@Comment("Vehicle planning horizon in the case of undersupply."
@@ -54,7 +54,7 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " Discussion: M. Maciejewski, J. Bischoff, K. Nagel: An assignment-based approach to efficient real-time"
 			+ " city-scale taxi dispatching. IEEE Intelligent Systems, 2016.")
 	@Positive
-	public double vehPlanningHorizonUndersupply = 30;
+	private double vehPlanningHorizonUndersupply = 30;
 
 	// TODO should we adjust both the limits based on the current demand-supply relation?
 	@Parameter
@@ -66,7 +66,7 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " To turn off this feature - specify a sufficiently big number (not recommended)."
 			+ " The default value is 40 (used for simulating taxis in Berlin).")
 	@Positive
-	public int nearestRequestsLimit = 40;
+	private int nearestRequestsLimit = 40;
 
 	@Parameter
 	@Comment("Limits the number of available vehicles considered in"
@@ -77,22 +77,19 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " To turn off this feature - specify a sufficiently big number (not recommended)."
 			+ " The default value is 40 (used for simulating taxis in Berlin).")
 	@Positive
-	public int nearestVehiclesLimit = 40;
+	private int nearestVehiclesLimit = 40;
 
 	@Parameter
 	@Comment("Specifies the cost for vehicle-request pairs not included in the matrix"
 			+ " calculation. Should be high enough to prevent choosing such assignments."
 			+ " The default value is 48 * 3600 seconds (2 days) (used for simulating taxis in Berlin).")
 	@Positive
-	public double nullPathCost = 48 * 3600;
+	private double nullPathCost = 48 * 3600;
 
-	/**
-	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
-	 */
 	@Parameter
 	@Comment(REOPTIMIZATION_TIME_STEP_EXP)
 	@Positive
-	public int reoptimizationTimeStep = 10;
+	private int reoptimizationTimeStep = 10;
 
 	public AssignmentTaxiOptimizerParams() {
 		super(SET_NAME, true, true);
@@ -101,14 +98,74 @@ public final class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerPa
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		if (vehPlanningHorizonUndersupply < getReoptimizationTimeStep()
-				|| vehPlanningHorizonOversupply < getReoptimizationTimeStep()) {
+		if (getVehPlanningHorizonUndersupply() < getReoptimizationTimeStep()
+				|| getVehPlanningHorizonOversupply() < getReoptimizationTimeStep()) {
 			throw new RuntimeException("'vehPlanningHorizonUndersupply' and 'vehPlanningHorizonOversupply'"
 					+ "must not be less than 'reoptimizationTimeStep'");
 		}
 	}
 
+	/**
+	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
+	 */
 	public int getReoptimizationTimeStep() {
 		return reoptimizationTimeStep;
+	}
+
+	public @NotNull Mode getMode() {
+		return mode;
+	}
+
+	public void setMode(@NotNull Mode mode) {
+		this.mode = mode;
+	}
+
+	@Positive
+	public double getVehPlanningHorizonOversupply() {
+		return vehPlanningHorizonOversupply;
+	}
+
+	public void setVehPlanningHorizonOversupply(@Positive double vehPlanningHorizonOversupply) {
+		this.vehPlanningHorizonOversupply = vehPlanningHorizonOversupply;
+	}
+
+	@Positive
+	public double getVehPlanningHorizonUndersupply() {
+		return vehPlanningHorizonUndersupply;
+	}
+
+	public void setVehPlanningHorizonUndersupply(@Positive double vehPlanningHorizonUndersupply) {
+		this.vehPlanningHorizonUndersupply = vehPlanningHorizonUndersupply;
+	}
+
+	@Positive
+	public int getNearestRequestsLimit() {
+		return nearestRequestsLimit;
+	}
+
+	public void setNearestRequestsLimit(@Positive int nearestRequestsLimit) {
+		this.nearestRequestsLimit = nearestRequestsLimit;
+	}
+
+	@Positive
+	public int getNearestVehiclesLimit() {
+		return nearestVehiclesLimit;
+	}
+
+	public void setNearestVehiclesLimit(@Positive int nearestVehiclesLimit) {
+		this.nearestVehiclesLimit = nearestVehiclesLimit;
+	}
+
+	@Positive
+	public double getNullPathCost() {
+		return nullPathCost;
+	}
+
+	public void setNullPathCost(@Positive double nullPathCost) {
+		this.nullPathCost = nullPathCost;
+	}
+
+	public void setReoptimizationTimeStep(@Positive int reoptimizationTimeStep) {
+		this.reoptimizationTimeStep = reoptimizationTimeStep;
 	}
 }

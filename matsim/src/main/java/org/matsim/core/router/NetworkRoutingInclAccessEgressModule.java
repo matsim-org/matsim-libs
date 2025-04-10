@@ -140,8 +140,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = multimodalLinkChooser.decideAccessLink(request, filteredNetwork);
-		Link egressActLink = multimodalLinkChooser.decideEgressLink(request, filteredNetwork);
+		Link accessActLink = multimodalLinkChooser.decideAccessLink(request, mode, filteredNetwork);
+		Link egressActLink = multimodalLinkChooser.decideEgressLink(request, mode, filteredNetwork);
 
 		double now = departureTime;
 
@@ -393,14 +393,18 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (toLink != fromLink) { // (a "true" route)
 
+			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+
+			Path path;
 			if (invertedNetwork != null) {
 				startNode = invertedNetwork.getNodes().get(Id.create(fromLink.getId(), Node.class));
 				endNode = invertedNetwork.getNodes().get(Id.create(toLink.getId(), Node.class));
+            	path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
+			} else {
+				path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, depTime, person, vehicle);
 			}
 
-			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) {
 				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " for mode " + mode + ".");
 			}

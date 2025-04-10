@@ -109,7 +109,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 
             //create a new carrierPlan from the best solution
-            CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf( solutions ) );
+            CarrierPlan newPlan = MatsimJspritFactory.createPlan(Solutions.bestOf( solutions ) );
 
             //route plan
             NetworkRouter.routePlan(newPlan, netBasedCosts);

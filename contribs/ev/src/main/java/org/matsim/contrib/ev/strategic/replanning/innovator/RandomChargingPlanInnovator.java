@@ -55,11 +55,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config) {
 		this.chargerProvider = chargerProvider;
 		this.timeInterpretation = timeInterpretation;
-		this.minimumActivityChargingDuration = config.minimumActivityChargingDuration;
-		this.maximumActivityChargingDuration = config.maximumActivityChargingDuration;
-		this.minimumEnrouteDriveTime = config.minimumEnrouteDriveTime;
-		this.minimumEnrouteChargingDuration = config.minimumEnrouteChargingDuration;
-		this.maximumEnrouteChargingDuration = config.maximumEnrouteChargingDuration;
+		this.minimumActivityChargingDuration = config.getMinimumActivityChargingDuration();
+		this.maximumActivityChargingDuration = config.getMaximumActivityChargingDuration();
+		this.minimumEnrouteDriveTime = config.getMinimumEnrouteDriveTime();
+		this.minimumEnrouteChargingDuration = config.getMinimumEnrouteChargingDuration();
+		this.maximumEnrouteChargingDuration = config.getMaximumEnrouteChargingDuration();
 		this.candidateFinder = candidateFinder;
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -137,7 +137,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		// remove if too short
 		legBased.removeIf(candidate -> {
-			return candidate.leg().getTravelTime().seconds() < minimumEnrouteDriveTime;
+			return timeInterpretation.decideOnLegTravelTime(candidate.leg()).seconds() < minimumEnrouteDriveTime;
 		});
 
 		// reduce slots that are incompatible with the selected activity-based ones

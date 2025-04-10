@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckAndContinueEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -63,15 +64,15 @@ final class QNodeImpl extends AbstractQNode {
 			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic, qsimConfig ) ;
 		}
 	}
-	
+
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
 	private Double[] inLinkPriorities;
-	
+
 	private final Random random;
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
-	
+
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
 	private NodeTransition nodeTransitionLogic;
 	private boolean stopMoveNodeWhenSingleOutlinkFull;
@@ -86,14 +87,14 @@ final class QNodeImpl extends AbstractQNode {
 		return x > 1E-10;
 	}
 
-	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, 
+	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2,
 			TurnAcceptanceLogic turnAcceptanceLogic, QSimConfigGroup qsimConfig) {
 		super(n) ;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
 		this.nodeTransitionLogic = qsimConfig.getNodeTransitionLogic();
-		
+
 		switch (nodeTransitionLogic) {
 		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
 		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
@@ -107,7 +108,7 @@ final class QNodeImpl extends AbstractQNode {
 		default:
 			throw new UnsupportedOperationException("Node transition logic " + nodeTransitionLogic + " is not implemented.");
 		}
-		
+
 		int nofInLinks = n.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
@@ -120,7 +121,7 @@ final class QNodeImpl extends AbstractQNode {
 			this.random = MatsimRandom.getRandom();
 		}
 	}
-	
+
 	/**
 	 * Loads the inLinks-array with the corresponding links.
 	 * Cannot be called in constructor, as the queueNetwork does not yet know
@@ -165,21 +166,21 @@ final class QNodeImpl extends AbstractQNode {
 	 */
 	@Override
 	public boolean doSimStep(final double now) {
-		
+
 		if (inLinkPriorities == null) {
 			/* initialize inLink priorities.
-			 * unfortunately, this can't be done in init() because when capacities are changed 
-			 * before controler.run() init() uses the old capacities. theresa, may'20 */ 
+			 * unfortunately, this can't be done in init() because when capacities are changed
+			 * before controler.run() init() uses the old capacities. theresa, may'20 */
 			inLinkPriorities = new Double[inLinksArrayCache.length];
 			for (int inLinkCounter=0; inLinkCounter<this.inLinksArrayCache.length; inLinkCounter++) {
 				double linkCap = this.inLinksArrayCache[inLinkCounter].getLink().getCapacity(now);
 				inLinkPriorities[inLinkCounter] = 1. / linkCap;
 			}
 		}
-		
+
 		// reset congestion flag
 		this.atLeastOneOutgoingLaneIsJammed = false;
-		
+
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
 		for (int inLinkIndex = 0; inLinkIndex < this.inLinksArrayCache.length; inLinkIndex++) {
@@ -189,12 +190,12 @@ final class QNodeImpl extends AbstractQNode {
 				inLinksCapSum += link.getLink().getCapacity(now);
 			}
 		}
-		
+
 		if (!capacityLeft(inLinksCapSum)) {
 			this.setActive(false);
 			return false; // Nothing to do
-		} 
-		
+		}
+
 		// select vehicles to be moved over the node. The order of vehicles selected depends on the chosen node transition logic.
 		switch (nodeTransitionLogic) {
 		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
@@ -262,7 +263,7 @@ final class QNodeImpl extends AbstractQNode {
 				double minPrio = Float.MAX_VALUE;
 				int prioInLinkIndex = -1;
 				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
-					if (tempLinks[i] != null && 
+					if (tempLinks[i] != null &&
 							/* compare link priorities with some tolerance (done by comparing the float part of the double).
 							 * otherwise, priorities that should be equal are different when compared as double because its fixed precision
 							 * (e.g. 1/7200 + 1/7200 as double is greater than 1/3600).
@@ -275,7 +276,7 @@ final class QNodeImpl extends AbstractQNode {
 					}
 				}
 				QLinkI selectedLink = this.inLinksArrayCache[prioInLinkIndex];
-				
+
 				// try to move a vehicle from this selected link over the node
 				if ( ! moveFirstVehicleOnLink(now, selectedLink)) {
 					// the link is not able to move (more) vehicles in this time step
@@ -292,49 +293,49 @@ final class QNodeImpl extends AbstractQNode {
 					updatePriorities(now, prioWithWhichTheLastVehWasSent, prioInLinkIndex);
 					return true;
 				}
-				
+
 				// select the next link (could be the same again) that is allowed to move a vehicle. I.e. start again with the beginning of the while-loop
 			}
-			// vehicle moving done for this time step. update priorities 
+			// vehicle moving done for this time step. update priorities
 			updatePriorities(now, prioWithWhichTheLastVehWasSent, -1);
 			break;
 		default:
 			throw new UnsupportedOperationException("Node transition logic " + nodeTransitionLogic + " is not implemented.");
 		}
-		
+
 		return true;
 	}
 
 	private void updatePriorities(final double now, double prioWithWhichTheLastVehWasSent, int linkIndexToBeExcluded) {
-		
+
 		for (int linkIndex=0; linkIndex < this.inLinkPriorities.length; linkIndex++) {
 			// when the node was blocked (see * above) no priority updating is necessary for the blocked links
-			if (linkIndex != linkIndexToBeExcluded && tempLinks[linkIndex] == null) {	
+			if (linkIndex != linkIndexToBeExcluded && tempLinks[linkIndex] == null) {
 				// shift priorities of links that where disabled earlier because of other reasons, e.g. because their buffer was empty or a traffic light showed red,
 				// to the level of the other priorities such that they are not overprioritized in next time steps
-				inLinkPriorities[linkIndex] = prioWithWhichTheLastVehWasSent 
+				inLinkPriorities[linkIndex] = prioWithWhichTheLastVehWasSent
 						+ 1. / inLinksArrayCache[linkIndex].getLink().getCapacity(now);
 			}
 			// shift all priorities around zero accordingly to avoid overflow of double at some time step
-			inLinkPriorities[linkIndex] -= prioWithWhichTheLastVehWasSent;	
+			inLinkPriorities[linkIndex] -= prioWithWhichTheLastVehWasSent;
 		}
 	}
 
 	/**
 	 * @return <code>true</code> if a vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case all next links are jammed)
-	 * 
+	 *
 	 * This logic is only implemented for the case without lanes. When multiple lanes exist for a link, an exception is thrown.
 	 */
 	private boolean moveFirstVehicleOnLink(final double now, QLinkI link) {
 		if (link.getOfferingQLanes().size() > 1) {
-			throw new RuntimeException("The qsim node transition parameter " + NodeTransition.moveVehByVehRandomDistribution_dontBlockNode + ", " 
-					+ NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull + " and " 
-						+ NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull 
-							+ " are only implemented for the case without lanes. But link " + link.getLink().getId() 
+			throw new RuntimeException("The qsim node transition parameter " + NodeTransition.moveVehByVehRandomDistribution_dontBlockNode + ", "
+					+ NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull + " and "
+						+ NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull
+							+ " are only implemented for the case without lanes. But link " + link.getLink().getId()
 								+ " in your scenario has more than one lane. "
 									+ "Use the default node transiton " + NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode
-										+ " or " + NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull 
+										+ " or " + NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull
 											+ " or adapt the implementation such that it also works for lanes.");
 		}
 		for (QLaneI lane : link.getOfferingQLanes()) {
@@ -344,7 +345,7 @@ final class QNodeImpl extends AbstractQNode {
 					// vehicle was moved. stop here
 					return true;
 				} else {
-					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red. 
+					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red.
 					if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
 						// next link/lane is jammed. stop vehicle moving for the whole node
 						return false;
@@ -357,13 +358,13 @@ final class QNodeImpl extends AbstractQNode {
 		}
 		return false;
 	}
-	
+
 	private void moveLink(final QLinkI link, final double now){
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
 				if (! moveVehicleOverNode(veh, link, lane, now )) {
-					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red. 
+					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red.
 					if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
 						// next link/lane is jammed. stop vehicle moving for the whole node
 						return;
@@ -375,9 +376,9 @@ final class QNodeImpl extends AbstractQNode {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
@@ -388,7 +389,7 @@ final class QNodeImpl extends AbstractQNode {
 	private boolean moveVehicleOverNode( final QVehicle veh, QLinkI fromLink, final QLaneI fromLane, final double now ) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = fromLink.getLink() ;
-	
+
 		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLane, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLane, now, currentLink.getId() ) ;
@@ -396,16 +397,16 @@ final class QNodeImpl extends AbstractQNode {
 		} else if ( turn.equals(AcceptTurn.WAIT) ) {
 			return false;
 		}
-		
+
 		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 		if (nextQueueLane.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 			return true;
-		} 
+		}
 		// else, i.e. next link or lane is jammed
 		this.atLeastOneOutgoingLaneIsJammed = true;
-				
+
 		if (vehicleIsStuck(fromLane, now)) {
 			/* We just push the vehicle further after stucktime is over, regardless
 			 * of if there is space on the next link or not.. optionally we let them
@@ -415,24 +416,32 @@ final class QNodeImpl extends AbstractQNode {
 				moveVehicleFromInlinkToAbort(veh, fromLane, now, currentLink.getId());
 				return false ;
 			} else {
+				if (this.context.qsimConfig.isNotifyAboutStuckVehicles()) {
+					// first treat the passengers:
+					for ( PassengerAgent pp : veh.getPassengers() ) {
+						this.context.getEventsManager().processEvent(new PersonStuckAndContinueEvent(now, pp.getId(), fromLink.getLink().getId(), veh.getDriver().getMode()));
+					}
+					// now treat the driver:
+					this.context.getEventsManager().processEvent(new PersonStuckAndContinueEvent(now, veh.getDriver().getId(), fromLink.getLink().getId(), veh.getDriver().getMode()));
+				}
 				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 				return true;
-				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
-				// kai, feb'12) 
+				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps.
+				// kai, feb'12)
 			}
 		}
-		
+
 		return false;
-		
+
 	}
-	
+
 	private static int wrnCnt = 0 ;
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
 		fromLane.popFirstVehicle();
 		// -->
 		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
-		
+
 		// first treat the passengers:
 		for ( PassengerAgent pp : veh.getPassengers() ) {
 			if ( pp instanceof MobsimAgent ) {
@@ -444,35 +453,35 @@ final class QNodeImpl extends AbstractQNode {
 				log.warn(Gbl.ONLYONCE) ;
 			}
 		}
-		
+
 		// now treat the driver:
 		veh.getDriver().setStateToAbort(now) ;
 		netsimEngine.arrangeNextAgentState(veh.getDriver()) ;
-		
+
 	}
-	
+
 	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, Id<Link> currentLinkId, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
 		double now = this.context.getSimTimer().getTimeOfDay() ;
-		
+
 		fromLane.popFirstVehicle();
 		// -->
 		//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
 		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
-		
+
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
-		
+
 		// -->
 		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId));
 		// <--
 		nextQueueLane.addFromUpstream(veh);
 	}
-	
+
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {
 		//		final double stuckTime = network.simEngine.getStuckTime();
 		final double stuckTime = this.context.qsimConfig.getStuckTime() ;
 		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > stuckTime;
 	}
-	
+
 
 }

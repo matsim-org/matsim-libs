@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,10 +33,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -64,12 +65,9 @@ public class SecondReloadLSPSchedulingTest {
 
 	@BeforeEach
 	public void initialize() {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
-
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -201,7 +199,7 @@ public class SecondReloadLSPSchedulingTest {
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 
-		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		ArrayList<Link> linkList = new ArrayList<>(scenario.getNetwork().getLinks().values());
 
 		for (int i = 1; i < 2; i++) {
 			Id<LspShipment> id = Id.create(i, LspShipment.class);
@@ -267,7 +265,7 @@ public class SecondReloadLSPSchedulingTest {
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-			assertEquals("HANDLE", planElements.get(7).getElementType());
+			assertEquals("HANDLING", planElements.get(7).getElementType());
 			assertTrue(planElements.get(7).getEndTime() >= (0));
 			assertTrue(planElements.get(7).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(7).getStartTime() <= planElements.get(7).getEndTime());
@@ -311,7 +309,7 @@ public class SecondReloadLSPSchedulingTest {
 
 			assertTrue(planElements.get(4).getStartTime() >= (planElements.get(3).getEndTime() / (1.0001)) + 300);
 
-			assertEquals("HANDLE", planElements.get(3).getElementType());
+			assertEquals("HANDLING", planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
@@ -359,21 +357,17 @@ public class SecondReloadLSPSchedulingTest {
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>
-						entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
 				assertSame(service.getServiceLinkId(), shipment.getFrom());
-                assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
 				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				boolean handledByTranshipmentHub = false;
 				for (LogisticChainElement clientElement :
-						reloadEventHandler.getTranshipmentHub().getClientElements()) {
+					reloadEventHandler.getTranshipmentHub().getClientElements()) {
 					if (clientElement == element) {
 						handledByTranshipmentHub = true;
 						break;
@@ -394,24 +388,17 @@ public class SecondReloadLSPSchedulingTest {
 			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
 			TransshipmentHubTourEndEventHandler reloadEventHandler =
 					(TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
-			Iterator<
-					Entry<
-							CarrierService,
-							TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>
-					iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
 
-			while (iter.hasNext()) {
-				Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>
-						entry = iter.next();
+			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
 				assertSame(service.getServiceLinkId(), toLinkId);
-                assertEquals(service.getCapacityDemand(), shipment.getSize());
+				assertEquals(service.getCapacityDemand(), shipment.getSize());
 				assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 				boolean handledByTranshipmentHub = false;
 				for (LogisticChainElement clientElement :
-						reloadEventHandler.getTranshipmentHub().getClientElements()) {
+					reloadEventHandler.getTranshipmentHub().getClientElements()) {
 					if (clientElement == element) {
 						handledByTranshipmentHub = true;
 						break;

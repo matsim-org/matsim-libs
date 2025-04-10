@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -153,13 +152,13 @@ public class FreightDemandGenerationUtils {
 						thisShipment.getPickupLinkId().toString() + "	" +
 						thisShipment.getDeliveryLinkId().toString() + "	"+
 						0 + "\n");
-					writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
+                    writer.write(thisCarrier.getId().toString() + thisShipment.getId() + "	"
 						+ coordTo.getX() + "	" + coordTo.getY() + "	"
 						+ "Delivery" + "	"+
 							" "+"	"+
 						thisShipment.getPickupLinkId() + "	" +
 						thisShipment.getDeliveryLinkId() + "	"+
-						thisShipment.getSize() + "\n");
+                            thisShipment.getCapacityDemand() + "\n");
 				}
 			}
 			writer.flush();

@@ -63,8 +63,8 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest {
 					, "--solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.SolutionType.onePlan_direct
 			});
 
-		} catch (Exception ee) {
-			ee.printStackTrace();
+		} catch (Exception e) {
+			log.error("Exception occurred while running example", e);
 			fail();
 		}
 

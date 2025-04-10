@@ -18,6 +18,11 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
@@ -42,26 +47,36 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	@Comment("Specifies how often empty vehicle rebalancing is executed."
 			+ " Must be positive. Default is 1800 s. Expects an Integer Value")
 	@Positive
-	public int interval = 1800;// [s]
+	private int interval = 1800;// [s]
 
 	@Parameter
 	@Comment(
 			"Minimum remaining service time of an idle/busy vehicle to be considered as rebalancable/soon-idle (respectively)."
 					+ " Default is 3600 s. In general, should be higher than interval (e.g. 2 x interval).")
 	@Positive
-	public double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 2 * getInterval();// [s]
 
 	@Parameter
 	@Comment("Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
 			+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)")
 	@PositiveOrZero
-	public double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 0.5 * getInterval();// [s], if 0 then soon-idle vehicle will not be considered
 
 	public interface RebalancingStrategyParams {
 	}
 
 	@NotNull
 	private RebalancingStrategyParams rebalancingStrategyParams;
+
+	public enum TargetLinkSelection {random, mostCentral}
+
+	@Parameter("zoneTargetLinkSelection")
+	@Comment("Defines how the target link of a zone is determined (e.g. for rebalancing)."
+			+ " Possible values are [random,mostCentral]. Default behavior is mostCentral, where all vehicles are sent to the same link.")
+	@NotNull
+	private TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
+
+	private ZoneSystemParams zoneSystemParams;
 
 	public RebalancingParams() {
 		super(SET_NAME);
@@ -82,17 +97,72 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 		addDefinition(CustomRebalancingStrategyParams.SET_NAME, CustomRebalancingStrategyParams::new,
 			() -> (ConfigGroup)rebalancingStrategyParams,
 			params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Preconditions.checkArgument(minServiceTime > maxTimeBeforeIdle,
+		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
 				"minServiceTime must be greater than maxTimeBeforeIdle");
 	}
 
 	public RebalancingStrategyParams getRebalancingStrategyParams() {
 		return rebalancingStrategyParams;
+	}
+
+	@Positive
+	public int getInterval() {
+		return interval;
+	}
+
+	public void setInterval(@Positive int interval) {
+		this.interval = interval;
+	}
+
+	@Positive
+	public double getMinServiceTime() {
+		return minServiceTime;
+	}
+
+	public void setMinServiceTime(@Positive double minServiceTime) {
+		this.minServiceTime = minServiceTime;
+	}
+
+	@PositiveOrZero
+	public double getMaxTimeBeforeIdle() {
+		return maxTimeBeforeIdle;
+	}
+
+	public void setMaxTimeBeforeIdle(@PositiveOrZero double maxTimeBeforeIdle) {
+		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
+	}
+
+	public @NotNull TargetLinkSelection getTargetLinkSelection() {
+		return targetLinkSelection;
+	}
+
+	public void setTargetLinkSelection(@NotNull TargetLinkSelection targetLinkSelection) {
+		this.targetLinkSelection = targetLinkSelection;
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }
