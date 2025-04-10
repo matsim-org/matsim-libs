@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TransitScheduleValidatorTest.java
@@ -21,6 +20,10 @@
 
 package org.matsim.pt.utils;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -29,16 +32,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.ChainedDeparture;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.matsim.pt.utils.TransitScheduleValidator.ValidationResult;
 
 public class TransitScheduleValidatorTest {
 
@@ -122,5 +123,176 @@ public class TransitScheduleValidatorTest {
 		Assertions.assertEquals(1, result.getIssues().size(), "Should warn against missing stop4.");
 		Assertions.assertTrue(result.getIssues().get(0).getMessage().contains("stop4"), "Message should contain hint about stop4 being missing. " + result.getIssues().get(0).getMessage());
 	}
-
+	
+	@Test
+	void testValidator_ChainedDepartures_valid() {
+		// Create a scenario with valid chained departures
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+		
+		// Create transit lines and routes
+		Id<TransitLine> line1Id = Id.create("line1", TransitLine.class);
+		Id<TransitRoute> route1Id = Id.create("route1", TransitRoute.class);
+		
+		TransitLine line1 = factory.createTransitLine(line1Id);
+		TransitRoute route1 = factory.createTransitRoute(route1Id, null, Collections.emptyList(), "bus");
+		
+		// Create departures
+		Id<Departure> dep1Id = Id.create("dep1", Departure.class);
+		Id<Departure> dep2Id = Id.create("dep2", Departure.class);
+		
+		Departure departure1 = factory.createDeparture(dep1Id, 8.0 * 3600);
+		Departure departure2 = factory.createDeparture(dep2Id, 9.0 * 3600);
+		
+		// Create a chained departure from dep1 to dep2
+		ChainedDeparture chainedDep = factory.createChainedDeparture(line1Id, route1Id, dep2Id);
+		departure1.setChainedDepartures(List.of(chainedDep));
+		
+		// Add departures to route
+		route1.addDeparture(departure1);
+		route1.addDeparture(departure2);
+		
+		// Add route to line and line to schedule
+		line1.addRoute(route1);
+		schedule.addTransitLine(line1);
+		
+		// Validate chained departures
+		ValidationResult result = TransitScheduleValidator.validateChainedDepartures(schedule);
+		
+		// Should have no issues
+		assertThat(result.getIssues()).isEmpty();
+	}
+	
+	@Test
+	void testValidator_ChainedDepartures_missingLine() {
+		// Create a scenario with an invalid line reference in a chained departure
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+		
+		// Create transit lines and routes
+		Id<TransitLine> line1Id = Id.create("line1", TransitLine.class);
+		Id<TransitLine> missingLineId = Id.create("missingLine", TransitLine.class);
+		Id<TransitRoute> route1Id = Id.create("route1", TransitRoute.class);
+		
+		TransitLine line1 = factory.createTransitLine(line1Id);
+		TransitRoute route1 = factory.createTransitRoute(route1Id, null, Collections.emptyList(), "bus");
+		
+		// Create departures
+		Id<Departure> dep1Id = Id.create("dep1", Departure.class);
+		Id<Departure> dep2Id = Id.create("dep2", Departure.class);
+		
+		Departure departure1 = factory.createDeparture(dep1Id, 8.0 * 3600);
+		Departure departure2 = factory.createDeparture(dep2Id, 9.0 * 3600);
+		
+		// Create a chained departure with a reference to a missing line
+		ChainedDeparture chainedDep = factory.createChainedDeparture(missingLineId, route1Id, dep2Id);
+		departure1.setChainedDepartures(List.of(chainedDep));
+		
+		// Add departures to route
+		route1.addDeparture(departure1);
+		route1.addDeparture(departure2);
+		
+		// Add route to line and line to schedule
+		line1.addRoute(route1);
+		schedule.addTransitLine(line1);
+		
+		// Validate chained departures
+		ValidationResult result = TransitScheduleValidator.validateChainedDepartures(schedule);
+		
+		// Should have 1 error for the missing line
+		assertThat(result.getIssues()).hasSize(1);
+		ValidationResult.ValidationIssue issue = result.getIssues().get(0);
+		assertThat(issue.getSeverity()).isEqualTo(ValidationResult.Severity.ERROR);
+		assertThat(issue.getMessage()).contains("missingLine");
+		assertThat(issue.getMessage()).contains("does not exist in the schedule");
+	}
+	
+	@Test
+	void testValidator_ChainedDepartures_missingRoute() {
+		// Create a scenario with an invalid route reference in a chained departure
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+		
+		// Create transit lines and routes
+		Id<TransitLine> line1Id = Id.create("line1", TransitLine.class);
+		Id<TransitRoute> route1Id = Id.create("route1", TransitRoute.class);
+		Id<TransitRoute> missingRouteId = Id.create("missingRoute", TransitRoute.class);
+		
+		TransitLine line1 = factory.createTransitLine(line1Id);
+		TransitRoute route1 = factory.createTransitRoute(route1Id, null, Collections.emptyList(), "bus");
+		
+		// Create departures
+		Id<Departure> dep1Id = Id.create("dep1", Departure.class);
+		Id<Departure> dep2Id = Id.create("dep2", Departure.class);
+		
+		Departure departure1 = factory.createDeparture(dep1Id, 8.0 * 3600);
+		Departure departure2 = factory.createDeparture(dep2Id, 9.0 * 3600);
+		
+		// Create a chained departure with a reference to a missing route
+		ChainedDeparture chainedDep = factory.createChainedDeparture(line1Id, missingRouteId, dep2Id);
+		departure1.setChainedDepartures(List.of(chainedDep));
+		
+		// Add departures to route
+		route1.addDeparture(departure1);
+		route1.addDeparture(departure2);
+		
+		// Add route to line and line to schedule
+		line1.addRoute(route1);
+		schedule.addTransitLine(line1);
+		
+		// Validate chained departures
+		ValidationResult result = TransitScheduleValidator.validateChainedDepartures(schedule);
+		
+		// Should have 1 error for the missing route
+		assertThat(result.getIssues()).hasSize(1);
+		ValidationResult.ValidationIssue issue = result.getIssues().get(0);
+		assertThat(issue.getSeverity()).isEqualTo(ValidationResult.Severity.ERROR);
+		assertThat(issue.getMessage()).contains("missingRoute");
+		assertThat(issue.getMessage()).contains("does not exist in the schedule");
+	}
+	
+	@Test
+	void testValidator_ChainedDepartures_missingDeparture() {
+		// Create a scenario with an invalid departure reference in a chained departure
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+		
+		// Create transit lines and routes
+		Id<TransitLine> line1Id = Id.create("line1", TransitLine.class);
+		Id<TransitRoute> route1Id = Id.create("route1", TransitRoute.class);
+		
+		TransitLine line1 = factory.createTransitLine(line1Id);
+		TransitRoute route1 = factory.createTransitRoute(route1Id, null, Collections.emptyList(), "bus");
+		
+		// Create departures
+		Id<Departure> dep1Id = Id.create("dep1", Departure.class);
+		Id<Departure> missingDepId = Id.create("missingDep", Departure.class);
+		
+		Departure departure1 = factory.createDeparture(dep1Id, 8.0 * 3600);
+		
+		// Create a chained departure with a reference to a missing departure
+		ChainedDeparture chainedDep = factory.createChainedDeparture(line1Id, route1Id, missingDepId);
+		departure1.setChainedDepartures(List.of(chainedDep));
+		
+		// Add departure to route
+		route1.addDeparture(departure1);
+		
+		// Add route to line and line to schedule
+		line1.addRoute(route1);
+		schedule.addTransitLine(line1);
+		
+		// Validate chained departures
+		ValidationResult result = TransitScheduleValidator.validateChainedDepartures(schedule);
+		
+		// Should have 1 error for the missing departure
+		assertThat(result.getIssues()).hasSize(1);
+		ValidationResult.ValidationIssue issue = result.getIssues().get(0);
+		assertThat(issue.getSeverity()).isEqualTo(ValidationResult.Severity.ERROR);
+		assertThat(issue.getMessage()).contains("missingDep");
+		assertThat(issue.getMessage()).contains("does not exist in the schedule");
+	}
 }
