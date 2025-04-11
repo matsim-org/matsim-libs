@@ -273,7 +273,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			} else {
 				this.writeStartTag(Constants.DEPARTURE, attributes, false);
 
-				if (!AttributesUtils.isEmpty(dep.getAttributes())) {
+				if (!dep.getAttributes().isEmpty()) {
 					this.writer.write(NL);
 					this.attributesWriter.writeAttributes("\t\t\t\t\t", this.writer, dep.getAttributes());
 				}
