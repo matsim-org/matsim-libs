@@ -3,7 +3,7 @@ name: deploy-on-pr-merge
 on:
   pull_request_target: # pr-labelled deployment
     branches:
-      - main
+      - 2025.x
     types:
       - closed
 
