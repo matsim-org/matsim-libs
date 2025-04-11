@@ -22,6 +22,7 @@ package org.matsim.pt.utils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assertions;
@@ -301,5 +302,76 @@ public class TransitScheduleValidatorTest {
 		assertThat(issue.getSeverity()).isEqualTo(ValidationResult.Severity.ERROR);
 		assertThat(issue.getMessage()).contains("missingDep");
 		assertThat(issue.getMessage()).contains("does not exist in the schedule");
+	}
+
+	@Test
+	void testValidator_ChainedDepartures_stopMismatch() {
+		// Create a scenario with mismatched stops in chained departures
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory factory = schedule.getFactory();
+
+		// Create transit lines and routes
+		Id<TransitLine> line1Id = Id.create("line1", TransitLine.class);
+		Id<TransitRoute> route1Id = Id.create("route1", TransitRoute.class);
+		Id<TransitRoute> route2Id = Id.create("route2", TransitRoute.class);
+
+		TransitLine line1 = factory.createTransitLine(line1Id);
+		
+		// Create stop facilities
+		Id<TransitStopFacility> stop1Id = Id.create("stop1", TransitStopFacility.class);
+		Id<TransitStopFacility> stop2Id = Id.create("stop2", TransitStopFacility.class);
+		Id<TransitStopFacility> stop3Id = Id.create("stop3", TransitStopFacility.class);
+		
+		TransitStopFacility stop1 = factory.createTransitStopFacility(stop1Id, new Coord(0, 0), false);
+		TransitStopFacility stop2 = factory.createTransitStopFacility(stop2Id, new Coord(1000, 0), false);
+		TransitStopFacility stop3 = factory.createTransitStopFacility(stop3Id, new Coord(2000, 0), false);
+		
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		// Create routes with different stops
+		List<TransitRouteStop> route1Stops = new ArrayList<>();
+		route1Stops.add(factory.createTransitRouteStop(stop1, 0, 0));
+		route1Stops.add(factory.createTransitRouteStop(stop2, 100, 100));
+		
+		List<TransitRouteStop> route2Stops = new ArrayList<>();
+		route2Stops.add(factory.createTransitRouteStop(stop3, 0, 0)); // Different first stop than route1's last stop
+		route2Stops.add(factory.createTransitRouteStop(stop1, 100, 100));
+
+		TransitRoute route1 = factory.createTransitRoute(route1Id, null, route1Stops, "bus");
+		TransitRoute route2 = factory.createTransitRoute(route2Id, null, route2Stops, "bus");
+
+		// Create departures
+		Id<Departure> dep1Id = Id.create("dep1", Departure.class);
+		Id<Departure> dep2Id = Id.create("dep2", Departure.class);
+
+		Departure departure1 = factory.createDeparture(dep1Id, 8.0 * 3600);
+		Departure departure2 = factory.createDeparture(dep2Id, 9.0 * 3600);
+
+		// Create a chained departure with mismatched stops
+		ChainedDeparture chainedDep = factory.createChainedDeparture(line1Id, route2Id, dep2Id);
+		departure1.setChainedDepartures(List.of(chainedDep));
+
+		// Add departures to routes
+		route1.addDeparture(departure1);
+		route2.addDeparture(departure2);
+
+		// Add routes to line and line to schedule
+		line1.addRoute(route1);
+		line1.addRoute(route2);
+		schedule.addTransitLine(line1);
+
+		// Validate chained departures
+		ValidationResult result = TransitScheduleValidator.validateChainedDepartures(schedule);
+
+		// Should have 1 error for the stop mismatch
+		assertThat(result.getIssues()).hasSize(1);
+		ValidationResult.ValidationIssue issue = result.getIssues().get(0);
+		assertThat(issue.getSeverity()).isEqualTo(ValidationResult.Severity.ERROR);
+		assertThat(issue.getMessage()).contains("does not match the first stop");
+		assertThat(issue.getMessage()).contains("stop2");
+		assertThat(issue.getMessage()).contains("stop3");
 	}
 }

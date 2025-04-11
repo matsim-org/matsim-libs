@@ -417,6 +417,23 @@ public abstract class TransitScheduleValidator {
 									departureId + " in route " + targetRoute.getId() + ", line " + transitLineId +
 									" which does not exist in the schedule.", 
 									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+
+							// Check if the last stop of the route matches the first stop of the chained route
+							if (!route.getStops().isEmpty() && !targetRoute.getStops().isEmpty()) {
+								TransitRouteStop lastStop = route.getStops().get(route.getStops().size() - 1);
+								TransitRouteStop firstStop = targetRoute.getStops().get(0);
+								
+								if (!lastStop.getStopFacility().getId().equals(firstStop.getStopFacility().getId())) {
+									result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR,
+										"Transit line " + line.getId() + ", route " + route.getId() +
+										", departure " + departure.getId() + " has a chained departure where the last stop (" +
+										lastStop.getStopFacility().getId() + ") does not match the first stop (" +
+										firstStop.getStopFacility().getId() + ") of the chained route " + targetRoute.getId() +
+										" in line " + transitLineId,
+										ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								}
 							}
 						}
 					}

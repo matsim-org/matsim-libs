@@ -32,7 +32,7 @@
 				<stop refId="221075_bus" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="90277_bus" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="true"/>
 				<stop refId="196643_bus" arrivalOffset="00:04:00" departureOffset="00:04:00" awaitDeparture="true"/>
-				<stop refId="206564_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
+				<stop refId="221075_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
 			</routeProfile>
 
 			<route>
@@ -76,7 +76,7 @@
 				<stop refId="221075_bus" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="90277_bus" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="true"/>
 				<stop refId="196643_bus" arrivalOffset="00:04:00" departureOffset="00:04:00" awaitDeparture="true"/>
-				<stop refId="206564_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
+				<stop refId="221075_bus" arrivalOffset="00:06:00" departureOffset="00:06:00" awaitDeparture="true"/>
 			</routeProfile>
 
 			<route>
