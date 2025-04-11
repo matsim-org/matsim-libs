@@ -90,8 +90,8 @@
 			<departures>
 				<departure id="d1" departureTime="09:14:00" vehicleRefId="pt_842---32640_0_0">
 
-					<chainedDeparture toTransitLine="line" toTransitRoute="line1_r1" toDeparture="d2"/>
-					<chainedDeparture toTransitLine="line" toTransitRoute="line1_r1" toDeparture="d3"/>
+					<chainedDeparture toTransitLine="line1" toTransitRoute="line1_r1" toDeparture="d2"/>
+					<chainedDeparture toTransitLine="line1" toTransitRoute="line1_r1" toDeparture="d3"/>
 				</departure>
 			</departures>
 

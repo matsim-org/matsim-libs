@@ -5,7 +5,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -91,7 +90,7 @@ public class ChainedDepartureTest {
     @Test
     void testReadWriteChainedDeparturesFromXML() {
         // Read the example schedule
-        String inputFile = "test/input/org/matsim/pt/transitSchedule/chained_departures_schedule.xml";
+        String inputFile = utils.getPackageInputDirectory() + "chained_departures_schedule.xml";
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         TransitSchedule schedule = scenario.getTransitSchedule();
         new TransitScheduleReader(scenario).readFile(inputFile);
@@ -130,13 +129,13 @@ public class ChainedDepartureTest {
         // Verify the first chained departure of line2
         ChainedDeparture lineTwo_firstChainedDep = chainedDeparturesLine2.get(0);
         assertEquals(Id.create("d2", Departure.class), lineTwo_firstChainedDep.getChainedDepartureId(), "First chained departure should point to d2");
-        assertEquals(Id.create("line", TransitLine.class), lineTwo_firstChainedDep.getChainedTransitLineId(), "Transit line ID should be 'line'");
+        assertEquals(Id.create("line1", TransitLine.class), lineTwo_firstChainedDep.getChainedTransitLineId(), "Transit line ID should be 'line'");
         assertEquals(Id.create("line1_r1", TransitRoute.class), lineTwo_firstChainedDep.getChainedRouteId(), "Transit route ID should be 'line1_r1'");
 
         // Verify the second chained departure of line2
         ChainedDeparture lineTwo_secondChainedDep = chainedDeparturesLine2.get(1);
         assertEquals(Id.create("d3", Departure.class), lineTwo_secondChainedDep.getChainedDepartureId(), "Second chained departure should point to d3");
-        assertEquals(Id.create("line", TransitLine.class), lineTwo_secondChainedDep.getChainedTransitLineId(), "Transit line ID should be 'line'");
+        assertEquals(Id.create("line1", TransitLine.class), lineTwo_secondChainedDep.getChainedTransitLineId(), "Transit line ID should be 'line'");
         assertEquals(Id.create("line1_r1", TransitRoute.class), lineTwo_secondChainedDep.getChainedRouteId(), "Transit route ID should be 'line1_r1'");
 
         // Test writing and reading back
