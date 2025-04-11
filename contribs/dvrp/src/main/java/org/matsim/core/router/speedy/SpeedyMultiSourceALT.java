@@ -168,7 +168,7 @@ public class SpeedyMultiSourceALT {
 		LOG.warn("No route was found from nodes [" + startNodes.stream()
 				.map(n -> n.node.getId() + "")
 				.collect(joining(",")) + "] to node " + endNode.getId() + ". Some possible reasons:");
-		LOG.warn("  * Network is not connected.  Run NetworkCleaner().");
+		LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).");
 		LOG.warn(
 				"  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
 		LOG.warn(
