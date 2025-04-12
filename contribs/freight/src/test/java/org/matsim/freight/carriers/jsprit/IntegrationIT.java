@@ -77,7 +77,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
@@ -88,11 +88,11 @@ public class IntegrationIT {
 			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
 			// Test method if all jobs are handled
 			Assertions.assertTrue(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "Not all jobs are handled");
-			CarrierService.Builder builder = CarrierService.Builder.newInstance(Id.create(
-				"service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"))
-				.setServiceDuration(10.);
-			CarrierService newService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(0, 86000)).build();
-			carrier.getServices().put(newService.getId(), newService);
+			CarrierService newService  = CarrierService.Builder.newInstance(Id.create("service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"),0)
+				.setServiceDuration(10.)
+				.setServiceStartingTimeWindow(TimeWindow.newInstance(0, 86000))
+				.build();
+			CarriersUtils.addService(carrier, newService);
 			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
 		}
 	}
@@ -126,7 +126,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 	}
 
@@ -149,7 +149,7 @@ public class IntegrationIT {
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			// (maybe not optimal, but since re-routing is a matsim strategy,

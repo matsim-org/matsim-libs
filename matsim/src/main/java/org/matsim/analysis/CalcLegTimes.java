@@ -64,11 +64,6 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	private double sumLegDurations = 0;
 	private int sumLegs = 0;
 
-	@Inject
-	CalcLegTimes(EventsManager eventsManager) {
-		eventsManager.addHandler(this);
-	}
-
 	public CalcLegTimes() {
 
 	}

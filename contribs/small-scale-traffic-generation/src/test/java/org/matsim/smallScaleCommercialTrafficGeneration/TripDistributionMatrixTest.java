@@ -166,8 +166,8 @@ public class TripDistributionMatrixTest {
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
-		ArrayList<String> modesORvehTypes = new ArrayList<String>(
-				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
+		ArrayList<String> modesORvehTypes = new ArrayList<>(
+			Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
 		ArrayList<String> listOfZones = new ArrayList<>( List.of("area1", "area2", "area3"));
 
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);

@@ -21,6 +21,8 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -28,6 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunPassengerAlongWithCarriersIT {
+
+	private static final Logger log = LogManager.getLogger(RunPassengerAlongWithCarriersIT.class);
 
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -43,7 +47,7 @@ public class RunPassengerAlongWithCarriersIT {
             // ---
             abc.run();
         } catch (Exception ee ) {
-            ee.printStackTrace();
+			log.error("Exception while running example", ee);
             Assertions.fail("something went wrong: " + ee.getMessage());
         }
     }

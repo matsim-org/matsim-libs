@@ -82,8 +82,12 @@ public final class Injector {
 	}
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
-		Level level = Level.INFO;
-		log.log(level, "=== printInjector start ===");
+		Level level = Level.DEBUG;
+		log.info("=== printInjector output skipped ===");
+		log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+			+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+
+		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
 			if (entry.getKey().toString().contains("type=org.matsim")) {
 				Annotation annotation = entry.getKey().getAnnotation();

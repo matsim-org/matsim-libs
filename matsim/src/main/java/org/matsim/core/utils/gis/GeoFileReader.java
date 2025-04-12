@@ -50,7 +50,7 @@ import java.util.*;
  * @author glaemmel
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
- * @author nkuehnel / MOIA // add gpkg suuport
+ * @author nkuehnel / MOIA // add gpkg support
  */
 public class GeoFileReader implements MatsimSomeReader {
     	private static final Logger log = LogManager.getLogger(GeoFileReader.class);
@@ -121,7 +121,7 @@ public class GeoFileReader implements MatsimSomeReader {
 
 		File file;
 		// Remote files have to be downloaded
-		if (url.getProtocol().startsWith("http")) {
+		if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar")) {
 
 			String name = FilenameUtils.getBaseName(url.getFile());
 

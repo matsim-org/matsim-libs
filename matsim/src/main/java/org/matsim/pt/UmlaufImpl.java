@@ -34,7 +34,7 @@ public class UmlaufImpl implements Umlauf {
 	private Id<Umlauf> id;
 	private Id<Vehicle> vehicleId;
 
-	private List<UmlaufStueckI> umlaufStuecke = new ArrayList<UmlaufStueckI>();
+	private List<UmlaufStueckI> umlaufStuecke = new ArrayList<>();
 
 	public UmlaufImpl(Id<Umlauf> id) {
 		super();
@@ -64,11 +64,6 @@ public class UmlaufImpl implements Umlauf {
 	@Override
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
-	}
-
-	@Override
-	public Id<TransitLine> getLineId() {
-		return getLineId(getUmlaufStuecke());
 	}
 
 	private Id<TransitLine> getLineId(Collection<UmlaufStueckI> umlaufInConstruction) {

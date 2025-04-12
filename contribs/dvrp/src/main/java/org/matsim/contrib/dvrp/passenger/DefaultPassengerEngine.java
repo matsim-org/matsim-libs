@@ -156,6 +156,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private void handleDepartureImpl(double now, List<MobsimPassengerAgent> group) {
 		List<Id<Person>> groupIds = group.stream().map(Identifiable::getId).toList();
 
+		List<Route> routes = group.stream().map(agent -> {
+			Leg leg = (Leg)((PlanAgent) agent).getCurrentPlanElement();
+			return leg.getRoute();
+		}).toList();
+
 		MobsimPassengerAgent representative = group.getFirst();
 
 		Id<Link> fromLinkId = representative.getCurrentLinkId();
@@ -169,9 +174,8 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		PassengerRequest request = advanceRequestProvider.retrieveRequest(representative, leg);
 
 		if (request == null) { // immediate request
-			Route route = leg.getRoute();
 			request = requestCreator.createRequest(tracker.createRequestId(),
-					groupIds, route, getLink(fromLinkId), getLink(toLinkId), now, now);
+					groupIds, routes, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 			// must come before validateAndSubmitRequest (to come before rejection event)
 			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), groupIds));
@@ -293,7 +297,6 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			rejectedRequestsEvents.add(event);
 		}
 	}
-
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return createProvider(mode, Collections.singleton(mode));
 	}

@@ -104,7 +104,7 @@ public class SpeedCalculatorTest{
         AbstractQSimModule module = new AbstractQSimModule(){
             @Override public void configureQSim(){
                 bind( DefaultLinkSpeedCalculator.class ).in( Singleton.class );
-                this.addLinkSpeedCalculator().to( SpecificLinkSpeedCalculator.class ).in( Singleton.class );
+                this.addLinkSpeedCalculatorBinding().to( SpecificLinkSpeedCalculator.class ).in( Singleton.class );
             }
         };
         EventsManager eventsManager = EventsUtils.createEventsManager();

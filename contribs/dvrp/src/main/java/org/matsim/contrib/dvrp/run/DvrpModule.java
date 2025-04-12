@@ -19,8 +19,12 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.net.URL;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
@@ -40,12 +44,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
+import java.net.URL;
+import java.util.Map;
 
-import jakarta.inject.Provider;
+import static org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule.TT_MATRIX_ZONE_SYSTEM;
 
 /**
  * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects.
@@ -75,6 +77,20 @@ public final class DvrpModule extends AbstractModule {
 
 		install(dvrpTravelTimeEstimationModule);
 
+		MapBinder.newMapBinder(binder(), String.class, ZoneSystem.class).addBinding(TT_MATRIX_ZONE_SYSTEM).toProvider(new com.google.inject.Provider<>() {
+
+            @Inject
+            private Network network;
+
+            @Override
+            public ZoneSystem get() {
+                DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+                return ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
+                        matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
+            }
+        });
+
+
 		//lazily initialised because:
 		// 1. we may have only mode-filtered subnetworks
 		// 2. optimisers may not use it
@@ -86,19 +102,20 @@ public final class DvrpModule extends AbstractModule {
 			@Inject
 			private QSimConfigGroup qSimConfigGroup;
 
+			@Inject
+			private Map<String, Provider<ZoneSystem>> zoneSystems;
+
 			@Override
 			public TravelTimeMatrix get() {
 				var numberOfThreads = getConfig().global().getNumberOfThreads();
 				var params = dvrpConfigGroup.getTravelTimeMatrixParams();
-				DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
-				ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
-					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
-				
-				if (params.cachePath == null) {
+				ZoneSystem zoneSystem = zoneSystems.get(TT_MATRIX_ZONE_SYSTEM).get();
+
+				if (params.getCachePath() == null) {
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize());
 				} else {
-					URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), params.cachePath);
+					URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), params.getCachePath());
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize(), cachePath);
 				}

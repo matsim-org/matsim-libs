@@ -55,12 +55,12 @@ import java.util.concurrent.ExecutionException;
  * @author: Ricardo Ewert
  */
 @CommandLine.Command(name = "generate-freight-demand", description = "The class generates a freight demand based on the "
-		+ " *          selected input options and the read input files. The format and "
-		+ " *          column titles of the input csv should not be changed. The format of"
-		+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
+	+ " *          selected input options and the read input files. The format and "
+	+ " *          column titles of the input csv should not be changed. The format of"
+	+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class FreightDemandGeneration implements MATSimAppCommand {
 
-	private final JobDurationCalculator jobDurationCalculator;
+	private final DemandGenerationSpecification demandGenerationSpecification;
 
 	private enum CarrierInputOptions {
 		readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData
@@ -81,6 +81,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private enum OptionsOfVRPSolutions {
 		runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint, runJsprit, runJspritWithDistanceConstraint,
 		createNoSolutionAndOnlyWriteCarrierFile
+	}
+
+	protected enum TotalDemandGenerationsOption {
+		demandPerPerson, demandForShape, NoSelection
+	}
+
+	protected enum DemandDistributionOption {
+		toRandomLinks, toRandomPersons, toPersonsByAge, NoSelection
 	}
 
 	private static final Logger log = LogManager.getLogger(FreightDemandGeneration.class);
@@ -155,13 +163,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private int defaultJspritIterations;
 
 	public FreightDemandGeneration() {
-		this.jobDurationCalculator = new DefaultJobDurationCalculator();
-		log.info("Using default {} for job duration calculation", jobDurationCalculator.getClass().getSimpleName());
+		this.demandGenerationSpecification = new DefaultDemandGenerationSpecification();
+		log.info("Using default {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
-	public FreightDemandGeneration(JobDurationCalculator jobDurationCalculator) {
-		this.jobDurationCalculator = jobDurationCalculator;
-		log.info("Using {} for job duration calculation", jobDurationCalculator.getClass().getSimpleName());
+	public FreightDemandGeneration(DemandGenerationSpecification demandGenerationSpecification) {
+		this.demandGenerationSpecification = demandGenerationSpecification;
+		log.info("Using {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
 	public static void main(String[] args) {
@@ -176,7 +184,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		// create and prepare MATSim config
 		outputLocation = outputLocation
-				.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
+			.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
 		int lastMATSimIteration = 0;
 
 		Config config = prepareConfig(lastMATSimIteration, networkCRS);
@@ -204,20 +212,19 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		}
 		log.info("Start creating carriers. Selected option: {}", selectedCarrierInputOption);
 		createCarrier(scenario, selectedCarrierInputOption, csvCarrierPath, indexShape,
-				defaultJspritIterations, crsTransformationFromNetworkToShape);
+			defaultJspritIterations, crsTransformationFromNetworkToShape);
 
 		// create the demand
 		log.info("Start creating the demand. Selected option: {}", selectedCarrierInputOption);
 		createDemand(selectedDemandGenerationOption, scenario, csvDemandPath, indexShape, populationFilePath,
-				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
-				crsTransformationFromNetworkToShape);
+			selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
+			crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
 		Controller controller = prepareController(scenario);
-		FreightDemandGenerationUtils.createDemandLocationsFile(controller);
-		solveSelectedSolution(selectedSolution, config, controller);
+		demandGenerationSpecification.writeAdditionalOutputFiles(controller);
 
-		// TODO analyze results
+		solveSelectedSolution(selectedSolution, config, controller);
 
 		log.info("Finished");
 		return 0;
@@ -236,7 +243,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		config.controller().setOutputDirectory(outputLocation.toString());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-				config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
+			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
@@ -246,7 +253,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		if (carrierFilePath != null)
 			freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
-
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		return config;
 	}
 
@@ -259,7 +266,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws RuntimeException 				if the networkPathOfOtherNetwork is empty
 	 */
 	private static void setNetworkAndNetworkChangeEvents(Config config, String networkPathOfOtherNetwork,
-			String networkChangeEventsFileLocation) throws RuntimeException {
+														 String networkChangeEventsFileLocation) throws RuntimeException {
 
 		if (networkPathOfOtherNetwork.isEmpty())
 			throw new RuntimeException("no correct network path network");
@@ -305,11 +312,11 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 * @throws IOException 						if the carrier file is not found
 	 */
 	private void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
-			Path csvLocationCarrier, ShpOptions.Index indexShape,
-			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
+							   Path csvLocationCarrier, ShpOptions.Index indexShape,
+							   int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				FreightCarriersConfigGroup.class);
+			FreightCarriersConfigGroup.class);
 		switch (selectedCarrierInputOption) {
 			case addCSVDataToExistingCarrierFileData -> {
 				// reads an existing carrier file and adds the information based on the read csv
@@ -318,7 +325,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-					log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
+					log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
 						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 				}
@@ -329,13 +336,13 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-					log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
+					log.info("Load carriers from: {}", freightCarriersConfigGroup.getCarriersFile());
 				}
 			}
 			case createCarriersFromCSV ->
 				// creates all carriers based on the given information in the read carrier csv
-					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
-						indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
+				CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
+					indexShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 			default -> throw new RuntimeException("no method to create or read carrier selected.");
 		}
 	}
@@ -363,7 +370,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case createDemandFromCSV ->
 				// creates the demand by using the information given in the read csv file
 					DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape, combineSimilarJobs,
-							crsTransformationNetworkAndShape, null, shapeCategory, jobDurationCalculator);
+							crsTransformationNetworkAndShape, null, shapeCategory, demandGenerationSpecification);
 			case createDemandFromCSVAndUsePopulation -> {
 				/*
 				 * Option creates the demand by using the information given in the read csv file
@@ -382,8 +389,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 * locations are created related to the given share of persons in the population
 						 * with this demand.
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-									upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
 					case increaseDemandOnLocation -> {
 						/*
 						 * If the demand sample is higher than the population sample, the demand per
@@ -399,24 +406,27 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 * If the demand sample is equal to the population sample, the demand is created
 						 * based on the given population and the set input population sampleSize
 						 */
-							FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-								sampleSizeInputPopulation, "noPopulationSampling");
+						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							sampleSizeInputPopulation, "noPopulationSampling");
 					default -> throw new RuntimeException("No valid sampling option selected!");
 				}
 				switch (selectedPopulationOption) {
 					case useNoPopulation:
 						break;
 					case useHolePopulation:
-						// uses the hole population as possible demand locations
+						// uses the whole population as possible demand locations
+						//ERROR2
+						if(population != null && shapeCategory != null )
+							log.warn("Population isn't reduced to shapefile even though shapefile is defined. This might lead to errors when no areas or locations for pickup or delivery are defined.");
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, jobDurationCalculator);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, demandGenerationSpecification);
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
 						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
-								shp.createIndex(populationCRS, "_"));
+							shp.createIndex(populationCRS, "_"));
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
-								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, jobDurationCalculator);
+								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, demandGenerationSpecification);
 						break;
 					default:
 						throw new RuntimeException("No valid population option selected!");
@@ -426,7 +436,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				// use only the given demand of the read carrier file
 				boolean oneCarrierHasJobs = false;
 				for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values())
-					if (carrier.getServices().isEmpty() && carrier.getShipments().isEmpty())
+					if (!CarriersUtils.hasJobs(carrier))
 						log.warn("{} has no jobs which can be used", carrier.getId().toString());
 					else {
 						oneCarrierHasJobs = true;
@@ -452,7 +462,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			@Override
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
-		}});
+			}});
 
 		return controller;
 	}

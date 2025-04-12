@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -147,7 +148,7 @@ public class CarriersUtils {
 			Tour tour = sTour.getTour().duplicate();
 			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
 		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
+		CarrierPlan copiedPlan = new CarrierPlan(tours);
 		double initialScoreOfCopiedPlan = plan2copy.getScore();
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		return copiedPlan;
@@ -214,11 +215,13 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight").runCarrierAnalysis(
+			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
+			scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
 
 		Carriers carriers = getCarriers(scenario);
 
@@ -244,7 +247,7 @@ public class CarriersUtils {
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
-		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
+		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
 		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
 
@@ -267,7 +270,7 @@ public class CarriersUtils {
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
-	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
+	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
@@ -294,6 +297,44 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Checks if all carriers with jobs have at least one plan.
+	 *
+	 * @param carriers the carriers
+	 * @return true if all carriers with jobs have at teast one plan
+	 */
+	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
+		for (Carrier carrier : carriers.getCarriers().values())
+			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
+
+		return true;
+	}
+
+	/**
+	 * Creates a list of carriers with unhandled jobs.
+	 *
+	 * @param carriers the carriers
+	 * @return list of carriers with unhandled jobs
+	 */
+	public static List<Carrier> createListOfCarrierWithUnhandledJobs(Carriers carriers) {
+		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			if (!allJobsHandledBySelectedPlan(carrier))
+				carriersWithUnhandledJobs.add(carrier);
+		}
+		return carriersWithUnhandledJobs;
+	}
+
+	/**
+	 * Checks if a carrier has jobs (services or shipments).
+	 *
+	 * @param carrier the carrier
+	 * @return true if a carrier has jobs (services or shipments)
+	 */
+	public static boolean hasJobs(Carrier carrier) {
+		return !carrier.getServices().isEmpty() || !carrier.getShipments().isEmpty();
 	}
 
 	/**
@@ -335,10 +376,14 @@ public class CarriersUtils {
 		return addOrGetCarriers(scenario);
 	}
 
+	/**
+	 * Will return the {@link Carriers} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the Carrier should be added.
+	 * @return the Carriers container
+	 */
 	public static Carriers addOrGetCarriers(Scenario scenario) {
-		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controller is started, it is better to fail if the carriers are not found.
-		// kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {
 			carriers = new Carriers();
@@ -357,7 +402,14 @@ public class CarriersUtils {
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
-	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from or added.
+	 * @return the CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getOrAddCarrierVehicleTypes(Scenario scenario) {
 		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 		if (types == null) {
 			types = new CarrierVehicleTypes();
@@ -367,6 +419,27 @@ public class CarriersUtils {
 	}
 
 	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * Please note, that this has changed in feb'25:
+	 * If the container does not exist, it will throw an exception instead of creating it.
+	 * For creating it, please use {@link #getOrAddCarrierVehicleTypes(Scenario)}.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from .
+	 * @return the (existing) CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
+		// not found. (Similar to getOrCreateCarriers and getCarriers.) kmt, feb'25
+		if (scenario.getScenarioElement(CARRIER_VEHICLE_TYPES) == null) {
+			throw new RuntimeException("cannot retrieve carrierVehicleTypes from scenario; typical ways to resolve that problem are to call " +
+				"CarrierControlerUtils.getOrCreateCarriers(...) or CarrierControlerUtils.loadCarriersAccordingToFreightConfig(...) early enough\n");
+		}
+		return (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
+	}
+
+
+
+	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
 	 *
 	 * @param scenario the scenario
@@ -374,13 +447,23 @@ public class CarriersUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()));
+		//Load VehicleTypes
 
-		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
-		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
+		String carriersVehicleTypesFile = freightCarriersConfigGroup.getCarriersVehicleTypesFile();
+		if (carriersVehicleTypesFile == null ||carriersVehicleTypesFile.isEmpty()) {
+			throw new IllegalArgumentException("CarriersVehicleTypes file path should not be null or empty");
+		}
+		new CarrierVehicleTypeReader(getOrAddCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersVehicleTypesFile));
+
+		//Load Carriers
+		String carriersFile = freightCarriersConfigGroup.getCarriersFile();
+		if (carriersFile == null ||carriersFile.isEmpty()) {
+			throw new IllegalArgumentException("Carriers file path should not be null or empty");
+		}
+		// also registers with scenario
+		new CarrierPlanXmlReader(addOrGetCarriers(scenario), getOrAddCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersFile));
 	}
 
 	/**
@@ -780,7 +863,7 @@ public class CarriersUtils {
 
 			log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
 
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier {}", carrier.getId());

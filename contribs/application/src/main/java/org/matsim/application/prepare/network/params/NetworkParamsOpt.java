@@ -141,16 +141,16 @@ class NetworkParamsOpt {
 	static Object2DoubleMap<SampleValidationRoutes.FromToNodes> readValidation(List<String> validationFiles, List<Integer> refHours) throws IOException {
 
 		// entry to hour and list of speeds
-		Map<SampleValidationRoutes.FromToNodes, Int2ObjectMap<DoubleList>> entries = SampleValidationRoutes.readValidation(validationFiles);
+		Map<SampleValidationRoutes.FromToNodes, Int2ObjectMap<SampleValidationRoutes.Data>> entries = SampleValidationRoutes.readValidation(validationFiles);
 
 		Object2DoubleMap<SampleValidationRoutes.FromToNodes> result = new Object2DoubleOpenHashMap<>();
 
 		// Target values
-		for (Map.Entry<SampleValidationRoutes.FromToNodes, Int2ObjectMap<DoubleList>> e : entries.entrySet()) {
+		for (Map.Entry<SampleValidationRoutes.FromToNodes, Int2ObjectMap<SampleValidationRoutes.Data>> e : entries.entrySet()) {
 
-			Int2ObjectMap<DoubleList> perHour = e.getValue();
+			Int2ObjectMap<SampleValidationRoutes.Data> perHour = e.getValue();
 
-			double avg = refHours.stream().map(h -> perHour.get((int) h).doubleStream())
+			double avg = refHours.stream().map(h -> perHour.get((int) h).speeds().doubleStream())
 				.flatMapToDouble(Function.identity()).average().orElseThrow();
 
 

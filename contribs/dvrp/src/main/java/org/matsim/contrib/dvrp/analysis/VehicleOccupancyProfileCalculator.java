@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
@@ -35,11 +37,12 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
@@ -54,15 +57,35 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * @author michalm (Michal Maciejewski)
+ * 
+ * Note: This class calculates occupancy in terms of *requests*. It does *not* take into
+ * account the DvrpLoad of a request for the time being. All the standard DRT analysis tools
+ * are kept backwards compatible at the time of introducing DvrpLoad. For a pricse occupancy
+ * analysis using the actual loads, make use of the specific analysis tools (can be enabled
+ * in the respective parameters set). /sh, jan 2025
  */
+
+
 public class VehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
 		TaskEndedEventHandler {
+
+	private final static Logger logger = LogManager.getLogger(VehicleOccupancyProfileCalculator.class);
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
 		private int occupancy;
 		private double beginTime;
+
+		public VehicleState(Task.TaskType taskType, int occupancy, double beginTime) {
+			this.taskType = taskType;
+			this.occupancy = occupancy;
+			this.beginTime = beginTime;
+		}
+
+		public VehicleState(int occupancy) {
+			this(null, occupancy, 0.0);
+		}
 	}
 
 	private final TimeDiscretizer timeDiscretizer;
@@ -81,7 +104,7 @@ public class VehicleOccupancyProfileCalculator
 	private boolean wasConsolidatedInThisIteration = false;
 
 	public VehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
-			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
+			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes, DvrpLoadType loadType) {
 		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
 
@@ -94,13 +117,28 @@ public class VehicleOccupancyProfileCalculator
 				.orElse(0);
 		analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(analysisEndTime), timeInterval);
+		maxCapacity = findMaxVehicleCapacity(fleet, loadType);
+	}
 
-		maxCapacity = fleet.getVehicleSpecifications()
-				.values()
-				.stream()
-				.mapToInt(DvrpVehicleSpecification::getCapacity)
-				.max()
-				.orElse(0);
+	/**
+	 * @param fleet
+	 * @return
+	 */
+	public static int findMaxVehicleCapacity(FleetSpecification fleet, DvrpLoadType loadType) {
+		int maximumCapacity = 0;
+
+		for (var spec : fleet.getVehicleSpecifications().values()) {
+			int vehicleCapacity = 0;
+
+			// for multi-dimensional capacities, we consider the sum
+			for (int k = 0; k < loadType.size(); k++) {
+				vehicleCapacity += (int) spec.getCapacity().getElement(k);
+			}
+
+			maximumCapacity = Math.max(maximumCapacity, vehicleCapacity);
+		}
+		
+		return maximumCapacity;
 	}
 
 	private void consolidate() {
@@ -163,13 +201,17 @@ public class VehicleOccupancyProfileCalculator
 
 	private void increment(VehicleState state, double endTime) {
 		Verify.verify(state.taskType != null);
-		Verify.verify(state.occupancy >= 0);
-		Verify.verify(state.occupancy <= maxCapacity);
 
-		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
+		int currentVehicleOccupancy = state.occupancy;
+		Verify.verify(currentVehicleOccupancy >= 0);
+		if(currentVehicleOccupancy > maxCapacity) {
+			logger.warn("Current limitation of VehicleOccupancyProfileCalculator does not allow to consider changing scalar capacities that are greater than the initial maximum capacity of the fleet");
+			return;
+		}
+		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || currentVehicleOccupancy > 0;
 
 		double[] profile = servingPassengers ?
-				vehicleOccupancyProfiles.get(state.occupancy) :
+				vehicleOccupancyProfiles.get(currentVehicleOccupancy) :
 				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
 						v -> new double[timeDiscretizer.getIntervalCount()]);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
@@ -203,10 +245,9 @@ public class VehicleOccupancyProfileCalculator
 		if (!event.getDvrpMode().equals(dvrpMode)) {
 			return;
 		}
-
 		final VehicleState state;
 		if (event.getTaskIndex() == 0) {
-			state = new VehicleState();
+			state = new VehicleState(0);
 			vehicleStates.put(event.getDvrpVehicleId(), state);
 		} else {
 			state = vehicleStates.get(event.getDvrpVehicleId());

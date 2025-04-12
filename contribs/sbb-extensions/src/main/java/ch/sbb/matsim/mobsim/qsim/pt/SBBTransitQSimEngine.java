@@ -58,40 +58,43 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 
 	private static final Logger log = LogManager.getLogger(SBBTransitQSimEngine.class);
 
-	private final SBBTransitConfigGroup config;
-	private final TransitConfigGroup ptConfig;
-	private final QSim qSim;
-	private final ReplanningContext context;
-	private final TransitStopAgentTracker agentTracker;
-	private final TransitSchedule schedule;
-	private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
-	private final Map<TransitRoute, List<Link[]>> linksCache;
-	private final PriorityQueue<LinkEvent> linkEventQueue;
-	private InternalInterface internalInterface;
-	private TransitDriverAgentFactory deterministicDriverFactory;
-	private TransitDriverAgentFactory networkDriverFactory;
-	private final TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
-	private boolean createLinkEvents = false;
+    private final SBBTransitConfigGroup config;
+    private final TransitConfigGroup ptConfig;
+    private final QSim qSim;
+    private final ReplanningContext context;
+    private final TransitStopAgentTracker agentTracker;
+    private final TransitSchedule schedule;
+    private final PriorityQueue<TransitEvent> eventQueue = new PriorityQueue<>();
+    private final Map<TransitRoute, List<Link[]>> linksCache;
+    private final PriorityQueue<LinkEvent> linkEventQueue;
+    private InternalInterface internalInterface;
+    private TransitDriverAgentFactory deterministicDriverFactory;
+    private TransitDriverAgentFactory networkDriverFactory;
+    @Inject private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+    private boolean createLinkEvents = false;
 
-	@Inject
-	public SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker,
-								TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
-		super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
-		this.qSim = qSim;
-		this.context = context;
-		this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
-		this.ptConfig = qSim.getScenario().getConfig().transit();
-		this.schedule = qSim.getScenario().getTransitSchedule();
-		this.agentTracker = agentTracker;
-		if (this.config.getCreateLinkEventsInterval() > 0) {
-			this.linkEventQueue = new PriorityQueue<>();
-			this.linksCache = new ConcurrentHashMap<>();
-		} else {
-			this.linkEventQueue = null;
-			this.linksCache = null;
-		}
-		checkSettings();
-	}
+    @Inject
+    SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
+        // ( https://github.com/google/guice/wiki/KeepConstructorsHidden )
+
+        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
+        // (it feels a bit odd to inject TransitStopHandlerFactory, but to put the simple version here as an argument.  kai, feb '25)
+
+        this.qSim = qSim;
+        this.context = context;
+        this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
+        this.ptConfig = qSim.getScenario().getConfig().transit();
+        this.schedule = qSim.getScenario().getTransitSchedule();
+        this.agentTracker = agentTracker;
+        if (this.config.getCreateLinkEventsInterval() > 0) {
+            this.linkEventQueue = new PriorityQueue<>();
+            this.linksCache = new ConcurrentHashMap<>();
+        } else {
+            this.linkEventQueue = null;
+            this.linksCache = null;
+        }
+        checkSettings();
+    }
 
 	private void checkSettings() {
 		if (this.config.getDeterministicServiceModes().isEmpty()) {

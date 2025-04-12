@@ -45,6 +45,7 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
@@ -65,8 +66,8 @@ import org.matsim.vehicles.VehicleUtils;
  * <p>The decision which of these plans is chosen should be made via the Score of the plans. We will
  * modify the costs of the vehicles and/or for using(having) the Transshipment hub. Depending on
  * this setting, the plan selection should be done accordingly.
- *
- * <p>Please note: This example is in part on existing examples, but I start from the scratch for a)
+ * <p>
+ * Please note: This example is in part on existing examples, but I start from the scratch for a)
  * see, if this works and b) have a "clean" class :)
  *
  * @author Kai Martins-Turner (kturner)
@@ -246,7 +247,7 @@ final class ExampleTwoEchelonGrid_NR {
     }
 
     log.info("Add LSP to the scenario");
-    LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
     return scenario;
   }

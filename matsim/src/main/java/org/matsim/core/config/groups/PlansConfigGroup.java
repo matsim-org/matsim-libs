@@ -41,18 +41,18 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
-	
+
 	/**
 	 * Defines how trip durations are interpreted when routing along a plan
 	 */
-	public enum TripDurationHandling { 
+	public enum TripDurationHandling {
 		/** When routing along a plan, the nominal end times of activities are using as departure times of the following trips */
 		ignoreDelays
-		, 
+		,
 		/** When routing along a plan, travel times are accumulated and activity end times may be shifted, if necessary */
-		shiftActivityEndTimes 
+		shiftActivityEndTimes
 	}
-	
+
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
@@ -64,12 +64,12 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	private String inputPersonAttributeFile = null;
 //	private String subpopulationAttributeName = "subpopulation";
 	private String inputCRS = null;
-	
+
 	//--
-	
+
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
 	private static final String TRIP_DURATION_HANDLING="tripDurationHandling";
-	
+
 	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
 	private TripDurationHandling tripDurationHandling = TripDurationHandling.ignoreDelays;
 
@@ -100,13 +100,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {
 			str.append(" ").append(itp.toString());
 		}
-		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
+		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides "
 				+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
 		"(simpler) version of the TimeAllocationMutator.") ;
-		comments.put(TRIP_DURATION_HANDLING, "Defines how departure times are interpreted in rerouting applications. If set to '" + TripDurationHandling.ignoreDelays + "', " + 
-				"the departure time of a trip when routing along a plan will always be the nominal (plan-based) activity end time. If set to '" + TripDurationHandling.shiftActivityEndTimes + "', " + 
+		comments.put(TRIP_DURATION_HANDLING, "Defines how departure times are interpreted in rerouting applications. If set to '" + TripDurationHandling.ignoreDelays + "', " +
+				"the departure time of a trip when routing along a plan will always be the nominal (plan-based) activity end time. If set to '" + TripDurationHandling.shiftActivityEndTimes + "', " +
 				"routing along a plan will accumulate travel times and shift activity end times if necessary");
-		
+
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
                 "activityStartTime. default=false. Use with Caution!");
 
@@ -134,26 +134,26 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
 	private static final String INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedPersonAttributeFile" ;
 	@StringSetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
-	public final void setInsistingOnUsingDeprecatedPersonAttributeFile( boolean val ) {
+	public void setInsistingOnUsingDeprecatedPersonAttributeFile( boolean val ) {
 		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
 	}
 	@StringGetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
-	public final boolean isInsistingOnUsingDeprecatedPersonAttributeFile() {
+	public boolean isInsistingOnUsingDeprecatedPersonAttributeFile() {
 		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
-	
-	public static enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier }
+
+	public enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier }
 	private HandlingOfPlansWithoutRoutingMode handlingOfPlansWithoutRoutingMode = HandlingOfPlansWithoutRoutingMode.reject ;
 	private static final String HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE = "handlingOfPlansWithoutRoutingMode" ;
 	@StringSetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
-	public final void setHandlingOfPlansWithoutRoutingMode( HandlingOfPlansWithoutRoutingMode val ) {
+	public void setHandlingOfPlansWithoutRoutingMode( HandlingOfPlansWithoutRoutingMode val ) {
 		this.handlingOfPlansWithoutRoutingMode = val ;
 	}
 	@StringGetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
-	public final HandlingOfPlansWithoutRoutingMode getHandlingOfPlansWithoutRoutingMode() {
+	public HandlingOfPlansWithoutRoutingMode getHandlingOfPlansWithoutRoutingMode() {
 		return handlingOfPlansWithoutRoutingMode;
 	}
-	
+
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public String getInputPersonAttributeFile() {
@@ -184,23 +184,6 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		this.networkRouteType = routeType;
 	}
 	// ---
-//	/**
-//	 * @deprecated -- use {@link org.matsim.core.population.PopulationUtils#getSubpopulation(Person, Config)}
-//	 */
-//	@Deprecated
-//	@StringGetter( SUBPOPULATION_ATTRIBUTE )
-//	public String getSubpopulationAttributeName() {
-//		return subpopulationAttributeName;
-//	}
-//	/**
-//	 * @deprecated -- do not set away from default
-//	 */
-//	@Deprecated
-//	@StringSetter( SUBPOPULATION_ATTRIBUTE )
-//	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
-//		this.subpopulationAttributeName = subpopulationAttributeName;
-//	}
-	// ---
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
 	public PlansConfigGroup.ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation ;
@@ -222,7 +205,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		}
 		this.activityDurationInterpretation = actDurInterpret;
 	}
-	
+
 	@StringGetter(TRIP_DURATION_HANDLING)
 	public PlansConfigGroup.TripDurationHandling getTripDurationHandling() {
 		return this.tripDurationHandling ;
@@ -232,9 +215,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public void setTripDurationHandling( final PlansConfigGroup.TripDurationHandling value ) {
 		this.tripDurationHandling = value;
 	}
-	
+
 	// ---
-	
+
 	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes";
 	private boolean removingUnneccessaryPlanAttributes = false;
 	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)

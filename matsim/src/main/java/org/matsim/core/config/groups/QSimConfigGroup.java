@@ -57,6 +57,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
+	private static final String NOTIFY_ABOUT_STUCK_VEHICLES = "notifyAboutStuckVehicles";
+	/* package */ final static String NOTIFY_ABOUT_STUCK_VEHICLES_STRING =
+		"Boolean. `true': when a vehicle is moved to the next link because the stuck time is exceeded, a PersonStuckAndContinueEvent is thrown.";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
@@ -66,11 +69,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 			"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
 	private static final String FILTER_SNAPSHOTS = "filterSnapshots";
 	private static final String LINK_DYNAMICS = "linkDynamics";
+	private static final String PERSON_INITIALIZED_EVENTS = "personInitializedEvents";
 	private InflowCapacitySetting inflowCapacitySetting = InflowCapacitySetting.INFLOW_FROM_FDIAG;
 
 	public enum StarttimeInterpretation {maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime}
-
 	public enum EndtimeInterpretation {minOfEndtimeAndMobsimFinished, onlyUseEndtime}
+	public enum PersonInitializedEventsSetting {none, singleActAgentsOnly, all}
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
@@ -88,6 +92,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
+	private boolean notifyAboutStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
 	@Positive
 	private int numberOfThreads = 1;
@@ -156,6 +161,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle;
 	private Collection<String> seepModes = Collections.singletonList(TransportMode.bike);
 	// ---
+	private PersonInitializedEventsSetting personInitializedEventsSetting = PersonInitializedEventsSetting.none;
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -173,7 +179,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 				+ "In contrast to earlier versions, the non-parallel special version is no longer there.");
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING);
 		map.put(STUCK_TIME, STUCK_TIME_STRING);
-
+		map.put(NOTIFY_ABOUT_STUCK_VEHICLES, NOTIFY_ABOUT_STUCK_VEHICLES_STRING);
 		{
 			StringBuilder options = new StringBuilder(60);
 			for (TrafficDynamics dyn : TrafficDynamics.values()) {
@@ -229,7 +235,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(FILTER_SNAPSHOTS, "If set to " + FilterSnapshots.withLinkAttributes + " snapshots will only be generated for links which include " + SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY + " as attribute key. Default is no filtering.");
 //		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
 //				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
-
+		{
+			StringBuilder options = new StringBuilder(60);
+			for (PersonInitializedEventsSetting ii : PersonInitializedEventsSetting.values()) {
+				options.append(ii).append(' ');
+			}
+			map.put(PERSON_INITIALIZED_EVENTS, "Which agents should throw a PersonInitializedEvent on creation. Options: " + options);
+		}
 		return map;
 	}
 
@@ -408,6 +420,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		return this.removeStuckVehicles;
 	}
 
+	@StringSetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public void setNotifyAboutStuckVehicles(final boolean notifyAboutStuckVehicles) {
+		this.notifyAboutStuckVehicles = notifyAboutStuckVehicles;
+	}
+
+	@StringGetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public boolean isNotifyAboutStuckVehicles() {
+		return this.notifyAboutStuckVehicles;
+	}
+
 	@StringSetter(FAST_CAPACITY_UPDATE)
 	public final void setUsingFastCapacityUpdate(boolean val) {
 		this.usingFastCapacityUpdate = val;
@@ -497,6 +519,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(SIM_ENDTIME_INTERPRETATION)
 	public EndtimeInterpretation getSimEndtimeInterpretation() {
 		return simEndtimeInterpretation;
+	}
+
+	@StringSetter(PERSON_INITIALIZED_EVENTS)
+	public void setPersonInitializedEventsSetting(PersonInitializedEventsSetting setting) {
+		this.personInitializedEventsSetting = setting;
+	}
+	
+	@StringGetter(PERSON_INITIALIZED_EVENTS)
+	public PersonInitializedEventsSetting getPersonInitializedEventsSetting() {
+		return personInitializedEventsSetting;
 	}
 
 	@StringSetter(SIM_ENDTIME_INTERPRETATION)

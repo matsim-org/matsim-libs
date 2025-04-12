@@ -54,19 +54,6 @@ final class InitialCarrierPlanCreator {
     }
 
     public CarrierPlan createPlan(Carrier carrier){
-//		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-//		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, carrier.getCarrierCapabilities().getVehicleTypes());
-//		NetworkBasedTransportCosts costs = costsBuilder.build();
-//		vrpBuilder.setRoutingCost(costs);
-//		VehicleRoutingProblem vrp = vrpBuilder.build();
-//
-//		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
-////		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
-//		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-//
-//		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
-//
-
 
         //construct the routing problem - here the interface to jsprit comes into play
         VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
@@ -94,15 +81,14 @@ final class InitialCarrierPlanCreator {
         //should be inline with activity-scoring
         VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts(){
 
-            private final double penalty4missedTws = 0.01;
-
-            @Override
+			@Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
                 double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
+				double penalty4missedTws = 0.01;
+				return penalty4missedTws *tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
             }
 
 			@Override
@@ -147,7 +133,7 @@ final class InitialCarrierPlanCreator {
         //		SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
         //create carrierPlan from solution
-        CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+        CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
         NetworkRouter.routePlan(plan, netbasedTransportcosts);
         return plan;
     }

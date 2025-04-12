@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
  * <p>
- * Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
+ * Fleet (and the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
  *
  * @author michalm
  */

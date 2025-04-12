@@ -61,6 +61,6 @@ public class DefaultAnnealingAcceptorTest {
 	}
 
 	private double temperature(MutableInt iteration) {
-		return TemperatureFunction.DefaultFunctions.exponentialMultiplicative.getTemperature(simAnCfg.alpha, simAnCfg.initialTemperature, simAnCfg.finalTemperature, simAnCfg.nCoolingCycles, iteration.getValue(), Double.NaN, Double.NaN);
+		return TemperatureFunction.DefaultFunctions.exponentialMultiplicative.getTemperature(simAnCfg.getAlpha(), simAnCfg.getInitialTemperature(), simAnCfg.getFinalTemperature(), simAnCfg.getnCoolingCycles(), iteration.getValue(), Double.NaN, Double.NaN);
 	}
 }

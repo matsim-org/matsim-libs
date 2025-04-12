@@ -22,13 +22,16 @@ package org.matsim.core.mobsim.qsim.agents;
 import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonInitializedEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.PersonInitializedEventsSetting;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
@@ -61,6 +64,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 	private final Netsim qsim;
 	private final Collection<String> mainModes;
 	private final Map<Id<Vehicle>, Id<Link>> seenVehicleIds = new HashMap<>();
+	private final PersonInitializedEventsSetting personHelloEventsSetting;
 	private int warnCnt = 0;
 
 	@Inject
@@ -70,6 +74,7 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 		this.qVehicleFactory = qVehicleFactory;
 		this.qsim = qsim;
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+		this.personHelloEventsSetting = qsim.getScenario().getConfig().qsim().getPersonInitializedEventsSetting();
 	}
 
 	public static Id<Link> getStartLink(Scenario scenario, Person person) {
@@ -94,6 +99,11 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			qsim.insertAgentIntoMobsim(agent);
+			if (this.personHelloEventsSetting == PersonInitializedEventsSetting.all
+					|| (this.personHelloEventsSetting == PersonInitializedEventsSetting.singleActAgentsOnly && p.getSelectedPlan().getPlanElements().size() == 1)) {
+				Coord firstActCoord = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				this.qsim.getEventsManager().processEvent(new PersonInitializedEvent(0, p.getId(), firstActCoord));
+			}
 		}
 	}
 

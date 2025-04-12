@@ -48,7 +48,7 @@ public final class IndividualChargeTimeProfileCollectorProvider implements Provi
 	IndividualChargeTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices, Config config) {
 		this.evFleet = evFleet;
 		this.matsimServices = matsimServices;
-		maxVehicleColumns = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).numberOfIndividualTimeProfiles;
+		maxVehicleColumns = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).getNumberOfIndividualTimeProfiles();
 	}
 
 	@Override
