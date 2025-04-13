@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;

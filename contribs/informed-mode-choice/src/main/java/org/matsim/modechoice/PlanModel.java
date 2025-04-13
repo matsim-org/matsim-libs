@@ -10,7 +10,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;

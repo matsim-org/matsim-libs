@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Design decisions:

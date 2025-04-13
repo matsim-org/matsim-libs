@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -832,7 +832,7 @@ public final class NetworkUtils {
 	 * * remove links without any allowed modes
 	 * * remove invalid DisallowedNextLinks
 	 * * remove nodes without links
-	 * 
+	 *
 	 * @param network
 	 * @param modes   set of modes to clean network (e.g. modes which are routed)
 	 */
@@ -857,7 +857,7 @@ public final class NetworkUtils {
 	/**
 	 * Removes nodes from the network that have no incoming or outgoing links
 	 * attached to them.
-	 * 
+	 *
 	 * @param network
 	 */
 	public static void removeNodesWithoutLinks(Network network) {
@@ -870,7 +870,7 @@ public final class NetworkUtils {
 
 	/**
 	 * Removes links from the network that have no allowed modes.
-	 * 
+	 *
 	 * @param network
 	 */
 	public static void removeLinksWithoutModes(Network network) {
@@ -890,7 +890,7 @@ public final class NetworkUtils {
 	/**
 	 * Simplifies the network considering turn restrictions aka
 	 * {@link DisallowedNextLinks}
-	 * 
+	 *
 	 * @param network
 	 * @see {@link DisallowedNextLinksUtils#clean(Network)},
 	 *      {@link #cleanNetwork(Network, Set)},
