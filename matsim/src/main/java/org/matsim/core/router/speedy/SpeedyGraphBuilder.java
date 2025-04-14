@@ -1,6 +1,6 @@
 package org.matsim.core.router.speedy;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,11 +37,11 @@ public class SpeedyGraphBuilder {
 	 * Builds a routing graph from a network considering all links without caring
 	 * about allowedModes but considering {@link DisallowedNextLinks} (aka turn
 	 * restrictions) of the given {@code turnRestrictionsMode}.
-	 * 
+	 *
 	 * If turnRestrictionsMode == null, see
 	 * {@link TurnRestrictionsContext#build(Network, String)} for how this is
 	 * handled.
-	 * 
+	 *
 	 * @param network
 	 * @param turnRestrictionsMode
 	 * @return

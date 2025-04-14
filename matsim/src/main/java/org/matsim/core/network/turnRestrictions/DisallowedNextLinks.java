@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * Class to store disallowed next links, e.g. to model turn restrictions.
- * 
+ *
  * @author hrewald, mrieser
  */
 public class DisallowedNextLinks {
@@ -53,7 +53,7 @@ public class DisallowedNextLinks {
         /**
          * Be aware that several calls to the build() method of a particular Builder
          * instance will return the same DisallowedNextLinks instance!
-         * 
+         *
          * @return an instance with the required disallowedNextLinks set
          */
         public DisallowedNextLinks build() {
@@ -70,7 +70,7 @@ public class DisallowedNextLinks {
 
 	/**
 	 * Add a sequence of subsequent links to be disallowed from the current link.
-	 * 
+	 *
 	 * @param mode
 	 * @param linkSequence sequence of links that shall not be passed after passing
 	 *                     the link where this object is attached

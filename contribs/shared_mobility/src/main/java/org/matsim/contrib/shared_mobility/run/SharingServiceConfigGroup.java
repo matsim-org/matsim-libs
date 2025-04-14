@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnegative;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
+
+import javax.annotation.Nonnegative;
 
 public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "mode";
@@ -25,7 +26,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public static final String DISTANCE_FARE = "distanceFare";
 	public static final String BASE_FARE = "baseFare";
 	public static final String MINIMUM_FARE = "minimumFare";
-	
+
 	public static final String SERVICE_INPUT_FILE_EXP = "Input file defining vehicles and stations";
 	public static final String ID_EXP = "The id of the sharing service";
 	public static final String SERVICE_SCHEME_EXP = "One of: " + String.join(", ",
@@ -58,16 +59,16 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Positive
 	private double maximumAccessEgressDistance = 1000;
-	
+
 	@Nonnegative
 	private double timeFare = 0.0;
-	
+
 	@Nonnegative
 	private double distanceFare = 0.0;
-	
+
 	@Nonnegative
 	private double baseFare = 0.0;
-	
+
 	@Nonnegative
 	private double minimumFare = 0.0;
 
@@ -134,7 +135,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public double getMaximumAccessEgressDistance() {
 		return maximumAccessEgressDistance;
 	}
-	
+
 	@StringSetter(TIME_FARE)
 	public void setTimeFare(double timeFare) {
 		this.timeFare = timeFare;
@@ -144,7 +145,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public double getTimeFare() {
 		return timeFare;
 	}
-	
+
 	@StringSetter(DISTANCE_FARE)
 	public void setDistanceFare(double distanceFare) {
 		this.distanceFare = distanceFare;
@@ -154,7 +155,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public double getDistanceFare() {
 		return distanceFare;
 	}
-	
+
 	@StringSetter(BASE_FARE)
 	public void setBaseFare(double baseFare) {
 		this.baseFare = baseFare;
@@ -164,7 +165,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public double getBaseFare() {
 		return baseFare;
 	}
-	
+
 	@StringSetter(MINIMUM_FARE)
 	public void setMinimumFare(double minimumFare) {
 		this.minimumFare = minimumFare;
@@ -196,5 +197,5 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 		map.put(MINIMUM_FARE, MINIMUM_FARE_EXP);
 		return map;
 	}
-	
+
 }
