@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -77,12 +78,14 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 
 	PlanInheritanceRecordWriter planInheritanceRecordWriter;
 	private ArrayList<String> strategies;
+	private Character delimiter;
 
 	private BufferedWriter selectedPlanStrategyShareWriter;
 	private BufferedWriter planStrategyShareWriter;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		this.delimiter = event.getServices().getConfig().global().getDefaultDelimiter().charAt(0);
 		// initialize all default writers
 		CompressionType compressionType = event.getServices().getConfig().controller().getCompressionType();
 		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
@@ -124,11 +127,6 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		return strategies;
 	}
 
-	private Character getDefaultDelimiter()
-	{
-		return this.getConfig().global().getDefaultDelimiter().charAt(0);
-	}
-
 	/**
 	 * Initialize the writer with the active strategies
 	 */
@@ -136,10 +134,10 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		BufferedWriter planStrategyShareWriter = IOUtils.getBufferedWriter(filename);
 
 		StringBuffer header = new StringBuffer();
-		header.append("iteration"); header.append(this.getDefaultDelimiter());
+		header.append("iteration"); header.append(this.delimiter);
 		for (int i = 0; i < strategies.size(); i++) {
 			if (i > 0) {
-				header.append(getDefaultDelimiter());
+				header.append(this.delimiter);
 			}
 			header.append(strategies.get(i));
 		}
@@ -227,10 +225,10 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		long sum = strategy2count.values().stream().mapToLong(AtomicLong::get).sum();
 		StringBuffer line = new StringBuffer();
 		line.append(currentIteration);
-		line.append(getDefaultDelimiter());
+		line.append(this.delimiter);
 		for (int i = 0; i < strategies.size(); i++) {
 			if (i > 0) {
-				line.append(getDefaultDelimiter());
+				line.append(this.delimiter);
 			}
 			line.append(String.valueOf(strategy2count.get(strategies.get(i)).doubleValue() / sum));
 		}
