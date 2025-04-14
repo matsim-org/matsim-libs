@@ -24,6 +24,7 @@ package org.matsim.codeexamples.mobsim.simpleAdaptiveSignalEngine;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -55,6 +56,7 @@ public class RunSimpleAdaptiveSignalExample {
 		config.controller().setWriteEventsInterval(config.controller().getLastIteration());
 		config.qsim().setUsingFastCapacityUpdate(false);
 		config.vspExperimental().setWritingOutputEvents(true);
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		// remove unmaterialized module from the config
 		config.removeModule("otfvis");
 		final Controler controler = new Controler(config);
