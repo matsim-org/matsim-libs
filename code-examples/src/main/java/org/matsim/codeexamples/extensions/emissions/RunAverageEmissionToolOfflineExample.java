@@ -21,7 +21,9 @@ package org.matsim.codeexamples.extensions.emissions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.CreateEmissionConfig;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -38,7 +40,10 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.Set;
 
 import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.*;
 
@@ -88,6 +93,11 @@ public final class RunAverageEmissionToolOfflineExample{
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+
+		// there is no network mode default "car" any more since matsim version 2025.0
+		for (String type : Set.of("car_average", "car_petrol", "car_diesel", "truck")) {
+			scenario.getVehicles().getVehicleTypes().get(Id.create(type, VehicleType.class)).setNetworkMode(TransportMode.car);
+		}
 
 		// examples for how to set attributes to links and vehicles in order to make this work (already there for example scenario):
 
