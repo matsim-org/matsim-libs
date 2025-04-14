@@ -21,7 +21,6 @@ package org.matsim.codeexamples.extensions.freight;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarrierPlanWriter;
-import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -30,6 +29,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.controller.CarrierModule;
 
 import java.util.concurrent.ExecutionException;
 

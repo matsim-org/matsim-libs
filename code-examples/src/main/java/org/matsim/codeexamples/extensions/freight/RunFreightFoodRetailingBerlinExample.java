@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarrierPlanWriter;
-import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -33,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.controller.CarrierModule;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -105,7 +105,7 @@ public class RunFreightFoodRetailingBerlinExample {
 		var analysis = new RunFreightAnalysisEventBased(config.controller().getOutputDirectory()+"/", config.controller().getOutputDirectory()+"/analysis", "EPSG:31468");
 		try {
 			analysis.runAnalysis();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

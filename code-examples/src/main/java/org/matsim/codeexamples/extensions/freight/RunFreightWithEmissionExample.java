@@ -24,9 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.CarrierPlanXmlWriterV2;
-import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,6 +35,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.controller.CarrierModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -114,14 +114,14 @@ public class RunFreightWithEmissionExample {
 		}
 
 		// output before jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
+		new CarrierPlanWriter(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//Solving the VRP (generate carrier's tour plans)
 		CarriersUtils.runJsprit( scenario );
 
 		// output after jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
+		new CarrierPlanWriter(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//MATSim configuration:
