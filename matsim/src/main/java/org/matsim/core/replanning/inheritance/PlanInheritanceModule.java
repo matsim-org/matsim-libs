@@ -224,7 +224,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 			String mutatedBy = planId2planInheritanceRecords.get(planId).getMutatedBy();
 			strategy2count.get(mutatedBy).incrementAndGet();
 		}
-		long sum = strategy2count.values().stream().mapToLong(count -> count.get()).sum();
+		long sum = strategy2count.values().stream().mapToLong(AtomicLong::get).sum();
 		StringBuffer line = new StringBuffer();
 		line.append(currentIteration);
 		line.append(getDefaultDelimiter());
@@ -259,7 +259,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 			this.planStrategyShareWriter.flush();
 			this.planStrategyShareWriter.close();
 		} catch (IOException e) {
-			new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
 
 		this.planId2planInheritanceRecords.clear();
