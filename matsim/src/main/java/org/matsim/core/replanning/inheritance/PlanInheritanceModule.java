@@ -2,7 +2,7 @@ package org.matsim.core.replanning.inheritance;
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelPopulationReaderMatsimV6.java
+ * PlanInheritanceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
