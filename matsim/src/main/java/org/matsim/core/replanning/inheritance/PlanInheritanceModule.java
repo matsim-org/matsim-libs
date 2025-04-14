@@ -57,7 +57,7 @@ import com.google.inject.Singleton;
  *  <li> Initialization of initially read plans and default writers
  *  <li> Book-keeping, i.e. setting additional plan attributes not stored in the plan itself
  *  <li> Calculation default stats like the distribution of mutators among (selected) plans
- * 
+ *
  * @author neuma, alex94263
  */
 @Singleton
@@ -66,22 +66,21 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public static final String PLAN_ID = "planId";
 	public static final String ITERATION_CREATED = "iterationCreated";
 	public static final String PLAN_MUTATOR = "planMutator";
-	
+
 	public static final String INITIAL_PLAN = "initialPlan";
 	public static final String NONE = "NONE";
-	
+
 	public static final String FILENAME_PLAN_INHERITANCE_RECORDS = "planInheritanceRecords";
-	
+
 	long numberOfPlanInheritanceRecordsCreated = 0;
 	Map<Id<Plan>, PlanInheritanceRecord> planId2planInheritanceRecords = new ConcurrentHashMap<>();
-	
+
 	PlanInheritanceRecordWriter planInheritanceRecordWriter;
 	private ArrayList<String> strategies;
-	
-	private final Character DELIMITER = '\t';
+
 	private BufferedWriter selectedPlanStrategyShareWriter;
 	private BufferedWriter planStrategyShareWriter;
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// initialize all default writers
@@ -109,67 +108,71 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		for (StrategySettings strategySetting : strategySettings) {
 			activeSubpopulations.add(strategySetting.getSubpopulation());
 		}
-		
+
 		Set<String> planStrategiesNames = new HashSet<>();
 		for (String subpopulation : activeSubpopulations) {
 			for (GenericPlanStrategy<Plan, Person> planStrategy : strategyManager.getStrategies(subpopulation)) {
 				planStrategiesNames.add(planStrategy.toString());
 			}
 		}
-		
+
 		ArrayList<String> strategies = new ArrayList<>(planStrategiesNames.size() + 1);
 		strategies.addAll(planStrategiesNames);
 		Collections.sort(strategies);
 		strategies.add(0, INITIAL_PLAN);
-		
+
 		return strategies;
+	}
+
+	private Character getDefaultDelimiter()
+	{
+		return this.getConfig().global().getDefaultDelimiter().charAt(0);
 	}
 
 	/**
 	 * Initialize the writer with the active strategies
 	 */
 	private BufferedWriter initializeDistributionWriter(ArrayList<String> strategies, String filename) {
-		
 		BufferedWriter planStrategyShareWriter = IOUtils.getBufferedWriter(filename);
-		
+
 		StringBuffer header = new StringBuffer();
-		header.append("iteration"); header.append(DELIMITER);
+		header.append("iteration"); header.append(this.getDefaultDelimiter());
 		for (int i = 0; i < strategies.size(); i++) {
 			if (i > 0) {
-				header.append(DELIMITER);
-			} 
+				header.append(getDefaultDelimiter());
+			}
 			header.append(strategies.get(i));
 		}
-		
+
 		try {
 			planStrategyShareWriter.write(header.toString());
 			planStrategyShareWriter.newLine();
 		} catch (IOException e) {
 			throw new RuntimeException("Could not initialize the plan strategy share writer!", e);
 		}
-		
+
 		return planStrategyShareWriter;
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// check the plans of the population and all currently stored plan records - do the actual book-keeping
-		
+
 		Set<Id<Plan>> activePlanIds = new HashSet<>();
 		Set<Id<Plan>> selectedPlanIds = new HashSet<>();
-		
+
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				
+
 				if (plan.getPlanMutator() == null) {
 					// initial plan - set initial plan defaults
 					plan.setPlanMutator(INITIAL_PLAN);
 					plan.setIterationCreated(event.getIteration());
 				}
-				
+
 				if (plan.getIterationCreated() == event.getIteration()) {
 					// it's a new plan created in this iteration - create a new record
-					
+
 					PlanInheritanceRecord planInheritanceRecord = new PlanInheritanceRecord();
 					planInheritanceRecord.setAgentId(person.getId());
 					planInheritanceRecord.setPlanId(Id.create(Long.toString(++this.numberOfPlanInheritanceRecordsCreated, 36), Plan.class));
@@ -177,34 +180,34 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 					plan.setPlanId(planInheritanceRecord.getPlanId());
 					planInheritanceRecord.setIterationCreated(plan.getIterationCreated());
 					planInheritanceRecord.setMutatedBy(plan.getPlanMutator());
-					
+
 					this.planId2planInheritanceRecords.put(planInheritanceRecord.getPlanId(), planInheritanceRecord);
 				}
-				
+
 				if (PersonUtils.isSelected(plan)) {
 					this.planId2planInheritanceRecords.get(plan.getId()).getIterationsSelected().add(event.getIteration());
 					selectedPlanIds.add(plan.getId());
 				}
-				
+
 				activePlanIds.add(plan.getId());
 			}
 		}
-		
+
 		List<Id<Plan>> deletedPlans = new ArrayList<>();
 		for (Id<Plan> planId : this.planId2planInheritanceRecords.keySet()) {
 			if (!activePlanIds.contains(planId)) {
 				deletedPlans.add(planId);
 			}
 		}
-		
+
 		for (Id<Plan> deletedPlanId : deletedPlans) {
 			PlanInheritanceRecord deletedPlanInheritanceRecord = this.planId2planInheritanceRecords.remove(deletedPlanId);
 			deletedPlanInheritanceRecord.setIterationRemoved(event.getIteration());
 			this.planInheritanceRecordWriter.write(deletedPlanInheritanceRecord);
 		}
-		
+
 		this.planInheritanceRecordWriter.flush();
-		
+
 		this.calculateAndWriteDistribution(event.getIteration(), this.strategies, this.planId2planInheritanceRecords, selectedPlanIds, this.selectedPlanStrategyShareWriter);
 		this.calculateAndWriteDistribution(event.getIteration(), this.strategies, this.planId2planInheritanceRecords, this.planId2planInheritanceRecords.keySet(), this.planStrategyShareWriter);
 	}
@@ -224,11 +227,11 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		long sum = strategy2count.values().stream().mapToLong(count -> count.get()).sum();
 		StringBuffer line = new StringBuffer();
 		line.append(currentIteration);
-		line.append(DELIMITER);
+		line.append(getDefaultDelimiter());
 		for (int i = 0; i < strategies.size(); i++) {
 			if (i > 0) {
-				line.append(DELIMITER);
-			} 
+				line.append(getDefaultDelimiter());
+			}
 			line.append(String.valueOf(strategy2count.get(strategies.get(i)).doubleValue() / sum));
 		}
 		try {
@@ -238,18 +241,18 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 			throw new RuntimeException("Could not initialize the plan strategy share writer!", e);
 		}
 	}
-	
+
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		// flush all pending plan inheritance records and close the readers
-		
+
 		for (PlanInheritanceRecord planInheritanceRecord : this.planId2planInheritanceRecords.values()) {
 			this.planInheritanceRecordWriter.write(planInheritanceRecord);
 		}
-		
+
 		this.planInheritanceRecordWriter.flush();
 		this.planInheritanceRecordWriter.close();
-		
+
 		try {
 			this.selectedPlanStrategyShareWriter.flush();
 			this.selectedPlanStrategyShareWriter.close();
@@ -258,7 +261,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		} catch (IOException e) {
 			new RuntimeException(e);
 		}
-		
+
 		this.planId2planInheritanceRecords.clear();
 	}
 
