@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionModule;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
@@ -114,10 +115,10 @@ public class RunMelunPrebooking {
 		DrtConfigGroup drtConfig = new DrtConfigGroup();
 		multiModeDrtConfig.addParameterSet(drtConfig);
 
-		drtConfig.mode = "drt";
-		drtConfig.operationalScheme = OperationalScheme.door2door;
-		drtConfig.stopDuration = 60.0;
-		DrtOptimizationConstraintsParams constraintsParam = drtConfig.getDrtOptimizationConstraintsParam();
+		drtConfig.setMode("drt");
+		drtConfig.setOperationalScheme(OperationalScheme.door2door);
+		drtConfig.setStopDuration(60.0);
+		DrtOptimizationConstraintsSetImpl constraintsParam = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		constraintsParam.maxWaitTime = settings.maxWaitTime;
 		constraintsParam.maxTravelTimeAlpha = settings.maxTravelTimeAlpha;
 		constraintsParam.maxTravelTimeBeta = settings.maxWaitTime;
@@ -127,7 +128,7 @@ public class RunMelunPrebooking {
 
 		PrebookingParams prebookingParams = new PrebookingParams();
 		drtConfig.addParameterSet(prebookingParams);
-		prebookingParams.scheduleWaitBeforeDrive = settings.scheduleWaitBeforeDrive;
+		prebookingParams.setScheduleWaitBeforeDrive(settings.scheduleWaitBeforeDrive);
 
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
