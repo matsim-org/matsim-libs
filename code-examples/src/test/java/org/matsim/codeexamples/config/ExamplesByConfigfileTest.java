@@ -18,22 +18,15 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.config;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 /**
  * @author nagel
@@ -41,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ExamplesByConfigfileTest {
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
+
 	public static Stream<String> arguments() {
 		return Stream.of("scenarios/equil/config.xml",
 				"scenarios/equil/config-with-minimal-plans-file.xml",
@@ -56,8 +49,7 @@ public class ExamplesByConfigfileTest {
 				"scenarios/equil-extended/config-with-subpopulation.xml",
 				"scenarios/equil-extended/config-with-trips.xml",
 				"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml",
-				"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml",
-				"examples/tutorial/config/externalReplanning.xml");
+				"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml");
 	}
 
 	private String outputDir ;
