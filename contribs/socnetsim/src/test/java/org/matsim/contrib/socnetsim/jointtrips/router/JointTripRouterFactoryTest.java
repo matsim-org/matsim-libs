@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +38,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -67,6 +63,8 @@ import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author thibautd
@@ -243,6 +241,12 @@ public class JointTripRouterFactoryTest {
 
 	@Test
 	void testDriverRoute() throws Exception {
+		Vehicle defaultVeh = VehicleUtils.createVehicle(Id.createVehicleId("1"), VehicleUtils.createDefaultVehicleType());
+		HashMap<String, Id<Vehicle>> map = new HashMap();
+		map.put("car", defaultVeh.getId());
+		scenario.getVehicles().addVehicleType(VehicleUtils.createDefaultVehicleType());
+		scenario.getVehicles().addVehicle(defaultVeh);
+
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
@@ -260,6 +264,8 @@ public class JointTripRouterFactoryTest {
 			}
 
 			if (toRoute) {
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes(plan.getPerson(), map);
+
 				log.debug( "testing driver route on plan of "+plan.getPerson().getId() );
 				planRouter.run( plan );
 
