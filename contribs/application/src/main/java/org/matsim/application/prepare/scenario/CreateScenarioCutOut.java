@@ -326,7 +326,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 			cv = new CutoutVolumeCalculator(
 				changeEventsInterval,
-				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet())
+				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
+				scenario
 			);
 
 			EventsManager manager = EventsUtils.createEventsManager();
@@ -519,6 +520,27 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					 capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time))*((changeEventsInterval/3600)*link.getCapacity()));
 				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
+				else if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
+					// TODO WIP
+
+					// Compute the cleaned travelTimes. The idea is to compute, how long the average vehicle in the scenario would wait in a queue,
+					// if the "static" traffic (teh traffic, that will be removed after the cutout) was there. This waiting time is then used to
+					// set the new freespeed accordingly. The capacity will be set to the value, which is "remaining" after the static traffic is subtracted.
+
+					// 1. We first compute the averaged load (using only the vehicles, which will be removed later on)
+					double averageLoad = cv.getAveragedAccumulatedLoad(link.getId());
+
+					// 2. Then we look at the average PCE of all vehicles in the cutout scenario
+					double averagePC = 1; // TODO
+
+					// 3. We calculate the average waiting time using the average load and average PCE
+					double averageWaitingTime = averageLoad / averagePC; // TODO Check for units
+
+					// 4. The freespeed is given by adding the averageWaitingTime to the average travel time of the link
+					freespeed = link.getFreespeed() + link.getLength() / averageWaitingTime; // TODO This formula seems wrong, fix it
+
+				}
+
 
 				boolean speedSame = prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6;
 				boolean capacitySame = prevCapacity != null && Math.abs(capacity - prevCapacity) < 1e-6;
@@ -663,7 +685,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		 * Calculates the proportion of the original number of vehicles remaining after the cutout and multiplies this to the original capacity. <br>
 		 * This method will keep the relative capacity utilization, but the individual vehicle is weighted more than before.
 		 */
-		relativeAdjustmentOfCapacities
+		relativeAdjustmentOfCapacities,
+
+		/**
+		 * TODO
+		 */
+		cleanedFreespeeds
 
 	}
 
