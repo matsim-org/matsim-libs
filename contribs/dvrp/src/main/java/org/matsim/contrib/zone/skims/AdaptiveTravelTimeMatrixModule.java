@@ -55,7 +55,9 @@ public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
     public void install() {
         bindModal(AdaptiveTravelTimeMatrix.class).toProvider(modalProvider(
                 getter -> {
-                    ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {}).get(TT_MATRIX_ZONE_SYSTEM).get();
+                    Map<String, Provider<ZoneSystem>> modal = getter.get(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {
+                    });
+                    ZoneSystem zoneSystem = modal.get(TT_MATRIX_ZONE_SYSTEM).get();
                     Network network = getter.getModal(Network.class);
 					DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
 
