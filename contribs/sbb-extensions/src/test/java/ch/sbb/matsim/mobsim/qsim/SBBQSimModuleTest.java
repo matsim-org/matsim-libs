@@ -24,11 +24,16 @@ import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import com.google.inject.Provides;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -36,6 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -72,6 +78,15 @@ public class SBBQSimModuleTest {
         new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
         config.controller().setOutputDirectory(this.utils.getOutputDirectory());
         Scenario scenario = ScenarioUtils.createScenario(config);
+
+		// Add dummy network (otherwise the router will crash)
+		Node a = NetworkUtils.createNode(Id.createNodeId("a"), new Coord(0,0));
+		Node b = NetworkUtils.createNode(Id.createNodeId("b"), new Coord(0,0));
+		scenario.getNetwork().addNode(a);
+		scenario.getNetwork().addNode(b);
+		scenario.getNetwork().addLink(NetworkUtils.createLink(Id.createLinkId("l1"), a, b, scenario.getNetwork(), 1,1,1,1));
+		scenario.getNetwork().addLink(NetworkUtils.createLink(Id.createLinkId("l2"), b, a, scenario.getNetwork(), 1,1,1,1));
+
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new AbstractModule() {
