@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;

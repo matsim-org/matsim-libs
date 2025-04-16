@@ -72,7 +72,7 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(SpeedyGraphBuilder.build(network), nodeMap, travelTime, travelDisutility,
+		pathSearch = OneToManyPathSearch.createSearch(SpeedyGraphBuilder.build(network), travelTime, travelDisutility,
 				false);
 
 		// TODO this kNN is slow

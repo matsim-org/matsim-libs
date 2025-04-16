@@ -2,7 +2,7 @@ package org.matsim.core.network.turnRestrictions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -88,11 +88,11 @@ public final class TurnRestrictionsContext {
      * Builds a graph from a network considering all links without caring about
      * allowedModes but considering {@link DisallowedNextLinks} (aka turn
      * restrictions) of the given {@code mode}.
-     * 
+     *
      * If mode == null and network contains turn restrictions, turn
      * restrictions of all modes are merged. This could result in a network which
      * is more restrictive than necessary for routing.
-     * 
+     *
      * @param network
      * @param mode
      * @return

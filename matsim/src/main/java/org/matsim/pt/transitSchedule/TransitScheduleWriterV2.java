@@ -35,6 +35,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.pt.transitSchedule.api.ChainedDeparture;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -169,13 +170,13 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		}
 
 		for (TransitRoute route : line.getRoutes().values()) {
-			writeTransitRoute(route);
+			writeTransitRoute(line.getId(), route);
 		}
 
 		this.writeEndTag(Constants.TRANSIT_LINE);
 	}
 
-	private void writeTransitRoute(final TransitRoute route) throws IOException, UncheckedIOException {
+	private void writeTransitRoute(Id<TransitLine> lineId, final TransitRoute route) throws IOException, UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<>(1);
 		attributes.add(createTuple(Constants.ID, route.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
@@ -197,7 +198,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 
 		this.writeRouteProfile(route.getStops());
 		this.writeRoute(route.getRoute());
-		this.writeDepartures(route.getDepartures());
+		this.writeDepartures(lineId, route.getId(), route.getDepartures());
 
 		this.writeEndTag(Constants.TRANSIT_ROUTE);
 	}
@@ -251,7 +252,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		}
 	}
 
-	private void writeDepartures(final Map<Id<Departure>, Departure> departures) throws IOException, UncheckedIOException {
+	private void writeDepartures(Id<TransitLine> lineId, Id<TransitRoute> routeId, final Map<Id<Departure>, Departure> departures) throws IOException, UncheckedIOException {
 		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures
@@ -264,15 +265,39 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			if (dep.getVehicleId() != null) {
 				attributes.add(createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
 			}
-			if (dep.getAttributes().isEmpty()) {
+
+			boolean hasChainedDepartures = !dep.getChainedDepartures().isEmpty();
+
+			if (dep.getAttributes().isEmpty() && !hasChainedDepartures) {
 				this.writeStartTag(Constants.DEPARTURE, attributes, true);
 			} else {
 				this.writeStartTag(Constants.DEPARTURE, attributes, false);
-				this.writer.write(NL);
-				this.attributesWriter.writeAttributes("\t\t\t\t\t", this.writer, dep.getAttributes());
+
+				if (!dep.getAttributes().isEmpty()) {
+					this.writer.write(NL);
+					this.attributesWriter.writeAttributes("\t\t\t\t\t", this.writer, dep.getAttributes());
+				}
+
+				// Write chained departures
+				if (hasChainedDepartures) {
+					for (ChainedDeparture chainedDep : dep.getChainedDepartures()) {
+						List<Tuple<String, String>> chainedAttributes = new ArrayList<>(3);
+						chainedAttributes.add(createTuple(Constants.TO_DEPARTURE, chainedDep.getChainedDepartureId().toString()));
+
+						if (chainedDep.getChainedTransitLineId() != lineId) {
+							chainedAttributes.add(createTuple(Constants.TO_TRANSIT_LINE, chainedDep.getChainedTransitLineId().toString()));
+						}
+
+						if (chainedDep.getChainedRouteId() != routeId) {
+							chainedAttributes.add(createTuple(Constants.TO_TRANSIT_ROUTE, chainedDep.getChainedRouteId().toString()));
+						}
+
+						this.writeStartTag(Constants.CHAINED_DEPARTURE, chainedAttributes, true);
+					}
+				}
+
 				this.writeEndTag(Constants.DEPARTURE);
 			}
-
 		}
 
 		this.writeEndTag(Constants.DEPARTURES);
