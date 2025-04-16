@@ -1,0 +1,112 @@
+package playground.vsp.changeExpBeta;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+
+public class RunTestingScenario {
+	private static final String modeA = "modeA";
+	private static final String modeB = "modeB";
+	private static final String dummy = "dummy";
+
+	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// configure config file
+		config.controller().setOutputDirectory(args[0]);
+		config.controller().setLastIteration(100);
+		config.replanning().setFractionOfIterationsToDisableInnovation(0.9);
+
+		// specify modes
+		config.changeMode().setModes(new String[]{modeA, modeB});
+
+		// specify strategy settings
+		// change mode
+		ReplanningConfigGroup.StrategySettings changeMode = new ReplanningConfigGroup.StrategySettings();
+		changeMode.setStrategyName("ChangeSingleTripMode");
+		changeMode.setWeight(0.1);
+		config.replanning().addStrategySettings(changeMode);
+
+		// change exp beta
+		ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
+		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setWeight(0.9);
+		config.replanning().addStrategySettings(changeExpBeta);
+
+		// scoring params
+		ScoringConfigGroup.ModeParams modeAParams = new ScoringConfigGroup.ModeParams(modeA);
+		modeAParams.setConstant(0.1);
+		ScoringConfigGroup.ModeParams modeBParams = new ScoringConfigGroup.ModeParams(modeB);
+		modeBParams.setConstant(0.);
+		ScoringConfigGroup.ActivityParams dummyActParams = new ScoringConfigGroup.ActivityParams();
+		dummyActParams.setTypicalDuration(3600);
+		dummyActParams.setActivityType(dummy);
+
+		config.scoring().addModeParams(modeAParams);
+		config.scoring().addModeParams(modeBParams);
+		config.scoring().addActivityParams(dummyActParams);
+
+		// teleportation setting
+		RoutingConfigGroup.TeleportedModeParams modeATeleportation = new RoutingConfigGroup.TeleportedModeParams();
+		modeATeleportation.setMode(modeA);
+		modeATeleportation.setTeleportedModeSpeed(5.);
+
+		RoutingConfigGroup.TeleportedModeParams modeBTeleportation = new RoutingConfigGroup.TeleportedModeParams();
+		modeBTeleportation.setMode(modeB);
+		modeBTeleportation.setTeleportedModeSpeed(5.);
+
+		RoutingConfigGroup.TeleportedModeParams walk = new RoutingConfigGroup.TeleportedModeParams();
+		walk.setMode(TransportMode.walk);
+		walk.setTeleportedModeSpeed(1.);
+
+		config.routing().addTeleportedModeParams(modeATeleportation);
+		config.routing().addTeleportedModeParams(modeBTeleportation);
+		config.routing().addTeleportedModeParams(walk);
+
+		// prepare network
+		Network network = scenario.getNetwork();
+		Node nodeA = NetworkUtils.createNode(Id.createNodeId("A"), new Coord(0, 0));
+		Node nodeB = NetworkUtils.createNode(Id.createNodeId("B"), new Coord(2000, 0));
+		network.addNode(nodeA);
+		network.addNode(nodeB);
+		Link link1 = NetworkUtils.createLink(Id.createLinkId("1"), nodeA, nodeB, network, 2000, 10, 3600, 1);
+		Link link2 = NetworkUtils.createLink(Id.createLinkId("2"), nodeB, nodeA, network, 2000, 10, 3600, 1);
+		network.addLink(link1);
+		network.addLink(link2);
+
+		// prepare plans
+		Population plans = scenario.getPopulation();
+		PopulationFactory populationFactory = plans.getFactory();
+		for (int i = 0; i < 10000; i++) {
+			Person person = populationFactory.createPerson(Id.createPersonId("dummy_person_" + i));
+			Plan plan = populationFactory.createPlan();
+			Activity fromAct = populationFactory.createActivityFromCoord(dummy, new Coord(0, 0));
+			fromAct.setEndTime(3600);
+			Leg leg = populationFactory.createLeg(modeA);
+			Activity toAct = populationFactory.createActivityFromCoord(dummy, new Coord(2000, 0));
+			plan.addActivity(fromAct);
+			plan.addLeg(leg);
+			plan.addActivity(toAct);
+			person.addPlan(plan);
+			plans.addPerson(person);
+		}
+
+		// run simulation
+		Controler controler = new Controler(scenario);
+		controler.run();
+	}
+}
