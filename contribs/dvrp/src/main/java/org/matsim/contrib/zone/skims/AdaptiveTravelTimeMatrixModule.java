@@ -20,8 +20,9 @@
 package org.matsim.contrib.zone.skims;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import jakarta.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
@@ -46,9 +47,6 @@ public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
     @Inject
     private DvrpConfigGroup dvrpConfigGroup;
 
-    @Inject
-    private Map<String, Provider<ZoneSystem>> zoneSystems;
-
     public AdaptiveTravelTimeMatrixModule(String mode) {
         super(mode);
     }
@@ -57,9 +55,9 @@ public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
     public void install() {
         bindModal(AdaptiveTravelTimeMatrix.class).toProvider(modalProvider(
                 getter -> {
-					Network network = getter.getModal(Network.class);
+                    ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {}).get(TT_MATRIX_ZONE_SYSTEM).get();
+                    Network network = getter.getModal(Network.class);
 					DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
-                    ZoneSystem zoneSystem = zoneSystems.get(TT_MATRIX_ZONE_SYSTEM).get();
 
                     return new AdaptiveTravelTimeMatrixImpl(qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
                             network,
