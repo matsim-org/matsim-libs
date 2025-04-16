@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,6 +43,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -61,6 +63,9 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
@@ -137,6 +142,18 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
+
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		for (Person p : population.getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
 		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped,
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
@@ -223,6 +240,18 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
+
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		for (Person p : population.getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
@@ -319,6 +348,18 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
+
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		for (Person p : population.getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
