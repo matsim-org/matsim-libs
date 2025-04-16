@@ -132,14 +132,17 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 	private Replacement findReplacement(DvrpVehicle vehicle, DrtStopTask stopTask) {
 		// replace from current or previous task
 		Task startTask = vehicle.getSchedule().getCurrentTask();
-		for (Task task : Schedules.getTasksBetween(startTask.getTaskIdx() + 1, stopTask.getTaskIdx(), vehicle.getSchedule())) {
+		for (Task task : Schedules.getTasksBetween(startTask.getTaskIdx(), stopTask.getTaskIdx(), vehicle.getSchedule())) {
 			if (STOP.isBaseTypeOf(task)) {
 				startTask = task;
 			}
 		}
-        for (Task task : Schedules.getTasksUntilLast(stopTask.getTaskIdx() + 1 , vehicle.getSchedule())) {
-			 if (STOP.isBaseTypeOf(task)) {
-				 return new Replacement(startTask, task, vehicle.getSchedule());
+
+		if(vehicle.getSchedule().getTaskCount() > startTask.getTaskIdx() + 1) {
+			for (Task task : Schedules.getTasksUntilLast(stopTask.getTaskIdx() + 1, vehicle.getSchedule())) {
+				if (STOP.isBaseTypeOf(task)) {
+					return new Replacement(startTask, task, vehicle.getSchedule());
+				}
 			}
 		}
 		return new Replacement(startTask, Schedules.getLastTask(vehicle.getSchedule()), vehicle.getSchedule());
