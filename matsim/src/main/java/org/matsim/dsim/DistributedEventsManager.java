@@ -315,14 +315,14 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void removeHandler(EventHandler handler) {
 
-		List<EventHandlerTask> toRemove = tasks.stream().filter(t -> t.getHandler() == handler).toList();
-
-		if (toRemove.isEmpty()) {
-			throw new IllegalArgumentException("Handler %s not found for removal.".formatted(handler.getName()));
+		var it = tasks.iterator();
+		while (it.hasNext()) {
+			var task = it.next();
+			if (task.getHandler() == handler) {
+				it.remove();
+				executor.deregister(task);
+			}
 		}
-
-		toRemove.forEach(this::removeTask);
-		toRemove.forEach(executor::deregister);
 	}
 
 	@Override
