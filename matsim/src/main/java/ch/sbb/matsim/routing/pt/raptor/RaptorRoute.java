@@ -20,15 +20,15 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author mrieser / SBB
@@ -110,6 +110,12 @@ public class RaptorRoute {
         public final double distance;
         public final TransitLine line;
         public final TransitRoute route;
+
+		/**
+		 * Optional chained route part. TODO: not yet used
+		 */
+		public RoutePart chainedPart;
+
         final List<? extends PlanElement> planElements;
 
         RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double vehicleDepTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
