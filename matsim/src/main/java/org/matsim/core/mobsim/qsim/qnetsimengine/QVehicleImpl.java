@@ -67,7 +67,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 	private Id<Link> currentLinkId = null;
 	private final Vehicle vehicle;
 	private final int passengerCapacity;
-	private final double scaledPce;
+	private final double pceScalingFactor;
 
 	/**
 	 * Creates a new QVehicle and takes the pce of the supplied vehicle type as is.
@@ -87,7 +87,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 	public QVehicleImpl(final Vehicle basicVehicle, double pceScalingFactor) {
 		this.id = basicVehicle.getId();
 		this.vehicle = basicVehicle;
-		this.scaledPce = basicVehicle.getType().getPcuEquivalents() * pceScalingFactor;
+		this.pceScalingFactor = pceScalingFactor;
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
@@ -122,7 +122,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 		this.linkEnterTime = message.linkEnterTime();
 		this.earliestLinkExitTime = message.earliestLinkExitTime();
 		this.currentLinkId = message.currentLinkId();
-		this.scaledPce = message.scaledPce();
+		this.pceScalingFactor = message.pceScalingFactor();
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 
 	@Override
 	public double getSizeInEquivalents() {
-		return scaledPce;
+		return vehicle.getType().getPcuEquivalents() * pceScalingFactor;
 	}
 
 	@Override
@@ -252,7 +252,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 			this.currentLinkId,
 			this.vehicle,
 			this.passengerCapacity,
-			this.scaledPce
+			this.pceScalingFactor
 		);
 	}
 
@@ -265,7 +265,7 @@ public class QVehicleImpl implements QVehicle, DistributedMobsimVehicle {
 		Id<Link> currentLinkId,
 		Vehicle vehicle,
 		int passengerCapacity,
-		double scaledPce
+		double pceScalingFactor
 	) implements Message {
 	}
 }
