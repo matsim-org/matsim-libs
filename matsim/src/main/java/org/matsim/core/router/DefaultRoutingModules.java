@@ -26,7 +26,7 @@ import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author nagel

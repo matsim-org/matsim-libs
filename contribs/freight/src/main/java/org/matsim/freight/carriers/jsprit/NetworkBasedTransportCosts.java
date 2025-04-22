@@ -574,7 +574,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,
@@ -657,7 +657,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		} else {
 			informStartCalc();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,
@@ -720,7 +720,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			travelDistance = fromLink.getLength();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,

@@ -160,7 +160,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE));
             }
             final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
-            final double endTime = startTime + shiftsParams.changeoverDuration;
+            final double endTime = startTime + shiftsParams.getChangeoverDuration();
             if (path.getArrivalTime() > shift.getEndTime()) {
                 logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                         + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
@@ -184,7 +184,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                 }
                 if (path.getArrivalTime() < shift.getEndTime()) {
                     double slack = shift.getEndTime() - path.getArrivalTime();
-                    if (shiftsParams.shiftEndRelocationArrival == ShiftsParams.ShiftEndRelocationArrival.justInTime) {
+                    if (shiftsParams.getShiftEndRelocationArrival() == ShiftsParams.ShiftEndRelocationArrival.justInTime) {
                         DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTime, departureTime + slack, currentLink);
                         schedule.addTask(waitTask);
                         path = path.withDepartureTime(departureTime + slack);
@@ -192,19 +192,19 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                 }
                 schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE));
                 final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
-                final double endTime = Math.min(startTime + shiftsParams.changeoverDuration, vehicle.getServiceEndTime());
+                final double endTime = Math.min(startTime + shiftsParams.getChangeoverDuration(), vehicle.getServiceEndTime());
                 if (path.getArrivalTime() > shift.getEndTime()) {
                     logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "
                             + (path.getArrivalTime() - shift.getEndTime()) + " seconds.");
                 }
-                if (shiftsParams.shiftEndRelocationArrival != ShiftsParams.ShiftEndRelocationArrival.justInTime) {
+                if (shiftsParams.getShiftEndRelocationArrival() != ShiftsParams.ShiftEndRelocationArrival.justInTime) {
                     schedule.addTask(taskFactory.createStayTask(vehicle, path.getArrivalTime(), startTime, path.getToLink()));
                 }
                 appendShiftChange(vehicle, shift, breakFacility, startTime, endTime, link);
             } else {
                 drtStayTask.setEndTime(shift.getEndTime());
                 final double startTime = shift.getEndTime();
-                final double endTime = Math.min(shift.getEndTime() + shiftsParams.changeoverDuration, vehicle.getServiceEndTime());
+                final double endTime = Math.min(shift.getEndTime() + shiftsParams.getChangeoverDuration(), vehicle.getServiceEndTime());
                 appendShiftChange(vehicle, shift, breakFacility, startTime, endTime, link);
             }
         }
@@ -266,7 +266,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         if (vrpPath.getArrivalTime() < shift.getEndTime()) {
             schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), shift.getEndTime(), vrpPath.getToLink()));
         }
-        final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftsParams.changeoverDuration;
+        final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftsParams.getChangeoverDuration();
         ShiftChangeOverTask changeTask = taskFactory.createShiftChangeoverTask(vehicle,
                 Math.max(shift.getEndTime(), vrpPath.getArrivalTime()), endTime, vrpPath.getToLink(), shift, facility);
         schedule.addTask(changeTask);

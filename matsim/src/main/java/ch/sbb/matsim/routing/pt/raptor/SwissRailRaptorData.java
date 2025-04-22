@@ -23,7 +23,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 import java.util.*;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,7 +98,8 @@ public class SwissRailRaptorData {
 
         // data needed if cached transfer construction is activated
         this.staticTransferTimes = staticTransferTimes;
-        this.transferCache = new RTransfer[routeStops.length][];
+        this.transferCache = config.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive) ? 
+            new RTransfer[routeStops.length][] : null;
     }
 
     public static SwissRailRaptorData create(TransitSchedule schedule, @Nullable Vehicles transitVehicles, RaptorStaticConfig staticConfig, Network network, OccupancyData occupancyData) {
@@ -238,7 +239,7 @@ public class SwissRailRaptorData {
 
         // if adaptive transfer calculation is used, build a map for quick lookup of and collection of minimal transfer times
 		IdMap<TransitStopFacility, Map<TransitStopFacility, Double>> staticTransferTimes = null;
-		if (staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Adaptive)) {
+		if (!staticConfig.getTransferCalculation().equals(RaptorTransferCalculation.Initial)) {
 			staticTransferTimes = new IdMap<>(TransitStopFacility.class);
 
 			MinimalTransferTimes.MinimalTransferTimesIterator iterator = schedule.getMinimalTransferTimes().iterator();
@@ -654,8 +655,10 @@ public class SwissRailRaptorData {
 		// using a lock in some way. But so far, we didn't experience any problem. /sh
 		// may 2024
 
-    	RTransfer[] cache = transferCache[fromRouteStop.index];
-    	if (cache != null) return cache; // we had a cache hit
+        if (transferCache != null) {
+            RTransfer[] cache = transferCache[fromRouteStop.index];
+            if (cache != null) return cache; // we had a cache hit
+        }
 
     	// setting up useful constants
     	final double minimalTransferTime = config.getMinimalTransferTime();
@@ -705,8 +708,11 @@ public class SwissRailRaptorData {
         // convert to array
         RTransfer[] stopTransfers = transfers.toArray(new RTransfer[transfers.size()]);
 
-        // save to cache (no issue regarding parallel execution because we simply set an element)
-        transferCache[fromRouteStop.index] = stopTransfers;
+        if (transferCache != null) {
+            // save to cache (no issue regarding parallel execution because we simply set an element)
+            transferCache[fromRouteStop.index] = stopTransfers;
+        }
+
         return stopTransfers;
     }
 }

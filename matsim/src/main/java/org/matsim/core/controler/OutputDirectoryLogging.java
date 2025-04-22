@@ -147,7 +147,8 @@ public final class OutputDirectoryLogging {
 		ctx.updateLoggers();
 
 		if (collectLogMessagesAppender != null) {
-			for (LogEvent e : collectLogMessagesAppender.getLogEvents()) {
+			LogEvent e;
+			while ((e = collectLogMessagesAppender.getLogEvents().poll()) != null) {
 				appender.append(e);
 				if (e.getLevel().isMoreSpecificThan(Level.WARN)) {
 					warnErrorAppender.append(e);

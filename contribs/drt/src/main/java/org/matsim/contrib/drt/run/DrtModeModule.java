@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
@@ -71,15 +70,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork, drtCfg.travelTimeMatrixCachePath));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork(), drtCfg.getTravelTimeMatrixCachePath()));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile() == null ?
 				null :
-				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule, drtCfg.addOrGetLoadParams()));
-		install(new DrtModeZonalSystemModule(drtCfg));
+				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.getVehiclesFile()),
+				drtCfg.isChangeStartLinkToLastLinkInSchedule(), drtCfg.addOrGetLoadParams()));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
 
@@ -98,29 +96,29 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		});
 
 		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
-			return StaticPassengerStopDurationProvider.of(drtCfg.stopDuration, 0.0);
+			return StaticPassengerStopDurationProvider.of(drtCfg.getStopDuration(), 0.0);
 		}));
 
 		bindModal(DefaultStopTimeCalculator.class).toProvider(modalProvider(getter -> {
-			return new DefaultStopTimeCalculator(drtCfg.stopDuration);
+			return new DefaultStopTimeCalculator(drtCfg.getStopDuration());
 		})).in(Singleton.class);
 
 		if (drtCfg.getPrebookingParams().isEmpty()) {
 			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
-				return new DefaultStopTimeCalculator(drtCfg.stopDuration);
+				return new DefaultStopTimeCalculator(drtCfg.getStopDuration());
 			})).in(Singleton.class);
 		} else {
 			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
 				PassengerStopDurationProvider provider = getter.getModal(PassengerStopDurationProvider.class);
-				return new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(provider), drtCfg.stopDuration);
+				return new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(provider), drtCfg.getStopDuration());
 			}));
 
 			install(new PrebookingModeAnalysisModule(getMode()));
 		}
 
-		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
+		install(new AdaptiveTravelTimeMatrixModule(drtCfg.getMode()));
 
-		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
+		if (drtCfg.getSimulationType() == DrtConfigGroup.SimulationType.estimateAndTeleport ) {
 			Optional<DrtEstimatorParams> drtEstimatorParams = drtCfg.getDrtEstimatorParams();
 			if(drtEstimatorParams.isEmpty()) {
 				throw new IllegalStateException("parameter set 'estimator' is required when 'simulationType' is set to 'estimateAndTeleport'");
@@ -130,7 +128,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().defaultRequestDimension);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().getDefaultRequestDimension());
 		})).asEagerSingleton();
 
 	}

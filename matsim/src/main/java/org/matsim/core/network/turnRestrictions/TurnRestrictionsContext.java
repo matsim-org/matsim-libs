@@ -1,5 +1,8 @@
 package org.matsim.core.network.turnRestrictions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,6 +17,8 @@ import java.util.*;
  *  * @author mrieser / Simunto
  */
 public final class TurnRestrictionsContext {
+
+    private static final Logger LOG = LogManager.getLogger(TurnRestrictionsContext.class);
 
     private int nodeCount;
     private int linkCount;
@@ -79,7 +84,20 @@ public final class TurnRestrictionsContext {
         }
     }
 
-    public static TurnRestrictionsContext build(Network network) {
+    /**
+     * Builds a graph from a network considering all links without caring about
+     * allowedModes but considering {@link DisallowedNextLinks} (aka turn
+     * restrictions) of the given {@code mode}.
+     *
+     * If mode == null and network contains turn restrictions, turn
+     * restrictions of all modes are merged. This could result in a network which
+     * is more restrictive than necessary for routing.
+     *
+     * @param network
+     * @param mode
+     * @return
+     */
+    public static TurnRestrictionsContext build(Network network, @Nullable String mode) {
         /*
          * The implementation follows the algorithm developed by
          * Marcel Rieser (Simunto) and Hannes Rewald (Volkswagen Group)
@@ -106,15 +124,28 @@ public final class TurnRestrictionsContext {
          * - As turn restrictions are mode-specific, the algorithm needs to know for which mode the
          *   turn restriction need to be considered.
          */
+        boolean didWarnAboutMergingOfDisallowedNextLinks = false;
 
         TurnRestrictionsContext context = new TurnRestrictionsContext(network);
 
         for (Link startingLink : network.getLinks().values()) {
+
+            // get disallowed next links for statingLink
             DisallowedNextLinks disallowedNextLinks = NetworkUtils.getDisallowedNextLinks(startingLink);
             if (disallowedNextLinks == null) {
                 continue;
             }
-            Collection<List<Id<Link>>> turnRestrictions = disallowedNextLinks.getMergedDisallowedLinkSequences();
+            Collection<List<Id<Link>>> turnRestrictions;
+            if (mode != null) {
+                turnRestrictions = disallowedNextLinks.getDisallowedLinkSequences(mode);
+            } else {
+                turnRestrictions = disallowedNextLinks.getMergedDisallowedLinkSequences();
+                if (!didWarnAboutMergingOfDisallowedNextLinks) {
+                    LOG.warn("No mode was specified, merging available DisallowedNextLinks from all modes.");
+                    LOG.warn("This could result in a graph that is more restrictive than meant to be for routing.");
+                    didWarnAboutMergingOfDisallowedNextLinks = true;
+                }
+            }
             if (turnRestrictions == null || turnRestrictions.isEmpty()) {
                 continue;
             }

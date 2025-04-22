@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
+import org.matsim.core.mobsim.messagequeue.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;

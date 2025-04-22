@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -109,16 +109,16 @@ public class PtAlongALineTest {
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.mode = "drt_A";
-			drtConfig.stopDuration = 60.;
-			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                    (DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
+			drtConfig.setMode("drt_A");
+			drtConfig.setStopDuration(60.);
+			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                    drtConfig.addOrGetDrtOptimizationConstraintsParams()
 							.addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxWaitTime = 900.;
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
 			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-			drtConfig.changeStartLinkToLastLinkInSchedule = true;
+			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 
@@ -251,15 +251,15 @@ public class PtAlongALineTest {
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.stopDuration = 60.;
-			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-					(DefaultDrtOptimizationConstraintsSet) drtConfig.addOrGetDrtOptimizationConstraintsParams()
-							.addOrGetDefaultDrtOptimizationConstraintsSet();
+			drtConfig.setStopDuration(60.);
+			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                    drtConfig.addOrGetDrtOptimizationConstraintsParams()
+                            .addOrGetDefaultDrtOptimizationConstraintsSet();
 			defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
 			defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
 			defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
 			defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
-			drtConfig.mode = TransportMode.drt;
+			drtConfig.setMode(TransportMode.drt);
 			mm.addParameterSet(drtConfig);
 		}
 

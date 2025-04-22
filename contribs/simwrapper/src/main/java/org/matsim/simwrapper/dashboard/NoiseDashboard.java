@@ -46,7 +46,7 @@ public class NoiseDashboard implements Dashboard {
 				viz.description = "Shows the noise assessment for the day/evening/night in dB(A) calculated by the CNOSSOS-EU and the RLS-16 method.";
 				viz.height = 12.0;
 				viz.center = data.context().getCenter();
-				viz.zoom = data.context().mapZoomLevel;
+				viz.zoom = data.context().getMapZoomLevel();
 				viz.minValue = minDb;
 				viz.maxValue = maxDb;
 				viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");

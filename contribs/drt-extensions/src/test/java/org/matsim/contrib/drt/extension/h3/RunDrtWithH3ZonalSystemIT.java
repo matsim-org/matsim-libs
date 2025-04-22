@@ -1,13 +1,16 @@
 package org.matsim.contrib.drt.extension.h3;
 
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.common.zones.ZoneSystem;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -21,6 +24,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,21 +51,24 @@ public class RunDrtWithH3ZonalSystemIT {
 
 		MultiModeDrtConfigGroup drtConfigs = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		for (DrtConfigGroup drtConfig : drtConfigs.getModalElements()) {
-
-			DrtZoneSystemParams drtZoneSystemParams = drtConfig.getZonalSystemParams().get();
-			drtZoneSystemParams.removeParameterSet(drtZoneSystemParams.getZoneSystemParams());
-			ConfigGroup zoneSystemParams = drtZoneSystemParams.createParameterSet(H3GridZoneSystemParams.SET_NAME);
-			((H3GridZoneSystemParams) zoneSystemParams).h3Resolution = 9;
-			drtZoneSystemParams.addParameterSet(zoneSystemParams);
+			ZoneSystemParams set = drtConfig.addOrGetAnalysisZoneSystemParams();
+			drtConfig.removeParameterSet(set);
+			ConfigGroup zoneSystemParams = drtConfig.createParameterSet(H3GridZoneSystemParams.SET_NAME);
+			((H3GridZoneSystemParams) zoneSystemParams).setH3Resolution(9);
+			drtConfig.addParameterSet(zoneSystemParams);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					install(new AbstractDvrpModeModule(drtConfig.mode) {
+					install(new AbstractDvrpModeModule(drtConfig.getMode()) {
 						@Override
 						public void install() {
 							bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-								getter -> new DrtZonalWaitTimesAnalyzer(drtConfig, getter.getModal(DrtEventSequenceCollector.class),
-									getter.getModal(ZoneSystem.class), config.global().getDefaultDelimiter()))).asEagerSingleton();
+								getter -> {
+									ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+											.get(DrtModeAnalysisModule.ANALYSIS_ZONE_SYSTEM).get();
+									return new DrtZonalWaitTimesAnalyzer(drtConfig, getter.getModal(DrtEventSequenceCollector.class),
+											zoneSystem, config.global().getDefaultDelimiter());
+                                })).asEagerSingleton();
 							addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 						}
 					});

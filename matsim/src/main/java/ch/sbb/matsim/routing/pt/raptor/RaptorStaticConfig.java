@@ -65,7 +65,14 @@ public class RaptorStaticConfig {
 		 * which avoids any simulation start-up time but may increase the routing time
 		 * itself.
 		 */
-		Adaptive
+		Adaptive,
+
+        /**
+         * Use this option if you wnat the algorithm to calculate transfers on demand,
+         * but not cache them. This allows for a large reduction in memory use, but may
+         * drastically increase processing times.
+         */
+        Online
 	}
 
 

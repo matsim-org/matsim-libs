@@ -394,10 +394,14 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 
-				/* We think the maxFlowFromFdiag must be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
+				/* We think the maxFlowFromFdiag should be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
 				* It's unit is (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s
-				* tilmann + theresa, feb'25 */
-				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
+				* Unfortunately, there are no tests failing when we make changes here, i.e. the qsim behavior with kinematic waves seems to be not
+				* suitable covered by tests. Still, simulation outcome of the Berlin scenario differs a lot when we multiply the flow capacity factor
+				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
+				* as before.
+				* tilmann, theresa + christian, feb+mar'25 */
+				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
@@ -409,9 +413,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						log.warn("you are using the maximum capacity for one lane as the inflow capacity. This is the old standard behavior of the qsim and probably leads to wrong results " +
 								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
 								"InflowCapacitySetting.INCREASE_NUMBER_OF_LANES or InflowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
-					}
-					if ( wrnCnt==10 ) { //this verbose warning is only given 10 times
-						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+
+						if ( wrnCnt==10 ) { //this verbose warning is only given 10 times
+							log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+						}
 					}
 
 					this.maxInflowUsedInQsim = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
@@ -434,9 +439,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
 							log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
 						}
-					}
-					if (wrnCnt == 10) {
-						log.warn(Gbl.FUTURE_SUPPRESSED);
+
+						if (wrnCnt == 10) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
 					}
 
 					// now either correct the flow capacity or the number of lanes!

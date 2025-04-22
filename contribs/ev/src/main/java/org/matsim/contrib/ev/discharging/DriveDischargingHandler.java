@@ -161,6 +161,13 @@ public final class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
 				.calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption may be negative on links with negative slope
+			//===============================================================
+			//Added to handle cases when the negative energy discharged would surpass the battery capacity
+			//The new resulting energy should mean that the battery stays at the battery capacity when the energy is negative
+			if(ev.getBattery().getCharge() - energy > ev.getBattery().getCapacity()){
+				energy = ev.getBattery().getCharge() - ev.getBattery().getCapacity();
+			}
+			//===================================================================
 			ev.getBattery()
 				.dischargeEnergy(energy,
 					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(now, ev.getId(), link.getId(), missingEnergy)));

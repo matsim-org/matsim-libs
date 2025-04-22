@@ -65,7 +65,7 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
 
 			return new PrebookingManager(getMode(), network, requestCreator, optimizer, mobsimTimer, requestValidator,
-					eventsManager, requestUnscheduler, prebookingParams.abortRejectedPrebookings);
+					eventsManager, requestUnscheduler, prebookingParams.isAbortRejectedPrebookings());
 		})).in(Singleton.class);
 		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
 
@@ -79,7 +79,7 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 		}));
 
 		bindModal(MaximumDelayAbandonVoter.class).toProvider(modalProvider(getter -> {
-			double maximumDelay = prebookingParams.maximumPassengerDelay;
+			double maximumDelay = prebookingParams.getMaximumPassengerDelay();
 			return new MaximumDelayAbandonVoter(maximumDelay);
 		})).in(Singleton.class);
 		bindModal(AbandonVoter.class).to(modalKey(MaximumDelayAbandonVoter.class));
@@ -98,10 +98,10 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			ScheduleTimingUpdater timingUpdater = getter.getModal(ScheduleTimingUpdater.class);
 
 			return new ComplexRequestUnscheduler(vehicleLookup, entryFactory, taskFactory, router, travelTime,
-					timingUpdater, prebookingParams.scheduleWaitBeforeDrive);
+					timingUpdater, prebookingParams.isScheduleWaitBeforeDrive());
 		})).in(Singleton.class);
 
-		switch (prebookingParams.unschedulingMode) {
+		switch (prebookingParams.getUnschedulingMode()) {
 		case StopBased:
 			bindModal(RequestUnscheduler.class).to(modalKey(SimpleRequestUnscheduler.class));
 			break;

@@ -33,8 +33,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
@@ -70,20 +70,20 @@ public final class ZoneSystemUtils {
 
 		final ZoneSystem zoneSystem = switch (zoneSystemParams.getName()) {
 			case GISFileZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+				Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).getZonesShapeFile());
 				Preconditions.checkNotNull(context);
-				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).getZonesShapeFile());
 				Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
 				yield ZoneSystemUtils.createFromFeatures(network, features, zoneFilter);
 			}
 			case SquareGridZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).cellSize);
-                yield new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).cellSize, zoneFilter);
+				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).getCellSize());
+                yield new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).getCellSize(), zoneFilter);
 			}
 			case H3GridZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).h3Resolution);
+				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution());
 				Preconditions.checkNotNull(crs);
-				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
+				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution(), network, zoneFilter);
 			}
 			case GeometryFreeZoneSystemParams.SET_NAME -> new GeometryFreeZoneSystem(network);
 			default -> throw new IllegalStateException("Unexpected value: " + zoneSystemParams.getName());

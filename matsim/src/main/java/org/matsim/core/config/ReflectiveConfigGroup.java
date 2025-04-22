@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -305,7 +305,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	public void handleAddUnknownParam(final String paramName, final String value) {
 		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
 				+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
-			this.setters.keySet());
+			this.registeredParams);
 
 		log.warn(
 			"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",

@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.routing;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -41,13 +41,12 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
 				.chooseConstraintSet(departureTime, accessActLink, egressActLink, person, tripAttributes).orElse(drtCfg
 						.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
-		if (constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultSet) {
+		if (constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultSet) {
 			double maxTravelTime = defaultSet.maxTravelTimeAlpha * unsharedRideTime + defaultSet.maxTravelTimeBeta;
 			double maxDetour = Math.max(defaultSet.minimumAllowedDetour, unsharedRideTime * (defaultSet.maxDetourAlpha -1) + defaultSet.maxDetourBeta);
 			double maxRideTime = unsharedRideTime + Math.min(defaultSet.maxAbsoluteDetour, maxDetour);
 			double maxWaitTime = constraintsSet.maxWaitTime;
-
-			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime);
+			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime, constraintsSet.maxAllowedPickupDelay, constraintsSet.lateDiversionthreshold);
 		} else {
 			throw new IllegalArgumentException("Constraint set is not a default set");
 		}

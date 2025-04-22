@@ -3,7 +3,7 @@ package org.matsim.contrib.ev.strategic;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,9 +38,9 @@ import com.google.common.base.Preconditions;
  * calculated and the agent tries to charge once it gets clear that a
  * configurable "critical SoC" will be reached. To find a charger, the
  * ChargingProvider logic is used.
- * 
+ *
  * The critical SoC for an agent must be defined as an agent attribute.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class CriticalAlternativeProvider implements ChargingAlternativeProvider {
@@ -61,7 +61,7 @@ public class CriticalAlternativeProvider implements ChargingAlternativeProvider 
         this.travelTime = travelTime;
         this.chargerProvider = chargerProvider;
         this.infrastructure = infrastructure;
-        this.minimumDuration = config.minimumEnrouteChargingDuration;
+        this.minimumDuration = config.getMinimumEnrouteChargingDuration();
     }
 
     @Override

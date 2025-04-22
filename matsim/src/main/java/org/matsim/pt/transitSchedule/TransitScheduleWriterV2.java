@@ -35,6 +35,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.pt.transitSchedule.api.ChainedDeparture;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -42,7 +43,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
@@ -124,11 +124,11 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 				attributes.add(createTuple(Constants.STOP_AREA_ID, stop.getStopAreaId().toString()));
 			}
 			attributes.add(createTuple("isBlocking", stop.getIsBlockingLane()));
-			if (AttributesUtils.isEmpty(stop.getAttributes())) {
+			if (stop.getAttributes().isEmpty()) {
 				this.writeStartTag(Constants.STOP_FACILITY, attributes, true);
 			} else {
 				this.writeStartTag(Constants.STOP_FACILITY, attributes, false);
-				if (!AttributesUtils.isEmpty(stop.getAttributes())) {
+				if (!stop.getAttributes().isEmpty()) {
 					this.writer.write(NL);
 					this.attributesWriter.writeAttributes("\t\t\t", this.writer, stop.getAttributes());
 				}
@@ -164,24 +164,24 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			attributes.add(createTuple(Constants.NAME, line.getName()));
 		}
 		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
-		if (!AttributesUtils.isEmpty(line.getAttributes())) {
+		if (!line.getAttributes().isEmpty()) {
 			this.writer.write(NL);
 			this.attributesWriter.writeAttributes("\t\t", this.writer, line.getAttributes());
 		}
 
 		for (TransitRoute route : line.getRoutes().values()) {
-			writeTransitRoute(route);
+			writeTransitRoute(line.getId(), route);
 		}
 
 		this.writeEndTag(Constants.TRANSIT_LINE);
 	}
 
-	private void writeTransitRoute(final TransitRoute route) throws IOException, UncheckedIOException {
+	private void writeTransitRoute(Id<TransitLine> lineId, final TransitRoute route) throws IOException, UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<>(1);
 		attributes.add(createTuple(Constants.ID, route.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
 
-		if (!AttributesUtils.isEmpty(route.getAttributes())) {
+		if (!route.getAttributes().isEmpty()) {
 			this.writer.write(NL);
 			this.attributesWriter.writeAttributes("\t\t\t", this.writer, route.getAttributes());
 		}
@@ -198,7 +198,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 
 		this.writeRouteProfile(route.getStops());
 		this.writeRoute(route.getRoute());
-		this.writeDepartures(route.getDepartures());
+		this.writeDepartures(lineId, route.getId(), route.getDepartures());
 
 		this.writeEndTag(Constants.TRANSIT_ROUTE);
 	}
@@ -252,7 +252,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		}
 	}
 
-	private void writeDepartures(final Map<Id<Departure>, Departure> departures) throws IOException, UncheckedIOException {
+	private void writeDepartures(Id<TransitLine> lineId, Id<TransitRoute> routeId, final Map<Id<Departure>, Departure> departures) throws IOException, UncheckedIOException {
 		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures
@@ -265,15 +265,39 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 			if (dep.getVehicleId() != null) {
 				attributes.add(createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
 			}
-			if (AttributesUtils.isEmpty(dep.getAttributes())) {
+
+			boolean hasChainedDepartures = !dep.getChainedDepartures().isEmpty();
+
+			if (dep.getAttributes().isEmpty() && !hasChainedDepartures) {
 				this.writeStartTag(Constants.DEPARTURE, attributes, true);
 			} else {
 				this.writeStartTag(Constants.DEPARTURE, attributes, false);
-				this.writer.write(NL);
-				this.attributesWriter.writeAttributes("\t\t\t\t\t", this.writer, dep.getAttributes());
+
+				if (!dep.getAttributes().isEmpty()) {
+					this.writer.write(NL);
+					this.attributesWriter.writeAttributes("\t\t\t\t\t", this.writer, dep.getAttributes());
+				}
+
+				// Write chained departures
+				if (hasChainedDepartures) {
+					for (ChainedDeparture chainedDep : dep.getChainedDepartures()) {
+						List<Tuple<String, String>> chainedAttributes = new ArrayList<>(3);
+						chainedAttributes.add(createTuple(Constants.TO_DEPARTURE, chainedDep.getChainedDepartureId().toString()));
+
+						if (chainedDep.getChainedTransitLineId() != lineId) {
+							chainedAttributes.add(createTuple(Constants.TO_TRANSIT_LINE, chainedDep.getChainedTransitLineId().toString()));
+						}
+
+						if (chainedDep.getChainedRouteId() != routeId) {
+							chainedAttributes.add(createTuple(Constants.TO_TRANSIT_ROUTE, chainedDep.getChainedRouteId().toString()));
+						}
+
+						this.writeStartTag(Constants.CHAINED_DEPARTURE, chainedAttributes, true);
+					}
+				}
+
 				this.writeEndTag(Constants.DEPARTURE);
 			}
-
 		}
 
 		this.writeEndTag(Constants.DEPARTURES);

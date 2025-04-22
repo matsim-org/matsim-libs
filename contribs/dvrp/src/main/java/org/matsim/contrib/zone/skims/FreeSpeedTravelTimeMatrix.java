@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
@@ -66,8 +67,8 @@ public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
-		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.maxNeighborDistance,
-			params.maxNeighborTravelTime, 0).orElse(null);
+		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.getMaxNeighborDistance(),
+				params.getMaxNeighborTravelTime(), 0).orElse(null);
 	}
 
 	@Override
