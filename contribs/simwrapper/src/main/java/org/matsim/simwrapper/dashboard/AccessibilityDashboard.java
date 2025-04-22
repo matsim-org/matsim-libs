@@ -41,15 +41,20 @@ public class AccessibilityDashboard implements Dashboard {
 		header.title = "Accessibility";
 		header.description = "Shows accessibility for different modes. Note: 10 utils are added to all values, since negative values can't get be rendered in GridMap";
 
+		double pixelHeight = 12.0;
+		double pixelOpacity = 0.1;
+		int pixelRadius = 300;
+
+
 		for (String poi : pois) {
 			layout.row("row1-" + poi)
 				.el(GridMap.class, (viz, data) -> {
 					viz.title = "Freespeed Accessibility to " + poi;
 					viz.unit = "Utils";
 					viz.description = "at 10:00:00";
-					viz.height = 12.0;
-					viz.cellSize = 90;
-					viz.opacity = 0.1;
+					viz.height = pixelHeight;
+					viz.cellSize = pixelRadius;
+					viz.opacity = pixelOpacity;
 					viz.maxHeight = 1;
 					viz.projection = this.coordinateSystem;
 					viz.center = data.context().getCenter();
@@ -62,9 +67,9 @@ public class AccessibilityDashboard implements Dashboard {
 					viz.title = "Car Accessibility to " + poi;
 					viz.unit = "Utils";
 					viz.description = "at 10:00:00";
-					viz.height = 12.0;
-					viz.cellSize = 90;
-					viz.opacity = 0.1;
+					viz.height = pixelHeight;
+					viz.cellSize = pixelRadius;
+					viz.opacity = pixelOpacity;
 					viz.maxHeight = 1;
 					viz.projection = this.coordinateSystem;
 					viz.center = data.context().getCenter();
@@ -79,9 +84,9 @@ public class AccessibilityDashboard implements Dashboard {
 					viz.title = "PT Accessibility  to " + poi;
 					viz.unit = "Utils";
 					viz.description = "at 10:00:00";
-					viz.height = 12.0;
-					viz.cellSize = 90;
-					viz.opacity = 0.1;
+					viz.height = pixelHeight;
+					viz.cellSize = pixelRadius;
+					viz.opacity = pixelOpacity;
 					viz.maxHeight = 1;
 					viz.projection = this.coordinateSystem;
 					viz.center = data.context().getCenter();
@@ -94,9 +99,9 @@ public class AccessibilityDashboard implements Dashboard {
 					viz.title = "DRT Accessibility to " + poi;
 					viz.unit = "Utils";
 					viz.description = "at 10:00:00";
-					viz.height = 12.0;
-					viz.cellSize = 90;
-					viz.opacity = 0.1;
+					viz.height = pixelHeight;
+					viz.cellSize = pixelRadius;
+					viz.opacity = pixelOpacity;
 					viz.maxHeight = 1;
 					viz.projection = this.coordinateSystem;
 					viz.center = data.context().getCenter();
