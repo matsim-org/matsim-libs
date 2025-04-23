@@ -39,7 +39,7 @@ public class ProfilingIT {
 		File recording = new File(config.controller().getOutputDirectory(), "profile-1-2.jfr");
 		assertThat(recording).exists();
 		assertThat(recording).isNotEmpty();
-		// read the profile.jfr and expect the events defined by the module and via AOP to be there
+		// read the profile.jfr and expect the events defined by the module and via AOP to be there (but none from TestTraceProfilingAspect)
 
 	}
 
@@ -72,4 +72,21 @@ public class ProfilingIT {
 		assertThat(file4).isNotEmpty();
 	}
 
+	@Test
+	public void whenTraceEnabled_expectResultFileToContainTraceEvents() {
+		// use simple scenario configuration for testing
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		config.controller().setLastIteration(2);
+		Controller controller = new Controler(config);
+		// configure events and instrument modules
+		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 2, "trace-profile", true));
+		// run scenario
+		controller.run();
+		// check for profile.jfr to exist
+		File recording = new File(config.controller().getOutputDirectory(), "trace-profile.jfr");
+		assertThat(recording).exists();
+		assertThat(recording).isNotEmpty();
+		// read the profile.jfr and expect the trace events defined via TestTraceProfilingAspect to be there (and none from the module)
+
+	}
 }

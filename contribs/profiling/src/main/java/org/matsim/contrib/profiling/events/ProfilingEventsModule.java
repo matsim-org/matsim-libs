@@ -30,6 +30,12 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * Hook into MATSim Listeners to create JFR profiling events at different phases within MATSim.
+ * <p>Events to be recorded:
+ * <ul>
+ *     <li>{@link JFRIterationEvent}</li>
+ *     <li>{@link JFRMobsimEvent}</li>
+ *     <li>{@link JFRMatsimEvent} on startup, replanning, scoring, and shutdown</li>
+ * </ul>
  */
 public class ProfilingEventsModule extends AbstractModule {
 

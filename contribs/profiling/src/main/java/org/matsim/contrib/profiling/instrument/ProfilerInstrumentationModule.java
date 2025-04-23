@@ -56,7 +56,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param startIteration iteration to create a profiler recording for
 	 */
 	public ProfilerInstrumentationModule(int startIteration) {
-		this(startIteration, startIteration, "profile-"+startIteration);
+		this(startIteration, startIteration, "profile-"+startIteration, false);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param endIteration iteration after which to end the profiler recording
 	 */
 	public ProfilerInstrumentationModule(int startIteration, int endIteration) {
-		this(startIteration, endIteration, "profile-"+startIteration+"-"+endIteration);
+		this(startIteration, endIteration, "profile-"+startIteration+"-"+endIteration, false);
 	}
 
 	/**
@@ -75,7 +75,17 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
 	 */
 	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename) {
-		this.profilingControlRegistry = new ProfilingControlRegistry(startIteration, endIteration, outputFilename);
+		this(startIteration, endIteration, outputFilename, false);
+	}
+
+	/**
+	 * @param startIteration iteration before which to start the profiler recording
+	 * @param endIteration iteration after which to end the profiler recording
+	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
+	 * @param trace Whether to set {@link Trace} for the duration of the recording
+	 */
+	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename, boolean trace) {
+		this.profilingControlRegistry = new ProfilingControlRegistry(startIteration, endIteration, outputFilename, trace);
 	}
 
 	@Override
@@ -90,9 +100,10 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 		private final int startIteration;
 		private final int endIteration;
 		private final String outputFilename;
+		private final boolean trace;
 		private Recording recording;
 
-		public ProfilingControlRegistry(int startIteration, int endIteration, String outputFilename) {
+		public ProfilingControlRegistry(int startIteration, int endIteration, String outputFilename, boolean trace) {
 			if (startIteration < 0 || endIteration < 0 || startIteration > endIteration) {
 				throw new IllegalArgumentException("startIteration must be positive and less than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
 			}
@@ -100,6 +111,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 			this.startIteration = startIteration;
 			this.endIteration = endIteration;
 			this.outputFilename = Objects.requireNonNull(outputFilename);
+			this.trace = trace;
 		}
 
 		/**
@@ -147,6 +159,9 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 			if (iterationStartsEvent.getIteration() == settings.startIteration) {
 				// start recording
 				log.info("[PROFILING] Starting Recording at iteration {}", iterationStartsEvent.getIteration());
+				if (settings.trace) {
+					Trace.enable();
+				}
 				settings.recording.start();
 			}
 		}
@@ -165,6 +180,9 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 			if (iterationEndsEvent.getIteration() == settings.endIteration) {
 				// stop recording - automatically dumped since output path is set and then closed as well
 				settings.recording.stop();
+				if (settings.trace) {
+					Trace.disable();
+				}
 			}
 			log.info("[PROFILING] {} Current iteration: {}", settings.recording.getState(), iterationEndsEvent.getIteration());
 		}
