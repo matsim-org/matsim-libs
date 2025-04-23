@@ -106,9 +106,9 @@ public final class AccessibilityFromEvents{
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 
 				DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
-					.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+					.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(421.87))
 					.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
-					.setRideDurationEstimator(new ConstantRideDurationEstimator(1.25, 300))
+					.setRideDurationEstimator(new ConstantRideDurationEstimator(0.11873288637584138, 71.82))
 					.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
 					.build();
 

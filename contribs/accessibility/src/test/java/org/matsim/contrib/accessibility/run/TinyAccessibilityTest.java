@@ -19,7 +19,13 @@
 
 package org.matsim.contrib.accessibility.run;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -27,6 +33,10 @@ import java.util.*;
 
 import com.google.inject.multibindings.MapBinder;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.math3.stat.inference.TestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -290,6 +300,115 @@ public class TinyAccessibilityTest {
 //		builder.addDataListener( new ResultsComparator() );
 		builder.build().run() ;
 
+	}
+
+
+	@Test
+	public void runFromEventsDrtCongestedKelheim() throws IOException {
+		String stopsInputFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/kelheim/kelheim-drt-accessibility-JB-master/input/drt-stops-land.xml";
+
+		String eventsFile = "/Users/jakob/git/matsim-kelheim/output/output-kelheim-v3.1-1pct/kelheim-v3.1-1pct.output_events.xml.gz";
+
+		double accMeasTime = 12 * 60 * 60.;
+
+		final Config config = createTestConfig();
+
+		config.global().setCoordinateSystem("EPSG:25832");
+
+		config.network().setInputFile("/Users/jakob/git/matsim-kelheim/output/output-kelheim-v3.1-1pct/kelheim-v3.1-1pct.output_network.xml.gz");
+
+		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+		drtParams.setMarginalUtilityOfDistance(-2.5E-4);
+		drtParams.setMarginalUtilityOfTraveling(0.0);
+
+		config.scoring().addModeParams(drtParams);
+
+		ScoringConfigGroup.ModeParams walkParams = config.scoring().getModes().get(TransportMode.walk);
+		walkParams.setMarginalUtilityOfTraveling(0.0);
+		config.scoring().addModeParams(walkParams);
+
+		double mapCenterX = 721455;
+		double mapCenterY = 5410601;
+
+		double tileSize = 200;
+		double num_rows = 0.25;//50;
+
+		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox);
+		accConfig.setBoundingBoxLeft(mapCenterX - num_rows*tileSize - tileSize/2);
+		accConfig.setBoundingBoxRight(mapCenterX + num_rows*tileSize + tileSize/2);
+		accConfig.setBoundingBoxBottom(mapCenterY - num_rows*tileSize - tileSize/2);
+		accConfig.setBoundingBoxTop(mapCenterY + num_rows*tileSize + tileSize/2);
+		accConfig.setTileSize_m((int) tileSize);
+
+		accConfig.setTimeOfDay(accMeasTime);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+
+
+		ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
+		drtConfigGroup.transitStopFile = stopsInputFile;
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
+
+		// ---
+
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+
+		String filePath = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/kelheim/kelheim-drt-accessibility-JB-master/input/pois_complete.csv";
+		readPoiCsv(scenario.getActivityFacilities(), filePath);
+
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, eventsFile, List.of("train_station"));
+
+		ConfigUtils.writeConfig(config, utils.getOutputDirectory() + "config.xml");
+
+		builder.build().run();
+
+	}
+
+	private static void readPoiCsv(ActivityFacilities activityFacilities, String filePath) {
+
+		ActivityFacilitiesFactory af = activityFacilities.getFactory();
+		HttpURLConnection connection;
+		try {
+			connection = (HttpURLConnection) new URL(filePath).openConnection();
+			connection.setRequestMethod("GET");
+		} catch (ProtocolException | MalformedURLException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		try (CSVParser parser = new CSVParser(new BufferedReader(new InputStreamReader(connection.getInputStream())),
+
+			CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
+
+			for (CSVRecord record : parser) {
+
+				String id = record.get("id");
+				double x = Double.parseDouble(record.get("x"));
+				double y = Double.parseDouble(record.get("y"));
+				String type = record.get("type");
+				ActivityFacility fac = af.createActivityFacility(Id.create(id, ActivityFacility.class), new Coord(x, y));
+				ActivityOption ao = af.createActivityOption(type);
+				fac.addActivityOption(ao);
+				activityFacilities.addActivityFacility(fac);
+
+
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void createDrtStopsFile(String stopsInputFileName) throws IOException {
