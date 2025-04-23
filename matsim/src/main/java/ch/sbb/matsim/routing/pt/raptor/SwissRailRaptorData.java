@@ -208,7 +208,7 @@ public class SwissRailRaptorData {
 						Departure c = schedule.getTransitLines().get(chained.getChainedTransitLineId()).getRoutes().get(chained.getChainedRouteId())
 							.getDepartures().get(chained.getChainedDepartureId());
 
-						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(route, dep));
+						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(route, c));
 					}
 
                 }
@@ -222,9 +222,7 @@ public class SwissRailRaptorData {
 		for (Map.Entry<Departure, List<Pair<TransitRoute, Departure>>> e : chainedDeparturesRef.entrySet()) {
 			chainedDepartures.put((int) departureIdRef.get(e.getKey()),
 				e.getValue().stream()
-					.map(d -> {
-						return new RChained(routeIdRef.get(d.key()), departureIdRef.get(d.value()));
-					})
+					.map(d -> new RChained(routeIdRef.get(d.key()), departureIdRef.get(d.value())))
 					.toArray(RChained[]::new));
 		}
 
@@ -284,12 +282,13 @@ public class SwissRailRaptorData {
 			routeStops, transfers, chainedDepartures, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, occupancyData, staticTransferTimes);
 
         long endMillis = System.currentTimeMillis();
-        log.info("SwissRailRaptor data preparation done. Took " + (endMillis - startMillis) / 1000 + " seconds.");
-        log.info("SwissRailRaptor statistics:  #routes = " + routes.length);
-        log.info("SwissRailRaptor statistics:  #departures = " + departures.length);
-        log.info("SwissRailRaptor statistics:  #routeStops = " + routeStops.length);
-        log.info("SwissRailRaptor statistics:  #stopFacilities = " + countStopFacilities);
-        log.info("SwissRailRaptor statistics:  #transfers (between routeStops) = " + transfers.length);
+		log.info("SwissRailRaptor data preparation done. Took {} seconds.", (endMillis - startMillis) / 1000);
+		log.info("SwissRailRaptor statistics:  #routes = {}", routes.length);
+		log.info("SwissRailRaptor statistics:  #departures = {}", departures.length);
+		log.info("SwissRailRaptor statistics:  #routeStops = {}", routeStops.length);
+		log.info("SwissRailRaptor statistics:  #stopFacilities = {}", countStopFacilities);
+		log.info("SwissRailRaptor statistics:  #transfers (between routeStops) = {}", transfers.length);
+		log.info("SwissRailRaptor statistics:  #chainedDepartures = {}", chainedDepartures.size());
         return data;
     }
 
