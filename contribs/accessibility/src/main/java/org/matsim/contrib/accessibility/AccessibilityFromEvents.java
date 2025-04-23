@@ -4,6 +4,8 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -40,9 +42,11 @@ import java.util.*;
  */
 public final class AccessibilityFromEvents{
 	private final List<String> actTypes;
+	private final DrtEstimator drtEstimator;
 
 	public static final class Builder {
 		private final List<String> actTypes;
+		private DrtEstimator drtEstimator;
 		private Scenario scenario;
 		private String eventsFile;
 		private final List<FacilityDataExchangeInterface> dataListeners = new ArrayList<>() ;
@@ -54,14 +58,20 @@ public final class AccessibilityFromEvents{
 			this.scenario = scenario;
 			this.eventsFile = eventsFile;
 			this.actTypes = actTypes;
+			this.drtEstimator = null;
 		}
+
+		public void addDrtEstimator(DrtEstimator drtEstimator) {
+			this.drtEstimator = drtEstimator;
+		}
+
 
 
 		public void addDataListener( FacilityDataExchangeInterface dataListener ) {
 			dataListeners.add( dataListener ) ;
 		}
 		public AccessibilityFromEvents build() {
-			return new AccessibilityFromEvents(scenario, eventsFile, dataListeners, actTypes);
+			return new AccessibilityFromEvents(scenario, eventsFile, dataListeners, actTypes, drtEstimator);
 		}
 	}
 
@@ -69,11 +79,12 @@ public final class AccessibilityFromEvents{
 	private final String eventsFile;
 	private final List<FacilityDataExchangeInterface> dataListeners ;
 
-	private AccessibilityFromEvents(Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, List<String> actType) {
+	private AccessibilityFromEvents(Scenario scenario, String eventsFile, List<FacilityDataExchangeInterface> dataListeners, List<String> actType, DrtEstimator drtEstimator) {
 		this.scenario = scenario;
 		this.eventsFile = eventsFile;
 		this.dataListeners = dataListeners;
 		this.actTypes = actType;
+		this.drtEstimator = drtEstimator;
 	}
 
 	public void run() {
@@ -105,14 +116,10 @@ public final class AccessibilityFromEvents{
 
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 
-				DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
-					.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(421.87))
-					.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))
-					.setRideDurationEstimator(new ConstantRideDurationEstimator(0.11873288637584138, 71.82))
-					.setRideDurationDistributionGenerator(new NormalDistributionGenerator(2, 0.3))
-					.build();
 
-				bind(DrtEstimator.class).toInstance(drtEstimator);
+				if(drtEstimator!=null){
+					bind(DrtEstimator.class).toInstance(drtEstimator);
+				}
 
 				install( new TripRouterModule() ) ;
 				// (= installs the trip router.  This includes (based on the config settings) installing everything that is needed

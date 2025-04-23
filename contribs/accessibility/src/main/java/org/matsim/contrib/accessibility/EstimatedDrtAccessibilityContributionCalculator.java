@@ -213,25 +213,6 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 				travelUtility = drtUtility;
 			}
 
-//			System.out.println("-----------------");
-//			System.out.println("-----------------");
-//			System.out.println("origin: " + origin.getId());
-//			System.out.println("utilityAccess: " + utilityAccess);
-//			System.out.println("utilityDrtTime: " + utilityDrtTime);
-//			System.out.println("utilityDrtDistance: " + utilityDrtDistance);
-//			System.out.println("utilityEgress: " + utilityEgress);
-//			System.out.println("utilityDrtConstant: " + utilityDrtConstant);
-//			System.out.println("drtUtility: " + drtUtility);
-//			System.out.println("directWalkUtility: " + directWalkUtility);
-//			System.out.println("travelUtility: " + travelUtility);
-//			System.out.println("-----------------");
-//			System.out.println("-----------------");
-
-			// this is added to the sum of utilities from the measuring point
-
-			if(origin.getCoord().toString().equals("[x=721405.0 | y=5410751.0]")){
-				System.out.println();
-			}
 
 			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * travelUtility);
 
