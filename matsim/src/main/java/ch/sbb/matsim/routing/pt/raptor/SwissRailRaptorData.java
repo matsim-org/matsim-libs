@@ -205,10 +205,10 @@ public class SwissRailRaptorData {
                     indexDeparture++;
 
 					for (ChainedDeparture chained : dep.getChainedDepartures()) {
-						Departure c = schedule.getTransitLines().get(chained.getChainedTransitLineId()).getRoutes().get(chained.getChainedRouteId())
-							.getDepartures().get(chained.getChainedDepartureId());
+						TransitRoute otherRoute = schedule.getTransitLines().get(chained.getChainedTransitLineId()).getRoutes().get(chained.getChainedRouteId());
+						Departure c = otherRoute.getDepartures().get(chained.getChainedDepartureId());
 
-						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(route, c));
+						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(otherRoute, c));
 					}
 
                 }
