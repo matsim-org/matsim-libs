@@ -396,7 +396,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			}
 
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId); // TODO This line creates a lot of problems in the tests: The old router did not need any vehicles, but this one does #aleks
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) {
 				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " for mode " + mode + ".");
