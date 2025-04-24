@@ -45,6 +45,15 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			line != null ? line.getId() : null, route != null ? route.getId() : null);
 	}
 
+	public DefaultTransitPassengerRoute(TransitStopFacility accessFacility, TransitLine line, TransitRoute route,
+										TransitStopFacility egressFacility, DefaultTransitPassengerRoute chainedRoute) {
+		this( //
+			accessFacility.getLinkId(), egressFacility.getLinkId(), //
+			accessFacility.getId(), egressFacility.getId(), //
+			line != null ? line.getId() : null, route != null ? route.getId() : null);
+		this.chainedRoute = chainedRoute;
+	}
+
 	public DefaultTransitPassengerRoute( //
 										 final Id<Link> accessLinkId, final Id<Link> egressLinkId, //
 										 Id<TransitStopFacility> accessFacilityId, Id<TransitStopFacility> egressFacilityId, //

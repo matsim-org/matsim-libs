@@ -14,6 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -166,6 +167,12 @@ public class SwissRailRaptorChainedDepartureTest {
 
 		assertThat(leg.getDepartureTime())
 			.isEqualTo(OptionalTime.defined(20520.0));
+
+		DefaultTransitPassengerRoute r = (DefaultTransitPassengerRoute) leg.getRoute();
+
+		assertThat(r.getChainedRoute())
+			.isNotNull();
+
 
 	}
 
