@@ -714,6 +714,10 @@ public class SwissRailRaptorCore {
 		double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(
 			!useTransportModeUtilities ? boardingPE.toRouteStop.mode : boardingPE.toRouteStop.route.getTransportMode());
 
+		SwissRailRaptorData.RChained[] chains = this.data.chainedDepartures.get(currentDepartureIndex);
+		PathElement lastPE = null;
+		boolean hasChains = chains != null;
+
 		for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
 			RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
 			if (!toRouteStop.routeStop.isAllowAlighting()) {
@@ -727,14 +731,20 @@ public class SwissRailRaptorCore {
 			double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(boardingPE, transferProvider, data.config, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
 			double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
 			double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
+
+			double distance = toRouteStop.distanceAlongRoute - boardingPE.toRouteStop.distanceAlongRoute;
+
+			// Create last path element if necessary
+			lastPE = totalArrivalCost <= previousArrivalCost || hasChains ?
+				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
+				null;
+
 			if (totalArrivalCost <= previousArrivalCost) {
-				double distance = toRouteStop.distanceAlongRoute - boardingPE.toRouteStop.distanceAlongRoute;
-				PathElement pe = new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null);
-				this.arrivalPathPerRouteStop[toRouteStopIndex] = pe;
+				this.arrivalPathPerRouteStop[toRouteStopIndex] = lastPE;
 				this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
 				if (totalArrivalCost <= this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex]) {
 					this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex] = totalArrivalCost;
-					this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
+					this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = lastPE;
 					this.improvedStops.set(toRouteStop.stopFacilityIndex);
 					checkForBestArrival(toRouteStopIndex, totalArrivalCost);
 				}
@@ -756,6 +766,13 @@ public class SwissRailRaptorCore {
 						currentDepartureIndex = alternativeDepartureIndex;
 						currentVehicle = this.data.departureVehicles[currentDepartureIndex];
 						currentDepartureTime = alternativeDepartureTime;
+
+						// Reset chain information when switching connection
+						// TODO: with chains an infinite loop can occur here
+						chains = null;
+						lastPE = null;
+						hasChains = false;
+
 						if (alternativeBoardingPE.isTransfer) {
 							firstRouteStop = this.data.routeStops[toRouteStopIndex];
 						} else {
@@ -785,10 +802,32 @@ public class SwissRailRaptorCore {
 			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
 		}
 
-		SwissRailRaptorData.RChained[] chains = this.data.chainedDepartures.get(currentDepartureIndex);
-		if (chains != null) {
+		if (hasChains) {
+
+			MutableInt tmp = new MutableInt(-1);
+
+			assert lastPE != null : "Path element should not be null if we have chains";
+
 			for (SwissRailRaptorData.RChained chain : chains) {
-				System.out.println("TODO");
+
+				RRoute chainedRoute = this.data.routes[chain.toRoute];
+				int chainedDepartureIndex = chain.toDeparture;
+
+				int chainedDepartureTime = this.data.departures[chainedDepartureIndex];
+
+				assert chainedDepartureTime >= lastPE.arrivalTime:
+					String.format("Chained departure (%s -> %s) arrival time should be before departure time",
+						this.data.departureIds[currentDepartureIndex], this.data.departureIds[chainedDepartureIndex]);
+
+				RRouteStop firstStop = this.data.routeStops[chainedRoute.indexFirstRouteStop];
+
+				PathElement chainPe = new PathElement(lastPE, firstStop, lastPE.firstDepartureTime, lastPE.arrivalTime, chainedDepartureTime,
+					lastPE.arrivalTime, lastPE.arrivalTravelCost, lastPE.arrivalTransferCost, 0, lastPE.transferCount, false, true, null, null);
+
+				// For arrival time the departure time of the first stop is used, so that no wait time is incurred
+				exploreRoute(parameters, person, transferProvider,
+					chainedDepartureIndex, firstStop, chainedDepartureTime, chainPe, chainedRoute, chain.toRoute,
+					chainedRoute.indexFirstRouteStop, chainedRoute.indexFirstRouteStop, tmp);
 			}
 		}
 
@@ -961,13 +1000,18 @@ public class SwissRailRaptorCore {
         double time = departureTime;
         TransitStopFacility fromStop = null;
         int peCount = pes.size();
+		boolean chainNext = false;
         int i = -1;
         for (PathElement pe : pes) {
             i++;
             TransitStopFacility toStop = pe.toRouteStop == null ? null : pe.toRouteStop.routeStop.getStopFacility();
             double travelTime = pe.arrivalTime - time;
             if (pe.initialStop != null && pe.initialStop.planElements != null) {
-                raptorRoute.addPlanElements(time, travelTime, pe.initialStop.planElements);
+				raptorRoute.addPlanElements(time, travelTime, pe.initialStop.planElements);
+			}
+			else if (pe.isChained) {
+				// The next leg is chained to the previous one
+				chainNext = true;
             } else if (pe.isTransfer) {
                 // add (peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && to catch case of only access and egress
                 // legs without a real leg in between which was previously caught above by
@@ -983,9 +1027,17 @@ public class SwissRailRaptorCore {
                 String mode = TransportMode.walk;
                 raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);
             } else {
+
                 TransitLine line = pe.toRouteStop.line;
                 TransitRoute route = pe.toRouteStop.route;
-                raptorRoute.addPt(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+
+				if (chainNext) {
+					// Chained part is appended to the last one
+					raptorRoute.addChainedPart(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+					chainNext = false;
+				} else
+					raptorRoute.addPt(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+
             }
             time = pe.arrivalTime;
             fromStop = toStop;

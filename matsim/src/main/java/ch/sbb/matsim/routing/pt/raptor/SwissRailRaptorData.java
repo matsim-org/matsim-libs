@@ -128,7 +128,7 @@ public class SwissRailRaptorData {
 
         int[] departures = new int[(int) countDepartures];
         Vehicle[] departureVehicles = new Vehicle[(int) countDepartures];
-        Id<Departure>[] departureIds = new Id[(int) countDepartures];
+        Departure[] departureObjs = new Departure[(int) countDepartures];
         RRoute[] routes = new RRoute[countRoutes];
         RRouteStop[] routeStops = new RRouteStop[(int) countRouteStops];
 
@@ -200,8 +200,7 @@ public class SwissRailRaptorData {
                 for (Departure dep : route.getDepartures().values()) {
                     departures[indexDeparture] = (int) dep.getDepartureTime();
                     departureVehicles[indexDeparture] = vehicles.get(dep.getVehicleId());
-                    departureIds[indexDeparture] = dep.getId();
-					departureIdRef.put(dep, indexDeparture);
+                    departureObjs[indexDeparture] = dep;
                     indexDeparture++;
 
 					for (ChainedDeparture chained : dep.getChainedDepartures()) {
@@ -210,20 +209,47 @@ public class SwissRailRaptorData {
 
 						chainedDeparturesRef.computeIfAbsent(dep, k -> new ArrayList<>()).add(Pair.of(otherRoute, c));
 					}
-
                 }
-                Arrays.sort(departures, indexFirstDeparture, indexDeparture);
-                indexRoutes++;
-            }
+
+				// The departures get re-ordered here, ensure thw new ids are consistent with the new order
+				it.unimi.dsi.fastutil.Arrays.quickSort(
+					indexFirstDeparture, indexDeparture,
+					(i, j) -> Integer.compare(departures[i], departures[j]),
+					(i, j) -> {
+						// Swap departures
+						int tmp = departures[i];
+						departures[i] = departures[j];
+						departures[j] = tmp;
+
+						// Swap vehicles
+						Vehicle tmpVehicle = departureVehicles[i];
+						departureVehicles[i] = departureVehicles[j];
+						departureVehicles[j] = tmpVehicle;
+
+						// Swap departure objects
+						Departure tmpId = departureObjs[i];
+						departureObjs[i] = departureObjs[j];
+						departureObjs[j] = tmpId;
+					}
+				);
+
+				// Create mapping of departure id refs
+				for (int i = indexFirstDeparture; i < indexDeparture; i++) {
+					departureIdRef.put(departureObjs[i], i);
+				}
+
+				indexRoutes++;
+			}
         }
 
 		// Build the map containing only indices
 		Int2ObjectMap<RChained[]> chainedDepartures = new Int2ObjectOpenHashMap<>();
 		for (Map.Entry<Departure, List<Pair<TransitRoute, Departure>>> e : chainedDeparturesRef.entrySet()) {
-			chainedDepartures.put((int) departureIdRef.get(e.getKey()),
-				e.getValue().stream()
-					.map(d -> new RChained(routeIdRef.get(d.key()), departureIdRef.get(d.value())))
-					.toArray(RChained[]::new));
+			RChained[] chains = e.getValue().stream()
+				.map(d -> new RChained(routeIdRef.get(d.key()), departureIdRef.get(d.value())))
+				.toArray(RChained[]::new);
+
+			chainedDepartures.put((int) departureIdRef.get(e.getKey()), chains);
 		}
 
         // only put used transit stops into the quad tree
@@ -278,7 +304,9 @@ public class SwissRailRaptorData {
 			}
 		}
 
-        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds,
+		Id<Departure>[] departureIds = Arrays.stream(departureObjs).map(Departure::getId).toArray(Id[]::new);
+
+		SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds,
 			routeStops, transfers, chainedDepartures, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, occupancyData, staticTransferTimes);
 
         long endMillis = System.currentTimeMillis();

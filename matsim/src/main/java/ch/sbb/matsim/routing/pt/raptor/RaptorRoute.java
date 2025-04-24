@@ -75,6 +75,12 @@ public class RaptorRoute {
         this.ptLegCount++;
     }
 
+	void addChainedPart(TransitStopFacility fromStop, TransitStopFacility toStop, TransitLine line, TransitRoute route, String mode, double depTime, double boardingTime, double vehDepTime, double arrivalTime, double distance) {
+		RoutePart part = new RoutePart(fromStop, toStop, mode, depTime, boardingTime, vehDepTime, arrivalTime, distance, line, route, null);
+		this.travelTime += (arrivalTime - depTime);
+		editableParts.getLast().chainedPart = part;
+	}
+
     public double getTotalCosts() {
         return this.totalCosts;
     }
@@ -112,7 +118,7 @@ public class RaptorRoute {
         public final TransitRoute route;
 
 		/**
-		 * Optional chained route part. TODO: not yet used
+		 * Optional chained route part.
 		 */
 		public RoutePart chainedPart;
 
