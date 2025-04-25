@@ -4,21 +4,14 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.matsim.contrib.profiling.instrument.Trace;
 
 @Aspect
 public abstract class TraceProfilingAspect {
 
-
 	@Pointcut
-	public abstract void traceTarget(ProceedingJoinPoint thisJoinPoint);
+	public abstract void traceTarget();
 
-	@Pointcut("if()")
-	public static boolean traceEnabled() {
-		return Trace.isEnabled();
-	}
-
-	@Around("traceTarget(joinPoint) && traceEnabled() && !within(org.matsim.contrib.profiling.*)")
+	@Around("traceTarget() && org.matsim.contrib.profiling.instrument.Trace.isEnabled() && !within(org.matsim.contrib.profiling..*)")
 	public Object trace(ProceedingJoinPoint joinPoint) throws Throwable {
 		var event = new TraceProfilingEvent();
 		event.begin();
