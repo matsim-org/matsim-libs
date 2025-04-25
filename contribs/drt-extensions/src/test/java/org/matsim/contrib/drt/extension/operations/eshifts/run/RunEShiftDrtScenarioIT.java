@@ -64,16 +64,16 @@ public class RunEShiftDrtScenarioIT {
 		DrtOptimizationConstraintsSetImpl constraintsSet =
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-		constraintsSet.maxTravelTimeAlpha = 1.5;
-        constraintsSet.maxTravelTimeBeta = 10. * 60.;
+		constraintsSet.setMaxTravelTimeAlpha(1.5);
+        constraintsSet.setMaxTravelTimeBeta(10. * 60.);
 		drtConfigGroup.setStopDuration(30.);
-        constraintsSet.maxWaitTime = 600.;
-        constraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
+        constraintsSet.setMaxWaitTime(600.);
+        constraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
 		drtConfigGroup.setPlotDetailedCustomerStats(true);
-        constraintsSet.maxWalkDistance = 1000.;
+        constraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
