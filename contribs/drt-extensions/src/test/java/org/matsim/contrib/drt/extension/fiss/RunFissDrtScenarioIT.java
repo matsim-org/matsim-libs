@@ -158,13 +158,13 @@ public class RunFissDrtScenarioIT {
 		{
 			// FISS config:
 			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-			fissConfigGroup.sampleFactor = 0.1;
-			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
-			fissConfigGroup.switchOffFISSLastIteration = true;
+			fissConfigGroup.setSampleFactor(0.1);
+			fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+			fissConfigGroup.setSwitchOffFISSLastIteration(true);
 
 			// provide mode vehicle types (in production code, one should set them more diligently):
 			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
-			for( String sampledMode : fissConfigGroup.sampledModes ){
+			for( String sampledMode : fissConfigGroup.getSampledModes()){
 				vehiclesContainer.addVehicleType( VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) ) );
 			}
 
