@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * ProfilerInstrumentationModule.java
+ * EnableProfilingModule.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -43,9 +43,9 @@ import java.util.Objects;
 /**
  * Create a JFR profiling recording for the duration of the configured MATSim iterations
  */
-public class ProfilerInstrumentationModule extends AbstractModule {
+public class EnableProfilingModule extends AbstractModule {
 
-	private static final Logger log = LogManager.getLogger(ProfilerInstrumentationModule.class);
+	private static final Logger log = LogManager.getLogger(EnableProfilingModule.class);
 
 	private final ProfilingControlRegistry profilingControlRegistry;
 
@@ -55,7 +55,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 *
 	 * @param startIteration iteration to create a profiler recording for
 	 */
-	public ProfilerInstrumentationModule(int startIteration) {
+	public EnableProfilingModule(int startIteration) {
 		this(startIteration, startIteration, "profile-"+startIteration, false);
 	}
 
@@ -65,7 +65,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param startIteration iteration before which to start the profiler recording
 	 * @param endIteration iteration after which to end the profiler recording
 	 */
-	public ProfilerInstrumentationModule(int startIteration, int endIteration) {
+	public EnableProfilingModule(int startIteration, int endIteration) {
 		this(startIteration, endIteration, "profile-"+startIteration+"-"+endIteration, false);
 	}
 
@@ -74,7 +74,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param endIteration iteration after which to end the profiler recording
 	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
 	 */
-	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename) {
+	public EnableProfilingModule(int startIteration, int endIteration, String outputFilename) {
 		this(startIteration, endIteration, outputFilename, false);
 	}
 
@@ -84,7 +84,7 @@ public class ProfilerInstrumentationModule extends AbstractModule {
 	 * @param outputFilename name of the .jfr recording file within the {@link ControllerConfigGroup#getOutputDirectory()}
 	 * @param trace Whether to set {@link Trace} for the duration of the recording
 	 */
-	public ProfilerInstrumentationModule(int startIteration, int endIteration, String outputFilename, boolean trace) {
+	public EnableProfilingModule(int startIteration, int endIteration, String outputFilename, boolean trace) {
 		this.profilingControlRegistry = new ProfilingControlRegistry(startIteration, endIteration, outputFilename, trace);
 	}
 

@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.profiling.events.ProfilingEventsModule;
-import org.matsim.contrib.profiling.instrument.ProfilerInstrumentationModule;
+import org.matsim.contrib.profiling.instrument.EnableProfilingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
@@ -31,7 +31,7 @@ public class ProfilingIT {
 		config.controller().setLastIteration(2);
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
-		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 2));
+		controller.addOverridingModule(new EnableProfilingModule(1, 2));
 		controller.addOverridingModule(new ProfilingEventsModule());
 		// run scenario
 		controller.run();
@@ -50,10 +50,10 @@ public class ProfilingIT {
 		config.controller().setLastIteration(3);
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
-		controller.addOverridingModule(new ProfilerInstrumentationModule(0));
-		controller.addOverridingModule(new ProfilerInstrumentationModule(1));
-		controller.addOverridingModule(new ProfilerInstrumentationModule(2));
-		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 3, "profile"));
+		controller.addOverridingModule(new EnableProfilingModule(0));
+		controller.addOverridingModule(new EnableProfilingModule(1));
+		controller.addOverridingModule(new EnableProfilingModule(2));
+		controller.addOverridingModule(new EnableProfilingModule(1, 3, "profile"));
 		controller.addOverridingModule(new ProfilingEventsModule());
 		// run scenario
 		controller.run();
@@ -79,7 +79,7 @@ public class ProfilingIT {
 		config.controller().setLastIteration(2);
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
-		controller.addOverridingModule(new ProfilerInstrumentationModule(1, 2, "trace-profile", true));
+		controller.addOverridingModule(new EnableProfilingModule(1, 2, "trace-profile", true));
 		// run scenario
 		controller.run();
 		// check for profile.jfr to exist
