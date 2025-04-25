@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * ProfilingEventsModule.java
+ * FireDefaultProfilingEventsModule.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
  *     <li>{@link JFRMatsimEvent} on startup, replanning, scoring, and shutdown</li>
  * </ul>
  */
-public class ProfilingEventsModule extends AbstractModule {
+public class FireDefaultProfilingEventsModule extends AbstractModule {
 
 	@Override
 	public void install() {

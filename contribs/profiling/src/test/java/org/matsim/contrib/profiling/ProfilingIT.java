@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.profiling.events.ProfilingEventsModule;
+import org.matsim.contrib.profiling.events.FireDefaultProfilingEventsModule;
 import org.matsim.contrib.profiling.instrument.EnableProfilingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -32,7 +32,7 @@ public class ProfilingIT {
 		Controller controller = new Controler(config);
 		// configure events and instrument modules
 		controller.addOverridingModule(new EnableProfilingModule(1, 2));
-		controller.addOverridingModule(new ProfilingEventsModule());
+		controller.addOverridingModule(new FireDefaultProfilingEventsModule());
 		// run scenario
 		controller.run();
 		// check for profile.jfr to exist
@@ -54,7 +54,7 @@ public class ProfilingIT {
 		controller.addOverridingModule(new EnableProfilingModule(1));
 		controller.addOverridingModule(new EnableProfilingModule(2));
 		controller.addOverridingModule(new EnableProfilingModule(1, 3, "profile"));
-		controller.addOverridingModule(new ProfilingEventsModule());
+		controller.addOverridingModule(new FireDefaultProfilingEventsModule());
 		// run scenario
 		controller.run();
 		// check for the recordings to exist
