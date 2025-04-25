@@ -1,5 +1,7 @@
 package org.matsim.contrib.profiling.instrument;
 
+import org.aspectj.lang.annotation.Pointcut;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -12,6 +14,7 @@ public final class Trace {
 	// todo potentially use volatile boolean instead, when limiting visibility of setters and only one-thread will update the value
 	private static final AtomicBoolean enabled = new AtomicBoolean(false);
 
+	@Pointcut("if()")
 	public static boolean isEnabled() {
 		return enabled.get();
 	}
