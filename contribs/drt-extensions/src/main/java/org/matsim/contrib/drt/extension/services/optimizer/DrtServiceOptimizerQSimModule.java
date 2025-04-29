@@ -40,6 +40,7 @@ import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -78,7 +79,7 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 			getter -> {
 				var delegate = new DefaultDrtOptimizer(drtConfigGroup, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 					getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-					getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdaterImpl.class),
+					getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 					getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 					getter.getModal(DrtRequestInsertionRetryQueue.class));
 				return new DrtServiceTaskOptimizer(getter.getModal(ServiceTaskDispatcher.class),

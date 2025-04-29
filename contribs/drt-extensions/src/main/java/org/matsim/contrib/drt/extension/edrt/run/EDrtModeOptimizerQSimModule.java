@@ -177,7 +177,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
-								getter.getModal(ScheduleTimingUpdaterImpl.class), getter.getModal(DrtTaskFactory.class),
+								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class),
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 

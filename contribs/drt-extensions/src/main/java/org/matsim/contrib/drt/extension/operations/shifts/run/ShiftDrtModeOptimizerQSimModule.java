@@ -83,12 +83,12 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					return new ShiftDrtOptimizer(
 							new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 									getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-									getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdaterImpl.class),
+									getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 									getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 									getter.getModal(DrtRequestInsertionRetryQueue.class)
 							),
 							getter.getModal(DrtShiftDispatcher.class),
-							getter.getModal(ScheduleTimingUpdaterImpl.class));
+							getter.getModal(ScheduleTimingUpdater.class));
 				}));
 
 		bindModal(AssignShiftToVehicleLogic.class).toProvider(modalProvider(getter ->
