@@ -13,22 +13,37 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunTestingScenario {
-	private static final String modeA = "modeA";
-	private static final String modeB = "modeB";
+	static final String modeA = "modeA";
+	static final String modeB = "modeB";
 	private static final String dummy = "dummy";
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+	enum ExpBetaChanger {ChangeExpBeta, SelectExpBeta}
 
-		// configure config file
-		config.controller().setOutputDirectory(args[0]);
-		config.controller().setLastIteration(100);
+	public static void main(String[] args) {
+		Config config = createTestingConfig(0., args[0], ExpBetaChanger.SelectExpBeta);
+		Scenario scenario = prepareScenario(config);
+		Controler controler = new Controler(scenario);
+		// binding for score stochastic
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(new DisturbanceGenerator(0., 0.3));
+			}
+		});
+		// run simulation
+		controler.run();
+	}
+
+	static Config createTestingConfig(double ascForModeB, String output, ExpBetaChanger expBetaChanger) {
+		Config config = ConfigUtils.createConfig();
+		config.controller().setOutputDirectory(output);
+		config.controller().setLastIteration(500);
 		config.replanning().setFractionOfIterationsToDisableInnovation(0.9);
 
 		// specify modes
@@ -41,17 +56,17 @@ public class RunTestingScenario {
 		changeMode.setWeight(0.1);
 		config.replanning().addStrategySettings(changeMode);
 
-		// change exp beta
+		// exponential beta setting
 		ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
-		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setStrategyName(expBetaChanger.name());
 		changeExpBeta.setWeight(0.9);
 		config.replanning().addStrategySettings(changeExpBeta);
 
 		// scoring params
 		ScoringConfigGroup.ModeParams modeAParams = new ScoringConfigGroup.ModeParams(modeA);
-		modeAParams.setConstant(0.1);
+		modeAParams.setConstant(0.);
 		ScoringConfigGroup.ModeParams modeBParams = new ScoringConfigGroup.ModeParams(modeB);
-		modeBParams.setConstant(0.);
+		modeBParams.setConstant(ascForModeB);
 		ScoringConfigGroup.ActivityParams dummyActParams = new ScoringConfigGroup.ActivityParams();
 		dummyActParams.setTypicalDuration(3600);
 		dummyActParams.setActivityType(dummy);
@@ -77,6 +92,11 @@ public class RunTestingScenario {
 		config.routing().addTeleportedModeParams(modeBTeleportation);
 		config.routing().addTeleportedModeParams(walk);
 
+		return config;
+	}
+
+	static Scenario prepareScenario(Config config) {
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// prepare network
 		Network network = scenario.getNetwork();
 		Node nodeA = NetworkUtils.createNode(Id.createNodeId("A"), new Coord(0, 0));
@@ -104,9 +124,6 @@ public class RunTestingScenario {
 			person.addPlan(plan);
 			plans.addPerson(person);
 		}
-
-		// run simulation
-		Controler controler = new Controler(scenario);
-		controler.run();
+		return scenario;
 	}
 }
