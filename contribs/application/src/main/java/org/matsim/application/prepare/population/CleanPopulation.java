@@ -62,6 +62,7 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	private final TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
 
 	//Needed for registration of this application in scenarios
+	@SuppressWarnings("unused")
 	public CleanPopulation() {
 	}
 
