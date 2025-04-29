@@ -24,10 +24,10 @@ import java.util.Set;
  * @author rakow
  */
 @CommandLine.Command(
-		name = "clean-population",
-		description = "Remove information from population, such as routes or unselected plans.",
-		mixinStandardHelpOptions = true,
-		showDefaultValues = true
+	name = "clean-population",
+	description = "Remove information from population, such as routes or unselected plans.",
+	mixinStandardHelpOptions = true,
+	showDefaultValues = true
 )
 public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 
@@ -61,9 +61,9 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	// to be able to process older population files without any routing modes!
 	private final TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
 
-	//deliberately package-private
-	@SuppressWarnings("unused")
-	CleanPopulation() {}
+	//Needed for registration of this application in scenarios
+	public CleanPopulation() {
+	}
 
 	private CleanPopulation(boolean rmUnselected, boolean rmActivityLocations, boolean rmActivityFacilities, boolean rmRoutes, boolean tripsToLegs, Set<String> rmLegs) {
 		this.rmUnselected = rmUnselected;
