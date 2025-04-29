@@ -142,19 +142,21 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				var vehicle = insertion.insertion.vehicleEntry.vehicle;
 				var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
+				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
+				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
+				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+				acceptedRequest.get().setPickupTime(expectedPickupTime);
+
+				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
+				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
+				acceptedRequest.get().setDropoffTime(expectedDropoffTime);
+
 				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 				if (newVehicleEntry != null) {
 					vehicleEntries.put(vehicle.getId(), newVehicleEntry);
 				} else {
 					vehicleEntries.remove(vehicle.getId());
 				}
-
-				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
-				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
-				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
-
-				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
-				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
