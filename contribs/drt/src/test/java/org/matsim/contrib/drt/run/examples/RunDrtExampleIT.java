@@ -272,7 +272,7 @@ public class RunDrtExampleIT {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		DrtOptimizationConstraintsSetImpl drtOptimizationConstraintsSet = multiModeDrtConfigGroup.getModalElements().iterator().next().addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		drtOptimizationConstraintsSet.maxAbsoluteDetour = 5 * 60;
+		drtOptimizationConstraintsSet.setMaxAbsoluteDetour(5 * 60);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
