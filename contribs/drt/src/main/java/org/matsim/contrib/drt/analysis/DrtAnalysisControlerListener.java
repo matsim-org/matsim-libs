@@ -402,7 +402,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]", "Initially planned wait time [s]",
-						times, Pair.of(0., drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime));
+						times, Pair.of(0., drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().getMaxWaitTime()));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
 				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
@@ -668,8 +668,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			DrtOptimizationConstraintsSet constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 			Pair<Double, Double> lineCoeffs = null;
 			if(constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultConstraintsSet) {
-                lineCoeffs = Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
-                        defaultConstraintsSet.maxTravelTimeBeta);
+                lineCoeffs = Pair.of(defaultConstraintsSet.getMaxTravelTimeAlpha(),
+						defaultConstraintsSet.getMaxTravelTimeBeta());
             }
 			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]", "unshared ride time [s]", travelTimes,
 					lineCoeffs);

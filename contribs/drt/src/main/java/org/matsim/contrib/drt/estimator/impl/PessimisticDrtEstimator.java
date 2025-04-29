@@ -23,11 +23,11 @@ public class PessimisticDrtEstimator implements DrtEstimator {
 		// beta is not used, because estimates are supposed to be minimums and not worst cases
 		DrtOptimizationConstraintsSet constraints = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		if(constraints instanceof DrtOptimizationConstraintsSetImpl defaultConstraints) {
-			double travelTime = Math.min(route.getDirectRideTime() + defaultConstraints.maxAbsoluteDetour,
-					route.getDirectRideTime() * defaultConstraints.maxTravelTimeAlpha);
+			double travelTime = Math.min(route.getDirectRideTime() + defaultConstraints.getMaxAbsoluteDetour(),
+					route.getDirectRideTime() * defaultConstraints.getMaxTravelTimeAlpha());
 
 			// for distance, we multiply the direct distance to the ratio between estimated travel time and direct travel time
-			return new Estimate(route.getDistance() * (travelTime / route.getDirectRideTime()), travelTime, constraints.maxWaitTime, 0);
+			return new Estimate(route.getDistance() * (travelTime / route.getDirectRideTime()), travelTime, constraints.getMaxWaitTime(), 0);
 		} else {
 			throw new RuntimeException("Not implemented for custom constraints sets");
 		}
