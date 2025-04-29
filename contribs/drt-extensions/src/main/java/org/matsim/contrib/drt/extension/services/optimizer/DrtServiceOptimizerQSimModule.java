@@ -84,7 +84,7 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					getter.getModal(DrtRequestInsertionRetryQueue.class));
 				return new DrtServiceTaskOptimizer(getter.getModal(ServiceTaskDispatcher.class),
 					delegate,
-					getter.getModal(ScheduleTimingUpdaterImpl.class),
+					getter.getModal(ScheduleTimingUpdater.class),
 					getter.get(MobsimTimer.class));
 			}));
 	}

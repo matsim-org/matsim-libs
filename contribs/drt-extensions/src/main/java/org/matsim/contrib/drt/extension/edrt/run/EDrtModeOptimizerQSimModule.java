@@ -92,7 +92,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				getter ->  {
 					return new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdaterImpl.class),
+						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 						getter.getModal(DrtRequestInsertionRetryQueue.class));
 				})).asEagerSingleton();
