@@ -92,9 +92,7 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		if (output.getParent() != null)
 			Files.createDirectories(output.getParent());
 
-		for (Person person : population.getPersons().values()) {
-			run(person);
-		}
+		cleanPopulation(population);
 
 		PopulationUtils.writePopulation(population, output.toString());
 
@@ -128,6 +126,12 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 					act.setFacilityId(null);
 				}
 			}
+		}
+	}
+
+	public void cleanPopulation(Population population) {
+		for (Person person : population.getPersons().values()) {
+			run(person);
 		}
 	}
 
