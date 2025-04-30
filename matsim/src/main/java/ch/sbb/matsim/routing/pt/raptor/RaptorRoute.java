@@ -78,7 +78,11 @@ public class RaptorRoute {
 	void addChainedPart(TransitStopFacility fromStop, TransitStopFacility toStop, TransitLine line, TransitRoute route, String mode, double depTime, double boardingTime, double vehDepTime, double arrivalTime, double distance) {
 		RoutePart part = new RoutePart(fromStop, toStop, mode, depTime, boardingTime, vehDepTime, arrivalTime, distance, line, route, null);
 		this.travelTime += (arrivalTime - depTime);
-		editableParts.getLast().chainedPart = part;
+		RoutePart lastPart = editableParts.getLast();
+		while (lastPart.chainedPart != null) {
+			lastPart = lastPart.chainedPart;
+		}
+		lastPart.chainedPart = part;
 	}
 
     public double getTotalCosts() {
