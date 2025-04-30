@@ -1,7 +1,5 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,7 +20,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +36,7 @@ public class SwissRailRaptorChainedDepartureTest {
 	TransitStopFacility genf;
 	TransitStopFacility bern;
 	TransitStopFacility luzern;
-	TransitStopFacility langental;
+	TransitStopFacility langenthal;
 
 	@BeforeEach
 	void setUp() {
@@ -63,7 +60,7 @@ public class SwissRailRaptorChainedDepartureTest {
 		genf = scenario.getTransitSchedule().getFacilities().get(Id.create("f12", TransitStopFacility.class));
 		bern = scenario.getTransitSchedule().getFacilities().get(Id.create("f3", TransitStopFacility.class));
 		luzern = scenario.getTransitSchedule().getFacilities().get(Id.create("f31", TransitStopFacility.class));
-		langental = scenario.getTransitSchedule().getFacilities().get(Id.create("f29", TransitStopFacility.class));
+		langenthal = scenario.getTransitSchedule().getFacilities().get(Id.create("f29", TransitStopFacility.class));
 	}
 
 	@Test
@@ -102,7 +99,7 @@ public class SwissRailRaptorChainedDepartureTest {
 		});
 
 		assertThat(connections)
-			.containsEntry(langental, new Result(17820.0, 22080.0, 0))
+			.containsEntry(langenthal, new Result(17820.0, 22080.0, 0))
 			.containsEntry(bern, new Result(17820.0, 23160.0, 0));
 
 	}
@@ -143,7 +140,7 @@ public class SwissRailRaptorChainedDepartureTest {
 			.hasSize(18)
 			.allMatch(r -> r.getNumberOfTransfers() == 0);
 
-		routes = raptor.calcRoutes(luzern, langental, 0, 4 * 3600, 86400, null, null);
+		routes = raptor.calcRoutes(luzern, langenthal, 0, 4 * 3600, 86400, null, null);
 
 		assertThat(routes)
 			.hasSize(20)
