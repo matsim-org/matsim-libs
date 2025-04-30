@@ -161,12 +161,10 @@ public final class RaptorUtils {
                 Leg ptLeg = PopulationUtils.createLeg(part.mode);
                 ptLeg.setDepartureTime(part.depTime);
                 ptLeg.setTravelTime(part.arrivalTime - part.depTime);
-                DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop);
-                ptRoute.setBoardingTime(part.boardingTime);
-                ptRoute.setTravelTime(part.arrivalTime - part.depTime);
-                ptRoute.setDistance(part.distance);
-                ptLeg.setRoute(ptRoute);
-                legs.add(ptLeg);
+
+                ptLeg.setRoute(convertRoutePart(part));
+
+				legs.add(ptLeg);
                 lastArrivalTime = part.arrivalTime;
                 firstPtLegProcessed = true;
                 if (previousTransferWalkleg != null) {
@@ -198,4 +196,21 @@ public final class RaptorUtils {
 
         return legs;
     }
+
+
+	/**
+	 * Create passenger routes recursively.
+	 */
+	private static DefaultTransitPassengerRoute convertRoutePart(RaptorRoute.RoutePart part) {
+
+		if (part == null)
+			return null;
+
+		DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop, convertRoutePart(part.chainedPart));
+		ptRoute.setBoardingTime(part.boardingTime);
+		ptRoute.setTravelTime(part.arrivalTime - part.depTime);
+		ptRoute.setDistance(part.distance);
+
+		return ptRoute;
+	}
 }
