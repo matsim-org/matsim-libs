@@ -76,9 +76,6 @@ public class SwissRailRaptorChainedDepartureTest {
 				assertThat(r.getTravelTime())
 					.isEqualTo(arrivalTime - departureTime);
 
-//				assertThat(transferCount)
-//					.isEqualTo(r.getNumberOfTransfers());
-
 				connections.computeIfAbsent(stopFacility, (k) -> new Result(departureTime, arrivalTime, transferCount));
 			}
 		});

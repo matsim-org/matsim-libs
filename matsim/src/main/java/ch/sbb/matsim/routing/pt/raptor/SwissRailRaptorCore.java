@@ -768,7 +768,6 @@ public class SwissRailRaptorCore {
 						currentDepartureTime = alternativeDepartureTime;
 
 						// Reset chain information when switching connection
-						// TODO: with chains an infinite loop can occur here
 						chains = null;
 						lastPE = null;
 						hasChains = false;
