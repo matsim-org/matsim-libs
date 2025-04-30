@@ -85,8 +85,8 @@ import java.io.UncheckedIOException;
             }
 
             @Override
-            public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
+            public void shutdown(boolean unexpected, String exceptionMessage) {
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exceptionMessage);
             }
         };
         MatsimRuntimeModifications.run(runnable);
