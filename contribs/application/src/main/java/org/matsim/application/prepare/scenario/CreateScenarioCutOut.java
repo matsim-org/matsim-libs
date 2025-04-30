@@ -510,9 +510,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 				// Adjusting capacity to the link usage
 				double capacity = link.getCapacity();
-				if (capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities)
-					 capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time))*((changeEventsInterval/3600)*link.getCapacity()));
-				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
+				if (capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities) {
+					// If a link outside the shp + buffer has no traffic, then it should not be in the network at all.
+					// If this assertion fails, it implicates a programming error or a weird program configuration.
+					assert cv.getCutoutLinkVolume(link.getId(), time) != 0;
+
+					capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time)) * ((changeEventsInterval / 3600) * link.getCapacity()));
+				} else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
 				else if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
 					// TODO WIP
