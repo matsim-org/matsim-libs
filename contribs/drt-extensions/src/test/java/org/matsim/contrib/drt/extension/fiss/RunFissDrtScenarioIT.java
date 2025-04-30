@@ -68,11 +68,11 @@ public class RunFissDrtScenarioIT {
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-		defaultConstraintsSet.maxWaitTime = 600.;
-		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-		defaultConstraintsSet.maxWalkDistance = 1000.;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+		defaultConstraintsSet.setMaxWaitTime(600.);
+		defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+		defaultConstraintsSet.setMaxWalkDistance(1000.);
 		drtConfigGroup.setUseModeFilteredSubnetwork(false);
 		drtConfigGroup.setVehiclesFile(fleetFile);
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
@@ -158,13 +158,13 @@ public class RunFissDrtScenarioIT {
 		{
 			// FISS config:
 			FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-			fissConfigGroup.sampleFactor = 0.1;
-			fissConfigGroup.sampledModes = Set.of(TransportMode.car);
-			fissConfigGroup.switchOffFISSLastIteration = true;
+			fissConfigGroup.setSampleFactor(0.1);
+			fissConfigGroup.setSampledModes(Set.of(TransportMode.car));
+			fissConfigGroup.setSwitchOffFISSLastIteration(true);
 
 			// provide mode vehicle types (in production code, one should set them more diligently):
 			Vehicles vehiclesContainer = controler.getScenario().getVehicles();
-			for( String sampledMode : fissConfigGroup.sampledModes ){
+			for( String sampledMode : fissConfigGroup.getSampledModes()){
 				vehiclesContainer.addVehicleType( VehicleUtils.createVehicleType( Id.create( sampledMode, VehicleType.class ) ) );
 			}
 

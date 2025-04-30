@@ -14,7 +14,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandlerDefaultImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 public class FISSModule extends AbstractModule{
@@ -29,13 +28,13 @@ public class FISSModule extends AbstractModule{
 			@Override public void notifyStartup( StartupEvent event ){
 				Vehicles vehiclesContainer = scenario.getVehicles();
 
-				for( String sampledMode : fissConfigGroup.sampledModes ){
+				for( String sampledMode : fissConfigGroup.getSampledModes()){
 
 					final Id<VehicleType> vehicleTypeId = Id.create( sampledMode, VehicleType.class );
 					VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get( vehicleTypeId );
 					Gbl.assertNotNull( vehicleType, "you are using mode vehicle types, but have not provided a vehicle type for mode=" + sampledMode );
 
-					final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
+					final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.getSampleFactor();
 					LOG.info( "Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu );
 					vehicleType.setPcuEquivalents( pcu );
 				}
