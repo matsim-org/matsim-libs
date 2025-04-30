@@ -86,7 +86,7 @@ class MatsimRuntimeModifications {
 				log.error("Shutdown possibly caused by the following Exception:", uncaughtException);
 			}
 			try {
-				runnable.shutdown(unexpectedShutdown.get(), uncaughtException.toString());
+				runnable.shutdown(unexpectedShutdown.get(), uncaughtException == null ? null: uncaughtException.toString());
 			} catch (Exception e) {
 				unexpectedShutdown.set(true);
 				log.error("Exception during shutdown:", e);
