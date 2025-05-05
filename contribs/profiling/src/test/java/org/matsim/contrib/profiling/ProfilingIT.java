@@ -1,10 +1,14 @@
 package org.matsim.contrib.profiling;
 
+import jdk.jfr.consumer.EventStream;
+import jdk.jfr.consumer.RecordingFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.contrib.profiling.aop.TraceProfilingEvent;
 import org.matsim.contrib.profiling.events.FireDefaultProfilingEventsModule;
+import org.matsim.contrib.profiling.events.JFRMatsimEvent;
 import org.matsim.contrib.profiling.instrument.EnableProfilingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -14,8 +18,11 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProfilingIT {
 
@@ -25,7 +32,7 @@ public class ProfilingIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void whenProfilingTwoIterationsOfThreeTotal_expectResultFileToContainJFREvents() {
+	public void whenProfilingTwoIterationsOfThreeTotal_expectResultFileToContainJFREvents() throws IOException {
 		// use simple scenario configuration for testing
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(2);
@@ -40,7 +47,14 @@ public class ProfilingIT {
 		assertThat(recording).exists();
 		assertThat(recording).isNotEmpty();
 		// read the profile.jfr and expect the events defined by the module and via AOP to be there (but none from TestTraceProfilingAspect)
-
+		assertThat(RecordingFile.readAllEvents(recording.toPath())
+			.stream()
+			.filter(recordedEvent -> recordedEvent.getEventType().getCategoryNames().contains("MATSim"))
+		).isNotEmpty();
+		assertThat(RecordingFile.readAllEvents(recording.toPath())
+			.stream()
+			.filter(recordedEvent -> recordedEvent.getEventType().getName().equals(TraceProfilingEvent.class.getName()))
+		).isEmpty();
 	}
 
 	@Test
@@ -73,7 +87,7 @@ public class ProfilingIT {
 	}
 
 	@Test
-	public void whenTraceEnabled_expectResultFileToContainTraceEvents() {
+	public void whenTraceEnabled_expectResultFileToContainTraceEvents() throws IOException {
 		// use simple scenario configuration for testing
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setLastIteration(2);
@@ -87,6 +101,20 @@ public class ProfilingIT {
 		assertThat(recording).exists();
 		assertThat(recording).isNotEmpty();
 		// read the profile.jfr and expect the trace events defined via TestTraceProfilingAspect to be there (and none from the module)
-
+		AtomicBoolean hasTraceEvent = new AtomicBoolean(false);
+		EventStream eventStream = EventStream.openFile(recording.toPath());
+		eventStream.onEvent(TraceProfilingEvent.class.getName(), e -> hasTraceEvent.set(true));
+		// assert that no events from FireDefaultProfilingEventsModule are here
+		eventStream.onEvent(e -> {
+			if (e.getEventType().getName().startsWith(JFRMatsimEvent.class.getPackageName()) &&
+				!e.getString("type").startsWith("AOP") // test aspects like ScoringListenerProfilingAspect are active
+			) {
+				fail();
+			}
+		});
+		try (eventStream) {
+			eventStream.start();
+		}
+		assertTrue(hasTraceEvent.get());
 	}
 }
