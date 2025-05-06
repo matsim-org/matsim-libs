@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  * identify disconnected elements using the original
  * {@link MultimodalNetworkCleaner}.
  * Only keeps turn restrictions that do not disconnect the network.
+ * The resulting network will only have turn restrictions for the specified mode
  *
  * @author nkuehnel / MOIA
  */
@@ -30,7 +31,7 @@ public class TurnRestrictionsNetworkCleaner {
         colorNetwork(network, turnRestrictions);
         new MultimodalNetworkCleaner(network).run(Set.of(mode));
         collapseNetwork(network, turnRestrictions);
-        reapplyRestrictions(network, turnRestrictions);
+        reapplyRestrictions(network, turnRestrictions, mode);
     }
 
     public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
@@ -146,20 +147,20 @@ public class TurnRestrictionsNetworkCleaner {
         }
     }
 
-    private void reapplyRestrictions(Network network, TurnRestrictionsContext turnRestrictions) {
+    private void reapplyRestrictions(Network network, TurnRestrictionsContext turnRestrictions, String mode) {
         for (Map.Entry<Id<Link>, TurnRestrictionsContext.ColoredLink> idColoredLinkEntry : turnRestrictions.replacedLinks.entrySet()) {
             Link link = network.getLinks().get(idColoredLinkEntry.getValue().link.getId());
             List<Id<Link>> currentPath = new ArrayList<>();
             if (idColoredLinkEntry.getValue().toNode != null) {
                 throw new RuntimeException("Shouldn't happen");
             } else {
-                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions);
+                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions, mode);
             }
         }
     }
 
     private void advance(TurnRestrictionsContext.ColoredLink coloredLink, List<Id<Link>> currentPath,
-                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions) {
+                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions, String mode) {
 
         if (!network.getLinks().containsKey(coloredLink.link.getId())) {
             // link sequence is not part of the network anymore and doesn't need to be explored.
@@ -194,7 +195,7 @@ public class TurnRestrictionsNetworkCleaner {
                 for (Id<Link> unrestrictedReachableLink : unrestrictedReachableLinks) {
                     List<Id<Link>> path = new ArrayList<>(currentPath);
                     path.add(unrestrictedReachableLink);
-                    disallowedNextLinks.addDisallowedLinkSequence("car", path);
+                    disallowedNextLinks.addDisallowedLinkSequence(mode, path);
                 }
             }
 
@@ -204,7 +205,7 @@ public class TurnRestrictionsNetworkCleaner {
                 if (turnRestrictions.replacedLinks.containsKey(link.link.getId())) {
                     return;
                 }
-                advance(link, nextPath, replacedStartLink, network, turnRestrictions);
+                advance(link, nextPath, replacedStartLink, network, turnRestrictions, mode);
             }
         }
     }
