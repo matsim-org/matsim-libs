@@ -8,7 +8,7 @@ public class LogisticViewer extends Viz {
 	public String network;
 
 	@JsonProperty(required = true)
-	public String carrier;
+	public String carriers;
 
 	@JsonProperty(required = true)
 	public String lsps;

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.viz.*;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -112,6 +113,29 @@ public class SimWrapperTest {
 						viz.projection = "EPSG:31468";
 						viz.addAggregation("O/D Summary", "Origins", "fromX", "fromY", "Destinations", "toX", "toY");
 					}));
+
+			layout.row("eleventh")
+				.el(CarrierViewer.class, (viz, data) -> {
+					viz.title = "carrierViewer";
+
+					// Include a network that has not been filtered
+					viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+						"--mode-filter", "", "--shp", "none");
+
+					viz.carriers = data.output("output_carriers.xml.gz");
+				});
+
+			layout.row("twelfth")
+				.el(LogisticViewer.class, (viz, data) -> {
+					viz.title = "logisticViewer";
+
+					// Include a network that has not been filtered
+					viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+						"--mode-filter", "", "--shp", "none");
+
+					viz.carriers = data.output("output_carriers.xml.gz");
+					viz.lsps = data.output("output_lsps.xml.gz");
+				});
 		});
 
 		String outputDirectory = utils.getOutputDirectory();

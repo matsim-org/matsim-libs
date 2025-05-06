@@ -27,7 +27,7 @@ public class LogisticDashboard implements Dashboard  {
 			viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
 				"--mode-filter", "", "--shp", "none");
 
-			viz.carrier = data.output("(*.)?output_carriers.xml.gz");
+			viz.carriers = data.output("(*.)?output_carriers.xml.gz");
 			viz.lsps = data.output("(*.)?output_lsps.xml.gz");
 
 		});

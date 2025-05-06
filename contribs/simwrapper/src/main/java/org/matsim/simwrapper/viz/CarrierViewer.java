@@ -8,7 +8,7 @@ public class CarrierViewer extends Viz {
 	public String network;
 
 	@JsonProperty(required = true)
-	public String carrier;
+	public String carriers;
 
 	public CarrierViewer() {
 		super("carrier");
