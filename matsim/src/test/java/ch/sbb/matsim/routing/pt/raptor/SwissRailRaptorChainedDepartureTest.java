@@ -37,6 +37,7 @@ public class SwissRailRaptorChainedDepartureTest {
 	TransitStopFacility bern;
 	TransitStopFacility luzern;
 	TransitStopFacility langenthal;
+	TransitStopFacility lausanne;
 
 	@BeforeEach
 	void setUp() {
@@ -57,10 +58,11 @@ public class SwissRailRaptorChainedDepartureTest {
 		raptor = new SwissRailRaptor.Builder(data, config).build();
 		params = RaptorUtils.createParameters(config);
 
-		genf = scenario.getTransitSchedule().getFacilities().get(Id.create("f12", TransitStopFacility.class));
+		genf = scenario.getTransitSchedule().getFacilities().get(Id.create("f16", TransitStopFacility.class));
 		bern = scenario.getTransitSchedule().getFacilities().get(Id.create("f3", TransitStopFacility.class));
-		luzern = scenario.getTransitSchedule().getFacilities().get(Id.create("f31", TransitStopFacility.class));
-		langenthal = scenario.getTransitSchedule().getFacilities().get(Id.create("f29", TransitStopFacility.class));
+		luzern = scenario.getTransitSchedule().getFacilities().get(Id.create("f37", TransitStopFacility.class));
+		langenthal = scenario.getTransitSchedule().getFacilities().get(Id.create("f35", TransitStopFacility.class));
+		lausanne = scenario.getTransitSchedule().getFacilities().get(Id.create("f33", TransitStopFacility.class));
 	}
 
 	@Test
@@ -82,6 +84,53 @@ public class SwissRailRaptorChainedDepartureTest {
 
 		assertThat(connections)
 			.containsEntry(bern, new Result(20520.0, 26760, 0));
+
+	}
+
+	@Test
+	void test_single_departure() {
+
+		Map<TransitStopFacility, Result> connections = new HashMap<>();
+
+		raptor.calcTreesObservable(bern, 0, 86400, params, null, new SwissRailRaptor.RaptorObserver() {
+			@Override
+			public void arrivedAtStop(double departureTime, TransitStopFacility stopFacility, double arrivalTime, int transferCount, Supplier<RaptorRoute> route) {
+
+				RaptorRoute r = route.get();
+
+				assertThat(r.getTravelTime())
+					.isEqualTo(arrivalTime - departureTime);
+
+				if (transferCount != 0)
+					return;
+
+				connections.computeIfAbsent(stopFacility, (k) -> new Result(departureTime, arrivalTime, transferCount));
+			}
+		});
+
+		// There is a direct (chained) connection with later departure time than an alternative with a transfer
+		// The direct one should be found first
+		assertThat(connections)
+			.containsEntry(lausanne, new Result(20040.0, 24000, 0));
+
+
+		List<? extends PlanElement> route = raptor.calcRoute(bern, lausanne, 0, 4 * 3600, 6 * 3600, null, null);
+
+		assertThat(route)
+			.hasSize(3);
+
+		PlanElement ptLeg = route.get(1);
+		Leg leg = (Leg) ptLeg;
+
+		assertThat(leg.getDepartureTime())
+			.isEqualTo(OptionalTime.defined(20040.0));
+
+		assertThat(leg.getTravelTime())
+			.isEqualTo(OptionalTime.defined(24000.0 - 20040.0));
+
+		assertThat(((DefaultTransitPassengerRoute) leg.getRoute()).getChainedRoute())
+			.isNotNull();
+
 	}
 
 	@Test
@@ -104,7 +153,7 @@ public class SwissRailRaptorChainedDepartureTest {
 	@Test
 	void testTree_ring() {
 
-		TransitStopFacility ziegelb = scenario.getTransitSchedule().getFacilities().get(Id.create("f68", TransitStopFacility.class));
+		TransitStopFacility ziegelb = scenario.getTransitSchedule().getFacilities().get(Id.create("f85", TransitStopFacility.class));
 
 		Map<TransitStopFacility, Result> connections = new HashMap<>();
 		raptor.calcTreesObservable(ziegelb, 0, 86400, params, null, new SwissRailRaptor.RaptorObserver() {
@@ -121,7 +170,7 @@ public class SwissRailRaptorChainedDepartureTest {
 			}
 		});
 
-		TransitStopFacility lichtensteig = scenario.getTransitSchedule().getFacilities().get(Id.create("f28", TransitStopFacility.class));
+		TransitStopFacility lichtensteig = scenario.getTransitSchedule().getFacilities().get(Id.create("f34", TransitStopFacility.class));
 
 		assertThat(connections)
 			.containsEntry(lichtensteig, new Result(19920.0, 21630.0, 0));

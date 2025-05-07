@@ -160,12 +160,12 @@ public final class RaptorUtils {
                 // a pt leg
                 Leg ptLeg = PopulationUtils.createLeg(part.mode);
                 ptLeg.setDepartureTime(part.depTime);
-                ptLeg.setTravelTime(part.arrivalTime - part.depTime);
+                ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
 
                 ptLeg.setRoute(convertRoutePart(part));
 
 				legs.add(ptLeg);
-                lastArrivalTime = part.arrivalTime;
+                lastArrivalTime = part.getChainedArrivalTime();
                 firstPtLegProcessed = true;
                 if (previousTransferWalkleg != null) {
                     //adds the margin only to legs in between pt legs
