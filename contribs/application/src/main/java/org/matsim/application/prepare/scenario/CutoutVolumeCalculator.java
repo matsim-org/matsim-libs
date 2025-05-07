@@ -53,15 +53,16 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 	/**
 	 * Average PCE used in the calculation for the accumulated load.
 	 */
-	private double averagePCE = -1;
+	private double averagePCE;
 
 	/**
 	 * Map of vehicleId to personId updated when a person uses a new vehicle.
 	 */
 	private final Map<Id<Vehicle>, Id<Person>> vehicle2Person = new HashMap<>();
 
-	// TODO DEBUG; MAybe change departTimes to vehicles, to obtain pce
-	private final Map<Id<Link>, List<Double>> departTimes = new HashMap<>();
+	// TODO DEBUG; Maybe change departTimes to vehicles, to obtain pce
+	// Map of departure times of vehicles, that will be removed after the cutout
+	private final Map<Id<Link>, List<Double>> staticDepartTimes = new HashMap<>();
 	private final Scenario scenario;
 
 	CutoutVolumeCalculator(double changeEventsInterval, double changeEventsMaxTime, Set<Id<Person>> cutoutPersons, Scenario scenario) {
@@ -126,7 +127,7 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 	 */
 	public double getAccumulatedLoad(Id<Link> linkId, double time, double averagePCE) {
 		if (linkId2timeslice2accLoad == null){
-			linkId2timeslice2accLoad = new AveragedAccumulatedLoadCalculator(scenario.getNetwork(), departTimes, averagePCE, changeEventsMaxTime, changeEventsInterval).computeAverageAccumulatedLoadForNetwork();
+			linkId2timeslice2accLoad = new AveragedAccumulatedLoadCalculator(scenario.getNetwork(), staticDepartTimes, averagePCE, changeEventsMaxTime, changeEventsInterval).computeAverageAccumulatedLoadForNetwork();
 			this.averagePCE = averagePCE;
 		} else if (averagePCE != this.averagePCE){
 			// TODO Maybe move the averagePCE variable somewhere else, since it will always be the same value
@@ -140,9 +141,10 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO DEBUG
-		{
-			departTimes.computeIfAbsent(event.getLinkId(), k -> new ArrayList<>());
-			departTimes.get(event.getLinkId()).add(event.getTime());
+		// Check if this vehicle is static traffic
+		if(cutoutPersons.contains(vehicle2Person.get(event.getVehicleId()))){
+			staticDepartTimes.computeIfAbsent(event.getLinkId(), k -> new ArrayList<>());
+			staticDepartTimes.get(event.getLinkId()).add(event.getTime());
 		}
 	}
 

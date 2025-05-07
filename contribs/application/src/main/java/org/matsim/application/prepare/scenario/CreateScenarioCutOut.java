@@ -516,9 +516,11 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					assert cv.getCutoutLinkVolume(link.getId(), time) != 0;
 
 					capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time)) * ((changeEventsInterval / 3600) * link.getCapacity()));
-				} else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
+				} else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities || capacityCalculation == CapacityCalculation.cleanedFreespeeds)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
-				else if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
+
+
+				if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
 					// Compute the cleaned travelTimes. The idea is to compute, how long the average vehicle in the scenario would wait in a queue,
 					// if the "static" traffic (the traffic, that will be removed after the cutout) was there. This waiting time is then used to
 					// set the new freespeed accordingly. The capacity will be set to the value, which is "remaining" after the static traffic is subtracted.
@@ -534,7 +536,6 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 					// 4. The freespeed is given by adding the averageWaitingTime to the average travel time of the link
 					freespeed = link.getLength() / (averageWaitingTime+(link.getLength()/link.getFreespeed()));
-
 				}
 
 
@@ -685,6 +686,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		/**
 		 * TODO This method may or may not work. It is purely theoretical. A test will be done during the next days to see, if it works in practice.
+		 * TODO It is currently an extension of subtractLostVehiclesCapacities, it will get an individual option later
 		 */
 		cleanedFreespeeds
 
