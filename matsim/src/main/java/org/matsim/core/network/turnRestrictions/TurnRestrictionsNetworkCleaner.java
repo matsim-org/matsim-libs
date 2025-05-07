@@ -154,7 +154,9 @@ public class TurnRestrictionsNetworkCleaner {
                         }
                     }
                 }
-
+                if (disallowedNextLinks.isEmpty()) {
+                    NetworkUtils.removeDisallowedNextLinks(linkCopy);
+                }
             }
             network.addLink(linkCopy);
         }
