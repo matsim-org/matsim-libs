@@ -29,8 +29,8 @@ public class TurnRestrictionsNetworkCleaner {
         TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network, mode);
         colorNetwork(network, turnRestrictions);
         new MultimodalNetworkCleaner(network).run(Set.of(mode));
-        collapseNetwork(network, turnRestrictions);
-        reapplyRestrictions(network, turnRestrictions);
+        collapseNetwork(network, turnRestrictions, mode);
+        reapplyRestrictions(network, turnRestrictions, mode);
     }
 
     public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
@@ -82,7 +82,7 @@ public class TurnRestrictionsNetworkCleaner {
     }
 
 
-    private void collapseNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
+    private void collapseNetwork(Network network, TurnRestrictionsContext turnRestrictions, String mode) {
 
         for (TurnRestrictionsContext.ColoredNode coloredNode : turnRestrictions.coloredNodes) {
             Id<Node> nodeId = getColoredNodeId(coloredNode);
@@ -105,12 +105,12 @@ public class TurnRestrictionsNetworkCleaner {
 
         for (Map.Entry<Id<Link>, TurnRestrictionsContext.ColoredLink> idColoredLinkEntry : turnRestrictions.replacedLinks.entrySet()) {
             TurnRestrictionsContext.ColoredLink coloredLink = idColoredLinkEntry.getValue();
-            checkRealLinkExistence(network, coloredLink);
+            checkRealLinkExistence(network, coloredLink, mode);
         }
 
         for (Map.Entry<Id<Link>, List<TurnRestrictionsContext.ColoredLink>> idColoredLinkEntry : turnRestrictions.coloredLinksPerLinkMap.entrySet()) {
             for (TurnRestrictionsContext.ColoredLink coloredLink : idColoredLinkEntry.getValue()) {
-                checkRealLinkExistence(network, coloredLink);
+                checkRealLinkExistence(network, coloredLink, mode);
             }
         }
 
@@ -126,7 +126,7 @@ public class TurnRestrictionsNetworkCleaner {
         }
     }
 
-    private void checkRealLinkExistence(Network network, TurnRestrictionsContext.ColoredLink coloredLink) {
+    private void checkRealLinkExistence(Network network, TurnRestrictionsContext.ColoredLink coloredLink, String mode) {
         Id<Link> copyId = getColoredLinkId(coloredLink);
         if (network.getLinks().containsKey(copyId) && !network.getLinks().containsKey(coloredLink.link.getId())) {
             Link link = coloredLink.link;
@@ -142,24 +142,40 @@ public class TurnRestrictionsNetworkCleaner {
             );
             // copy all attributes except initial turn restrictions
             NetworkUtils.copyAttributesExceptDisallowedNextLinks(coloredLink.link, linkCopy);
+
+            // copy all turn restrictions of all other modes
+            DisallowedNextLinks originalDisallowedNextLinks = NetworkUtils.getDisallowedNextLinks(coloredLink.link);
+            if(originalDisallowedNextLinks != null) {
+                DisallowedNextLinks disallowedNextLinks = NetworkUtils.getOrCreateDisallowedNextLinks(linkCopy);
+                for (Map.Entry<String, List<List<Id<Link>>>> restriction : originalDisallowedNextLinks.getAsMap().entrySet()) {
+                    if(!mode.equals(restriction.getKey())) {
+                        for (List<Id<Link>> sequence : restriction.getValue()) {
+                            disallowedNextLinks.addDisallowedLinkSequence(restriction.getKey(), sequence);
+                        }
+                    }
+                }
+                if (disallowedNextLinks.isEmpty()) {
+                    NetworkUtils.removeDisallowedNextLinks(linkCopy);
+                }
+            }
             network.addLink(linkCopy);
         }
     }
 
-    private void reapplyRestrictions(Network network, TurnRestrictionsContext turnRestrictions) {
+    private void reapplyRestrictions(Network network, TurnRestrictionsContext turnRestrictions, String mode) {
         for (Map.Entry<Id<Link>, TurnRestrictionsContext.ColoredLink> idColoredLinkEntry : turnRestrictions.replacedLinks.entrySet()) {
             Link link = network.getLinks().get(idColoredLinkEntry.getValue().link.getId());
             List<Id<Link>> currentPath = new ArrayList<>();
             if (idColoredLinkEntry.getValue().toNode != null) {
                 throw new RuntimeException("Shouldn't happen");
             } else {
-                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions);
+                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions, mode);
             }
         }
     }
 
     private void advance(TurnRestrictionsContext.ColoredLink coloredLink, List<Id<Link>> currentPath,
-                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions) {
+                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions, String mode) {
 
         if (!network.getLinks().containsKey(coloredLink.link.getId())) {
             // link sequence is not part of the network anymore and doesn't need to be explored.
@@ -194,7 +210,7 @@ public class TurnRestrictionsNetworkCleaner {
                 for (Id<Link> unrestrictedReachableLink : unrestrictedReachableLinks) {
                     List<Id<Link>> path = new ArrayList<>(currentPath);
                     path.add(unrestrictedReachableLink);
-                    disallowedNextLinks.addDisallowedLinkSequence("car", path);
+                    disallowedNextLinks.addDisallowedLinkSequence(mode, path);
                 }
             }
 
@@ -204,7 +220,7 @@ public class TurnRestrictionsNetworkCleaner {
                 if (turnRestrictions.replacedLinks.containsKey(link.link.getId())) {
                     return;
                 }
-                advance(link, nextPath, replacedStartLink, network, turnRestrictions);
+                advance(link, nextPath, replacedStartLink, network, turnRestrictions, mode);
             }
         }
     }
