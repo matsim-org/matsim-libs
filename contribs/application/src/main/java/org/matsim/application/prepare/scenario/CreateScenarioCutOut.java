@@ -320,6 +320,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 			cv = new CutoutVolumeCalculator(
 				changeEventsInterval,
+				changeEventsMaxTime,
 				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
 				scenario
 			);
@@ -332,7 +333,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			EventsUtils.readEvents(manager, eventPath);
 			manager.finishProcessing();
 
-			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
+			List<NetworkChangeEvent> events = generateNetworkChangeEvents();
 			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
 
@@ -471,10 +472,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	 * Creates and applies the {@link NetworkChangeEvent}s to the network. It sets the capacity for all links outside the shapefile and bufferzone
 	 * to infinite and reduces the freespeed of the links so that the agents behave somehow realistically outside the cutout-area.
 	 *
-	 * @param timeFrameLength interval length of time frames in seconds
 	 * @return a list of the generated NetworkChangeEvents. Use is optional.
 	 */
-	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength) {
+	private List<NetworkChangeEvent> generateNetworkChangeEvents() {
 		List<NetworkChangeEvent> events = new LinkedList<>();
 
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -498,7 +498,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			Double prevCapacity = null;
 
 			// Do this for the whole simulation run
-			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
+			for (double time = 0; time < changeEventsMaxTime; time += changeEventsInterval) {
 
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
@@ -519,23 +519,21 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				} else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
 				else if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
-					// TODO WIP
-
 					// Compute the cleaned travelTimes. The idea is to compute, how long the average vehicle in the scenario would wait in a queue,
-					// if the "static" traffic (teh traffic, that will be removed after the cutout) was there. This waiting time is then used to
+					// if the "static" traffic (the traffic, that will be removed after the cutout) was there. This waiting time is then used to
 					// set the new freespeed accordingly. The capacity will be set to the value, which is "remaining" after the static traffic is subtracted.
 
-					// 1. We first compute the averaged load (using only the vehicles, which will be removed later on)
-					double averageLoad = cv.getAveragedAccumulatedLoad(link.getId());
+					// 1. We first compute the average PCE of all vehicles in the cutout scenario
+					double averagePCE = 1; // TODO this is just a placeholder value
 
-					// 2. Then we look at the average PCE of all vehicles in the cutout scenario
-					double averagePC = 1; // TODO
+					// 2. Then we compute the averaged load (using only the vehicles, which will be removed later on)
+					double averageLoad = cv.getAccumulatedLoad(link.getId(), time, averagePCE);
 
 					// 3. We calculate the average waiting time using the average load and average PCE
-					double averageWaitingTime = averageLoad / averagePC; // TODO Check for units
+					double averageWaitingTime = averageLoad / averagePCE;
 
 					// 4. The freespeed is given by adding the averageWaitingTime to the average travel time of the link
-					freespeed = link.getFreespeed() + link.getLength() / averageWaitingTime; // TODO This formula seems wrong, fix it
+					freespeed = link.getLength() / (averageWaitingTime+(link.getLength()/link.getFreespeed()));
 
 				}
 
@@ -686,7 +684,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		relativeAdjustmentOfCapacities,
 
 		/**
-		 * TODO
+		 * TODO This method may or may not work. It is purely theoretical. A test will be done during the next days to see, if it works in practice.
 		 */
 		cleanedFreespeeds
 
