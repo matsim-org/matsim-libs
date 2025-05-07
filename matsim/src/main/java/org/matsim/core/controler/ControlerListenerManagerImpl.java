@@ -128,7 +128,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * Notifies all ControlerListeners
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
-	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable String exception) {
+	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable Throwable exception) {
 		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration, exception);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());

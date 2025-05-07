@@ -36,9 +36,9 @@ public final class ShutdownEvent extends ControlerEvent {
 	 */
 	private final boolean unexpected;
 	private final int iteration;
-	private final String exception;
+	private final Throwable exception;
 	
-	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration, String exception) {
+	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration, Throwable exception) {
 		super(controler);
 		this.unexpected = unexpected;
 		this.iteration = iteration;
@@ -56,7 +56,7 @@ public final class ShutdownEvent extends ControlerEvent {
 		return iteration;
 	}
 
-	public Optional<String> getException() {
+	public Optional<Throwable> getException() {
 		return Optional.ofNullable(this.exception);
 	}
 }
