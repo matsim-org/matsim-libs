@@ -143,6 +143,11 @@ public class TurnRestrictionsNetworkCleaner {
             // copy all attributes except initial turn restrictions
             NetworkUtils.copyAttributesExceptDisallowedNextLinks(coloredLink.link, linkCopy);
 
+            // copy all other modes
+            for (String allowedMode : coloredLink.link.getAllowedModes()) {
+                NetworkUtils.addAllowedMode(linkCopy, allowedMode);
+            }
+
             // copy all turn restrictions of all other modes
             DisallowedNextLinks originalDisallowedNextLinks = NetworkUtils.getDisallowedNextLinks(coloredLink.link);
             if(originalDisallowedNextLinks != null) {
