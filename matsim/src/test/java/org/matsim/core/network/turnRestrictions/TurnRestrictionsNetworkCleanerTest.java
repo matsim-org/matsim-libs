@@ -28,18 +28,16 @@ class TurnRestrictionsNetworkCleanerTest {
 	private static final Set<String> MODES = Set.of(CAR, BUS, BIKE);
 
 	@ParameterizedTest
-	@ValueSource(strings = { CAR, BUS, BIKE }) // ! DEBUG: works only with car!?
+	@ValueSource(strings = { CAR, BUS, BIKE })
 	void cleanTest(String dnlMode) {
 
 		Network network = crossingWithForbiddenUTurn(MODES, dnlMode);
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
-		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
 		trc.run(network, dnlMode);
-		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
