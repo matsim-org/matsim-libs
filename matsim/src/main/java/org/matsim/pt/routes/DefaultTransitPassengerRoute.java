@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultTransitPassengerRoute extends AbstractRoute implements TransitPassengerRoute {
 	protected final static int NULL_ID = -1;
-	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	final public static String ROUTE_TYPE = "default_pt";
 
@@ -90,7 +89,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		try {
 			RouteDescription routeDescription = new RouteDescription(this);
-			return OBJECT_MAPPER.writeValueAsString(routeDescription);
+			return RouteDescription.toJson(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -99,7 +98,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	@Override
 	public void setRouteDescription(String routeDescription) {
 		try {
-			RouteDescription parsed = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
+			RouteDescription parsed = RouteDescription.fromJson(routeDescription);
 			this.boardingTime = parsed.boardingTime;
 			this.accessFacilityIndex = parsed.accessFacilityId == null ? NULL_ID : parsed.accessFacilityId.index();
 			this.egressFacilityIndex = parsed.egressFacilityId == null ? NULL_ID : parsed.egressFacilityId.index();
@@ -187,6 +186,9 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	}
 
 	public static final class RouteDescription {
+
+		private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
 		public double boardingTime = UNDEFINED_TIME;
 
 		public Id<TransitLine> transitLineId;
@@ -210,6 +212,14 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			if (r.chainedRoute != null) {
 				this.chainedRoute = new RouteDescription(r.chainedRoute);
 			}
+		}
+
+		public static String toJson(RouteDescription routeDescription) throws JsonProcessingException {
+			return OBJECT_MAPPER.writeValueAsString(routeDescription);
+		}
+
+		public static RouteDescription fromJson(String json) throws JsonProcessingException {
+			return OBJECT_MAPPER.readValue(json, RouteDescription.class);
 		}
 
 		@JsonProperty("boardingTime")
