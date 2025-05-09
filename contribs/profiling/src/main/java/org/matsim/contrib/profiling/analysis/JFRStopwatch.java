@@ -3,11 +3,11 @@ package org.matsim.contrib.profiling.analysis;
 import jdk.jfr.consumer.EventStream;
 import jdk.jfr.consumer.RecordedFrame;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.contrib.profiling.events.JFRIterationEvent;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -17,9 +17,6 @@ public class JFRStopwatch implements AutoCloseable {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch();
 	private final EventStream eventStream;
-
-	private int iteration = -1;
-	private Instant currentIterationStart = null;
 
 	public static void main(String[] args) throws IOException {
 
@@ -57,7 +54,17 @@ public class JFRStopwatch implements AutoCloseable {
 	 */
 	public JFRStopwatch(EventStream eventStream) {
 		this.eventStream = eventStream;
-		eventStream.setOrdered(true);
+		eventStream.setOrdered(true); // this orders all events by their *commit* time
+		// JFRIterationEvents will occur *after* all the operations happening within them
+		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
+		eventStream.onEvent(JFRIterationEvent.class.getName(), event -> {
+			// start iteration in stopwatch
+			stopwatch.beginIteration(event.getInt("iteration"), event.getStartTime().toEpochMilli());
+			// add all other recorded events to stopwatch
+			// todo
+			// end iteration in stopwatch & flush recordings
+			stopwatch.endIteration(event.getEndTime().toEpochMilli());
+		});
 
 		eventStream.onEvent("jdk.ExecutionSample", event -> {
 			AtomicBoolean hasIterationFrame = new AtomicBoolean(false);
@@ -77,37 +84,11 @@ public class JFRStopwatch implements AutoCloseable {
 						var method = recordedMethod.getName();
 
 						System.out.println(type + "#" + method);
-//						if ("org.matsim.analysis.IterationStopwatch".equals(type) && "beginIteration".equals(method)) {
-//							if (currentIterationStart == null) {
-//								currentIterationStart = event.getStartTime();
-//								stopwatch.beginIteration(++iteration, currentIterationStart.toEpochMilli());
-//							}
-//						}
-//
-//						if ("org.matsim.analysis.IterationStopwatch".equals(type) && "endIteration".equals(method)) {
-//							if (currentIterationStart != null) {
-//								stopwatch.endIteration(event.getEndTime().toEpochMilli());
-//								currentIterationStart = null;
-//							}
-//						}
 						if ("org.matsim.core.controler.AbstractController".equals(type) && "iteration".equals(method)) {
-							if (currentIterationStart == null) {
-								currentIterationStart = event.getStartTime();
-								stopwatch.beginIteration(++iteration, currentIterationStart.toEpochMilli());
-							}
-							hasIterationFrame.set(true);
-							// we now need to keep track of this iteration and every operation in it, until it ends
-							// if the recording was started from some iteration and not from the start of the app
-							// we might need to drop the first iteration
-							// if existing, rely on JFRIterationEvent, but that might not exist.
+
 						}
 					});
 				System.out.println("---");
-				if (!hasIterationFrame.get() && currentIterationStart != null) {
-					stopwatch.endIteration(event.getEndTime().toEpochMilli());
-					currentIterationStart = null;
-					System.out.println("outside iteration");
-				}
 			}
 		});
 
