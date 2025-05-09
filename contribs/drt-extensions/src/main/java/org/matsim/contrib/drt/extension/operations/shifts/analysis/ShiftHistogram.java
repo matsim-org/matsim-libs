@@ -13,7 +13,7 @@ import java.io.UncheckedIOException;
 /**
  * @author nkuehnel / MOIA
  */
-class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
+public final class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
         DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
     private final String mode;
