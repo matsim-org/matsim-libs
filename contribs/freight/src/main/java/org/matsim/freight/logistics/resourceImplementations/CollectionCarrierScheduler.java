@@ -82,7 +82,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 	private CarrierService convertToCarrierService(LspShipment lspShipment) {
 		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom(),lspShipment.getSize());
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getSize());
 		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
 			.setServiceDuration(lspShipment.getDeliveryServiceTime())
 			.build();
