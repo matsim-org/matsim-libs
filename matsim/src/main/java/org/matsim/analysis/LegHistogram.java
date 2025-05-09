@@ -66,7 +66,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private final Map<String, DataFrame> data = new TreeMap<>();
 
 	@Inject
-	LegHistogram(Population population, EventsManager eventsManager, Config config) {
+	LegHistogram(Population population, Config config) {
 		super();
 		this.binSize = DEFAULT_BIN_SIZE;
 		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
@@ -76,8 +76,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		} else {
 			this.personIds = population.getPersons().keySet();
 		}
-		eventsManager.addHandler(this);
-	}
+		}
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
