@@ -27,13 +27,13 @@ public class TurnRestrictionsNetworkCleaner {
     @SuppressWarnings("deprecation")
     public void run(Network network, String mode) {
         TurnRestrictionsContext turnRestrictions = TurnRestrictionsContext.build(network, mode);
-        colorNetwork(network, turnRestrictions);
+        colorNetwork(network, turnRestrictions, mode);
         new MultimodalNetworkCleaner(network).run(Set.of(mode));
         collapseNetwork(network, turnRestrictions, mode);
         reapplyRestrictions(network, turnRestrictions, mode);
     }
 
-    public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions) {
+    public void colorNetwork(Network network, TurnRestrictionsContext turnRestrictions, String mode) {
 
         for (Link link : network.getLinks().values()) {
             if (turnRestrictions.replacedLinks.containsKey(link.getId())) {
@@ -47,6 +47,7 @@ public class TurnRestrictionsNetworkCleaner {
             coloredCopy.getAttributes().putAttribute("colored", coloredNode.node().getId());
         }
 
+        Set<String> modeSingletonSet = Set.of(mode);
         for (TurnRestrictionsContext.ColoredLink coloredLink : turnRestrictions.coloredLinks) {
             Node fromNode;
             if (coloredLink.fromColoredNode != null) {
@@ -76,6 +77,7 @@ public class TurnRestrictionsNetworkCleaner {
                     coloredLink.link.getCapacity(),
                     coloredLink.link.getNumberOfLanes()
             );
+            link.setAllowedModes(modeSingletonSet);
             link.getAttributes().putAttribute("colored", coloredLink.link.getId());
             network.addLink(link);
         }
