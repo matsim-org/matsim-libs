@@ -46,7 +46,7 @@ public final class IterationStopWatch {
 	 */
 	public static final String OPERATION_ITERATION = "iteration";
 
-	/*
+	/**
 	 * Time spent in operations which are not measured in detail.
 	 */
 	public static final String OPERATION_OTHER = "other";
@@ -111,6 +111,10 @@ public final class IterationStopWatch {
 	 * the analysis.
 	 */
 	public void beginIteration(final int iteration) {
+		beginIteration(iteration, System.currentTimeMillis());
+	}
+
+	public void beginIteration(final int iteration, final long timestamp) {
 		this.iteration = iteration;
 		if (this.iterations.get(this.iteration) == null) {
 			this.currentIterationValues = new HashMap<>();
@@ -121,7 +125,7 @@ public final class IterationStopWatch {
 			this.currentIterationChildren = new HashMap<>();
 			this.children.put(this.iteration, this.currentIterationChildren);
 		}
-        this.beginOperation(OPERATION_ITERATION);
+        this.beginOperation(OPERATION_ITERATION, timestamp);
 	}
 
 	/**
@@ -130,6 +134,18 @@ public final class IterationStopWatch {
 	 * @param identifier The name of the beginning operation.
 	 */
 	public void beginOperation(final String identifier) {
+		beginOperation(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that an operation begins.
+	 *
+	 * @param identifier The name of the beginning operation.
+	 * @param timestamp timestamp of the start of the operation
+	 *
+	 * @see #beginOperation(String) for the current time
+	 */
+	public void beginOperation(final String identifier, long timestamp) {
 
 		if (identifier.equals(OPERATION_OTHER)) {
 			throw new RuntimeException("Identifier " + OPERATION_OTHER + " is reserved! Please use another one. Aborting!");
@@ -137,7 +153,7 @@ public final class IterationStopWatch {
 
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
-		this.currentIterationValues.put(ident, System.currentTimeMillis());
+		this.currentIterationValues.put(ident, timestamp);
 
 		this.currentIterationChildren.put(identifier, new ArrayList<>());
 
@@ -152,16 +168,28 @@ public final class IterationStopWatch {
 	}
 
 	/**
-	 * Tells the stop watch that an operation ends. The operation must have been started before with
+	 * Tells the stop watch that an operation ends.
+	 * The operation must have been started before with
 	 * {@link #beginOperation(String)}.
 	 *
 	 * @param identifier The name of the ending operation.
 	 */
 	public void endOperation(final String identifier) {
+		endOperation(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that an operation ends. The operation must have been started before with
+	 * {@link #beginOperation(String)}.
+	 *
+	 * @param identifier The name of the ending operation.
+	 */
+	public void endOperation(final String identifier, long timestamp) {
 		String ident = "END " + identifier;
 		ensureIdentifier(ident);
 		ensureOperation(identifier);
-		this.currentIterationValues.put(ident, System.currentTimeMillis());
+		// todo ensure the timestamp is not smaller than begin timestamp?
+		this.currentIterationValues.put(ident, timestamp);
 
 
 		this.currentMeasuredOperations.pop();
@@ -171,14 +199,27 @@ public final class IterationStopWatch {
         this.endOperation(OPERATION_ITERATION);
     }
 
+	public void endIteration(long timestamp) {
+		this.endOperation(OPERATION_ITERATION, timestamp);
+	}
+
 	/**
 	 * Tells the stop watch that a special event happened, for which the time should be remembered.
 	 *
 	 * @param identifier The name of the event.
 	 */
 	public void timestamp(final String identifier) {
+		timestamp(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that a special event happened, for which the time should be remembered.
+	 *
+	 * @param identifier The name of the event.
+	 */
+	public void timestamp(final String identifier, long timestamp) {
 		ensureIdentifier(identifier);
-		this.currentIterationValues.put(identifier, System.currentTimeMillis());
+		this.currentIterationValues.put(identifier, timestamp);
 	}
 
 	/**
