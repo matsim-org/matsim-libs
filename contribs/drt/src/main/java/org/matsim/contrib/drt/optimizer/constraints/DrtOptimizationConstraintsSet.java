@@ -27,8 +27,10 @@ public abstract class DrtOptimizationConstraintsSet extends ReflectiveConfigGrou
             + " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
             + " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
             + " InsertionCostCalculator.PenaltyCalculator")
-    private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
+    public boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
+
+    //TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
     @Parameter
     @Comment(
             "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt."
