@@ -42,6 +42,29 @@ class TurnRestrictionsNetworkCleanerTest {
 	}
 
 	@Test
+	void testNoChangeWithOtherMode() {
+
+		Network network = createNetwork();
+		addDisallowedNextLinks(network);
+		network.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, TransportMode.car);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createNetwork();
+		addDisallowedNextLinks(expectedNetwork);
+		expectedNetwork.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+	}
+
+	@Test
 	void testWithIsland() {
 
 		Network network = createNetwork();
@@ -56,6 +79,66 @@ class TurnRestrictionsNetworkCleanerTest {
 		// * --------------------------------------------------
 
 		Network expectedNetwork = createNetwork();
+
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+	}
+
+	@Test
+	void testWithIslandAndOtherMode() {
+
+		Network network = createNetwork();
+		addNetworkIsland(network);
+		network.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, TransportMode.car);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createNetwork();
+		addNetworkIsland(expectedNetwork);
+		expectedNetwork.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("78")), TransportMode.car);
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("87")), TransportMode.car);
+
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+	}
+
+	@Test
+	void testWithIslandAndOtherModeAndOtherDnl() {
+
+		Network network = createNetwork();
+		addNetworkIsland(network);
+		network.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("01")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("12")));
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("12")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("23")));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, TransportMode.car);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createNetwork();
+		addNetworkIsland(expectedNetwork);
+		expectedNetwork.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		NetworkUtils.getOrCreateDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("01")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("12")));
+		NetworkUtils.getOrCreateDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("12")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("23")));
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("78")), TransportMode.car);
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("87")), TransportMode.car);
 
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
 		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
@@ -84,6 +167,73 @@ class TurnRestrictionsNetworkCleanerTest {
 		expectedNetwork.removeLink(Id.createLinkId("87"));
 		Link l67 = expectedNetwork.getLinks().get(Id.createLinkId("67"));
 		NetworkUtils.removeDisallowedNextLinks(l67);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+	}
+
+	@Test
+	void testNoExitWithOtherMode() {
+
+		Network network = createNetwork();
+		addNoExit(network);
+		network.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, TransportMode.car);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createNetwork();
+		addNoExit(expectedNetwork);
+		expectedNetwork.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		// some modes are removed, but bus stays everywhere
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("78")), TransportMode.car);
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("87")), TransportMode.car);
+		NetworkUtils.removeDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("67")));
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+
+	}
+
+	@Test
+	void testNoExitWithOtherModeAndOtherDnl() {
+
+		Network network = createNetwork();
+		addNoExit(network);
+		network.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("67")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("78")));
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("87")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("78")));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, TransportMode.car);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = createNetwork();
+		addNoExit(expectedNetwork);
+		expectedNetwork.getLinks().values().forEach(link -> NetworkUtils.addAllowedMode(link, "bus"));
+		NetworkUtils.getOrCreateDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("67")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("78")));
+		NetworkUtils.getOrCreateDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("87")))
+				.addDisallowedLinkSequence("bus", List.of(Id.createLinkId("78")));
+		// some modes are removed, but bus stays everywhere
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("78")), TransportMode.car);
+		NetworkUtils.removeAllowedMode(expectedNetwork.getLinks().get(Id.createLinkId("87")), TransportMode.car);
+		NetworkUtils.getDisallowedNextLinks(expectedNetwork.getLinks().get(Id.createLinkId("67")))
+				.removeDisallowedLinkSequences(TransportMode.car);
 		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
 
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
