@@ -132,8 +132,8 @@ public class TurnRestrictionsNetworkCleaner {
             Link link = coloredLink.link;
             Link linkCopy = NetworkUtils.createLink(
                     link.getId(),
-                    link.getFromNode(),
-                    link.getToNode(),
+                    network.getNodes().get(link.getFromNode().getId()),
+                    network.getNodes().get(link.getToNode().getId()),
                     network,
                     link.getLength(),
                     link.getFreespeed(),
@@ -188,15 +188,18 @@ public class TurnRestrictionsNetworkCleaner {
         }
 
         if (coloredLink.toColoredNode != null) {
-            Node node = coloredLink.toColoredNode.node();
+
+            // initial node may have been cleaned but re-inserted when colored versions persist.
+            // -> retrieve by original id
+            Node node = network.getNodes().get(coloredLink.toColoredNode.node().getId());
 
             // set of reachable links from the original node
             // use id, as the link object may have been deleted and re-inserted as a copy during the process
-            Set<Id<Link>> unrestrictedReachableLinks = new HashSet<>(node.getOutLinks().values()
+            Set<Id<Link>> unrestrictedReachableLinks = node.getOutLinks().values()
                     .stream()
                     .map(Identifiable::getId)
                     .filter(link -> network.getLinks().containsKey(link))
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet());
 
 
             List<TurnRestrictionsContext.ColoredLink> toAdvance = new ArrayList<>();
