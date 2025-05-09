@@ -186,7 +186,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		return copy;
 	}
 
-	private static final class RouteDescription {
+	public static final class RouteDescription {
 		public double boardingTime = UNDEFINED_TIME;
 
 		public Id<TransitLine> transitLineId;
