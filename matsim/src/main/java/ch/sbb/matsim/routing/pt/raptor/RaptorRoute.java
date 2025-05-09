@@ -141,5 +141,15 @@ public class RaptorRoute {
             this.route = route;
             this.planElements = planElements;
         }
+
+		/**
+		 * Return the arrival time of the last part of the route.
+		 */
+		public double getChainedArrivalTime() {
+			if (this.chainedPart == null) {
+				return this.arrivalTime;
+			}
+			return this.chainedPart.getChainedArrivalTime();
+		}
     }
 }

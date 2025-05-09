@@ -13,7 +13,7 @@ import java.io.UncheckedIOException;
 /**
  * @author nkuehnel / MOIA
  */
-public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
+class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
         DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
     private final String mode;
@@ -27,7 +27,7 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     private DataFrame data = null;
 
 
-    public ShiftHistogram(String mode, Config config) {
+    ShiftHistogram(String mode, Config config) {
         super();
         this.mode = mode;
         this.binSize = DEFAULT_BIN_SIZE;

@@ -47,7 +47,6 @@ class StripTransitSchedule {
 
 		cleanNetwork(scenario.getNetwork(), schedule);
 
-
 		// Write the stripped schedule to file
 		new TransitScheduleWriter(ScrambleTransitSchedule.scramble(schedule)).writeFile(outputScheduleFile);
 
@@ -68,8 +67,11 @@ class StripTransitSchedule {
 	 */
 	private static void stripTransitSchedule(TransitSchedule schedule) {
 		// Step 1: First identify all routes that have or are referenced by chained departures
+
 		Set<Id<TransitRoute>> routesToKeep = new HashSet<>();
-		Set<Id<TransitLine>> linesToKeep = new HashSet<>();
+
+		// Keep this specific line, needed for the test
+		Set<Id<TransitLine>> linesToKeep = Set.of(Id.create("005-D-15301", TransitLine.class));
 
 		// Find routes with chained departures
 		for (TransitLine line : schedule.getTransitLines().values()) {
@@ -81,15 +83,17 @@ class StripTransitSchedule {
 
 				route.getAttributes().clear();
 
+				if (linesToKeep.contains(line.getId())) {
+					routesToKeep.add(route.getId());
+				}
+
 				for (Departure departure : route.getDepartures().values()) {
 					if (!departure.getChainedDepartures().isEmpty()) {
 
-						linesToKeep.add(line.getId());
 						routesToKeep.add(route.getId());
 
 						// Also add the referenced routes
 						for (ChainedDeparture chainedDep : departure.getChainedDepartures()) {
-							linesToKeep.add(chainedDep.getChainedTransitLineId());
 							routesToKeep.add(chainedDep.getChainedRouteId());
 						}
 					}

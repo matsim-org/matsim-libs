@@ -1,7 +1,5 @@
 package org.matsim.contrib.drt.extension.fiss;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -42,11 +40,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 public class RunFissDrtScenarioIT {
-	private static final Logger LOG = LogManager.getLogger( RunFissDrtScenarioIT.class );
 
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils() ;
 
