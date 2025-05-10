@@ -81,3 +81,14 @@ layout:
       - title: Destinations
         x: toX
         "y": toY
+  eleventh:
+  - type: carrier
+    title: carrierViewer
+    network: analysis/network-all/network.avro
+    carriers: output_carriers.xml.gz
+  twelfth:
+  - type: lsp
+    title: logisticViewer
+    network: analysis/network-all/network.avro
+    carriers: output_carriers.xml.gz
+    lsps: output_lsps.xml.gz

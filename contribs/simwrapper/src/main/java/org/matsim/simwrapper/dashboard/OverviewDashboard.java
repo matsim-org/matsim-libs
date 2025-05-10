@@ -109,6 +109,19 @@ public class OverviewDashboard implements Dashboard {
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), viz.addDataset(data.compute(LogFileAnalysis.class, "memory_stats.csv")).pivot(List.of("time"), "names", "values").mapping().name("names").x("time").y("values"));
 		});
+
+		layout.row("fourth")
+			.el(CarrierViewer.class, (viz, data) -> {
+				viz.title = "Carrier Viewer";
+				viz.height = 12d;
+				viz.description = "Visualize the carrier's routes";
+
+				// Include a network that has not been filtered
+				viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+					"--mode-filter", "", "--shp", "none");
+
+				viz.carriers = data.output("(*.)?output_carriers.xml.gz");
+			});
 	}
 
 	@Override
