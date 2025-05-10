@@ -121,9 +121,9 @@ public class TeleportationRoutingModuleTest {
 							"mode",
 							scenario, 10.0, 1.0, "customSpeed");
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
-			Assertions.assertEquals(200.0, tt, 10e-7);
-			Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 10e-7);
-			Assertions.assertEquals(200.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(50.0, tt, 10e-7);
+			Assertions.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(50.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 		}
 
 		{ // fallback
@@ -134,9 +134,9 @@ public class TeleportationRoutingModuleTest {
 							"mode",
 							scenario, 30.0, 1.0, "customSpeed");
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
-			Assertions.assertEquals(300.0, tt, 10e-7);
-			Assertions.assertEquals(300.0, leg.getTravelTime().seconds(), 10e-7);
-			Assertions.assertEquals(300.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(33.0, tt, 10e-7);
+			Assertions.assertEquals(33.0, leg.getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(33.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 		}
 	}
 }
