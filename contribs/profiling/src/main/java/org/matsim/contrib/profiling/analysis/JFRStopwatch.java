@@ -9,9 +9,10 @@ import org.matsim.contrib.profiling.events.JFRIterationEvent;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
 /**
  * Service to generate a stopwatch.png from jfr profiling recording files
@@ -21,9 +22,21 @@ public class JFRStopwatch implements AutoCloseable {
 	private final IterationStopWatch stopwatch = new IterationStopWatch();
 	private final EventStream eventStream;
 
-	//private final Queue<Pair<String, Long>> stages = new LinkedBlockingQueue<>(); // for using just the custom events
-	private final Map<String, Long> stagesBegin = Collections.synchronizedMap(new LinkedHashMap<>());
-	private final Map<String, Long> stagesEnd = Collections.synchronizedMap(new LinkedHashMap<>());
+	// linked hashmap to keep insertion order but also hashmap access times
+	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
+	private final Deque<String> ongoingOperations = new LinkedBlockingDeque<>();
+
+	public static final Map<String, Pair<String, String>> OPERATION_METHODS = Map.of(
+		"fireControlerIterationStartsEvent",	Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationStartListeners"),
+		"fireControlerReplanningEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "replanning"),
+		"fireControlerBeforeMobsimEvent",		Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "beforeMobsimListeners"),
+		"notifyBeforeMobsim", 					Pair.of("org.matsim.core.controler.corelisteners.PlansDumpingImpl", "dump all plans"),
+		"prepareForMobsim",						Pair.of("org.matsim.core.controler.NewControler", "prepareForMobsim"), // needs to be actual impl and not an interface/abstract method
+		"runMobSim",								Pair.of("org.matsim.core.controler.NewControler", "mobsim"), //  needs to be actual impl and not an interface/abstract method
+		"fireControlerAfterMobsimEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "afterMobsimListeners"),
+		"fireControlerScoringEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "scoring"),
+		"fireControlerIterationEndsEvent",		Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationEndsListeners")
+	);
 
 	public static void main(String[] args) throws IOException {
 
@@ -55,6 +68,12 @@ public class JFRStopwatch implements AutoCloseable {
 		}
 	}
 
+	record Operation(
+		String name,
+		String methodName,
+		boolean isBegin
+	) {}
+
 	/**
 	 * param: either stream of recordedevents or EventStream?
 	 * former: likely easier to work with, latter better for RAM usage
@@ -66,21 +85,30 @@ public class JFRStopwatch implements AutoCloseable {
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
 		eventStream.onEvent(JFRIterationEvent.class.getName(), event -> {
 			// start iteration in stopwatch
+			System.out.println(event.getStartTime() + " BEGIN iteration");
 			stopwatch.beginIteration(event.getInt("iteration"), event.getStartTime().toEpochMilli());
 			// add all other recorded events to stopwatch
-			synchronized (stagesBegin) {
-				// todo sort the timestamp before putting here
-				stagesBegin.forEach((stage, startTime) -> {
-					stopwatch.beginOperation(stage, startTime);
-					stopwatch.endOperation(stage, stagesEnd.getOrDefault(stage, startTime));
-					if (!stagesEnd.containsKey(stage)) {
-						System.out.println("Stage began but no ending recorded: " + stage + " - resorting to startTime"); // todo might happen for scoring, use iteration end instead?
+			synchronized (stages) {
+				stages.forEach((operation, timestamp) -> {
+					if (operation.isBegin) {
+						System.out.println(Instant.ofEpochMilli(timestamp) + " BEGIN " + operation.name);
+						stopwatch.beginOperation(operation.name, timestamp);
+					} else {
+						System.out.println(Instant.ofEpochMilli(timestamp) + " END   " + operation.name);
+						stopwatch.endOperation(operation.name, timestamp);
 					}
 				});
-				stagesBegin.clear();
-				stagesEnd.clear();
+				// make sure every operation ended
+				ongoingOperations
+					.forEach(operation -> {
+						System.out.println("--- Missing end time for " + operation + " - using iteration end time instead");
+						stopwatch.endOperation(OPERATION_METHODS.get(operation).getRight(), event.getEndTime().toEpochMilli());
+					});
+				stages.clear();
+				ongoingOperations.clear();
 			}
-			// end iteration in stopwatch & flush recordings
+			// end iteration in stopwatch
+			System.out.println(event.getEndTime() + " END   iteration");
 			stopwatch.endIteration(event.getEndTime().toEpochMilli());
 		});
 
@@ -88,28 +116,34 @@ public class JFRStopwatch implements AutoCloseable {
 			AtomicBoolean hasIterationFrame = new AtomicBoolean(false);
 
 			var thread = event.getThread("sampledThread"); // getThread() is always null: https://bugs.openjdk.org/browse/JDK-8291503
-			System.out.println(thread.getJavaName() + "@");
+			//System.out.println(thread.getJavaName() + "@");
 
 			if ("main".equals(thread.getJavaName())) {
 
 				// for all started but not ended operations
-				synchronized (stagesBegin) {
-					stagesBegin.entrySet()
-						.stream()
-						.filter(entry -> !stagesEnd.containsKey(entry.getKey()))
-						.filter(entry ->
-							// if no mention anymore in the stacktrace, the operation is assumed to be over
-							event.getStackTrace()
-								.getFrames()
-								.stream()
-								.filter(RecordedFrame::isJavaFrame)
-								.map(RecordedFrame::getMethod)
-								.noneMatch(frameMethod -> entry.getKey().equals(frameMethod.getName()))
-						).forEach(entry -> stagesEnd.put(entry.getKey(), event.getEndTime().toEpochMilli()));
+				synchronized (stages) {
+					while (!ongoingOperations.isEmpty()) {
+						var operation = ongoingOperations.getFirst();
+						// if no mention anymore in the stacktrace, the operation is assumed to be over
+						if (event.getStackTrace()
+							.getFrames()
+							.stream()
+							.filter(RecordedFrame::isJavaFrame)
+							.map(RecordedFrame::getMethod)
+							.noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
+							stages.put(new Operation(OPERATION_METHODS.get(operation).getRight(), operation, false), event.getEndTime().toEpochMilli());
+							ongoingOperations.removeFirst();
+						} else {
+							// only the topmost ongoing operation can be ended
+							// assuming the nested operation has to be higher on the stacktrace and thus exited earlier
+							break;
+						}
+					}
 				}
 
 				event.getStackTrace()
 					.getFrames()
+					.reversed()
 					.stream()
 					.filter(RecordedFrame::isJavaFrame)
 					.map(RecordedFrame::getMethod)
@@ -119,26 +153,20 @@ public class JFRStopwatch implements AutoCloseable {
 						var method = recordedMethod.getName();
 						var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
 
-						System.out.println(type + "#" + method);
+						//System.out.println(type + "#" + method);
 
-						// todo missing stage names equal to current stopwatch
-						Stream.of(
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerIterationStartsEvent"), // iterationStartListeners
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerReplanningEvent"), // replanning
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerBeforeMobsimEvent"), // beforeMobsimListeners
-							Pair.of("org.matsim.core.controler.corelisteners.PlansDumpingImpl", "notifyBeforeMobsim"), // dump all plans
-							Pair.of("org.matsim.core.controler.NewControler", "prepareForMobsim"), // prepareForMobsim - needs to be actual impl and not an interface/abstract method
-							Pair.of("org.matsim.core.controler.NewControler", "runMobSim"), // mobsim - needs to be actual impl and not an interface/abstract method
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerAfterMobsimEvent"), // afterMobsimListeners
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerScoringEvent"), // scoring
-							Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "fireControlerIterationEndsEvent") // iterationEndsListeners
-						)
-							.filter(entry -> entry.getKey().equals(recordedMethod.getType().getName()) && entry.getValue().equals(recordedMethod.getName()))
+						OPERATION_METHODS.entrySet().stream()
+							.filter(entry -> entry.getValue().getLeft().equals(type) && entry.getKey().equals(method))
 							.findFirst()
-							.ifPresent(entry -> stagesBegin.putIfAbsent(method, time));
+							.ifPresent(entry -> {
+								stages.putIfAbsent(new Operation(entry.getValue().getRight(), method, true), time);
+								if (!ongoingOperations.contains(entry.getKey())) {
+									ongoingOperations.addFirst(entry.getKey());
+								}
+							});
 
 					});
-				System.out.println("---");
+				//System.out.println("---");
 			}
 		});
 
