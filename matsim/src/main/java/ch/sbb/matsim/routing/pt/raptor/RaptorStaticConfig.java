@@ -51,7 +51,7 @@ public class RaptorStaticConfig {
          * (see {@link SwissRailRaptor#calcTree(TransitStopFacility, double, RaptorParameters, Person)} ).
          */
         OneToAllRouting }
-	
+
 	public enum RaptorTransferCalculation {
 		/**
 		 * Use this option if you want the algorithm to calculate all possible transfers
@@ -68,7 +68,7 @@ public class RaptorStaticConfig {
 		Adaptive,
 
         /**
-         * Use this option if you wnat the algorithm to calculate transfers on demand,
+         * Use this option if you want the algorithm to calculate transfers on demand,
          * but not cache them. This allows for a large reduction in memory use, but may
          * drastically increase processing times.
          */
@@ -191,7 +191,7 @@ public class RaptorStaticConfig {
 	public void setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling) {
 		this.intermodalLegOnlyHandling = intermodalLegOnlyHandling;
 	}
-	
+
     public RaptorTransferCalculation getTransferCalculation() {
         return this.transferCalculation;
     }

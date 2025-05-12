@@ -92,9 +92,6 @@ public class SpeedyALT implements LeastCostPathCalculator {
 			if(replacedLinks.containsKey(fromLink.getId())) {
 				startNodeIndex = replacedLinks.get(fromLink.getId()).toColoredNode.index();
 			}
-			if(replacedLinks.containsKey(toLink.getId())) {
-				endNodeIndex = replacedLinks.get(toLink.getId()).toColoredNode.index();
-			}
 		}
 
 		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle);

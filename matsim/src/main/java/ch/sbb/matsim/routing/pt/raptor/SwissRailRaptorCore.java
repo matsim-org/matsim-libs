@@ -28,6 +28,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.CachingTransferProvid
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -179,7 +180,8 @@ public class SwissRailRaptorCore {
                     double waitingCost = waitingTime * -parameters.getMarginalUtilityOfWaitingPt_utl_s();
 
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, nextDepartureTimeAtStop, nextDepartureTimeAtStop, arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, nextDepartureTimeAtStop, nextDepartureTimeAtStop, arrivalTime, arrivalCost, 0,
+						stop.distance, 0, true, false,null, stop);
 
                     /* okay, the following is not very nice...
                      * we want to find the least-cost access leg including the waiting time
@@ -207,7 +209,7 @@ public class SwissRailRaptorCore {
                 } else if (isIntermodalAccess) {
                     // there is no more departure, but we start here by intermodal access, so still register to allow transfers to other (non-)intermodal stops.
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, TIME_UNDEFINED,arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, TIME_UNDEFINED,arrivalTime, arrivalCost, 0, stop.distance, 0, true, false, null, stop);
 
                     /* okay, the following is not very nice...
                      * ... see long comment above, it's the same
@@ -372,7 +374,7 @@ public class SwissRailRaptorCore {
                 double arrivalCost = depAtRouteStop.accessStop.accessCost + depAtRouteStop.costOffset;
                 RRouteStop toRouteStop = depAtRouteStop.routeStop;
                 int routeStopIndex = depAtRouteStop.routeStopIndex;
-                PathElement pe = new PathElement(null, toRouteStop, depAtRouteStop.depTime, depAtRouteStop.depTime, depAtRouteStop.depTime, arrivalTime, arrivalCost, 0, depAtRouteStop.accessStop.distance, 0, true, null, depAtRouteStop.accessStop);
+                PathElement pe = new PathElement(null, toRouteStop, depAtRouteStop.depTime, depAtRouteStop.depTime, depAtRouteStop.depTime, arrivalTime, arrivalCost, 0, depAtRouteStop.accessStop.distance, 0, true, false, null, depAtRouteStop.accessStop);
                 this.arrivalPathPerRouteStop[routeStopIndex] = pe;
                 this.leastArrivalCostAtRouteStop[routeStopIndex] = arrivalCost;
                 this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
@@ -526,7 +528,7 @@ public class SwissRailRaptorCore {
 								int arrivalTime = (int) (depTime + stop.accessTime);
 								double arrivalCost = stop.accessCost;
 								RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-								PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
+								PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, false, null, stop);
 								this.arrivalPathPerRouteStop[routeStopIndex] = pe;
 								this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
 								this.leastArrivalCostAtRouteStop[routeStopIndex] = arrivalCost;
@@ -652,13 +654,10 @@ public class SwissRailRaptorCore {
         this.improvedStops.clear();
         this.reachedRouteStopIndices.clear();
 
-        double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
-        boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
-
-        int routeIndex = -1;
+        MutableInt routeIndex = new MutableInt(-1);
         for (int firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(0); firstRouteStopIndex >= 0; firstRouteStopIndex = this.improvedRouteStopIndices.nextSetBit(firstRouteStopIndex+1)) {
             RRouteStop firstRouteStop = this.data.routeStops[firstRouteStopIndex];
-            if (firstRouteStop.transitRouteIndex == routeIndex) {
+            if (firstRouteStop.transitRouteIndex == routeIndex.getValue()) {
                 continue; // we've handled this route already
             }
             int tmpRouteIndex = firstRouteStop.transitRouteIndex;
@@ -669,106 +668,170 @@ public class SwissRailRaptorCore {
             // firstRouteStop is the first RouteStop in the route we can board in this round
             // figure out which departure we can take
             PathElement boardingPE = this.arrivalPathPerRouteStop[firstRouteStopIndex];
+
             int agentFirstArrivalTime = boardingPE.arrivalTime;
             int currentBoardingRouteStopIndex = firstRouteStopIndex;
             int currentDepartureIndex = findNextDepartureIndex(route, firstRouteStop, agentFirstArrivalTime);
+
             if (currentDepartureIndex >= 0) {
-                Vehicle currentVehicle = this.data.departureVehicles[currentDepartureIndex];
-                int currentDepartureTime = this.data.departures[currentDepartureIndex];
-                int currentAgentBoardingTime;
-                double currentTravelCostWhenBoarding;
-                double currentTransferCostWhenBoarding;
-                {
-                    int vehicleArrivalTime = currentDepartureTime + firstRouteStop.arrivalOffset;
-                    currentAgentBoardingTime = Math.max(agentFirstArrivalTime, vehicleArrivalTime);
-                    int waitingTime = currentAgentBoardingTime - agentFirstArrivalTime;
-                    double waitingCost = -marginalUtilityOfWaitingPt_utl_s * waitingTime;
-                    currentTravelCostWhenBoarding = boardingPE.arrivalTravelCost + waitingCost;
-                    currentTransferCostWhenBoarding = boardingPE.arrivalTransferCost;
-                }
-
-                if ((currentTravelCostWhenBoarding + currentTransferCostWhenBoarding) > this.bestArrivalCost) {
-                    continue;
-                }
-                routeIndex = tmpRouteIndex;
-                int firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
-
-                double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(
-                		 !useTransportModeUtilities ? boardingPE.toRouteStop.mode : boardingPE.toRouteStop.route.getTransportMode());
-                transferProvider.reset(boardingPE.transfer);
-
-                for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
-                    RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
-                    if (!toRouteStop.routeStop.isAllowAlighting()) {
-                        continue;
-                    }
-                    this.routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
-                    int arrivalTime = currentDepartureTime + toRouteStop.arrivalOffset;
-                    int inVehicleTime = arrivalTime - currentAgentBoardingTime;
-                    double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
-                    double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
-                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(boardingPE,transferProvider, data.config, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
-                    double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
-                    double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
-                    if (totalArrivalCost <= previousArrivalCost) {
-                        double distance = toRouteStop.distanceAlongRoute - boardingPE.toRouteStop.distanceAlongRoute;
-                        PathElement pe = new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, null, null);
-                        this.arrivalPathPerRouteStop[toRouteStopIndex] = pe;
-                        this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
-                        if (totalArrivalCost <= this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex]) {
-                            this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex] = totalArrivalCost;
-                            this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
-                            this.improvedStops.set(toRouteStop.stopFacilityIndex);
-                            checkForBestArrival(toRouteStopIndex, totalArrivalCost);
-                        }
-                    } else /*if (previousArrivalCost < arrivalCost)*/ {
-                        // looks like we could reach this stop with better cost from somewhere else
-                        // check if we can depart also with better cost, if yes, switch to this connection
-                        PathElement alternativeBoardingPE = this.arrivalPathPerRouteStop[toRouteStopIndex];
-                        int alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
-                        int alternativeDepartureIndex = findNextDepartureIndex(route, toRouteStop, alternativeAgentFirstArrivalTime);
-                        if (alternativeDepartureIndex >= 0) {
-                            int alternativeDepartureTime = this.data.departures[alternativeDepartureIndex];
-                            int alternativeVehicleArrivalTime = alternativeDepartureTime + toRouteStop.arrivalOffset;
-                            int alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
-                            int alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
-                            double alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
-                            double alternativeTravelCostWhenBoarding = alternativeBoardingPE.arrivalTravelCost + alternativeWaitingCost;
-                            double alternativeTotalCostWhenBoarding = alternativeTravelCostWhenBoarding + alternativeBoardingPE.arrivalTransferCost;
-                            if (alternativeTotalCostWhenBoarding < totalArrivalCost) {
-                                currentDepartureIndex = alternativeDepartureIndex;
-                                currentVehicle = this.data.departureVehicles[currentDepartureIndex];
-                                currentDepartureTime = alternativeDepartureTime;
-                                if (alternativeBoardingPE.isTransfer) {
-                                    firstRouteStop = this.data.routeStops[toRouteStopIndex];
-                                } else {
-                                    // we improve to a line/route we entered at some earlier stop, do not create a new transfer for this,
-                                    // but set the boarding info back to the original boarding of this route
-                                    alternativeBoardingPE = alternativeBoardingPE.comingFrom;
-                                    alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
-                                    alternativeVehicleArrivalTime = alternativeDepartureTime + alternativeBoardingPE.toRouteStop.arrivalOffset;
-                                    alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
-
-                                    alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
-                                    alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
-                                    alternativeTravelCostWhenBoarding = alternativeBoardingPE.arrivalTravelCost + alternativeWaitingCost;
-
-                                    firstRouteStop = alternativeBoardingPE.toRouteStop;
-                                }
-                                currentAgentBoardingTime = alternativeAgentBoardingTime;
-                                currentTravelCostWhenBoarding = alternativeTravelCostWhenBoarding;
-                                currentTransferCostWhenBoarding = alternativeBoardingPE.arrivalTransferCost;
-                                boardingPE = alternativeBoardingPE;
-                                firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
-                                currentBoardingRouteStopIndex = alternativeBoardingPE.toRouteStop.index;
-                            }
-                        }
-                    }
-                    firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
-                }
+				firstRouteStopIndex = exploreRoute(parameters, person, transferProvider,
+					currentDepartureIndex, firstRouteStop, agentFirstArrivalTime,
+					boardingPE, route, tmpRouteIndex,
+					currentBoardingRouteStopIndex, firstRouteStopIndex, routeIndex);
             }
         }
     }
+
+	private int exploreRoute(RaptorParameters parameters, Person person, CachingTransferProvider transferProvider,
+							  int currentDepartureIndex, RRouteStop firstRouteStop, int agentFirstArrivalTime,
+							  PathElement boardingPE, RRoute route, int tmpRouteIndex,
+							  int currentBoardingRouteStopIndex, int firstRouteStopIndex, MutableInt routeIndex) {
+		double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
+		boolean useTransportModeUtilities = parameters.isUseTransportModeUtilities();
+
+		Vehicle currentVehicle = this.data.departureVehicles[currentDepartureIndex];
+		int currentDepartureTime = this.data.departures[currentDepartureIndex];
+		int currentAgentBoardingTime;
+		double currentTravelCostWhenBoarding;
+		double currentTransferCostWhenBoarding;
+		{
+			int vehicleArrivalTime = currentDepartureTime + firstRouteStop.arrivalOffset;
+			currentAgentBoardingTime = Math.max(agentFirstArrivalTime, vehicleArrivalTime);
+			int waitingTime = currentAgentBoardingTime - agentFirstArrivalTime;
+			double waitingCost = -marginalUtilityOfWaitingPt_utl_s * waitingTime;
+			currentTravelCostWhenBoarding = boardingPE.arrivalTravelCost + waitingCost;
+			currentTransferCostWhenBoarding = boardingPE.arrivalTransferCost;
+		}
+
+		if ((currentTravelCostWhenBoarding + currentTransferCostWhenBoarding) > this.bestArrivalCost) {
+			return firstRouteStopIndex;
+		}
+
+		routeIndex.setValue(tmpRouteIndex);
+
+		int firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
+
+		double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(
+			!useTransportModeUtilities ? boardingPE.toRouteStop.mode : boardingPE.toRouteStop.route.getTransportMode());
+
+		SwissRailRaptorData.RChained[] chains = this.data.chainedDepartures.get(currentDepartureIndex);
+		PathElement lastPE = null;
+		boolean hasChains = chains != null;
+
+		for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
+			RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
+			if (!toRouteStop.routeStop.isAllowAlighting()) {
+				continue;
+			}
+			this.routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
+			int arrivalTime = currentDepartureTime + toRouteStop.arrivalOffset;
+			int inVehicleTime = arrivalTime - currentAgentBoardingTime;
+			double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
+			double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
+			double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(boardingPE, transferProvider, data.config, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
+			double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
+			double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
+
+			double distance = toRouteStop.distanceAlongRoute - boardingPE.toRouteStop.distanceAlongRoute;
+
+			// Create last path element if necessary
+			lastPE = totalArrivalCost <= previousArrivalCost || hasChains ?
+				new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, currentDepartureTime + firstRouteStop.departureOffset, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, false, null, null) :
+				null;
+
+			if (totalArrivalCost <= previousArrivalCost) {
+				this.arrivalPathPerRouteStop[toRouteStopIndex] = lastPE;
+				this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
+				if (totalArrivalCost <= this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex]) {
+					this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex] = totalArrivalCost;
+					this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = lastPE;
+					this.improvedStops.set(toRouteStop.stopFacilityIndex);
+					checkForBestArrival(toRouteStopIndex, totalArrivalCost);
+				}
+			} else /*if (previousArrivalCost < arrivalCost)*/ {
+				// looks like we could reach this stop with better cost from somewhere else
+				// check if we can depart also with better cost, if yes, switch to this connection
+				PathElement alternativeBoardingPE = this.arrivalPathPerRouteStop[toRouteStopIndex];
+				int alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
+				int alternativeDepartureIndex = findNextDepartureIndex(route, toRouteStop, alternativeAgentFirstArrivalTime);
+				if (alternativeDepartureIndex >= 0) {
+					int alternativeDepartureTime = this.data.departures[alternativeDepartureIndex];
+					int alternativeVehicleArrivalTime = alternativeDepartureTime + toRouteStop.arrivalOffset;
+					int alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
+					int alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
+					double alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
+					double alternativeTravelCostWhenBoarding = alternativeBoardingPE.arrivalTravelCost + alternativeWaitingCost;
+					double alternativeTotalCostWhenBoarding = alternativeTravelCostWhenBoarding + alternativeBoardingPE.arrivalTransferCost;
+					if (alternativeTotalCostWhenBoarding < totalArrivalCost) {
+						currentDepartureIndex = alternativeDepartureIndex;
+						currentVehicle = this.data.departureVehicles[currentDepartureIndex];
+						currentDepartureTime = alternativeDepartureTime;
+
+						// Reset chain information when switching connection
+						chains = null;
+						lastPE = null;
+						hasChains = false;
+
+						if (alternativeBoardingPE.isTransfer) {
+							firstRouteStop = this.data.routeStops[toRouteStopIndex];
+						} else {
+							// we improve to a line/route we entered at some earlier stop, do not create a new transfer for this,
+							// but set the boarding info back to the original boarding of this route
+							alternativeBoardingPE = alternativeBoardingPE.comingFrom;
+							alternativeAgentFirstArrivalTime = alternativeBoardingPE.arrivalTime;
+							alternativeVehicleArrivalTime = alternativeDepartureTime + alternativeBoardingPE.toRouteStop.arrivalOffset;
+							alternativeAgentBoardingTime = Math.max(alternativeAgentFirstArrivalTime, alternativeVehicleArrivalTime);
+
+							alternativeWaitingTime = alternativeAgentBoardingTime - alternativeAgentFirstArrivalTime;
+							alternativeWaitingCost = -marginalUtilityOfWaitingPt_utl_s * alternativeWaitingTime;
+							alternativeTravelCostWhenBoarding = alternativeBoardingPE.arrivalTravelCost + alternativeWaitingCost;
+
+							firstRouteStop = alternativeBoardingPE.toRouteStop;
+						}
+						currentAgentBoardingTime = alternativeAgentBoardingTime;
+						currentTravelCostWhenBoarding = alternativeTravelCostWhenBoarding;
+						currentTransferCostWhenBoarding = alternativeBoardingPE.arrivalTransferCost;
+						boardingPE = alternativeBoardingPE;
+						firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
+						currentBoardingRouteStopIndex = alternativeBoardingPE.toRouteStop.index;
+					}
+				}
+			}
+
+			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
+		}
+
+		if (hasChains) {
+
+			MutableInt tmp = new MutableInt(-1);
+
+			assert lastPE != null : "Path element should not be null if we have chains";
+
+			for (SwissRailRaptorData.RChained chain : chains) {
+
+				RRoute chainedRoute = this.data.routes[chain.toRoute];
+				int chainedDepartureIndex = chain.toDeparture;
+
+				int chainedDepartureTime = this.data.departures[chainedDepartureIndex];
+
+				assert chainedDepartureTime >= lastPE.arrivalTime:
+					String.format("Chained departure (%s -> %s) arrival time should be before departure time",
+						this.data.departureIds[currentDepartureIndex], this.data.departureIds[chainedDepartureIndex]);
+
+				RRouteStop firstStop = this.data.routeStops[chainedRoute.indexFirstRouteStop];
+
+				PathElement chainPe = new PathElement(lastPE, firstStop, lastPE.firstDepartureTime, lastPE.arrivalTime, chainedDepartureTime,
+					lastPE.arrivalTime, lastPE.arrivalTravelCost, lastPE.arrivalTransferCost, 0, lastPE.transferCount, false, true, null, null);
+
+				// For arrival time the departure time of the first stop is used, so that no wait time is incurred
+				exploreRoute(parameters, person, transferProvider,
+					chainedDepartureIndex, firstStop, chainedDepartureTime, chainPe, chainedRoute, chain.toRoute,
+					chainedRoute.indexFirstRouteStop, chainedRoute.indexFirstRouteStop, tmp);
+			}
+		}
+
+		return firstRouteStopIndex;
+	}
 
     private void checkForBestArrival(int routeStopIndex, double arrivalCost) {
         if (this.destinationRouteStopIndices.get(routeStopIndex)) {
@@ -852,7 +915,7 @@ public class SwissRailRaptorCore {
                 double prevLeastArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                 if (newTotalArrivalCost < prevLeastArrivalCost || (!strict && newTotalArrivalCost <= prevLeastArrivalCost)) {
                     RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
-                    PathElement pe = new PathElement(fromPE, toRouteStop, fromPE.firstDepartureTime, TIME_UNDEFINED, TIME_UNDEFINED, newArrivalTime, newArrivalTravelCost, newArrivalTransferCost, transfer.transferDistance, fromPE.transferCount + 1, true, transfer, null);
+                    PathElement pe = new PathElement(fromPE, toRouteStop, fromPE.firstDepartureTime, TIME_UNDEFINED, TIME_UNDEFINED, newArrivalTime, newArrivalTravelCost, newArrivalTransferCost, transfer.transferDistance, fromPE.transferCount + 1, true, false, transfer, null);
                     this.arrivalPathPerRouteStop[toRouteStopIndex] = pe;
                     this.leastArrivalCostAtRouteStop[toRouteStopIndex] = newTotalArrivalCost;
                     this.improvedRouteStopIndices.set(toRouteStopIndex);
@@ -892,7 +955,7 @@ public class SwissRailRaptorCore {
 					double arrivalTravelCost = pe.arrivalTravelCost + egressStop.accessCost;
 					double totalCost = arrivalTravelCost + pe.arrivalTransferCost;
 					if ((totalCost < leastCost) || (totalCost == leastCost && pe.transferCount < leastCostPath.transferCount)) {
-						PathElement egressLegCandidate = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, null, egressStop);
+						PathElement egressLegCandidate = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, false, null, egressStop);
 
 						if (pe.comingFrom == null && checkBothPtAndPurelyIntermodalRoutes) {
 							if (totalCost < leastCostFeederOnly) {
@@ -936,13 +999,18 @@ public class SwissRailRaptorCore {
         double time = departureTime;
         TransitStopFacility fromStop = null;
         int peCount = pes.size();
+		boolean chainNext = false;
         int i = -1;
         for (PathElement pe : pes) {
             i++;
             TransitStopFacility toStop = pe.toRouteStop == null ? null : pe.toRouteStop.routeStop.getStopFacility();
             double travelTime = pe.arrivalTime - time;
             if (pe.initialStop != null && pe.initialStop.planElements != null) {
-                raptorRoute.addPlanElements(time, travelTime, pe.initialStop.planElements);
+				raptorRoute.addPlanElements(time, travelTime, pe.initialStop.planElements);
+			}
+			else if (pe.isChained) {
+				// The next leg is chained to the previous one
+				chainNext = true;
             } else if (pe.isTransfer) {
                 // add (peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && to catch case of only access and egress
                 // legs without a real leg in between which was previously caught above by
@@ -958,9 +1026,17 @@ public class SwissRailRaptorCore {
                 String mode = TransportMode.walk;
                 raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);
             } else {
+
                 TransitLine line = pe.toRouteStop.line;
                 TransitRoute route = pe.toRouteStop.route;
-                raptorRoute.addPt(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+
+				if (chainNext) {
+					// Chained part is appended to the last one
+					raptorRoute.addChainedPart(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+					chainNext = false;
+				} else
+					raptorRoute.addPt(fromStop, toStop, line, route, pe.toRouteStop.mode, time, pe.boardingTime, pe.vehDepartureTime, pe.arrivalTime, pe.distance);
+
             }
             time = pe.arrivalTime;
             fromStop = toStop;
@@ -984,10 +1060,13 @@ public class SwissRailRaptorCore {
         final double distance;
         final int transferCount;
         final boolean isTransfer;
+		final boolean isChained;
         final RTransfer transfer;
         final InitialStop initialStop;
 
-        PathElement(PathElement comingFrom, RRouteStop toRouteStop, int firstDepartureTime, int boardingTime, int vehDeparturetime, int arrivalTime, double arrivalTravelCost, double arrivalTransferCost, double distance, int transferCount, boolean isTransfer, RTransfer transfer, InitialStop initialStop) {
+        PathElement(PathElement comingFrom, RRouteStop toRouteStop, int firstDepartureTime, int boardingTime, int vehDeparturetime,
+					int arrivalTime, double arrivalTravelCost, double arrivalTransferCost, double distance, int transferCount,
+					boolean isTransfer, boolean isChained, RTransfer transfer, InitialStop initialStop) {
             this.comingFrom = comingFrom;
             this.toRouteStop = toRouteStop;
             this.firstDepartureTime = firstDepartureTime;
@@ -999,6 +1078,7 @@ public class SwissRailRaptorCore {
             this.distance = distance;
             this.transferCount = transferCount;
             this.isTransfer = isTransfer;
+			this.isChained = isChained;
             this.transfer = transfer;
             this.initialStop = initialStop;
         }
