@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,6 +21,32 @@ import com.google.common.base.Verify;
  * @author hrewald
  */
 class TurnRestrictionsNetworkCleanerTest {
+
+	private static final String CAR = "car";
+	private static final String BUS = "bus";
+	private static final String BIKE = "bike";
+	private static final Set<String> MODES = Set.of(CAR, BUS, BIKE);
+
+	@ParameterizedTest
+	@ValueSource(strings = { CAR, BUS, BIKE })
+	void cleanTest(String dnlMode) {
+
+		Network network = crossingWithForbiddenUTurn(MODES, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, dnlMode);
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = crossingWithForbiddenUTurn(MODES, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+	}
 
 	@Test
 	void testNoChange() {
@@ -242,6 +270,49 @@ class TurnRestrictionsNetworkCleanerTest {
 	}
 
 	// Helpers
+
+	static Network crossingWithForbiddenUTurn(Set<String> modes, String dnlMode) {
+		Verify.verify(modes.contains(dnlMode));
+
+		Network network = NetworkUtils.createNetwork();
+
+		Node n0 = NetworkUtils.createNode(Id.createNodeId("0"), new Coord(0, 0));
+		Node n1 = NetworkUtils.createNode(Id.createNodeId("1"), new Coord(-1, 0));
+		Node n2 = NetworkUtils.createNode(Id.createNodeId("2"), new Coord(0, -1));
+		Node n3 = NetworkUtils.createNode(Id.createNodeId("3"), new Coord(1, 0));
+		Node n4 = NetworkUtils.createNode(Id.createNodeId("4"), new Coord(0, 1));
+		network.addNode(n0);
+		network.addNode(n1);
+		network.addNode(n2);
+		network.addNode(n3);
+		network.addNode(n4);
+
+		Link l01 = NetworkUtils.createLink(Id.createLinkId("01"), n0, n1, network, 1, 1, 300, 1);
+		Link l10 = NetworkUtils.createLink(Id.createLinkId("10"), n1, n0, network, 1, 1, 300, 1);
+		Link l02 = NetworkUtils.createLink(Id.createLinkId("02"), n0, n2, network, 1, 1, 300, 1);
+		Link l20 = NetworkUtils.createLink(Id.createLinkId("20"), n2, n0, network, 1, 1, 300, 1);
+		Link l03 = NetworkUtils.createLink(Id.createLinkId("03"), n0, n3, network, 1, 1, 300, 1);
+		Link l30 = NetworkUtils.createLink(Id.createLinkId("30"), n3, n0, network, 1, 1, 300, 1);
+		Link l04 = NetworkUtils.createLink(Id.createLinkId("04"), n0, n4, network, 1, 1, 300, 1);
+		Link l40 = NetworkUtils.createLink(Id.createLinkId("40"), n4, n0, network, 1, 1, 300, 1);
+		network.addLink(l01);
+		network.addLink(l10);
+		network.addLink(l02);
+		network.addLink(l20);
+		network.addLink(l03);
+		network.addLink(l30);
+		network.addLink(l04);
+		network.addLink(l40);
+
+		for (Link link : network.getLinks().values()) {
+			link.setAllowedModes(modes);
+		}
+
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("10")))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId("01"))); // no uturn
+
+		return network;
+	}
 
 	static Network createNetwork() {
 		Network network = NetworkUtils.createNetwork();
