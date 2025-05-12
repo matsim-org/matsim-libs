@@ -269,7 +269,183 @@ class TurnRestrictionsNetworkCleanerTest {
 
 	}
 
+	@Test
+	void doubleUturnSingleMode() {
+		String dnlMode = BUS;
+		Set<String> modes = Set.of(BUS);
+
+		Network network = doubleUturn(modes, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, dnlMode);
+		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = doubleUturn(modes, dnlMode);
+		expectedNetwork.removeLink(Id.createLinkId("23"));
+		expectedNetwork.removeLink(Id.createLinkId("32"));
+		expectedNetwork.removeNode(Id.createNodeId("3"));
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { CAR, BUS, BIKE })
+	void doubleUturn(String dnlMode) {
+
+		Network network = doubleUturn(MODES, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, dnlMode);
+		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = doubleUturn(MODES, dnlMode);
+		Link l23 = expectedNetwork.getLinks().get(Id.createLinkId("23"));
+		NetworkUtils.removeAllowedMode(l23, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l23);
+		Link l32 = expectedNetwork.getLinks().get(Id.createLinkId("32"));
+		NetworkUtils.removeAllowedMode(l32, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l32);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+	}
+
+	@Test
+	void trippleUturnSingleMode() {
+		String dnlMode = CAR;
+		Set<String> modes = Set.of(CAR);
+
+		Network network = trippleUturn(modes, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, dnlMode);
+		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = trippleUturn(modes, dnlMode);
+		expectedNetwork.removeLink(Id.createLinkId("23"));
+		expectedNetwork.removeLink(Id.createLinkId("32"));
+		expectedNetwork.removeNode(Id.createNodeId("3"));
+		expectedNetwork.removeLink(Id.createLinkId("12"));
+		expectedNetwork.removeLink(Id.createLinkId("21"));
+		expectedNetwork.removeNode(Id.createNodeId("2"));
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { CAR, BUS, BIKE })
+	void trippleUturn(String dnlMode) {
+
+		Network network = trippleUturn(MODES, dnlMode);
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, dnlMode);
+		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
+
+		// * --------------------------------------------------
+
+		Network expectedNetwork = trippleUturn(MODES, dnlMode);
+		Link l23 = expectedNetwork.getLinks().get(Id.createLinkId("23"));
+		NetworkUtils.removeAllowedMode(l23, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l23);
+		Link l32 = expectedNetwork.getLinks().get(Id.createLinkId("32"));
+		NetworkUtils.removeAllowedMode(l32, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l32);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+		Link l12 = expectedNetwork.getLinks().get(Id.createLinkId("12"));
+		NetworkUtils.removeAllowedMode(l12, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l12);
+		Link l21 = expectedNetwork.getLinks().get(Id.createLinkId("21"));
+		NetworkUtils.removeAllowedMode(l21, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l21);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
+		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
+		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
+	}
+
 	// Helpers
+
+	static Network trippleUturn(Set<String> modes, String dnlMode) {
+		Network network = doubleUturn(modes, dnlMode);
+
+		// no uturn at end of 12
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("12")))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId("21"))); // no uturn
+
+		return network;
+	}
+
+	static Network doubleUturn(Set<String> modes, String dnlMode) {
+		Verify.verify(modes.contains(dnlMode));
+
+		Network network = NetworkUtils.createNetwork();
+
+		Node n0 = NetworkUtils.createNode(Id.createNodeId("0"), new Coord(0, 0));
+		Node n1 = NetworkUtils.createNode(Id.createNodeId("1"), new Coord(0, 1));
+		Node n2 = NetworkUtils.createNode(Id.createNodeId("2"), new Coord(0, 2));
+		Node n3 = NetworkUtils.createNode(Id.createNodeId("3"), new Coord(0, 3));
+		network.addNode(n0);
+		network.addNode(n1);
+		network.addNode(n2);
+		network.addNode(n3);
+
+		Link l01 = NetworkUtils.createLink(Id.createLinkId("01"), n0, n1, network, 1, 1, 300, 1);
+		Link l10 = NetworkUtils.createLink(Id.createLinkId("10"), n1, n0, network, 1, 1, 300, 1);
+		Link l12 = NetworkUtils.createLink(Id.createLinkId("12"), n1, n2, network, 1, 1, 300, 1);
+		Link l21 = NetworkUtils.createLink(Id.createLinkId("21"), n2, n1, network, 1, 1, 300, 1);
+		Link l23 = NetworkUtils.createLink(Id.createLinkId("23"), n2, n3, network, 1, 1, 300, 1);
+		Link l32 = NetworkUtils.createLink(Id.createLinkId("32"), n3, n2, network, 1, 1, 300, 1);
+		network.addLink(l01);
+		network.addLink(l10);
+		network.addLink(l12);
+		network.addLink(l21);
+		network.addLink(l23);
+		network.addLink(l32);
+
+		for (Link link : network.getLinks().values()) {
+			link.setAllowedModes(modes);
+		}
+
+		// no uturns at 23 and 32 vice versa
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("23")))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId("32"))); // no uturn
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("32")))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId("23"))); // no uturn
+
+		return network;
+	}
 
 	static Network crossingWithForbiddenUTurn(Set<String> modes, String dnlMode) {
 		Verify.verify(modes.contains(dnlMode));
