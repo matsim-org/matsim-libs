@@ -25,6 +25,7 @@ import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivi
 
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -172,6 +173,29 @@ import org.matsim.testcases.MatsimTestUtils;
 		new ConfigReader( configV2 ).readFile( v2path );
 
 		assertIdentical("re-read v2", initialGroup, configV2.scoring());
+	}
+
+	@Test
+	void testRoutingModesAndScoringModes(){
+		Config config = ConfigUtils.createConfig();
+		config.routing().clearTeleportedModeParams();
+		config.routing().setNetworkModes(Set.of());
+
+		{
+			config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams().setMode("car").setTeleportedModeSpeed(1.0));
+			config.scoring().addModeParams(new ModeParams().setMode("car"));
+			Assertions.assertDoesNotThrow(() -> config.checkConsistency());
+		}
+
+		{
+			config.scoring().addModeParams(new ModeParams().setMode("car"));
+			Assertions.assertDoesNotThrow(() -> config.checkConsistency());
+		}
+
+		{
+			config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams().setMode("car").setTeleportedModeSpeed(1.0));
+			Assertions.assertThrows(RuntimeException.class, () -> config.checkConsistency());
+		}
 	}
 
 	private void assertIdentical(
