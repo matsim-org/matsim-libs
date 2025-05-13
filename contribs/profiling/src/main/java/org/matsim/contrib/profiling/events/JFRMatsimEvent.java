@@ -20,15 +20,13 @@
 
 package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.Category;
-import jdk.jfr.Description;
-import jdk.jfr.Event;
-import jdk.jfr.Label;
+import jdk.jfr.*;
 
 /**
  * JFR profiling {@link Event} intended as a marker event to record relevant
  * notifications during MATSim execution without a duration.
  */
+@Name("matsim.OperationMarker")
 @Label("MATSim notifications")
 @Description("Notifications about startup, shutdown, replanning, and scoring")
 @Category("MATSim")

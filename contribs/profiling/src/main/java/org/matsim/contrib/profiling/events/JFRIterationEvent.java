@@ -25,6 +25,7 @@ import jdk.jfr.*;
 /**
  * Record a MATSim iteration start and end as a JFR profiling {@link Event}.
  */
+@Name("matsim.Iteration")
 @Label("MATSim iteration")
 @Description("Event to record the duration of a single iterations")
 @Category("MATSim")
