@@ -88,6 +88,9 @@ import org.matsim.vehicles.VehicleType;
 			CarrierService carrierService = convertToCarrierService(lspShipment);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 
+			//TODO: Include all vehicle(types) here and perform a jsprit run for tour planning.
+			// Maybe only, of the the vehicleType collection fo the carrier has more than one vehicleType.
+			//kmt may'25
 			VehicleType vehicleType =
 				ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + lspShipment.getSize())
