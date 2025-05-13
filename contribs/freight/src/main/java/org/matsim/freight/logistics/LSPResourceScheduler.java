@@ -45,7 +45,7 @@ public abstract class LSPResourceScheduler {
 
   protected LSPPlan lspPlan;
 
-  public final void scheduleShipments(LSPPlan lspPlan, LSPResource resource, int bufferTime) {
+  public final void scheduleLspShipments(LSPPlan lspPlan, LSPResource resource, int bufferTime) {
     this.lspPlan = lspPlan;
     this.resource = resource;
     this.lspShipmentsToSchedule = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class LSPResourceScheduler {
     presortIncomingShipments();
     scheduleResource();
     updateShipments();
-    switchHandledShipments(bufferTime);
+    switchHandledLspShipments(bufferTime);
     lspShipmentsToSchedule.clear();
   }
 
@@ -86,7 +86,7 @@ public abstract class LSPResourceScheduler {
     lspShipmentsToSchedule.sort(Comparator.comparingDouble(LspShipmentUtils::getTimeOfLspShipment));
   }
 
-  private void switchHandledShipments(int bufferTime) {
+  private void switchHandledLspShipments(int bufferTime) {
     for (LspShipment lspShipmentWithTime : lspShipmentsToSchedule) {
       var shipmentPlan = LspShipmentUtils.getOrCreateShipmentPlan(lspPlan, lspShipmentWithTime.getId());
       double endOfTransportTime = shipmentPlan.getMostRecentEntry().getEndTime() + bufferTime;

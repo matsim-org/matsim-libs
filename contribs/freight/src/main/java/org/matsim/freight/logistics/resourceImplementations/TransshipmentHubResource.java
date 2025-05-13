@@ -93,7 +93,7 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
 
   @Override
   public void schedule(int bufferTime, LSPPlan lspPlan) {
-    transshipmentHubScheduler.scheduleShipments(lspPlan, this, bufferTime);
+    transshipmentHubScheduler.scheduleLspShipments(lspPlan, this, bufferTime);
   }
 
   public double getCapacityNeedFixed() {
