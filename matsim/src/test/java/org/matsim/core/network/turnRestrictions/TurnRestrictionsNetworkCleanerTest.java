@@ -1,11 +1,19 @@
 package org.matsim.core.network.turnRestrictions;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -17,6 +25,8 @@ import org.matsim.core.network.NetworkUtils;
 
 import com.google.common.base.Verify;
 
+import jakarta.annotation.Nullable;
+
 /**
  * @author hrewald
  */
@@ -26,6 +36,10 @@ class TurnRestrictionsNetworkCleanerTest {
 	private static final String BUS = "bus";
 	private static final String BIKE = "bike";
 	private static final Set<String> MODES = Set.of(CAR, BUS, BIKE);
+	private static final List<String> LINK_SUFFIXES_WITH_DNL = List.of("23", "32", "12");
+
+	@TempDir
+	private static File tempFolder;
 
 	@ParameterizedTest
 	@ValueSource(strings = { CAR, BUS, BIKE })
@@ -276,13 +290,11 @@ class TurnRestrictionsNetworkCleanerTest {
 
 		Network network = doubleUturn(modes, dnlMode);
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
-		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
 		trc.run(network, dnlMode);
-		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
@@ -291,7 +303,6 @@ class TurnRestrictionsNetworkCleanerTest {
 		expectedNetwork.removeLink(Id.createLinkId("32"));
 		expectedNetwork.removeNode(Id.createNodeId("3"));
 		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
-		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
 
 		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
@@ -303,13 +314,11 @@ class TurnRestrictionsNetworkCleanerTest {
 
 		Network network = doubleUturn(MODES, dnlMode);
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
-		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
 		trc.run(network, dnlMode);
-		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
@@ -321,7 +330,6 @@ class TurnRestrictionsNetworkCleanerTest {
 		NetworkUtils.removeAllowedMode(l32, dnlMode);
 		NetworkUtils.removeDisallowedNextLinks(l32);
 		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
-		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
 
 		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
@@ -334,13 +342,11 @@ class TurnRestrictionsNetworkCleanerTest {
 
 		Network network = trippleUturn(modes, dnlMode);
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
-		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
 		trc.run(network, dnlMode);
-		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
@@ -352,7 +358,6 @@ class TurnRestrictionsNetworkCleanerTest {
 		expectedNetwork.removeLink(Id.createLinkId("21"));
 		expectedNetwork.removeNode(Id.createNodeId("2"));
 		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
-		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
 
 		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
@@ -364,13 +369,11 @@ class TurnRestrictionsNetworkCleanerTest {
 
 		Network network = trippleUturn(MODES, dnlMode);
 		Verify.verify(DisallowedNextLinksUtils.isValid(network));
-		NetworkUtils.writeNetwork(network, "0" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
 		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
 		trc.run(network, dnlMode);
-		NetworkUtils.writeNetwork(network, "1" + dnlMode + ".xml"); // ! DEBUG
 
 		// * --------------------------------------------------
 
@@ -389,19 +392,127 @@ class TurnRestrictionsNetworkCleanerTest {
 		NetworkUtils.removeAllowedMode(l21, dnlMode);
 		NetworkUtils.removeDisallowedNextLinks(l21);
 		Verify.verify(DisallowedNextLinksUtils.isValid(expectedNetwork));
-		NetworkUtils.writeNetwork(expectedNetwork, "2" + dnlMode + ".xml"); // ! DEBUG
 
 		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(network));
 		Assertions.assertTrue(NetworkUtils.compare(expectedNetwork, network));
 	}
 
+	@ParameterizedTest
+	@MethodSource("provideTrippleUturnNetworkPaths")
+	void trippleUturn(String networkPath, String dnlMode) {
+
+		Network input = NetworkUtils.readNetwork(networkPath);
+		Verify.verify(DisallowedNextLinksUtils.isValid(input));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(input, dnlMode);
+
+		// * --------------------------------------------------
+
+		Network expected = NetworkUtils.readNetwork(networkPath);
+		Link l23 = expected.getLinks().get(findLinkIdWithSuffix(expected, "23"));
+		NetworkUtils.removeAllowedMode(l23, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l23);
+		Link l32 = expected.getLinks().get(findLinkIdWithSuffix(expected, "32"));
+		NetworkUtils.removeAllowedMode(l32, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l32);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expected));
+		Link l12 = expected.getLinks().get(findLinkIdWithSuffix(expected, "12"));
+		NetworkUtils.removeAllowedMode(l12, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l12);
+		Link l21 = expected.getLinks().get(findLinkIdWithSuffix(expected, "21"));
+		NetworkUtils.removeAllowedMode(l21, dnlMode);
+		NetworkUtils.removeDisallowedNextLinks(l21);
+		Verify.verify(DisallowedNextLinksUtils.isValid(expected));
+
+		Assertions.assertTrue(DisallowedNextLinksUtils.isValid(input));
+		Assertions.assertTrue(NetworkUtils.compare(expected, input));
+
+	}
+
 	// Helpers
 
-	static Network trippleUturn(Set<String> modes, String dnlMode) {
-		Network network = doubleUturn(modes, dnlMode);
+	static Stream<Arguments> provideTrippleUturnNetworkPaths() {
+		List<Arguments> arguments = new ArrayList<>();
+		// add multimodal network, shuffling the order of links with DNL
+		for (String dnlMode : MODES) {
+			List<Arguments> argumentsOfDnlMode = new ArrayList<>();
+			for (String networkPath : trippleUturnShuffled(MODES, dnlMode, tempFolder)) {
+				argumentsOfDnlMode.add(Arguments.of(networkPath, dnlMode));
+			}
+			arguments.addAll(argumentsOfDnlMode);
+		}
+		return arguments.stream();
+	}
 
+	static Network trippleUturn(Set<String> modes, String dnlMode) {
+		return createTrippeUturnWithShuffledLinkIds(modes, dnlMode, LINK_SUFFIXES_WITH_DNL);
+	}
+
+	static List<String> trippleUturnShuffled(Set<String> modes, String dnlMode, File tempFolder) {
+		List<String> linkIdPrefixes = List.of("a", "b", "c");
+
+		List<List<String>> linkIdsWithDnlList = new ArrayList<>();
+		for (List<String> linkIdPrefixPermutation : permutate(linkIdPrefixes)) {
+			List<String> linkIdsWithDnl = new ArrayList<>();
+			for (int i = 0; i < linkIdPrefixes.size(); ++i) {
+				linkIdsWithDnl.add(linkIdPrefixPermutation.get(i) + LINK_SUFFIXES_WITH_DNL.get(i));
+			}
+			linkIdsWithDnlList.add(linkIdsWithDnl);
+		}
+
+		List<String> networkPaths = new ArrayList<>();
+		for (List<String> linkIdsWithDnl : linkIdsWithDnlList) {
+			Network network = createTrippeUturnWithShuffledLinkIds(modes, dnlMode, linkIdsWithDnl);
+			File tempFile = new File(tempFolder, "network_" + StringUtils.join(modes, ",") + "_" + dnlMode + "_"
+					+ StringUtils.join(linkIdsWithDnl, ",") + "_.xml");
+			String networkPath = tempFile.toString();
+			NetworkUtils.writeNetwork(network, networkPath);
+			networkPaths.add(networkPath);
+		}
+
+		return networkPaths;
+	}
+
+	static Network createTrippeUturnWithShuffledLinkIds(Set<String> modes, String dnlMode,
+			List<String> permutation) {
+		Verify.verify(modes.contains(dnlMode));
+
+		Network network = NetworkUtils.createNetwork();
+
+		Node n0 = NetworkUtils.createNode(Id.createNodeId("0"), new Coord(0, 0));
+		Node n1 = NetworkUtils.createNode(Id.createNodeId("1"), new Coord(0, 1));
+		Node n2 = NetworkUtils.createNode(Id.createNodeId("2"), new Coord(0, 2));
+		Node n3 = NetworkUtils.createNode(Id.createNodeId("3"), new Coord(0, 3));
+		network.addNode(n0);
+		network.addNode(n1);
+		network.addNode(n2);
+		network.addNode(n3);
+
+		Link l01 = NetworkUtils.createLink(Id.createLinkId("01"), n0, n1, network, 1, 1, 300, 1);
+		Link l10 = NetworkUtils.createLink(Id.createLinkId("10"), n1, n0, network, 1, 1, 300, 1);
+		Link l12 = NetworkUtils.createLink(Id.createLinkId(permutation.get(2)), n1, n2, network, 1, 1, 300, 1);
+		Link l21 = NetworkUtils.createLink(Id.createLinkId("21"), n2, n1, network, 1, 1, 300, 1);
+		Link l23 = NetworkUtils.createLink(Id.createLinkId(permutation.get(0)), n2, n3, network, 1, 1, 300, 1);
+		Link l32 = NetworkUtils.createLink(Id.createLinkId(permutation.get(1)), n3, n2, network, 1, 1, 300, 1);
+		List<Link> links = List.of(l01, l10, l12, l21, l23, l32).stream()
+				.sorted(Comparator.comparing(link -> link.getId().toString()))
+				.toList();
+		links.forEach(network::addLink);
+
+		for (Link link : network.getLinks().values()) {
+			link.setAllowedModes(modes);
+		}
+
+		// no uturns at 23 and 32 vice versa
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId(permutation.get(0))))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId(permutation.get(1)))); // no uturn
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId(permutation.get(1))))
+				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId(permutation.get(0)))); // no uturn
 		// no uturn at end of 12
-		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId("12")))
+		NetworkUtils.getOrCreateDisallowedNextLinks(network.getLinks().get(Id.createLinkId(permutation.get(2))))
 				.addDisallowedLinkSequence(dnlMode, List.of(Id.createLinkId("21"))); // no uturn
 
 		return network;
@@ -621,5 +732,30 @@ class TurnRestrictionsNetworkCleanerTest {
 
 		DisallowedNextLinks dnl67 = NetworkUtils.getOrCreateDisallowedNextLinks(l67);
 		dnl67.addDisallowedLinkSequence(TransportMode.car, List.of(Id.createLinkId("78")));
+	}
+
+	static @Nullable Id<Link> findLinkIdWithSuffix(Network network, String suffix) {
+		return network.getLinks().keySet().stream()
+				.filter(linkId -> linkId.toString().endsWith(suffix))
+				.findFirst().orElse(null);
+	}
+
+	static <T> List<List<T>> permutate(List<T> elements) {
+		List<List<T>> permutations = new ArrayList<>();
+		permutations.add(new ArrayList<>());
+
+		for (T e : elements) {
+			List<List<T>> newPermutations = new ArrayList<>();
+			for (List<T> permutation : permutations) {
+				for (int i = 0; i <= permutation.size(); i++) {
+					List<T> newPermutation = new ArrayList<>(permutation);
+					newPermutation.add(i, e);
+					newPermutations.add(newPermutation);
+				}
+			}
+			permutations = newPermutations;
+		}
+
+		return permutations;
 	}
 }
