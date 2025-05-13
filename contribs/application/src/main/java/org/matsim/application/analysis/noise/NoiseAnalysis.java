@@ -180,14 +180,28 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
 		// Total stats
 		DecimalFormat df = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.US));
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("noise_stats.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Annual cost rate per pop. unit [€]:", df.format(noiseParameters.getAnnualCostRate()));
-			for (Map.Entry<String, Float> labelValueEntry : mergeNoiseOutput.getTotalReceiverPointValues().entrySet()) {
-				printer.printRecord("Total " + labelValueEntry.getKey() + " at receiver points", df.format(labelValueEntry.getValue()));
+		try (CSVPrinter printer = new CSVPrinter(
+			IOUtils.getBufferedWriter(output.getPath("noise_stats.csv").toString()),
+			CSVFormat.DEFAULT)) {
+			// annual cost rate per population unit: € / (pop * dB(A) * year)
+			printer.printRecord(
+				"Annual cost rate per pop. unit [€ / (pop * dB(A) * year)]",
+			df.format(noiseParameters.getAnnualCostRate())
+			);
+			// loop over the aggregated receiver point values
+			for (Map.Entry<String, Float> e : mergeNoiseOutput.getTotalReceiverPointValues().entrySet()) {
+				String key = e.getKey();
+				String header = switch (key) {
+					case "damages" -> "Total damages at receiver points (24 h) [€]";
+					case "immission" -> "Total immission at receiver points (24 h) [dB(A) * h]";
+					default -> "Total " + key + " at receiver points";
+				};
+				printer.printRecord(header, df.format(e.getValue()));
 			}
 		} catch (IOException ex) {
 			log.error(ex);
 		}
+
 
 		return 0;
 	}

@@ -108,7 +108,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private String receiverPointsCSVFile = null;
 	private String receiverPointsCSVFileCoordinateSystem = TransformationFactory.DHDN_SoldnerBerlin;
 
-	private static double annualCostRateEws = (85.0 / (1.95583)) * (Math.pow(1.02, (2014 - 1995)));
+	private static double annualCostRateEws = (85.0 / (1.95583)) * (Math.pow(1.02, (2025 - 1995)));
 	private double annualCostRate = annualCostRateEws;
 	// -- 1st term is EWS value (85DM/"dB(A) above German threshold value") converted to Euro
 	// -- 2nd term is 2 pct inflation
