@@ -151,7 +151,7 @@ public class EnableProfilingModule extends AbstractModule {
 		@Override
 		public double priority() {
 			// highest priority to start recording before all other startListeners
-			return Double.MAX_VALUE;
+			return Double.POSITIVE_INFINITY;
 		}
 
 		@Override
@@ -172,7 +172,7 @@ public class EnableProfilingModule extends AbstractModule {
 		@Override
 		public double priority() {
 			// lowest priority to stop recording after all other endListeners
-			return Double.MIN_VALUE;
+			return Double.NEGATIVE_INFINITY;
 		}
 
 		@Override

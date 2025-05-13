@@ -58,11 +58,11 @@ public class FireDefaultProfilingEventsModule extends AbstractModule {
 
 			/**
 			 * @return Almost highest possible priority to start before most other listeners.
-			 * 		   Run only after instrumentation start listener.
+			 * 		   Run only after {@link org.matsim.contrib.profiling.instrument.EnableProfilingModule#ProfilingStartListener}.
 			 */
 			@Override
 			public double priority() {
-				return Double.MAX_VALUE - 100;
+				return Double.MAX_VALUE;
 			}
 
 			@Override
@@ -78,11 +78,11 @@ public class FireDefaultProfilingEventsModule extends AbstractModule {
 
 		/**
 		 * @return Almost lowest possible priority to end after most other listeners.
-		 * 		   Only run before instrumentation end listener.
+		 * 		   Only run before {@link org.matsim.contrib.profiling.instrument.EnableProfilingModule#ProfilingEndListener}.
 		 */
 		@Override
 		public double priority() {
-			return Double.MIN_VALUE + 100;
+			return -Double.MAX_VALUE;
 		}
 
 		@Override
