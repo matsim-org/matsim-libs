@@ -72,9 +72,15 @@
 <!ELEMENT departures       (departure*)>
 <!-- the single departures along that transitRoute -->
 
-<!ELEMENT departure        (attributes?)>
+<!ELEMENT departure        (attributes?,chainedDeparture*)>
 <!ATTLIST departure
           id               CDATA   #REQUIRED
           departureTime    CDATA   #REQUIRED
           vehicleRefId     CDATA   #IMPLIED>
 <!-- the departure.id must be unique within a transitLine only -->
+
+<!ELEMENT chainedDeparture EMPTY>
+<!ATTLIST chainedDeparture
+          toDeparture      CDATA   #REQUIRED
+          toTransitLine    CDATA   #IMPLIED
+          toTransitRoute   CDATA   #IMPLIED>

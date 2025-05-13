@@ -19,24 +19,26 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -45,6 +47,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
@@ -52,12 +55,11 @@ import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -74,7 +76,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective)")
 	@NotBlank
-	public String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
+	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
 	@Parameter
 	@Comment("Limit the operation of vehicles to links (of the 'dvrp_routing'"
@@ -82,30 +84,110 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " For backward compatibility, the value is set to false by default"
 			+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
 			+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)")
-	public boolean useModeFilteredSubnetwork = false;
+	private boolean useModeFilteredSubnetwork = false;
+
+	@Parameter
+	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
+	private String travelTimeMatrixCachePath = null;
 
 	@Parameter
 	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
-	public double stopDuration = Double.NaN;// seconds
+	private double stopDuration = Double.NaN;// seconds
 
 	@Parameter
 	@Comment("If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
 			+ "day at the link where it stopped operating the day before. False by default.")
-	public boolean changeStartLinkToLastLinkInSchedule = false;
+	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	@Parameter
 	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
-	public boolean idleVehiclesReturnToDepots = false;
+	private boolean idleVehiclesReturnToDepots = false;
 
 	@Parameter
 	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
 		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
-	public double returnToDepotTimeout = 60;
+	private double returnToDepotTimeout = 60;
 
 	@Parameter
 	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
-	public double returnToDepotEvaluationInterval = 60;
+	private double returnToDepotEvaluationInterval = 60;
+
+	public @NotNull OperationalScheme getOperationalScheme() {
+		return operationalScheme;
+	}
+
+	public void setOperationalScheme(@NotNull OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
+	}
+
+	@Nullable
+	public String getVehiclesFile() {
+		return vehiclesFile;
+	}
+
+	public void setVehiclesFile(@Nullable String vehiclesFile) {
+		this.vehiclesFile = vehiclesFile;
+	}
+
+	@Nullable
+	public String getTransitStopFile() {
+		return transitStopFile;
+	}
+
+	public void setTransitStopFile(@Nullable String transitStopFile) {
+		this.transitStopFile = transitStopFile;
+	}
+
+	@Nullable
+	public String getDrtServiceAreaShapeFile() {
+		return drtServiceAreaShapeFile;
+	}
+
+	public void setDrtServiceAreaShapeFile(@Nullable String drtServiceAreaShapeFile) {
+		this.drtServiceAreaShapeFile = drtServiceAreaShapeFile;
+	}
+
+	public boolean isPlotDetailedCustomerStats() {
+		return plotDetailedCustomerStats;
+	}
+
+	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
+		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
+	}
+
+	@Positive
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	public void setNumberOfThreads(@Positive int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
+
+	public boolean isStoreUnsharedPath() {
+		return storeUnsharedPath;
+	}
+
+	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
+		this.storeUnsharedPath = storeUnsharedPath;
+	}
+
+	public SimulationType getSimulationType() {
+		return simulationType;
+	}
+
+	public void setSimulationType(SimulationType simulationType) {
+		this.simulationType = simulationType;
+	}
+
+	public boolean isUpdateRoutes() {
+		return updateRoutes;
+	}
+
+	public void setUpdateRoutes(boolean updateRoutes) {
+		this.updateRoutes = updateRoutes;
+	}
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
@@ -114,7 +196,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default")
 	@NotNull
-	public OperationalScheme operationalScheme = OperationalScheme.door2door;
+	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
 	@Parameter
 	@Comment("An XML file specifying the vehicle fleet."
@@ -122,22 +204,22 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
 			+ " See FleetModule.")
 	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
-	public String vehiclesFile = null;
+	private String vehiclesFile = null;
 
 	@Parameter
 	@Comment("Stop locations file (transit schedule format, but without lines) for DRT stops. "
 			+ "Used only for the stopbased mode")
 	@Nullable
-	public String transitStopFile = null; // only for stopbased DRT scheme
+	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	@Parameter
 	@Comment("Allows to configure a service area per drt mode. Used with serviceArea Operational Scheme")
 	@Nullable
-	public String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
+	private String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
 
 	@Parameter("writeDetailedCustomerStats")
 	@Comment("Writes out detailed DRT customer stats in each iteration. True by default.")
-	public boolean plotDetailedCustomerStats = true;
+	private boolean plotDetailedCustomerStats = true;
 
 	@Parameter
 	@Comment("Number of threads used for parallel evaluation of request insertion into existing schedules."
@@ -145,12 +227,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ " using up to 4 threads."
 			+ " Default value is the number of cores available to JVM.")
 	@Positive
-	public int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@Parameter
 	@Comment("Store planned unshared drt route as a link sequence")
-	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
-
+	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
 	public enum SimulationType {
 		fullSimulation, estimateAndTeleport
@@ -158,16 +239,17 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Parameter
 	@Comment("Whether full simulation drt is employed")
-	public SimulationType simulationType = SimulationType.fullSimulation;
+	private SimulationType simulationType = SimulationType.fullSimulation;
+
+	@Parameter
+	@Comment("Defines whether routes along schedules are updated regularly")
+	private boolean updateRoutes = false;
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
 	@NotNull
 	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
-
-	@Nullable
-	private DrtZoneSystemParams zonalSystemParams;
 
 	@Nullable
 	private RebalancingParams rebalancingParams;
@@ -182,13 +264,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private PrebookingParams prebookingParams;
 
 	@Nullable
-	private DrtEstimatorParams drtEstimatorParams = new DrtEstimatorParams();
+	private DrtEstimatorParams drtEstimatorParams;
+
+	@Nullable
+	private DvrpLoadParams loadParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
+	private ZoneSystemParams analysisZoneSystemParams;
+
 	public DrtConfigGroup() {
-		this(DefaultDrtOptimizationConstraintsSet::new);
+		this(DrtOptimizationConstraintsSetImpl::new);
 	}
 
 	public DrtConfigGroup(Supplier<DrtOptimizationConstraintsSet> constraintsSetSupplier) {
@@ -207,9 +294,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
 				params -> rebalancingParams = (RebalancingParams)params);
 
-		//zonal system (optional)
-		addDefinition(DrtZoneSystemParams.SET_NAME, DrtZoneSystemParams::new, () -> zonalSystemParams,
-				params -> zonalSystemParams = (DrtZoneSystemParams)params);
 
 		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
@@ -244,11 +328,40 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
 			params -> drtEstimatorParams = (DrtEstimatorParams) params);
+
+		// load
+		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
+			() -> loadParams,
+			params -> loadParams = (DvrpLoadParams) params);
+
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams)params);
+
+		addDefinition(ZonalSystemWrapper.SET_NAME, ZonalSystemWrapper::new,
+				() -> analysisZoneSystemParams,
+				params -> {
+					ZoneSystemParams delegate = ((ZonalSystemWrapper) params).delegate;
+					super.addParameterSet(delegate);
+					params.removeParameterSet(delegate);
+                });
 	}
 
-	/**
-	 * for backwards compatibility with old drt config groups
-	 */
+		/**
+         * for backwards compatibility with old drt config groups
+         */
 	public void handleAddUnknownParam(final String paramName, final String value) {
 		switch (paramName) {
 			case "maxWaitTime":
@@ -283,38 +396,38 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
 		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
-			Verify.verify(constraintsSet.maxWaitTime >= stopDuration,
+			Verify.verify(constraintsSet.getMaxWaitTime() >= getStopDuration(),
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 
-		Verify.verify(operationalScheme != OperationalScheme.stopbased || transitStopFile != null,
+		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
 				"transitStopFile must not be null when operationalScheme is " + OperationalScheme.stopbased);
 
-		Verify.verify(operationalScheme != OperationalScheme.serviceAreaBased || drtServiceAreaShapeFile != null,
+		Verify.verify(getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
 				"drtServiceAreaShapeFile must not be null when operationalScheme is "
 						+ OperationalScheme.serviceAreaBased);
 
-		Verify.verify(numberOfThreads <= Runtime.getRuntime().availableProcessors(),
+		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
 				"numberOfThreads is higher than the number of logical cores available to JVM");
 
-		if (config.global().getNumberOfThreads() < numberOfThreads) {
+		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
 					+ " in order to speed up the DRT route update during the replanning phase.");
 		}
 
-		if (this.idleVehiclesReturnToDepots && this.returnToDepotTimeout < this.returnToDepotEvaluationInterval) {
+		if (this.isIdleVehiclesReturnToDepots() && this.getReturnToDepotTimeout() < this.getReturnToDepotEvaluationInterval()) {
 			log.warn("idleVehiclesReturnToDepots is active and returnToDepotTimeout < returnToDepotEvaluationInterval. " +
-				"Vehicles will be send back to depot after {} seconds",returnToDepotEvaluationInterval);
+				"Vehicles will be send back to depot after {} seconds", getReturnToDepotEvaluationInterval());
 		}
 
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
 				"More than one rebalancing parameter sets is specified");
 
-		if (useModeFilteredSubnetwork) {
-			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
+		if (isUseModeFilteredSubnetwork()) {
+			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, getMode());
 		}
 
-		if (simulationType == SimulationType.estimateAndTeleport) {
+		if (getSimulationType() == SimulationType.estimateAndTeleport) {
 			Verify.verify(drtSpeedUpParams == null, "Simulation type is estimateAndTeleport, but drtSpeedUpParams is set. " +
 				"Please remove drtSpeedUpParams from the config, as these two functionalities are not compatible.");
 		}
@@ -337,10 +450,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			this.addParameterSet(params);
 		}
 		return drtOptimizationConstraintsParams;
-	}
-
-	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
-		return Optional.ofNullable(zonalSystemParams);
 	}
 
 	public Optional<RebalancingParams> getRebalancingParams() {
@@ -367,6 +476,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(drtEstimatorParams);
 	}
 
+	public DvrpLoadParams addOrGetLoadParams() {
+		if(this.loadParams == null) {
+			this.addParameterSet(new DvrpLoadParams());
+		}
+		return this.loadParams;
+	}
+
 	/**
 	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
 	 *
@@ -381,5 +497,181 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	 */
 	public final void setDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);
+	}
+
+	public void setMode(@NotBlank String mode) {
+		this.mode = mode;
+	}
+
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+	}
+
+	public String getTravelTimeMatrixCachePath() {
+		return travelTimeMatrixCachePath;
+	}
+
+	public void setTravelTimeMatrixCachePath(String travelTimeMatrixCachePath) {
+		this.travelTimeMatrixCachePath = travelTimeMatrixCachePath;
+	}
+
+	@Positive
+	public double getStopDuration() {
+		return stopDuration;
+	}
+
+	public void setStopDuration(@Positive double stopDuration) {
+		this.stopDuration = stopDuration;
+	}
+
+	public boolean isChangeStartLinkToLastLinkInSchedule() {
+		return changeStartLinkToLastLinkInSchedule;
+	}
+
+	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
+		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
+	}
+
+	public boolean isIdleVehiclesReturnToDepots() {
+		return idleVehiclesReturnToDepots;
+	}
+
+	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
+		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
+	}
+
+	public double getReturnToDepotTimeout() {
+		return returnToDepotTimeout;
+	}
+
+	public void setReturnToDepotTimeout(double returnToDepotTimeout) {
+		this.returnToDepotTimeout = returnToDepotTimeout;
+	}
+
+	public double getReturnToDepotEvaluationInterval() {
+		return returnToDepotEvaluationInterval;
+	}
+
+	public void setReturnToDepotEvaluationInterval(double returnToDepotEvaluationInterval) {
+		this.returnToDepotEvaluationInterval = returnToDepotEvaluationInterval;
+	}
+
+	public ZoneSystemParams addOrGetAnalysisZoneSystemParams() {
+		if (analysisZoneSystemParams == null) {
+			ZoneSystemParams params = new SquareGridZoneSystemParams();
+			this.addParameterSet(params);
+		} else if(analysisZoneSystemParams instanceof ZonalSystemWrapper zonalSystemWrapper) {
+			// for backwards compatibility
+			return zonalSystemWrapper.delegate;
+		}
+		return analysisZoneSystemParams;
+	}
+
+	/** required for backwards compatibility. Remove at some later point (introduced during code sprint March '25, nkuehnel)
+	 only works as long as empty param sets are not written out.
+	 Old config formats should automatically be written in the new format (see ReadOldConfigTest)*/
+	@Deprecated
+	private final class ZonalSystemWrapper extends ZoneSystemParams {
+
+		private final static String SET_NAME = "zonalSystem";
+		private ZoneSystemParams delegate;
+
+		public ZonalSystemWrapper() {
+			super(SET_NAME);
+			initSingletonDefs();
+		}
+
+		private void initSingletonDefs() {
+			addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (SquareGridZoneSystemParams)params);
+
+			addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (GISFileZoneSystemParams)params);
+
+			addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (H3GridZoneSystemParams)params);
+
+			addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (GeometryFreeZoneSystemParams)params);
+		}
+
+
+		@Override
+		public void handleAddUnknownParam(String paramName, String value) {
+			switch (paramName) {
+				case "zoneTargetLinkSelection": {
+					log.warn("Param " + paramName + " is no longer supported as part of the deprecated zonal system params. Please set this param in the" +
+							" rebalancing params section in the future. The setting will be IGNORED in this execution.");
+					break;
+				}
+				case "zonesGeneration": {
+					if (delegate == null) {
+						switch (value) {
+							case "ShapeFile": {
+								addParameterSet(createParameterSet(GISFileZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GridFromNetwork": {
+								addParameterSet(createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "H3": {
+								addParameterSet(createParameterSet(H3GridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GeometryFree":{
+								addParameterSet(createParameterSet(GeometryFreeZoneSystemParams.SET_NAME));
+							}
+							default:
+								super.handleAddUnknownParam(paramName, value);
+						}
+					}
+					break;
+				}
+				case "cellSize": {
+					SquareGridZoneSystemParams squareGridParams;
+					if(delegate == null) {
+						squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+						addParameterSet(squareGridParams);
+					} else {
+						squareGridParams = (SquareGridZoneSystemParams) delegate;
+					}
+					squareGridParams.setCellSize(Double.parseDouble(value));
+					break;
+				}
+				case "zonesShapeFile": {
+					GISFileZoneSystemParams gisFileParams;
+					if(delegate == null) {
+						gisFileParams = (GISFileZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(gisFileParams);
+					} else {
+						gisFileParams = (GISFileZoneSystemParams) delegate;
+					}
+					gisFileParams.setZonesShapeFile(value);
+					break;
+				}
+				case "h3Resolution": {
+					H3GridZoneSystemParams h3GridParams;
+					if(delegate == null) {
+						h3GridParams = (H3GridZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(h3GridParams);
+					} else {
+						h3GridParams = (H3GridZoneSystemParams) delegate;
+					}
+					h3GridParams.setH3Resolution(Integer.parseInt(value));
+					break;
+				}
+				default:
+					super.handleAddUnknownParam(paramName, value);
+			}
+		}
 	}
 }

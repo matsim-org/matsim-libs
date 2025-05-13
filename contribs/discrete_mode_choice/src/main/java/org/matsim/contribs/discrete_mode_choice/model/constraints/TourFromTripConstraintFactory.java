@@ -5,14 +5,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
-import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraintFactory;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintFactory;
 
 /**
  * Creates a TourFromTripConstraint.
- * 
+ *
  * @author sebhoerl
  */
 public class TourFromTripConstraintFactory implements TourConstraintFactory {
@@ -23,7 +22,7 @@ public class TourFromTripConstraintFactory implements TourConstraintFactory {
 	}
 
 	@Override
-	public TourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
+	public TourFromTripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> planTrips,
 			Collection<String> availableModes) {
 		TripConstraint constraint = factory.createConstraint(person, planTrips, availableModes);
 		return new TourFromTripConstraint(constraint);

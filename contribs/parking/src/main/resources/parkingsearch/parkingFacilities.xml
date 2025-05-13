@@ -2,36 +2,36 @@
 <!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
 <facilities>
 
-<!-- ====================================================================== -->
+	<!-- ====================================================================== -->
 
 	<facility id="114_curbside" linkId="114" x="-300.0" y="-790.0">
-		<activity type="car interaction">
-			<capacity value="5.0" />
+		<activity type="parking">
+			<capacity value="5.0"/>
 		</activity>
 
 	</facility>
 	<facility id="314_curbside" linkId="314" x="-300.0" y="-810.0">
-		<activity type="car interaction">
-			<capacity value="5.0" />
+		<activity type="parking">
+			<capacity value="5.0"/>
 		</activity>
 
 	</facility>
 
-<!-- ====================================================================== -->
+	<!-- ====================================================================== -->
 
 	<facility id="349_curbside" linkId="349" x="300.0" y="-210.0">
-		<activity type="car interaction">
-			<capacity value="5.0" />
+		<activity type="parking">
+			<capacity value="5.0"/>
 		</activity>
 
 	</facility>
 	<facility id="149_curbside" linkId="149" x="300.0" y="-190.0">
-		<activity type="car interaction">
-			<capacity value="5.0" />
+		<activity type="parking">
+			<capacity value="5.0"/>
 		</activity>
 
 	</facility>
 
-<!-- ====================================================================== -->
+	<!-- ====================================================================== -->
 
 </facilities>

@@ -121,12 +121,27 @@ public class EvalFreespeedParams implements MATSimAppCommand {
 						speedFactor = speedModel.predict(ft.features(), ft.categories());
 
 					// apply lower and upper bound
-					speedFactor = Math.max(speedFactorBounds[0], speedFactor);
-					speedFactor = Math.min(speedFactorBounds[1], speedFactor);
+					if (speedFactorBounds[0] >= 0)
+						speedFactor = Math.max(speedFactorBounds[0], speedFactor);
+
+					if (speedFactorBounds[1] >= 0)
+						speedFactor = Math.min(speedFactorBounds[1], speedFactor);
 
 					attributes.put(link.getId(), speedModel.getData(ft.features(), ft.categories()));
 
-					link.setFreespeed(allowedSpeed * speedFactor);
+					double freespeed = allowedSpeed * speedFactor;
+
+					// Check absolute bounds on the freespeed
+					if (speedFactorBounds[0] < 0 && freespeed < -speedFactorBounds[0]/3.6) {
+						freespeed = -speedFactorBounds[0]/3.6;
+						speedFactor = freespeed / allowedSpeed;
+					}
+					if (speedFactorBounds[1] < 0 && freespeed > -speedFactorBounds[1]/3.6) {
+						freespeed = -speedFactorBounds[1]/3.6;
+						speedFactor = freespeed / allowedSpeed;
+					}
+
+					link.setFreespeed(freespeed);
 					link.getAttributes().putAttribute("speed_factor", speedFactor);
 
 				} else

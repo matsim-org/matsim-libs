@@ -81,7 +81,7 @@ class ExtensiveInsertionProvider {
 			return List.of();
 		}
 
-		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.nearestInsertionsAtEndLimit,
+		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.getNearestInsertionsAtEndLimit(),
 				preFilteredInsertions);
 	}
 }

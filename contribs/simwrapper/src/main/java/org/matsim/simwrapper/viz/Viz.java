@@ -13,7 +13,7 @@ public abstract class Viz {
 	@JsonProperty(index = 1, required = true)
 	public String title;
 
-	@JsonProperty(index = 2)
+	@JsonProperty(index = 3)
 	public String description;
 	public Double height;
 	public Double width;

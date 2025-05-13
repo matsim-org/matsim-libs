@@ -3,7 +3,7 @@ name: verify-push
 on:
   push:
     branches-ignore:
-      - 'master' # no need to run after merging to master
+      - 'main' # no need to run after merging to main
     tags-ignore:
       - '*' # do not run on pushing tags (see deploy-on-release-created)
   pull_request:
@@ -73,7 +73,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v4
 
-      - name: Detect changes against master
+      - name: Detect changes against main
         # we only want to build matsim (module) if changes are not limited to contribs
         id: detect-changes
         uses: dorny/paths-filter@v3

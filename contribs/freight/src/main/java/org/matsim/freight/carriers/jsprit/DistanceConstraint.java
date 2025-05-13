@@ -23,10 +23,7 @@ package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
-import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,124 +61,81 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	/**
-	 * When adding a TourActivity to the tour and the new vehicle has an
-	 * energyCapacity (fuel or electricity etc.) the algorithm always checks the
-	 * fulfilled method if all conditions (constraints) are fulfilled or not.
-	 * Because every activity is added separately and the pickup before the delivery
-	 * of a shipment, it will investigate which additional distance is necessary for
-	 * the pickup and which minimal additional distance of the associated Delivery
-	 * is needed. This is also important for the fulfilled decision of this
-	 * function. At the end the conditions checks if the consumption of the tour
-	 * including the additional shipment is possible with the possible
-	 * energyCapacity.
+	 * When adding a TourActivity to the tour and the new vehicle has an energyCapacity (fuel or electricity etc.) the algorithm always checks the fulfilled method if all conditions (constraints) are fulfilled or not.
+	 * If a delivery is added, it also accounts for the necessary consumption if the pickup is added at the given position of the tour. This is also important for the fulfilled decision of this
+	 * function. In the end, the conditions check if the consumption of the tour including the additional shipment is possible with the possible energyCapacity.
 	 */
 	//TODO add the time dependencies of the distance calculation because the route choice can be different for different times
 	@Override
 	public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct,
-			TourActivity nextAct, double departureTime) {
-		double additionalDistance;
+			TourActivity nextAct, double prevActDepTime) {
+//		double additionalDistance;
 
+		Vehicle newVehicle = context.getNewVehicle();
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
-				.get(Id.create(context.getNewVehicle().getType().getTypeId(), VehicleType.class));
-		if (VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation()) != null) {
+				.get(Id.create(newVehicle.getType().getTypeId(), VehicleType.class));
+		if (VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation()) == null)  return ConstraintsStatus.FULFILLED;
 
-			Vehicle newVehicle = context.getNewVehicle();
+		Double energyCapacityInKWhOrLiters = VehicleUtils
+			.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
+		Double consumptionPerMeter;
+		if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity"))
+			consumptionPerMeter = VehicleUtils
+				.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
+		else
+			consumptionPerMeter = VehicleUtils.getFuelConsumptionLitersPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
 
-			Double energyCapacityInKWhOrLiters = VehicleUtils
-					.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
-			Double consumptionPerMeter;
-			if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity"))
-				consumptionPerMeter = VehicleUtils
-						.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
+		double currentDistance = calculateRouteDistance(context, newVehicle);
+		double currentRouteConsumption = currentDistance * (consumptionPerMeter);
+		if (currentRouteConsumption > energyCapacityInKWhOrLiters) return ConstraintsStatus.NOT_FULFILLED_BREAK;
+
+		double distancePrevAct2NewAct = getDistance(prevAct, newAct, newVehicle, prevActDepTime);
+		double distanceNewAct2nextAct = getDistance(newAct, nextAct, newVehicle, prevActDepTime);
+		double distancePrevAct2NextAct = getDistance(prevAct, nextAct, newVehicle, prevActDepTime);
+		if (prevAct instanceof Start && nextAct instanceof End) distancePrevAct2NextAct = 0;
+		if (nextAct instanceof End && !context.getNewVehicle().isReturnToDepot()) {
+			distanceNewAct2nextAct = 0;
+			distancePrevAct2NextAct = 0;
+		}
+		double additionalDistance = distancePrevAct2NewAct + distanceNewAct2nextAct - distancePrevAct2NextAct;
+		double additionalConsumption = additionalDistance * (consumptionPerMeter);
+		if (currentRouteConsumption + additionalConsumption > energyCapacityInKWhOrLiters) return ConstraintsStatus.NOT_FULFILLED;
+
+
+		double additionalDistanceOfPickup;
+		double additionalConsumptionOfPickup = 0;
+		if (newAct instanceof DeliverShipment) {
+			int iIndexOfPickup = context.getRelatedActivityContext().getInsertionIndex();
+			TourActivity pickup = context.getAssociatedActivities().getFirst();
+			TourActivity actBeforePickup;
+			if (iIndexOfPickup > 0) actBeforePickup = context.getRoute().getActivities().get(iIndexOfPickup - 1);
+			else actBeforePickup = new Start(context.getNewVehicle().getStartLocation(), 0, Double.MAX_VALUE);
+			TourActivity actAfterPickup;
+			if (iIndexOfPickup < context.getRoute().getActivities().size())
+				actAfterPickup = context.getRoute().getActivities().get(iIndexOfPickup);
 			else
-				consumptionPerMeter = VehicleUtils.getFuelConsumption(vehicleTypeOfNewVehicle);
-
-			double routeDistance = calculateRouteDistance(context, newVehicle);
-			double routeConsumption = routeDistance * (consumptionPerMeter);
-
-			if (newAct instanceof PickupShipment) {
-				// calculates the additional distance for adding a pickup and checks the shortest possibility for adding the associated delivery
-				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
-						- getDistance(prevAct, nextAct, newVehicle)+ findMinimalAdditionalDistance(context, newAct, newAct);
-
-			} else if (newAct instanceof DeliverShipment) {
-				// calculates the distance new for integrating the associated pickup
-				routeDistance = calculateRouteDistanceWithAssociatedPickup(context);
-				routeConsumption = routeDistance * (consumptionPerMeter);
-
-				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
-						- getDistance(prevAct, nextAct, newVehicle);
-
-			} else {
-				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
-						- getDistance(prevAct, nextAct, newVehicle);
+				actAfterPickup = nextAct;
+			double distanceActBeforePickup2Pickup = getDistance(actBeforePickup, pickup, newVehicle, actBeforePickup.getEndTime());
+			double distancePickup2ActAfterPickup = getDistance(pickup, actAfterPickup, newVehicle, context.getRelatedActivityContext().getEndTime());
+			double distanceBeforePickup2AfterPickup = getDistance(actBeforePickup, actAfterPickup,newVehicle, actBeforePickup.getEndTime());
+			if (context.getRoute().isEmpty()) distanceBeforePickup2AfterPickup = 0;
+			if (actAfterPickup instanceof End && !context.getNewVehicle().isReturnToDepot()) {
+				distancePickup2ActAfterPickup = 0;
+				distanceBeforePickup2AfterPickup = 0;
 			}
-			double additionalConsumption = additionalDistance * (consumptionPerMeter);
-			double newRouteConsumption = routeConsumption + additionalConsumption;
-
-			if (newRouteConsumption > energyCapacityInKWhOrLiters) {
-				return ConstraintsStatus.NOT_FULFILLED_BREAK;
-			} else {
-				return ConstraintsStatus.FULFILLED;
-			}
-		} else {
-			return ConstraintsStatus.FULFILLED;
+			additionalDistanceOfPickup = distanceActBeforePickup2Pickup + distancePickup2ActAfterPickup - distanceBeforePickup2AfterPickup;
+			additionalConsumptionOfPickup = additionalDistanceOfPickup * (consumptionPerMeter);
 		}
+
+		if (currentRouteConsumption + additionalConsumption + additionalConsumptionOfPickup > energyCapacityInKWhOrLiters)
+			return ConstraintsStatus.NOT_FULFILLED;
+
+		return ConstraintsStatus.FULFILLED;
+
 	}
 
 	/**
-	 * Calculates the distance based on the route-based distances between every tour
-	 * activities. The method also integrates the associated pickup in the tour.
-	 */
-	private double calculateRouteDistanceWithAssociatedPickup(JobInsertionContext context) {
-		double routeDistance;
-		int positionOfRelatedPickup = context.getRelatedActivityContext().getInsertionIndex();
-		int nextRouteActivity = 0;
-
-		// checks if the associated pickup is on first position
-		if (positionOfRelatedPickup == 0 && context.getRoute().getActivities().isEmpty()) {
-			context.getRoute().getStart().setLocation(context.getNewVehicle().getStartLocation());
-			context.getRoute().getEnd().setLocation(context.getNewVehicle().getEndLocation());
-			routeDistance = getDistance(context.getAssociatedActivities().getFirst(), context.getRoute().getEnd(),
-					context.getNewVehicle(), context.getNewDepTime());
-			return routeDistance;
-		} else if (positionOfRelatedPickup == 0 && !context.getRoute().getActivities().isEmpty()) {
-			routeDistance = getDistance(context.getAssociatedActivities().getFirst(),
-					context.getRoute().getActivities().getFirst(), context.getNewVehicle(), context.getNewDepTime());
-		} else {
-			routeDistance = getDistance(context.getRoute().getStart(), context.getRoute().getActivities().getFirst(),
-					context.getNewVehicle(), context.getNewDepTime());
-		}
-		// adds distances between every tour activity and adds the associated pickup on
-		// the correct position of the tour
-		while (context.getRoute().getTourActivities().getActivities().size() > (nextRouteActivity + 1)) {
-			if (positionOfRelatedPickup == (nextRouteActivity + 1) && positionOfRelatedPickup != 0) {
-				routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-						context.getAssociatedActivities().getFirst(), context.getNewVehicle());
-				routeDistance = routeDistance + getDistance(context.getAssociatedActivities().getFirst(),
-						context.getRoute().getActivities().get(nextRouteActivity), context.getNewVehicle());
-			} else {
-				routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-						context.getRoute().getActivities().get(nextRouteActivity + 1), context.getNewVehicle());
-			}
-			nextRouteActivity++;
-		}
-		if (positionOfRelatedPickup == context.getRoute().getActivities().size()) {
-			routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-					context.getAssociatedActivities().getFirst(), context.getNewVehicle());
-			routeDistance = routeDistance + getDistance(context.getAssociatedActivities().getFirst(),
-					context.getRoute().getEnd(), context.getNewVehicle());
-		} else
-			routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
-					context.getRoute().getEnd(), context.getNewVehicle());
-
-		return routeDistance;
-	}
-
-	/**
-	 * Calculates the distance based on the route-based distances between every tour
-	 * activities.
-	 *
+	 * Calculates the distance based on the route-based distances between every tour activity.
 	 */
 	private double calculateRouteDistance(JobInsertionContext context, Vehicle newVehicle) {
 		double realRouteDistance = 0;
@@ -189,119 +143,18 @@ import org.matsim.vehicles.VehicleUtils;
 			return realRouteDistance;
 		int n = 0;
 		realRouteDistance = getDistance(context.getRoute().getStart(),
-				context.getRoute().getTourActivities().getActivities().getFirst(), newVehicle);
+				context.getRoute().getTourActivities().getActivities().getFirst(), newVehicle, context.getRoute().getStart().getEndTime());
 		while (context.getRoute().getTourActivities().getActivities().size() > (n + 1)) {
+
+			TourActivity from = context.getRoute().getTourActivities().getActivities().get(n);
 			realRouteDistance = realRouteDistance
-					+ getDistance(context.getRoute().getTourActivities().getActivities().get(n),
-							context.getRoute().getTourActivities().getActivities().get(n + 1), newVehicle);
+					+ getDistance(from,	context.getRoute().getTourActivities().getActivities().get(n + 1), newVehicle, from.getEndTime());
 			n++;
 		}
+		TourActivity from = context.getRoute().getTourActivities().getActivities().get(n);
 		realRouteDistance = realRouteDistance + getDistance(
-				context.getRoute().getTourActivities().getActivities().get(n), context.getRoute().getEnd(), newVehicle);
+				context.getRoute().getTourActivities().getActivities().get(n), context.getRoute().getEnd(), newVehicle, from.getEndTime());
 		return realRouteDistance;
-	}
-
-	/**
-	 * Finds a minimal additional distance for the tour, when a pickup is added to
-	 * the plan. The AssociatedActivities contains both activities of a job which
-	 * should be added to the existing tour. The TourActivities which are already in
-	 * the tour are found in context.getRoute().getTourActivities. In this method
-	 * the position of the new pickup is fixed and three options of the location of
-	 * the delivery activity will be checked: delivery between every other activity
-	 * after the pickup, delivery as the last activity before the end and delivery
-	 * directly behind the new pickup. This method gives back the minimal distance
-	 * of this three options.
-	 *
-	 * @param context
-	 * @param newInvestigatedPickup
-	 * @param nextAct
-	 * @return minimal distance of the associated delivery
-	 */
-	private double findMinimalAdditionalDistance(JobInsertionContext context, TourActivity newInvestigatedPickup,
-			TourActivity nextAct) {
-		double minimalAdditionalDistance = 0;
-
-		if (context.getAssociatedActivities().get(1) instanceof DeliverShipment) {
-			TourActivity assignedDelivery = context.getAssociatedActivities().get(1);
-			minimalAdditionalDistance = 0;
-			int indexNextActivity = nextAct.getIndex();
-			int tourPositionOfActivityBehindNewPickup = 0;
-			int countIndex = 0;
-			Vehicle newVehicle = context.getNewVehicle();
-			VehicleRoute route = context.getRoute();
-
-			// search the index of the activity behind the pickup activity which should be
-			// added to the tour
-			a: for (TourActivity tourActivity : route.getTourActivities().getActivities()) {
-				if (tourActivity.getIndex() == indexNextActivity) {
-					while (countIndex < route.getTourActivities().getActivities().size()) {
-						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActivity) {
-							tourPositionOfActivityBehindNewPickup = countIndex;
-							break a;
-						}
-						countIndex++;
-					}
-				}
-			}
-
-			// search the minimal distance between every exiting TourActivity
-			while ((tourPositionOfActivityBehindNewPickup + 1) < route.getTourActivities().getActivities().size()) {
-				TourActivity activityBefore = route.getTourActivities().getActivities()
-						.get(tourPositionOfActivityBehindNewPickup);
-				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfActivityBehindNewPickup + 1);
-				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle)
-						- getDistance(activityBefore, activityAfter, newVehicle);
-				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
-				tourPositionOfActivityBehindNewPickup++;
-			}
-			// checks the distance if the delivery is the last activity before the end of
-			// the tour
-			if (!route.getTourActivities().getActivities().isEmpty()) {
-				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
-						.getLast();
-				TourActivity activityEnd = route.getEnd();
-				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityEnd, newVehicle)
-						- getDistance(activityLastDelivery, activityEnd, newVehicle);
-				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
-
-				// Checks the distance if the delivery will be added directly behind the pickup
-				TourActivity activityAfter = route.getTourActivities().getActivities()
-						.get(tourPositionOfActivityBehindNewPickup);
-				possibleAdditionalDistance = getDistance(newInvestigatedPickup, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle)
-						- getDistance(newInvestigatedPickup, activityAfter, newVehicle);
-				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
-			}
-
-		}
-		return minimalAdditionalDistance;
-	}
-
-	/**
-	 * Checks if the find possible distance is the minimal one.
-	 *
-	 * @param minimalAdditionalDistance
-	 * @param possibleAdditionalDistance
-	 * @return the minimal transport distance
-	 */
-	private double findMinimalDistance(double minimalAdditionalDistance, double possibleAdditionalDistance) {
-		if (minimalAdditionalDistance == 0)
-			minimalAdditionalDistance = possibleAdditionalDistance;
-		else if (possibleAdditionalDistance < minimalAdditionalDistance)
-			minimalAdditionalDistance = possibleAdditionalDistance;
-		return minimalAdditionalDistance;
-	}
-
-	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle) {
-		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
-				vehicle);
-		if (!(distance >= 0.))
-			throw new AssertionError("Distance must not be negative! From, to" + from + ", " + to
-					+ " distance " + distance);
-		return distance;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {

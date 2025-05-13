@@ -64,16 +64,15 @@ public class DrtTeleportationWithModeChoiceTest {
 		// Setting DRT config group
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.setSimulationType(DrtConfigGroup.SimulationType.estimateAndTeleport);
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
-		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.mode) {
+		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
 			@Override
 			public void install() {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(getter -> new
-					EuclideanDistanceBasedDrtEstimator(getter.getModal(Network.class), 2.0, 0.1577493,
-					103.0972273, 120, 0.3, -0.1, 0.28)));
+					EuclideanDistanceBasedDrtEstimator.Builder(getter.getModal(Network.class), 2.0).build()));
 			}
 		});
 

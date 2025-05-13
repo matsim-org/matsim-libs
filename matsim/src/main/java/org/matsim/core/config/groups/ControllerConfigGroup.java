@@ -82,7 +82,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String MEMORY_OBSERVER_INTERVAL = "memoryObserverInterval";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {qsim, JDEQSim, hermes}
+	public enum MobsimType {qsim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
@@ -224,6 +224,31 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
     public void setWriteTripsInterval(int writeTripsInterval) {
         this.writeTripsInterval = writeTripsInterval;
     }
+
+	@Parameter
+	@Comment("Defines in which iterations the legHistogram analysis is run (iterationNumber % interval == 0). Use 0 to disable this analysis.")
+	private int legHistogramInterval = 1;
+
+	@Parameter
+	@Comment("Defines in which iterations the legDurations analysis is run (iterationNumber % interval == 0). Use 0 to disable this analysis.")
+	private int legDurationsInterval = 1;
+
+	public int getLegHistogramInterval() {
+		return this.legHistogramInterval;
+	}
+
+	public void setLegHistogramInterval(int legHistogramInterval) {
+		this.legHistogramInterval = legHistogramInterval;
+	}
+
+	public int getLegDurationsInterval() {
+		return this.legDurationsInterval;
+	}
+
+	public void setLegDurationsInterval(int legDurationsInterval) {
+		this.legDurationsInterval = legDurationsInterval;
+	}
+
 
 	@StringSetter( RUNID )
 	public void setRunId(final String runid) {

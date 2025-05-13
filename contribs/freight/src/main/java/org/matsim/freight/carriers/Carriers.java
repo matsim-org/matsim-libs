@@ -21,13 +21,12 @@
 
 package org.matsim.freight.carriers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 
 /**
  * A container that maps carriers.
@@ -42,28 +41,29 @@ public class Carriers {
 
 	private final Map<Id<Carrier>, Carrier> carriers = new LinkedHashMap<>();
 
+	public Carriers() {}
+
 	public Carriers(Collection<Carrier> carriers) {
-		makeMap(carriers);
+		addCarriers(carriers);
 	}
 
-	public Carriers() {
-	}
-
-	private void makeMap(Collection<Carrier> carriers) {
+	private void addCarriers(Collection<Carrier> carriers) {
 		for (Carrier carrier : carriers) {
 			this.carriers.put(carrier.getId(), carrier);
 		}
-	}
-
-	public Map<Id<Carrier>, Carrier> getCarriers() {
-		return carriers;
 	}
 
 	public void addCarrier(Carrier carrier) {
 		if(!carriers.containsKey(carrier.getId())){
 			carriers.put(carrier.getId(), carrier);
 		}
-		else log.warn("carrier {} already exists", carrier.getId());
+		else log.warn("carrier {} already exists. It has NOT been added.", carrier.getId());
 	}
+
+	public Map<Id<Carrier>, Carrier> getCarriers() {
+		return carriers;
+	}
+
+
 
 }

@@ -66,7 +66,7 @@ public class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupL
 
 	public SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
 											   TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
-		this(network, travelTime, travelDisutility, drtCfg.numberOfThreads, new SpeedyALTFactory());
+		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(), new SpeedyALTFactory());
 	}
 
 	@VisibleForTesting
@@ -129,7 +129,7 @@ public class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupL
 			return PathData.EMPTY;
 		}
 
-		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+		Path path = router.calcLeastCostPath(fromLink, toLink, departureTime + FIRST_LINK_TT,
 				null, null);
 		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(travelTime, toLink,
 				departureTime + FIRST_LINK_TT + path.travelTime);

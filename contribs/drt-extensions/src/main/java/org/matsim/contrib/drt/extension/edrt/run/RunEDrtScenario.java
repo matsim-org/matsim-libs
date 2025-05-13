@@ -22,15 +22,18 @@ package org.matsim.contrib.drt.extension.edrt.run;
 
 import java.net.URL;
 
+import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
+import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -39,6 +42,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import com.google.inject.Key;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -60,8 +65,8 @@ public class RunEDrtScenario {
 			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
-					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+					bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
+							new EDrtVehicleDataEntryFactoryProvider(getMode(), MIN_RELATIVE_SOC));
 				}
 			});
 		}
@@ -69,10 +74,13 @@ public class RunEDrtScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+				bind(ChargingLogic.Factory.class).to(ChargingWithQueueingAndAssignmentLogic.Factory.class);
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
+
+				for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+					bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtCfg.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
+				}
 			}
 		});
 		

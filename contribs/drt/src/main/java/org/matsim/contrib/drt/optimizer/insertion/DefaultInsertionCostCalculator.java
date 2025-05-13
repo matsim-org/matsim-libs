@@ -54,11 +54,6 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	 */
 	@Override
 	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
-		// check if the max riding time constraints is violated (with default config, the max ride duration
-		// is infinity)
-		if (violatesMaxRideDuration(drtRequest, detourTimeInfo)) {
-			return INFEASIBLE_SOLUTION_COST;
-		}
 
 		var vEntry = insertion.vehicleEntry;
 
@@ -73,49 +68,6 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		if (vEntry.stops != null && !vEntry.stops.isEmpty() && constraintsSet.lateDiversionthreshold > 0) {
-			if(violatesLateDiversion(insertion, detourTimeInfo, vEntry, effectiveDropoffTimeLoss)) {
-				return INFEASIBLE_SOLUTION_COST;
-			}
-		}
-
 		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
-	}
-
-	private boolean violatesMaxRideDuration(DrtRequest drtRequest, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
-		// Check if the max travel time constraint for the newly inserted request is violated
-		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
-		return drtRequest.getMaxRideDuration() < rideDuration;
-	}
-
-	private boolean violatesLateDiversion(Insertion insertion, DetourTimeInfo detourTimeInfo,
-										  VehicleEntry vEntry, double effectiveDropoffTimeLoss) {
-        if (detourTimeInfo.pickupDetourInfo.pickupTimeLoss > 0) {
-			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.pickup.index, insertion.dropoff.index,
-					constraintsSet.lateDiversionthreshold)) {
-				return true;
-			}
-		}
-        if (effectiveDropoffTimeLoss > 0) {
-			if (violatesLateDiversionBetweenStopIndices(vEntry, insertion.dropoff.index, vEntry.stops.size(),
-					constraintsSet.lateDiversionthreshold)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean violatesLateDiversionBetweenStopIndices(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
-		for (int s = start; s < end; s++) {
-			Waypoint.Stop stop = vehicleEntry.stops.get(s);
-			if (!stop.task.getDropoffRequests().isEmpty()) {
-                double remainingRideDuration = stop.getArrivalTime() - vehicleEntry.start.getDepartureTime();
-				if (remainingRideDuration < lateDiversionThreshold) {
-					return true;
-				}
-				break;
-			}
-		}
-		return false;
 	}
 }

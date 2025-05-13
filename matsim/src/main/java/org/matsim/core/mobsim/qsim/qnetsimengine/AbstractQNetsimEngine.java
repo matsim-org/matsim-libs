@@ -80,7 +80,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
-	private final VehicularDepartureHandler dpHandler;
+//	private final NetworkModeDepartureHandler dpHandler;
 //	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
 	protected final QNetwork qNetwork;
@@ -89,23 +89,26 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	private List<A> engines;
 	private InternalInterface internalInterface = null;
 
-	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory, NetworkModeDepartureHandler dpHandler) {
+		if ( netsimNetworkFactory==null ) {
+			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
+		}
+
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qSimConfigGroup = config.qsim();
 
-		// configuring the car departure hander (including the vehicle behavior)
-		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
-		switch(vehicleBehavior) {
-		case exception:
-		case teleport:
-		case wait:
-			break;
-		default:
-			throw new RuntimeException("Unknown vehicle behavior option.");
-		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
+//		// configuring the car departure hander (including the vehicle behavior)
+//		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
+//		switch(vehicleBehavior) {
+//		case exception:
+//		case teleport:
+//		case wait:
+//			break;
+//		default:
+//			throw new RuntimeException("Unknown vehicle behavior option.");
+//		}
 
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
@@ -114,19 +117,10 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 			}
 		}
 
-		if (netsimNetworkFactory != null){
-			qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else {
-			throw new RuntimeException( "this execution path is no longer allowed; network factory needs to come from elsewhere (in general via injection).  kai, jun'23" );
-//			Scenario scenario = sim.getScenario();
-//			EventsManager events = sim.getEventsManager() ;
-//			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-//			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-//			AgentCounter agentCounter = sim.getAgentCounter() ;
-//			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-//			qNetwork = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
-		}
+		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+
 		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
+		// yyyy this now looks like the initialize could be integrated into the constructor?!  kai, jan'25
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
@@ -154,12 +148,8 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	@Override
 	public final void onPrepareSim() {
-		this.infoTime =
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
-		/*
-		 * infoTime may be < simStartTime, this ensures to print out the
-		 * info at the very first timestep already
-		 */
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
+		// (infoTime may be < simStartTime, this ensures to print out the * info at the very first timestep already)
 
 		this.engines = initQSimEngineRunners();
 		assignNetElementActivators();
@@ -273,12 +263,14 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	}
 
 	public final NetsimNetwork getNetsimNetwork() {
+		// yy isn't this available from injection? kai, jan'25
 		return this.qNetwork;
 	}
 
-	public final VehicularDepartureHandler getDepartureHandler() {
-		return dpHandler;
-	}
+//	public final NetworkModeDepartureHandler getVehicularDepartureHandler() {
+//		return dpHandler;
+//	}
+	// get from injection
 
 	public final Map<Id<Vehicle>, QVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);

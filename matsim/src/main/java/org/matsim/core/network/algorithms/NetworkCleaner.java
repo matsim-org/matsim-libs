@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  * Ensures that each link in the network can be reached by any other link.
@@ -42,9 +43,11 @@ import org.matsim.core.api.internal.NetworkRunnable;
  * Nodes with no incoming or outgoing links are removed as well from the
  * network.
  *
+ * @deprecated Use {@link NetworkUtils#cleanNetwork(Network, Set)}
  * @author mrieser
  * @author balmermi
  */
+@Deprecated(since = "2025.0-SNAPSHOT")
 public final class NetworkCleaner implements NetworkRunnable {
 
 	private static final Logger log = LogManager.getLogger(NetworkCleaner.class);
@@ -62,10 +65,10 @@ public final class NetworkCleaner implements NetworkRunnable {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<>(network.getNodes().size());
 
-		ArrayList<Node> pendingForward = new ArrayList<>();
-		ArrayList<Node> pendingBackward = new ArrayList<>();
+		List<Node> pendingForward = new ArrayList<>();
+		List<Node> pendingBackward = new ArrayList<>();
 
-		TreeMap<Id<Node>, Node> clusterNodes = new TreeMap<>();
+		Map<Id<Node>, Node> clusterNodes = new TreeMap<>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;
@@ -76,8 +79,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 
 		// step through the network in forward mode
 		while (!pendingForward.isEmpty()) {
-			int idx = pendingForward.size() - 1;
-			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
+			Node currNode = pendingForward.removeLast(); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getOutLinks().values()) {
 				Node node = link.getToNode();
 				r = getDoubleFlag(node, nodeRoles);
@@ -90,8 +92,7 @@ public final class NetworkCleaner implements NetworkRunnable {
 
 		// now step through the network in backward mode
 		while (!pendingBackward.isEmpty()) {
-			int idx = pendingBackward.size()-1;
-			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
+			Node currNode = pendingBackward.removeLast(); // get the last element to prevent object shifting in the array
 			for (Link link : currNode.getInLinks().values()) {
 				Node node = link.getFromNode();
 				r = getDoubleFlag(node, nodeRoles);

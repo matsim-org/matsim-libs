@@ -57,6 +57,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
+	private static final String NOTIFY_ABOUT_STUCK_VEHICLES = "notifyAboutStuckVehicles";
+	/* package */ final static String NOTIFY_ABOUT_STUCK_VEHICLES_STRING =
+		"Boolean. `true': when a vehicle is moved to the next link because the stuck time is exceeded, a PersonStuckAndContinueEvent is thrown.";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
@@ -89,6 +92,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
+	private boolean notifyAboutStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
 	@Positive
 	private int numberOfThreads = 1;
@@ -175,7 +179,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 				+ "In contrast to earlier versions, the non-parallel special version is no longer there.");
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING);
 		map.put(STUCK_TIME, STUCK_TIME_STRING);
-
+		map.put(NOTIFY_ABOUT_STUCK_VEHICLES, NOTIFY_ABOUT_STUCK_VEHICLES_STRING);
 		{
 			StringBuilder options = new StringBuilder(60);
 			for (TrafficDynamics dyn : TrafficDynamics.values()) {
@@ -416,6 +420,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		return this.removeStuckVehicles;
 	}
 
+	@StringSetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public void setNotifyAboutStuckVehicles(final boolean notifyAboutStuckVehicles) {
+		this.notifyAboutStuckVehicles = notifyAboutStuckVehicles;
+	}
+
+	@StringGetter(NOTIFY_ABOUT_STUCK_VEHICLES)
+	public boolean isNotifyAboutStuckVehicles() {
+		return this.notifyAboutStuckVehicles;
+	}
+
 	@StringSetter(FAST_CAPACITY_UPDATE)
 	public final void setUsingFastCapacityUpdate(boolean val) {
 		this.usingFastCapacityUpdate = val;
@@ -439,8 +453,15 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
 
+	/**
+	 * This determines the traffic dynamics of a link. The default is 'queue', but the recommended setting is kinematic waves.
+	 *
+	 * DEPRECATION NOTE: 'withHoles' is deprecated, use 'kinematicWaves' instead, as that uses 'withHoles' and adds an inflow capacity on top.
+	 */
 	public enum TrafficDynamics {
-		queue, withHoles,
+		queue,
+		@Deprecated
+		withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	}
 
@@ -448,11 +469,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 * Defines how the qsim sets the inflow and/or how it reacts to link attributes which are inconsistent with regard to the fundamental diagram. <br>
 	 *
 	 * <li>Note that {@code MAX_CAP_FOR_ONE_LANE} is backwards-compatible but always sets the inflow capacity to the maximum according to the fundamental diagram for one lane,
-	 * so it essentially sets the inflow capacity too low for multiple-lane-links. </li>
-	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
-	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental diagram, assuming the flow capacity in the link attributes to be correct.</li>
+	 * so it essentially sets the inflow capacity too low for multiple-lane-links. DEPRECATED: This is only for backwards compatibility. Use
+	 * INFLOW_FROM_FDIAG instead.</li>
+	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the
+	 * fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
+	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental
+	 * diagram, assuming the flow capacity in the link attributes to be correct. DEPRECATED: In practice the other setting is used most often! Use\
+	 * INFLOW_FROM_FDIAG instead.</li>
 	 */
-	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG, NR_OF_LANES_FROM_FDIAG, MAX_CAP_FOR_ONE_LANE}
+	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG,
+		@Deprecated
+		NR_OF_LANES_FROM_FDIAG,
+		@Deprecated
+		MAX_CAP_FOR_ONE_LANE}
 
 	@StringSetter(TRAFFIC_DYNAMICS)
 	public void setTrafficDynamics(final TrafficDynamics str) {

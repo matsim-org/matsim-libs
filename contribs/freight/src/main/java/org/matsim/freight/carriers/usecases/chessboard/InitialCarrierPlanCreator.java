@@ -34,6 +34,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
 import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -44,8 +45,6 @@ import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
 
-import java.util.Collection;
-
 final class InitialCarrierPlanCreator {
 
     private final Network network;
@@ -55,19 +54,6 @@ final class InitialCarrierPlanCreator {
     }
 
     public CarrierPlan createPlan(Carrier carrier){
-//		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-//		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, carrier.getCarrierCapabilities().getVehicleTypes());
-//		NetworkBasedTransportCosts costs = costsBuilder.build();
-//		vrpBuilder.setRoutingCost(costs);
-//		VehicleRoutingProblem vrp = vrpBuilder.build();
-//
-//		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
-////		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
-//		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-//
-//		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
-//
-
 
         //construct the routing problem - here the interface to jsprit comes into play
         VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
@@ -95,15 +81,14 @@ final class InitialCarrierPlanCreator {
         //should be inline with activity-scoring
         VehicleRoutingActivityCosts activitycosts = new VehicleRoutingActivityCosts(){
 
-            private final double penalty4missedTws = 0.01;
-
-            @Override
+			@Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
                 double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
+				double penalty4missedTws = 0.01;
+				return penalty4missedTws *tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
             }
 
 			@Override
@@ -148,7 +133,7 @@ final class InitialCarrierPlanCreator {
         //		SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
         //create carrierPlan from solution
-        CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+        CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
         NetworkRouter.routePlan(plan, netbasedTransportcosts);
         return plan;
     }
@@ -166,14 +151,11 @@ final class InitialCarrierPlanCreator {
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReader(carriers, types ).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml" );
 
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-
         for(Carrier carrier : carriers.getCarriers().values()){
             CarrierPlan plan = new InitialCarrierPlanCreator(scenario.getNetwork()).createPlan(carrier);
             carrier.addPlan(plan);
         }
-
-        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+		CarriersUtils.writeCarriers(carriers, "input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

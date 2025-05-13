@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -69,8 +69,8 @@ public class ConfigBehaviorTest{
                         // generate a test config that sets two values away from their defaults, and write it to file:
                         Config config = ConfigUtils.createConfig();
                         DvrpConfigGroup dvrpConfigGroup = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-					dvrpConfigGroup.travelTimeEstimationAlpha = 1.23;
-					dvrpConfigGroup.travelTimeEstimationBeta = 4.56;
+					dvrpConfigGroup.setTravelTimeEstimationAlpha(1.23);
+					dvrpConfigGroup.setTravelTimeEstimationBeta(4.56);
 					ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config.xml" );
                 }
 
@@ -82,8 +82,8 @@ public class ConfigBehaviorTest{
                         DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 
                         // check if you are getting back the values from the config file:
-					Assertions.assertEquals( 1.23, dvrpConfig.travelTimeEstimationAlpha, Double.MIN_VALUE );
-					Assertions.assertEquals( 4.56, dvrpConfig.travelTimeEstimationBeta, Double.MIN_VALUE );
+					Assertions.assertEquals( 1.23, dvrpConfig.getTravelTimeEstimationAlpha(), Double.MIN_VALUE );
+					Assertions.assertEquals( 4.56, dvrpConfig.getTravelTimeEstimationBeta(), Double.MIN_VALUE );
                 }
         }
 
@@ -99,10 +99,10 @@ public class ConfigBehaviorTest{
             multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
             DrtOptimizationConstraintsParams drtOptimizationConstraintsParams = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams();
-            DefaultDrtOptimizationConstraintsSet optimizationConstraintsSet =
-                    (DefaultDrtOptimizationConstraintsSet) drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
-            optimizationConstraintsSet.maxTravelTimeAlpha = 2.;
-            optimizationConstraintsSet.maxTravelTimeBeta = 5. * 60;
+            DrtOptimizationConstraintsSetImpl optimizationConstraintsSet =
+                    drtOptimizationConstraintsParams.addOrGetDefaultDrtOptimizationConstraintsSet();
+            optimizationConstraintsSet.setMaxTravelTimeAlpha(2.);
+            optimizationConstraintsSet.setMaxTravelTimeBeta(5. * 60);
 
             ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config-default-optimization-constraints.xml");
         }
@@ -115,11 +115,11 @@ public class ConfigBehaviorTest{
             DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().iterator().next();
 
             // check if you are getting back the values from the config file:
-            DefaultDrtOptimizationConstraintsSet constraintsSet =
-                    (DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
+            DrtOptimizationConstraintsSetImpl constraintsSet =
+                    drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().
                             addOrGetDefaultDrtOptimizationConstraintsSet();
-            Assertions.assertEquals( 2., constraintsSet.maxTravelTimeAlpha, Double.MIN_VALUE );
-            Assertions.assertEquals( 300., constraintsSet.maxTravelTimeBeta, Double.MIN_VALUE );
+            Assertions.assertEquals( 2., constraintsSet.getMaxTravelTimeAlpha(), Double.MIN_VALUE );
+            Assertions.assertEquals( 300., constraintsSet.getMaxTravelTimeBeta(), Double.MIN_VALUE );
         }
     }
 

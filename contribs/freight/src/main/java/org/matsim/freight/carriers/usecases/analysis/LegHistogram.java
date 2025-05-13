@@ -22,6 +22,17 @@
 package org.matsim.freight.carriers.usecases.analysis;
 
 import jakarta.inject.Inject;
+import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -42,15 +53,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Time;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 /**
  * It is a copy of {@link org.matsim.analysis.LegHistogram}. It is modified to include or exclude persons.
  *
@@ -60,6 +62,8 @@ import java.util.TreeMap;
  * based on events.
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+
+	private static final Logger log = LogManager.getLogger(LegHistogram.class);
 
 	private int iteration = 0;
 	private final int binSize;
@@ -185,7 +189,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			stream = new PrintStream(filename);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.warn("FileNotFoundException occurred while writing", e);
 			return;
 		}
 		write(stream);
@@ -361,7 +365,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred while writing", e);
 		}
 	}
 
@@ -379,7 +383,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		try {
 			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("IOException occurred while writing", e);
 		}
 	}
 
@@ -392,8 +396,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 
 	private ModeData getDataForMode(final String legMode) {
 		// +1 for all times out of our range
-		ModeData modeData = this.data.computeIfAbsent(legMode, k -> new ModeData(this.nofBins + 1));
-		return modeData;
+		return this.data.computeIfAbsent(legMode, k -> new ModeData(this.nofBins + 1));
 	}
 
 	private static class ModeData {

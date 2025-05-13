@@ -57,7 +57,7 @@ class RunJointDemandCarToggleJspritExample {
                 configUrl = localConfigFile.toURI().toURL();
             } else {
                 log.info("Starting simulation run with the example config file from GitHub repository");
-                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/commercialTrafficApplications/"
+                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/commercialTrafficApplications/"
                         + EXAMPLE_CONFIG);
             }
         }

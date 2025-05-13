@@ -4,7 +4,7 @@ import com.google.common.base.Verify;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.core.config.Config;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 
 /**
@@ -24,12 +24,21 @@ public class H3GridZoneSystemParams extends ZoneSystemParams {
 		"Usually meaningful between resolution 6 (3.7 km avg edge length) " +
 		"and 10 (70 m avg edge length). ")
 	@Nullable
-	public Integer h3Resolution = null;
+	private Integer h3Resolution = null;
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Verify.verify(h3Resolution != null && h3Resolution >= 0 && h3Resolution < 15, "H3 resolution must be a valid level between 0 and 15.");
+		Verify.verify(getH3Resolution() != null && getH3Resolution() >= 0 && getH3Resolution() < 15, "H3 resolution must be a valid level between 0 and 15.");
+	}
+
+	@Nullable
+	public Integer getH3Resolution() {
+		return h3Resolution;
+	}
+
+	public void setH3Resolution(@Nullable Integer h3Resolution) {
+		this.h3Resolution = h3Resolution;
 	}
 }

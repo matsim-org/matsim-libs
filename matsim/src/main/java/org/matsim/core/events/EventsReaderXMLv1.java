@@ -223,6 +223,18 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<TransitStopFacility> waitStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP), TransitStopFacility.class);
 			Id<TransitStopFacility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), TransitStopFacility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
+		} else if (VehicleStartsParkingSearch.EVENT_TYPE.equals(eventType)) {
+			Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleStartsParkingSearch.ATTRIBUTE_DRIVER));
+			Id<Link> linkId = Id.createLinkId(atts.getValue(VehicleStartsParkingSearch.ATTRIBUTE_LINK));
+			Id<Vehicle> vehicleId = Id.createVehicleId(atts.getValue(VehicleStartsParkingSearch.ATTRIBUTE_VEHICLE));
+			String networkMode = atts.getValue(VehicleStartsParkingSearch.ATTRIBUTE_NETWORKMODE);
+			this.events.processEvent(new VehicleStartsParkingSearch(time, driverId, linkId, vehicleId, networkMode));
+		} else if (VehicleEndsParkingSearch.EVENT_TYPE.equals(eventType)) {
+			Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_DRIVER));
+			Id<Link> linkId = Id.createLinkId(atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_LINK));
+			Id<Vehicle> vehicleId = Id.createVehicleId(atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_VEHICLE));
+			String networkMode = atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_NETWORKMODE);
+			this.events.processEvent(new VehicleEndsParkingSearch(time, driverId, linkId, vehicleId, networkMode));
 		} else if (PersonInitializedEvent.EVENT_TYPE.equals(eventType)){
 			Id<Person> personId = Id.create(atts.getValue(PersonInitializedEvent.ATTRIBUTE_PERSON), Person.class);
 			Coord coord = null;

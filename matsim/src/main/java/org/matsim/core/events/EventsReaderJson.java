@@ -275,12 +275,7 @@ public final class EventsReaderJson {
 					Id.create(o.get(VehicleAbortsEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
 					linkId));
 		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
-			this.events.processEvent(new PersonMoneyEvent(
-					time,
-					Id.create(o.get(PersonMoneyEvent.ATTRIBUTE_PERSON).asText(), Person.class),
-					o.get(PersonMoneyEvent.ATTRIBUTE_AMOUNT).asDouble(),
-					o.path(PersonMoneyEvent.ATTRIBUTE_PURPOSE).asText(null),
-					o.path(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER).asText(null)));
+			this.events.processEvent(new PersonMoneyEvent(time, Id.create(o.get(PersonMoneyEvent.ATTRIBUTE_PERSON).asText(), Person.class), o.get(PersonMoneyEvent.ATTRIBUTE_AMOUNT).asDouble(), o.path(PersonMoneyEvent.ATTRIBUTE_PURPOSE).asText(null), o.path(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER).asText(null), null));
 		} else if (PersonScoreEvent.EVENT_TYPE.equals(eventType) || "personScore".equals(eventType)) {
 			this.events.processEvent(new PersonScoreEvent(
 					time,
