@@ -1,6 +1,7 @@
 package org.matsim.contrib.profiling.analysis;
 
 import jdk.jfr.consumer.EventStream;
+import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.analysis.IterationStopWatch;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Service to generate a stopwatch.png from jfr profiling recording files
@@ -21,11 +22,63 @@ public class JFRStopwatch implements AutoCloseable {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch();
 	private final EventStream eventStream;
+	private final SamplingStatistics statistics = new SamplingStatistics();
 
 	// linked hashmap to keep insertion order but also hashmap access times
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
 	private final Deque<String> ongoingOperations = new LinkedBlockingDeque<>();
 
+	record Operation(
+		String name,
+		String methodName,
+		boolean isBegin
+	) {}
+
+	static class SamplingStatistics {
+		String configured;
+		long min = Long.MAX_VALUE;
+		long max;
+		long sum;
+		long count;
+
+		Long previousEvent;
+
+		long avg() {
+			return count > 0 ? sum / count : 0;
+		}
+
+		void add(RecordedEvent event) {
+			long now = event.getEndTime().toEpochMilli();
+			if (previousEvent != null) {
+				long interval = now - previousEvent;
+				if (interval < min) {
+					min = interval;
+				}
+				if (interval > max) {
+					max = interval;
+				}
+				sum += interval;
+				count++;
+			}
+			previousEvent = now;
+		}
+
+		@Override
+		public String toString() {
+			return """
+				SamplingStatistics[
+					configured=%s
+					min=%s ms
+					max=%s ms
+					avg=%s ms
+					count=%s
+				]""".formatted(configured, min, max, avg(), count);
+		}
+	}
+
+	/**
+	 * Map the stopwatch operation names to their respective pairs of class and method
+	 */
 	public static final Map<String, Pair<String, String>> OPERATION_METHODS = Map.of(
 		"fireControlerIterationStartsEvent",	Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationStartListeners"),
 		"fireControlerReplanningEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "replanning"),
@@ -58,21 +111,17 @@ public class JFRStopwatch implements AutoCloseable {
 				stopwatch.start();
 			}
 
+			System.out.println("--- done");
+			System.out.println(stopwatch.statistics);
 			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/stopwatch-" + fileChooser.getFile() + ".csv", ";");
 			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/stopwatch-" + fileChooser.getFile());
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
 			frame.dispose();
-			System.out.println("done");
+			System.out.println("goodbye");
 		}
 	}
-
-	record Operation(
-		String name,
-		String methodName,
-		boolean isBegin
-	) {}
 
 	/**
 	 * param: either stream of recordedevents or EventStream?
@@ -113,24 +162,27 @@ public class JFRStopwatch implements AutoCloseable {
 		});
 
 		eventStream.onEvent("jdk.ExecutionSample", event -> {
-			AtomicBoolean hasIterationFrame = new AtomicBoolean(false);
 
 			var thread = event.getThread("sampledThread"); // getThread() is always null: https://bugs.openjdk.org/browse/JDK-8291503
 			//System.out.println(thread.getJavaName() + "@");
 
 			if ("main".equals(thread.getJavaName())) {
+				statistics.add(event);
+
+				var methodsInStackTrace = event.getStackTrace()
+					.getFrames()
+					.reversed()
+					.stream()
+					.filter(RecordedFrame::isJavaFrame)
+					.map(RecordedFrame::getMethod)
+					.toList();
 
 				// for all started but not ended operations
 				synchronized (stages) {
 					while (!ongoingOperations.isEmpty()) {
 						var operation = ongoingOperations.getFirst();
 						// if no mention anymore in the stacktrace, the operation is assumed to be over
-						if (event.getStackTrace()
-							.getFrames()
-							.stream()
-							.filter(RecordedFrame::isJavaFrame)
-							.map(RecordedFrame::getMethod)
-							.noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
+						if (methodsInStackTrace.stream().noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
 							stages.put(new Operation(OPERATION_METHODS.get(operation).getRight(), operation, false), event.getEndTime().toEpochMilli());
 							ongoingOperations.removeFirst();
 						} else {
@@ -141,14 +193,7 @@ public class JFRStopwatch implements AutoCloseable {
 					}
 				}
 
-				event.getStackTrace()
-					.getFrames()
-					.reversed()
-					.stream()
-					.filter(RecordedFrame::isJavaFrame)
-					.map(RecordedFrame::getMethod)
-					.forEach(recordedMethod -> {
-
+				methodsInStackTrace.forEach(recordedMethod -> {
 						var type = recordedMethod.getType().getName();
 						var method = recordedMethod.getName();
 						var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
@@ -170,9 +215,24 @@ public class JFRStopwatch implements AutoCloseable {
 			}
 		});
 
-	}
+		var idExecutionSample = new AtomicLong();
 
-	// method to register a method in the sampling to track an operation?
+		eventStream.onMetadata(metadataEvent -> {
+			metadataEvent.getEventTypes()
+				.stream()
+				.filter(eventType -> eventType.getName().equals("jdk.ExecutionSample"))
+				.findFirst()
+				.ifPresent(eventType -> idExecutionSample.set(eventType.getId()));
+		});
+
+		eventStream.onEvent("jdk.ActiveSetting", event -> {
+			if (event.getLong("id") == idExecutionSample.get() && event.getString("name").equals("period")) {
+				System.out.println("Configured Execution Sampling Period: " + event.getString("value"));
+				statistics.configured = event.getString("value");
+			}
+		});
+
+	}
 
 	public void start() {
 		this.eventStream.start();
@@ -186,7 +246,5 @@ public class JFRStopwatch implements AutoCloseable {
 	public void close() {
 		this.eventStream.close();
 	}
-
-
 
 }
