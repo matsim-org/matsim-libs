@@ -3,6 +3,7 @@ package org.matsim.pt.routes;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DefaultTransitPassengerRoute extends AbstractRoute implements TransitPassengerRoute {
 	protected final static int NULL_ID = -1;
 	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	
+
 	final public static String ROUTE_TYPE = "default_pt";
 
 	public double boardingTime = UNDEFINED_TIME;
@@ -30,28 +31,53 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	public int accessFacilityIndex;
 	public int egressFacilityIndex;
 
+	public DefaultTransitPassengerRoute chainedRoute = null;
+
 	DefaultTransitPassengerRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this(startLinkId, endLinkId, null, null, null, null);
 	}
 
 	public DefaultTransitPassengerRoute(TransitStopFacility accessFacility, TransitLine line, TransitRoute route,
-			TransitStopFacility egressFacility) {
+										TransitStopFacility egressFacility) {
 		this( //
-				accessFacility.getLinkId(), egressFacility.getLinkId(), //
-				accessFacility.getId(), egressFacility.getId(), //
-				line != null ? line.getId() : null, route != null ? route.getId() : null);
+			accessFacility.getLinkId(), egressFacility.getLinkId(), //
+			accessFacility.getId(), egressFacility.getId(), //
+			line != null ? line.getId() : null, route != null ? route.getId() : null);
+	}
+
+	public DefaultTransitPassengerRoute(TransitStopFacility accessFacility, TransitLine line, TransitRoute route,
+										TransitStopFacility egressFacility, DefaultTransitPassengerRoute chainedRoute) {
+		this( //
+			accessFacility.getLinkId(), egressFacility.getLinkId(), //
+			accessFacility.getId(), egressFacility.getId(), //
+			line != null ? line.getId() : null, route != null ? route.getId() : null);
+		this.chainedRoute = chainedRoute;
 	}
 
 	public DefaultTransitPassengerRoute( //
-			final Id<Link> accessLinkId, final Id<Link> egressLinkId, //
-			Id<TransitStopFacility> accessFacilityId, Id<TransitStopFacility> egressFacilityId, //
-			Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
+										 final Id<Link> accessLinkId, final Id<Link> egressLinkId, //
+										 Id<TransitStopFacility> accessFacilityId, Id<TransitStopFacility> egressFacilityId, //
+										 Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 		super(accessLinkId, egressLinkId);
 
 		this.transitLineIndex = Objects.isNull(transitLineId) ? NULL_ID : transitLineId.index();
 		this.transitRouteIndex = Objects.isNull(transitRouteId) ? NULL_ID : transitRouteId.index();
 		this.accessFacilityIndex = Objects.isNull(accessFacilityId) ? NULL_ID : accessFacilityId.index();
 		this.egressFacilityIndex = Objects.isNull(egressFacilityId) ? NULL_ID : egressFacilityId.index();
+	}
+
+	/**
+	 * Construct for data read from JSON.
+	 */
+	private DefaultTransitPassengerRoute(double boardingTime, int accessFacilityIndex, int egressFacilityIndex,
+										 int transitLineIndex, int transitRouteIndex, DefaultTransitPassengerRoute chainedRoute) {
+		super(null, null);
+		this.boardingTime = boardingTime;
+		this.accessFacilityIndex = accessFacilityIndex;
+		this.egressFacilityIndex = egressFacilityIndex;
+		this.transitLineIndex = transitLineIndex;
+		this.transitRouteIndex = transitRouteIndex;
+		this.chainedRoute = chainedRoute;
 	}
 
 	@Override
@@ -63,12 +89,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	public String getRouteDescription() {
 
 		try {
-			RouteDescription routeDescription = new RouteDescription();
-			routeDescription.boardingTime = this.boardingTime;
-			routeDescription.accessFacilityId = this.accessFacilityIndex == NULL_ID ? null : Id.get(this.accessFacilityIndex, TransitStopFacility.class);
-			routeDescription.egressFacilityId = this.egressFacilityIndex == NULL_ID ? null : Id.get(this.egressFacilityIndex, TransitStopFacility.class);
-			routeDescription.transitLineId = this.transitLineIndex == NULL_ID ? null : Id.get(this.transitLineIndex, TransitLine.class);
-			routeDescription.transitRouteId = this.transitRouteIndex == NULL_ID ? null : Id.get(this.transitRouteIndex, TransitRoute.class);
+			RouteDescription routeDescription = new RouteDescription(this);
 			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
@@ -84,9 +105,31 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			this.egressFacilityIndex = parsed.egressFacilityId == null ? NULL_ID : parsed.egressFacilityId.index();
 			this.transitLineIndex = parsed.transitLineId == null ? NULL_ID : parsed.transitLineId.index();
 			this.transitRouteIndex = parsed.transitRouteId == null ? NULL_ID : parsed.transitRouteId.index();
+			this.chainedRoute = createChainedRoutes(parsed.chainedRoute);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Creates a new DefaultTransitPassengerRoute from the given RouteDescription recursively.
+	 */
+	private static DefaultTransitPassengerRoute createChainedRoutes(RouteDescription r) {
+
+		if (r == null) {
+			return null;
+		}
+
+		double boardingTime = r.boardingTime;
+		int accessFacilityIndex = r.accessFacilityId == null ? NULL_ID : r.accessFacilityId.index();
+		int egressFacilityIndex = r.egressFacilityId == null ? NULL_ID : r.egressFacilityId.index();
+		int transitLineIndex = r.transitLineId == null ? NULL_ID : r.transitLineId.index();
+		int transitRouteIndex = r.transitRouteId == null ? NULL_ID : r.transitRouteId.index();
+
+		return new DefaultTransitPassengerRoute(
+			boardingTime, accessFacilityIndex, egressFacilityIndex, transitLineIndex, transitRouteIndex,
+			createChainedRoutes(r.chainedRoute)
+		);
 	}
 
 	@Override
@@ -120,11 +163,21 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	}
 
 	@Override
+	public DefaultTransitPassengerRoute getChainedRoute() {
+		return chainedRoute;
+	}
+
+	@Override
 	public DefaultTransitPassengerRoute clone() {
 		DefaultTransitPassengerRoute copy = new DefaultTransitPassengerRoute( //
-				getStartLinkId(), getEndLinkId(), //
-				getAccessStopId(), getEgressStopId(), //
-				getLineId(), getRouteId());
+			getStartLinkId(), getEndLinkId(), //
+			getAccessStopId(), getEgressStopId(), //
+			getLineId(), getRouteId());
+
+		// Perform deep copy of the chained route
+		if (this.chainedRoute != null) {
+			copy.chainedRoute = this.chainedRoute.clone();
+		}
 
 		copy.setDistance(getDistance());
 		getTravelTime().ifDefined(copy::setTravelTime);
@@ -133,7 +186,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		return copy;
 	}
 
-	public static class RouteDescription {
+	private static final class RouteDescription {
 		public double boardingTime = UNDEFINED_TIME;
 
 		public Id<TransitLine> transitLineId;
@@ -141,6 +194,23 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		public Id<TransitStopFacility> accessFacilityId;
 		public Id<TransitStopFacility> egressFacilityId;
+
+		public RouteDescription chainedRoute;
+
+		public RouteDescription() {
+		}
+
+		public RouteDescription(DefaultTransitPassengerRoute r) {
+			boardingTime = r.boardingTime;
+			accessFacilityId = r.accessFacilityIndex == NULL_ID ? null : Id.get(r.accessFacilityIndex, TransitStopFacility.class);
+			egressFacilityId = r.egressFacilityIndex == NULL_ID ? null : Id.get(r.egressFacilityIndex, TransitStopFacility.class);
+			transitLineId = r.transitLineIndex == NULL_ID ? null : Id.get(r.transitLineIndex, TransitLine.class);
+			transitRouteId = r.transitRouteIndex == NULL_ID ? null : Id.get(r.transitRouteIndex, TransitRoute.class);
+
+			if (r.chainedRoute != null) {
+				this.chainedRoute = new RouteDescription(r.chainedRoute);
+			}
+		}
 
 		@JsonProperty("boardingTime")
 		public String getBoardingTime() {
@@ -192,5 +262,15 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			this.egressFacilityId = egressFacilityId == null ? null : Id.create(egressFacilityId, TransitStopFacility.class);
 		}
 
+		@JsonProperty("chainedRoute")
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public RouteDescription getChainedRoute() {
+			return chainedRoute;
+		}
+
+		@JsonProperty("chainedRoute")
+		public void setChainedRoute(RouteDescription chainedRoute) {
+			this.chainedRoute = chainedRoute;
+		}
 	}
 }

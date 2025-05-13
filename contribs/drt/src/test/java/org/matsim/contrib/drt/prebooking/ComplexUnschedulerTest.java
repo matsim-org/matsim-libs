@@ -628,7 +628,7 @@ public class ComplexUnschedulerTest {
 
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.setStopDuration(30.0);
-			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime = 600.0;
+			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
 			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);
 

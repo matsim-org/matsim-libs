@@ -124,7 +124,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.delimiter = config.global().getDefaultDelimiter();
 	}
 
-	private record DrtLeg(Id<Request> request, double submissionTime, double departureTime, Id<Person> person, Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
+	private record DrtLeg(Id<Request> request, double submissionTime, double readyForPickupTime, double pickupTime, Id<Person> person,
+						  Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m,
 						  double arrivalTime, double fare, double earliestDepartureTime, double latestDepartureTime, double latestArrivalTime) {
 	}
@@ -151,12 +152,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		var latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
 
 		for (Id<Person> person : submittedEvent.getPersonIds()) {
-			var departureTime = personEvents.get(person).getDeparture().get().getTime();
+			var pickupReadyTime = personEvents.get(person).getDeparture().get().getTime();
 			PassengerPickedUpEvent pickedUp = personEvents.get(person).getPickedUp().get();
 			var vehicle = pickedUp.getVehicleId();
-			var waitTime = pickedUp.getTime() -  personEvents.get(person).getDeparture().get().getTime();
+			var waitTime = pickedUp.getTime() - earliestDepartureTime;
 			var arrivalTime = personEvents.get(person).getDroppedOff().get().getTime();
-			legs.add(new DrtLeg(request, submissionTime, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
+			legs.add(new DrtLeg(request, submissionTime, pickupReadyTime, pickedUp.getTime(), person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
 					unsharedTimeEstimate_m, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime));
 		}
 		return legs;
@@ -176,7 +177,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.filter(EventSequence::isCompleted)
 				.map(sequence -> newDrtLegs(sequence, network.getLinks()::get))
 				.flatMap(Collection::stream)
-				.sorted(Comparator.comparing(leg -> leg.departureTime))
+				.sorted(Comparator.comparing(leg -> leg.submissionTime))
 				.collect(toList());
 
 		List<PassengerRequestRejectedEvent> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
@@ -227,7 +228,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		if (drtCfg.isPlotDetailedCustomerStats()) {
 			String header = String.join(delimiter, //
 					"submissionTime", //
-					"departureTime",//
+					"readyForPickupTime",//
 					"personId",//
 					"requestId",//
 					"vehicleId",//
@@ -249,7 +250,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(delimiter,//
 					(Double)leg.submissionTime + "",//
-					(Double)leg.departureTime + "",//
+					(Double)leg.readyForPickupTime + "",//
 					leg.person + "",//
 					leg.request + "",//
 					leg.vehicle + "",//
@@ -261,7 +262,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					format.format(leg.toCoord.getY()),//
 					leg.waitTime + "",//
 					leg.arrivalTime + "",//
-					(leg.arrivalTime - leg.departureTime - leg.waitTime) + "",//
+					(leg.arrivalTime - leg.pickupTime - leg.waitTime) + "",//
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
 					format.format(leg.fare), //
@@ -276,7 +277,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
-				.orElseGet(() -> legs.isEmpty() ? qSimCfg.getStartTime().orElse(0) : legs.get(legs.size() - 1).departureTime);
+				.orElseGet(() -> legs.isEmpty() ? qSimCfg.getStartTime().orElse(0) : legs.get(legs.size() - 1).readyForPickupTime);
 
 		analyzeBoardingsAndDeboardings(legs, delimiter, qSimCfg.getStartTime().orElse(0), endTime, 3600, filename(event, "drt_boardings", ".csv"),
 				filename(event, "drt_alightments", ".csv"), network);
@@ -389,10 +390,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				List<Id<Person>> personIds = seq.getSubmitted().getPersonIds();
 				for (Id<Person> person : personIds) {
 					if(seq.getPersonEvents().containsKey(person)) {
+						double earliestDepartureTime = seq.getSubmitted().getEarliestDepartureTime();
 						EventSequence.PersonEvents personEvents = seq.getPersonEvents().get(person);
 						if(personEvents.getPickedUp().isPresent() && personEvents.getDeparture().isPresent()) {
-							double actualWaitTime = personEvents.getPickedUp().get().getTime() - personEvents.getDeparture().get().getTime();
-							double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarliestDepartureTime();
+							double actualWaitTime = personEvents.getPickedUp().get().getTime() - earliestDepartureTime;
+							double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - earliestDepartureTime;
 							bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
 							times.add(actualWaitTime, estimatedWaitTime);
 						}
@@ -402,7 +404,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]", "Initially planned wait time [s]",
-						times, Pair.of(0., drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime));
+						times, Pair.of(0., drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().getMaxWaitTime()));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
 				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
@@ -462,14 +464,14 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private static Map<Double, List<DrtLeg>> splitLegsIntoBins(Collection<DrtLeg> legs, int startTime, int endTime, int binSize_s) {
 		LinkedList<DrtLeg> allLegs = new LinkedList<>(legs);
 		DrtLeg currentLeg = allLegs.pollFirst();
-		if (currentLeg.departureTime > endTime) {
+		if (currentLeg.readyForPickupTime > endTime) {
 			LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
 		}
 		Map<Double, List<DrtLeg>> splitLegs = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtLeg> currentList = new ArrayList<>();
 			splitLegs.put((double)time, currentList);
-			while (currentLeg.departureTime < time + binSize_s) {
+			while (currentLeg.readyForPickupTime < time + binSize_s) {
 				currentList.add(currentLeg);
 				currentLeg = allLegs.pollFirst();
 				if (currentLeg == null) {
@@ -519,7 +521,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 		for (DrtLeg leg : legs) {
 			int[] board = boardings.getOrDefault(leg.fromLinkId, new int[bins]);
-			int startTimeBin = (int)((leg.departureTime + leg.waitTime - startTime) / timeBinSize);
+			int startTimeBin = (int)((leg.readyForPickupTime + leg.waitTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
 				boardings.put(leg.fromLinkId, board);
@@ -581,10 +583,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			}
 			servedRides.add(leg.request);
 			waitStats.addValue(leg.waitTime);
-			rideStats.addValue(leg.arrivalTime - leg.departureTime - leg.waitTime);
+			rideStats.addValue(leg.arrivalTime - leg.pickupTime);
 			distanceStats.addValue(travelDistances.get(leg.request));
 			directDistanceStats.addValue(leg.unsharedDistanceEstimate_m);
-			traveltimes.addValue(leg.arrivalTime - leg.departureTime);
+			traveltimes.addValue(leg.arrivalTime - leg.readyForPickupTime);
 		}
 
 		return String.join(delimiter, format.format(servedRides.entrySet().size()) + "",//
@@ -638,11 +640,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			}
 
 			double travelDistance = travelDistances.get(leg.request);
-			double travelTime = leg.arrivalTime - leg.departureTime;
+			double travelTime = leg.arrivalTime - leg.readyForPickupTime;
 			if (createGraphs) {
 				distances.add(travelDistance, leg.unsharedDistanceEstimate_m);
 				travelTimes.add(travelTime, leg.unsharedTimeEstimate_m);
-				rideTimes.add(leg.arrivalTime - leg.departureTime - leg.waitTime, leg.unsharedTimeEstimate_m);
+				rideTimes.add(leg.arrivalTime - leg.pickupTime, leg.unsharedTimeEstimate_m);
 			}
 
 			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
@@ -668,8 +670,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			DrtOptimizationConstraintsSet constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 			Pair<Double, Double> lineCoeffs = null;
 			if(constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultConstraintsSet) {
-                lineCoeffs = Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
-                        defaultConstraintsSet.maxTravelTimeBeta);
+                lineCoeffs = Pair.of(defaultConstraintsSet.getMaxTravelTimeAlpha(),
+						defaultConstraintsSet.getMaxTravelTimeBeta());
             }
 			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]", "unshared ride time [s]", travelTimes,
 					lineCoeffs);
@@ -682,10 +684,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs, String delimiter) {
-		if (legs.size() == 0)
+		if (legs.isEmpty()) {
 			return;
-		int startTime = ((int)(legs.get(0).departureTime / binsize_s)) * binsize_s;
-		int endTime = ((int)(legs.get(legs.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
+		}
+		int startTime = ((int)(legs.getFirst().readyForPickupTime / binsize_s)) * binsize_s;
+		int endTime = ((int)(legs.getLast().readyForPickupTime / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DrtLeg>> splitLegs = splitLegsIntoBins(legs, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
@@ -984,12 +987,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 		for (DrtLeg leg : legs) {
 			double waitingTime = leg.waitTime;
-			double maximumWaitingTime = leg.latestDepartureTime - leg.departureTime;
+			double maximumWaitingTime = leg.latestDepartureTime - leg.earliestDepartureTime;
 			waitingTimes.add(maximumWaitingTime, waitingTime);
 
 			if (leg.toLinkId != null) {
-				double travelTime = leg.arrivalTime - leg.departureTime;
-				double maximumTravelTime = leg.latestArrivalTime - leg.departureTime;
+				double travelTime = leg.arrivalTime - leg.readyForPickupTime;
+				double maximumTravelTime = leg.latestArrivalTime - leg.readyForPickupTime;
 				travelTimes.add(maximumTravelTime, travelTime);
 			}
 		}

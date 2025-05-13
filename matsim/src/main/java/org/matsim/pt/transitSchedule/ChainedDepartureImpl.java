@@ -34,4 +34,13 @@ public class ChainedDepartureImpl implements ChainedDeparture {
 	public Id<Departure> getChainedDepartureId() {
 		return this.chainedDepartureId;
 	}
+
+	@Override
+	public String toString() {
+		return "[ChainedDeparture: " +
+			"chainedTransitLineId=" + chainedTransitLineId +
+			", chainedRouteId=" + chainedRouteId +
+			", chainedDepartureId=" + chainedDepartureId +
+			']';
+	}
 }
