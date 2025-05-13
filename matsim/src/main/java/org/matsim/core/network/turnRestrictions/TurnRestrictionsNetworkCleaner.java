@@ -37,7 +37,18 @@ public class TurnRestrictionsNetworkCleaner {
 
         for (Link link : network.getLinks().values()) {
             if (turnRestrictions.replacedLinks.containsKey(link.getId())) {
-                network.removeLink(link.getId());
+                if(link.getAllowedModes().contains(mode)) {
+                    NetworkUtils.removeAllowedMode(link, mode);
+                    DisallowedNextLinks disallowedNextLinks = NetworkUtils.getDisallowedNextLinks(link);
+                    Verify.verifyNotNull(disallowedNextLinks);
+                    disallowedNextLinks.removeDisallowedLinkSequences(mode);
+                    if(disallowedNextLinks.isEmpty()) {
+                        NetworkUtils.removeDisallowedNextLinks(link);
+                    }
+                }
+                if(link.getAllowedModes().isEmpty()) {
+                    network.removeLink(link.getId());
+                }
             }
         }
 
