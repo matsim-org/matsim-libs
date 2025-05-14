@@ -78,6 +78,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
 		CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
+		updateShipments();
 	}
 
 	private CarrierService convertToCarrierService(LspShipment lspShipment) {

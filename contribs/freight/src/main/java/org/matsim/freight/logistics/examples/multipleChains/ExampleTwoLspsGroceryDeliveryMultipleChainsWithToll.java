@@ -392,7 +392,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			//.setNumberOfJspritIterations // TODO Das mal hier einbauen. --> Ist aktuell in CarrierUtils.
 			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.serviceBased);
+		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
 		for (VehicleType vehicleType : vehicleTypesDistributionRun.getVehicleTypes().values()) {
 			CarriersUtils.addCarrierVehicle(

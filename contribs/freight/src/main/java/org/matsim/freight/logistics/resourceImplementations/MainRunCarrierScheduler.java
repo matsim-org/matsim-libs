@@ -117,6 +117,8 @@ import org.matsim.vehicles.VehicleType;
 		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.addPlan(plan);
 		carrier.setSelectedPlan(plan);
+
+		updateShipments();
 	}
 
 	private CarrierPlan createCarrierPlan(Carrier carrier, List<LspShipment> lspShipments) {

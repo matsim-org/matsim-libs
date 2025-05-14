@@ -89,6 +89,7 @@ import org.matsim.vehicles.VehicleType;
 			case shipmentBased -> scheduleCarrierBasedOnShipments(copyOfShipmentsToSchedule);
 			default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
 		}
+		updateShipments();
 	}
 
 
