@@ -31,6 +31,10 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * @author ricoraber
+ * Rebalancing is done based on the relative demand in the zones.
+ * If there are more rebalancable vehicles than demand, then the target per zone is simply the demand at that zone.
+ * If there are less rebalancable vehicles than demand, then we compute the relative demand per zone: w(zone) = demand(zone) / totalDemand,
+ * and the target per zone is target(zone) = w(zone) * number of rebalancable vehicles.
  */
 public class RelativeDemandEstimatorAsTargetCalculator implements RebalancingTargetCalculator {
 	private final ZonalDemandEstimator demandEstimator;
