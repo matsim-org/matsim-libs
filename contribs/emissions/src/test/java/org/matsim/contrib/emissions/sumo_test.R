@@ -206,7 +206,8 @@ library(tidyverse)
 {
   # TODO add the segment length in JAVA, so that it can be evaluated automatically
   # Load data from MATSim
-  diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
+  # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
+  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_eachMinimum_0_out.csv")
 
   # Create summarized data fram from MATSim results
   data.MATSIM <- diff_out %>%
@@ -222,7 +223,7 @@ library(tidyverse)
 
   # Extract the interval times from the matsim-test-file
   intervals <- diff_out %>%
-    mutate(endTime = startTime+travelTime, lengths = c(3095, 4756, 7158, 8254)) %>% # TODO remove length vector, when it is added into the Test output
+    mutate(endTime = startTime+travelTime) %>% # TODO remove length vector, when it is added into the Test output
     select(segment, startTime, endTime, travelTime, lengths) %>%
     mutate(across(
       .cols = everything(),

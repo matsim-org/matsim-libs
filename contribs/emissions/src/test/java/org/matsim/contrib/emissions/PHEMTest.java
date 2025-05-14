@@ -107,12 +107,20 @@ public class PHEMTest {
 		List<List<DrivingCycleSecond>> drivingSegments = new ArrayList<>();
 		List<DrivingCycleSecond> currentList = new ArrayList<>();
 		double lastDelta = 1;
+		double lastTime = 0;
 		for (int sec = 1; sec < drivingCycleSeconds.size(); sec++) {
 			double currentDelta = drivingCycleSeconds.get(sec).vel - drivingCycleSeconds.get(sec - 1).vel;
 
 
 			if(cutSetting == LinkCutSetting.fixedIntervalLength){
-				// TODO
+				/*
+				We want to create a new link at
+				1. Each end of fixed interval
+				 */
+				if(sec % cutSetting.getAttr() == 0){
+					drivingSegments.add(currentList);
+					currentList = new ArrayList<>();
+				}
 			} else if(cutSetting == LinkCutSetting.eachMinimum){
 				/*
 				We want to create a new link at
@@ -138,7 +146,22 @@ public class PHEMTest {
 					*/
 				}
 			} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
-				// TODO
+				/*
+				We want to create a new link at
+				1. every minimum
+				2. every end of a standing period
+				But only if the last end of a segment was at least 'spacing'-seconds before.
+
+				TODO currently, it is impossible to simulate standing times. How do we want to overcome this?
+				TODO -> currently, the program creates links with 0 speed and length, which will probably cause problems
+				 */
+
+				if (lastDelta <= 0 && currentDelta > 0 && sec - lastTime > cutSetting.getAttr()) {
+					// We have found a minimum, crate a new sublist
+					drivingSegments.add(currentList);
+					currentList = new ArrayList<>();
+					lastTime = sec;
+				}
 			} else {
 				throw new RuntimeException("LinkCutSetting " + cutSetting.name() + " not implemented!");
 			}
@@ -164,11 +187,12 @@ public class PHEMTest {
 		for (var segment : drivingSegments) {
 			// Compute the sum of velocities of the segment (which equals the numerical integral, thus the total distance)
 			double len = segment.stream().map(s -> s.vel/3.6).reduce(0., Double::sum);
-			double freespeed = (len / (segment.getLast().second+1 - segment.getFirst().second));
 
 			// TODO This is a temporary solution. Make this work properly
 			if(len == 0)
 				len = 1;
+
+			double freespeed = (len / (segment.getLast().second+1 - segment.getFirst().second));
 
 			// Use default hbefa Hbefa Road Type mapping
 			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 10000, 1);
@@ -297,40 +321,41 @@ public class PHEMTest {
 					Integer.parseInt(record.get(0)),
 					Integer.parseInt(record.get(1)),
 					Integer.parseInt(record.get(2)),
+					Double.parseDouble(record.get(3)),
 
 					new double[]{
-						Double.parseDouble(record.get(3)),
 						Double.parseDouble(record.get(4)),
 						Double.parseDouble(record.get(5)),
-						Double.parseDouble(record.get(6))
+						Double.parseDouble(record.get(6)),
+						Double.parseDouble(record.get(7))
 					},
 
 					new double[]{
-						Double.parseDouble(record.get(7)),
 						Double.parseDouble(record.get(8)),
 						Double.parseDouble(record.get(9)),
-						Double.parseDouble(record.get(10))
+						Double.parseDouble(record.get(10)),
+						Double.parseDouble(record.get(11))
 					},
 
 					new double[]{
-						Double.parseDouble(record.get(11)),
 						Double.parseDouble(record.get(12)),
 						Double.parseDouble(record.get(13)),
-						Double.parseDouble(record.get(14))
+						Double.parseDouble(record.get(14)),
+						Double.parseDouble(record.get(15))
 					},
 
 					new double[]{
-						Double.parseDouble(record.get(15)),
 						Double.parseDouble(record.get(16)),
 						Double.parseDouble(record.get(17)),
-						Double.parseDouble(record.get(18))
+						Double.parseDouble(record.get(18)),
+						Double.parseDouble(record.get(19))
 					},
 
 					new double[]{
-						Double.parseDouble(record.get(19)),
 						Double.parseDouble(record.get(20)),
 						Double.parseDouble(record.get(21)),
-						Double.parseDouble(record.get(22))
+						Double.parseDouble(record.get(22)),
+						Double.parseDouble(record.get(23))
 					}
 				));
 			}
@@ -421,9 +446,19 @@ public class PHEMTest {
 	}
 
 	static Stream<Arguments> testArgs() {
+		// TODO settings with args only executed for one argument (10)! It should run every argument configuration
+		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
+			LinkCutSetting.fromLinkAttributes,
+			LinkCutSetting.fixedIntervalLength.setAttr(10),
+			LinkCutSetting.fixedIntervalLength.setAttr(50),
+			LinkCutSetting.eachMinimum,
+			LinkCutSetting.minSpacingMinimum.setAttr(10),
+			LinkCutSetting.minSpacingMinimum.setAttr(50),
+		};
+
 		// All combinations
 		return Stream.of("petrol", "diesel")
-			.flatMap(fuel -> Arrays.stream(LinkCutSetting.values())
+			.flatMap(fuel -> Arrays.stream(cutSettings)
 				.map(setting -> Arguments.of(fuel, setting)));
 	}
 
@@ -453,13 +488,13 @@ public class PHEMTest {
 			wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
 			wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
 		} else if(cutSetting == LinkCutSetting.fixedIntervalLength){
-			// TODO
-			throw new RuntimeException("Not implemented yet");
+			cutSetting.setAttr(10);
+			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
 		} else if(cutSetting == LinkCutSetting.eachMinimum){
 			wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.eachMinimum);
 		} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
-			// TODO
-			throw new RuntimeException("Not implemented yet");
+			cutSetting.setAttr(10);
+			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
 		}
 		assert wltpLinkAttributes != null;
 
@@ -509,6 +544,7 @@ public class PHEMTest {
 				i,
 				currentSecond,
 				wltpLinkAttributes.get(i).time,
+				wltpLinkAttributes.get(i).length,
 
 				new double[]{sumoSegments.get(i).CO/1000,
 					link_pollutant2grams.get(i).get(Pollutant.CO),
@@ -539,12 +575,16 @@ public class PHEMTest {
 			currentSecond += wltpLinkAttributes.get(i).time;
 		}
 
-		// Print out the results as csv
+		// Print out the results as csv TODO Change path to output
+		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each  run.
+		// If you need the files, you have to change the path to a custom file path.
+		String diff_name = "diff_" + fuel + "_" + cutSetting + "_" + cutSetting.getAttr() + "_out.csv";
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_" + fuel + "_out.csv"),
+			IOUtils.getBufferedWriter("D:/Projects/VSP/MATSim/PHEMv2/out/" + diff_name),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"segment",
+			"lengths",
 			"startTime",
 			"travelTime",
 			"CO-SUMO",
@@ -574,6 +614,7 @@ public class PHEMTest {
 				i,
 				comparison.get(i).startTime,
 				comparison.get(i).travelTime,
+				comparison.get(i).length,
 
 				comparison.get(i).CO[0],
 				comparison.get(i).CO[1],
@@ -658,9 +699,8 @@ public class PHEMTest {
 	 * @param startTime in seconds
 	 * @param travelTime in seconds <br>
 	 */
-	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
+	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 
-	// TODO Use this setting
 	public enum LinkCutSetting {
 		/**
 		 * The easiest setting: Each link corresponds to one {@link WLTPLinkAttributes}.
@@ -671,7 +711,20 @@ public class PHEMTest {
 		/**
 		 * Generates a new link at a fixed time interval.
 		 */
-		fixedIntervalLength,
+		fixedIntervalLength {
+			int interval;
+
+			@Override
+			public int getAttr() {
+				return interval;
+			}
+
+			@Override
+			public LinkCutSetting setAttr(int interval) {
+				this.interval = interval;
+				return this;
+			}
+		},
 
 		/**
 		 * Generates a new link at each minimum and each end of a standing period.
@@ -681,6 +734,24 @@ public class PHEMTest {
 		/**
 		 * Generates a new link at a minimum, if the last minimum was longer ago than the minimum spacing time
 		 */
-		minSpacingMinimum
+		minSpacingMinimum{
+			private int spacing;
+
+			@Override
+			public int getAttr() {
+				return spacing;
+			}
+
+			@Override
+			public LinkCutSetting setAttr(int spacing) {
+				this.spacing = spacing;
+				return this;
+			}
+		};
+
+		public int getAttr(){
+			return 0;
+		};
+		public LinkCutSetting setAttr(int attr){return this;}
 	}
 }
