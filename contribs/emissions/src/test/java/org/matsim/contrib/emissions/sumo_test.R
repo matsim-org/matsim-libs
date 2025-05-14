@@ -204,10 +204,9 @@ library(tidyverse)
 
 # ==== Plot with MATSim/PHEMLight/HBEFA3
 {
-  # TODO add the segment length in JAVA, so that it can be evaluated automatically
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_eachMinimum_0_out.csv")
+  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_fixedIntervalLength_60_out.csv")
 
   # Create summarized data fram from MATSim results
   data.MATSIM <- diff_out %>%
@@ -223,7 +222,7 @@ library(tidyverse)
 
   # Extract the interval times from the matsim-test-file
   intervals <- diff_out %>%
-    mutate(endTime = startTime+travelTime) %>% # TODO remove length vector, when it is added into the Test output
+    mutate(endTime = startTime+travelTime) %>%
     select(segment, startTime, endTime, travelTime, lengths) %>%
     mutate(across(
       .cols = everything(),
@@ -251,6 +250,28 @@ library(tidyverse)
     group_by(segment, component) %>%
     summarize(value = sum(value)) %>%
     mutate(model = "SUMO_PHEMLight", value=value/1000)
+
+  # Load data from SUMO with PHEMLight5 and summarize for each interval
+  data.SUMO_PHEMLight5 <- read_delim("D:/Projects/VSP/MATSim/PHEMv2/sumo_petrol_pl5_output.csv",
+                                    delim = ";",
+                                    col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                    col_types = cols(
+                                      time = col_integer(),
+                                      velocity = col_double(),
+                                      acceleration = col_double(),
+                                      slope = col_double(),
+                                      CO = col_double(),
+                                      CO2 = col_double(),
+                                      HC = col_double(),
+                                      PMx = col_double(),
+                                      NOx = col_double(),
+                                      fuel = col_double(),
+                                      electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
+    group_by(segment, component) %>%
+    summarize(value = sum(value)) %>%
+    mutate(model = "SUMO_PHEMLight5", value=value/1000)
 
   # TODO make sure, that this actually is a petrol car! It is just called "default"
   # Load data from SUMO with HBEFA3 and summarize for each interval
@@ -286,7 +307,7 @@ library(tidyverse)
   # Bar-Plot
   ggplot(data) +
     geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
-    scale_fill_manual(values=c("#d21717", "#bfbf00", "#17d2a4")) +
+    scale_fill_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme(text = element_text(size=18))
@@ -295,9 +316,9 @@ library(tidyverse)
 
   # Line-Plot (for scenarios with more links)
   ggplot(data) +
-    geom_line(aes(x=segment, y=gPkm, color=model), size=1.5) +
-    geom_point(aes(x=segment, y=gPkm, color=model), size=2.5) +
-    scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4")) +
+    geom_line(aes(x=startTime, y=gPkm, color=model), size=8/nrow(intervals)) +
+    geom_point(aes(x=startTime, y=gPkm, color=model), size=4/nrow(intervals)) +
+    scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme(text = element_text(size=18))
