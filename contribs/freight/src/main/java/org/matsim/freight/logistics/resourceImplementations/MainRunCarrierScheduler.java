@@ -243,9 +243,7 @@ import org.matsim.vehicles.VehicleType;
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
 					if (element instanceof Tour.ServiceActivity serviceActivity) {
-						LSPShipmentCarrierServicePair carrierPair =
-							new LSPShipmentCarrierServicePair(
-								LspShipment, serviceActivity.getService());
+						LSPShipmentCarrierServicePair carrierPair = new LSPShipmentCarrierServicePair(LspShipment, serviceActivity.getService());
 						for (LSPShipmentCarrierServicePair pair : pairs) {
 							if (pair.lspShipment == carrierPair.lspShipment
 								&& pair.carrierService.getId() == carrierPair.carrierService.getId()) {

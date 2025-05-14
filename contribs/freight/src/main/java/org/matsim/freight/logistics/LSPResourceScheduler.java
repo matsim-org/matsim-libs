@@ -52,7 +52,7 @@ public abstract class LSPResourceScheduler {
     initializeValues(resource);
     presortIncomingShipments();
     scheduleResource();
-   // updateShipments(); // I included this into the schedule Ressource step before. So each resource does it after scheduling.
+    //updateShipments(); // I included this into the schedule Ressource step before. So each resource does it after scheduling.
     switchHandledLspShipments(bufferTime);
     lspShipmentsToSchedule.clear();
   }
