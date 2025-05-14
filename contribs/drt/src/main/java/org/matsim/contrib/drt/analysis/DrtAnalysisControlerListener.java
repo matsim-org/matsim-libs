@@ -262,7 +262,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					format.format(leg.toCoord.getY()),//
 					leg.waitTime + "",//
 					leg.arrivalTime + "",//
-					(leg.arrivalTime - leg.pickupTime - leg.waitTime) + "",//
+					(leg.arrivalTime - leg.pickupTime) + "",//
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
 					format.format(leg.fare), //
