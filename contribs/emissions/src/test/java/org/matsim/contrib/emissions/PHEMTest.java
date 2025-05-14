@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -28,10 +27,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
@@ -88,7 +84,6 @@ public class PHEMTest {
 	}
 
 	/**
-	 * TODO Add different constraint options when to add a new link
 	 * Reads a csv (header: time,speed,acceleration) containing a wltp cycle and converts it into a List og {@link WLTPLinkAttributes},
 	 * with each element representing a section of the cycle.
 	 * @param path path of the wltp.csv
@@ -106,6 +101,7 @@ public class PHEMTest {
 		 */
 		List<List<DrivingCycleSecond>> drivingSegments = new ArrayList<>();
 		List<DrivingCycleSecond> currentList = new ArrayList<>();
+		currentList.add(drivingCycleSeconds.getFirst());
 		double lastDelta = 1;
 		double lastTime = 0;
 		for (int sec = 1; sec < drivingCycleSeconds.size(); sec++) {
@@ -179,29 +175,26 @@ public class PHEMTest {
 
 		// Variables needed for the mapping
 		List<WLTPLinkAttributes> attributeList = new ArrayList<>();
-		Node n0 = NetworkUtils.createNode(Id.createNodeId("n0"));
-		Node n1 = NetworkUtils.createNode(Id.createNodeId("n0"));
 
-		int i = 1;
-		double dist_summed = 0;
+		int i = 0;
+		int finishedSegments = 0;
 		for (var segment : drivingSegments) {
+			i++;
 			// Compute the sum of velocities of the segment (which equals the numerical integral, thus the total distance)
+			// If then length of this segment is 0, then we need to append it to the next segment. A 0-segment would cause infinite emissions.
+			// So we continue if len == 0.
 			double len = segment.stream().map(s -> s.vel/3.6).reduce(0., Double::sum);
+			if (len == 0) continue;
 
-			// TODO This is a temporary solution. Make this work properly
-			if(len == 0)
-				len = 1;
+			// TODO The freespeed is essential for correct results. Just taking the max value is not the cleanest solution
+			double freespeed = segment.stream().map(s -> s.vel).max(Comparator.naturalOrder()).get()/3.6;
 
-			double freespeed = (len / (segment.getLast().second+1 - segment.getFirst().second));
-
-			// Use default hbefa Hbefa Road Type mapping
-			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 10000, 1);
+			// Use default hbefa Hbefa Road Type mapping TODO NoOfLanes is important for this to work! Currently statically set to 1
+			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 1, 1);
 			String roadType = mapping.determineHbefaType(link);
 
-			attributeList.add(new WLTPLinkAttributes(segment.size(), len, freespeed, roadType));
-
-			dist_summed += len;
-			i++;
+			attributeList.add(new WLTPLinkAttributes((segment.getLast().second+1 - drivingSegments.get(finishedSegments).getFirst().second), len, freespeed, roadType));
+			finishedSegments = i;
 		}
 
 		return attributeList;
@@ -446,14 +439,11 @@ public class PHEMTest {
 	}
 
 	static Stream<Arguments> testArgs() {
-		// TODO settings with args only executed for one argument (10)! It should run every argument configuration
 		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
 			LinkCutSetting.fromLinkAttributes,
-			LinkCutSetting.fixedIntervalLength.setAttr(10),
-			LinkCutSetting.fixedIntervalLength.setAttr(50),
+			LinkCutSetting.fixedIntervalLength.setAttr(60),
 			LinkCutSetting.eachMinimum,
-			LinkCutSetting.minSpacingMinimum.setAttr(10),
-			LinkCutSetting.minSpacingMinimum.setAttr(50),
+			LinkCutSetting.minSpacingMinimum.setAttr(30),
 		};
 
 		// All combinations
@@ -465,6 +455,8 @@ public class PHEMTest {
 	@ParameterizedTest
 	@MethodSource("testArgs")
 	public void test(String fuel, LinkCutSetting cutSetting) throws IOException, URISyntaxException {
+		System.out.println(fuel + cutSetting + cutSetting.getAttr());
+
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -488,12 +480,10 @@ public class PHEMTest {
 			wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
 			wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
 		} else if(cutSetting == LinkCutSetting.fixedIntervalLength){
-			cutSetting.setAttr(10);
 			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
 		} else if(cutSetting == LinkCutSetting.eachMinimum){
-			wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.eachMinimum);
+			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
 		} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
-			cutSetting.setAttr(10);
 			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
 		}
 		assert wltpLinkAttributes != null;
@@ -584,9 +574,9 @@ public class PHEMTest {
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"segment",
-			"lengths",
 			"startTime",
 			"travelTime",
+			"lengths",
 			"CO-SUMO",
 			"CO-MATSIM",
 			"CO-Diff",
@@ -701,9 +691,10 @@ public class PHEMTest {
 	 */
 	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 
+	// TODO Due to enums being a singleton, the variables can cause unexpected behavior if not used properly!
 	public enum LinkCutSetting {
 		/**
-		 * The easiest setting: Each link corresponds to one {@link WLTPLinkAttributes}.
+		 * The easiest setting: Each link corresponds to predefined {@link WLTPLinkAttributes}.
 		 * There are 4 links in total: slow (~50km/h), medium(~80km/h), high(~100km/h), very high(~130km/h)
 		 */
 		fromLinkAttributes,
