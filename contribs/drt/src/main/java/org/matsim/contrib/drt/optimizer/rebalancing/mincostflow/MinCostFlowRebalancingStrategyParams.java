@@ -51,7 +51,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@Parameter
 	@Comment("Defines the calculator used for computing rebalancing targets per each zone"
 			+ " (i.e. number of the desired vehicles)."
-			+ " Can be one of [EstimatedDemand, RelativeEstimatedDemand, EqualRebalancableVehicleDistribution,"
+			+ " Can be one of [EstimatedDemand, EstimatedRelativeDemand, EqualRebalancableVehicleDistribution,"
 			+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
 			+ " Current default is EstimatedDemand")
 	@NotNull
