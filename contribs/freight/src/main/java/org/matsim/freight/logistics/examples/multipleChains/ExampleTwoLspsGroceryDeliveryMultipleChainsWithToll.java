@@ -49,6 +49,7 @@ import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.vehicles.VehicleType;
@@ -72,8 +73,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 	private static final double TOLL_VALUE = 1000;
 
-	private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-	private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+	private static final String CARRIER_PLAN_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+	private static final String VEHICLE_TYPE_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+
+
+	//	private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+//	private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 	private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
@@ -119,11 +124,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
 		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeSmall));
-		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeSmall));
-		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeLarge));
-		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
-		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
-		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeSmall));
+//		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeSmall));
+//		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeLarge));
+//		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
+//		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
+//		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeSmall));
 		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
 
@@ -156,7 +161,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			config.controller().setLastIteration(1);
 		}
 
-		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+		//TODO: Wieder auf public-svn umstellen. Habe aber gerade kein Internet im ICE -.-
+		config.network().setInputFile("../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+		//config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 		config.global().setCoordinateSystem("EPSG:31468");
 		config.global().setRandomSeed(4177);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -282,12 +289,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
 		log.info("create LSP");
 		//Chains
-		LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect);
+//		LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect);
 		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun);
 
 		LSPPlan multipleMixedEchelonChainsPlan =
 			LSPUtils.createLSPPlan()
-				.addLogisticChain(directChain)
+//				.addLogisticChain(directChain)
 				.addLogisticChain(twoEchelonChain)
 				.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
@@ -465,6 +472,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		Carrier directCarrier = CarriersUtils.createCarrier(Id.create(lspName + "_directCarrier", Carrier.class));
 		directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
+
 		for (VehicleType vehicleType : vehicleTypes.getVehicleTypes().values()) {
 			CarriersUtils.addCarrierVehicle(directCarrier,
 				CarrierVehicle.newInstance(
@@ -477,6 +485,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.build();
+		CarrierSchedulerUtils.setVrpLogic(directCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
 		LogisticChainElement singleCarrierElement =
 			LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierElement", LogisticChainElement.class))

@@ -112,7 +112,7 @@ import org.matsim.vehicles.VehicleType;
 						}
 					}
 					case shipmentBased -> {
-						log.warn("Not sure, if assind of the shipment<load|transport|Unload> element is not implemented properly at the moment for the shipment-based VRP.!");
+						log.warn("Not sure, if everything of the shipment<load|transport|Unload> element is implemented properly at the moment for the shipment-based VRP.!");
 						//TODO needs to get fixed. KMT'Aug'24
 						for (TourElement element : tour.getTourElements()) {
 							if (element instanceof Tour.Delivery deliveryActivity) {
