@@ -478,3 +478,17 @@ library(tidyverse)
     EFA = c(0.347, 0.317, 0.546, 0.784, 1.537, 3.524)
   )
 }
+
+# ==== Quantitative analysis ====
+{
+  # Load data from MATSim
+  # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
+  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_fixedIntervalLength_60_out.csv")
+
+  # Compute the average difference for each component
+  print(paste("CO:", (mean(diff_out$`CO-Factor`)-1)*100, "%"))
+  print(paste("CO2:", (mean(diff_out$`CO2(total)-Factor`)-1)*100, "%"))
+  print(paste("HC:", (mean(diff_out$`HC-Factor`)-1)*100, "%"))
+  print(paste("NOx:", (mean(diff_out$`NOx-Factor`)-1)*100, "%"))
+  print(paste("PM:", (mean(diff_out$`PM-Factor`)-1)*100, "%"))
+}
