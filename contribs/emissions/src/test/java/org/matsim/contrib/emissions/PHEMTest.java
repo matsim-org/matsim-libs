@@ -171,7 +171,7 @@ public class PHEMTest {
 		drivingSegments.add(currentList);
 
 		// Now build the list of WLTP Link attributes
-		VspHbefaRoadTypeMapping mapping = new VspHbefaRoadTypeMapping();
+		PHEMTestHbefaRoadTypeMapping mapping = new PHEMTestHbefaRoadTypeMapping();
 
 		// Variables needed for the mapping
 		List<WLTPLinkAttributes> attributeList = new ArrayList<>();
@@ -745,4 +745,69 @@ public class PHEMTest {
 		};
 		public LinkCutSetting setAttr(int attr){return this;}
 	}
+}
+
+// TODO This class is only temporary here
+class PHEMTestHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
+
+	// have this here, since the existing mappers have a build method as well.
+	public static HbefaRoadTypeMapping build() {
+		return new PHEMTestHbefaRoadTypeMapping();
+	}
+
+	public PHEMTestHbefaRoadTypeMapping() {
+	}
+
+	@Override
+	protected String determineHbefaType(Link link) {
+
+		var freespeed = link.getFreespeed();
+
+		if (freespeed <= 8.333333333) { //30kmh
+			return "URB/Access/30";
+		} else if (freespeed <= 11.111111111) { //40kmh
+			return "URB/Access/40";
+		} else if (freespeed <= 13.888888889) { //50kmh
+			double lanes = link.getNumberOfLanes();
+			if (lanes <= 1.0) {
+				return "URB/Local/50";
+			} else if (lanes <= 2.0) {
+				return "URB/Distr/50";
+			} else if (lanes > 2.0) {
+				return "URB/Trunk-City/50";
+			} else {
+				throw new RuntimeException("NoOfLanes not properly defined");
+			}
+		} else if (freespeed <= 16.666666667) { //60kmh
+			double lanes = link.getNumberOfLanes();
+			if (lanes <= 1.0) {
+				return "URB/Local/60";
+			} else if (lanes <= 2.0) {
+				return "URB/Trunk-City/60";
+			} else if (lanes > 2.0) {
+				return "URB/MW-City/60";
+			} else {
+				throw new RuntimeException("NoOfLanes not properly defined");
+			}
+		} else if (freespeed <= 19.444444444) { //70kmh
+			return "URB/MW-City/70";
+		} else if (freespeed <= 22.222222222) { //80kmh
+			return "URB/MW-Nat./80";
+		} else if (freespeed <= 25) {// 90kmh
+			return "RUR/MW/90";
+		} else if (freespeed <= 27.77777777){ // 100kmh
+			return "RUR/MW/100";
+		} else if (freespeed <= 30.55555555){ // 110kmh
+			return "RUR/MW/110";
+		} else if (freespeed <= 33.33333333){ // 120kmh
+			return "RUR/MW/120";
+		} else if (freespeed <= 36.11111111){ // 130kmh
+			return "RUR/MW/130";
+		}else if (freespeed > 36.11111111) { //faster
+			return "RUR/MW/>130";
+		} else {
+			throw new RuntimeException("No mapping specified for links with freespeed: " + link.getFreespeed() + " and " + link.getNumberOfLanes() + " lanes");
+		}
+	}
+
 }
