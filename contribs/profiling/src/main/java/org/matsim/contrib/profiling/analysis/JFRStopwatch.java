@@ -114,8 +114,8 @@ public class JFRStopwatch implements AutoCloseable {
 
 			System.out.println("--- done");
 			System.out.println(stopwatch.statistics);
-			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/stopwatch-" + fileChooser.getFile() + ".csv", ";");
-			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/stopwatch-" + fileChooser.getFile());
+			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".stopwatch.csv", ";");
+			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".stopwatch");
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
