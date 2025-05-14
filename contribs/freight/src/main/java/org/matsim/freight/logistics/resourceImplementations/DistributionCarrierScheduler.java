@@ -157,7 +157,7 @@ import org.matsim.vehicles.VehicleType;
 			if ((load + lspShipment.getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
 				Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(
-						createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
+					createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				carrier.getServices().putAll(auxiliaryCarrier.getServices());
 				cumulatedLoadingTime = 0;
@@ -171,7 +171,7 @@ import org.matsim.vehicles.VehicleType;
 		//Restliche Sendungen in einem letzten Vrp planen
 		if (!shipmentsInCurrentTour.isEmpty()) {
 			Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(
-					createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
+				createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
 			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			carrier.getServices().putAll(auxiliaryCarrier.getServices());
 			shipmentsInCurrentTour.clear();
@@ -245,7 +245,7 @@ import org.matsim.vehicles.VehicleType;
 
 		CarrierPlan plan = new CarrierPlan(auxCarrier.getSelectedPlan().getScheduledTours());
 		plan.setScore(auxCarrier.getSelectedPlan().getScore());
-   		plan.setJspritScore(auxCarrier.getSelectedPlan().getJspritScore());
+		plan.setJspritScore(auxCarrier.getSelectedPlan().getJspritScore());
 		carrier.getShipments().putAll(auxCarrier.getShipments());
 		carrier.addPlan(plan);
 		carrier.setSelectedPlan(plan);
@@ -275,9 +275,29 @@ import org.matsim.vehicles.VehicleType;
 	 * @return a CarrierShipment
 	 */
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
-		Id<CarrierShipment> serviceId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
-		Id<Link> fromLinkId = lspShipment.getFrom(); //Todo: needs to be the hub, if there is one. KMT mar'25
-		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(serviceId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
+		Id<CarrierShipment> carrierShipmentId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
+		var lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
+		var latestEntry = lspShipmentPlan.getMostRecentEntry();
+		var ressourceIdOfLatestEntry = latestEntry.getResourceId();
+
+		Id<Link> fromLinkId = null;
+
+		for (LSPResource resource : this.lspPlan.getLSP().getResources()) {
+			if (resource instanceof TransshipmentHubResource hubResource) {
+				if (hubResource.getId().equals(ressourceIdOfLatestEntry)) {
+					fromLinkId  = hubResource.getEndLinkId();
+				}
+			}
+		}
+
+
+		if (fromLinkId == null) { // Not comming from a hub... use from location of the shipment. TODO: Can this happen?
+			fromLinkId = lspShipment.getFrom();
+		}
+	//	Id<Link> fromLinkId = lspShipment.getFrom(); //Todo: needs to be the hub, if there is one. KMT mar'25
+
+		assert fromLinkId != null;
+		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
 			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
 			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
 			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
@@ -422,26 +442,26 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 	private void addDistributionEventHandlers(Tour.TourActivity tourActivity, LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
-	    for (LogisticChainElement element : this.resource.getClientElements()) {
-	        if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-	            DistributionServiceStartEventHandler serviceHandler;
-	            LSPTourStartEventHandler tourHandler;
-	            switch (tourActivity) {
-	                case Tour.ServiceActivity serviceActivity -> {
-	                    serviceHandler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource);
-	                    tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
-	                }
-	                case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-	                    serviceHandler = new DistributionServiceStartEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
-	                    tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
-	                }
-	                default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
-	            }
+		for (LogisticChainElement element : this.resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				DistributionServiceStartEventHandler serviceHandler;
+				LSPTourStartEventHandler tourHandler;
+				switch (tourActivity) {
+					case Tour.ServiceActivity serviceActivity -> {
+						serviceHandler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
+					}
+					case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
+						serviceHandler = new DistributionServiceStartEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
+					}
+					default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
+				}
 				lspShipment.addSimulationTracker(tourHandler);
-	            lspShipment.addSimulationTracker(serviceHandler);
-	            break;
-	        }
-	    }
+				lspShipment.addSimulationTracker(serviceHandler);
+				break;
+			}
+		}
 	}
 
 }
