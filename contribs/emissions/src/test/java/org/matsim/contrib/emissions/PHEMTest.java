@@ -4,15 +4,13 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.matsim.api.core.v01.Coord;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -25,15 +23,16 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
 import static org.apache.commons.lang3.math.IEEE754rUtils.min;
@@ -62,6 +61,128 @@ public class PHEMTest {
 	static CSVPrinter csvPrinter = null;
 
 	// ----- Helper methods -----
+
+	/**
+	 * Reads out a csv-file containing a driving cycle.
+	 */
+	private static List<DrivingCycleSecond> readCycle(Path path){
+		List<DrivingCycleSecond> drivingCycleSeconds = new ArrayList<>();
+
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(";")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
+
+		try (var reader = Files.newBufferedReader(path); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				drivingCycleSeconds.add(new DrivingCycleSecond(
+					Integer.parseInt(record.get(0)),
+					Double.parseDouble(record.get(1)),
+					Double.parseDouble(record.get(2))));
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+		return drivingCycleSeconds;
+	}
+
+	/**
+	 * TODO Add different constraint options when to add a new link
+	 * Reads a csv (header: time,speed,acceleration) containing a wltp cycle and converts it into a List og {@link WLTPLinkAttributes},
+	 * with each element representing a section of the cycle.
+	 * @param path path of the wltp.csv
+	 * @param cutSetting defining where the cuts in the cycle are set
+	 */
+	private static List<WLTPLinkAttributes> createTestLinks(Path path, LinkCutSetting cutSetting){
+		List<DrivingCycleSecond> drivingCycleSeconds = readCycle(path);
+		for (var i : drivingCycleSeconds) {
+			System.out.println(i);
+		}
+
+		/*
+		Partitions the drivingCycleSeconds list into multiple disjunct lists, containing consecutive records.
+		When a new partition is created depends on the curSetting.
+		 */
+		List<List<DrivingCycleSecond>> drivingSegments = new ArrayList<>();
+		List<DrivingCycleSecond> currentList = new ArrayList<>();
+		double lastDelta = 1;
+		for (int sec = 1; sec < drivingCycleSeconds.size(); sec++) {
+			double currentDelta = drivingCycleSeconds.get(sec).vel - drivingCycleSeconds.get(sec - 1).vel;
+
+
+			if(cutSetting == LinkCutSetting.fixedIntervalLength){
+				// TODO
+			} else if(cutSetting == LinkCutSetting.eachMinimum){
+				/*
+				We want to create a new link at
+				1. every minimum
+				2. every end of a standing period
+				The minimum is determined by computing the delta value.
+				If the sign changed form negative to positive, the minimum must be somewhere between this point and the last.
+				NOTE: We are not using the acceleration as the data does not match numerically with the velocity.
+				TODO currently, it is impossible to simulate standing times. How do we want to overcome this?
+				TODO -> currently, the program creates links with 0 speed and length, which will probably cause problems
+				 */
+
+				if (lastDelta <= 0 && currentDelta > 0) {
+					// We have found a minimum, crate a new sublist
+					drivingSegments.add(currentList);
+					currentList = new ArrayList<>();
+
+					/*// TODO DEBUG ONLY
+					try{
+						csvPrinter.printRecord(drivingCycleSeconds.get(sec).second);
+					} catch(Exception e){
+						System.out.println(e);
+					*/
+				}
+			} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
+				// TODO
+			} else {
+				throw new RuntimeException("LinkCutSetting " + cutSetting.name() + " not implemented!");
+			}
+
+			lastDelta = currentDelta;
+
+			currentList.add(drivingCycleSeconds.get(sec));
+		}
+
+		// Add last segment
+		drivingSegments.add(currentList);
+
+		// Now build the list of WLTP Link attributes
+		VspHbefaRoadTypeMapping mapping = new VspHbefaRoadTypeMapping();
+
+		// Variables needed for the mapping
+		List<WLTPLinkAttributes> attributeList = new ArrayList<>();
+		Node n0 = NetworkUtils.createNode(Id.createNodeId("n0"));
+		Node n1 = NetworkUtils.createNode(Id.createNodeId("n0"));
+
+		int i = 1;
+		double dist_summed = 0;
+		for (var segment : drivingSegments) {
+			// Compute the sum of velocities of the segment (which equals the numerical integral, thus the total distance)
+			double len = segment.stream().map(s -> s.vel/3.6).reduce(0., Double::sum);
+			double freespeed = (len / (segment.getLast().second+1 - segment.getFirst().second));
+
+			// TODO This is a temporary solution. Make this work properly
+			if(len == 0)
+				len = 1;
+
+			// Use default hbefa Hbefa Road Type mapping
+			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 10000, 1);
+			String roadType = mapping.determineHbefaType(link);
+
+			attributeList.add(new WLTPLinkAttributes(segment.size(), len, freespeed, roadType));
+
+			dist_summed += len;
+			i++;
+		}
+
+		return attributeList;
+
+	}
 
 	private static List<SumoEntry> readSumoFile(Path path){
 		List<SumoEntry> sumoSeconds = new ArrayList<>();
@@ -299,9 +420,16 @@ public class PHEMTest {
 		Assertions.assertTrue(testAverages[4]/refComparison.size()-1 <= refAverages[4]/refComparison.size()-1);
 	}
 
+	static Stream<Arguments> testArgs() {
+		// All combinations
+		return Stream.of("petrol", "diesel")
+			.flatMap(fuel -> Arrays.stream(LinkCutSetting.values())
+				.map(setting -> Arguments.of(fuel, setting)));
+	}
+
 	@ParameterizedTest
-	@ValueSource(strings = {"petrol", "diesel"})
-	public void test(String fuel) throws IOException, URISyntaxException {
+	@MethodSource("testArgs")
+	public void test(String fuel, LinkCutSetting cutSetting) throws IOException, URISyntaxException {
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -315,17 +443,30 @@ public class PHEMTest {
 		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
 
-		// Define Test-case (WLTP Class 3b) -> Creates a link for each wltp-segment
-		List<WLTPLinkAttributes> wltpLinkAttributes = new ArrayList<>();
-		wltpLinkAttributes.add(new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"));
-		wltpLinkAttributes.add(new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"));
-		wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
-		wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
+		// Define the wltpLinkAttributes
+		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp.csv");
+		List<WLTPLinkAttributes> wltpLinkAttributes = null;
+		if(cutSetting == LinkCutSetting.fromLinkAttributes){
+			wltpLinkAttributes = new ArrayList<>();
+			wltpLinkAttributes.add(new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"));
+			wltpLinkAttributes.add(new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"));
+			wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
+			wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
+		} else if(cutSetting == LinkCutSetting.fixedIntervalLength){
+			// TODO
+			throw new RuntimeException("Not implemented yet");
+		} else if(cutSetting == LinkCutSetting.eachMinimum){
+			wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.eachMinimum);
+		} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
+			// TODO
+			throw new RuntimeException("Not implemented yet");
+		}
+		assert wltpLinkAttributes != null;
 
 		// Read in the SUMO-outputs
 		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
-		Path dir = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
-		List<PHEMTest.SumoEntry> sumoSegments = readSumoEmissionsForLinks(dir, wltpLinkAttributes);
+		Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
+		List<SumoEntry> sumoSegments = readSumoEmissionsForLinks(sumo_out_path, wltpLinkAttributes);
 
 		// Define vehicle
 		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
@@ -494,7 +635,7 @@ public class PHEMTest {
 	 * @param fuel [mg/s] / [mg]
 	 * @param electricity [Wh/s] / [Wh]
 	 */
-	private record SumoEntry(SumoEntry.Type type, int second, double velocity, double acceleration, double slope, double CO, double CO2, double HC, double PMx, double NOx, double fuel, double electricity){
+	private record SumoEntry(Type type, int second, double velocity, double acceleration, double slope, double CO, double CO2, double HC, double PMx, double NOx, double fuel, double electricity){
 		private enum Type{
 			SECOND,
 			SEGMENT
@@ -508,7 +649,7 @@ public class PHEMTest {
 	 * @param freespeed [m/s]
 	 * @param hbefaStreetType More information at: {@link VspHbefaRoadTypeMapping}
 	 */
-	private record WLTPLinkAttributes(int time, int length, double freespeed, String hbefaStreetType){}
+	private record WLTPLinkAttributes(int time, double length, double freespeed, String hbefaStreetType){}
 
 	/**
 	 * Helper struct containing values important for comparing SUMO and MATSim emissions.
@@ -518,4 +659,28 @@ public class PHEMTest {
 	 * @param travelTime in seconds <br>
 	 */
 	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
+
+	// TODO Use this setting
+	public enum LinkCutSetting {
+		/**
+		 * The easiest setting: Each link corresponds to one {@link WLTPLinkAttributes}.
+		 * There are 4 links in total: slow (~50km/h), medium(~80km/h), high(~100km/h), very high(~130km/h)
+		 */
+		fromLinkAttributes,
+
+		/**
+		 * Generates a new link at a fixed time interval.
+		 */
+		fixedIntervalLength,
+
+		/**
+		 * Generates a new link at each minimum and each end of a standing period.
+		 */
+		eachMinimum,
+
+		/**
+		 * Generates a new link at a minimum, if the last minimum was longer ago than the minimum spacing time
+		 */
+		minSpacingMinimum
+	}
 }
