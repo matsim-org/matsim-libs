@@ -214,8 +214,10 @@ public final class AccessibilityModule extends AbstractModule {
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
 //								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
 				} else if ( TransportMode.walk.equals( mode ) || TransportMode.bike.equals( mode ) ) {
-					// special case(s), since often in the simulation this is not treated as network route
-					calculator = new ConstantSpeedAccessibilityExpContributionCalculator( mode, scenario ) ;
+//					 special case(s), since often in the simulation this is not treated as network route
+//					calculator = new ConstantSpeedAccessibilityExpContributionCalculator( mode, scenario ) ;
+					calculator = new TeleportedModeContributionCalculator(mode, tripRouter, config.scoring());
+
 				} else {
 					// see if we find a trip router for that mode
 					final TravelTime travelTime = travelTimes.get( mode );

@@ -1,18 +1,9 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
-import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
-import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.ColorScheme;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.GridMap;
-import org.matsim.simwrapper.viz.MapPlot;
-import org.matsim.simwrapper.viz.Table;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,94 +32,65 @@ public class AccessibilityDashboard implements Dashboard {
 		header.title = "Accessibility";
 		header.description = "Shows accessibility for different modes. Note: 10 utils are added to all values, since negative values can't get be rendered in GridMap";
 
-		double pixelHeight = 12.0;
-		double pixelOpacity = 0.1;
-		int pixelRadius = 300;
-
-
 		for (String poi : pois) {
-			layout.row("row1-" + poi)
+//			layout.row("freespeed-" + poi)
+//				.el(GridMap.class, (viz, data) -> {
+//					accessibilityDataGridMap("Freespeed", "freespeed_accessibility", poi, viz, data);
+//				}).el(GridMap.class, (viz, data) -> {
+//					accessibilityDataGridMap("Freespeed - Walk", "freespeed_accessibility_diff", poi, viz, data);
+//				});
+			layout.row("car-" + poi)
 				.el(GridMap.class, (viz, data) -> {
-					viz.title = "Freespeed Accessibility to " + poi;
-					viz.unit = "Utils";
-					viz.description = "at 10:00:00";
-					viz.height = pixelHeight;
-					viz.cellSize = pixelRadius;
-					viz.opacity = pixelOpacity;
-					viz.maxHeight = 1;
-					viz.projection = this.coordinateSystem;
-					viz.center = data.context().getCenter();
-					viz.zoom = data.context().mapZoomLevel;
-					viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-					viz.valueColumn = "freespeed_accessibility";
-					viz.width = 0.5;
-				})
-				.el(GridMap.class, (viz, data) -> {
-					viz.title = "Car Accessibility to " + poi;
-					viz.unit = "Utils";
-					viz.description = "at 10:00:00";
-					viz.height = pixelHeight;
-					viz.cellSize = pixelRadius;
-					viz.opacity = pixelOpacity;
-					viz.maxHeight = 1;
-					viz.projection = this.coordinateSystem;
-					viz.center = data.context().getCenter();
-					viz.zoom = data.context().mapZoomLevel;
-					viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-					viz.valueColumn = "car_accessibility";
-					viz.width = 0.5;
-				});
-
-			layout.row("pt_drt-" + poi)
-				.el(GridMap.class, (viz, data) -> {
-					viz.title = "PT Accessibility  to " + poi;
-					viz.unit = "Utils";
-					viz.description = "at 10:00:00";
-					viz.height = pixelHeight;
-					viz.cellSize = pixelRadius;
-					viz.opacity = pixelOpacity;
-					viz.maxHeight = 1;
-					viz.projection = this.coordinateSystem;
-					viz.center = data.context().getCenter();
-					viz.zoom = data.context().mapZoomLevel;
-					viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-					viz.valueColumn = "pt_accessibility";
-					viz.width = 0.5;
-
+					accessibilityDataGridMap("Car", "car_accessibility", poi, viz, data);
 				}).el(GridMap.class, (viz, data) -> {
-					viz.title = "DRT Accessibility to " + poi;
-					viz.unit = "Utils";
-					viz.description = "at 10:00:00";
-					viz.height = pixelHeight;
-					viz.cellSize = pixelRadius;
-					viz.opacity = pixelOpacity;
-					viz.maxHeight = 1;
-					viz.projection = this.coordinateSystem;
-					viz.center = data.context().getCenter();
-					viz.zoom = data.context().mapZoomLevel;
-					viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-					viz.valueColumn = "estimatedDrt_accessibility";
-					viz.width = 0.5;
+					accessibilityDataGridMap("Car - Walk", "car_accessibility_diff", poi, viz, data);
 				});
 
-			layout.tab(poi).add("row1-" + poi).add("pt_drt-"+poi);
+			layout.row("pt-" + poi)
+				.el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("PT", "pt_accessibility", poi, viz, data);
+				}).el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("PT - Walk", "pt_accessibility_diff", poi, viz, data);
+				});
+			layout.row("drt-" + poi)
+			.el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("DRT", "estimatedDrt_accessibility", poi, viz, data);
+				}).el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("DRT - Walk", "estimatedDrt_accessibility_diff", poi, viz, data);
+				});;
+
+			layout.row("walk-" + poi)
+				.el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("Walk", "walk_accessibility", poi, viz, data);
+				}).el(GridMap.class, (viz, data) -> {
+					accessibilityDataGridMap("Walk - Walk", "walk_accessibility_diff", poi, viz, data);
+				});
+//			layout.row("bike-" + poi)
+//				.el(GridMap.class, (viz, data) -> {
+//					accessibilityDataGridMap("Bike", "bike_accessibility", poi, viz, data);
+//				}).el(GridMap.class, (viz, data) -> {
+//					accessibilityDataGridMap("Bike - Walk", "bike_accessibility_diff", poi, viz, data);
+//				});
+//			layout.tab(poi).add("freespeed-" + poi).add("car-" + poi).add("pt-"+poi).add("drt-"+poi).add("walk-"+poi).add("bike-"+poi);
+			layout.tab(poi).add("car-" + poi).add("pt-" + poi).add("drt-"+poi).add("walk-" + poi);
 		}
 
+	}
 
-//		layout.row("Car")
-//			.el(GridMap.class, (viz, data) -> {
-//				viz.title = "Car Accessibility to X";
-//				viz.unit = "Utils";
-//				viz.description = "at 10:00:00";
-//				viz.projection = this.coordinateSystem;
-////				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
-////				viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities.csv", "supermarket");
-//				viz.file = data.compute(AccessibilityAnalysis.class, "supermarket_freespeed.csv");
-//				viz.valueColumn = "car_accessibility";
-////				viz.setColorRamp(new double[]{-5., -2.5, 0.0, 2.5, 5}, new String[]{DARK_BLUE, LIGHT_BLUE, YELLOW, SAND, ORANGE, RED});
-////				viz.height = 0.0;
-////				viz.maxHeight = 0;
-//			});
+	private void accessibilityDataGridMap(String modeName, String columnName, String poi, GridMap viz, Data data) {
+		viz.title = modeName + " Accessibility to " + poi;
+		viz.unit = "Utils";
+		viz.description = "at 10:00:00";
+		viz.cellSize = 300;
+		viz.opacity = 1.0;
+		viz.maxHeight = 1;
 
+		viz.projection = this.coordinateSystem;
+		viz.center = data.context().getCenter();
+		viz.zoom = data.context().mapZoomLevel;
+		viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
+		viz.valueColumn = columnName;
+		viz.height = 12.;
+		viz.width = 0.5;
 	}
 }

@@ -2,23 +2,10 @@ package org.matsim.application.analysis.accessibility;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
-import org.matsim.contrib.accessibility.AccessibilityFromEvents;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.zone.ZonalSystemParams;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityOption;
 import picocli.CommandLine;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
@@ -26,7 +13,6 @@ import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.io.csv.CsvWriteOptions;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +28,13 @@ import java.util.stream.Collectors;
 		"%s/accessibilities_simwrapper.csv"
 	}
 )
+
+
+
+
 public class AccessibilityAnalysis implements MATSimAppCommand {
+
+
 
 	private static final Logger log = LogManager.getLogger(AccessibilityAnalysis.class);
 
@@ -60,51 +52,6 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
-
-
-
-		// ------------ following moved to analysis class, to be complete BEFORE dashboard is generated!!
-//		//CONFIG
-//		// set necessary input files:
-//		Config config = ConfigUtils.loadConfig(ApplicationUtils.matchInput("config.xml", input.getRunDirectory()).toAbsolutePath().toString());
-//		config.controller().setOutputDirectory(input.getRunDirectory().toString());
-//		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//		config.network().setInputFile(ApplicationUtils.matchInput("output_network.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-//		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("output_transitSchedule.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-//		config.transit().setVehiclesFile(null);
-//		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-//
-//		config.plans().setInputFile(ApplicationUtils.matchInput("output_plans.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-//		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
-//		config.facilities().setInputFile(ApplicationUtils.matchInput("output_facilities.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
-//		config.eventsManager().setNumberOfThreads(null);
-//		config.eventsManager().setEstimatedNumberOfEvents(null);
-//		config.global().setNumberOfThreads(1);
-//
-//		for (DrtConfigGroup drtConfig : ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class).getModalElements()) {
-//			drtConfig.transitStopFile = "/Users/jakob/git/matsim-libs/examples/scenarios/kelheim/drt-stops.xml"; // todo!!!
-//			drtConfig.removeParameterSet(drtConfig.getZonalSystemParams().get());
-//			drtConfig.plotDetailedCustomerStats = false;
-//		}
-//		config.routing().setRoutingRandomness(0);
-//		// todo: otherwise swissRailRaptor guice bindings are neccessary. But what if we need transit accessibility?
-////		config.transit().setUseTransit(false);
-//		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
-//
-//
-//		//SCENARIO
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		Set<String> activityOptions = scenario.getActivityFacilities().getFacilities().values().stream().flatMap(fac -> fac.getActivityOptions().values().stream()).map(ActivityOption::getType).collect(Collectors.toSet());
-//
-//		String eventsFile = ApplicationUtils.matchInput("output_events.xml.gz", input.getRunDirectory()).toString();
-//
-//		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, eventsFile, List.of("trainStation","cityCenter"));
-//		builder.build().run();
-
-
-		// read in, rename columns, and print out:
-
-		// ------------------- FOllowing moved into Accessibility Dashboard, because the standard simwapper contrib workflow doesn't quite efficiently do what we want it to.
 
 
 		Set<String> activityOptions = null;
@@ -125,10 +72,18 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 			String filePath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/accessibilities.csv";
 			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/accessibilities_simwrapper.csv";
 
-			// we don't want to repeat the same operation x times.
-			if (new File(outputPath).exists()) {
-				continue;
+			try {
+				Path path = Path.of(outputPath);
+				if (Files.exists(path)) {
+					Files.delete(path);
+					System.out.println("File deleted: " + outputPath);
+				} else {
+					System.out.println("File does not exist: " + outputPath);
+				}
+			} catch (IOException e) {
+				System.err.println("Failed to delete file: " + e.getMessage());
 			}
+
 
 			try {
 				// Use CsvReadOptions to configure the CSV reading options
@@ -147,11 +102,25 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 
 				//added 10 to accessibility because grid map can't currently handle negative vals
 				List<Column<?>> modCols = new ArrayList<>();
+				DoubleColumn walkColMod = null;
+				int modifier = 100;
+				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
+					Column<?> column = iterator.next();
+					if (column.name().equals("walk_accessibility")) {
+						walkColMod = table.doubleColumn(column.name()).add(modifier).setName(column.name());
+						break;
+					}
+				}
+
 				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
 					Column<?> column = iterator.next();
 					if (column.name().endsWith("_accessibility")) {
-						DoubleColumn colMod = table.doubleColumn(column.name()).add(10).setName(column.name());
+						DoubleColumn colMod = table.doubleColumn(column.name()).add(modifier).setName(column.name());
 						modCols.add(colMod);
+						if(walkColMod!=null){
+							DoubleColumn modColWithoutWalk = colMod.subtract(walkColMod).setName(column.name() + "_diff");
+							modCols.add(modColWithoutWalk);
+						}
 						iterator.remove();
 					}
 				}
