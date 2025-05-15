@@ -63,7 +63,7 @@ public class RunCarsharing {
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.loadConfig(args[0]);
 
-		if (Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
+		if (config.qsim().getNumberOfThreads() > 1)
 			LogManager.getLogger("org.matsim.core.controler").warn(
 					"Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 

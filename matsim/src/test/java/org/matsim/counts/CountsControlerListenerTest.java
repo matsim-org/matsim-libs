@@ -361,8 +361,42 @@ public class CountsControlerListenerTest {
 		cConfig.setFilterModes(true);
 		createAndRunControler(config);
 		Assertions.assertEquals(0, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+	}
 
+	@Test
+	void test_dontWriteCountsAnalysisWithoutCounts() {
+		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
+		CountsConfigGroup cConfig = config.counts();
 
+		cConfig.setWriteCountsInterval(3);
+		cConfig.setAverageCountsOverIterations(1);
+		cConfig.setOutputFormat("txt");
+		cConfig.setInputFile(null); // do not specify any counts
+
+		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+			}
+		});
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(7);
+
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		controler.run();
+
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt").exists());
+		Assertions.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt").exists());
 	}
 
 	private void createAndRunControler(Config config) {

@@ -33,8 +33,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;

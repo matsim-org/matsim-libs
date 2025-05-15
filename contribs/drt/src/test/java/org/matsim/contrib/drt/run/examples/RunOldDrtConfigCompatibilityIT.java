@@ -43,7 +43,7 @@ public class RunOldDrtConfigCompatibilityIT {
             //disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
                     .addOrGetDefaultDrtOptimizationConstraintsSet()
-                    .rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+                    .setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
         }
 
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

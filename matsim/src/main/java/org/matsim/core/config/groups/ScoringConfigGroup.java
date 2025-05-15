@@ -20,14 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Design decisions:
@@ -1387,14 +1382,12 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		/* parameter set handling */
 		@Override
 		public ConfigGroup createParameterSet(final String type) {
-			switch (type) {
-			case ActivityParams.SET_TYPE:
-				return new ActivityParams();
-			case ModeParams.SET_TYPE:
-				return new ModeParams();
-			default:
-				throw new IllegalArgumentException(type);
-			}
+			return switch (type) {
+				case ActivityParams.SET_TYPE -> new ActivityParams();
+				case ModeParams.SET_TYPE -> new ModeParams();
+				case TasteVariationsConfigParameterSet.SET_TYPE -> new TasteVariationsConfigParameterSet();
+				default -> throw new IllegalArgumentException(type);
+			};
 		}
 
 		@Override
@@ -1416,6 +1409,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 				final String m = ((ModeParams) module).getMode();
 				if (getModes().get(m) != null) {
 					throw new IllegalStateException("already a parameter set for mode " + m);
+				}
+				break;
+			case TasteVariationsConfigParameterSet.SET_TYPE:
+				if (!(module instanceof TasteVariationsConfigParameterSet)) {
+					throw new RuntimeException("wrong class for " + module);
+				}
+				if (getTasteVariationsParams() != null) {
+					throw new IllegalStateException("already a parameter set for taste variations");
 				}
 				break;
 			default:
@@ -1526,6 +1527,44 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			}
 
 			super.addParameterSet(params);
+		}
+
+		public void setTasteVariationsParams(TasteVariationsConfigParameterSet set) {
+			Collection<? extends ConfigGroup> toRemove = new ArrayList<>(getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE));
+			toRemove.forEach(this::removeParameterSet);
+			super.addParameterSet(set);
+		}
+
+		/**
+		 * Get existing or add a {@link TasteVariationsConfigParameterSet} to the config.
+		 */
+		public TasteVariationsConfigParameterSet getOCreateTasteVariationsParams() {
+
+			Collection<? extends ConfigGroup> existing = getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE);
+			if (existing.size() > 1) {
+				throw new RuntimeException("more than one TasteVariationsConfigParameterSet found");
+			}
+
+			Optional<? extends ConfigGroup> first = existing.stream().findFirst();
+
+			if (first.isPresent()) {
+				return (TasteVariationsConfigParameterSet) first.get();
+			}
+
+			TasteVariationsConfigParameterSet created = new TasteVariationsConfigParameterSet();
+			addParameterSet(created);
+			return created;
+		}
+
+		/**
+		 * Get the {@link TasteVariationsConfigParameterSet} from the config. Null if not present.
+		 */
+		@Nullable
+		public TasteVariationsConfigParameterSet getTasteVariationsParams() {
+			return getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE).stream()
+				.map(TasteVariationsConfigParameterSet.class::cast)
+				.findFirst()
+				.orElse(null);
 		}
 
 		/**

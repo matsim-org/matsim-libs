@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 public interface Zone extends BasicLocation, Identifiable<Zone>, Attributable {
 	@Nullable

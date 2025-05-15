@@ -93,9 +93,7 @@ public class Events2Snapshot {
 		System.out.println("Events2Snapshot");
 		System.out.println("Converts an events file to a snapshot file.");
 		System.out.println();
-		System.out.println("usage: Events2Snapshot [OPTIONS] configfile [eventsfile]");
-		System.out.println("       If no eventsfile is given, the in-events-file specified in the config-");
-		System.out.println("       file will be used.");
+		System.out.println("usage: Events2Snapshot [OPTIONS] configfile eventsfile");
 		System.out.println("       The snapshots are generated according to the snapshot-settings in the");
 		System.out.println("       simulation-part of the configuration.");
 		System.out.println();
@@ -127,9 +125,6 @@ public class Events2Snapshot {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
 		prepare();
 
-		if (this.eventsfile == null) {
-			this.eventsfile = this.config.getParam("events", "inputFile");
-		}
 		System.out.println("reading events from " + this.eventsfile);
 		File file = new File(this.eventsfile);
 		String outputDir = file.getParent() + "/";
@@ -162,9 +157,6 @@ public class Events2Snapshot {
 
 		prepare();
 
-		if (this.eventsfile == null) {
-			this.eventsfile = this.config.getParam("events", "inputFile");
-		}
 		System.out.println("reading events from " + this.eventsfile);
 		File file = new File(this.eventsfile);
 		String outputDir = file.getParent() + "/";

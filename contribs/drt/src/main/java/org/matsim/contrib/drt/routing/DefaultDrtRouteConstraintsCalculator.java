@@ -42,11 +42,11 @@ public class DefaultDrtRouteConstraintsCalculator implements DrtRouteConstraints
 						.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		if (constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultSet) {
-			double maxTravelTime = defaultSet.maxTravelTimeAlpha * unsharedRideTime + defaultSet.maxTravelTimeBeta;
-			double maxDetour = Math.max(defaultSet.minimumAllowedDetour, unsharedRideTime * (defaultSet.maxDetourAlpha -1) + defaultSet.maxDetourBeta);
-			double maxRideTime = unsharedRideTime + Math.min(defaultSet.maxAbsoluteDetour, maxDetour);
-			double maxWaitTime = constraintsSet.maxWaitTime;
-			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime, constraintsSet.maxAllowedPickupDelay, constraintsSet.lateDiversionthreshold);
+			double maxTravelTime = defaultSet.getMaxTravelTimeAlpha() * unsharedRideTime + defaultSet.getMaxTravelTimeBeta();
+			double maxDetour = Math.max(defaultSet.getMinimumAllowedDetour(), unsharedRideTime * (defaultSet.getMaxDetourAlpha() -1) + defaultSet.getMaxDetourBeta());
+			double maxRideTime = unsharedRideTime + Math.min(defaultSet.getMaxAbsoluteDetour(), maxDetour);
+			double maxWaitTime = constraintsSet.getMaxWaitTime();
+			return new DrtRouteConstraints(maxTravelTime, maxRideTime, maxWaitTime, constraintsSet.getMaxAllowedPickupDelay(), constraintsSet.getLateDiversionthreshold());
 		} else {
 			throw new IllegalArgumentException("Constraint set is not a default set");
 		}

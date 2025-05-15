@@ -32,10 +32,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class QSimExternalTransitionLink extends AbstractQLink {
 
@@ -46,8 +51,8 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	private final QNodeI toQNode ;
 
 	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine,
-							   QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
-		super(link, toQNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
+							   QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+		super(link, toQNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
 		this.e = e;
 		this.em = e.getEventsManager();
 		this.context = context ;

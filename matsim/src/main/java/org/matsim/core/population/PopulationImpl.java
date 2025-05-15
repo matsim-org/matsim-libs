@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.scenario.Lockable;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -45,8 +46,11 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	private long counter = 0;
 	private long nextMsg = 1;
 
-	PopulationImpl(PopulationFactory populationFactory2) {
-		this.populationFactory = populationFactory2 ;
+	PopulationImpl(PopulationFactory populationFactory, Double scale) {
+		this.populationFactory = populationFactory ;
+		if(scale != null) {
+			ScenarioUtils.putScale(this, scale);
+		}
 	}
 
 	@Override
