@@ -44,15 +44,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -105,7 +105,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet, DrtVehicleDistanceStats drtVehicleStats,
 			MatsimServices matsimServices, Network network, DrtEventSequenceCollector drtEventSequenceCollector,
-			VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
+			VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator, DvrpLoadType loadType) {
 		this.drtVehicleStats = drtVehicleStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
@@ -114,7 +114,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = Optional.ofNullable(config.controller().getRunId()).orElse(notAvailableString);
-		maxcap = findMaxVehicleCapacity(fleet);
+		maxcap = VehicleOccupancyProfileCalculator.findMaxVehicleCapacity(fleet, loadType);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -224,7 +224,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				+ format.format(minCountAndShareIdleVehiclesOverDay.minCountIdleVehiclesOverDay);
 		String occStats = summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter, maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
-		if (drtCfg.plotDetailedCustomerStats) {
+		if (drtCfg.isPlotDetailedCustomerStats()) {
 			String header = String.join(delimiter, //
 					"submissionTime", //
 					"departureTime",//
@@ -667,7 +667,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			DrtOptimizationConstraintsSet constraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 			Pair<Double, Double> lineCoeffs = null;
-			if(constraintsSet instanceof DefaultDrtOptimizationConstraintsSet defaultConstraintsSet) {
+			if(constraintsSet instanceof DrtOptimizationConstraintsSetImpl defaultConstraintsSet) {
                 lineCoeffs = Pair.of(defaultConstraintsSet.maxTravelTimeAlpha,
                         defaultConstraintsSet.maxTravelTimeBeta);
             }
@@ -936,14 +936,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				format.format(empty.getMean()) + "",//
 				format.format(passengerTraveledDistance.getMean()) + "",//
 				format.format(d_p_d_t) + "");
-	}
-
-	/**
-	 * @param fleet
-	 * @return
-	 */
-	static int findMaxVehicleCapacity(FleetSpecification fleet) {
-		return fleet.getVehicleSpecifications().values().stream().mapToInt(DvrpVehicleSpecification::getCapacity).max().getAsInt();
 	}
 
 	private static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del,

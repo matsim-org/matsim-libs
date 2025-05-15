@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,8 +48,7 @@ public class CollectionShipmentBuilderTest {
 
 	@BeforeEach
 	public void initialize() {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		this.network = scenario.getNetwork();
@@ -60,8 +60,6 @@ public class CollectionShipmentBuilderTest {
 		for (int i = 1; i < 11; i++) {
 			Id<LspShipment> id = Id.create(i, LspShipment.class);
 			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(id);
-			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
-			builder.setCapacityDemand(capacityDemand);
 
 			while (true) {
 				Collections.shuffle(linkList);
@@ -73,15 +71,14 @@ public class CollectionShipmentBuilderTest {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
-
 			}
-
 			builder.setToLinkId(toLinkId);
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
-			builder.setStartTimeWindow(startTimeWindow);
+
+			int capacityDemand = MatsimRandom.getRandom().nextInt(10);
+			builder.setCapacityDemand(capacityDemand);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
+			builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			shipments.add(builder.build());
 		}
 	}
@@ -91,22 +88,18 @@ public class CollectionShipmentBuilderTest {
 		assertEquals(10, shipments.size());
 		for (LspShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
-			assertNotNull(shipment.getSize());
+			assertTrue(shipment.getSize() >= 0 && shipment.getSize() < 10);
 			assertNotNull(shipment.getDeliveryTimeWindow());
 			assertNotNull(shipment.getFrom());
-			assertNotNull(shipment.getDeliveryServiceTime());
+			assertEquals(shipment.getSize()*60, shipment.getDeliveryServiceTime());
 			assertNotNull(shipment.getTo());
 			assertNotNull(shipment.getPickupTimeWindow());
-//			assertNotNull(shipment.getShipmentPlan());
 			assertNotNull(shipment.getShipmentLog());
 			assertNotNull(shipment.getSimulationTrackers());
 
 			assertTrue(shipment.getSimulationTrackers().isEmpty());
 			assertEquals(shipment.getShipmentLog().getLspShipmentId(), shipment.getId());
 			assertTrue(shipment.getShipmentLog().getPlanElements().isEmpty());
-
-//			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment.getId());
-//			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
 
 			Link link = network.getLinks().get(shipment.getFrom());
 			assertTrue(link.getFromNode().getCoord().getX() <= 4000);

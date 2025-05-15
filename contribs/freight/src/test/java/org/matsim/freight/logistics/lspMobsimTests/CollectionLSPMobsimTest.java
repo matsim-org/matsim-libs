@@ -177,14 +177,9 @@ public class CollectionLSPMobsimTest {
 			}
 			collectionLSP.scheduleLogisticChains();
 		}
-		final LSPs lsps;
-		{
-			ArrayList<LSP> lspList = new ArrayList<>();
-			lspList.add(collectionLSP);
-			lsps = new LSPs(lspList);
-		}
+
 		Controller controller = ControllerUtils.createController(scenario);
-		controller.getEvents().addHandler((BasicEventHandler) event -> log.warn(event));
+		controller.getEvents().addHandler((BasicEventHandler) log::warn);
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -193,7 +188,7 @@ public class CollectionLSPMobsimTest {
 			}
 		});
 
-		LSPUtils.addLSPs(scenario, lsps);
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controller.run();

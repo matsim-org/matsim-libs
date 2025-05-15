@@ -60,15 +60,13 @@ class OneToManyPathCalculator {
 	private final double startTime;
 
 	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
-			boolean forwardSearch, Link fromLink, double startTime) {
+							boolean forwardSearch, Link fromLink, double startTime) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
 		this.travelTime = travelTime;
 		this.forwardSearch = forwardSearch;
 		this.fromLink = fromLink;
 		this.startTime = startTime;
-
-		verifyParallelLinks();
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks) {
@@ -127,7 +125,7 @@ class OneToManyPathCalculator {
 			return null;
 		}
 		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
-		var links = constructLinkSequence(nodes);
+		var links = constructLinkSequence(dijkstraTree, toNode, forwardSearch);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
 	}
@@ -145,11 +143,8 @@ class OneToManyPathCalculator {
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes.add(toNode);
 
-		int index = dijkstraTree.getComingFrom(toNode.getId().index());
-		while (index >= 0) {
-			nodes.add(nodeMap.get(Id.get(index, Node.class)));
-			index = dijkstraTree.getComingFrom(index);
-		}
+		LeastCostPathTree.PathIterator pathIterator = dijkstraTree.getNodePathIterator(toNode);
+		pathIterator.forEachRemaining(nodes::add);
 
 		if (forward) {
 			Collections.reverse(nodes);
@@ -157,21 +152,14 @@ class OneToManyPathCalculator {
 		return nodes;
 	}
 
-	private List<Link> constructLinkSequence(List<Node> nodes) {
-		List<Link> links = new ArrayList<>(nodes.size() - 1);
-		Node prevNode = nodes.get(0);
-		for (int i = 1; i < nodes.size(); i++) {
-			Node nextNode = nodes.get(i);
-			for (Link link : prevNode.getOutLinks().values()) {
-				//FIXME this method will not work properly if there are many prevNode -> nextNode links
-				//TODO save link idx in tree OR pre-check: at most 1 arc per each node pair OR choose faster/better link
-				// sh, 26/07/2023, added a check further below to increase awareness
-				if (link.getToNode() == nextNode) {
-					links.add(link);
-					break;
-				}
-			}
-			prevNode = nextNode;
+	private List<Link> constructLinkSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+		ArrayList<Link> links = new ArrayList<>();
+
+		LeastCostPathTree.LinkPathIterator pathIterator = dijkstraTree.getLinkPathIterator(toNode);
+		pathIterator.forEachRemaining(links::add);
+
+		if (forward) {
+			Collections.reverse(links);
 		}
 		return links;
 	}
@@ -189,32 +177,5 @@ class OneToManyPathCalculator {
 				VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime) :
 				VrpPaths.getLastLinkTT(travelTime, fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
-	}
-
-	private final static Logger logger = LogManager.getLogger(OneToManyPathCalculator.class);
-	private static int parallelLinksWarningCount = 0;
-
-	private void verifyParallelLinks() {
-		if (parallelLinksWarningCount < 20) {
-			for (Node prevNode : nodeMap.values()) {
-				Set<Integer> candidates = new HashSet<>();
-
-				for (Link link : prevNode.getOutLinks().values()) {
-					if (!candidates.add(link.getToNode().getId().index())) {
-						logger.warn(
-								"Found parallel links between nodes {} and {}. This may lead to problems in path calculation.",
-								prevNode.getId().toString(), link.getToNode().getId().toString());
-
-						if (parallelLinksWarningCount > 20) {
-							logger.warn("Consider using NetworkSegmentDoubleLinks.run on your network");
-							logger.warn("Only showing 20 of these warnings ...");
-							return;
-						}
-
-						parallelLinksWarningCount++;
-					}
-				}
-			}
-		}
 	}
 }

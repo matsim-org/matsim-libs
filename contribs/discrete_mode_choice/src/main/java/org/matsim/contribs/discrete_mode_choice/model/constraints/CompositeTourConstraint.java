@@ -1,5 +1,6 @@
 package org.matsim.contribs.discrete_mode_choice.model.constraints;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
@@ -8,10 +9,10 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraint;
 
 /**
  * A TourConstraint that makes it easy to combine different constraints.
- * 
+ *
  * Validation happens as a AND operation, i.e. a candidate is only considered
  * feasible if all child constraints find it feasible.
- * 
+ *
  * @author sebhoerl
  */
 public class CompositeTourConstraint implements TourConstraint {
@@ -20,6 +21,10 @@ public class CompositeTourConstraint implements TourConstraint {
 	CompositeTourConstraint(List<TourConstraint> constraints) {
 		this.constraints = constraints;
 	}
+
+    public List<TourConstraint> getConstraints() {
+        return new ArrayList<>(this.constraints);
+    }
 
 	@Override
 	public boolean validateBeforeEstimation(List<DiscreteModeChoiceTrip> tour, List<String> modes,

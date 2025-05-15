@@ -45,7 +45,7 @@ public class RebalancingUtils {
 	public static Map<Zone, List<DvrpVehicle>> groupRebalancableVehicles(ZoneSystem zoneSystem,
 																		 RebalancingParams params, Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone = new HashMap<>();
-		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.minServiceTime).forEach(v -> {
+		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.getMinServiceTime()).forEach(v -> {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
 			Zone zone = zoneSystem.getZoneForLinkId(link.getId())
 				.orElse(ZoneImpl.createDummyZone(Id.create("single-vehicle-zone-" + v.getId(), Zone.class),
@@ -63,8 +63,8 @@ public class RebalancingUtils {
 			Schedule s = v.getSchedule();
 			StayTask stayTask = (StayTask)Schedules.getLastTask(s);
 			if (stayTask.getStatus() == Task.TaskStatus.PLANNED
-					&& stayTask.getBeginTime() < time + params.maxTimeBeforeIdle
-					&& v.getServiceEndTime() > time + params.minServiceTime) {
+					&& stayTask.getBeginTime() < time + params.getMaxTimeBeforeIdle()
+					&& v.getServiceEndTime() > time + params.getMinServiceTime()) {
 				zoneSystem.getZoneForLinkId(stayTask.getLink().getId())
 					.ifPresent(
 						zone -> soonIdleVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v)

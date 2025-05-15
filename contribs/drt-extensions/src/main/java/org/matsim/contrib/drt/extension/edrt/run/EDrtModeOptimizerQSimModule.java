@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtRoutingDriveTaskUpdater;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -52,6 +53,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -62,6 +64,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -119,7 +123,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.numberOfThreads));
+				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
 
 		bindModal(RequestFleetFilter.class).toProvider(modalProvider(getter -> RequestFleetFilter.none));
 
@@ -138,8 +142,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(
-				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
+		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(EDrtVehicleDataEntryFactory.class));
 
 		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)
@@ -168,7 +171,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
@@ -176,20 +179,35 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
-		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor(
-				defaultConstraintsSet.maxAllowedPickupDelay)));
+		bindModal(DefaultOfferAcceptor.class).toProvider(modalProvider(getter -> new DefaultOfferAcceptor()));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(DefaultOfferAcceptor.class));
+
+		if (!drtCfg.isUpdateRoutes()) {
+			bindModal(DriveTaskUpdater.class).toInstance(DriveTaskUpdater.NOOP);
+		} else {
+			bindModal(DriveTaskUpdater.class).toProvider(modalProvider(getter -> {
+				TravelTime travelTime = getter.getModal(TravelTime.class);
+				Network network = getter.getModal(Network.class);
+				DrtTaskFactory taskFactory = getter.getModal(DrtTaskFactory.class);
+				TravelDisutility travelDisutility = getter.getModal(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+
+				LeastCostPathCalculator lcpc = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+				return new DrtRoutingDriveTaskUpdater(taskFactory, lcpc, travelTime);
+			})).in(Singleton.class);
+		}
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))))).asEagerSingleton();
+						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)),
+						getter.getModal(DriveTaskUpdater.class)))).asEagerSingleton();
 
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
 
 			// Makes basic DrtActionCreator create legs with consumption tracker
-			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
+			return v -> EDrtActionCreator.createLeg(dvrpCfg.getMobsimMode(), v, timer);
 		})).in(Singleton.class);
 
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {

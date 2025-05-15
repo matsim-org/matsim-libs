@@ -99,7 +99,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		DrtConfigGroup drtCfg = multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtCfg.stopDuration = 1;
+		drtCfg.setStopDuration(1);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation()

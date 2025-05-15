@@ -19,12 +19,9 @@ public class ChangeCommercialJobOperatorTest {
 
 	@Test
 	void getPlanAlgoInstance() {
-
-
         Carriers carriers = TestScenarioGeneration.generateCarriers();
         Scenario scenario = TestScenarioGeneration.generateScenario();
-        Map<String, TravelTime> travelTimes = new HashMap<>();
-        travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+
         ChangeCommercialJobOperator changeCommercialJobOperator = new ChangeCommercialJobOperator(scenario.getConfig().global(), carriers);
 
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();

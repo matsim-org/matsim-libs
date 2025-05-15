@@ -1,6 +1,7 @@
 package org.matsim.core.network.turnRestrictions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,6 +52,68 @@ public class DisallowedNextLinksUtils {
 		return errors.isEmpty();
 	}
 
+	/**
+	 * Remove link sequences of DisallowedNextLinks which contain missing links or
+	 * wrong modes.
+	 * 
+	 * @param network
+	 */
+	public static void clean(Network network) {
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+
+		links.values().forEach(link -> {
+
+			DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
+			if (dnl == null) {
+				return;
+			}
+
+			// remove link sequences for modes, that are not allowed on this link
+			for (Entry<String, List<List<Id<Link>>>> entry : dnl.getAsMap().entrySet()) {
+				final String mode = entry.getKey();
+				final int linkSequencesCount = entry.getValue().size();
+
+				if (!link.getAllowedModes().contains(mode)) {
+					dnl.removeDisallowedLinkSequences(mode);
+					LOG.info("Link {}: Removed all {} disallowed next link sequences of mode {}"
+							+ " because {} is not allowed", link.getId(), linkSequencesCount, mode, mode);
+				}
+			}
+
+			// keep only valid link sequences
+			for (Entry<String, List<List<Id<Link>>>> entry : dnl.getAsMap().entrySet()) {
+				final String mode = entry.getKey();
+				final List<List<Id<Link>>> linkSequences = entry.getValue();
+
+				// find valid link sequences
+				List<List<Id<Link>>> validLinkSequences = linkSequences.stream()
+						// links of sequence exist in network
+						.filter(linkIds -> linkIds.stream().allMatch(links::containsKey))
+						// links all have mode in allowed modes
+						.filter(linkIds -> linkIds.stream()
+								.map(links::get)
+								.map(Link::getAllowedModes)
+								.allMatch(allowedModes -> allowedModes.contains(mode)))
+						.toList();
+
+				// update mode with valid link sequences
+				final int invalidLinkSequencesCount = linkSequences.size() - validLinkSequences.size();
+				if (invalidLinkSequencesCount > 0) {
+					dnl.removeDisallowedLinkSequences(mode);
+					validLinkSequences.forEach(linkIds -> dnl.addDisallowedLinkSequence(mode, linkIds));
+					LOG.info("Link {}: Removed {} disallowed next link sequences for mode {}",
+							link.getId(), invalidLinkSequencesCount, mode);
+				}
+			}
+
+			// remove attribute completely, if it contains no link sequences anymore.
+			if (dnl.isEmpty()) {
+				NetworkUtils.removeDisallowedNextLinks(link);
+			}
+
+		});
+	}
+
 	// Helpers
 
 	private static List<String> getErrors(Map<Id<Link>, ? extends Link> links, Id<Link> linkId,
@@ -60,9 +123,15 @@ public class DisallowedNextLinksUtils {
 
 		Link link = links.get(linkId);
 		for (Entry<String, List<List<Id<Link>>>> entry : disallowedNextLinks.getAsMap().entrySet()) {
+			String mode = entry.getKey();
 			List<List<Id<Link>>> linkSequences = entry.getValue();
+
 			for (List<Id<Link>> linkSequence : linkSequences) {
+				// check for (1) link sequences being a valid sequence and (2) links existing
 				errors.addAll(isNextLinkSequenceOf(links, link, linkSequence));
+
+				// check for allowedModes on this and next links
+				errors.addAll(isInAllowedModes(links, mode, link, linkSequence));
 			}
 		}
 		return errors;
@@ -96,6 +165,60 @@ public class DisallowedNextLinksUtils {
 	private static boolean isNextLinkOf(Link link, Id<Link> nextLinkId) {
 		Node toNode = link.getToNode();
 		return toNode.getOutLinks().get(nextLinkId) != null;
+	}
+
+	private static List<String> isInAllowedModes(Map<Id<Link>, ? extends Link> links, String mode, Link link,
+			List<Id<Link>> nextLinkIds) {
+
+		List<String> messages = new ArrayList<>();
+
+		if (!link.getAllowedModes().contains(mode)) {
+			messages.add(String.format("Link %s does not allow mode %s",
+					link.getId(), mode));
+		}
+
+		for (Id<Link> nextLinkId : nextLinkIds) {
+			Link nextLink = links.get(nextLinkId);
+			if (nextLink != null && !nextLink.getAllowedModes().contains(mode)) {
+				messages.add(String.format("Next link %s does not allow mode %s",
+						nextLink.getId(), mode));
+			}
+		}
+
+		return messages;
+	}
+
+	/**
+	 * Returns a list of link id sequences that are not allowed to be traveled due
+	 * to turn restrictions.
+	 * 
+	 * @param network
+	 * @param mode    use turn restrictions of that mode
+	 * @return
+	 */
+	public static List<List<Id<Link>>> getDisallowedLinkIdSequences(Network network, String mode) {
+		return network.getLinks().values().stream()
+				.map(link -> {
+					DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
+					List<List<Id<Link>>> disallowedLinkSequences = Collections.emptyList();
+					if (dnl != null) {
+						disallowedLinkSequences = dnl.getDisallowedLinkSequences(mode);
+					}
+					return Map.entry(link.getId(), disallowedLinkSequences);
+				})
+				.filter(e -> !e.getValue().isEmpty())
+				.map(e -> {
+					List<List<Id<Link>>> linkSequences = new ArrayList<>(e.getValue().size());
+					for (List<Id<Link>> disallowedNextLinks : e.getValue()) {
+						List<Id<Link>> linkIds = new ArrayList<>(disallowedNextLinks.size() + 1);
+						linkIds.add(e.getKey()); // add this link at start of link id sequence
+						linkIds.addAll(disallowedNextLinks);
+						linkSequences.add(linkIds);
+					}
+					return linkSequences;
+				})
+				.flatMap(List::stream)
+				.toList();
 	}
 
 }

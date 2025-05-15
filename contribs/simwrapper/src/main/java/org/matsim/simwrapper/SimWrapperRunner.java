@@ -59,14 +59,14 @@ public class SimWrapperRunner implements MATSimAppCommand {
 			SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
 			if (exclude != null)
-				simWrapperConfigGroup.exclude.addAll(exclude);
+				simWrapperConfigGroup.setExclude(exclude);
 
 			if (include != null)
-				simWrapperConfigGroup.include.addAll(include);
+				simWrapperConfigGroup.setInclude(include);
 
 			SimWrapperListener listener = new SimWrapperListener(SimWrapper.create(config), config);
 			try {
-				listener.run(input);
+				listener.run(input, configPath);
 			} catch (IOException e) {
 				log.error("Error creating dashboards on {}", input, e);
 			}

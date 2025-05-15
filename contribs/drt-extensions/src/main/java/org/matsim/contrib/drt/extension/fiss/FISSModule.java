@@ -17,7 +17,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-class FISSModule extends AbstractModule{
+public class FISSModule extends AbstractModule{
 	private static final Logger LOG = LogManager.getLogger( FISSModule.class );
 
 	@Override public void install(){

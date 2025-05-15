@@ -15,7 +15,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
 /**
  * This constraint forbids or allows a certain mode depending on whether a
  * certain link attribute is available for the origin and/or destination.
- * 
+ *
  * @author sebhoerl
  */
 public class LinkAttributeConstraint implements TripConstraint {
@@ -26,7 +26,7 @@ public class LinkAttributeConstraint implements TripConstraint {
 	private final String linkAttributeValue;
 
 	public enum Requirement {
-		ORIGIN, DESTINATION, BOTH, ANY, NONE;
+		ORIGIN, DESTINATION, BOTH, ANY, NONE
 	}
 
 	private final Requirement requirement;
@@ -57,18 +57,13 @@ public class LinkAttributeConstraint implements TripConstraint {
 			boolean originValid = checkAttribute(trip.getOriginActivity().getLinkId());
 			boolean destinationValid = checkAttribute(trip.getDestinationActivity().getLinkId());
 
-			switch (requirement) {
-			case ANY:
-				return originValid || destinationValid;
-			case BOTH:
-				return originValid && destinationValid;
-			case DESTINATION:
-				return destinationValid;
-			case ORIGIN:
-				return originValid;
-			case NONE:
-				return !(originValid || destinationValid);
-			}
+			return switch (requirement) {
+				case ANY -> originValid || destinationValid;
+				case BOTH -> originValid && destinationValid;
+				case DESTINATION -> destinationValid;
+				case ORIGIN -> originValid;
+				case NONE -> !(originValid || destinationValid);
+			};
 		}
 
 		return true;
@@ -97,7 +92,7 @@ public class LinkAttributeConstraint implements TripConstraint {
 		}
 
 		@Override
-		public TripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
+		public LinkAttributeConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
 				Collection<String> availableModes) {
 			return new LinkAttributeConstraint(network, restrictedModes, linkAttributeName, linkAttributeValue,
 					requirement);

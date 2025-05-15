@@ -51,7 +51,7 @@ public class NestedLogitSelector implements UtilitySelector {
 	@Override
 	public Optional<UtilityCandidate> select(Random random) {
 		// I) If not candidates are available, give back nothing
-		if (candidates.size() == 0) {
+		if (candidates.isEmpty()) {
 			return Optional.empty();
 		}
 
@@ -73,8 +73,8 @@ public class NestedLogitSelector implements UtilitySelector {
 		List<Double> cumulativeDensity = new ArrayList<>(density.size());
 		double totalDensity = 0.0;
 
-		for (int i = 0; i < density.size(); i++) {
-			totalDensity += density.get(i);
+		for (Double obs : density) {
+			totalDensity += obs;
 			cumulativeDensity.add(totalDensity);
 		}
 
@@ -97,7 +97,7 @@ public class NestedLogitSelector implements UtilitySelector {
 		}
 
 		@Override
-		public UtilitySelector createUtilitySelector() {
+		public NestedLogitSelector createUtilitySelector() {
 			return new NestedLogitSelector(structure, minimumUtility, maximumUtility);
 		}
 	}

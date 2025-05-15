@@ -59,6 +59,7 @@ public class CostCalculationStrategyTest {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(Double.POSITIVE_INFINITY)
 				.build();
 		assertThat(new CostCalculationStrategy.RejectSoftConstraintViolations().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);
@@ -89,6 +90,7 @@ public class CostCalculationStrategyTest {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(Double.POSITIVE_INFINITY)
 				.build();
 		assertThat(new CostCalculationStrategy.DiscourageSoftConstraintViolations().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);

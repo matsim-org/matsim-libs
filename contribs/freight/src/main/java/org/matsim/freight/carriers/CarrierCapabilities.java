@@ -40,6 +40,12 @@ import org.matsim.vehicles.VehicleType;
  */
 public class CarrierCapabilities {
 
+	/**
+	 * <p>FleetSize can be FleetSize.INFINITE and FleetSize.FINITE. If fleetSize is FleetSize.INFINITE then the vehicles in carrierVehicles are representative vehicles.
+	 * Each representative vehicle can be employed infinite times.
+	 * <p>If fleetSize is FleetSize.FINITE then the vehicles in carrierVehicles are exactly the vehicles
+	 * the carrier can employ.
+	 */
 	public enum FleetSize {
 		INFINITE, FINITE
 	}
@@ -49,25 +55,19 @@ public class CarrierCapabilities {
 		public static Builder newInstance(){ return new Builder(); }
 
 		private final Collection<VehicleType> vehicleTypes = new ArrayList<>();
-
 		private final Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
-
 		private final Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
-
 		private FleetSize fleetSize = FleetSize.FINITE;
+
 
 		public Builder setFleetSize(FleetSize fleetSize){
 			this.fleetSize = fleetSize;
 			return this;
 		}
 
-		/**
-		 * @deprecated Since the vehicle type is in the {@link CarrierVehicleTypes}
-		 * container, it should not be duplicated here. It is also not written
-		 * to file when writing.
-		 */
-		@Deprecated
-		public Builder addType( VehicleType type ){
+		public Builder addVehicle(CarrierVehicle carrierVehicle){
+			vehicles.put(carrierVehicle.getId(), carrierVehicle);
+			VehicleType type = carrierVehicle.getType();
 			if(!typeIds.contains(type.getId())){
 				vehicleTypes.add(type);
 				typeIds.add(type.getId());
@@ -75,17 +75,9 @@ public class CarrierCapabilities {
 			return this;
 		}
 
-		public Builder addVehicle(CarrierVehicle carrierVehicle){
-			vehicles.put(carrierVehicle.getId(), carrierVehicle);
-			if(carrierVehicle.getType() != null) addType(carrierVehicle.getType() );
-			return this;
-		}
-
 		public CarrierCapabilities build(){
 			return new CarrierCapabilities(this);
 		}
-
-
 	}
 
 	/**
@@ -108,23 +100,9 @@ public class CarrierCapabilities {
 	}
 
 	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
-
 	private Collection<VehicleType> vehicleTypes = new ArrayList<>();
-
-
-	/**
-	 * Sets the fleetSize.
-	 *
-	 * <p>FleetSize can be FleetSize.INFINITE and FleetSize.FINITE. If fleetSize is FleetSize.INFINITE then the vehicles in carrierVehicles are representative vehicles.
-	 * Each representative vehicle can be employed infinite times.
-	 * <p>If fleetSize is FleetSize.FINITE then the vehicles in carrierVehicles are exactly the vehicles
-	 * the carrier can employ.
-	 *
-	 * <p>By default, it is FleetSize.FINITE
-	 *
-	 * @see FleetSize
-	 */
 	private FleetSize fleetSize = FleetSize.FINITE;
+
 
 	/**
 	 * Returns a collection of carrierVehicles, a carrier has to its disposal.
@@ -137,18 +115,13 @@ public class CarrierCapabilities {
 		return carrierVehicles;
 	}
 
-
-
 	public FleetSize getFleetSize() {
 		return fleetSize;
 	}
 
-
-
 	public void setFleetSize(FleetSize fleetSize) {
 		this.fleetSize = fleetSize;
 	}
-
 
 	/**
 	 * Returns a collection of CarrierVehicleTypes.

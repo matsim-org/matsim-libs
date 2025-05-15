@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 import com.google.common.base.MoreObjects;
@@ -33,6 +34,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	private final DvrpVehicleSpecification specification;
 	private final Link startLink;
 	private final Schedule schedule;
+	private DvrpLoad capacity;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
 		if (startLink == null) {
@@ -48,6 +50,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		}
 		this.specification = specification;
 		this.startLink = startLink;
+		this.capacity = specification.getCapacity();
 		schedule = Schedule.create(specification);
 	}
 
@@ -59,11 +62,6 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	@Override
 	public Link getStartLink() {
 		return startLink;
-	}
-
-	@Override
-	public int getCapacity() {
-		return specification.getCapacity();
 	}
 
 	@Override
@@ -83,6 +81,15 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	public DvrpVehicleSpecification getSpecification() {
 		return specification;
+	}
+
+	public void setCapacity(DvrpLoad capacity) {
+		this.capacity = capacity;
+	}
+
+	@Override
+	public DvrpLoad getCapacity() {
+		return this.capacity;
 	}
 
 	@Override

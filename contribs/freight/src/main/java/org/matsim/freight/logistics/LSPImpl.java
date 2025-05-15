@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 /* package-private */ class LSPImpl extends LSPDataObject<LSP> implements LSP {
+  @SuppressWarnings("unused")
   private static final Logger log = LogManager.getLogger(LSPImpl.class);
 
   private final Collection<LspShipment> lspShipments;
@@ -37,7 +38,6 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   private LSPPlan selectedPlan;
   private LSPScorer scorer;
 
-  //	private LSPReplanner replanner;
 
   LSPImpl(LSPUtils.LSPBuilder builder) {
     super(builder.id);
@@ -54,8 +54,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   public static LSPPlan copyPlan(LSPPlan plan2copy) {
     List<LogisticChain> newPlanChains = new ArrayList<>();
     for (LogisticChain initialPlanChain : plan2copy.getLogisticChains()) {
-      LogisticChain newPlanChain =
-          LSPUtils.LogisticChainBuilder.newInstance(initialPlanChain.getId()).build();
+      LogisticChain newPlanChain = LSPUtils.LogisticChainBuilder.newInstance(initialPlanChain.getId()).build();
       newPlanChain.getLogisticChainElements().addAll(initialPlanChain.getLogisticChainElements());
       newPlanChain.getLspShipmentIds().addAll(initialPlanChain.getLspShipmentIds());
       newPlanChains.add(newPlanChain);

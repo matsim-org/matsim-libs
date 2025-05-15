@@ -16,7 +16,7 @@ import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilitiesParams;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -64,39 +64,39 @@ public class RunFissDrtScenarioIT {
 		DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
 		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup;
-		drtConfigGroup.mode = TransportMode.drt;
-		drtConfigGroup.stopDuration = 30.;
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
+		drtConfigGroup.setMode(TransportMode.drt);
+		drtConfigGroup.setStopDuration(30.);
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
 		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
 		defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
 		defaultConstraintsSet.maxWaitTime = 600.;
 		defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 		defaultConstraintsSet.maxWalkDistance = 1000.;
-		drtConfigGroup.useModeFilteredSubnetwork = false;
-		drtConfigGroup.vehiclesFile = fleetFile;
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-		drtConfigGroup.plotDetailedCustomerStats = true;
-		drtConfigGroup.idleVehiclesReturnToDepots = false;
+		drtConfigGroup.setUseModeFilteredSubnetwork(false);
+		drtConfigGroup.setVehiclesFile(fleetFile);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtConfigGroup.setPlotDetailedCustomerStats(true);
+		drtConfigGroup.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
 		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
 		drtConfigGroup.addParameterSet(rebalancing);
-		((RebalancingParams) rebalancing).interval = 600;
+		((RebalancingParams) rebalancing).setInterval(600);
 
 		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-		strategyParams.targetAlpha = 0.3;
-		strategyParams.targetBeta = 0.3;
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
 		drtConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
 
 		DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
 		SquareGridZoneSystemParams zoneSystemParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-		zoneSystemParams.cellSize = 500.;
+		zoneSystemParams.setCellSize(500.);
 		drtZoneSystemParams.addParameterSet(zoneSystemParams);
-		drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
+		drtZoneSystemParams.setTargetLinkSelection(DrtZoneSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZoneSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
@@ -141,9 +141,10 @@ public class RunFissDrtScenarioIT {
 		operationsParams.addParameterSet(shiftsParams);
 		operationsParams.addParameterSet(operationFacilitiesParams);
 
-		operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
-		shiftsParams.shiftInputFile = shiftsFile;
-		shiftsParams.allowInFieldChangeover = true;
+		operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftsParams.setShiftInputFile(shiftsFile);
+		shiftsParams.setAllowInFieldChangeover(true);
+		shiftsParams.setShiftEndRelocationArrival(ShiftsParams.ShiftEndRelocationArrival.immediate);
 		drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
 

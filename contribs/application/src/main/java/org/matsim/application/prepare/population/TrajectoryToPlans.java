@@ -141,8 +141,9 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         return 0;
     }
 
-	@Deprecated // why?  what should I use instead?  kai, feb'24
+	@Deprecated
     /**
+     * Deprecated, use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
      * Split activities into typical durations to improve value of travel time savings calculation.
      */
     private void splitActivityTypesBasedOnDuration(Population population) {
