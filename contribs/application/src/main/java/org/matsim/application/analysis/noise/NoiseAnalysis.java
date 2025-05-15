@@ -185,7 +185,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 			CSVFormat.DEFAULT)) {
 			// annual cost rate per population unit: € / (pop * dB(A) * year)
 			printer.printRecord(
-				"Annual cost rate per pop. unit [€ / (pop * dB(A) * year)]",
+				"Annual marginal cost per pop. unit [€ / (pop * dB(A) * year)]",
 			df.format(noiseParameters.getAnnualCostRate())
 			);
 			// loop over the aggregated receiver point values
