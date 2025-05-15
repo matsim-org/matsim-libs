@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -49,6 +50,12 @@ public class AcceptedDrtRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
+
+	// allow null to ensure we realize it hasn't been set
+	private Double pickupTime = null;
+
+	// allow null to ensure we realize it hasn't been set
+	private Double dropoffTime = null;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
@@ -117,6 +124,22 @@ public class AcceptedDrtRequest {
 
 	public String getMode() {
 		return request.getMode();
+	}
+
+	public void setPickupTime(double pickupTime) {
+		this.pickupTime = pickupTime;
+	}
+
+	public Optional<Double> getPickupTime() {
+		return Optional.ofNullable(pickupTime);
+	}
+
+	public void setDropoffTime(double dropoffTime) {
+		this.dropoffTime = dropoffTime;
+	}
+
+	public Optional<Double> getDropoffTime() {
+		return Optional.ofNullable(dropoffTime);
 	}
 
 	@Override
