@@ -12,6 +12,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -155,16 +156,40 @@ public class LeastCostPathTree {
 
     public void calculateBackwards(Link arrivalLink, double arrivalTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
 
-        int arrivalNode = arrivalLink.getFromNode().getId().index();
-
         Arrays.fill(this.data, Double.POSITIVE_INFINITY);
         Arrays.fill(this.comingFrom, -1);
         Arrays.fill(this.fromLink, -1);
 
-        setData(arrivalNode, 0, arrivalTime, 0);
-
         this.pq.clear();
+
+        int arrivalNode = arrivalLink.getFromNode().getId().index();
+        setData(arrivalNode, 0, arrivalTime, 0);
         this.pq.insert(arrivalNode);
+
+        if(graph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext turnRestrictionsContext = graph.getTurnRestrictions().get();
+            // it might be that the "real" node is not accessible in the colored graph, but only its colored
+            // copies. Loop over all in links and add their colored to nodes to the queue. nkuehnel, May 2025
+            for (Link inLink : arrivalLink.getFromNode().getInLinks().values()) {
+                TurnRestrictionsContext.ColoredLink replacedLink = turnRestrictionsContext.replacedLinks
+                        .get(inLink.getId());
+                if (replacedLink != null && replacedLink.toColoredNode != null) {
+                    int coloredArrivalNode = replacedLink.toColoredNode.index();
+                    setData(coloredArrivalNode, 0, arrivalTime, 0);
+                    this.pq.insert(coloredArrivalNode);
+                }
+                List<TurnRestrictionsContext.ColoredLink> coloredLinks = turnRestrictionsContext.coloredLinksPerLinkMap.get(inLink.getId());
+                if (coloredLinks != null) {
+                    for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
+                        if (coloredLink.toColoredNode != null) {
+                            int coloredArrivalNode = coloredLink.toColoredNode.index();
+                            setData(coloredArrivalNode, 0, arrivalTime, 0);
+                            this.pq.insert(coloredArrivalNode);
+                        }
+                    }
+                }
+            }
+        }
 
         while (!this.pq.isEmpty()) {
             final int nodeIdx = this.pq.poll();
