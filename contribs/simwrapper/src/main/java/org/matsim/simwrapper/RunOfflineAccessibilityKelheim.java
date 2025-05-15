@@ -87,7 +87,10 @@ public class RunOfflineAccessibilityKelheim {
 
 		}
 
-		accConfig.setTimeOfDay(2 * 60 * 60.);
+		List<Double> timesHour = List.of(6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0);
+		List<Double> timesSeconds = timesHour.stream().map(t -> t * 60 * 60).toList();
+
+		accConfig.setTimeOfDay(timesSeconds);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);

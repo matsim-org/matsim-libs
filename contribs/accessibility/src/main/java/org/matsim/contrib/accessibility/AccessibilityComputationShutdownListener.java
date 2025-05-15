@@ -108,7 +108,9 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		}
 
 		LOG.info("Start computing accessibilities.");
-		computeAccessibilities(acg.getTimeOfDay(), opportunities);
+		for (double timeOfDay : acg.getTimeOfDay()) {
+			computeAccessibilities(timeOfDay, opportunities);
+		}
 		LOG.info("Finished computing accessibilities.");
 
 		writeCSVFile(outputDirectory);

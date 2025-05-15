@@ -123,7 +123,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
-	private Double timeOfDay = 8.*3600;
+	private List<Double> timeOfDay = List.of(8.*3600);
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
@@ -210,14 +210,20 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
         this.shapeFileCellBasedAccessibility = value;
     }
 	@StringGetter(TIME_OF_DAY)
-	public Double getTimeOfDay() {
+	public List<Double> getTimeOfDay() {
 		return this.timeOfDay ;
 	}
 	@StringSetter(TIME_OF_DAY)
 	public AccessibilityConfigGroup setTimeOfDay(Double timeOfDay) {
+		this.timeOfDay = List.of(timeOfDay);
+		return this;
+	}
+
+	public AccessibilityConfigGroup setTimeOfDay(List<Double> timeOfDay) {
 		this.timeOfDay = timeOfDay;
 		return this;
 	}
+
 
     @StringGetter(MEASURE_POINT_GEOMETRY_PROVISION)
     public MeasurePointGeometryProvision getMeasurePointGeometryProvision() {
